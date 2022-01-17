@@ -1,0 +1,6 @@
+std = "lua52+vim"
+[lints]
+multiple_statements = "allow"
+global_usage = "allow"
+[globals]
+Util = { any = true }
