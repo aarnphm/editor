@@ -11,8 +11,6 @@ local plug_map = {
     ["n|gb"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
     ["n|<A-j>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
     ["n|<A-k>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
-    ["n|<A-S-j>"] = map_cr("BufferLineMoveNext"):with_noremap():with_silent(),
-    ["n|<A-S-k>"] = map_cr("BufferLineMovePrev"):with_noremap():with_silent(),
     ["n|<leader>be"] = map_cr("BufferLineSortByExtension"):with_noremap(),
     ["n|<leader>bd"] = map_cr("BufferLineSortByDirectory"):with_noremap(),
     ["n|<A-1>"] = map_cr("BufferLineGoToBuffer 1"):with_noremap():with_silent(),
@@ -116,11 +114,6 @@ local plug_map = {
         :with_silent(),
     ["n|<Leader>fz"] = map_cu("Telescope zoxide list"):with_noremap()
         :with_silent(),
-    -- Plugin vim-eft
-    ["n|f"] = map_cmd("v:lua.enhance_ft_move('f')"):with_expr(),
-    ["n|F"] = map_cmd("v:lua.enhance_ft_move('F')"):with_expr(),
-    ["n|t"] = map_cmd("v:lua.enhance_ft_move('t')"):with_expr(),
-    ["n|T"] = map_cmd("v:lua.enhance_ft_move('T')"):with_expr(),
     -- Plugin Hop
     ["n|<leader>w"] = map_cu("HopWord"):with_noremap(),
     ["n|<leader>j"] = map_cu("HopLine"):with_noremap(),
@@ -137,45 +130,6 @@ local plug_map = {
     ["n|<C-w>t"] = map_cr("VTerm"):with_noremap():with_silent(),
     -- Plugin MarkdownPreview
     ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
-    -- Plugin auto_session
-    ["n|<leader>ss"] = map_cu("SaveSession"):with_noremap():with_silent(),
-    ["n|<leader>sr"] = map_cu("RestoreSession"):with_noremap():with_silent(),
-    ["n|<leader>sd"] = map_cu("DeleteSession"):with_noremap():with_silent(),
-    -- Plugin SnipRun
-    ["v|<leader>r"] = map_cr("SnipRun"):with_noremap():with_silent(),
-    -- Plugin dap
-    ["n|<F6>"] = map_cr("lua require('dap').continue()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>dr"] = map_cr("lua require('dap').continue()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>dd"] = map_cr("lua require('dap').disconnect()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>db"] = map_cr("lua require('dap').toggle_breakpoint()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>dB"] = map_cr(
-        "lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))"):with_noremap()
-        :with_silent(),
-    ["n|<leader>dbl"] = map_cr("lua require('dap').list_breakpoints()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>drc"] = map_cr("lua require('dap').run_to_cursor()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>drl"] = map_cr("lua require('dap').run_last()"):with_noremap()
-        :with_silent(),
-    ["n|<F9>"] = map_cr("lua require('dap').step_over()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>dv"] = map_cr("lua require('dap').step_over()"):with_noremap()
-        :with_silent(),
-    ["n|<F10>"] = map_cr("lua require('dap').step_into()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>di"] = map_cr("lua require('dap').step_into()"):with_noremap()
-        :with_silent(),
-    ["n|<F11>"] = map_cr("lua require('dap').step_out()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>do"] = map_cr("lua require('dap').step_out()"):with_noremap()
-        :with_silent(),
-    ["n|<leader>dl"] = map_cr("lua require('dap').repl.open()"):with_noremap()
-        :with_silent(),
-    ["o|m"] = map_cu([[lua require('tsht').nodes()]]):with_silent()
 }
 
 bind.nvim_load_mapping(plug_map)

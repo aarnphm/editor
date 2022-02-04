@@ -7,6 +7,7 @@ editor["itchyny/vim-cursorword"] = {
     event = {"BufReadPre", "BufNewFile"},
     config = conf.vim_cursorwod
 }
+editor['alexghergh/nvim-tmux-navigation'] = {opt=true, config = conf.nvim_tmux_navigation}
 editor["terrortylor/nvim-comment"] = {
     opt = false,
     config = function()
@@ -64,7 +65,6 @@ editor["andymass/vim-matchup"] = {
     after = "nvim-treesitter",
     config = conf.matchup
 }
-editor["hrsh7th/vim-eft"] = {opt = true}
 editor["romainl/vim-cool"] = {
     opt = true,
     event = {"CursorMoved", "InsertEnter"}
@@ -93,18 +93,6 @@ editor["norcalli/nvim-colorizer.lua"] = {
     config = conf.nvim_colorizer
 }
 editor["jdhao/better-escape.vim"] = {opt = true, event = "InsertEnter"}
-editor["rcarriga/nvim-dap-ui"] = {
-    opt = false,
-    config = conf.dapui,
-    requires = {
-        {"mfussenegger/nvim-dap", config = conf.dap}, {
-            "Pocco81/DAPInstall.nvim",
-            opt = true,
-            cmd = {"DIInstall", "DIUninstall", "DIList"},
-            config = conf.dapinstall
-        }
-    }
-}
 editor["tpope/vim-fugitive"] = {opt = true, cmd = {"Git", "G"}}
 editor["tpope/vim-surround"] = {opt = true}
 editor["famiu/bufdelete.nvim"] = {
