@@ -1,18 +1,16 @@
 local config = {}
 local sessions_dir = vim.fn.stdpath("data") .. "/sessions/"
 
-function config.nvim_tmux_navigation()
-    require'nvim-tmux-navigation'.setup {
-            disable_when_zoomed = true, -- defaults to false
-            keybindings = {
-                left = "<C-h>",
-                down = "<C-j>",
-                up = "<C-k>",
-                right = "<C-l>",
-                last_active = "<C-\\>",
-                next = "<C-Space>",
-            }
-        }
+function config.vim_cursorword()
+    vim.api.nvim_command("augroup user_plugin_cursorword")
+    vim.api.nvim_command("autocmd!")
+    vim.api.nvim_command(
+        "autocmd FileType NvimTree,lspsagafinder,dashboard let b:cursorword = 0")
+    vim.api.nvim_command(
+        "autocmd WinEnter * if &diff || &pvw | let b:cursorword = 0 | endif")
+    vim.api.nvim_command("autocmd InsertEnter * let b:cursorword = 0")
+    vim.api.nvim_command("autocmd InsertLeave * let b:cursorword = 1")
+    vim.api.nvim_command("augroup END")
 end
 
 function config.symbols_outline()
@@ -66,18 +64,6 @@ function config.symbols_outline()
     })
 end
 
-function config.vim_cursorwod()
-    vim.api.nvim_command("augroup user_plugin_cursorword")
-    vim.api.nvim_command("autocmd!")
-    vim.api.nvim_command(
-        "autocmd FileType NvimTree,lspsagafinder,dashboard let b:cursorword = 0")
-    vim.api.nvim_command(
-        "autocmd WinEnter * if &diff || &pvw | let b:cursorword = 0 | endif")
-    vim.api.nvim_command("autocmd InsertEnter * let b:cursorword = 0")
-    vim.api.nvim_command("autocmd InsertLeave * let b:cursorword = 1")
-    vim.api.nvim_command("augroup END")
-end
-
 function config.nvim_treesitter()
     vim.api.nvim_command("set foldmethod=expr")
     vim.api.nvim_command("set foldexpr=nvim_treesitter#foldexpr()")
@@ -127,10 +113,6 @@ function config.nvim_treesitter()
     }
 end
 
-function config.matchup()
-    vim.cmd [[let g:matchup_matchparen_offscreen = {'method': 'popup'}]]
-end
-
 function config.nvim_gps()
     require("nvim-gps").setup({
         icons = {
@@ -146,7 +128,7 @@ function config.nvim_gps()
             ["java"] = true,
             ["javascript"] = true,
             ["lua"] = true,
-            ["python"] = false,
+            ["python"] = true,
             ["rust"] = true
         },
         separator = " > "
@@ -162,7 +144,9 @@ function config.autotag()
     })
 end
 
-function config.nvim_colorizer() require("colorizer").setup() end
+function config.matchup()
+    vim.cmd [[let g:matchup_matchparen_offscreen = {'method': 'popup'}]]
+end
 
 function config.toggleterm()
     require("toggleterm").setup {
@@ -187,5 +171,7 @@ function config.toggleterm()
         shell = vim.o.shell -- change the default shell
     }
 end
+
+function config.nvim_colorizer() require("colorizer").setup() end
 
 return config

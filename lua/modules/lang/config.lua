@@ -1,5 +1,7 @@
 local config = {}
 
+function config.lang_go() vim.g.go_doc_keywordprg_enabled = false end
+
 function config.rust_tools()
     local opts = {
         tools = {
@@ -67,14 +69,5 @@ function config.rust_tools()
 
     require("rust-tools").setup(opts)
 end
-
-function config.lang_go() vim.g.go_doc_keywordprg_enabled = false end
-
--- function config.lang_org()
---     require("orgmode").setup({
---         org_agenda_files = {"~/Sync/org/*"},
---         org_default_notes_file = "~/Sync/org/refile.org"
---     })
--- end
 
 return config

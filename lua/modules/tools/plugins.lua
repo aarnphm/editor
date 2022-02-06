@@ -29,20 +29,10 @@ tools["nvim-telescope/telescope-frecency.nvim"] = {
 }
 tools["jvgrootveld/telescope-zoxide"] = {opt = true, after = "telescope.nvim"}
 tools["thinca/vim-quickrun"] = {opt = true, cmd = {"QuickRun", "Q"}}
-tools["michaelb/sniprun"] = {
-    opt = true,
-    run = "bash ./install.sh",
-    cmd = {"SnipRun", "'<,'>SnipRun"}
-}
 tools["folke/which-key.nvim"] = {
     opt = true,
     keys = ",",
     config = function() require("which-key").setup {} end
-}
-tools["folke/trouble.nvim"] = {
-    opt = true,
-    cmd = {"Trouble", "TroubleToggle", "TroubleRefresh"},
-    config = conf.trouble
 }
 tools["dstein64/vim-startuptime"] = {opt = true, cmd = "StartupTime"}
 tools["gelguy/wilder.nvim"] = {

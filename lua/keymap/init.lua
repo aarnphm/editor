@@ -5,10 +5,9 @@ local map_cmd = bind.map_cmd
 require("keymap.config")
 
 local plug_map = {
-    -- Format
-    ["n|<C-A-l>"] = map_cu("FormatWrite"):with_noremap():with_silent(),
     -- Bufferline
-    ["n|gb"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
+    ["n|<Space>bp"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
+    ["n|<Space>bc"] = map_cr("BufferLinePickClose"):with_noremap():with_silent(),
     ["n|<A-j>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
     ["n|<A-k>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
     ["n|<leader>be"] = map_cr("BufferLineSortByExtension"):with_noremap(),
@@ -73,23 +72,11 @@ local plug_map = {
         :with_silent(),
     ["t|<A-S-d>"] = map_cu([[<C-\><C-n><CMD>lua require("FTerm").exit()]]):with_noremap()
         :with_silent(),
-    ["n|<Leader>g"] = map_cu("lua require('FTerm').run('gitui')"):with_noremap()
+    ["n|<Leader>gu"] = map_cu("lua require('FTerm').run('gitui')"):with_noremap()
         :with_silent(),
     ["n|<Leader>G"] = map_cu("Git"):with_noremap():with_silent(),
     ["n|gps"] = map_cr("G push"):with_noremap():with_silent(),
     ["n|gpl"] = map_cr("G pull"):with_noremap():with_silent(),
-    -- Plugin trouble
-    ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
-    ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap()
-        :with_silent(),
-    ["n|<leader>cd"] = map_cr("TroubleToggle lsp_document_diagnostics"):with_noremap()
-        :with_silent(),
-    ["n|<leader>cw"] = map_cr("TroubleToggle lsp_workspace_diagnostics"):with_noremap()
-        :with_silent(),
-    ["n|<leader>cq"] = map_cr("TroubleToggle quickfix"):with_noremap()
-        :with_silent(),
-    ["n|<leader>cl"] = map_cr("TroubleToggle loclist"):with_noremap()
-        :with_silent(),
     -- Plugin nvim-tree
     ["n|<C-n>"] = map_cr("NvimTreeToggle"):with_noremap():with_silent(),
     ["n|<Leader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
@@ -114,17 +101,12 @@ local plug_map = {
         :with_silent(),
     ["n|<Leader>fz"] = map_cu("Telescope zoxide list"):with_noremap()
         :with_silent(),
-    -- Plugin Hop
-    ["n|<leader>w"] = map_cu("HopWord"):with_noremap(),
-    ["n|<leader>j"] = map_cu("HopLine"):with_noremap(),
-    ["n|<leader>k"] = map_cu("HopLine"):with_noremap(),
-    ["n|<leader>c"] = map_cu("HopChar1"):with_noremap(),
-    ["n|<leader>cc"] = map_cu("HopChar2"):with_noremap(),
     -- Plugin EasyAlign
     ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
     ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),
     -- Plugin SymbolsOutline
-    ["n|<A-t>"] = map_cr("SymbolsOutline"):with_noremap():with_silent(),
+    ["n|so"] = map_cr("SymbolsOutlineOpen"):with_noremap():with_silent(),
+    ["n|sc"] = map_cr("SymbolsOutlineClose"):with_noremap():with_silent(),
     -- Plugin split-term
     ["n|<F5>"] = map_cr("VTerm"):with_noremap():with_silent(),
     ["n|<C-w>t"] = map_cr("VTerm"):with_noremap():with_silent(),

@@ -28,7 +28,6 @@ function config.catppuccin()
                     information = "underline"
                 }
             },
-            lsp_trouble = true,
             lsp_saga = true,
             gitgutter = false,
             gitsigns = true,
@@ -40,12 +39,10 @@ function config.catppuccin()
             neogit = false,
             vim_sneak = false,
             fern = false,
-            barbar = false,
             bufferline = true,
             markdown = true,
             lightspeed = false,
             ts_rainbow = true,
-            hop = true
         }
     })
 end
@@ -149,35 +146,6 @@ function config.nvim_tree()
     }
 end
 
-function config.nvim_bufferline()
-    require("bufferline").setup {
-        options = {
-            number = "none",
-            modified_icon = "✥",
-            buffer_close_icon = "",
-            left_trunc_marker = "",
-            right_trunc_marker = "",
-            max_name_length = 14,
-            max_prefix_length = 13,
-            tab_size = 20,
-            show_buffer_close_icons = true,
-            show_buffer_icons = true,
-            show_tab_indicators = true,
-            diagnostics = "nvim_lsp",
-            always_show_bufferline = true,
-            separator_style = "thin",
-            offsets = {
-                {
-                    filetype = "NvimTree",
-                    text = "File Explorer",
-                    text_align = "center",
-                    padding = 1
-                }
-            }
-        }
-    }
-end
-
 function config.gitsigns()
     require("gitsigns").setup {
         signs = {
@@ -216,11 +184,11 @@ function config.gitsigns()
             -- Default keymap options
             noremap = true,
             buffer = true,
-            ["n ]g"] = {
+            ["n <leader>]g"] = {
                 expr = true,
                 '&diff ? \']g\' : \'<cmd>lua require"gitsigns".next_hunk()<CR>\''
             },
-            ["n [g"] = {
+            ["n <leader>[g"] = {
                 expr = true,
                 '&diff ? \'[g\' : \'<cmd>lua require"gitsigns".prev_hunk()<CR>\''
             },
@@ -270,7 +238,36 @@ function config.indent_blankline()
         space_char_blankline = " "
     }
     -- because lazy load indent-blankline so need readd this autocmd
-    vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
+    -- vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
+end
+
+function config.nvim_bufferline()
+    require("bufferline").setup {
+        options = {
+            number = "none",
+            modified_icon = "✥",
+            buffer_close_icon = "",
+            left_trunc_marker = "",
+            right_trunc_marker = "",
+            max_name_length = 14,
+            max_prefix_length = 13,
+            tab_size = 20,
+            show_buffer_close_icons = true,
+            show_buffer_icons = true,
+            show_tab_indicators = true,
+            diagnostics = "nvim_lsp",
+            always_show_bufferline = true,
+            separator_style = "thin",
+            offsets = {
+                {
+                    filetype = "NvimTree",
+                    text = "File Explorer",
+                    text_align = "center",
+                    padding = 1
+                }
+            }
+        }
+    }
 end
 
 return config

@@ -1,13 +1,32 @@
 local editor = {}
 local conf = require("modules.editor.config")
 
+editor["tpope/vim-fugitive"] = {opt = false, cmd = {"Git", "G"}}
+editor["tpope/vim-surround"] = {opt = false}
+
 editor["junegunn/vim-easy-align"] = {opt = true, cmd = "EasyAlign"}
 editor["itchyny/vim-cursorword"] = {
     opt = true,
     event = {"BufReadPre", "BufNewFile"},
-    config = conf.vim_cursorwod
+    config = conf.vim_cursorword
 }
-editor['alexghergh/nvim-tmux-navigation'] = {opt=true, config = conf.nvim_tmux_navigation}
+
+editor["alexghergh/nvim-tmux-navigation"] = {
+    opt=false, 
+    config = function()
+        require'nvim-tmux-navigation'.setup {
+            disable_when_zoomed = true -- defaults to false
+        }
+
+        vim.api.nvim_set_keymap('n', "<C-h>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateLeft()<cr>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap('n', "<C-j>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateDown()<cr>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap('n', "<C-k>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateUp()<cr>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap('n', "<C-l>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateRight()<cr>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap('n', "<C-\\>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateLastActive()<cr>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap('n', "<C-Space>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateNext()<cr>", { noremap = true, silent = true })
+    end
+}
+
 editor["terrortylor/nvim-comment"] = {
     opt = false,
     config = function()
@@ -69,17 +88,6 @@ editor["romainl/vim-cool"] = {
     opt = true,
     event = {"CursorMoved", "InsertEnter"}
 }
-editor["phaazon/hop.nvim"] = {
-    opt = true,
-    branch = "v1",
-    cmd = {
-        "HopLine", "HopLineStart", "HopWord", "HopPattern", "HopChar1",
-        "HopChar2"
-    },
-    config = function()
-        require("hop").setup {keys = "etovxqpdygfblzhckisuran"}
-    end
-}
 editor["vimlab/split-term.vim"] = {opt = true, cmd = {"Term", "VTerm"}}
 editor["akinsho/nvim-toggleterm.lua"] = {
     opt = true,
@@ -93,8 +101,6 @@ editor["norcalli/nvim-colorizer.lua"] = {
     config = conf.nvim_colorizer
 }
 editor["jdhao/better-escape.vim"] = {opt = true, event = "InsertEnter"}
-editor["tpope/vim-fugitive"] = {opt = true, cmd = {"Git", "G"}}
-editor["tpope/vim-surround"] = {opt = true}
 editor["famiu/bufdelete.nvim"] = {
     opt = true,
     cmd = {"Bdelete", "Bwipeout", "Bdelete!", "Bwipeout!"}
