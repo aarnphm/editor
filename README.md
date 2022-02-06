@@ -1,2 +1,4 @@
 # editor
-neovim configuration. not human friendly, yet.
+neovim. not human friendly, yet.
+
+startup time: 33ms with [`dstein64/vim-startuptime`](https://github.com/dstein64/vim-startuptime)
