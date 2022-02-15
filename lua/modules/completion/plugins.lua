@@ -57,5 +57,6 @@ completion["windwp/nvim-autopairs"] = {
     config = conf.autopairs
 }
 completion["github/copilot.vim"] = {opt = true, cmd = "Copilot"}
+completion["lervag/vimtex"] = {opt = true}
 
 return completion

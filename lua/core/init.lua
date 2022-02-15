@@ -101,6 +101,7 @@ local load_core = function()
     pack.load_compile()
 
     vim.cmd [[colorscheme catppuccin]]
+    require('plenary.reload').reload_module('lua', true)
 end
 
 load_core()
