@@ -57,6 +57,15 @@ completion["windwp/nvim-autopairs"] = {
     config = conf.autopairs
 }
 completion["github/copilot.vim"] = {opt = true, cmd = "Copilot"}
-completion["lervag/vimtex"] = {opt = true}
+completion["lervag/vimtex"] = {opt = true, config=conf.vimtex}
+completion["jakewvincent/texmagic.nvim"] = {
+    opt = true,
+    config = function ()
+        require('texmagic').setup({
+            -- Config goes here; leave blank for defaults
+        })
+    end,
+    after = "nvim-lspconfig"
+}
 
 return completion

@@ -247,4 +247,9 @@ function config.nvim_lsputils()
     end
 end
 
+function config.vimtex()
+    vim.g.vimtex_view_general_viewer = '/Applications/Skim.app/Contents/SharedSupport/displayline'
+    vim.g.vimtex_view_general_options = '-r @line @pdf @tex'
+end
+
 return config
