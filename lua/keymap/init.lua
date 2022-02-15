@@ -5,6 +5,9 @@ local map_cmd = bind.map_cmd
 require("keymap.config")
 
 local plug_map = {
+    -- jupyter_ascending
+    ["n|<Space><Space>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
+    ["n|<Space><Space>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
     -- Bufferline
     ["n|<Space>bp"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
     ["n|<Space>bc"] = map_cr("BufferLinePickClose"):with_noremap():with_silent(),

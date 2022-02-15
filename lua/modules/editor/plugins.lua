@@ -106,4 +106,6 @@ editor["famiu/bufdelete.nvim"] = {
     cmd = {"Bdelete", "Bwipeout", "Bdelete!", "Bwipeout!"}
 }
 
+editor["untitled-ai/jupyter_ascending.vim"] = {opt=true, event="InsertEnter"}
+
 return editor
