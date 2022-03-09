@@ -92,16 +92,15 @@ local load_core = function()
     leader_map()
 
     pack.ensure_plugins()
+    pack.load_compile()
     dashboard_config()
 
     require("core.options")
     require("core.mapping")
     require("keymap")
     require("core.event")
-    pack.load_compile()
 
     vim.cmd [[colorscheme catppuccin]]
-    require('plenary.reload').reload_module('lua', true)
 end
 
 load_core()

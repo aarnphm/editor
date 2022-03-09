@@ -13,22 +13,9 @@ function autocmd.nvim_create_augroups(definitions)
     end
 end
 
--- augroup JupyterAscending
---   au!
---   if g:jupyter_ascending_auto_write
---     autocmd BufWritePost * :call jupyter_ascending#sync()
---   endif
--- augroup END
-
 function autocmd.load_autocmds()
     local definitions = {
         packer = {},
-        jupyter_ascending = {
-            {
-                "BufWritePost",
-                "*", "[[if g:jupyter_ascending_auto_write | call jupyter_ascending#sync() | endif]]"
-            },
-        },
         bufs = {
             -- Reload vim config automatically
             {

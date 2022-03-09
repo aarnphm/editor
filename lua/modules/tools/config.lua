@@ -9,6 +9,10 @@ function config.telescope()
         vim.cmd [[packadd telescope-fzf-native.nvim]]
     end
 
+    if not packer_plugins["telescope-file-browser.nvim"].loaded then
+        vim.cmd [[packadd telescope-file-browser.nvim]]
+    end
+
     if not packer_plugins["telescope-project.nvim"].loaded then
         vim.cmd [[packadd telescope-project.nvim]]
     end
@@ -55,6 +59,17 @@ function config.telescope()
                 case_mode = "smart_case" -- or "ignore_case" or "respect_case"
                 -- the default case_mode is "smart_case"
             },
+            file_browser = {
+                theme = 'ivy',
+                mappings = {
+                    ["i"] = {
+                    -- your custom insert mode mappings
+                    },
+                    ["n"] = {
+                    -- your custom normal mode mappings
+                    },
+                },
+            },
             frecency = {
                 show_scores = true,
                 show_unindexed = true,
@@ -63,10 +78,12 @@ function config.telescope()
         }
     }
 
+    require("telescope").load_extension("file_browser")
     require("telescope").load_extension("fzf")
     require("telescope").load_extension("project")
     require("telescope").load_extension("zoxide")
     require("telescope").load_extension("frecency")
+
 end
 
 function config.wilder()

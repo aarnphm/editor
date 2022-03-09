@@ -12,7 +12,7 @@ editor["itchyny/vim-cursorword"] = {
 }
 
 editor["alexghergh/nvim-tmux-navigation"] = {
-    opt=false, 
+    opt=false,
     config = function()
         require'nvim-tmux-navigation'.setup {
             disable_when_zoomed = true -- defaults to false
@@ -101,11 +101,10 @@ editor["norcalli/nvim-colorizer.lua"] = {
     config = conf.nvim_colorizer
 }
 editor["jdhao/better-escape.vim"] = {opt = true, event = "InsertEnter"}
+editor["untitled-ai/jupyter_ascending.vim"] = {opt=true, event={"InsertEnter","BufWrite"}, cmd = {"JupyterExecute", "JupyterExecuteAll"}}
 editor["famiu/bufdelete.nvim"] = {
     opt = true,
     cmd = {"Bdelete", "Bwipeout", "Bdelete!", "Bwipeout!"}
 }
-
-editor["untitled-ai/jupyter_ascending.vim"] = {opt=true, event="InsertEnter"}
 
 return editor
