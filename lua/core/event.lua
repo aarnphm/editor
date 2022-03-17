@@ -68,7 +68,10 @@ function autocmd.load_autocmds()
     },
     ft = {
       { "BufNewFile,BufRead", "*.toml", " setf toml" },
-      { "FileType", "make", "set noexpandtab shiftwidth=8 softtabstop=0" },
+      { "BufNewFile,BufRead", "*.j2", " setf html" },
+      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", " setf dockerfile" },
+      { "BufNewFile,BufRead", "Dockerfile-*", " setf dockerfile" },
+      { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       {
         "FileType",
         "dashboard",
@@ -78,11 +81,6 @@ function autocmd.load_autocmds()
         "FileType",
         "*",
         [[setlocal formatoptions-=c formatoptions-=r formatoptions-=o]],
-      },
-      {
-        "FileType",
-        "c,cpp",
-        "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
       },
     },
     yank = {

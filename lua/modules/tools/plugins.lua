@@ -4,15 +4,16 @@ local conf = require("modules.tools.config")
 tools["RishabhRD/popfix"] = { opt = false }
 tools["nvim-lua/plenary.nvim"] = { opt = false }
 tools["nvim-telescope/telescope.nvim"] = {
-  opt = true,
+  opt = false,
   module = "telescope",
   cmd = "Telescope",
   config = conf.telescope,
   requires = {
     { "nvim-lua/plenary.nvim", opt = false },
-    { "nvim-lua/popup.nvim", opt = true },
+    { "nvim-lua/popup.nvim", opt = false },
   },
 }
+tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true, requires = "nvim-telescope/telescope.nvim" }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
   opt = true,
   run = "make",
@@ -31,7 +32,7 @@ tools["nvim-telescope/telescope-frecency.nvim"] = {
   after = "telescope.nvim",
   requires = { { "tami5/sqlite.lua", opt = true } },
 }
-tools["jvgrootveld/telescope-zoxide"] = { opt = true, after = "telescope.nvim" }
+tools["jvgrootveld/telescope-zoxide"] = { opt = true, after = "telescope-frecency.nvim" }
 tools["thinca/vim-quickrun"] = { opt = true, cmd = { "QuickRun", "Q" } }
 tools["folke/which-key.nvim"] = {
   opt = true,

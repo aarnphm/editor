@@ -2,10 +2,16 @@ local ui = {}
 local conf = require("modules.ui.config")
 
 ui["kyazdani42/nvim-web-devicons"] = { opt = false }
+ui["rebelot/kanagawa.nvim"] = { opt = false, config = conf.kanagawa }
 ui["catppuccin/nvim"] = {
   opt = false,
   as = "catppuccin",
   config = conf.catppuccin,
+}
+ui["SmiteshP/nvim-gps"] = {
+  opt = true,
+  after = "nvim-treesitter",
+  config = conf.nvim_gps,
 }
 ui["hoob3rt/lualine.nvim"] = {
   opt = true,
@@ -19,11 +25,20 @@ ui["kyazdani42/nvim-tree.lua"] = {
   cmd = { "NvimTreeToggle", "NvimTreeOpen" },
   config = conf.nvim_tree,
 }
+ui["lukas-reineke/indent-blankline.nvim"] = {
+  opt = true,
+  event = "BufRead",
+  config = conf.indent_blankline,
+}
 ui["lewis6991/gitsigns.nvim"] = {
   opt = true,
   event = { "BufRead", "BufNewFile" },
   config = conf.gitsigns,
   requires = { "nvim-lua/plenary.nvim", opt = true },
+}
+ui["wfxr/minimap.vim"] = {
+  opt = true,
+  event = "BufRead",
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
   opt = true,

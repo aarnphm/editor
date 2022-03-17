@@ -1,29 +1,12 @@
 local config = {}
 
 function config.telescope()
-  if not packer_plugins["sqlite.lua"].loaded then
-    vim.cmd([[packadd sqlite.lua]])
-  end
-
-  if not packer_plugins["telescope-fzf-native.nvim"].loaded then
-    vim.cmd([[packadd telescope-fzf-native.nvim]])
-  end
-
-  if not packer_plugins["telescope-file-browser.nvim"].loaded then
-    vim.cmd([[packadd telescope-file-browser.nvim]])
-  end
-
-  if not packer_plugins["telescope-project.nvim"].loaded then
-    vim.cmd([[packadd telescope-project.nvim]])
-  end
-
-  if not packer_plugins["telescope-frecency.nvim"].loaded then
-    vim.cmd([[packadd telescope-frecency.nvim]])
-  end
-
-  if not packer_plugins["telescope-zoxide"].loaded then
-    vim.cmd([[packadd telescope-zoxide]])
-  end
+  vim.cmd([[packadd sqlite.lua]])
+  vim.cmd([[packadd telescope-fzf-native.nvim]])
+  vim.cmd([[packadd telescope-file-browser.nvim]])
+  vim.cmd([[packadd telescope-project.nvim]])
+  vim.cmd([[packadd telescope-frecency.nvim]])
+  vim.cmd([[packadd telescope-zoxide]])
 
   require("telescope").setup({
     defaults = {
@@ -64,16 +47,8 @@ function config.telescope()
         case_mode = "smart_case", -- or "ignore_case" or "respect_case"
         -- the default case_mode is "smart_case"
       },
-      file_browser = {
-        theme = "ivy",
-        mappings = {
-          ["i"] = {
-            -- your custom insert mode mappings
-          },
-          ["n"] = {
-            -- your custom normal mode mappings
-          },
-        },
+      ["ui-select"] = {
+        require("telescope.themes").get_dropdown({}),
       },
       frecency = {
         show_scores = true,
@@ -88,6 +63,7 @@ function config.telescope()
   require("telescope").load_extension("project")
   require("telescope").load_extension("zoxide")
   require("telescope").load_extension("frecency")
+  require("telescope").load_extension("ui-select")
 end
 
 function config.wilder()

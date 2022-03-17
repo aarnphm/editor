@@ -178,6 +178,15 @@ function plugins.magic_compile()
   plugins.convert_compile_file()
 end
 
+function plugins.auto_compile()
+  local file = vim.fn.expand("%:p")
+  if file:match(modules_dir) then
+    plugins.clean()
+    plugins.compile()
+    plugins.convert_compile_file()
+  end
+end
+
 function plugins.load_compile()
   if vim.fn.filereadable(compile_to_lua) == 1 then
     require("_compiled")
@@ -189,7 +198,7 @@ function plugins.load_compile()
   vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])
   vim.cmd([[command! PackerSync lua require('core.pack').sync()]])
   vim.cmd([[command! PackerClean lua require('core.pack').clean()]])
-  vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
+  vim.cmd([[autocmd User PackerComplete lua require('core.pack').auto_compile()]])
   vim.cmd([[command! PackerStatus lua require('core.pack').magic_compile() require('packer').status()]])
 end
 
@@ -214,9 +223,21 @@ function plugins.dashboard_config()
       description = { " Project find               comma f p " },
       command = "Telescope project",
     },
+    edit_nvim_config = {
+      description = { " NVIM Config                comma e c " },
+      command = ":e ~/.config/nvim/init.lua",
+    },
+    find_text = {
+      description = { " Find Text                  comma f t " },
+      command = "Telescope live_grep",
+    },
     find_file = {
       description = { " File find                  comma f f " },
       command = "DashboardFindFile",
+    },
+    find_git = {
+      description = { " Find git files             comma f g " },
+      command = "Telescope git_files",
     },
     file_new = {
       description = { " File new                   comma f n " },

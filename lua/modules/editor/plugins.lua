@@ -67,16 +67,22 @@ editor["terrortylor/nvim-comment"] = {
     })
   end,
 }
+
 editor["simrat39/symbols-outline.nvim"] = {
   opt = true,
   cmd = { "SymbolsOutline", "SymbolsOutlineOpen" },
   config = conf.symbols_outline,
 }
+
 editor["nvim-treesitter/nvim-treesitter"] = {
   opt = true,
   run = ":TSUpdate",
   event = "BufRead",
   config = conf.nvim_treesitter,
+}
+editor["nvim-treesitter/playground"] = {
+  opt = true,
+  after = "nvim-treesitter",
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
@@ -99,11 +105,8 @@ editor["mfussenegger/nvim-ts-hint-textobject"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["SmiteshP/nvim-gps"] = {
-  opt = true,
-  after = "nvim-treesitter",
-  config = conf.nvim_gps,
-}
+editor["lewis6991/spellsitter.nvim"] = { opt = true, after = "nvim-treesitter" }
+
 editor["windwp/nvim-ts-autotag"] = {
   opt = true,
   ft = { "html", "xml" },

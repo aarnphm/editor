@@ -53,6 +53,7 @@ local function minimap_config()
   g.minimap_auto_start = 0
   g.minimap_block_filetypes = { "aerial", "NvimTree" }
   g.minimap_git_colors = 1
+  g.minimap_auto_start_win_enter = 1
 end
 
 function M:preflight()
@@ -70,10 +71,10 @@ function M:setup()
   M.preflight()
   pack.setup_plugins()
   pack.dashboard_config()
+
   require("core.options")
   require("core.mapping")
   require("core.event")
-  require("core.keymap")
   pack.load_compile()
 
   vim.cmd([[colorscheme catppuccin]])

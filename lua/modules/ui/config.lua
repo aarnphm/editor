@@ -1,5 +1,23 @@
 local config = {}
 
+function config.kanagawa()
+  require("kanagawa").setup({
+    undercurl = true, -- enable undercurls
+    commentStyle = "italic",
+    functionStyle = "bold,italic",
+    keywordStyle = "italic",
+    statementStyle = "bold",
+    typeStyle = "NONE",
+    variablebuiltinStyle = "italic",
+    specialReturn = true, -- special highlight for the return keyword
+    specialException = true, -- special highlight for exception handling keywords
+    transparent = false, -- do not set background color
+    dimInactive = true, -- dim inactive window `:h hl-NormalNC`
+    colors = {},
+    overrides = {},
+  })
+end
+
 function config.catppuccin()
   require("catppuccin").setup({
     transparent_background = false,
@@ -57,6 +75,18 @@ function config.lualine()
       return ""
     end
   end
+  local mini_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = { "location" },
+  }
+  local minimap = {
+    sections = mini_sections,
+    filetypes = { "minimap" },
+  }
   local symbols_outline = {
     sections = {
       lualine_a = { "mode" },
@@ -108,8 +138,31 @@ function config.lualine()
       "nvim-tree",
       "toggleterm",
       "fugitive",
+      minimap,
       symbols_outline,
     },
+  })
+end
+
+function config.nvim_gps()
+  require("nvim-gps").setup({
+    icons = {
+      ["class-name"] = " ", -- Classes and class-like objects
+      ["function-name"] = " ", -- Functions
+      ["method-name"] = " ", -- Methods (functions inside class-like objects)
+    },
+    languages = {
+      -- You can disable any language individually here
+      ["c"] = true,
+      ["cpp"] = true,
+      ["go"] = true,
+      ["java"] = true,
+      ["javascript"] = true,
+      ["lua"] = true,
+      ["python"] = true,
+      ["rust"] = true,
+    },
+    separator = " > ",
   })
 end
 
@@ -221,6 +274,35 @@ function config.gitsigns()
   })
 end
 
+function config.nvim_bufferline()
+  require("bufferline").setup({
+    options = {
+      number = "none",
+      modified_icon = "✥",
+      buffer_close_icon = "",
+      left_trunc_marker = "",
+      right_trunc_marker = "",
+      max_name_length = 14,
+      max_prefix_length = 13,
+      tab_size = 20,
+      show_buffer_close_icons = true,
+      show_buffer_icons = true,
+      show_tab_indicators = true,
+      diagnostics = "nvim_lsp",
+      always_show_bufferline = true,
+      separator_style = "thin",
+      offsets = {
+        {
+          filetype = "NvimTree",
+          text = "File Explorer",
+          text_align = "center",
+          padding = 1,
+        },
+      },
+    },
+  })
+end
+
 function config.indent_blankline()
   vim.opt.termguicolors = true
   vim.opt.list = true
@@ -272,36 +354,7 @@ function config.indent_blankline()
     space_char_blankline = " ",
   })
   -- because lazy load indent-blankline so need readd this autocmd
-  -- vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
-end
-
-function config.nvim_bufferline()
-  require("bufferline").setup({
-    options = {
-      number = "none",
-      modified_icon = "✥",
-      buffer_close_icon = "",
-      left_trunc_marker = "",
-      right_trunc_marker = "",
-      max_name_length = 14,
-      max_prefix_length = 13,
-      tab_size = 20,
-      show_buffer_close_icons = true,
-      show_buffer_icons = true,
-      show_tab_indicators = true,
-      diagnostics = "nvim_lsp",
-      always_show_bufferline = true,
-      separator_style = "thin",
-      offsets = {
-        {
-          filetype = "NvimTree",
-          text = "File Explorer",
-          text_align = "center",
-          padding = 1,
-        },
-      },
-    },
-  })
+  vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
 end
 
 return config
