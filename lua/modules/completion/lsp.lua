@@ -4,6 +4,7 @@ vim.cmd([[packadd nvim-lsp-installer]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
+vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packadd aerial.nvim]])
 
 local saga = require("lspsaga")
@@ -19,8 +20,8 @@ local to_be_installed = {
   "gopls",
   "dockerls",
   "bashls",
-  "elmls",
   "terraformls",
+  "elmls",
 }
 
 for _, name in pairs(to_be_installed) do
@@ -32,7 +33,6 @@ for _, name in pairs(to_be_installed) do
 end
 
 -- Override diagnostics symbol
-
 saga.init_lsp_saga({
   error_sign = "",
   warn_sign = "",

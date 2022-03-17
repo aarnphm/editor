@@ -6,7 +6,7 @@ completion["neovim/nvim-lspconfig"] = {
   event = "BufReadPre",
   config = conf.nvim_lsp,
 }
-completion["folke/lua-dev.nvim"] = { opt = true, requires = "neovim/nvim-lspconfig" }
+completion["folke/lua-dev.nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
 completion["stevearc/aerial.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
