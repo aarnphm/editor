@@ -22,6 +22,7 @@ local to_be_installed = {
   "bashls",
   "terraformls",
   "elmls",
+  "jedi_language_server",
 }
 
 for _, name in pairs(to_be_installed) do
