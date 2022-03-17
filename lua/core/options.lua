@@ -1,6 +1,9 @@
 local global = require("core.global")
 
-local function bind_option(options)
+local M = {}
+M.__index = M
+
+function M:bind_option(options)
   for k, v in pairs(options) do
     if v == true then
       vim.cmd("set " .. k)
@@ -12,7 +15,7 @@ local function bind_option(options)
   end
 end
 
-local function load_options()
+function M:load_options()
   local bw_local = {
     number = true,
     relativenumber = true,
@@ -130,7 +133,7 @@ local function load_options()
   for name, value in pairs(global_local) do
     vim.o[name] = value
   end
-  bind_option(bw_local)
+  M:bind_option(bw_local)
 end
 
-load_options()
+return M

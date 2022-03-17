@@ -1,24 +1,35 @@
 require("modules.completion.formatting")
 
-if not packer_plugins["nvim-lsp-installer"].loaded then
-  vim.cmd([[packadd nvim-lsp-installer]])
-end
+vim.cmd([[packadd nvim-lsp-installer]])
+vim.cmd([[packadd lsp_signature.nvim]])
+vim.cmd([[packadd lspsaga.nvim]])
+vim.cmd([[packadd cmp-nvim-lsp]])
+vim.cmd([[packadd aerial.nvim]])
 
-if not packer_plugins["lsp_signature.nvim"].loaded then
-  vim.cmd([[packadd lsp_signature.nvim]])
-end
-
-if not packer_plugins["lspsaga.nvim"].loaded then
-  vim.cmd([[packadd lspsaga.nvim]])
-end
-
-if not packer_plugins["cmp-nvim-lsp"].loaded then
-  vim.cmd([[packadd cmp-nvim-lsp]])
-end
-
-local nvim_lsp = require("lspconfig")
 local saga = require("lspsaga")
+local lspconfig = require("lspconfig")
 local lsp_installer = require("nvim-lsp-installer")
+local lsp_configs = require("lspconfig.configs")
+
+-- Include the servers you want to have installed by default below
+local to_be_installed = {
+  "bashls",
+  "pyright",
+  "sumneko_lua",
+  "gopls",
+  "dockerls",
+  "bashls",
+  "elmls",
+  "terraformls",
+}
+
+for _, name in pairs(to_be_installed) do
+  local server_is_found, server = lsp_installer.get_server(name)
+  if server_is_found and not server:is_installed() then
+    print("Installing " .. name)
+    server:install()
+  end
+end
 
 -- Override diagnostics symbol
 
@@ -27,6 +38,12 @@ saga.init_lsp_saga({
   warn_sign = "",
   hint_sign = "",
   infor_sign = "",
+  code_action_keys = {
+    quit = { "q", "<ESC>" },
+  },
+  rename_action_keys = {
+    quit = { "q", "<ESC>" },
+  },
 })
 
 lsp_installer.settings({
@@ -43,14 +60,13 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 
 -- Override default format setting
-
 vim.lsp.handlers["textDocument/formatting"] = function(err, result, ctx)
   if err ~= nil or result == nil then
     return
   end
   if vim.api.nvim_buf_get_var(ctx.bufnr, "init_changedtick") == vim.api.nvim_buf_get_var(ctx.bufnr, "changedtick") then
     local view = vim.fn.winsaveview()
-    vim.lsp.util.apply_text_edits(result, ctx.bufnr)
+    vim.lsp.util.apply_text_edits(result, ctx.bufnr, "utf-16")
     vim.fn.winrestview(view)
     if ctx.bufnr == vim.api.nvim_get_current_buf() then
       vim.b.saving_format = true
@@ -60,7 +76,7 @@ vim.lsp.handlers["textDocument/formatting"] = function(err, result, ctx)
   end
 end
 
-local function custom_attach(client)
+local function on_editor_attach(client)
   require("lsp_signature").on_attach({
     bind = true,
     use_lspsaga = false,
@@ -70,6 +86,7 @@ local function custom_attach(client)
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
+  require("aerial").on_attach(client)
 
   if client.resolved_capabilities.document_formatting then
     vim.cmd([[augroup Format]])
@@ -79,33 +96,79 @@ local function custom_attach(client)
   end
 end
 
-local function switch_source_header_splitcmd(bufnr, splitcmd)
-  bufnr = nvim_lsp.util.validate_bufnr(bufnr)
-  local clangd_client = nvim_lsp.util.get_active_client_by_name(bufnr, "clangd")
-  local params = { uri = vim.uri_from_bufnr(bufnr) }
-  if clangd_client then
-    clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
-      if err then
-        error(tostring(err))
-      end
-      if not result then
-        print("Corresponding file can’t be determined")
-        return
-      end
-      vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
-    end)
-  else
-    print("method textDocument/switchSourceHeader is not supported by any servers active on the current buffer")
-  end
-end
-
 -- Override server settings here
+local default_options = {
+  capabilities = capabilities,
+  on_attach = on_editor_attach,
+  flags = { debounce_text_changes = 150 },
+}
+
+local format_config = require("modules.completion.formatting").language_format()
+local servers = {
+  tsserver = {
+    root_dir = lspconfig.util.root_pattern("tsconfig.json", "package.json", ".git"),
+  },
+  pyright = {
+    filetypes = { "python" },
+    init_options = {
+      formatters = {
+        black = {
+          command = "black",
+          args = { "--quiet", "-" },
+          rootPatterns = { "pyproject.toml" },
+        },
+        formatFiletypes = {
+          python = { "black" },
+        },
+      },
+    },
+  },
+  efm = {
+    filetypes = vim.tbl_keys(format_config),
+    init_options = { documentFormatting = true },
+    root_dir = lspconfig.util.root_pattern({ ".git/", "." }),
+    settings = { languages = format_config },
+  },
+  sumneko_lua = require("lua-dev").setup({}),
+}
+
+if not lsp_configs.ls_emmet then
+  lsp_configs.ls_emmet = {
+    default_config = {
+      cmd = { "ls_emmet", "--stdio" },
+      filetypes = {
+        "html",
+        "css",
+        "scss",
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "haml",
+        "xml",
+        "xsl",
+        "pug",
+        "slim",
+        "sass",
+        "stylus",
+        "less",
+        "sss",
+        "hbs",
+        "handlebars",
+      },
+      root_dir = function(fname)
+        return vim.loop.cwd()
+      end,
+      settings = {},
+    },
+  }
+end
 
 local enhance_server_opts = {
   ["sumneko_lua"] = function(opts)
     opts.settings = {
       Lua = {
-        diagnostics = { globals = { "vim", "packer_plugins" } },
+        diagnostics = { globals = { "vim" } },
         workspace = {
           library = {
             [vim.fn.expand("$VIMRUNTIME/lua")] = true,
@@ -118,107 +181,18 @@ local enhance_server_opts = {
       },
     }
   end,
-  ["clangd"] = function(opts)
-    opts.args = {
-      "--background-index",
-      "-std=c++20",
-      "--pch-storage=memory",
-      "--clang-tidy",
-      "--suggest-missing-includes",
-    }
-    opts.capabilities.offsetEncoding = { "utf-16" }
-    opts.single_file_support = true
-    opts.commands = {
-      ClangdSwitchSourceHeader = {
-        function()
-          switch_source_header_splitcmd(0, "edit")
-        end,
-        description = "Open source/header in current buffer",
-      },
-      ClangdSwitchSourceHeaderVSplit = {
-        function()
-          switch_source_header_splitcmd(0, "vsplit")
-        end,
-        description = "Open source/header in a new vsplit",
-      },
-      ClangdSwitchSourceHeaderSplit = {
-        function()
-          switch_source_header_splitcmd(0, "split")
-        end,
-        description = "Open source/header in a new split",
-      },
-    }
-    -- Disable `clangd`'s format
-    opts.on_attach = function(client)
-      client.resolved_capabilities.document_formatting = false
-      custom_attach(client)
-    end
-  end,
-  ["jsonls"] = function(opts)
-    opts.settings = {
-      json = {
-        -- Schemas https://www.schemastore.org
-        schemas = {
-          {
-            fileMatch = { "package.json" },
-            url = "https://json.schemastore.org/package.json",
-          },
-          {
-            fileMatch = { "tsconfig*.json" },
-            url = "https://json.schemastore.org/tsconfig.json",
-          },
-          {
-            fileMatch = {
-              ".prettierrc",
-              ".prettierrc.json",
-              "prettier.config.json",
-            },
-            url = "https://json.schemastore.org/prettierrc.json",
-          },
-          {
-            fileMatch = { ".eslintrc", ".eslintrc.json" },
-            url = "https://json.schemastore.org/eslintrc.json",
-          },
-          {
-            fileMatch = {
-              ".babelrc",
-              ".babelrc.json",
-              "babel.config.json",
-            },
-            url = "https://json.schemastore.org/babelrc.json",
-          },
-          {
-            fileMatch = { "lerna.json" },
-            url = "https://json.schemastore.org/lerna.json",
-          },
-          {
-            fileMatch = {
-              ".stylelintrc",
-              ".stylelintrc.json",
-              "stylelint.config.json",
-            },
-            url = "http://json.schemastore.org/stylelintrc.json",
-          },
-          {
-            fileMatch = { "/.github/workflows/*" },
-            url = "https://json.schemastore.org/github-workflow.json",
-          },
-        },
-      },
-    }
-  end,
   ["tsserver"] = function(opts)
     -- Disable `tsserver`'s format
     opts.on_attach = function(client)
       client.resolved_capabilities.document_formatting = false
-      custom_attach(client)
+      on_editor_attach(client)
     end
   end,
   ["dockerls"] = function(opts)
     -- Disable `dockerls`'s format
     opts.on_attach = function(client)
       client.resolved_capabilities.document_formatting = false
-      custom_attach(client)
+      on_editor_attach(client)
     end
   end,
   ["gopls"] = function(opts)
@@ -236,28 +210,25 @@ local enhance_server_opts = {
     -- Disable `gopls`'s format
     opts.on_attach = function(client)
       client.resolved_capabilities.document_formatting = false
-      custom_attach(client)
+      on_editor_attach(client)
     end
   end,
 }
 
-lsp_installer.on_server_ready(function(server)
-  local opts = {
-    capabilities = capabilities,
-    flags = { debounce_text_changes = 500 },
-    on_attach = custom_attach,
-  }
+lspconfig.ls_emmet.setup({ capabilities = capabilities })
 
+lsp_installer.on_server_ready(function(server)
+  local opt = servers[server.name] or {}
+  opt = vim.tbl_deep_extend("force", {}, default_options, opt)
   if enhance_server_opts[server.name] then
-    enhance_server_opts[server.name](opts)
+    enhance_server_opts[server.name](opt)
   end
 
-  server:setup(opts)
+  server:setup(opt)
 end)
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
-
-nvim_lsp.html.setup({
+lspconfig.html.setup({
   cmd = { "html-languageserver", "--stdio" },
   filetypes = { "html" },
   init_options = {
@@ -268,15 +239,13 @@ nvim_lsp.html.setup({
   single_file_support = true,
   flags = { debounce_text_changes = 500 },
   capabilities = capabilities,
-  on_attach = custom_attach,
+  on_attach = on_editor_attach,
 })
 
-local efmls = require("efmls-configs")
-
 -- Init `efm-langserver` here.
-
+local efmls = require("efmls-configs")
 efmls.init({
-  on_attach = custom_attach,
+  on_attach = on_editor_attach,
   capabilities = capabilities,
   init_options = { documentFormatting = true, codeAction = true },
 })
@@ -286,7 +255,7 @@ efmls.init({
 local vint = require("efmls-configs.linters.vint")
 local clangtidy = require("efmls-configs.linters.clang_tidy")
 local eslint = require("efmls-configs.linters.eslint")
-local flake8 = require("efmls-configs.linters.flake8")
+local pylint = require("efmls-configs.linters.pylint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
 local staticcheck = require("efmls-configs.linters.staticcheck")
 
@@ -297,14 +266,9 @@ local goimports = require("efmls-configs.formatters.goimports")
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
 
--- Add your own config for formatter and linter here
-
--- local rustfmt = require("modules.completion.efm.formatters.rustfmt")
-
 -- Override default config here
 
 -- Setup formatter and linter for efmls here
-
 efmls.setup({
   vim = { formatter = vint },
   lua = { formatter = luafmt },
@@ -312,6 +276,7 @@ efmls.setup({
   cpp = { formatter = clangfmt, linter = clangtidy },
   go = { formatter = goimports, linter = staticcheck },
   vue = { formatter = prettier },
+  python = { formatter = black, linter = pylint },
   typescript = { formatter = prettier, linter = eslint },
   javascript = { formatter = prettier, linter = eslint },
   typescriptreact = { formatter = prettier, linter = eslint },
@@ -322,5 +287,4 @@ efmls.setup({
   scss = { formatter = prettier },
   sh = { formatter = shfmt, linter = shellcheck },
   markdown = { formatter = prettier },
-  -- rust = {formatter = rustfmt},
 })

@@ -104,6 +104,13 @@ local plug_map = {
   ["n|<C-n>"] = map_cr("NvimTreeToggle"):with_noremap():with_silent(),
   ["n|<Leader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
   ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
+  -- Plugin trouble
+  ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
+  ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
+  ["n|<leader>cd"] = map_cr("TroubleToggle lsp_document_diagnostics"):with_noremap():with_silent(),
+  ["n|<leader>cw"] = map_cr("TroubleToggle lsp_workspace_diagnostics"):with_noremap():with_silent(),
+  ["n|<leader>cq"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
+  ["n|<leader>cl"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
   -- Plugin Telescope
   ["n|<Leader>ec"] = map_cu(":e ~/.config/nvim/init.lua"):with_noremap():with_silent(),
   ["n|<Leader>fp"] = map_cu("lua require('telescope').extensions.project.project{}"):with_noremap():with_silent(),
@@ -117,6 +124,7 @@ local plug_map = {
   ["n|<Leader>fg"] = map_cu("Telescope git_files"):with_noremap():with_silent(),
   ["n|<Leader>ft"] = map_cu("Telescope live_grep"):with_noremap():with_silent(),
   ["n|<Leader>fz"] = map_cu("Telescope zoxide list"):with_noremap():with_silent(),
+  ["n|<Leader>km"] = map_cu("Telescope keymaps"):with_noremap():with_silent(),
   -- Plugin EasyAlign
   ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
   ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),

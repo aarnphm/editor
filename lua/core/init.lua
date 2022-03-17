@@ -67,17 +67,14 @@ function M:preflight()
 end
 
 function M:setup()
-  local pack = require("core.pack")
   M.preflight()
-  pack.setup_plugins()
-  pack.dashboard_config()
+  require("core.pack").setup_plugins()
+  require("core.pack").dashboard_config()
 
-  require("core.options")
+  require("core.options").load_options()
   require("core.mapping")
   require("core.event")
-  pack.load_compile()
-
-  vim.cmd([[colorscheme catppuccin]])
+  require("core.pack").load_compile()
 end
 
 return M

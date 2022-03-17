@@ -1,5 +1,6 @@
 local tools = {}
 local conf = require("modules.tools.config")
+local utils = require("core.utils")
 
 tools["RishabhRD/popfix"] = { opt = false }
 tools["nvim-lua/plenary.nvim"] = { opt = false }
@@ -13,7 +14,7 @@ tools["nvim-telescope/telescope.nvim"] = {
     { "nvim-lua/popup.nvim", opt = false },
   },
 }
-tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true, requires = "nvim-telescope/telescope.nvim" }
+tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
   opt = true,
   run = "make",
@@ -47,5 +48,9 @@ tools["gelguy/wilder.nvim"] = {
   config = conf.wilder,
   requires = { { "romgrk/fzy-lua-native", after = "wilder.nvim" } },
 }
-
+tools["folke/trouble.nvim"] = {
+  opt = true,
+  cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+  config = conf.trouble,
+}
 return tools

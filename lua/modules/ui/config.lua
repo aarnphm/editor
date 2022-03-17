@@ -1,5 +1,15 @@
 local config = {}
 
+function config.edge()
+  vim.cmd([[set background=light]])
+  vim.g.edge_style = "neon"
+  vim.g.edge_enable_italic = 1
+  vim.g.edge_disable_italic_comment = 1
+  vim.g.edge_show_eob = 0
+  vim.g.edge_better_performance = 1
+  vim.g.edge_transparent_background = 0
+end
+
 function config.kanagawa()
   require("kanagawa").setup({
     undercurl = true, -- enable undercurls
@@ -102,7 +112,7 @@ function config.lualine()
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = "catppuccin",
+      theme = "auto",
       disabled_filetypes = {},
       component_separators = "|",
       section_separators = { left = "", right = "" },
@@ -354,7 +364,7 @@ function config.indent_blankline()
     space_char_blankline = " ",
   })
   -- because lazy load indent-blankline so need readd this autocmd
-  vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
+  -- vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
 end
 
 return config

@@ -1,4 +1,5 @@
-local fn, uv, api, g = vim.fn, vim.loop, vim.api, vim.g
+local fn, uv, api = vim.fn, vim.loop, vim.api
+local is_mac = require("core.global").is_mac
 local vim_path = require("core.global").vim_path
 local data_dir = require("core.global").data_dir
 local modules_dir = vim_path .. "/lua/modules"
@@ -7,60 +8,19 @@ local compile_to_lua = data_dir .. "lua/_compiled.lua"
 local bak_compiled = data_dir .. "lua/bak_compiled.lua"
 local packer = nil
 
-local M = {}
-M.__index = M
+local Packer = {}
+Packer.__index = Packer
 
 local preflight_plugins = function(use)
   use({
     "lewis6991/impatient.nvim",
     -- rocks = 'mpack'
   })
-
   use({ "wbthomason/packer.nvim", opt = true })
-
   use("antoinemadec/FixCursorHold.nvim") -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
-
-  use({
-    "rcarriga/nvim-notify",
-    config = function()
-      require("notify").setup({
-        -- Animation style (see below for details)
-        stages = "fade_in_slide_out",
-
-        -- Function called when a new window is opened, use for changing win settings/config
-        on_open = nil,
-
-        -- Function called when a window is closed
-        on_close = nil,
-
-        -- Render function for notifications. See notify-render()
-        render = "default",
-
-        -- Default timeout for notifications
-        timeout = 5000,
-
-        -- For stages that change opacity this is treated as the highlight behind the window
-        -- Set this to either a highlight group, an RGB hex value e.g. "#000000" or a function returning an RGB code for dynamic values
-        background_colour = "Normal",
-
-        -- Minimum width for notification windows
-        minimum_width = 50,
-
-        -- Icons for the different levels
-        icons = {
-          ERROR = "",
-          WARN = "",
-          INFO = "",
-          DEBUG = "",
-          TRACE = "✎",
-        },
-      })
-    end,
-    event = "BufRead",
-  })
 end
 
-function M:get_plugins_mapping()
+function Packer:get_plugins_mapping()
   self.repos = {}
 
   local get_plugins_list = function()
@@ -81,35 +41,47 @@ function M:get_plugins_mapping()
   end
 end
 
-function M:load_plugins()
+function Packer:load_packer()
   if not packer then
     api.nvim_command("packadd packer.nvim")
     packer = require("packer")
   end
 
-  packer.init({
-    compile_path = packer_compiled,
-    git = { clone_timeout = 120 },
-    disable_commands = true,
-    max_jobs = 50,
-    display = {
-      open_fn = function()
-        return require("packer.util").float({ border = "single" })
-      end,
-    },
-  })
+  if not is_mac then
+    packer.init({
+      compile_path = packer_compiled,
+      git = { clone_timeout = 60, default_url_format = "git@github.com:%s" },
+      disable_commands = true,
+      display = {
+        open_fn = function()
+          return require("packer.util").float({ border = "single" })
+        end,
+      },
+    })
+  else
+    packer.init({
+      compile_path = packer_compiled,
+      git = { clone_timeout = 60, default_url_format = "git@github.com:%s" },
+      disable_commands = true,
+      max_jobs = 50,
+      display = {
+        open_fn = function()
+          return require("packer.util").float({ border = "single" })
+        end,
+      },
+    })
+  end
 
   packer.reset()
   local use = packer.use
   self:get_plugins_mapping()
-
   preflight_plugins(use)
   for _, repo in ipairs(self.repos) do
     use(repo)
   end
 end
 
-function M:setup_plugins()
+function Packer:setup_plugins()
   local packer_dir = data_dir .. "pack/packer/opt/packer.nvim"
   local state = uv.fs_stat(packer_dir)
   if not state then
@@ -119,7 +91,7 @@ function M:setup_plugins()
     uv.fs_mkdir(data_dir .. "lua", 511, function()
       assert("make compile path dir failed")
     end)
-    self:load_plugins()
+    self:load_packer()
     packer.install()
   end
 end
@@ -127,14 +99,14 @@ end
 local plugins = setmetatable({}, {
   __index = function(_, key)
     if not packer then
-      M:load_plugins()
+      Packer:load_packer()
     end
     return packer[key]
   end,
 })
 
 function plugins.setup_plugins()
-  M:setup_plugins()
+  Packer:setup_plugins()
 end
 
 function plugins.convert_compile_file()
@@ -143,7 +115,8 @@ function plugins.convert_compile_file()
   lines[#lines + 1] = "vim.cmd [[packadd packer.nvim]]\n"
 
   local state = uv.fs_stat(packer_compiled)
-  if state then
+  if not state then
+  else
     for line in io.lines(packer_compiled) do
       lnum = lnum + 1
       if lnum > 15 then
@@ -178,15 +151,6 @@ function plugins.magic_compile()
   plugins.convert_compile_file()
 end
 
-function plugins.auto_compile()
-  local file = vim.fn.expand("%:p")
-  if file:match(modules_dir) then
-    plugins.clean()
-    plugins.compile()
-    plugins.convert_compile_file()
-  end
-end
-
 function plugins.load_compile()
   if vim.fn.filereadable(compile_to_lua) == 1 then
     require("_compiled")
@@ -198,15 +162,17 @@ function plugins.load_compile()
   vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])
   vim.cmd([[command! PackerSync lua require('core.pack').sync()]])
   vim.cmd([[command! PackerClean lua require('core.pack').clean()]])
-  vim.cmd([[autocmd User PackerComplete lua require('core.pack').auto_compile()]])
+  vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
   vim.cmd([[command! PackerStatus lua require('core.pack').magic_compile() require('packer').status()]])
+
+  vim.cmd([[silent! colorscheme edge]])
 end
 
 function plugins.dashboard_config()
-  g.dashboard_footer_icon = "🐬 "
-  g.dashboard_default_executive = "telescope"
+  vim.g.dashboard_footer_icon = "🐬 "
+  vim.g.dashboard_default_executive = "telescope"
 
-  g.dashboard_custom_section = {
+  vim.g.dashboard_custom_section = {
     change_colorscheme = {
       description = { " Scheme change              comma s c " },
       command = "DashboardChangeColorscheme",

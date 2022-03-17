@@ -15,49 +15,6 @@ local format_options_var = function()
   return string.format("format_options_%s", vim.bo.filetype)
 end
 
-local format_options_prettier = {
-  tabWidth = 4,
-  singleQuote = true,
-  trailingComma = "all",
-  configPrecedence = "prefer-file",
-}
-vim.g.format_options_typescript = format_options_prettier
-vim.g.format_options_javascript = format_options_prettier
-vim.g.format_options_typescriptreact = format_options_prettier
-vim.g.format_options_javascriptreact = format_options_prettier
-vim.g.format_options_json = format_options_prettier
-vim.g.format_options_css = format_options_prettier
-vim.g.format_options_scss = format_options_prettier
-vim.g.format_options_html = format_options_prettier
-vim.g.format_options_markdown = format_options_prettier
-
-vim.g.format_options_python = {
-  tabWidth = 4,
-  singleQuote = true,
-  trailingComma = "all",
-  configPrecedence = "prefer-file",
-}
-
-vim.g.format_options_go = {
-  tabWidth = 4,
-  singleQuote = true,
-  trailingComma = "all",
-  configPrecedence = "prefer-file",
-}
-
-vim.g.format_options_yaml = {
-  tabWidth = 2,
-  singleQuote = true,
-  trailingComma = "all",
-  configPrecedence = "prefer-file",
-}
-vim.g.format_options_sh = {
-  tabWidth = 2,
-}
-vim.g.format_options_lua = {
-  tabWidth = 2,
-}
-
 M.formatToggle = function(value)
   local var = format_disabled_var()
   vim.g[var] = xor(value ~= nil, value, not vim.g[var])
@@ -70,6 +27,37 @@ M.format = function()
     vim.b.init_changedtick = vim.b.changedtick
     vim.lsp.buf.formatting(vim.g[format_options_var()] or {})
   end
+end
+
+local eslint = {
+  lintCommand = "eslint_d -f unix --stdin --stdin-filename ${INPUT}",
+  lintIgnoreExitCode = true,
+  lintStdin = true,
+  lintFormats = { "%f:%l:%c: %m" },
+  formatCommand = "eslint_d --fix-to-stdout --stdin --stdin-filename=${INPUT}",
+  formatStdin = true,
+}
+
+local clang_format = { formatCommand = "clang-format -style=LLVM ${INPUT}", formatStdin = true }
+local prettier = { formatCommand = "./node_modules/.bin/prettier --stdin-filepath ${INPUT}", formatStdin = true }
+local stylua = { formatCommand = "stylua -s -", formatStdin = true }
+local black = { formatCommand = "black --quiet -", formatStdin = true }
+
+M.language_format = function()
+  return {
+    css = { prettier },
+    html = { prettier },
+    javascript = { prettier, eslint },
+    javascriptreact = { prettier, eslint },
+    json = { prettier },
+    lua = { stylua },
+    markdown = { prettier },
+    python = { black },
+    scss = { prettier },
+    typescript = { prettier, eslint },
+    typescriptreact = { prettier, eslint },
+    yaml = { prettier },
+  }
 end
 
 return M
