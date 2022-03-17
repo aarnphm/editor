@@ -117,9 +117,10 @@ function config.nvim_tree()
   require("nvim-tree").setup({
     disable_netrw = true,
     hijack_netrw = true,
-    open_on_setup = false,
+    open_on_setup = true,
     ignore_ft_on_setup = {},
     auto_close = true,
+    auto_reload_on_write = true,
     open_on_tab = false,
     hijack_cursor = true,
     update_cwd = false,
@@ -134,7 +135,7 @@ function config.nvim_tree()
       ignore_list = {},
     },
     system_open = { cmd = nil, args = {} },
-    filters = { dotfiles = false, custom = {} },
+    filters = { dotfiles = true, custom = {} },
     git = { enable = true, ignore = true, timeout = 500 },
     view = {
       width = 30,

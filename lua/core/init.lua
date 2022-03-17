@@ -1,8 +1,12 @@
 local global = require("core.global")
 local vim = vim
+local g = vim.g
+local api = vim.api
+
+local M = {}
 
 -- Create cache dir and subs dir
-local createdir = function()
+local init_dir = function()
   local data_dir = {
     global.cache_dir .. "backup",
     global.cache_dir .. "session",
@@ -23,86 +27,56 @@ local createdir = function()
 end
 
 local disable_distribution_plugins = function()
-  vim.g.loaded_fzf = 1
-  vim.g.loaded_gtags = 1
-  vim.g.loaded_gzip = 1
-  vim.g.loaded_tar = 1
-  vim.g.loaded_tarPlugin = 1
-  vim.g.loaded_zip = 1
-  vim.g.loaded_zipPlugin = 1
-  vim.g.loaded_getscript = 1
-  vim.g.loaded_getscriptPlugin = 1
-  vim.g.loaded_vimball = 1
-  vim.g.loaded_vimballPlugin = 1
-  vim.g.loaded_matchit = 1
-  vim.g.loaded_matchparen = 1
-  vim.g.loaded_2html_plugin = 1
-  vim.g.loaded_logiPat = 1
-  vim.g.loaded_rrhelper = 1
-  vim.g.loaded_netrw = 1
-  vim.g.loaded_netrwPlugin = 1
-  vim.g.loaded_netrwSettings = 1
-  vim.g.loaded_netrwFileHandlers = 1
+  g.loaded_fzf = 1
+  g.loaded_gtags = 1
+  g.loaded_gzip = 1
+  g.loaded_tar = 1
+  g.loaded_tarPlugin = 1
+  g.loaded_zip = 1
+  g.loaded_zipPlugin = 1
+  g.loaded_getscript = 1
+  g.loaded_getscriptPlugin = 1
+  g.loaded_vimball = 1
+  g.loaded_vimballPlugin = 1
+  g.loaded_matchit = 1
+  g.loaded_matchparen = 1
+  g.loaded_2html_plugin = 1
+  g.loaded_logiPat = 1
+  g.loaded_rrhelper = 1
+  g.loaded_netrw = 1
+  g.loaded_netrwPlugin = 1
+  g.loaded_netrwSettings = 1
+  g.loaded_netrwFileHandlers = 1
 end
 
-local leader_map = function()
-  vim.g.mapleader = ","
-  vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
-  vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
+local function minimap_config()
+  g.minimap_auto_start = 0
+  g.minimap_block_filetypes = { "aerial", "NvimTree" }
+  g.minimap_git_colors = 1
 end
 
-local dashboard_config = function()
-  vim.g.dashboard_footer_icon = "🐬 "
-  vim.g.dashboard_default_executive = "telescope"
-
-  vim.g.dashboard_custom_section = {
-    change_colorscheme = {
-      description = { " Scheme change              comma s c " },
-      command = "DashboardChangeColorscheme",
-    },
-    find_frecency = {
-      description = { " File frecency              comma f r " },
-      command = "Telescope frecency",
-    },
-    find_history = {
-      description = { " File history               comma f e " },
-      command = "DashboardFindHistory",
-    },
-    find_project = {
-      description = { " Project find               comma f p " },
-      command = "Telescope project",
-    },
-    find_file = {
-      description = { " File find                  comma f f " },
-      command = "DashboardFindFile",
-    },
-    file_new = {
-      description = { " File new                   comma f n " },
-      command = "DashboardNewFile",
-    },
-    find_word = {
-      description = { " Word find                  comma f w " },
-      command = "DashboardFindWord",
-    },
-  }
-end
-
-local load_core = function()
-  local pack = require("core.pack")
-  createdir()
+function M:preflight()
+  init_dir()
   disable_distribution_plugins()
-  leader_map()
+  minimap_config()
 
-  pack.ensure_plugins()
-  pack.load_compile()
-  dashboard_config()
+  g.mapleader = ","
+  api.nvim_set_keymap("n", " ", "", { noremap = true })
+  api.nvim_set_keymap("x", " ", "", { noremap = true })
+end
 
+function M:setup()
+  local pack = require("core.pack")
+  M.preflight()
+  pack.setup_plugins()
+  pack.dashboard_config()
   require("core.options")
   require("core.mapping")
-  require("keymap")
   require("core.event")
+  require("core.keymap")
+  pack.load_compile()
 
   vim.cmd([[colorscheme catppuccin]])
 end
 
-load_core()
+return M

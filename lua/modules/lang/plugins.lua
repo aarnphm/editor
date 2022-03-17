@@ -4,7 +4,10 @@ local conf = require("modules.lang.config")
 lang["ray-x/go.nvim"] = {
   opt = true,
   ft = "go",
-  config = conf.lang_go,
+  config = function()
+    require("go").setup()
+  end,
+  after = "nvim-treesitter",
 }
 lang["rust-lang/rust.vim"] = { opt = true, ft = "rust" }
 lang["simrat39/rust-tools.nvim"] = {

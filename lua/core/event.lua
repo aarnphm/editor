@@ -23,6 +23,11 @@ function autocmd.load_autocmds()
         [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
       }, -- Reload Vim script automatically if setlocal autoread
       {
+        "BufWritePre",
+        "*.go",
+        "silent! lua require('go.format').gofmt()",
+      },
+      {
         "BufWritePost,FileWritePost",
         "*.vim",
         [[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]],
