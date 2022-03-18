@@ -7,11 +7,6 @@ completion["neovim/nvim-lspconfig"] = {
   config = conf.nvim_lsp,
 }
 completion["folke/lua-dev.nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
-completion["stevearc/aerial.nvim"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-  config = conf.aerial,
-}
 completion["creativenull/efmls-configs-nvim"] = {
   opt = false,
   requires = "neovim/nvim-lspconfig",

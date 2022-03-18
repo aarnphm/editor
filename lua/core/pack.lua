@@ -165,7 +165,7 @@ function plugins.load_compile()
   vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
   vim.cmd([[command! PackerStatus lua require('core.pack').magic_compile() require('packer').status()]])
 
-  vim.cmd([[silent! colorscheme edge]])
+  vim.cmd([[silent! colorscheme PaperColor]])
 end
 
 function plugins.dashboard_config()
@@ -189,10 +189,6 @@ function plugins.dashboard_config()
       description = { " Project find               comma f p " },
       command = "Telescope project",
     },
-    edit_nvim_config = {
-      description = { " NVIM Config                comma e c " },
-      command = ":e ~/.config/nvim/init.lua",
-    },
     find_text = {
       description = { " Find Text                  comma f t " },
       command = "Telescope live_grep",
@@ -212,6 +208,10 @@ function plugins.dashboard_config()
     find_word = {
       description = { " Word find                  comma f w " },
       command = "DashboardFindWord",
+    },
+    edit_nvim_config = {
+      description = { "  NVIM Config                comma e r c " },
+      command = ":lua require('core.utils').edit_root()<CR>",
     },
   }
 end

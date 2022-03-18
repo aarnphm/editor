@@ -5,7 +5,6 @@ vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
-vim.cmd([[packadd aerial.nvim]])
 
 local saga = require("lspsaga")
 local lspconfig = require("lspconfig")
@@ -80,14 +79,13 @@ end
 local function on_editor_attach(client)
   require("lsp_signature").on_attach({
     bind = true,
-    use_lspsaga = false,
+    use_lspsaga = true,
     floating_window = true,
     fix_pos = true,
     hint_enable = true,
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
-  require("aerial").on_attach(client)
 
   if client.resolved_capabilities.document_formatting then
     vim.cmd([[augroup Format]])
@@ -130,7 +128,20 @@ local servers = {
     root_dir = lspconfig.util.root_pattern({ ".git/", "." }),
     settings = { languages = format_config },
   },
-  sumneko_lua = require("lua-dev").setup({}),
+  sumneko_lua = require("lua-dev").setup({
+      Lua = {
+        diagnostics = { globals = { "vim" } },
+        workspace = {
+          library = {
+            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+          },
+          maxPreload = 100000,
+          preloadFileSize = 10000,
+        },
+        telemetry = { enable = false },
+      },
+	}),
 }
 
 if not lsp_configs.ls_emmet then
@@ -150,7 +161,7 @@ if not lsp_configs.ls_emmet then
         "xsl",
         "pug",
         "slim",
-        "sass",
+       "sass",
         "stylus",
         "less",
         "sss",
@@ -166,22 +177,6 @@ if not lsp_configs.ls_emmet then
 end
 
 local enhance_server_opts = {
-  ["sumneko_lua"] = function(opts)
-    opts.settings = {
-      Lua = {
-        diagnostics = { globals = { "vim" } },
-        workspace = {
-          library = {
-            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-          },
-          maxPreload = 100000,
-          preloadFileSize = 10000,
-        },
-        telemetry = { enable = false },
-      },
-    }
-  end,
   ["tsserver"] = function(opts)
     -- Disable `tsserver`'s format
     opts.on_attach = function(client)

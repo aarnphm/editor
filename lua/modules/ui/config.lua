@@ -1,8 +1,12 @@
 local config = {}
 
-function config.edge()
+function config.papercolor()
   vim.cmd([[set background=light]])
-  vim.g.edge_style = "neon"
+end
+
+function config.edge()
+  vim.cmd([[set background=dark]])
+  vim.g.edge_style = "aura"
   vim.g.edge_enable_italic = 1
   vim.g.edge_disable_italic_comment = 1
   vim.g.edge_show_eob = 0

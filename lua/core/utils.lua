@@ -1,4 +1,5 @@
 local M = {}
+local root_path = vim.fn.stdpath("config")
 
 local function is_module_available(name)
   if package.loaded[name] then
@@ -39,6 +40,22 @@ function M.safe_require(pkg_name, cbk, opts)
   if #pkgs == #pkg_names then
     return cbk(unpack(pkgs))
   end
+end
+
+function M.edit_root()
+  M.safe_require('telescope.extensions', function(telescope)
+    telescope.file_browser{
+      shorten_path = true,
+      cwd = root_path,
+      prompt_title = "~ dotfiles ~",
+    }
+  end)
+end
+
+function M.reload()
+	require("core").setup()
+	require('packer').sync()
+  print('reloaded')
 end
 
 return M

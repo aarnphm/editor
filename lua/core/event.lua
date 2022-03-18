@@ -23,11 +23,6 @@ function autocmd.load_autocmds()
         [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
       }, -- Reload Vim script automatically if setlocal autoread
       {
-        "BufWritePre",
-        "*.go",
-        "silent! lua require('go.format').gofmt()",
-      },
-      {
         "BufWritePost,FileWritePost",
         "*.vim",
         [[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]],
@@ -37,6 +32,11 @@ function autocmd.load_autocmds()
       { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
       { "BufWritePre", "*.tmp", "setlocal noundofile" },
       { "BufWritePre", "*.bak", "setlocal noundofile" },
+      {
+        "BufWritePre",
+        "*.go",
+        "silent! lua require('go.format').gofmt()",
+      },
       { "BufEnter", "*", "silent! lcd %:p:h" }, -- auto place to last edit
       {
         "BufReadPost",
@@ -69,9 +69,13 @@ function autocmd.load_autocmds()
     ft = {
       { "BufNewFile,BufRead", "*.toml", " setf toml" },
       { "BufNewFile,BufRead", "*.j2", " setf html" },
-      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", " setf dockerfile" },
+      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}*", " setf dockerfile" },
+      { "BufNewFile,BufRead", "*-{Dockerfile,dockerfile}.j2", " setf dockerfile" },
       { "BufNewFile,BufRead", "Dockerfile-*", " setf dockerfile" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
+      { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
+      { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
+      { "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
       {
         "FileType",
         "dashboard",
