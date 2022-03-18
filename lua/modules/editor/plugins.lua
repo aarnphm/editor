@@ -133,6 +133,11 @@ editor["norcalli/nvim-colorizer.lua"] = {
   event = "BufRead",
   config = conf.nvim_colorizer,
 }
+editor["rmagatti/auto-session"] = {
+	opt = true,
+	cmd = { "SaveSession", "RestoreSession", "DeleteSession" },
+	config = conf.auto_session,
+}
 editor["jdhao/better-escape.vim"] = { opt = true, event = "InsertEnter" }
 editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,
@@ -142,6 +147,13 @@ editor["untitled-ai/jupyter_ascending.vim"] = {
 editor["famiu/bufdelete.nvim"] = {
   opt = true,
   cmd = { "Bdelete", "Bwipeout", "Bdelete!", "Bwipeout!" },
+}
+editor["abecodes/tabout.nvim"] = {
+	opt = true,
+	event = "InsertEnter",
+	wants = "nvim-treesitter",
+	after = "nvim-cmp",
+	config = conf.tabout,
 }
 
 return editor

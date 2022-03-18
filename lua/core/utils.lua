@@ -43,8 +43,8 @@ function M.safe_require(pkg_name, cbk, opts)
 end
 
 function M.edit_root()
-  M.safe_require('telescope.extensions', function(telescope)
-    telescope.file_browser{
+  M.safe_require('telescope.builtin', function(telescope)
+    telescope.git_files{
       shorten_path = true,
       cwd = root_path,
       prompt_title = "~ dotfiles ~",
@@ -53,7 +53,7 @@ function M.edit_root()
 end
 
 function M.reload()
-	require("core").setup()
+	require("core.pack").magic_compile()
 	require('packer').sync()
   print('reloaded')
 end

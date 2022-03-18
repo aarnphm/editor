@@ -11,6 +11,39 @@ function config.vim_cursorword()
   vim.api.nvim_command("augroup END")
 end
 
+function config.auto_session()
+	local opts = {
+		log_level = "info",
+		auto_session_enable_last_session = true,
+		auto_session_root_dir = sessions_dir,
+		auto_session_enabled = true,
+		auto_save_enabled = true,
+		auto_restore_enabled = true,
+		auto_session_suppress_dirs = nil,
+	}
+
+	require("auto-session").setup(opts)
+end
+function config.tabout()
+	require("tabout").setup({
+		tabkey = "<A-l>",
+		backwards_tabkey = "<A-h>",
+		ignore_beginning = false,
+		act_as_tab = true,
+		enable_backward = true,
+		completion = true,
+		tabouts = {
+			{ open = "'", close = "'" },
+			{ open = '"', close = '"' },
+			{ open = "`", close = "`" },
+			{ open = "(", close = ")" },
+			{ open = "[", close = "]" },
+			{ open = "{", close = "}" },
+		},
+		exclude = {},
+	})
+end
+
 function config.symbols_outline()
   require("symbols-outline").setup({
     highlight_hovered_item = true,

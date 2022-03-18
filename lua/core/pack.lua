@@ -114,19 +114,15 @@ function plugins.convert_compile_file()
   local lnum = 1
   lines[#lines + 1] = "vim.cmd [[packadd packer.nvim]]\n"
 
-  local state = uv.fs_stat(packer_compiled)
-  if not state then
-  else
-    for line in io.lines(packer_compiled) do
-      lnum = lnum + 1
-      if lnum > 15 then
-        lines[#lines + 1] = line .. "\n"
-        if line == "END" then
-          break
-        end
-      end
-    end
-  end
+	for line in io.lines(packer_compiled) do
+		lnum = lnum + 1
+		if lnum > 15 then
+			lines[#lines + 1] = line .. "\n"
+			if line == "END" then
+				break
+			end
+		end
+	end
   table.remove(lines, #lines)
 
   if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
@@ -149,6 +145,16 @@ end
 function plugins.magic_compile()
   plugins.compile()
   plugins.convert_compile_file()
+end
+
+
+function plugins.auto_compile()
+	local file = vim.fn.expand("%:p")
+	if file:match(modules_dir) then
+		plugins.clean()
+		plugins.compile()
+		plugins.convert_compile_file()
+	end
 end
 
 function plugins.load_compile()
@@ -211,7 +217,7 @@ function plugins.dashboard_config()
     },
     edit_nvim_config = {
       description = { "  NVIM Config                comma e r c " },
-      command = ":lua require('core.utils').edit_root()<CR>",
+      command = "lua require('core.utils').edit_root()",
     },
   }
 end

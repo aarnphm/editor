@@ -6,7 +6,7 @@ completion["neovim/nvim-lspconfig"] = {
   event = "BufReadPre",
   config = conf.nvim_lsp,
 }
-completion["folke/lua-dev.nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
+completion["folke/lua-dev.nvim"] = { opt = true, requires = "neovim/nvim-lspconfig" }
 completion["creativenull/efmls-configs-nvim"] = {
   opt = false,
   requires = "neovim/nvim-lspconfig",
@@ -19,13 +19,13 @@ completion["williamboman/nvim-lsp-installer"] = {
   after = "nvim-lspconfig",
 }
 completion["RishabhRD/nvim-lsputils"] = {
-  opt = true,
+  opt = false,
   after = "nvim-lspconfig",
   config = conf.nvim_lsputils,
 }
 completion["tami5/lspsaga.nvim"] = { opt = true, after = "nvim-lspconfig" }
 completion["kosayoda/nvim-lightbulb"] = {
-  opt = true,
+  opt = false,
   after = "nvim-lspconfig",
   config = conf.lightbulb,
 }
