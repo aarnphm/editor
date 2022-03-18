@@ -7,6 +7,7 @@ local packer_compiled = data_dir .. "packer_compiled.vim"
 local compile_to_lua = data_dir .. "lua/_compiled.lua"
 local bak_compiled = data_dir .. "lua/bak_compiled.lua"
 local packer = nil
+local packer_bootstrap = nil
 
 local Packer = {}
 Packer.__index = Packer
@@ -87,12 +88,15 @@ function Packer:setup_plugins()
   if not state then
     print(" Downloading packer.nvim...")
     local cmd = "!git clone https://github.com/wbthomason/packer.nvim " .. packer_dir
-    api.nvim_command(cmd)
+    packer_bootstrap = api.nvim_command(cmd)
     uv.fs_mkdir(data_dir .. "lua", 511, function()
       assert("make compile path dir failed")
     end)
-    self:load_packer()
+    self.load_packer()
     packer.install()
+		if packer_bootstrap then
+			require('packer').sync()
+		end
   end
 end
 
@@ -114,32 +118,38 @@ function plugins.convert_compile_file()
   local lnum = 1
   lines[#lines + 1] = "vim.cmd [[packadd packer.nvim]]\n"
 
-	for line in io.lines(packer_compiled) do
-		lnum = lnum + 1
-		if lnum > 15 then
-			lines[#lines + 1] = line .. "\n"
-			if line == "END" then
-				break
+
+  local state = uv.fs_stat(packer_compiled)
+  if state then
+		for line in io.lines(packer_compiled) do
+			lnum = lnum + 1
+			if lnum > 15 then
+				lines[#lines + 1] = line .. "\n"
+				if line == "END" then
+					break
+				end
 			end
 		end
+		table.remove(lines, #lines)
+
+		if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
+			os.execute("mkdir -p " .. data_dir .. "lua")
+		end
+
+		if vim.fn.filereadable(compile_to_lua) == 1 then
+			os.rename(compile_to_lua, bak_compiled)
+		end
+
+		local file = io.open(compile_to_lua, "w")
+		for _, line in ipairs(lines) do
+			file:write(line)
+		end
+		file:close()
+
+		os.remove(packer_compiled)
+	else
+		plugins.compile()
 	end
-  table.remove(lines, #lines)
-
-  if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
-    os.execute("mkdir -p " .. data_dir .. "lua")
-  end
-
-  if vim.fn.filereadable(compile_to_lua) == 1 then
-    os.rename(compile_to_lua, bak_compiled)
-  end
-
-  local file = io.open(compile_to_lua, "w")
-  for _, line in ipairs(lines) do
-    file:write(line)
-  end
-  file:close()
-
-  os.remove(packer_compiled)
 end
 
 function plugins.magic_compile()

@@ -1,9 +1,5 @@
 local config = {}
 
-function config.papercolor()
-  vim.cmd([[set background=light]])
-end
-
 function config.edge()
   vim.cmd([[set background=dark]])
   vim.g.edge_style = "aura"
@@ -119,7 +115,7 @@ function config.lualine()
       theme = "auto",
       disabled_filetypes = {},
       component_separators = "|",
-      section_separators = { left = "", right = "" },
+      -- section_separators = { left = "", right = "" },
     },
     sections = {
       lualine_a = { "mode" },

@@ -45,6 +45,7 @@ function autocmd.load_autocmds()
       },
     },
     wins = {
+			{"ColorSchemePre", "*", "set background=light"},
       -- Highlight current line only on focused window
       {
         "WinEnter,BufEnter,InsertLeave",
@@ -68,10 +69,10 @@ function autocmd.load_autocmds()
     },
     ft = {
       { "BufNewFile,BufRead", "*.toml", " setf toml" },
-      { "BufNewFile,BufRead", "*.j2", " setf html" },
-      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}*", " setf dockerfile" },
-      { "BufNewFile,BufRead", "*-{Dockerfile,dockerfile}.j2", " setf dockerfile" },
       { "BufNewFile,BufRead", "Dockerfile-*", " setf dockerfile" },
+      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", " setf dockerfile" },
+      { "BufNewFile,BufRead", "*-{Dockerfile,dockerfile}.j2", " setf dockerfile" },
+      { "BufNewFile,BufRead", "*.j2", " setf html" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },

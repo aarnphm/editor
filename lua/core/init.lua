@@ -75,6 +75,8 @@ function M:setup()
   require("core.mapping")
   require("core.event")
   require("core.pack").load_compile()
+
+  vim.cmd([[set background=light]])
 end
 
 return M

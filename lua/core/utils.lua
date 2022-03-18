@@ -43,13 +43,8 @@ function M.safe_require(pkg_name, cbk, opts)
 end
 
 function M.edit_root()
-  M.safe_require('telescope.builtin', function(telescope)
-    telescope.git_files{
-      shorten_path = true,
-      cwd = root_path,
-      prompt_title = "~ dotfiles ~",
-    }
-  end)
+	local telescope = require("telescope.builtin")
+	telescope.git_files { shorten_path = true, cwd = root_path }
 end
 
 function M.reload()

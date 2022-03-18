@@ -54,11 +54,11 @@ function config.telescope()
     },
   })
 
-  require("telescope").load_extension("file_browser")
   require("telescope").load_extension("fzf")
-  require("telescope").load_extension("project")
   require("telescope").load_extension("zoxide")
   require("telescope").load_extension("frecency")
+  require("telescope").load_extension("file_browser")
+  require("telescope").load_extension("project")
 end
 
 function config.wilder()
