@@ -42,7 +42,7 @@ local def_map = {
 bind.nvim_load_mapping(def_map)
 
 local plug_map = {
-	-- reload and edit config
+  -- reload and edit config
   ["n|<Leader>rc"] = map_cu("lua require('core.utils').reload()<CR>"):with_noremap():with_silent(),
   ["n|<Leader>erc"] = map_cu("lua require('core.utils').edit_root()<CR>"):with_noremap():with_silent(),
   ["n|<Leader>ec"] = map_cu(":e ~/.config/nvim/init.lua"):with_noremap():with_silent(),
@@ -57,18 +57,18 @@ local plug_map = {
   ["n|<leader>be"] = map_cr("BufferLineSortByExtension"):with_noremap(),
   ["n|<leader>bd"] = map_cr("BufferLineSortByDirectory"):with_noremap(),
   ["n|1gt"] = map_cr("BufferLineGoToBuffer 1"):with_noremap():with_silent(),
-	["n|2gt"] = map_cr("BufferLineGoToBuffer 2"):with_noremap():with_silent(),
-	["n|3gt"] = map_cr("BufferLineGoToBuffer 3"):with_noremap():with_silent(),
-	["n|4gt"] = map_cr("BufferLineGoToBuffer 4"):with_noremap():with_silent(),
-	["n|5gt"] = map_cr("BufferLineGoToBuffer 5"):with_noremap():with_silent(),
-	["n|6gt"] = map_cr("BufferLineGoToBuffer 6"):with_noremap():with_silent(),
-	["n|7gt"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),
-	["n|8gt"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
-	["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
+  ["n|2gt"] = map_cr("BufferLineGoToBuffer 2"):with_noremap():with_silent(),
+  ["n|3gt"] = map_cr("BufferLineGoToBuffer 3"):with_noremap():with_silent(),
+  ["n|4gt"] = map_cr("BufferLineGoToBuffer 4"):with_noremap():with_silent(),
+  ["n|5gt"] = map_cr("BufferLineGoToBuffer 5"):with_noremap():with_silent(),
+  ["n|6gt"] = map_cr("BufferLineGoToBuffer 6"):with_noremap():with_silent(),
+  ["n|7gt"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),
+  ["n|8gt"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
+  ["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
   ["n|<A-1>"] = map_cr("BufferLineGoToBuffer 1"):with_noremap():with_silent(),
   ["n|<A-2>"] = map_cr("BufferLineGoToBuffer 2"):with_noremap():with_silent(),
   ["n|<A-3>"] = map_cr("BufferLineGoToBuffer 3"):with_noremap():with_silent(),
-	["n|<A-4>"] = map_cr("BufferLineGoToBuffer 4"):with_noremap():with_silent(),
+  ["n|<A-4>"] = map_cr("BufferLineGoToBuffer 4"):with_noremap():with_silent(),
   ["n|<A-5>"] = map_cr("BufferLineGoToBuffer 5"):with_noremap():with_silent(),
   ["n|<A-6>"] = map_cr("BufferLineGoToBuffer 6"):with_noremap():with_silent(),
   ["n|<A-7>"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),

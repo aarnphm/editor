@@ -1,4 +1,5 @@
-local rhs_options = {} function rhs_options:new()
+local rhs_options = {}
+function rhs_options:new()
   local instance = {
     cmd = "",
     options = {

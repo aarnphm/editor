@@ -43,14 +43,14 @@ function M.safe_require(pkg_name, cbk, opts)
 end
 
 function M.edit_root()
-	local telescope = require("telescope.builtin")
-	telescope.git_files { shorten_path = true, cwd = root_path }
+  local telescope = require("telescope.builtin")
+  telescope.git_files({ shorten_path = true, cwd = root_path })
 end
 
 function M.reload()
-	require("core.pack").magic_compile()
-	require('packer').sync()
-  print('reloaded')
+  require("core.pack").magic_compile()
+  require("packer").sync()
+  print("reloaded")
 end
 
 return M

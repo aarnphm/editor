@@ -94,9 +94,9 @@ function Packer:setup_plugins()
     end)
     self.load_packer()
     packer.install()
-		if packer_bootstrap then
-			require('packer').sync()
-		end
+    if packer_bootstrap then
+      require("packer").sync()
+    end
   end
 end
 
@@ -118,38 +118,37 @@ function plugins.convert_compile_file()
   local lnum = 1
   lines[#lines + 1] = "vim.cmd [[packadd packer.nvim]]\n"
 
-
   local state = uv.fs_stat(packer_compiled)
   if state then
-		for line in io.lines(packer_compiled) do
-			lnum = lnum + 1
-			if lnum > 15 then
-				lines[#lines + 1] = line .. "\n"
-				if line == "END" then
-					break
-				end
-			end
-		end
-		table.remove(lines, #lines)
+    for line in io.lines(packer_compiled) do
+      lnum = lnum + 1
+      if lnum > 15 then
+        lines[#lines + 1] = line .. "\n"
+        if line == "END" then
+          break
+        end
+      end
+    end
+    table.remove(lines, #lines)
 
-		if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
-			os.execute("mkdir -p " .. data_dir .. "lua")
-		end
+    if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
+      os.execute("mkdir -p " .. data_dir .. "lua")
+    end
 
-		if vim.fn.filereadable(compile_to_lua) == 1 then
-			os.rename(compile_to_lua, bak_compiled)
-		end
+    if vim.fn.filereadable(compile_to_lua) == 1 then
+      os.rename(compile_to_lua, bak_compiled)
+    end
 
-		local file = io.open(compile_to_lua, "w")
-		for _, line in ipairs(lines) do
-			file:write(line)
-		end
-		file:close()
+    local file = io.open(compile_to_lua, "w")
+    for _, line in ipairs(lines) do
+      file:write(line)
+    end
+    file:close()
 
-		os.remove(packer_compiled)
-	else
-		plugins.compile()
-	end
+    os.remove(packer_compiled)
+  else
+    plugins.compile()
+  end
 end
 
 function plugins.magic_compile()
@@ -157,14 +156,13 @@ function plugins.magic_compile()
   plugins.convert_compile_file()
 end
 
-
 function plugins.auto_compile()
-	local file = vim.fn.expand("%:p")
-	if file:match(modules_dir) then
-		plugins.clean()
-		plugins.compile()
-		plugins.convert_compile_file()
-	end
+  local file = vim.fn.expand("%:p")
+  if file:match(modules_dir) then
+    plugins.clean()
+    plugins.compile()
+    plugins.convert_compile_file()
+  end
 end
 
 function plugins.load_compile()

@@ -45,7 +45,7 @@ function autocmd.load_autocmds()
       },
     },
     wins = {
-			{"ColorSchemePre", "*", "set background=light"},
+      { "ColorSchemePre", "*", "set background=light" },
       -- Highlight current line only on focused window
       {
         "WinEnter,BufEnter,InsertLeave",

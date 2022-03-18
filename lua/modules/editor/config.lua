@@ -12,36 +12,36 @@ function config.vim_cursorword()
 end
 
 function config.auto_session()
-	local opts = {
-		log_level = "info",
-		auto_session_enable_last_session = true,
-		auto_session_root_dir = sessions_dir,
-		auto_session_enabled = true,
-		auto_save_enabled = true,
-		auto_restore_enabled = true,
-		auto_session_suppress_dirs = nil,
-	}
+  local opts = {
+    log_level = "info",
+    auto_session_enable_last_session = true,
+    auto_session_root_dir = sessions_dir,
+    auto_session_enabled = true,
+    auto_save_enabled = true,
+    auto_restore_enabled = true,
+    auto_session_suppress_dirs = nil,
+  }
 
-	require("auto-session").setup(opts)
+  require("auto-session").setup(opts)
 end
 function config.tabout()
-	require("tabout").setup({
-		tabkey = "<A-l>",
-		backwards_tabkey = "<A-h>",
-		ignore_beginning = false,
-		act_as_tab = true,
-		enable_backward = true,
-		completion = true,
-		tabouts = {
-			{ open = "'", close = "'" },
-			{ open = '"', close = '"' },
-			{ open = "`", close = "`" },
-			{ open = "(", close = ")" },
-			{ open = "[", close = "]" },
-			{ open = "{", close = "}" },
-		},
-		exclude = {},
-	})
+  require("tabout").setup({
+    tabkey = "<A-l>",
+    backwards_tabkey = "<A-h>",
+    ignore_beginning = false,
+    act_as_tab = true,
+    enable_backward = true,
+    completion = true,
+    tabouts = {
+      { open = "'", close = "'" },
+      { open = '"', close = '"' },
+      { open = "`", close = "`" },
+      { open = "(", close = ")" },
+      { open = "[", close = "]" },
+      { open = "{", close = "}" },
+    },
+    exclude = {},
+  })
 end
 
 function config.symbols_outline()

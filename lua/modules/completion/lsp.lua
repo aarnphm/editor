@@ -129,19 +129,19 @@ local servers = {
     settings = { languages = format_config },
   },
   sumneko_lua = require("lua-dev").setup({
-      Lua = {
-        diagnostics = { globals = { "vim" } },
-        workspace = {
-          library = {
-            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-            [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-          },
-          maxPreload = 100000,
-          preloadFileSize = 10000,
+    Lua = {
+      diagnostics = { globals = { "vim" } },
+      workspace = {
+        library = {
+          [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+          [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
         },
-        telemetry = { enable = false },
+        maxPreload = 100000,
+        preloadFileSize = 10000,
       },
-	}),
+      telemetry = { enable = false },
+    },
+  }),
 }
 
 if not lsp_configs.ls_emmet then
@@ -161,7 +161,7 @@ if not lsp_configs.ls_emmet then
         "xsl",
         "pug",
         "slim",
-       "sass",
+        "sass",
         "stylus",
         "less",
         "sss",
