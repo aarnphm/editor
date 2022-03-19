@@ -19,7 +19,7 @@ function autocmd.load_autocmds()
 
   local definitions = {
     packer = {
-      { "BufWritePost", "*.lua", "lua require('core.pack').auto_compile()" },
+      { "BufWritePost", "*.lua", "lua require('core.pack').magic_compile()" },
     },
     bufs = {
       -- Reload vim config automatically
@@ -50,18 +50,11 @@ function autocmd.load_autocmds()
       },
     },
     wins = {
-      { "ColorSchemePre", "*", "set background=light" },
-      -- Highlight current line only on focused window
       {
         "WinEnter,BufEnter,InsertLeave",
         "*",
         [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]],
       },
-      {
-        "WinLeave,BufLeave,InsertEnter",
-        "*",
-        [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]],
-      }, -- Force write shada on leaving nvim
       {
         "VimLeave",
         "*",

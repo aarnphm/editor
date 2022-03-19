@@ -31,7 +31,7 @@ ui["hoob3rt/lualine.nvim"] = {
   config = conf.lualine,
 }
 ui["arkav/lualine-lsp-progress"] = { opt = true, after = "nvim-gps" }
-ui["glepnir/dashboard-nvim"] = { opt = true, event = "BufWinEnter" }
+ui["glepnir/dashboard-nvim"] = { opt = false, event = "BufWinEnter" }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle", "NvimTreeOpen" },

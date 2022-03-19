@@ -44,7 +44,7 @@ end
 
 function M.edit_root()
   local telescope = require("telescope.builtin")
-  telescope.git_files({ shorten_path = true, cwd = root_path })
+  telescope.find_files({ shorten_path = true, cwd = root_path })
 end
 
 function M.reload()

@@ -1,9 +1,9 @@
 local tools = {}
 local conf = require("modules.tools.config")
-local utils = require("core.utils")
 
 tools["RishabhRD/popfix"] = { opt = false }
 tools["nvim-lua/plenary.nvim"] = { opt = false }
+tools["wakatime/vim-wakatime"] = { opt = false }
 tools["nvim-telescope/telescope.nvim"] = {
   opt = false,
   module = "telescope",

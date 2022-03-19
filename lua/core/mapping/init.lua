@@ -23,7 +23,7 @@ local def_map = {
   ["n|<leader>I"] = map_cmd(":set list!<cr>"):with_noremap(),
   ["n|\\"] = map_cmd(":let @/=''<CR>:noh<CR>"):with_noremap(),
   ["n|<leader>p"] = map_cmd(":%s///g<CR>"):with_noremap():with_silent(),
-  ["n|<leader>i"] = map_cmd("gg=G<CR>"):with_noremap():with_silent(),
+	["n|<leader>i"] = map_cmd("gg=G<CR>"):with_noremap():with_silent(),
   ["n|<leader>l"] = map_cmd(":set list! list?<CR>"):with_noremap(),
   ["n|<leader>t"] = map_cmd(":%s/\\s\\+$//e<CR>"):with_noremap(),
   -- Insert
@@ -65,18 +65,9 @@ local plug_map = {
   ["n|7gt"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),
   ["n|8gt"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
   ["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
-  ["n|<A-1>"] = map_cr("BufferLineGoToBuffer 1"):with_noremap():with_silent(),
-  ["n|<A-2>"] = map_cr("BufferLineGoToBuffer 2"):with_noremap():with_silent(),
-  ["n|<A-3>"] = map_cr("BufferLineGoToBuffer 3"):with_noremap():with_silent(),
-  ["n|<A-4>"] = map_cr("BufferLineGoToBuffer 4"):with_noremap():with_silent(),
-  ["n|<A-5>"] = map_cr("BufferLineGoToBuffer 5"):with_noremap():with_silent(),
-  ["n|<A-6>"] = map_cr("BufferLineGoToBuffer 6"):with_noremap():with_silent(),
-  ["n|<A-7>"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),
-  ["n|<A-8>"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
-  ["n|<A-9>"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
   -- minimap
-  ["n|<Leader>mm"] = map_cr("MinimapToggle"):with_noremap():with_silent(),
-  ["n|<Leader>mr"] = map_cr("MinimapRefresh"):with_noremap():with_silent(),
+  ["n|mm"] = map_cr("MinimapToggle"):with_noremap():with_silent(),
+  ["n|mmr"] = map_cr("MinimapRefresh"):with_noremap():with_silent(),
   -- Packer
   ["n|<Space>ps"] = map_cr("PackerSync"):with_silent():with_noremap():with_nowait(),
   ["n|<Space>pu"] = map_cr("PackerUpdate"):with_silent():with_noremap():with_nowait(),
@@ -140,7 +131,8 @@ local plug_map = {
   -- Plugin MarkdownPreview
   ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
   -- Plugin go.nvim
-  ["n|<Leader>gof"] = map_cr('require("go.format").goimport()'):with_noremap():with_silent(),
+  ["n|<Leader>gof"] = map_cr('lua require("go.format").goimport()'):with_noremap():with_silent(),
+	["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
 }
 
 bind.nvim_load_mapping(plug_map)

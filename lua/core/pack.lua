@@ -138,6 +138,7 @@ end
 function plugins.auto_compile()
   local file = vim.fn.expand("%:p")
   if file:match(modules_dir) then
+    plugins.clean()
     plugins.compile()
     plugins.convert_compile_file()
   end
@@ -198,10 +199,6 @@ function plugins.dashboard_config()
     find_word = {
       description = { " Word find                  comma f w " },
       command = "DashboardFindWord",
-    },
-    edit_nvim_config = {
-      description = { "  NVIM Config               comma e r c " },
-      command = "lua require('core.utils').edit_root()",
     },
   }
 end
