@@ -52,13 +52,6 @@ function M.reload()
   require("packer").sync()
 end
 
-function M.config()
-  return {
-    colorscheme = "onenord",
-    background = "dark",
-  }
-end
-
 local status_config = {
   -- hide, show on specific filetypes
   hidden = {
@@ -88,6 +81,13 @@ M.hide_statusline = function()
   end
 
   api.nvim_set_option("laststatus", 2)
+end
+
+function M.config()
+  return {
+    colorscheme = "tokyonight",
+    background = "dark",
+  }
 end
 
 return M

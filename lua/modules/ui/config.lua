@@ -1,5 +1,14 @@
 local config = {}
 
+function config.tokyo()
+	vim.g.tokyonight_style = "night"
+	vim.g.tokyonight_italic_functions = true
+	vim.g.tokyonight_sidebars = { "terminal", "packer" }
+
+	-- Change the "hint" color to the "orange" color, and make the "error" color bright red
+	vim.g.tokyonight_colors = { hint = "orange", error = "#ff0000" }
+
+end
 function config.edge()
   vim.cmd([[set background=dark]])
   vim.g.edge_style = "aura"
@@ -364,7 +373,7 @@ function config.indent_blankline()
     space_char_blankline = " ",
   })
   -- because lazy load indent-blankline so need readd this autocmd
-  -- vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
+  vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
 end
 
 return config
