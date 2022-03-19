@@ -1,8 +1,8 @@
-local bind = require("core.mapping.bind")
+local bind = require("mapping.bind")
 local map_cr = bind.map_cr
 local map_cu = bind.map_cu
 local map_cmd = bind.map_cmd
-require("core.mapping.config")
+require("mapping.config")
 
 -- default map
 local def_map = {
@@ -23,7 +23,7 @@ local def_map = {
   ["n|<leader>I"] = map_cmd(":set list!<cr>"):with_noremap(),
   ["n|\\"] = map_cmd(":let @/=''<CR>:noh<CR>"):with_noremap(),
   ["n|<leader>p"] = map_cmd(":%s///g<CR>"):with_noremap():with_silent(),
-	["n|<leader>i"] = map_cmd("gg=G<CR>"):with_noremap():with_silent(),
+  ["n|<leader>i"] = map_cmd("gg=G<CR>"):with_noremap():with_silent(),
   ["n|<leader>l"] = map_cmd(":set list! list?<CR>"):with_noremap(),
   ["n|<leader>t"] = map_cmd(":%s/\\s\\+$//e<CR>"):with_noremap(),
   -- Insert
@@ -132,7 +132,7 @@ local plug_map = {
   ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
   -- Plugin go.nvim
   ["n|<Leader>gof"] = map_cr('lua require("go.format").goimport()'):with_noremap():with_silent(),
-	["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
+  ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
 }
 
 bind.nvim_load_mapping(plug_map)

@@ -192,12 +192,12 @@ function config.nvim_tree()
     ignore_ft_on_setup = {},
     auto_close = true,
     auto_reload_on_write = true,
-    open_on_tab = false,
+    open_on_tab = true,
     hijack_cursor = true,
     update_cwd = false,
     update_to_buf_dir = { enable = true, auto_open = true },
     diagnostics = {
-      enable = false,
+      enable = true,
       icons = { hint = "", info = "", warning = "", error = "" },
     },
     update_focused_file = {
@@ -215,11 +215,11 @@ function config.nvim_tree()
       side = "left",
       auto_resize = false,
       mappings = { custom_only = false, list = {} },
-      number = false,
-      relativenumber = false,
+      number = true,
+      relativenumber = true,
       signcolumn = "yes",
     },
-    trash = { cmd = "trash", require_confirm = true },
+    trash = { cmd = "rip", require_confirm = true },
   })
 end
 

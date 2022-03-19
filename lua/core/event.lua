@@ -19,7 +19,7 @@ function autocmd.load_autocmds()
 
   local definitions = {
     packer = {
-      { "BufWritePost", "*.lua", "lua require('core.pack').magic_compile()" },
+      { "BufWritePost", "*.lua", "lua require('core.pack').auto_compile()" },
     },
     bufs = {
       -- Reload vim config automatically

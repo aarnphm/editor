@@ -115,9 +115,9 @@ editor["lewis6991/spellsitter.nvim"] = {
 editor["folke/zen-mode.nvim"] = {
   opt = true,
   after = "nvim-treesitter",
-	requires = {
-		"folke/twilight.nvim"
-	},
+  requires = {
+    "folke/twilight.nvim",
+  },
   config = function()
     require("zen-mode").setup({
       window = {
@@ -156,7 +156,7 @@ editor["folke/zen-mode.nvim"] = {
         -- - allow_remote_control socket-only
         -- - listen_on unix:/tmp/kitty
         kitty = {
-          enabled = true,
+          enabled = false,
           font = "+4", -- font size increment
         },
       },

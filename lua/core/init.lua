@@ -69,11 +69,12 @@ end
 function M:setup()
   local config = require("core.utils").config()
   M.preflight()
+
+  require("mapping")
   require("core.pack").ensure_plugins()
   require("core.pack").dashboard_config()
 
   require("core.options").load_options()
-  require("core.mapping")
   require("core.event")
   require("core.pack").load_compile()
 
