@@ -80,11 +80,11 @@ editor["nvim-treesitter/nvim-treesitter"] = {
   event = "BufRead",
   config = conf.nvim_treesitter,
 }
-editor["nvim-treesitter/playground"] = {
+editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
+editor["nvim-treesitter/playground"] = {
   opt = true,
   after = "nvim-treesitter",
 }
@@ -105,11 +105,42 @@ editor["mfussenegger/nvim-ts-hint-textobject"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["lewis6991/spellsitter.nvim"] = { opt = true, after = "nvim-treesitter" }
-
+editor["lewis6991/spellsitter.nvim"] = {
+  opt = true,
+  after = "nvim-treesitter",
+  config = function()
+    require("spellsitter").setup()
+  end,
+}
+editor["folke/twilight.nvim"] = {
+  opt = true,
+  after = "nvim-treesitter",
+  config = function()
+    require("twilight").setup({
+      dimming = {
+        alpha = 0.25, -- amount of dimming
+        -- we try to get the foreground from the highlight groups or fallback color
+        color = { "Normal", "#ffffff" },
+        inactive = false, -- when true, other windows will be fully dimmed (unless they contain the same buffer)
+      },
+      context = 10, -- amount of lines we will try to show around the current line
+      treesitter = true, -- use treesitter when available for the filetype
+      -- treesitter is used to automatically expand the visible text,
+      -- but you can further control the types of nodes that should always be fully expanded
+      expand = { -- for treesitter, we we always try to expand to the top-most ancestor with these types
+        "function",
+        "method",
+        "table",
+        "if_statement",
+      },
+      exclude = {}, -- exclude these filetypes
+    })
+  end,
+}
 editor["windwp/nvim-ts-autotag"] = {
   opt = true,
   ft = { "html", "xml" },
+  after = "nvim-treesitter",
   config = conf.autotag,
 }
 editor["andymass/vim-matchup"] = {

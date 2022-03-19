@@ -1,14 +1,13 @@
 local config = {}
 
 function config.tokyo()
-	vim.g.tokyonight_style = "night"
-	vim.g.tokyonight_italic_functions = true
-	vim.g.tokyonight_sidebars = { "terminal", "packer" }
-
-	-- Change the "hint" color to the "orange" color, and make the "error" color bright red
-	vim.g.tokyonight_colors = { hint = "orange", error = "#ff0000" }
-
+  require("tokyonight.colors").setup({
+    tokyonight_style = "storm",
+    tokyonight_italic_functions = true,
+    tokyonight_sidebars = { "terminal", "packer" },
+  })
 end
+
 function config.edge()
   vim.cmd([[set background=dark]])
   vim.g.edge_style = "aura"

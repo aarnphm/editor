@@ -1,8 +1,8 @@
 local ui = {}
 local conf = require("modules.ui.config")
 
-ui["folke/tokyonight.nvim"] = { opt=false, config=conf.tokyo }
-ui["jacoborus/tender.vim"] = { opt=false }
+ui["folke/tokyonight.nvim"] = { opt = false, config = conf.tokyo }
+ui["jacoborus/tender.vim"] = { opt = false }
 ui["kyazdani42/nvim-web-devicons"] = { opt = false }
 ui["rebelot/kanagawa.nvim"] = { opt = false, config = conf.kanagawa }
 ui["NLKNguyen/papercolor-theme"] = { opt = false }

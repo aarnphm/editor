@@ -96,43 +96,23 @@ function config.symbols_outline()
 end
 
 function config.nvim_treesitter()
-  vim.api.nvim_command("set foldmethod=expr")
-  vim.api.nvim_command("set foldexpr=nvim_treesitter#foldexpr()")
+  vim.cmd([[set foldmethod=expr]])
+  vim.cmd([[set foldexpr=nvim_treesitter#foldexpr()]])
 
   require("nvim-treesitter.configs").setup({
     ensure_installed = "maintained",
-    highlight = { enable = true, disable = { "vim" } },
-    textobjects = {
-      select = {
-        enable = true,
-        keymaps = {
-          ["af"] = "@function.outer",
-          ["if"] = "@function.inner",
-          ["ac"] = "@class.outer",
-          ["ic"] = "@class.inner",
-        },
-      },
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          ["]["] = "@function.outer",
-          ["]m"] = "@class.outer",
-        },
-        goto_next_end = {
-          ["]]"] = "@function.outer",
-          ["]M"] = "@class.outer",
-        },
-        goto_previous_start = {
-          ["[["] = "@function.outer",
-          ["[m"] = "@class.outer",
-        },
-        goto_previous_end = {
-          ["[]"] = "@function.outer",
-          ["[M"] = "@class.outer",
-        },
+    sync_install = true,
+    incremental_selection = {
+      enable = true,
+      keymaps = {
+        -- mappings for incremental selection (visual mappings)
+        init_selection = "gnn", -- maps in normal mode to init the node/scope selection
+        node_incremental = "grn", -- increment to the upper named parent
+        scope_incremental = "grc", -- increment to the upper scope (as defined in locals.scm)
+        node_decremental = "grm", -- decrement to the previous node
       },
     },
+    highlight = { enable = true },
     rainbow = {
       enable = true,
       extended_mode = true, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
@@ -141,6 +121,79 @@ function config.nvim_treesitter()
     context_commentstring = { enable = false, enable_autocmd = false },
     matchup = { enable = true },
     context = { enable = true, throttle = true },
+    playground = {
+      enable = true,
+      disable = {},
+      updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+      persist_queries = false, -- Whether the query persists across vim sessions
+      keybindings = {
+        toggle_query_editor = "o",
+        toggle_hl_groups = "i",
+        toggle_injected_languages = "t",
+        toggle_anonymous_nodes = "a",
+        toggle_language_display = "I",
+        focus_language = "f",
+        unfocus_language = "F",
+        update = "R",
+        goto_node = "<cr>",
+        show_help = "?",
+      },
+    },
+    textobjects = {
+      enable = true,
+      lsp_interop = {
+        enable = true,
+        peek_definition_code = {
+          ["Df"] = "@function.outer",
+          ["Dc"] = "@class.outer",
+        },
+      },
+      swap = {
+        enable = true,
+        swap_next = {
+          ["<leader>a"] = "@parameter.inner",
+        },
+        swap_previous = {
+          ["<leader>A"] = "@parameter.inner",
+        },
+      },
+      select = {
+        enable = true,
+        keymaps = {
+          ["af"] = "@function.outer",
+          ["if"] = "@function.inner",
+          ["ac"] = "@class.outer",
+          ["ic"] = "@class.inner",
+          ["iF"] = {
+            python = "(function_definition) @function",
+            cpp = "(function_definition) @function",
+            c = "(function_definition) @function",
+            java = "(method_declaration) @function",
+            go = "(method_declaration) @function",
+          },
+        },
+      },
+      move = {
+        enable = true,
+        set_jumps = true, -- whether to set jumps in the jumplist
+        goto_next_start = {
+          ["]m"] = "@function.outer",
+          ["]]"] = "@class.outer",
+        },
+        goto_next_end = {
+          ["]M"] = "@function.outer",
+          ["]["] = "@class.outer",
+        },
+        goto_previous_start = {
+          ["[m"] = "@function.outer",
+          ["[["] = "@class.outer",
+        },
+        goto_previous_end = {
+          ["[M"] = "@function.outer",
+          ["[]"] = "@class.outer",
+        },
+      },
+    },
   })
 end
 
