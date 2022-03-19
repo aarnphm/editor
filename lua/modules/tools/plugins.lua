@@ -14,26 +14,26 @@ tools["nvim-telescope/telescope.nvim"] = {
     { "nvim-lua/popup.nvim", opt = false },
   },
 }
-tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true }
+tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = false }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
-  opt = true,
+  opt = false,
   run = "make",
   after = "telescope.nvim",
 }
 tools["nvim-telescope/telescope-project.nvim"] = {
-  opt = true,
+  opt = false,
   after = "telescope.nvim",
 }
 tools["nvim-telescope/telescope-file-browser.nvim"] = {
-  opt = true,
+  opt = false,
   after = "telescope.nvim",
 }
 tools["nvim-telescope/telescope-frecency.nvim"] = {
-  opt = true,
+  opt = false,
   after = "telescope.nvim",
-  requires = { { "tami5/sqlite.lua", opt = true } },
+  requires = { { "tami5/sqlite.lua", opt = false } },
 }
-tools["jvgrootveld/telescope-zoxide"] = { opt = true, after = "telescope-frecency.nvim" }
+tools["jvgrootveld/telescope-zoxide"] = { opt = false, after = "telescope-frecency.nvim" }
 tools["thinca/vim-quickrun"] = { opt = true, cmd = { "QuickRun", "Q" } }
 tools["folke/which-key.nvim"] = {
   opt = true,

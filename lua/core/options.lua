@@ -1,9 +1,11 @@
 local global = require("core.global")
+local config = require("core.utils").config()
 
 local M = {}
 M.__index = M
 
 function M:bind_option(options)
+  vim.cmd("silent! colorscheme " .. config.colorscheme)
   for k, v in pairs(options) do
     if v == true then
       vim.cmd("set " .. k)
@@ -17,6 +19,7 @@ end
 
 function M:load_options()
   local bw_local = {
+    background = config.background,
     number = true,
     relativenumber = true,
     autoindent = true,

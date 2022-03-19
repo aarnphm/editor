@@ -14,8 +14,13 @@ function autocmd.nvim_create_augroups(definitions)
 end
 
 function autocmd.load_autocmds()
+  -- remove statusline when entering into some buffer
+  vim.cmd([[ autocmd BufEnter,BufRead,BufWinEnter,FileType,WinEnter * lua require("core.utils").hide_statusline() ]])
+
   local definitions = {
-    packer = {},
+    packer = {
+      { "BufWritePost", "*.lua", "lua require('core.pack').auto_compile()" },
+    },
     bufs = {
       -- Reload vim config automatically
       {

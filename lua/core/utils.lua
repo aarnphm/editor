@@ -50,7 +50,44 @@ end
 function M.reload()
   require("core.pack").magic_compile()
   require("packer").sync()
-  print("reloaded")
+end
+
+function M.config()
+  return {
+    colorscheme = "onenord",
+    background = "dark",
+  }
+end
+
+local status_config = {
+  -- hide, show on specific filetypes
+  hidden = {
+    "help",
+    "NvimTree",
+    "terminal",
+    "alpha",
+  },
+  shown = {},
+}
+
+M.hide_statusline = function()
+  local hidden = status_config.hidden
+  local shown = status_config.shown
+  local api = vim.api
+  local buftype = api.nvim_buf_get_option(0, "ft")
+
+  -- shown table from config has the highest priority
+  if vim.tbl_contains(shown, buftype) then
+    api.nvim_set_option("laststatus", 2)
+    return
+  end
+
+  if vim.tbl_contains(hidden, buftype) then
+    api.nvim_set_option("laststatus", 0)
+    return
+  end
+
+  api.nvim_set_option("laststatus", 2)
 end
 
 return M

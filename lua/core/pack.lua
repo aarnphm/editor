@@ -7,21 +7,11 @@ local packer_compiled = data_dir .. "packer_compiled.vim"
 local compile_to_lua = data_dir .. "lua/_compiled.lua"
 local bak_compiled = data_dir .. "lua/bak_compiled.lua"
 local packer = nil
-local packer_bootstrap = nil
 
 local Packer = {}
 Packer.__index = Packer
 
-local preflight_plugins = function(use)
-  use({
-    "lewis6991/impatient.nvim",
-    -- rocks = 'mpack'
-  })
-  use({ "wbthomason/packer.nvim", opt = true })
-  use("antoinemadec/FixCursorHold.nvim") -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
-end
-
-function Packer:get_plugins_mapping()
+function Packer:load_plugins()
   self.repos = {}
 
   local get_plugins_list = function()
@@ -47,7 +37,6 @@ function Packer:load_packer()
     api.nvim_command("packadd packer.nvim")
     packer = require("packer")
   end
-
   if not is_mac then
     packer.init({
       compile_path = packer_compiled,
@@ -64,7 +53,7 @@ function Packer:load_packer()
       compile_path = packer_compiled,
       git = { clone_timeout = 60, default_url_format = "git@github.com:%s" },
       disable_commands = true,
-      max_jobs = 50,
+      max_jobs = 20,
       display = {
         open_fn = function()
           return require("packer.util").float({ border = "single" })
@@ -72,31 +61,26 @@ function Packer:load_packer()
       },
     })
   end
-
   packer.reset()
   local use = packer.use
-  self:get_plugins_mapping()
-  preflight_plugins(use)
+  self:load_plugins()
+  use({ "wbthomason/packer.nvim", opt = true })
   for _, repo in ipairs(self.repos) do
     use(repo)
   end
 end
 
-function Packer:setup_plugins()
+function Packer:init_ensure_plugins()
   local packer_dir = data_dir .. "pack/packer/opt/packer.nvim"
   local state = uv.fs_stat(packer_dir)
   if not state then
-    print(" Downloading packer.nvim...")
     local cmd = "!git clone https://github.com/wbthomason/packer.nvim " .. packer_dir
-    packer_bootstrap = api.nvim_command(cmd)
+    api.nvim_command(cmd)
     uv.fs_mkdir(data_dir .. "lua", 511, function()
       assert("make compile path dir failed")
     end)
-    self.load_packer()
+    self:load_packer()
     packer.install()
-    if packer_bootstrap then
-      require("packer").sync()
-    end
   end
 end
 
@@ -109,8 +93,8 @@ local plugins = setmetatable({}, {
   end,
 })
 
-function plugins.setup_plugins()
-  Packer:setup_plugins()
+function plugins.ensure_plugins()
+  Packer:init_ensure_plugins()
 end
 
 function plugins.convert_compile_file()
@@ -118,37 +102,32 @@ function plugins.convert_compile_file()
   local lnum = 1
   lines[#lines + 1] = "vim.cmd [[packadd packer.nvim]]\n"
 
-  local state = uv.fs_stat(packer_compiled)
-  if state then
-    for line in io.lines(packer_compiled) do
-      lnum = lnum + 1
-      if lnum > 15 then
-        lines[#lines + 1] = line .. "\n"
-        if line == "END" then
-          break
-        end
+  for line in io.lines(packer_compiled) do
+    lnum = lnum + 1
+    if lnum > 15 then
+      lines[#lines + 1] = line .. "\n"
+      if line == "END" then
+        break
       end
     end
-    table.remove(lines, #lines)
-
-    if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
-      os.execute("mkdir -p " .. data_dir .. "lua")
-    end
-
-    if vim.fn.filereadable(compile_to_lua) == 1 then
-      os.rename(compile_to_lua, bak_compiled)
-    end
-
-    local file = io.open(compile_to_lua, "w")
-    for _, line in ipairs(lines) do
-      file:write(line)
-    end
-    file:close()
-
-    os.remove(packer_compiled)
-  else
-    plugins.compile()
   end
+  table.remove(lines, #lines)
+
+  if vim.fn.isdirectory(data_dir .. "lua") ~= 1 then
+    os.execute("mkdir -p " .. data_dir .. "lua")
+  end
+
+  if vim.fn.filereadable(compile_to_lua) == 1 then
+    os.rename(compile_to_lua, bak_compiled)
+  end
+
+  local file = io.open(compile_to_lua, "w")
+  for _, line in ipairs(lines) do
+    file:write(line)
+  end
+  file:close()
+
+  os.remove(packer_compiled)
 end
 
 function plugins.magic_compile()
@@ -159,7 +138,6 @@ end
 function plugins.auto_compile()
   local file = vim.fn.expand("%:p")
   if file:match(modules_dir) then
-    plugins.clean()
     plugins.compile()
     plugins.convert_compile_file()
   end
@@ -178,8 +156,6 @@ function plugins.load_compile()
   vim.cmd([[command! PackerClean lua require('core.pack').clean()]])
   vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
   vim.cmd([[command! PackerStatus lua require('core.pack').magic_compile() require('packer').status()]])
-
-  vim.cmd([[silent! colorscheme PaperColor]])
 end
 
 function plugins.dashboard_config()
@@ -224,7 +200,7 @@ function plugins.dashboard_config()
       command = "DashboardFindWord",
     },
     edit_nvim_config = {
-      description = { "  NVIM Config                comma e r c " },
+      description = { "  NVIM Config               comma e r c " },
       command = "lua require('core.utils').edit_root()",
     },
   }

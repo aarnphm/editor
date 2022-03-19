@@ -2,6 +2,7 @@ local global = require("core.global")
 local vim = vim
 local g = vim.g
 local api = vim.api
+local config = require("core.utils").config()
 
 local M = {}
 
@@ -68,15 +69,13 @@ end
 
 function M:setup()
   M.preflight()
-  require("core.pack").setup_plugins()
+  require("core.pack").ensure_plugins()
   require("core.pack").dashboard_config()
 
   require("core.options").load_options()
   require("core.mapping")
   require("core.event")
   require("core.pack").load_compile()
-
-  vim.cmd([[set background=light]])
 end
 
 return M
