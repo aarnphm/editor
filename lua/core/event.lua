@@ -14,12 +14,9 @@ function autocmd.nvim_create_augroups(definitions)
 end
 
 function autocmd.load_autocmds()
-  -- remove statusline when entering into some buffer
-  vim.cmd([[ autocmd BufEnter,BufRead,BufWinEnter,FileType,WinEnter * lua require("core.utils").hide_statusline() ]])
-
   local definitions = {
     packer = {
-      { "BufWritePost", "*.lua", "lua require('core.pack').auto_compile()" },
+      -- { "BufWritePost", "*.lua", "lua require('core.pack').auto_compile()" },
     },
     bufs = {
       -- Reload vim config automatically
@@ -42,12 +39,6 @@ function autocmd.load_autocmds()
         "*.go",
         "silent! lua require('go.format').gofmt()",
       },
-      { "BufEnter", "*", "silent! lcd %:p:h" }, -- auto place to last edit
-      {
-        "BufReadPost",
-        "*",
-        [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
-      },
     },
     wins = {
       {
@@ -56,9 +47,9 @@ function autocmd.load_autocmds()
         [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]],
       },
       {
-        "VimLeave",
+        "WinLeave,BufLeave,InsertEnter",
         "*",
-        [[if has('nvim') | wshada! | else | wviminfo! | endif]],
+        [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]],
       },
       -- Check if file changed when its window is focus, more eager than 'autoread'
       { "FocusGained", "* checktime" },
@@ -70,6 +61,7 @@ function autocmd.load_autocmds()
       { "BufNewFile,BufRead", "Dockerfile-*", " setf dockerfile" },
       { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", " setf dockerfile" },
       { "BufNewFile,BufRead", "*-{Dockerfile,dockerfile}.j2", " setf dockerfile" },
+      { "BufNewFile,BufRead", "*-{md,markdown,mdx}.j2", " setf markdown" },
       { "BufNewFile,BufRead", "*.j2", " setf html" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },

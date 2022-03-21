@@ -186,10 +186,13 @@ end
 
 function config.nvim_tree()
   require("nvim-tree").setup({
+    hide_root_folder = true,
     disable_netrw = true,
     hijack_netrw = true,
     open_on_setup = true,
     ignore_ft_on_setup = {},
+    hijack_unnamed_buffer_when_opening = true,
+    ignore_buffer_on_setup = true,
     auto_close = true,
     auto_reload_on_write = true,
     open_on_tab = true,
@@ -197,7 +200,7 @@ function config.nvim_tree()
     update_cwd = false,
     update_to_buf_dir = { enable = true, auto_open = true },
     diagnostics = {
-      enable = true,
+      enable = false,
       icons = { hint = "", info = "", warning = "", error = "" },
     },
     update_focused_file = {
@@ -215,8 +218,8 @@ function config.nvim_tree()
       side = "left",
       auto_resize = false,
       mappings = { custom_only = false, list = {} },
-      number = true,
-      relativenumber = true,
+      number = false,
+      relativenumber = false,
       signcolumn = "yes",
     },
     trash = { cmd = "rip", require_confirm = true },

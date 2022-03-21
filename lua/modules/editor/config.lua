@@ -101,44 +101,17 @@ function config.nvim_treesitter()
 
   require("nvim-treesitter.configs").setup({
     ensure_installed = "maintained",
-    sync_install = false,
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        -- mappings for incremental selection (visual mappings)
-        init_selection = "gnn", -- maps in normal mode to init the node/scope selection
-        node_incremental = "grn", -- increment to the upper named parent
-        scope_incremental = "grc", -- increment to the upper scope (as defined in locals.scm)
-        node_decremental = "grm", -- decrement to the previous node
-      },
-    },
     highlight = { enable = true },
     rainbow = {
       enable = true,
       extended_mode = true, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
       max_file_lines = 1000, -- Do not enable for files with more than 1000 lines, int
     },
-    context_commentstring = { enable = false, enable_autocmd = false },
+    context_commentstring = { enable = true, enable_autocmd = false },
     matchup = { enable = true },
     context = { enable = true, throttle = true },
     textobjects = {
       enable = true,
-      lsp_interop = {
-        enable = true,
-        peek_definition_code = {
-          ["Df"] = "@function.outer",
-          ["Dc"] = "@class.outer",
-        },
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ["<leader>a"] = "@parameter.inner",
-        },
-        swap_previous = {
-          ["<leader>A"] = "@parameter.inner",
-        },
-      },
       select = {
         enable = true,
         keymaps = {
@@ -146,13 +119,6 @@ function config.nvim_treesitter()
           ["if"] = "@function.inner",
           ["ac"] = "@class.outer",
           ["ic"] = "@class.inner",
-          ["iF"] = {
-            python = "(function_definition) @function",
-            cpp = "(function_definition) @function",
-            c = "(function_definition) @function",
-            java = "(method_declaration) @function",
-            go = "(method_declaration) @function",
-          },
         },
       },
       move = {

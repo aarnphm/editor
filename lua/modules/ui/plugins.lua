@@ -16,7 +16,7 @@ ui["rmehri01/onenord.nvim"] = {
   opt = false,
   config = function()
     require("onenord").setup({
-      theme = "dark",
+      theme = require("core.utils").config().background,
     })
   end,
 }
@@ -31,7 +31,7 @@ ui["hoob3rt/lualine.nvim"] = {
   config = conf.lualine,
 }
 ui["arkav/lualine-lsp-progress"] = { opt = true, after = "nvim-gps" }
-ui["glepnir/dashboard-nvim"] = { opt = false, event = "BufWinEnter" }
+ui["glepnir/dashboard-nvim"] = { opt = false, event = { "BufWinEnter", "BufNewFile" } }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle", "NvimTreeOpen" },

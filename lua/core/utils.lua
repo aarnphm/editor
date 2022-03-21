@@ -85,7 +85,7 @@ end
 
 function M.config()
   return {
-    colorscheme = "tokyonight",
+    colorscheme = "edge",
     background = "dark",
   }
 end
