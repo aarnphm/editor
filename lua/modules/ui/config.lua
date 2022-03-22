@@ -9,7 +9,6 @@ function config.tokyo()
 end
 
 function config.edge()
-  vim.cmd([[set background=dark]])
   vim.g.edge_style = "aura"
   vim.g.edge_enable_italic = 1
   vim.g.edge_disable_italic_comment = 1
@@ -189,13 +188,10 @@ function config.nvim_tree()
     hide_root_folder = true,
     disable_netrw = true,
     hijack_netrw = true,
-    open_on_setup = true,
+    open_on_setup = false,
     ignore_ft_on_setup = {},
-    hijack_unnamed_buffer_when_opening = true,
-    ignore_buffer_on_setup = true,
     auto_close = true,
-    auto_reload_on_write = true,
-    open_on_tab = true,
+    open_on_tab = false,
     hijack_cursor = true,
     update_cwd = false,
     update_to_buf_dir = { enable = true, auto_open = true },

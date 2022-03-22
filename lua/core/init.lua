@@ -1,5 +1,4 @@
 local global = require("core.global")
-local vim = vim
 local g = vim.g
 local api = vim.api
 
@@ -67,10 +66,11 @@ function M:preflight()
 end
 
 function M:setup()
-  local config = require("core.utils").config()
+  local _config = global.load_config()
   M.preflight()
 
   require("mapping")
+  require("core.utils").hide_statusline()
   require("core.pack").ensure_plugins()
   require("core.pack").dashboard_config()
 
@@ -78,8 +78,8 @@ function M:setup()
   require("core.event")
   require("core.pack").load_compile()
 
-  vim.cmd("silent! colorscheme " .. config.colorscheme)
-  vim.cmd("set background=" .. config.background)
+  vim.cmd("silent! colorscheme " .. _config.colorscheme)
+  vim.cmd("set background=" .. _config.background)
 end
 
 return M

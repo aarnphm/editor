@@ -197,7 +197,7 @@ function plugins.load_compile()
 end
 
 function plugins.dashboard_config()
-  vim.g.dashboard_footer_icon = "🐬 "
+  vim.g.dashboard_footer_icon = "🍱 "
   vim.g.dashboard_default_executive = "telescope"
 
   vim.g.dashboard_custom_header = {
@@ -260,6 +260,14 @@ function plugins.dashboard_config()
     find_word = {
       description = { " Word find                  comma f w " },
       command = "DashboardFindWord",
+    },
+    edit_config = {
+      description = { " Edit local config          comma e c " },
+      command = "e ~/.editor.lua",
+    },
+    edit_nvim_config = {
+      description = { " NVIM config                comma e r " },
+      command = "lua require('core.utils').edit_root()",
     },
   }
 end

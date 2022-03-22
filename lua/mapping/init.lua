@@ -43,9 +43,9 @@ bind.nvim_load_mapping(def_map)
 
 local plug_map = {
   -- reload and edit config
-  ["n|<Leader>rc"] = map_cu("lua require('core.utils').reload()<CR>"):with_noremap():with_silent(),
-  ["n|<Leader>erc"] = map_cu("lua require('core.utils').edit_root()<CR>"):with_noremap():with_silent(),
-  ["n|<Leader>ec"] = map_cu(":e ~/.config/nvim/init.lua"):with_noremap():with_silent(),
+  ["n|<Leader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
+  ["n|<Leader>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),
+  ["n|<Leader>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
   -- jupyter_ascending
   ["n|<Space><Space>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
   ["n|<Space><Space>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),

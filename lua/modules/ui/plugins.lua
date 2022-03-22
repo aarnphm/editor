@@ -12,14 +12,6 @@ ui["catppuccin/nvim"] = {
   as = "catppuccin",
   config = conf.catppuccin,
 }
-ui["rmehri01/onenord.nvim"] = {
-  opt = false,
-  config = function()
-    require("onenord").setup({
-      theme = require("core.utils").config().background,
-    })
-  end,
-}
 ui["SmiteshP/nvim-gps"] = {
   opt = true,
   after = "nvim-treesitter",

@@ -1,50 +1,20 @@
 local M = {}
-local root_path = vim.fn.stdpath("config")
+local global = require("core.global")
 
-local function is_module_available(name)
-  if package.loaded[name] then
-    return true
-  else
-    for _, searcher in ipairs(package.searchers or package.loaders) do
-      local loader = searcher(name)
-      if type(loader) == "function" then
-        package.preload[name] = loader
-        return true
+-- Ref: https://github.com/tjdevries/lazy.nvim
+local function require_on_exported_call(mod)
+  return setmetatable({}, {
+    __index = function(_, picker)
+      return function(...)
+        return require(mod)[picker](...)
       end
-    end
-    return false
-  end
-end
-
-function M.safe_require(pkg_name, cbk, opts)
-  opts = opts or {}
-  local pkg_names = {}
-  if type(pkg_name) == "table" then
-    pkg_names = pkg_name
-  else
-    pkg_names = { pkg_name }
-  end
-
-  local pkgs = {}
-  for i, pkg_name_ in ipairs(pkg_names) do
-    if is_module_available(pkg_name_) then
-      pkgs[i] = require(pkg_name_)
-    else
-      if not opts.silent then
-        print("WARNING: package " .. pkg_name_ .. " is not found")
-      end
-      return
-    end
-  end
-
-  if #pkgs == #pkg_names then
-    return cbk(unpack(pkgs))
-  end
+    end,
+  })
 end
 
 function M.edit_root()
-  local telescope = require("telescope.builtin")
-  telescope.find_files({ shorten_path = true, cwd = root_path })
+  local files = require_on_exported_call("telescope.builtin.git").files
+  files({ cwd = vim.fn.stdpath("config") })
 end
 
 function M.reload()
@@ -83,11 +53,35 @@ M.hide_statusline = function()
   api.nvim_set_option("laststatus", 2)
 end
 
-function M.config()
-  return {
-    colorscheme = "edge",
-    background = "dark",
-  }
+local _config
+
+function M.get_local_config()
+  if _config then
+    return _config
+  end
+  local config_path = global.local_config_path
+  local ok, __config = pcall(dofile, config_path)
+
+  if not ok then
+    if not string.find(__config, "No such file or directory") then
+      print("WARNING: user config file is invalid")
+      print(__config)
+    end
+    local default_config_file = io.open(global.vim_path .. global.path_sep .. ".editor.lua", "r")
+    local default_config = default_config_file:read("*a")
+    default_config_file:close()
+    local local_config_file = io.open(config_path, "w")
+    local_config_file:write(default_config)
+    local_config_file:close()
+    __config = dofile(config_path)
+  end
+
+  _config = vim.deepcopy(__config)
+  return _config
+end
+
+function M.reset_local_config()
+  _config = nil
 end
 
 return M
