@@ -29,6 +29,7 @@ local status_config = {
     "help",
     "NvimTree",
     "terminal",
+    "dashboard",
     "alpha",
   },
   shown = {},
