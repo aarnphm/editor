@@ -77,49 +77,49 @@ function config.cmp()
     },
     formatting = {
       format = function(entry, vim_item)
-          local lspkind_icons = {
-            Text = "",
-            Method = "",
-            Function = "",
-            Constructor = "",
-            Field = "",
-            Variable = "",
-            Class = "ﴯ",
-            Interface = "",
-            Module = "",
-            Property = "ﰠ",
-            Unit = "",
-            Value = "",
-            Enum = "",
-            Keyword = "",
-            Snippet = "",
-            Color = "",
-            File = "",
-            Reference = "",
-            Folder = "",
-            EnumMember = "",
-            Constant = "",
-            Struct = "",
-            Event = "",
-            Operator = "",
-            TypeParameter = "",
-          }
-          -- load lspkind icons
-          vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
+        local lspkind_icons = {
+          Text = "",
+          Method = "",
+          Function = "",
+          Constructor = "",
+          Field = "",
+          Variable = "",
+          Class = "ﴯ",
+          Interface = "",
+          Module = "",
+          Property = "ﰠ",
+          Unit = "",
+          Value = "",
+          Enum = "",
+          Keyword = "",
+          Snippet = "",
+          Color = "",
+          File = "",
+          Reference = "",
+          Folder = "",
+          EnumMember = "",
+          Constant = "",
+          Struct = "",
+          Event = "",
+          Operator = "",
+          TypeParameter = "",
+        }
+        -- load lspkind icons
+        vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
 
-          vim_item.menu = ({
-            buffer = "[BUF]",
-            orgmode = "[ORG]",
-            nvim_lsp = "[LSP]",
-            nvim_lua = "[LUA]",
-            path = "[PATH]",
-            tmux = "[TMUX]",
-            luasnip = "[SNIP]",
-            spell = "[SPELL]",
-          })[entry.source.name]
+        vim_item.menu = ({
+          buffer = "[BUF]",
+          orgmode = "[ORG]",
+          nvim_lsp = "[LSP]",
+          nvim_lua = "[LUA]",
+          path = "[PATH]",
+          tmux = "[TMUX]",
+          luasnip = "[SNIP]",
+          spell = "[SPELL]",
+        })[entry.source.name]
 
-          return vim_item
-        end,
+        return vim_item
+      end,
     },
     -- You can set mappings if you want
     mapping = {

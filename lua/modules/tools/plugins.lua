@@ -37,6 +37,7 @@ tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true, after = "telesc
 tools["thinca/vim-quickrun"] = { opt = true, cmd = { "QuickRun", "Q" } }
 tools["folke/which-key.nvim"] = {
   opt = true,
+  key = ",",
   config = function()
     require("which-key").setup({
       plugins = {

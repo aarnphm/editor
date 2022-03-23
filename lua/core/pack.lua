@@ -91,7 +91,7 @@ function Packer:load_packer()
           background_colour = "Normal",
 
           -- Minimum width for notification windows
-					max_width = 50,
+          max_width = 50,
           minimum_width = 20,
 
           -- Icons for the different levels

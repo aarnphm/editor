@@ -7,10 +7,17 @@ ui["kyazdani42/nvim-web-devicons"] = { opt = false }
 ui["rebelot/kanagawa.nvim"] = { opt = false, config = conf.kanagawa }
 ui["NLKNguyen/papercolor-theme"] = { opt = false }
 ui["sainnhe/edge"] = { opt = false, config = conf.edge }
+ui["projekt0n/github-nvim-theme"] = { opt = false, config = conf.github_color }
 ui["catppuccin/nvim"] = {
   opt = false,
   as = "catppuccin",
   config = conf.catppuccin,
+}
+ui["rose-pine/neovim"] = {
+  opt = false,
+  as = "rose-pine",
+  tag = "v1.*",
+  config = conf.rose_pine,
 }
 ui["marko-cerovac/material.nvim"] = {
   opt = false,
