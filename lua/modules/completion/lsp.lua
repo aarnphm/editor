@@ -7,21 +7,20 @@ vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
 
 local saga = require("lspsaga")
-local lspconfig = require("lspconfig")
+local nvim_lsp = require("lspconfig")
 local lsp_installer = require("nvim-lsp-installer")
-local lsp_configs = require("lspconfig.configs")
 
 -- Include the servers you want to have installed by default below
 local to_be_installed = {
   "bashls",
   "pyright",
   "sumneko_lua",
-  "gopls",
   "dockerls",
   "bashls",
   "terraformls",
   "elmls",
   "jedi_language_server",
+  "rnix",
 }
 
 for _, name in pairs(to_be_installed) do
@@ -104,8 +103,12 @@ local default_options = {
 
 local format_config = require("modules.completion.formatting").language_format()
 local servers = {
+  rnix = {
+    cmd = { "rnix-lsp" },
+    filetypes = { "nix" },
+  },
   tsserver = {
-    root_dir = lspconfig.util.root_pattern("tsconfig.json", "package.json", ".git"),
+    root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
   },
   pyright = {
     filetypes = { "python" },
@@ -125,7 +128,7 @@ local servers = {
   efm = {
     filetypes = vim.tbl_keys(format_config),
     init_options = { documentFormatting = true },
-    root_dir = lspconfig.util.root_pattern({ ".git/", "." }),
+    root_dir = nvim_lsp.util.root_pattern({ ".git/", "." }),
     settings = { languages = format_config },
   },
   sumneko_lua = require("lua-dev").setup({
@@ -143,38 +146,6 @@ local servers = {
     },
   }),
 }
-
-if not lsp_configs.ls_emmet then
-  lsp_configs.ls_emmet = {
-    default_config = {
-      cmd = { "ls_emmet", "--stdio" },
-      filetypes = {
-        "html",
-        "css",
-        "scss",
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact",
-        "haml",
-        "xml",
-        "xsl",
-        "pug",
-        "slim",
-        "sass",
-        "stylus",
-        "less",
-        "sss",
-        "hbs",
-        "handlebars",
-      },
-      root_dir = function(fname)
-        return vim.loop.cwd()
-      end,
-      settings = {},
-    },
-  }
-end
 
 local enhance_server_opts = {
   ["tsserver"] = function(opts)
@@ -203,15 +174,11 @@ local enhance_server_opts = {
         },
       },
     }
-    -- Disable `gopls`'s format
     opts.on_attach = function(client)
-      client.resolved_capabilities.document_formatting = false
       on_editor_attach(client)
     end
   end,
 }
-
-lspconfig.ls_emmet.setup({ capabilities = capabilities })
 
 lsp_installer.on_server_ready(function(server)
   local opt = servers[server.name] or {}
@@ -224,7 +191,7 @@ lsp_installer.on_server_ready(function(server)
 end)
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
-lspconfig.html.setup({
+nvim_lsp.html.setup({
   cmd = { "html-languageserver", "--stdio" },
   filetypes = { "html" },
   init_options = {

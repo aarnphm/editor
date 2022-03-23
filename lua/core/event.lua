@@ -15,15 +15,13 @@ end
 
 function autocmd.load_autocmds()
   local definitions = {
-    packer = {
-      -- { "BufWritePost", "*.lua", "lua require('core.pack').auto_compile()" },
-    },
     bufs = {
       -- Reload vim config automatically
       {
         "BufWritePost",
         [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
-      }, -- Reload Vim script automatically if setlocal autoread
+      },
+      -- Reload Vim script automatically if setlocal autoread
       {
         "BufWritePost,FileWritePost",
         "*.vim",
@@ -71,6 +69,11 @@ function autocmd.load_autocmds()
         "FileType",
         "dashboard",
         "set showtabline=0 | autocmd WinLeave <buffer> set showtabline=2",
+      },
+      {
+        "BufEnter,BufRead,BufWinEnter,FileType,WinEnter",
+        "*",
+        'lua require("core.utils").hide_statusline()',
       },
       {
         "FileType",

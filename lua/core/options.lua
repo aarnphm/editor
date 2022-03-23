@@ -24,6 +24,7 @@ function M:load_options()
     wrap = false,
     conceallevel = 0,
     concealcursor = "niv",
+    pumblend = 0,
     expandtab = true,
     shiftwidth = 4,
     tabstop = 4,

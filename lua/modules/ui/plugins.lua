@@ -12,6 +12,11 @@ ui["catppuccin/nvim"] = {
   as = "catppuccin",
   config = conf.catppuccin,
 }
+ui["marko-cerovac/material.nvim"] = {
+  opt = false,
+  config = conf.material,
+}
+
 ui["SmiteshP/nvim-gps"] = {
   opt = true,
   after = "nvim-treesitter",

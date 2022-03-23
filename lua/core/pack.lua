@@ -104,6 +104,7 @@ function Packer:load_packer()
     end,
     event = "BufRead",
   })
+  use({ "stevearc/dressing.nvim", opt = true })
   for _, repo in ipairs(self.repos) do
     use(repo)
   end
@@ -199,12 +200,6 @@ function plugins.load_compile()
 end
 
 function plugins.dashboard_config()
-  math.randomseed(os.time())
-  local colors = { "white", "violet", "lightyellow" }
-  local function random_colors(color_lst)
-    return color_lst[math.random(1, #color_lst)]
-  end
-  vim.cmd(string.format("highlight dashboard guifg=%s guibg=bg", random_colors(colors)))
   vim.g.dashboard_footer_icon = "🍱 "
   vim.g.dashboard_default_executive = "telescope"
 

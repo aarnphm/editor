@@ -42,6 +42,8 @@ local def_map = {
 bind.nvim_load_mapping(def_map)
 
 local plug_map = {
+  -- change colorscheme
+  ["n|<Leader>mt"] = map_cu("lua require('material.functions').toggle_style()"):with_noremap():with_silent(),
   -- reload and edit config
   ["n|<Leader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
   ["n|<Leader>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),
@@ -72,7 +74,8 @@ local plug_map = {
   ["n|<Space>ps"] = map_cr("PackerSync"):with_silent():with_noremap():with_nowait(),
   ["n|<Space>pu"] = map_cr("PackerUpdate"):with_silent():with_noremap():with_nowait(),
   ["n|<Space>pi"] = map_cr("PackerInstall"):with_silent():with_noremap():with_nowait(),
-  ["n|<Space>pc"] = map_cr("PackerClean"):with_silent():with_noremap():with_nowait(),
+  ["n|<Space>pc"] = map_cr("PackerCompile"):with_silent():with_noremap():with_nowait(),
+  ["n|<Space>pcc"] = map_cr("PackerClean"):with_silent():with_noremap():with_nowait(),
   -- Lsp mapp work when insertenter and lsp start
   ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
   ["n|<leader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),

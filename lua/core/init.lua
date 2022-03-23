@@ -70,7 +70,6 @@ function M:setup()
   M.preflight()
 
   require("mapping")
-  require("core.utils").hide_statusline()
   require("core.pack").ensure_plugins()
   require("core.pack").dashboard_config()
 
