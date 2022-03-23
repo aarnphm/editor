@@ -20,6 +20,7 @@ end
 function M.reload()
   require("core.pack").magic_compile()
   require("packer").sync()
+  vim.notify("Config reloaded and compiled.")
 end
 
 local status_config = {
@@ -64,8 +65,8 @@ function M.get_local_config()
 
   if not ok then
     if not string.find(__config, "No such file or directory") then
-      print("WARNING: user config file is invalid")
-      print(__config)
+      vim.notify("WARNING: user config file is invalid")
+      vim.notify(__config)
     end
     local default_config_file = io.open(global.vim_path .. global.path_sep .. ".editor.lua", "r")
     local default_config = default_config_file:read("*a")

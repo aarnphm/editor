@@ -63,6 +63,7 @@ function autocmd.load_autocmds()
       { "BufNewFile,BufRead", "*.j2", " setf html" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
+      { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
       { "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
       {

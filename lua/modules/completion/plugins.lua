@@ -30,6 +30,8 @@ completion["kosayoda/nvim-lightbulb"] = {
   config = conf.lightbulb,
 }
 completion["ray-x/lsp_signature.nvim"] = { opt = true, after = "nvim-lspconfig" }
+
+completion["onsails/lspkind-nvim"] = { event = "VimEnter" }
 completion["hrsh7th/nvim-cmp"] = {
   config = conf.cmp,
   event = "InsertEnter",
@@ -44,6 +46,7 @@ completion["hrsh7th/nvim-cmp"] = {
     { "hrsh7th/cmp-buffer", after = "cmp-spell" },
     { "kdheepak/cmp-latex-symbols", after = "cmp-buffer" },
   },
+  after = "lspkind-nvim",
 }
 completion["L3MON4D3/LuaSnip"] = {
   after = "nvim-cmp",

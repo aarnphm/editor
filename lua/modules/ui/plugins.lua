@@ -22,12 +22,20 @@ ui["SmiteshP/nvim-gps"] = {
   after = "nvim-treesitter",
   config = conf.nvim_gps,
 }
-ui["hoob3rt/lualine.nvim"] = {
-  opt = true,
-  after = "lualine-lsp-progress",
+ui["nvim-lualine/lualine.nvim"] = {
+  opt = false,
+  after = "nvim-gps",
   config = conf.lualine,
 }
-ui["arkav/lualine-lsp-progress"] = { opt = true, after = "nvim-gps" }
+ui["j-hui/fidget.nvim"] = {
+  requires = {
+    "nvim-lualine/lualine.nvim",
+  },
+  config = function()
+    require("fidget").setup({})
+  end,
+  after = "nvim-gps",
+}
 ui["glepnir/dashboard-nvim"] = { opt = false, event = { "BufWinEnter", "BufNewFile" } }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,

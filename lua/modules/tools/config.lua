@@ -8,6 +8,7 @@ function config.telescope()
   vim.cmd([[packadd telescope-frecency.nvim]])
   vim.cmd([[packadd telescope-zoxide]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
+  vim.cmd([[packadd nvim-notify]])
 
   require("telescope").setup({
     defaults = {
@@ -64,19 +65,18 @@ function config.telescope()
   require("telescope").load_extension("ui-select")
   require("telescope").load_extension("file_browser")
   require("telescope").load_extension("project")
+  require("telescope").load_extension("notify")
 end
 
 function config.wilder()
   vim.cmd([[
 call wilder#setup({'modes': [':', '/', '?']})
-call wilder#set_option('use_python_remote_plugin', 0)
 
 call wilder#set_option('pipeline', [
       \   wilder#branch(
       \     wilder#python_file_finder_pipeline({
       \       'file_command': {_, arg -> stridx(arg, '.') != -1 ? ['fd', '-tf', '-H'] : ['fd', '-tf']},
       \       'dir_command': ['fd', '-td'],
-      \       'filters': ['cpsm_filter'],
       \     }),
       \     wilder#substitute_pipeline({
       \       'pipeline': wilder#python_search_pipeline({
@@ -87,7 +87,6 @@ call wilder#set_option('pipeline', [
       \       }),
       \     }),
       \     wilder#cmdline_pipeline({
-			\				'use_python': 0,
       \       'fuzzy': 1,
       \       'fuzzy_filter': has('nvim') ? wilder#lua_fzy_filter() : wilder#vim_fuzzy_filter(),
       \     }),
@@ -99,17 +98,13 @@ call wilder#set_option('pipeline', [
       \       'pattern': wilder#python_fuzzy_pattern({
       \         'start_at_boundary': 0,
       \       }),
-      \     }), [
-			\     wilder#check({_, x -> empty(x)}),
-			\     wilder#history(),
-			\     wilder#result({'draw': [{_, x -> ' ' . x}]})
-			\ ]
+      \     }),
       \   ),
       \ ])
 
 let s:highlighters = [
       \ wilder#pcre2_highlighter(),
-      \ has('nvim') ? wilder#lua_fzy_highlighter() : wilder#cpsm_highlighter(),
+      \ wilder#lua_fzy_highlighter(),
       \ ]
 
 let s:popupmenu_renderer = wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
@@ -142,7 +137,6 @@ call wilder#set_option('renderer', wilder#renderer_mux({
       \ '/': s:wildmenu_renderer,
       \ 'substitute': s:wildmenu_renderer,
       \ }))
-
 ]])
 end
 

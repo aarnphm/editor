@@ -109,7 +109,11 @@ tools["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime" }
 tools["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
   config = conf.wilder,
-  requires = { { "romgrk/fzy-lua-native", after = "wilder.nvim" }, { "nixprime/cpsm", after = "wilder.nvim" } },
+  requires = {
+    { "romgrk/fzy-lua-native", opt = false, after = "wilder.nvim" },
+    { "nixprime/cpsm", opt = false, after = "wilder.nvim" },
+  },
+  run = "UpdateRemotesPlugin",
 }
 tools["folke/trouble.nvim"] = {
   opt = true,

@@ -172,7 +172,6 @@ function config.lualine()
       lualine_a = { "mode" },
       lualine_b = { { "branch" }, { "diff" } },
       lualine_c = {
-        { "lsp_progress" },
         { gps_content, cond = gps.is_available },
       },
       lualine_x = {
@@ -223,7 +222,7 @@ function config.nvim_gps()
       ["python"] = true,
       ["rust"] = true,
     },
-    separator = " > ",
+    separator = " » ",
   })
 end
 

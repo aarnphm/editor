@@ -20,13 +20,13 @@ local to_be_installed = {
   "terraformls",
   "elmls",
   "jedi_language_server",
-  "rnix",
+  "gopls",
 }
 
 for _, name in pairs(to_be_installed) do
   local server_is_found, server = lsp_installer.get_server(name)
   if server_is_found and not server:is_installed() then
-    print("Installing " .. name)
+    vim.notify("Installing " .. name)
     server:install()
   end
 end
@@ -103,10 +103,6 @@ local default_options = {
 
 local format_config = require("modules.completion.formatting").language_format()
 local servers = {
-  rnix = {
-    cmd = { "rnix-lsp" },
-    filetypes = { "nix" },
-  },
   tsserver = {
     root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
   },
@@ -215,16 +211,12 @@ efmls.init({
 
 -- Require `efmls-configs-nvim`'s config here
 
-local vint = require("efmls-configs.linters.vint")
-local clangtidy = require("efmls-configs.linters.clang_tidy")
 local eslint = require("efmls-configs.linters.eslint")
 local pylint = require("efmls-configs.linters.pylint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
 local staticcheck = require("efmls-configs.linters.staticcheck")
 
 local black = require("efmls-configs.formatters.black")
-local luafmt = require("efmls-configs.formatters.lua_format")
-local clangfmt = require("efmls-configs.formatters.clang_format")
 local goimports = require("efmls-configs.formatters.goimports")
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
@@ -233,10 +225,6 @@ local shfmt = require("efmls-configs.formatters.shfmt")
 
 -- Setup formatter and linter for efmls here
 efmls.setup({
-  vim = { formatter = vint },
-  lua = { formatter = luafmt },
-  c = { formatter = clangfmt, linter = clangtidy },
-  cpp = { formatter = clangfmt, linter = clangtidy },
   go = { formatter = goimports, linter = staticcheck },
   vue = { formatter = prettier },
   python = { formatter = black, linter = pylint },

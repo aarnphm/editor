@@ -1,4 +1,5 @@
 local global = require("core.global")
+local local_config = global.load_config()
 
 local M = {}
 M.__index = M
@@ -121,6 +122,8 @@ function M:load_options()
     autowrite = true,
   }
 
+  vim.g.python3_host_prog = local_config.python3_host_prog
+
   if global.is_mac then
     vim.g.clipboard = {
       name = "macOS-clipboard",
@@ -128,8 +131,6 @@ function M:load_options()
       paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
       cache_enabled = 0,
     }
-    vim.g.python_host_prog = "/usr/bin/python"
-    vim.g.python3_host_prog = "/usr/local/bin/python3"
   end
   for name, value in pairs(global_local) do
     vim.o[name] = value

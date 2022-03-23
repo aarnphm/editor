@@ -75,6 +75,7 @@ function config.cmp()
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
+  local lspkind = require("lspkind")
   local cmp = require("cmp")
   cmp.setup({
     sorting = {
@@ -90,51 +91,58 @@ function config.cmp()
       },
     },
     formatting = {
-      format = function(entry, vim_item)
-        local lspkind_icons = {
-          Text = "",
-          Method = "",
-          Function = "",
-          Constructor = "",
-          Field = "",
-          Variable = "",
-          Class = "ﴯ",
-          Interface = "",
-          Module = "",
-          Property = "ﰠ",
-          Unit = "",
-          Value = "",
-          Enum = "",
-          Keyword = "",
-          Snippet = "",
-          Color = "",
-          File = "",
-          Reference = "",
-          Folder = "",
-          EnumMember = "",
-          Constant = "",
-          Struct = "",
-          Event = "",
-          Operator = "",
-          TypeParameter = "",
-        }
-        -- load lspkind icons
-        vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
+      format = lspkind.cmp_format({
+        maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+        preset = "default",
+        mode = "symbols",
 
-        vim_item.menu = ({
-          -- cmp_tabnine = "[TN]",
-          buffer = "[BUF]",
-          orgmode = "[ORG]",
-          nvim_lsp = "[LSP]",
-          nvim_lua = "[LUA]",
-          path = "[PATH]",
-          tmux = "[TMUX]",
-          luasnip = "[SNIP]",
-          spell = "[SPELL]",
-        })[entry.source.name]
+        -- The function below will be called before any actual modifications from lspkind
+        -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
+        before = function(entry, vim_item)
+          local lspkind_icons = {
+            Text = "",
+            Method = "",
+            Function = "",
+            Constructor = "",
+            Field = "",
+            Variable = "",
+            Class = "ﴯ",
+            Interface = "",
+            Module = "",
+            Property = "ﰠ",
+            Unit = "",
+            Value = "",
+            Enum = "",
+            Keyword = "",
+            Snippet = "",
+            Color = "",
+            File = "",
+            Reference = "",
+            Folder = "",
+            EnumMember = "",
+            Constant = "",
+            Struct = "",
+            Event = "",
+            Operator = "",
+            TypeParameter = "",
+          }
+          -- load lspkind icons
+          vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
 
-        return vim_item
-      end,
+          vim_item.menu = ({
+            buffer = "[BUF]",
+            orgmode = "[ORG]",
+            nvim_lsp = "[LSP]",
+            nvim_lua = "[LUA]",
+            path = "[PATH]",
+            tmux = "[TMUX]",
+            luasnip = "[SNIP]",
+            spell = "[SPELL]",
+          })[entry.source.name]
+
+          return vim_item
+        end,
+      }),
     },
     -- You can set mappings if you want
     mapping = {

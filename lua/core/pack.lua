@@ -69,42 +69,46 @@ function Packer:load_packer()
   use({
     "rcarriga/nvim-notify",
     config = function()
-      require("notify").setup({
-        -- Animation style (see below for details)
-        stages = "fade_in_slide_out",
+      vim.defer_fn(function()
+        require("notify").setup({
+          -- Animation style (see below for details)
+          stages = "fade",
 
-        -- Function called when a new window is opened, use for changing win settings/config
-        on_open = nil,
+          -- Function called when a new window is opened, use for changing win settings/config
+          on_open = nil,
 
-        -- Function called when a window is closed
-        on_close = nil,
+          -- Function called when a window is closed
+          on_close = nil,
 
-        -- Render function for notifications. See notify-render()
-        render = "default",
+          -- Render function for notifications. See notify-render()
+          render = "default",
 
-        -- Default timeout for notifications
-        timeout = 5000,
+          -- Default timeout for notifications
+          timeout = 5000,
 
-        -- For stages that change opacity this is treated as the highlight behind the window
-        -- Set this to either a highlight group, an RGB hex value e.g. "#000000" or a function returning an RGB code for dynamic values
-        background_colour = "Normal",
+          -- For stages that change opacity this is treated as the highlight behind the window
+          -- Set this to either a highlight group, an RGB hex value e.g. "#000000" or a function returning an RGB code for dynamic values
+          background_colour = "Normal",
 
-        -- Minimum width for notification windows
-        minimum_width = 50,
+          -- Minimum width for notification windows
+          minimum_width = 50,
 
-        -- Icons for the different levels
-        icons = {
-          ERROR = "",
-          WARN = "",
-          INFO = "",
-          DEBUG = "",
-          TRACE = "✎",
-        },
-      })
+          -- Icons for the different levels
+          icons = {
+            ERROR = "",
+            WARN = "",
+            INFO = "",
+            DEBUG = "",
+            TRACE = "✎",
+          },
+        })
+        vim.notify = require("notify")
+      end, 2000)
     end,
-    event = "BufRead",
+    event = "BufEnter",
+    opt = false,
   })
-  use({ "stevearc/dressing.nvim", opt = true })
+  use({ "stevearc/dressing.nvim" })
   for _, repo in ipairs(self.repos) do
     use(repo)
   end
@@ -190,6 +194,7 @@ function plugins.load_compile()
   else
     assert("Missing packer compile file, run PackerCompile Or PackerInstall to fix")
   end
+
   vim.cmd([[command! PackerCompile lua require('core.pack').magic_compile()]])
   vim.cmd([[command! PackerInstall lua require('core.pack').install()]])
   vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])
