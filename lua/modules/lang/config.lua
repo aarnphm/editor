@@ -72,4 +72,14 @@ function config.rust_tools()
   require("rust-tools").setup(opts)
 end
 
+function config.vimtex()
+  vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
+  vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
+end
+
+function config.lang_go()
+	vim.g.go_doc_keywordprg_enabled = false
+	vim.g.go_def_mapping_enabled = false
+end
+
 return config

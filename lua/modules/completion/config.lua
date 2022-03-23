@@ -17,20 +17,6 @@ function config.lightbulb()
       enabled = false,
       -- Text to show in the popup float
       text = "💡",
-      -- Available keys for window options:
-      -- - height     of floating window
-      -- - width      of floating window
-      -- - wrap_at    character to wrap at for computing height
-      -- - max_width  maximal width of floating window
-      -- - max_height maximal height of floating window
-      -- - pad_left   number of columns to pad contents at left
-      -- - pad_right  number of columns to pad contents at right
-      -- - pad_top    number of lines to pad contents at top
-      -- - pad_bottom number of lines to pad contents at bottom
-      -- - offset_x   x-axis offset of the floating window
-      -- - offset_y   y-axis offset of the floating window
-      -- - anchor     corner of float to place at the cursor (NW, NE, SW, SE)
-      -- - winblend   transparency of the window (0-100)
       win_opts = {},
     },
     virtual_text = {
@@ -75,7 +61,6 @@ function config.cmp()
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
-  local lspkind = require("lspkind")
   local cmp = require("cmp")
   cmp.setup({
     sorting = {
@@ -91,14 +76,7 @@ function config.cmp()
       },
     },
     formatting = {
-      format = lspkind.cmp_format({
-        maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-        preset = "default",
-        mode = "symbols",
-
-        -- The function below will be called before any actual modifications from lspkind
-        -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
-        before = function(entry, vim_item)
+      format = function(entry, vim_item)
           local lspkind_icons = {
             Text = "",
             Method = "",
@@ -142,7 +120,6 @@ function config.cmp()
 
           return vim_item
         end,
-      }),
     },
     -- You can set mappings if you want
     mapping = {
@@ -281,11 +258,6 @@ function config.nvim_lsputils()
       require("lsputil.symbols").workspace_handler(nil, result, { bufnr = bufn }, nil)
     end
   end
-end
-
-function config.vimtex()
-  vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
-  vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
 end
 
 return config

@@ -31,7 +31,6 @@ completion["kosayoda/nvim-lightbulb"] = {
 }
 completion["ray-x/lsp_signature.nvim"] = { opt = true, after = "nvim-lspconfig" }
 
-completion["onsails/lspkind-nvim"] = { event = "VimEnter" }
 completion["hrsh7th/nvim-cmp"] = {
   config = conf.cmp,
   event = "InsertEnter",
@@ -46,7 +45,6 @@ completion["hrsh7th/nvim-cmp"] = {
     { "hrsh7th/cmp-buffer", after = "cmp-spell" },
     { "kdheepak/cmp-latex-symbols", after = "cmp-buffer" },
   },
-  after = "lspkind-nvim",
 }
 completion["L3MON4D3/LuaSnip"] = {
   after = "nvim-cmp",
@@ -57,16 +55,4 @@ completion["windwp/nvim-autopairs"] = {
   after = "nvim-cmp",
   config = conf.autopairs,
 }
-completion["github/copilot.vim"] = { opt = true, cmd = "Copilot" }
-completion["lervag/vimtex"] = { opt = true, config = conf.vimtex }
-completion["jakewvincent/texmagic.nvim"] = {
-  opt = true,
-  config = function()
-    require("texmagic").setup({
-      -- Config goes here; leave blank for defaults
-    })
-  end,
-  after = "nvim-lspconfig",
-}
-
 return completion

@@ -214,10 +214,8 @@ efmls.init({
 local eslint = require("efmls-configs.linters.eslint")
 local pylint = require("efmls-configs.linters.pylint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
-local staticcheck = require("efmls-configs.linters.staticcheck")
 
 local black = require("efmls-configs.formatters.black")
-local goimports = require("efmls-configs.formatters.goimports")
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
 
@@ -225,7 +223,6 @@ local shfmt = require("efmls-configs.formatters.shfmt")
 
 -- Setup formatter and linter for efmls here
 efmls.setup({
-  go = { formatter = goimports, linter = staticcheck },
   vue = { formatter = prettier },
   python = { formatter = black, linter = pylint },
   typescript = { formatter = prettier, linter = eslint },

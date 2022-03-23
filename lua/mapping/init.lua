@@ -133,8 +133,6 @@ local plug_map = {
   ["n|<C-w>t"] = map_cr("VTerm"):with_noremap():with_silent(),
   -- Plugin MarkdownPreview
   ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
-  -- Plugin go.nvim
-  ["n|<Leader>gof"] = map_cr('lua require("go.format").goimport()'):with_noremap():with_silent(),
   ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
 }
 
