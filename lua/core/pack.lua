@@ -12,6 +12,10 @@ local packer = nil
 local Packer = {}
 Packer.__index = Packer
 
+function Packer:config()
+  return require("core.global").load_config()
+end
+
 function Packer:load_plugins()
   self.repos = {}
 
@@ -39,7 +43,7 @@ function Packer:load_preflight_plugins(use)
   use({ "kyazdani42/nvim-web-devicons" })
 
   -- colorscheme
-  require("themes.plugins").init(use)
+  require("themes.plugins").init(use, Packer:config())
 
   use({ "wbthomason/packer.nvim", opt = true })
   use({
@@ -97,7 +101,7 @@ function Packer:load_packer()
 
   local use = packer.use
 
-  local config = {
+  local packer_config = {
     compile_path = packer_compiled,
     git = { clone_timeout = 60, default_url_format = "git@github.com:%s" },
     disable_commands = true,
@@ -108,10 +112,10 @@ function Packer:load_packer()
     },
   }
   if is_mac then
-    config.max_jobs = 20
+    packer_config.max_jobs = 20
   end
 
-  packer.init(config)
+  packer.init(packer_config)
 
   packer.reset()
 

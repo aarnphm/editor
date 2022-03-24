@@ -1,5 +1,4 @@
 local M = {}
-local global_config = require("core.utils").get_local_config()
 local config = require("themes.config")
 
 M.supported_themes = {
@@ -18,7 +17,7 @@ M.supported_themes = {
   "edge",
 }
 
-function M.init(use)
+function M.init(use, global_config)
   use({
     "jacoborus/tender.vim",
 

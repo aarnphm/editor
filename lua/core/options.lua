@@ -1,5 +1,4 @@
 local global = require("core.global")
-local local_config = global.load_config()
 
 local M = {}
 M.__index = M
@@ -16,7 +15,7 @@ function M:bind_option(options)
   end
 end
 
-function M:load_options()
+function M:load_options(config)
   local bw_local = {
     number = true,
     relativenumber = true,
@@ -122,7 +121,7 @@ function M:load_options()
     autowrite = true,
   }
 
-  vim.g.python3_host_prog = local_config.python3_host_prog
+  vim.g.python3_host_prog = config.python3_host_prog
 
   if global.is_mac then
     vim.g.clipboard = {
