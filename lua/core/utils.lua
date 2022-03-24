@@ -17,10 +17,20 @@ function M.edit_root()
   files({ cwd = vim.fn.stdpath("config") })
 end
 
+function M.reset_cache()
+  local impatient = _G.__luacache
+  if impatient then
+    impatient.clear_cache()
+  end
+end
+
 function M.reload()
-  require("core.pack").magic_compile()
   require("packer").sync()
-  vim.notify("Config reloaded and compiled.")
+  require("core.pack").magic_compile()
+  M:reset_cache()
+  vim.schedule(function()
+    vim.notify("Config reloaded and compiled.")
+  end)
 end
 
 local status_config = {
@@ -55,12 +65,13 @@ M.hide_statusline = function()
   api.nvim_set_option("laststatus", 2)
 end
 
-local _config
+local _config = nil
 
 function M.get_local_config()
   if _config then
     return _config
   end
+
   local config_path = global.local_config_path
   local ok, __config = pcall(dofile, config_path)
 

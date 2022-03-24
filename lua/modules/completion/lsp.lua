@@ -22,6 +22,7 @@ local to_be_installed = {
   "elmls",
   "jedi_language_server",
   "gopls",
+  "efm",
 }
 
 for _, name in pairs(to_be_installed) do

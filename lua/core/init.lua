@@ -1,6 +1,7 @@
 local global = require("core.global")
 local g = vim.g
 local api = vim.api
+local config = global.load_config()
 
 local M = {}
 
@@ -62,7 +63,7 @@ local function minimap_config()
   g.minimap_auto_start_win_enter = 1
 end
 
-local function dashboard_config(config)
+local dashboard_config = function()
   local headers = nil
   vim.g.dashboard_default_executive = "telescope"
   vim.g.dashboard_custom_footer = { "🍱 github.com/aarnphm/editor" }
@@ -180,19 +181,19 @@ local function dashboard_config(config)
   }
 end
 
-function M:preflight(config)
+function M:preflight()
   init_dir()
-  disable_distribution_plugins()
   minimap_config()
-  dashboard_config(config)
+  dashboard_config()
+  disable_distribution_plugins()
 
   g.mapleader = ","
   api.nvim_set_keymap("n", " ", "", { noremap = true })
   api.nvim_set_keymap("x", " ", "", { noremap = true })
 end
 
-function M:setup(config)
-  M.preflight(config)
+function M:setup()
+  M.preflight()
 
   require("mapping")
   require("core.pack").ensure_plugins()

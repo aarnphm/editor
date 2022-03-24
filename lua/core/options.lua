@@ -1,4 +1,5 @@
 local global = require("core.global")
+local config = global.load_config()
 
 local M = {}
 M.__index = M
@@ -15,7 +16,7 @@ function M:bind_option(options)
   end
 end
 
-function M:load_options(config)
+function M:load_options()
   local bw_local = {
     number = true,
     relativenumber = true,
