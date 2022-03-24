@@ -226,6 +226,8 @@ function config.dapui()
 end
 
 function config.dap()
+  vim.cmd([[packadd dap]])
+  vim.cmd([[packadd dapui]])
   local dap = require("dap")
   local dapui = require("dapui")
 

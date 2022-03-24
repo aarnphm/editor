@@ -5,6 +5,7 @@ vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
+vim.cmd([[packad efmls-configs-nvim]])
 
 local saga = require("lspsaga")
 local nvim_lsp = require("lspconfig")

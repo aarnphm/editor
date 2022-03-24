@@ -37,7 +37,7 @@ tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true, after = "telesc
 tools["thinca/vim-quickrun"] = { opt = true, cmd = { "QuickRun", "Q" } }
 tools["folke/which-key.nvim"] = {
   opt = true,
-  key = ",",
+  keys = ",",
   config = function()
     require("which-key").setup({
       plugins = {
@@ -111,8 +111,8 @@ tools["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
   config = conf.wilder,
   requires = {
-    { "romgrk/fzy-lua-native", opt = false, after = "wilder.nvim" },
-    { "nixprime/cpsm", opt = false, after = "wilder.nvim" },
+    { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
+    { "nixprime/cpsm", opt = true, after = "wilder.nvim" },
   },
   run = "UpdateRemotesPlugin",
 }

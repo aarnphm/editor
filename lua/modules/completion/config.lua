@@ -35,8 +35,8 @@ function config.lightbulb()
     },
   })
   vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
-  vim.api.nvim_command("hi link LightBulbFloatWin YellowFloat")
-  vim.api.nvim_command("hi link LightBulbVirtualText YellowFloat")
+  vim.cmd([[hi link LightBulbFloatWin YellowFloat]])
+  vim.cmd([[hi link LightBulbVirtualText YellowFloat]])
 end
 
 function config.cmp()

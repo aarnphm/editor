@@ -1,8 +1,8 @@
 local editor = {}
 local conf = require("modules.editor.config")
 
-editor["tpope/vim-fugitive"] = { opt = false, cmd = { "Git", "G" } }
 editor["tpope/vim-surround"] = { opt = false }
+editor["tpope/vim-fugitive"] = { opt = true, cmd = { "Git", "G" } }
 
 editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
 editor["itchyny/vim-cursorword"] = {
@@ -58,7 +58,6 @@ editor["alexghergh/nvim-tmux-navigation"] = {
 }
 
 editor["terrortylor/nvim-comment"] = {
-  opt = false,
   config = function()
     require("nvim_comment").setup({
       hook = function()
@@ -239,7 +238,7 @@ editor["abecodes/tabout.nvim"] = {
   config = conf.tabout,
 }
 editor["rcarriga/nvim-dap-ui"] = {
-  opt = false,
+  opt = true,
   config = conf.dapui,
   requires = {
     { "mfussenegger/nvim-dap", config = conf.dap },

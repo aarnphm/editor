@@ -42,8 +42,6 @@ local def_map = {
 bind.nvim_load_mapping(def_map)
 
 local plug_map = {
-  -- change colorscheme
-  ["n|<Leader>mt"] = map_cu("lua require('material.functions').toggle_style()"):with_noremap():with_silent(),
   -- reload and edit config
   ["n|<Leader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
   ["n|<Leader>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),

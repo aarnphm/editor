@@ -12,7 +12,7 @@ lang["simrat39/rust-tools.nvim"] = {
   opt = true,
   ft = "rust",
   config = conf.rust_tools,
-  requires = { { "nvim-lua/plenary.nvim", opt = false } },
+  requires = "nvim-lua/plenary.nvim",
 }
 lang["iamcco/markdown-preview.nvim"] = {
   opt = true,
@@ -29,6 +29,17 @@ lang["jakewvincent/texmagic.nvim"] = {
     })
   end,
   after = "nvim-lspconfig",
+}
+lang["xeluxee/competitest.nvim"] = {
+  opt = true,
+  requires = "MunifTanjim/nui.nvim",
+  config = function()
+    require("competitest").setup()
+  end,
+}
+lang["p00f/cphelper.nvim"] = {
+  opt = true,
+  requires = "nvim-lua/plenary.nvim",
 }
 
 return lang

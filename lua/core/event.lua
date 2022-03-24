@@ -16,27 +16,11 @@ end
 function autocmd.load_autocmds()
   local definitions = {
     bufs = {
-      -- Reload vim config automatically
-      {
-        "BufWritePost",
-        [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
-      },
-      -- Reload Vim script automatically if setlocal autoread
-      {
-        "BufWritePost,FileWritePost",
-        "*.vim",
-        [[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]],
-      },
       { "BufWritePre", "/tmp/*", "setlocal noundofile" },
       { "BufWritePre", "COMMIT_EDITMSG", "setlocal noundofile" },
       { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
       { "BufWritePre", "*.tmp", "setlocal noundofile" },
       { "BufWritePre", "*.bak", "setlocal noundofile" },
-      {
-        "BufWritePre",
-        "*.go",
-        "silent! lua require('go.format').gofmt()",
-      },
     },
     wins = {
       {
@@ -75,11 +59,6 @@ function autocmd.load_autocmds()
         "BufEnter,BufRead,BufWinEnter,FileType,WinEnter",
         "*",
         'lua require("core.utils").hide_statusline()',
-      },
-      {
-        "FileType",
-        "*",
-        [[setlocal formatoptions-=c formatoptions-=r formatoptions-=o]],
       },
     },
     yank = {
