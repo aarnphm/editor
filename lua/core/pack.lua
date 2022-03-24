@@ -153,7 +153,7 @@ function plugins.convert_compile_file()
   local state = uv.fs_stat(packer_compiled)
   if not state then
     -- first time compiling
-    local pre_compiled_file = io.open(vim_path .. sep .. "plugin" .. sep .. "packer_compiled.lua", "r")
+    local pre_compiled_file = io.open(vim_path .. sep .. "_pre_compiled.lua", "r")
     local pre_compiled = pre_compiled_file:read("*a")
     pre_compiled_file:close()
     local _compiled_cache = io.open(compile_to_lua, "w")
