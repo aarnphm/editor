@@ -108,6 +108,10 @@ function Packer:load_packer()
     compile_path = packer_compiled,
     git = { clone_timeout = 60, default_url_format = "git@github.com:%s" },
     disable_commands = true,
+    auto_clean = true,
+    compile_on_sync = true,
+    auto_reload_compiled = true,
+    autoremove = true,
     display = {
       open_fn = function()
         return require("packer.util").float({ border = "single" })
@@ -182,14 +186,32 @@ function plugins.load_compile()
   else
     assert("Missing packer compile file, run PackerCompile Or PackerInstall to fix")
   end
-
-  vim.cmd([[command! PackerCompile lua require('core.pack').magic_compile()]])
-  vim.cmd([[command! PackerInstall lua require('core.pack').install()]])
-  vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])
-  vim.cmd([[command! PackerSync lua require('core.pack').sync()]])
-  vim.cmd([[command! PackerClean lua require('core.pack').clean()]])
-  vim.cmd([[command! PackerStatus  lua require('packer').status()]])
   vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
+  vim.cmd(
+    [[command! -nargs=+ -complete=customlist,v:lua.require'packer.snapshot'.completion.create PackerSnapshot  lua require('packer').snapshot(<f-args>)]]
+  )
+  vim.cmd(
+    [[command! -nargs=+ -complete=customlist,v:lua.require'packer.snapshot'.completion.rollback PackerSnapshotRollback  lua require('packer').rollback(<f-args>)]]
+  )
+  vim.cmd(
+    [[command! -nargs=+ -complete=customlist,v:lua.require'packer.snapshot'.completion.snapshot PackerSnapshotDelete lua require('packer.snapshot').delete(<f-args>)]]
+  )
+  vim.cmd(
+    [[command! -nargs=* -complete=customlist,v:lua.require'packer'.plugin_complete  PackerInstall lua require('packer').install(<f-args>)]]
+  )
+  vim.cmd(
+    [[command! -nargs=* -complete=customlist,v:lua.require'packer'.plugin_complete PackerUpdate lua require('packer').update(<f-args>)]]
+  )
+  vim.cmd(
+    [[command! -nargs=* -complete=customlist,v:lua.require'packer'.plugin_complete PackerSync lua require('packer').sync(<f-args>)]]
+  )
+  vim.cmd([[command! PackerClean             lua require('packer').clean()]])
+  vim.cmd([[command! -nargs=* PackerCompile  lua require('packer').compile(<q-args>)]])
+  vim.cmd([[command! PackerStatus            lua require('packer').status()]])
+  vim.cmd([[command! PackerProfile           lua require('packer').profile_output()]])
+  vim.cmd(
+    [[command! -bang -nargs=+ -complete=customlist,v:lua.require'packer'.loader_complete PackerLoad lua require('packer').loader(<f-args>, '<bang>' == '!')]]
+  )
 end
 
 return plugins
