@@ -1,4 +1,6 @@
-local function load_options()
+local M = {}
+
+function M.setup_options()
   local config = _G.__editor_config
 
   local vim_opt = {
@@ -86,8 +88,8 @@ local function load_options()
     cursorline = true,
     cursorcolumn = true,
     showtabline = 2,
-    winwidth = 30,
-    winminwidth = 10,
+    winwidth = 35,
+    winminwidth = 20,
     pumheight = 15,
     helpheight = 12,
     previewheight = 12,
@@ -124,4 +126,4 @@ local function load_options()
   end)
 end
 
-load_options()
+return M

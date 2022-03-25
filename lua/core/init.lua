@@ -1,4 +1,7 @@
-local vim = vim
+local mapping = _G.__lazy.require_on_exported_call("mapping").setup_mapping
+local options = _G.__lazy.require_on_exported_call("core.options").setup_options
+local events = _G.__lazy.require_on_exported_call("core.events").setup_autocmds
+
 local M = {}
 
 M.__index = M
@@ -152,6 +155,32 @@ end
 local function preflight()
   create_dir()
 
+  -- disable some builtin vim plugins
+  local disabled_built_ins = {
+    "2html_plugin",
+    "getscript",
+    "getscriptPlugin",
+    "gzip",
+    "logipat",
+    "netrw",
+    "netrwPlugin",
+    "netrwSettings",
+    "netrwFileHandlers",
+    "matchit",
+    "tar",
+    "tarPlugin",
+    "rrhelper",
+    "spellfile_plugin",
+    "vimball",
+    "vimballPlugin",
+    "zip",
+    "zipPlugin",
+  }
+
+  for _, plugin in pairs(disabled_built_ins) do
+    vim.g["loaded_" .. plugin] = 1
+  end
+
   vim.g.mapleader = ","
   vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
   vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
@@ -159,6 +188,7 @@ end
 
 function M:setup()
   local pack = require("core.pack")
+
   preflight()
 
   pack.ensure_plugins()
@@ -166,9 +196,9 @@ function M:setup()
   minimap_config()
   dashboard_config()
 
-  require("core.options")
-  require("mapping")
-  require("core.event")
+  mapping()
+  options()
+  events()
 
   pack.load_compile()
 end

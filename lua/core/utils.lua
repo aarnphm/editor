@@ -1,9 +1,24 @@
 local M = {}
 
-local lazy = require("lazy")
+function M.gitui()
+  local Terminal = require("toggleterm.terminal").Terminal
+  local gitui = Terminal:new({
+    cmd = "gitui",
+    hidden = true,
+    direction = "float",
+    float_opts = {
+      border = "double",
+    },
+    on_open = function(term)
+      vim.cmd([[startinsert!]])
+      vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+    end,
+  })
+  gitui:toggle()
+end
 
 function M.edit_root()
-  local files = lazy.require_on_exported_call("telescope.builtin.git").files
+  local files = _G.__lazy.require_on_exported_call("telescope.builtin.git").files
   files({ cwd = vim.fn.stdpath("config") })
 end
 
@@ -17,8 +32,8 @@ end
 function M.reload()
   M:reset_cache()
   require("packer").sync()
+  require("core.pack").magic_compile()
   vim.schedule(function()
-    require("core.pack").magic_compile()
     vim.notify("Config reloaded and compiled.")
   end)
 end

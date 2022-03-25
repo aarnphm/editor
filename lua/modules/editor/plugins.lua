@@ -153,7 +153,6 @@ editor["andymass/vim-matchup"] = {
   after = "nvim-treesitter",
   config = conf.matchup,
 }
-editor["vimlab/split-term.vim"] = { opt = true, cmd = { "Term", "VTerm" } }
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
   event = "BufRead",

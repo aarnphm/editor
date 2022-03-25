@@ -99,6 +99,9 @@ function config.nvim_treesitter()
       },
     },
   })
+
+  local parser_config = _G.__lazy.require_on_exported_call("nvim-treesitter.parsers").get_parser_configs
+  parser_config().markdown.filetype_to_parsername = "octo"
 end
 
 function config.autotag()
@@ -136,14 +139,14 @@ function config.toggleterm()
     start_in_insert = true,
     insert_mappings = true, -- whether or not the open mapping applies in insert mode
     persist_size = true,
-    direction = "horizontal",
+    direction = "vertical",
     close_on_exit = true, -- close the terminal window when the process exits
     shell = vim.o.shell, -- change the default shell
   })
 end
 
 function config.nvim_colorizer()
-  require("colorizer").setup()
+  require("colorizer").setup({})
 end
 
 function config.dapui()

@@ -1,7 +1,7 @@
 # editor
 neovim config. opinionated, yet fast.
 
-Startup time: 23ms with [`dstein64/vim-startuptime`](https://github.com/dstein64/vim-startuptime) on M1 Max
+Startup time: 15ms with [`dstein64/vim-startuptime`](https://github.com/dstein64/vim-startuptime) on M1 Max
 
 Supports multiple [themes](./lua/themes/plugins.lua)
 

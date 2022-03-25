@@ -88,6 +88,12 @@ function Packer:load_preflight_plugins(use)
   use({ "stevearc/dressing.nvim" })
   -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
   use({ "antoinemadec/FixCursorHold.nvim" })
+  use({
+    "folke/which-key.nvim",
+    config = function()
+      require("which-key").setup()
+    end,
+  })
 end
 
 function Packer:load_packer()
@@ -155,7 +161,7 @@ function plugins.convert_compile_file()
   if not state then
     -- first time compiling
     local pre_compiled_file = io.open(
-      _G.__editor_global.vim_path .. _G.__editor_global.path_sep .. "_pre_compiled.lua",
+      _G.__editor_global.vim_path .. _G.__editor_global.path_sep .. "__compiled.lua",
       "r"
     )
     local pre_compiled = pre_compiled_file:read("*a")
