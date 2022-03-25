@@ -1,7 +1,7 @@
 local fn, uv, api = vim.fn, vim.loop, vim.api
 local modules_dir = _G.__editor_global.vim_path .. "/lua/modules"
-local packer_compiled = _G.__editor_global.data_dir .. "packer_compiled.vim"
-local compile_to_lua = _G.__editor_global.data_dir .. "lua/_compiled.lua"
+local packer_compiled = _G.__editor_global.data_dir .. "lua/_compiled.lua"
+local checked_compiled = _G.__editor_global.vim_path .. "/_compiled.lua"
 
 local packer = nil
 
@@ -32,7 +32,10 @@ end
 function Packer:load_preflight_plugins(use)
   use({ "lewis6991/impatient.nvim" })
   use({ "nathom/filetype.nvim" })
+  use({ "stevearc/dressing.nvim" })
   use({ "kyazdani42/nvim-web-devicons" })
+  -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
+  use({ "antoinemadec/FixCursorHold.nvim" })
 
   -- colorscheme
   require("themes.plugins").init(use)
@@ -85,9 +88,6 @@ function Packer:load_preflight_plugins(use)
     end,
     event = "BufEnter",
   })
-  use({ "stevearc/dressing.nvim" })
-  -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
-  use({ "antoinemadec/FixCursorHold.nvim" })
   use({
     "folke/which-key.nvim",
     config = function()
@@ -156,69 +156,28 @@ function plugins.ensure_plugins()
   Packer:init_ensure_plugins()
 end
 
-function plugins.convert_compile_file()
-  local state = uv.fs_stat(packer_compiled)
-  if not state then
-    -- first time compiling
-    local pre_compiled_file = io.open(
-      _G.__editor_global.vim_path .. _G.__editor_global.path_sep .. "__compiled.lua",
-      "r"
-    )
-    local pre_compiled = pre_compiled_file:read("*a")
-    pre_compiled_file:close()
-    local _compiled_cache = io.open(compile_to_lua, "w")
+function plugins.magic_compile()
+  if vim.fn.filereadable(packer_compiled) == 1 then
+    local _compiled_file = io.open(packer_compiled, "r")
+    local pre_compiled = _compiled_file:read("*a")
+    _compiled_file:close()
+    local _compiled_cache = io.open(checked_compiled, "w")
     _compiled_cache:write(pre_compiled)
     _compiled_cache:close()
-  else
-    local lines = {}
-    local lnum = 1
-    lines[#lines + 1] = "vim.cmd [[packadd packer.nvim]]\n"
-
-    for line in io.lines(packer_compiled) do
-      lnum = lnum + 1
-      if lnum > 15 then
-        lines[#lines + 1] = line .. "\n"
-        if line == "END" then
-          break
-        end
-      end
-    end
-    table.remove(lines, #lines)
-
-    if vim.fn.isdirectory(_G.__editor_global.data_dir .. "lua") ~= 1 then
-      os.execute("mkdir -p " .. _G.__editor_global.data_dir .. "lua")
-    end
-
-    if vim.fn.filereadable(compile_to_lua) == 1 then
-      os.remove(compile_to_lua)
-    end
-
-    local file = io.open(compile_to_lua, "w")
-    for _, line in ipairs(lines) do
-      file:write(line)
-    end
-    file:close()
-
-    os.remove(packer_compiled)
   end
-end
-
-function plugins.magic_compile()
   plugins.compile()
-  plugins.convert_compile_file()
 end
 
 function plugins.auto_compile()
   local file = vim.fn.expand("%:p")
   if file:match(modules_dir) then
     plugins.clean()
-    plugins.compile()
-    plugins.convert_compile_file()
+    plugins.magic_compile()
   end
 end
 
 function plugins.load_compile()
-  if vim.fn.filereadable(compile_to_lua) == 1 then
+  if vim.fn.filereadable(packer_compiled) == 1 then
     require("_compiled")
   else
     assert("Missing packer compile file, run PackerCompile Or PackerInstall to fix")

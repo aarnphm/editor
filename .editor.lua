@@ -6,4 +6,5 @@ return {
     python3_host_org = "~/mambaforge/bin/python",
     shadafile = "NONE",
   },
+  repos = "bentoml/bentoml",
 }

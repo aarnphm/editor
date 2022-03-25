@@ -16,7 +16,6 @@ end
 function M.setup_autocmds()
   local definitions = {
     bufs = {
-      { "BufWritePre", "/tmp/*", "setlocal noundofile" },
       { "BufWritePre", "COMMIT_EDITMSG", "setlocal noundofile" },
       { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
       { "BufWritePre", "*.tmp", "setlocal noundofile" },

@@ -7,6 +7,7 @@ function config.telescope()
   vim.cmd([[packadd telescope-project.nvim]])
   vim.cmd([[packadd telescope-frecency.nvim]])
   vim.cmd([[packadd telescope-zoxide]])
+  vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
 
   require("telescope").setup({
@@ -55,6 +56,7 @@ function config.telescope()
   require("telescope").load_extension("file_browser")
   require("telescope").load_extension("project")
   require("telescope").load_extension("notify")
+  require("telescope").load_extension("emoji")
 end
 
 function config.octo()
@@ -302,6 +304,23 @@ function config.trouble()
       other = "﫠",
     },
     use_lsp_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
+  })
+end
+
+function config.cheatsheet()
+  require("cheatsheet").setup({
+    -- Whether to show bundled cheatsheets
+    bundled_cheatsheets = true,
+    bundled_plugin_cheatsheets = true,
+    include_only_installed_plugins = true,
+
+    -- Key mappings bound inside the telescope window
+    telescope_mappings = {
+      ["<CR>"] = require("cheatsheet.telescope.actions").select_or_fill_commandline,
+      ["<A-CR>"] = require("cheatsheet.telescope.actions").select_or_execute,
+      ["<C-Y>"] = require("cheatsheet.telescope.actions").copy_cheat_value,
+      ["<C-E>"] = require("cheatsheet.telescope.actions").edit_user_cheatsheet,
+    },
   })
 end
 
