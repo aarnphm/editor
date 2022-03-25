@@ -4,9 +4,11 @@ local supported_themes = require("themes.plugins").supported_themes
 
 local M = {}
 
-function M.init(config)
+M.config = _G.__editor_config
+
+function M.init()
   for _, theme in pairs(supported_themes) do
-    if theme == config.colorscheme then
+    if theme == M.config.colorscheme then
       colors = require(mod .. theme)
     end
   end

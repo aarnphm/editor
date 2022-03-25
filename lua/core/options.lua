@@ -1,23 +1,7 @@
-local global = require("core.global")
-local config = global.load_config()
+local function load_options()
+  local config = _G.__editor_config
 
-local M = {}
-M.__index = M
-
-function M:bind_option(options)
-  for k, v in pairs(options) do
-    if v == true then
-      vim.cmd("set " .. k)
-    elseif v == false then
-      vim.cmd("set no" .. k)
-    else
-      vim.cmd("set " .. k .. "=" .. v)
-    end
-  end
-end
-
-function M:load_options()
-  local bw_local = {
+  local vim_opt = {
     number = true,
     relativenumber = true,
     autoindent = true,
@@ -38,9 +22,6 @@ function M:load_options()
     linebreak = true,
     foldenable = true,
     signcolumn = "yes",
-  }
-
-  local global_local = {
     termguicolors = true,
     backspace = "indent,eol,start",
     complete = ".,w,b,k",
@@ -71,7 +52,7 @@ function M:load_options()
     swapfile = false,
     backup = false,
     writebackup = false,
-    undodir = global.cache_dir .. "undo/",
+    undodir = _G.__editor_global.cache_dir .. "undo/",
     undolevels = 9999,
     encoding = "utf-8",
     list = true,
@@ -85,6 +66,7 @@ function M:load_options()
     sessionoptions = "curdir,help,tabpages,winsize",
     history = 2000,
     shada = "!,'300,<50,@100,s10,h",
+    shadafile = "NONE",
     backupskip = "/tmp/*,$TMPDIR/*,$TMP/*,$TEMP/*,*/shm/*,/private/var/*,.vault.vim",
     shiftround = true,
     updatetime = 100,
@@ -117,14 +99,12 @@ function M:load_options()
     display = "lastline",
     showbreak = "↳  ",
     listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←",
-    pumblend = 10,
     winblend = 10,
     autowrite = true,
+    python3_host_prog = config.options.python3_host_prog,
   }
 
-  vim.g.python3_host_prog = config.python3_host_prog
-
-  if global.is_mac then
+  if _G.__editor_global.is_mac then
     vim.g.clipboard = {
       name = "macOS-clipboard",
       copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
@@ -132,10 +112,16 @@ function M:load_options()
       cache_enabled = 0,
     }
   end
-  for name, value in pairs(global_local) do
+
+  for name, value in pairs(vim_opt) do
     vim.o[name] = value
   end
-  M:bind_option(bw_local)
+
+  --Defer loading shada until after startup_
+  vim.schedule(function()
+    vim.opt.shadafile = vim_opt.shadafile
+    vim.cmd([[ silent! rsh ]])
+  end)
 end
 
-return M
+load_options()

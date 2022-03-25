@@ -21,30 +21,16 @@ function autocmd.load_autocmds()
       { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
       { "BufWritePre", "*.tmp", "setlocal noundofile" },
       { "BufWritePre", "*.bak", "setlocal noundofile" },
-    },
-    wins = {
       {
-        "WinEnter,BufEnter,InsertLeave",
+        "BufEnter,BufRead,BufWinEnter,FileType,WinEnter",
         "*",
-        [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]],
+        'lua require("core.utils").hide_statusline()',
       },
-      {
-        "WinLeave,BufLeave,InsertEnter",
-        "*",
-        [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]],
-      },
-      -- Check if file changed when its window is focus, more eager than 'autoread'
-      { "FocusGained", "* checktime" },
-      -- Equalize window dimensions when resizing vim window
-      { "VimResized", "*", [[tabdo wincmd =]] },
+      { "BufNewFile,BufRead", "*.toml", "setf toml" },
+      { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
+      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", "setf dockerfile" },
     },
     ft = {
-      { "BufNewFile,BufRead", "*.toml", " setf toml" },
-      { "BufNewFile,BufRead", "Dockerfile-*", " setf dockerfile" },
-      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", " setf dockerfile" },
-      { "BufNewFile,BufRead", "*-{Dockerfile,dockerfile}.j2", " setf dockerfile" },
-      { "BufNewFile,BufRead", "*-{md,markdown,mdx}.j2", " setf markdown" },
-      { "BufNewFile,BufRead", "*.j2", " setf html" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
@@ -54,11 +40,6 @@ function autocmd.load_autocmds()
         "FileType",
         "dashboard",
         "set showtabline=0 | autocmd WinLeave <buffer> set showtabline=2",
-      },
-      {
-        "BufEnter,BufRead,BufWinEnter,FileType,WinEnter",
-        "*",
-        'lua require("core.utils").hide_statusline()',
       },
     },
     yank = {

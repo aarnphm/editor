@@ -5,11 +5,6 @@ editor["tpope/vim-surround"] = { opt = false }
 editor["tpope/vim-fugitive"] = { opt = true, cmd = { "Git", "G" } }
 
 editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
-editor["itchyny/vim-cursorword"] = {
-  opt = true,
-  event = { "BufReadPre", "BufNewFile" },
-  config = conf.vim_cursorword,
-}
 
 editor["alexghergh/nvim-tmux-navigation"] = {
   opt = false,
@@ -91,11 +86,11 @@ editor["romgrk/nvim-treesitter-context"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["p00f/nvim-ts-rainbow"] = {
-  opt = true,
-  after = "nvim-treesitter",
-  event = "BufRead",
-}
+-- editor["p00f/nvim-ts-rainbow"] = {
+--   opt = true,
+--   after = "nvim-treesitter",
+--   event = "BufRead",
+-- }
 editor["JoosepAlviste/nvim-ts-context-commentstring"] = {
   opt = true,
   after = "nvim-treesitter",
@@ -144,48 +139,7 @@ editor["folke/zen-mode.nvim"] = {
     "folke/twilight.nvim",
   },
   config = function()
-    require("zen-mode").setup({
-      window = {
-        backdrop = 0.95, -- shade the backdrop of the Zen window. Set to 1 to keep the same as Normal
-        -- height and width can be:
-        -- * an absolute number of cells when > 1
-        -- * a percentage of the width / height of the editor when <= 1
-        -- * a function that returns the width or the height
-        width = 120, -- width of the Zen window
-        height = 1, -- height of the Zen window
-        -- by default, no options are changed for the Zen window
-        -- uncomment any of the options below, or add other vim.wo options you want to apply
-        options = {
-          -- signcolumn = "no", -- disable signcolumn
-          -- number = false, -- disable number column
-          -- relativenumber = false, -- disable relative numbers
-          -- cursorline = false, -- disable cursorline
-          -- cursorcolumn = false, -- disable cursor column
-          -- foldcolumn = "0", -- disable fold column
-          -- list = false, -- disable whitespace characters
-        },
-      },
-      plugins = {
-        -- disable some global vim options (vim.o...)
-        -- comment the lines to not apply the options
-        options = {
-          enabled = true,
-          ruler = false, -- disables the ruler text in the cmd line area
-          showcmd = false, -- disables the command in the last line of the screen
-        },
-        twilight = { enabled = true }, -- enable to start Twilight when zen mode opens
-        gitsigns = { enabled = false }, -- disables git signs
-        tmux = { enabled = false }, -- disables the tmux statusline
-        -- this will change the font size on kitty when in zen mode
-        -- to make this work, you need to set the following kitty options:
-        -- - allow_remote_control socket-only
-        -- - listen_on unix:/tmp/kitty
-        kitty = {
-          enabled = false,
-          font = "+4", -- font size increment
-        },
-      },
-    })
+    require("zen-mode").setup({})
   end,
 }
 editor["windwp/nvim-ts-autotag"] = {
@@ -199,10 +153,6 @@ editor["andymass/vim-matchup"] = {
   after = "nvim-treesitter",
   config = conf.matchup,
 }
-editor["romainl/vim-cool"] = {
-  opt = true,
-  event = { "CursorMoved", "InsertEnter" },
-}
 editor["vimlab/split-term.vim"] = { opt = true, cmd = { "Term", "VTerm" } }
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
@@ -215,11 +165,6 @@ editor["norcalli/nvim-colorizer.lua"] = {
   event = "BufRead",
   config = conf.nvim_colorizer,
 }
-editor["rmagatti/auto-session"] = {
-  opt = true,
-  cmd = { "SaveSession", "RestoreSession", "DeleteSession" },
-  config = conf.auto_session,
-}
 editor["jdhao/better-escape.vim"] = { opt = true, event = "InsertEnter" }
 editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,
@@ -229,13 +174,6 @@ editor["untitled-ai/jupyter_ascending.vim"] = {
 editor["famiu/bufdelete.nvim"] = {
   opt = true,
   cmd = { "Bdelete", "Bwipeout", "Bdelete!", "Bwipeout!" },
-}
-editor["abecodes/tabout.nvim"] = {
-  opt = true,
-  event = "InsertEnter",
-  wants = "nvim-treesitter",
-  after = "nvim-cmp",
-  config = conf.tabout,
 }
 editor["rcarriga/nvim-dap-ui"] = {
   opt = true,

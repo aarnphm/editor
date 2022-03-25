@@ -17,12 +17,12 @@ M.supported_themes = {
   "edge",
 }
 
-function M.init(use, global_config)
+function M.init(use)
   use({
     "jacoborus/tender.vim",
 
     as = "tender",
-    disable = global_config.colorscheme ~= "tender",
+    disable = _G.__editor_config.colorscheme ~= "tender",
   })
   use({
     "NLKNguyen/papercolor-theme",
@@ -32,28 +32,28 @@ function M.init(use, global_config)
       vim.g.background = "light"
       vim.cmd([[silent! colorscheme PaperColor]])
     end,
-    disable = global_config.colorscheme ~= "papercolor",
+    disable = _G.__editor_config.colorscheme ~= "papercolor",
   })
   use({
     "sainnhe/edge",
 
     as = "edge",
     config = config.edge,
-    disable = global_config.colorscheme ~= "edge",
+    disable = _G.__editor_config.colorscheme ~= "edge",
   })
   use({ -- color scheme
     "folke/tokyonight.nvim",
 
     as = "tokyonight",
     config = config.tokyonight,
-    disable = global_config.colorscheme ~= "tokyonight",
+    disable = _G.__editor_config.colorscheme ~= "tokyonight",
   })
   use({
     "catppuccin/nvim",
 
     as = "catppuccin",
     config = config.catppuccin,
-    disable = global_config.colorscheme ~= "catppuccin",
+    disable = _G.__editor_config.colorscheme ~= "catppuccin",
   })
 
   use({
@@ -65,7 +65,7 @@ function M.init(use, global_config)
       vim.g.nord_borders = true
       require("nord").set()
     end,
-    disable = global_config.colorscheme ~= "nord",
+    disable = _G.__editor_config.colorscheme ~= "nord",
   })
 
   use({
@@ -77,7 +77,7 @@ function M.init(use, global_config)
       vim.o.background = "dark"
       vim.cmd([[silent! colorscheme gruvbox]])
     end,
-    disable = global_config.colorscheme ~= "gruvbox",
+    disable = _G.__editor_config.colorscheme ~= "gruvbox",
   })
 
   use({
@@ -86,7 +86,7 @@ function M.init(use, global_config)
     as = "rose-pine",
     tag = "v1.*",
     config = config.rose_pine,
-    disable = global_config.colorscheme ~= "rose-pine",
+    disable = _G.__editor_config.colorscheme ~= "rose-pine",
   })
 
   use({
@@ -96,7 +96,7 @@ function M.init(use, global_config)
     config = function()
       vim.cmd("color nightfox")
     end,
-    disable = global_config.colorscheme ~= "nightfox",
+    disable = _G.__editor_config.colorscheme ~= "nightfox",
   })
 
   use({
@@ -106,7 +106,7 @@ function M.init(use, global_config)
     config = function()
       vim.cmd("color onedark")
     end,
-    disable = global_config.colorscheme ~= "onedark",
+    disable = _G.__editor_config.colorscheme ~= "onedark",
   })
 
   use({
@@ -116,7 +116,7 @@ function M.init(use, global_config)
     config = function()
       vim.cmd([[color dracula]])
     end,
-    disable = global_config.colorscheme ~= "dracula",
+    disable = _G.__editor_config.colorscheme ~= "dracula",
   })
 
   use({
@@ -124,7 +124,7 @@ function M.init(use, global_config)
 
     as = "kanagawa",
     config = config.kanagawa,
-    disable = global_config.colorscheme ~= "kanagawa",
+    disable = _G.__editor_config.colorscheme ~= "kanagawa",
   })
 
   use({
@@ -134,7 +134,7 @@ function M.init(use, global_config)
     config = function()
       require("github-theme").setup()
     end,
-    disable = global_config.colorscheme ~= "github",
+    disable = _G.__editor_config.colorscheme ~= "github",
   })
 end
 

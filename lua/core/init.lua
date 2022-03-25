@@ -1,23 +1,21 @@
-local global = require("core.global")
-local g = vim.g
-local api = vim.api
-local config = global.load_config()
-
+local vim = vim
 local M = {}
 
+M.__index = M
+
 -- Create cache dir and subs dir
-local init_dir = function()
+local function create_dir()
   local data_dir = {
-    global.cache_dir .. "backup",
-    global.cache_dir .. "session",
-    global.cache_dir .. "swap",
-    global.cache_dir .. "tags",
-    global.cache_dir .. "undo",
+    _G.__editor_global.cache_dir .. "backup",
+    _G.__editor_global.cache_dir .. "session",
+    _G.__editor_global.cache_dir .. "swap",
+    _G.__editor_global.cache_dir .. "tags",
+    _G.__editor_global.cache_dir .. "undo",
   }
   -- There only check once that If cache_dir exists
   -- Then I don't want to check subs dir exists
-  if vim.fn.isdirectory(global.cache_dir) == 0 then
-    os.execute("mkdir -p " .. global.cache_dir)
+  if vim.fn.isdirectory(_G.__editor_global.cache_dir) == 0 then
+    os.execute("mkdir -p " .. _G.__editor_global.cache_dir)
     for _, v in pairs(data_dir) do
       if vim.fn.isdirectory(v) == 0 then
         os.execute("mkdir -p " .. v)
@@ -26,49 +24,19 @@ local init_dir = function()
   end
 end
 
-local disable_distribution_plugins = function()
-  local disabled_built_ins = {
-    "netrw",
-    "netrwPlugin",
-    "netrwSettings",
-    "netrwFileHandlers",
-    "gzip",
-    "zip",
-    "zipPlugin",
-    "tar",
-    "tarPlugin",
-    "getscript",
-    "getscriptPlugin",
-    "vimball",
-    "vimballPlugin",
-    "2html_plugin",
-    "logipat",
-    "rrhelper",
-    "spellfile_plugin",
-    "matchit",
-    "matchparen",
-    "fzf",
-    "gtags",
-  }
-
-  for _, plugin in pairs(disabled_built_ins) do
-    vim.g["loaded_" .. plugin] = 1
-  end
-end
-
 local function minimap_config()
-  g.minimap_auto_start = 0
-  g.minimap_block_filetypes = { "aerial", "NvimTree" }
-  g.minimap_git_colors = 1
-  g.minimap_auto_start_win_enter = 1
+  vim.g.minimap_auto_start = 0
+  vim.g.minimap_block_filetypes = { "aerial", "NvimTree" }
+  vim.g.minimap_git_colors = 1
+  vim.g.minimap_auto_start_win_enter = 1
 end
 
-local dashboard_config = function()
+local function dashboard_config()
   local headers = nil
   vim.g.dashboard_default_executive = "telescope"
   vim.g.dashboard_custom_footer = { "🍱 github.com/aarnphm/editor" }
 
-  if config.background == "dark" then
+  if _G.__editor_config.background == "dark" then
     headers = {
       [[⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿]],
       [[⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿]],
@@ -181,26 +149,28 @@ local dashboard_config = function()
   }
 end
 
-function M:preflight()
-  init_dir()
-  minimap_config()
-  dashboard_config()
-  disable_distribution_plugins()
+local function preflight()
+  create_dir()
 
-  g.mapleader = ","
-  api.nvim_set_keymap("n", " ", "", { noremap = true })
-  api.nvim_set_keymap("x", " ", "", { noremap = true })
+  vim.g.mapleader = ","
+  vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
+  vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
 end
 
 function M:setup()
-  M.preflight()
+  local pack = require("core.pack")
+  preflight()
 
+  pack.ensure_plugins()
+
+  minimap_config()
+  dashboard_config()
+
+  require("core.options")
   require("mapping")
-  require("core.pack").ensure_plugins()
-
-  require("core.options").load_options(config)
   require("core.event")
-  require("core.pack").load_compile()
+
+  pack.load_compile()
 end
 
 return M

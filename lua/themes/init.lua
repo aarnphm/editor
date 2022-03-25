@@ -1,5 +1,4 @@
-local config = require("core.global").load_config()
-local colors = require("themes.colors").init(config)
+local _, colors = pcall(require, "themes.colors")
 if not colors then
   return
 end
