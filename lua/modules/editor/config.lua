@@ -56,7 +56,8 @@ function config.nvim_treesitter()
   vim.cmd([[set foldexpr=nvim_treesitter#foldexpr()]])
 
   require("nvim-treesitter.configs").setup({
-    ensure_installed = "maintained",
+    -- 'all', 'maintained', or list of string
+    ensure_installed = { "python", "go", "nix", "hcl", "rust", "typescript", "c", "java","lua", "javascript" },
     highlight = { enable = true },
     rainbow = {
       enable = true,

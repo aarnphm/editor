@@ -67,9 +67,7 @@ tools["gelguy/wilder.nvim"] = {
   config = conf.wilder,
   requires = {
     { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
-    { "nixprime/cpsm", opt = true, after = "wilder.nvim" },
   },
-  run = ":UpdateRemotesPlugin",
 }
 tools["folke/trouble.nvim"] = {
   opt = true,

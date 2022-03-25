@@ -36,6 +36,12 @@ function Packer:load_preflight_plugins(use)
   use({ "kyazdani42/nvim-web-devicons" })
   -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
   use({ "antoinemadec/FixCursorHold.nvim" })
+  use({
+    "lewis6991/spaceless.nvim",
+    config = function()
+      require("spaceless").setup()
+    end,
+  })
 
   -- colorscheme
   require("themes.plugins").init(use)
