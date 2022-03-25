@@ -1,4 +1,3 @@
-local lazy = require("lazy")
 local fn, uv, api = vim.fn, vim.loop, vim.api
 local modules_dir = _G.__editor_global.vim_path .. "/lua/modules"
 local packer_compiled = _G.__editor_global.data_dir .. "lua/_compiled.lua"
@@ -187,7 +186,7 @@ function plugins.load_compile()
   vim.cmd([[command! PackerSync lua require('core.pack').sync()]])
   vim.cmd([[command! PackerClean lua require('core.pack').clean()]])
   vim.cmd([[command! PackerStatus lua require('packer').status()]])
-  vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
+  vim.cmd([[autocmd User PackerComplete lua require('core.pack').compile()]])
   vim.cmd(
     [[command! -nargs=+ -complete=customlist,v:lua.require('packer.snapshot').completion.create PackerSnapshot  lua require('packer').snapshot(<f-args>)]]
   )

@@ -1,7 +1,7 @@
 local editor = {}
 local conf = require("modules.editor.config")
 
-editor["tpope/vim-surround"] = { opt = false }
+editor["tpope/vim-surround"] = { opt = true }
 editor["tpope/vim-fugitive"] = { opt = true, cmd = { "Git", "G" } }
 
 editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
@@ -152,6 +152,9 @@ editor["andymass/vim-matchup"] = {
   opt = true,
   after = "nvim-treesitter",
   config = conf.matchup,
+  setup = function()
+    require("core.utils").packer_lazy_load("vim-matchup")
+  end,
 }
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,

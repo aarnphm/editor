@@ -1,12 +1,10 @@
-local lazy = require("lazy")
-
 local _, colors = pcall(require, "themes.colors")
 if not colors then
   return
 end
 
-local get_highlight = lazy.require_on_exported_call("themes.utils").get_highlight
-local set_highlight = lazy.require_on_exported_call("themes.utils").set_highlight
+local get_highlight = _G.__lazy.require_on_exported_call("themes.utils").get_highlight
+local set_highlight = _G.__lazy.require_on_exported_call("themes.utils").set_highlight
 
 local statusline_colors = get_highlight("StatusLine")
 local error_colors = get_highlight("DiagnosticError")

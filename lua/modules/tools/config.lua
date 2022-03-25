@@ -10,7 +10,10 @@ function config.telescope()
   vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
 
-  require("telescope").setup({
+  local load_extension = _G.__lazy.require_on_exported_call("telescope").load_extension
+  local setup = _G.__lazy.require_on_exported_call("telescope").setup
+
+  local telescope_config = {
     defaults = {
       prompt_prefix = "🔭 ",
       selection_caret = "» ",
@@ -22,7 +25,7 @@ function config.telescope()
       grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
       file_sorter = require("telescope.sorters").get_fuzzy_file,
-      file_ignore_patterns = {},
+      file_ignore_patterns = { "__compiled.lua" },
       generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
       path_display = { "absolute" },
       winblend = 0,
@@ -33,7 +36,7 @@ function config.telescope()
     },
     extensions = {
       ["ui-select"] = {
-        require("telescope.themes").get_ivy({}),
+        require("telescope.themes").get_dropdown({}),
       },
       fzf = {
         fuzzy = false, -- false will only do exact matching
@@ -47,16 +50,19 @@ function config.telescope()
         ignore_patterns = { "*.git/*", "*/tmp/*" },
       },
     },
-  })
+  }
 
-  require("telescope").load_extension("fzf")
-  require("telescope").load_extension("zoxide")
-  require("telescope").load_extension("frecency")
-  require("telescope").load_extension("ui-select")
-  require("telescope").load_extension("file_browser")
-  require("telescope").load_extension("project")
-  require("telescope").load_extension("notify")
-  require("telescope").load_extension("emoji")
+  vim.defer_fn(function()
+    setup(telescope_config)
+    load_extension("fzf")
+    load_extension("zoxide")
+    load_extension("frecency")
+    load_extension("ui-select")
+    load_extension("file_browser")
+    load_extension("project")
+    load_extension("notify")
+    load_extension("emoji")
+  end, 0)
 end
 
 function config.octo()
@@ -227,7 +233,6 @@ let s:highlighters = [
       \ ]
 
 let s:popupmenu_renderer = wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
-      \ 'border': 'rounded',
       \ 'empty_message': wilder#popupmenu_empty_message_with_spinner(),
       \ 'highlighter': s:highlighters,
       \ 'left': [

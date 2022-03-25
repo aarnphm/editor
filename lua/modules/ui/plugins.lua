@@ -14,14 +14,12 @@ ui["SmiteshP/nvim-gps"] = {
   config = conf.nvim_gps,
 }
 ui["nvim-lualine/lualine.nvim"] = {
-  opt = false,
+  opt = true,
   after = "nvim-gps",
   config = conf.lualine,
 }
 ui["j-hui/fidget.nvim"] = {
-  requires = {
-    "nvim-lualine/lualine.nvim",
-  },
+  opt = true,
   config = function()
     require("fidget").setup({})
   end,

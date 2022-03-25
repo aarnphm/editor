@@ -3,7 +3,7 @@ local conf = require("modules.tools.config")
 
 tools["RishabhRD/popfix"] = { opt = false }
 tools["nvim-lua/plenary.nvim"] = { opt = false }
-tools["wakatime/vim-wakatime"] = { opt = true, run = ":WakaTimeApiKey" }
+tools["wakatime/vim-wakatime"] = { opt = true }
 tools["nvim-telescope/telescope.nvim"] = {
   opt = true,
   module = "telescope",
@@ -12,17 +12,6 @@ tools["nvim-telescope/telescope.nvim"] = {
   requires = {
     { "nvim-lua/plenary.nvim", opt = false },
     { "nvim-lua/popup.nvim", opt = false },
-  },
-}
-tools["pwntester/octo.nvim"] = {
-  opt = true,
-  after = "telescope.nvim",
-  config = conf.octo,
-  cmd = "Octo",
-  requires = {
-    "nvim-lua/plenary.nvim",
-    "nvim-telescope/telescope.nvim",
-    "kyazdani42/nvim-web-devicons",
   },
 }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
@@ -49,6 +38,17 @@ tools["xiyaowong/telescope-emoji.nvim"] = {
   opt = true,
   after = "telescope.nvim",
 }
+tools["pwntester/octo.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+  config = conf.octo,
+  cmd = "Octo",
+  requires = {
+    "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope.nvim",
+    "kyazdani42/nvim-web-devicons",
+  },
+}
 tools["sudormrfbin/cheatsheet.nvim"] = {
   opt = true,
   after = "telescope.nvim",
@@ -59,8 +59,6 @@ tools["sudormrfbin/cheatsheet.nvim"] = {
   },
   config = conf.cheatsheet,
 }
-
-tools["thinca/vim-quickrun"] = { opt = true, cmd = { "QuickRun", "Q" } }
 tools["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime" }
 tools["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
