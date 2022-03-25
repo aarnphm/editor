@@ -48,7 +48,7 @@ end
 function M.reload()
   M:reset_cache()
   require("packer").sync()
-  require("core.pack").magic_compile()
+  require("packer").compile(_G.__editor_global.data_dir .. "lua/_compiled.lua")
   vim.notify("Config reloaded and compiled.")
 end
 

@@ -4,4 +4,5 @@ GIT_ROOT=$(git rev-parse --show-toplevel)
 
 [[ -f "./nvim.log" ]] && rm ./nvim.log
 
-nvim --startuptime nvim.log -c ":q" && cat ./nvim.log
+nvim --startuptime nvim.log -c ":q"
+cat ./nvim.log

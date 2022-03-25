@@ -71,11 +71,10 @@ function M.setup_mapping()
     ["n|mm"] = map_cr("MinimapToggle"):with_noremap():with_silent(),
     ["n|mr"] = map_cr("MinimapRefresh"):with_noremap():with_silent(),
     -- Packer
-    ["n|<Space>ps"] = map_cr("PackerSync"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pu"] = map_cr("PackerUpdate"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pi"] = map_cr("PackerInstall"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pc"] = map_cr("PackerCompile"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pcc"] = map_cr("PackerClean"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>ps"] = map_cu("lua require('core.pack').sync()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>pu"] = map_cu("lua require('core.pack').update()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>pc"] = map_cu("lua require('core.pack').magic_compile()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>pcc"] = map_cu("lua require('core.pack').clean()"):with_silent():with_noremap():with_nowait(),
     -- Lsp mapp work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<leader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),

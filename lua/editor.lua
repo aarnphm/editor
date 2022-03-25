@@ -20,7 +20,6 @@ function M:editor_variables()
   self.home = home
   self.data_dir = string.format("%s/site/", vim.fn.stdpath("data"))
   self.local_config_path = vim.fn.expand("$HOME/.editor.lua")
-  return self
 end
 
 local function editor_config()
@@ -45,11 +44,14 @@ local function editor_config()
   end
 
   _config = vim.deepcopy(__config)
-  return _config
 end
 
-_G.__editor_global = M:editor_variables()
+M:editor_variables()
 
-_G.__editor_config = editor_config()
+editor_config()
+
+_G.__editor_global = M
+
+_G.__editor_config = _config
 
 return M
