@@ -1,22 +1,6 @@
 local M = {}
 local config = require("themes.config")
 
-M.supported_themes = {
-  "catppuccin",
-  "dracula",
-  "github",
-  "gruvbox",
-  "kanagawa",
-  "nightfox",
-  "nord",
-  "onedark",
-  "rose-pine",
-  "tokyonight",
-  "tender",
-  "papercolor",
-  "edge",
-}
-
 function M.init(use)
   use({
     "jacoborus/tender.vim",
@@ -84,7 +68,6 @@ function M.init(use)
     "rose-pine/neovim",
 
     as = "rose-pine",
-    tag = "v1.*",
     config = config.rose_pine,
     disable = _G.__editor_config.colorscheme ~= "rose-pine",
   })

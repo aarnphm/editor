@@ -118,12 +118,6 @@ function M.setup_options()
   for name, value in pairs(vim_opt) do
     vim.o[name] = value
   end
-
-  --Defer loading shada until after startup_
-  vim.schedule(function()
-    vim.opt.shadafile = vim_opt.shadafile
-    vim.cmd([[ silent! rsh ]])
-  end)
 end
 
 return M

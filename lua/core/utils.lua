@@ -1,4 +1,20 @@
 local M = {}
+local packer = nil
+
+-- load plugin after entering vim ui
+M.packer_lazy_load = function(plugin, timer)
+  if plugin then
+    timer = timer or 0
+    if not packer then
+      vim.cmd([[packadd packer.nvim]])
+      packer = require("packer")
+    end
+
+    vim.defer_fn(function()
+      packer.loader(plugin)
+    end, timer)
+  end
+end
 
 function M.gitui()
   local Terminal = require("toggleterm.terminal").Terminal
@@ -33,9 +49,7 @@ function M.reload()
   M:reset_cache()
   require("packer").sync()
   require("core.pack").magic_compile()
-  vim.schedule(function()
-    vim.notify("Config reloaded and compiled.")
-  end)
+  vim.notify("Config reloaded and compiled.")
 end
 
 function M.hide_statusline()

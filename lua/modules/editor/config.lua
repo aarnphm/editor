@@ -57,7 +57,7 @@ function config.nvim_treesitter()
 
   require("nvim-treesitter.configs").setup({
     -- 'all', 'maintained', or list of string
-    ensure_installed = { "python", "go", "nix", "hcl", "rust", "typescript", "c", "java","lua", "javascript" },
+    ensure_installed = { "python", "go", "nix", "hcl", "rust", "typescript", "c", "java", "lua", "javascript" },
     highlight = { enable = true },
     rainbow = {
       enable = true,

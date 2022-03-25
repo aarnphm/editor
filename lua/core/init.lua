@@ -153,8 +153,6 @@ local function dashboard_config()
 end
 
 local function preflight()
-  create_dir()
-
   -- disable some builtin vim plugins
   local disabled_built_ins = {
     "2html_plugin",
@@ -184,12 +182,14 @@ local function preflight()
   vim.g.mapleader = ","
   vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
   vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
+
+  create_dir()
 end
 
 function M:setup()
-  local pack = require("core.pack")
-
   preflight()
+
+  local pack = require("core.pack")
 
   pack.ensure_plugins()
 

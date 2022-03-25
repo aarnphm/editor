@@ -7,7 +7,6 @@ lang["fatih/vim-go"] = {
   run = ":GoInstallBinaries",
   config = conf.lang_go,
 }
-lang["rust-lang/rust.vim"] = { opt = true, ft = "rust" }
 lang["simrat39/rust-tools.nvim"] = {
   opt = true,
   ft = "rust",

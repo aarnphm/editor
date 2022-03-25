@@ -1,6 +1,13 @@
 local ui = {}
 local conf = require("modules.ui.config")
 
+ui["folke/which-key.nvim"] = {
+  opt = true,
+  event = "BufEnter",
+  config = function()
+    require("which-key").setup()
+  end,
+}
 ui["SmiteshP/nvim-gps"] = {
   opt = true,
   after = "nvim-treesitter",

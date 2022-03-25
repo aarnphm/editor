@@ -1,15 +1,27 @@
 local colors = {}
-local mod = "themes.integrated."
-local supported_themes = require("themes.plugins").supported_themes
 
 local M = {}
 
-M.config = _G.__editor_config
+local supported_themes = {
+  "catppuccin",
+  "dracula",
+  "github",
+  "gruvbox",
+  "kanagawa",
+  "nightfox",
+  "nord",
+  "onedark",
+  "rose-pine",
+  "tokyonight",
+  "tender",
+  "papercolor",
+  "edge",
+}
 
 function M.init()
   for _, theme in pairs(supported_themes) do
-    if theme == M.config.colorscheme then
-      colors = require(mod .. theme)
+    if theme == _G.__editor_config.colorscheme then
+      colors = require("themes.integrated." .. theme)
     end
   end
 
