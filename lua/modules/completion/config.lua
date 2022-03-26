@@ -1,7 +1,7 @@
 local config = {}
 
 function config.nvim_lsp()
-  require("modules.completion.lsp")
+  require("modules.completion.lspconfig")
 end
 
 function config.lightbulb()

@@ -1,8 +1,7 @@
 local editor = {}
-local conf = require("modules.editor.config")
+local config = require("modules.editor.config")
 
-editor["tpope/vim-surround"] = { opt = true }
-editor["tpope/vim-fugitive"] = { opt = true, cmd = { "Git", "G" } }
+editor["tpope/vim-fugitive"] = { opt = true, cmd = { "Git", "G", "Ggrep", "GBrowse" } }
 
 editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
 
@@ -65,20 +64,16 @@ editor["terrortylor/nvim-comment"] = {
 editor["simrat39/symbols-outline.nvim"] = {
   opt = true,
   cmd = { "SymbolsOutline", "SymbolsOutlineOpen" },
-  config = conf.symbols_outline,
+  config = config.symbols_outline,
 }
 
 editor["nvim-treesitter/nvim-treesitter"] = {
   opt = true,
   run = ":TSUpdate",
   event = "BufRead",
-  config = conf.nvim_treesitter,
+  config = config.nvim_treesitter,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["nvim-treesitter/playground"] = {
   opt = true,
   after = "nvim-treesitter",
 }
@@ -86,11 +81,6 @@ editor["romgrk/nvim-treesitter-context"] = {
   opt = true,
   after = "nvim-treesitter",
 }
--- editor["p00f/nvim-ts-rainbow"] = {
---   opt = true,
---   after = "nvim-treesitter",
---   event = "BufRead",
--- }
 editor["JoosepAlviste/nvim-ts-context-commentstring"] = {
   opt = true,
   after = "nvim-treesitter",
@@ -99,12 +89,11 @@ editor["mfussenegger/nvim-ts-hint-textobject"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["lewis6991/spellsitter.nvim"] = {
+editor["windwp/nvim-ts-autotag"] = {
   opt = true,
+  ft = { "html", "xml" },
   after = "nvim-treesitter",
-  config = function()
-    require("spellsitter").setup()
-  end,
+  config = config.autotag,
 }
 editor["folke/twilight.nvim"] = {
   opt = true,
@@ -142,32 +131,24 @@ editor["folke/zen-mode.nvim"] = {
     require("zen-mode").setup({})
   end,
 }
-editor["windwp/nvim-ts-autotag"] = {
-  opt = true,
-  ft = { "html", "xml" },
-  after = "nvim-treesitter",
-  config = conf.autotag,
-}
 editor["andymass/vim-matchup"] = {
   opt = true,
   after = "nvim-treesitter",
-  config = conf.matchup,
+  config = config.matchup,
 }
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
   event = "BufRead",
-  config = conf.toggleterm,
+  config = config.toggleterm,
 }
-editor["numtostr/FTerm.nvim"] = { opt = true, event = "BufRead" }
 editor["norcalli/nvim-colorizer.lua"] = {
   opt = true,
   event = "BufRead",
-  config = conf.nvim_colorizer,
+  config = config.nvim_colorizer,
 }
-editor["jdhao/better-escape.vim"] = { opt = true, event = "InsertEnter" }
 editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,
-  event = { "InsertEnter", "BufWrite" },
+  ft = "ipynb",
   cmd = { "JupyterExecute", "JupyterExecuteAll" },
 }
 editor["famiu/bufdelete.nvim"] = {
@@ -176,14 +157,14 @@ editor["famiu/bufdelete.nvim"] = {
 }
 editor["rcarriga/nvim-dap-ui"] = {
   opt = true,
-  config = conf.dapui,
+  config = config.dapui,
   requires = {
-    { "mfussenegger/nvim-dap", config = conf.dap },
+    { "mfussenegger/nvim-dap", config = config.dap },
     {
       "Pocco81/DAPInstall.nvim",
       opt = true,
       cmd = { "DIInstall", "DIUninstall", "DIList" },
-      config = conf.dapinstall,
+      config = config.dapinstall,
     },
   },
 }

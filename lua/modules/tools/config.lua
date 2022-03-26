@@ -10,9 +10,6 @@ function config.telescope()
   vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
 
-  local load_extension = _G.__lazy.require_on_exported_call("telescope").load_extension
-  local setup = _G.__lazy.require_on_exported_call("telescope").setup
-
   local telescope_config = {
     defaults = {
       prompt_prefix = "🔭 ",
@@ -52,15 +49,15 @@ function config.telescope()
     },
   }
 
-  setup(telescope_config)
-  load_extension("fzf")
-  load_extension("zoxide")
-  load_extension("frecency")
-  load_extension("ui-select")
-  load_extension("file_browser")
-  load_extension("project")
-  load_extension("notify")
-  load_extension("emoji")
+  require("telescope").setup(telescope_config)
+  require("telescope").load_extension("fzf")
+  require("telescope").load_extension("zoxide")
+  require("telescope").load_extension("frecency")
+  require("telescope").load_extension("ui-select")
+  require("telescope").load_extension("file_browser")
+  require("telescope").load_extension("project")
+  require("telescope").load_extension("notify")
+  require("telescope").load_extension("emoji")
 end
 
 function config.octo()

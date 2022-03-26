@@ -1,5 +1,6 @@
 local M = {}
 local packer = nil
+local lazy = require("lazy")
 
 -- load plugin after entering vim ui
 M.packer_lazy_load = function(plugin, timer)
@@ -16,10 +17,9 @@ M.packer_lazy_load = function(plugin, timer)
   end
 end
 
-function M.gitui()
+M.create_float_term = function(...)
   local Terminal = require("toggleterm.terminal").Terminal
-  local gitui = Terminal:new({
-    cmd = "gitui",
+  local config = {
     hidden = true,
     direction = "float",
     float_opts = {
@@ -29,12 +29,17 @@ function M.gitui()
       vim.cmd([[startinsert!]])
       vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
     end,
-  })
-  gitui:toggle()
+  }
+
+  if ... then
+    table.insert(config, ...)
+  end
+  local ft = Terminal:new(config)
+  ft:toggle()
 end
 
 function M.edit_root()
-  local files = _G.__lazy.require_on_exported_call("telescope.builtin.git").files
+  local files = lazy.require_on_exported_call("telescope.builtin.git").files
   files({ cwd = vim.fn.stdpath("config") })
 end
 
@@ -46,10 +51,12 @@ function M.reset_cache()
 end
 
 function M.reload()
-  M:reset_cache()
-  require("packer").sync()
-  require("packer").compile(_G.__editor_global.data_dir .. "lua/_compiled.lua")
+  require("core.pack").sync()
+  require("core.pack").compile()
   vim.notify("Config reloaded and compiled.")
+  if _G.__editor_config.reset_cache then
+    M:reset_cache()
+  end
 end
 
 function M.hide_statusline()
@@ -58,7 +65,6 @@ function M.hide_statusline()
     "NvimTree",
     "terminal",
     "dashboard",
-    "alpha",
   }
   local shown = {}
   local buftype = vim.api.nvim_buf_get_option(0, "ft")

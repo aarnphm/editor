@@ -1,13 +1,9 @@
-local exists = false
+require("editor")
 
-_G.__lazy = require("lazy")
-_G.__editor = require("editor")
-exists, _ = pcall(require, "impatient")
-
-local setup = _G.__lazy.require_on_exported_call("core").setup
+local exists, impatient = pcall(require, "impatient")
 
 if exists and _G.__editor_config.debug then
-  _G.__luacache.enable_profile()
+  impatient.enable_profile()
 end
 
-setup()
+require("core").setup()

@@ -1,7 +1,6 @@
 local fn, uv, api = vim.fn, vim.loop, vim.api
 local modules_dir = _G.__editor_global.vim_path .. "/lua/modules"
 local packer_compiled = _G.__editor_global.data_dir .. "lua/_compiled.lua"
-local checked_compiled = _G.__editor_global.vim_path .. "/__compiled.lua"
 
 local packer = nil
 
@@ -31,13 +30,22 @@ end
 
 function Packer:load_preflight_plugins(use)
   use({ "lewis6991/impatient.nvim" })
-  use({ "nathom/filetype.nvim" })
+  use({
+    "nathom/filetype.nvim",
+    config = function()
+      require("filetype").setup({})
+    end,
+  })
   use({ "kyazdani42/nvim-web-devicons" })
   -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
   use({ "antoinemadec/FixCursorHold.nvim" })
   use({ "stevearc/dressing.nvim" })
 
   use({ "wbthomason/packer.nvim", opt = true })
+
+  -- tpope
+  use({ "tpope/vim-sleuth" })
+  use({ "tpope/vim-surround" })
 
   -- colorscheme
   require("themes.plugins").init(use)
@@ -53,26 +61,11 @@ function Packer:load_preflight_plugins(use)
       local notify_config = {
         -- Animation style (see below for details)
         stages = "fade",
-
-        -- Function called when a new window is opened, use for changing win settings/config
-        on_open = nil,
-
-        -- Function called when a window is closed
-        on_close = nil,
-
-        -- Render function for notifications. See notify-render()
-        render = "default",
-
         -- Default timeout for notifications
         timeout = 5000,
-
-        -- For stages that change opacity this is treated as the highlight behind the window
-        -- Set this to either a highlight group, an RGB hex value e.g. "#000000" or a function returning an RGB code for dynamic values
-        background_colour = "Normal",
-
         -- Minimum width for notification windows
-        max_width = 50,
-        minimum_width = 20,
+        max_width = 100,
+        minimum_width = 50,
 
         -- Icons for the different levels
         icons = {
@@ -86,8 +79,11 @@ function Packer:load_preflight_plugins(use)
       notify.setup(notify_config)
       vim.notify = notify
     end,
-    event = "BufEnter",
-    after = "packer.nvim",
+  })
+  use({
+    "glepnir/dashboard-nvim",
+    event = { "BufWinEnter", "BufNewFile" },
+    after = "impatient.nvim",
   })
 end
 
@@ -132,7 +128,6 @@ function Packer:init_ensure_plugins()
   local packer_dir = _G.__editor_global.data_dir .. "pack/packer/opt/packer.nvim"
   local state = uv.fs_stat(packer_dir)
   if not state then
-    vim.fn.delete(packer_dir, "rf")
     local cmd = "!git clone https://github.com/wbthomason/packer.nvim " .. packer_dir
     api.nvim_command(cmd)
     uv.fs_mkdir(_G.__editor_global.data_dir .. "lua", 511, function()
@@ -156,26 +151,6 @@ function plugins.ensure_plugins()
   Packer:init_ensure_plugins()
 end
 
-function plugins.magic_compile()
-  if vim.fn.filereadable(packer_compiled) == 1 then
-    local _compiled_file = io.open(packer_compiled, "r")
-    local pre_compiled = _compiled_file:read("*a")
-    _compiled_file:close()
-    local _compiled_cache = io.open(checked_compiled, "w")
-    _compiled_cache:write(pre_compiled)
-    _compiled_cache:close()
-  end
-  plugins.compile()
-end
-
-function plugins.auto_compile()
-  local file = vim.fn.expand("%:p")
-  if file:match(modules_dir) then
-    plugins.clean()
-    plugins.magic_compile()
-  end
-end
-
 function plugins.load_compile()
   if vim.fn.filereadable(packer_compiled) == 1 then
     require("_compiled")
@@ -183,27 +158,21 @@ function plugins.load_compile()
     assert("Missing packer compile file, run PackerCompile Or PackerInstall to fix")
   end
 
-  vim.cmd([[autocmd User PackerComplete lua require('core.pack').magic_compile()]])
+  vim.cmd([[autocmd User PackerComplete lua require('core.pack').compile()]])
 
   if _G.__editor_config.debug then
-    vim.cmd([[command! PackerCompile lua require('core.pack').magic_compile()]])
+    if not packer then
+      vim.cmd([[packadd packer.nvim]])
+      packer = require("packer")
+    end
+
+    packer.make_commands()
+    vim.cmd([[command! PackerCompile lua require('core.pack').compile()]])
     vim.cmd([[command! PackerInstall lua require('core.pack').install()]])
     vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])
     vim.cmd([[command! PackerSync lua require('core.pack').sync()]])
     vim.cmd([[command! PackerClean lua require('core.pack').clean()]])
     vim.cmd([[command! PackerStatus lua require('packer').status()]])
-    vim.cmd(
-      [[command! -nargs=+ -complete=customlist,v:lua.require('packer.snapshot').completion.create PackerSnapshot  lua require('packer').snapshot(<f-args>)]]
-    )
-    vim.cmd(
-      [[command! -nargs=+ -complete=customlist,v:lua.require('packer.snapshot').completion.rollback PackerSnapshotRollback  lua require('packer').rollback(<f-args>)]]
-    )
-    vim.cmd(
-      [[command! -nargs=+ -complete=customlist,v:lua.require('packer.snapshot').completion.snapshot PackerSnapshotDelete lua require('packer.snapshot').delete(<f-args>)]]
-    )
-    vim.cmd(
-      [[command! -bang -nargs=+ -complete=customlist,v:lua.require('packer').loader_complete PackerLoad lua require('packer').loader(<f-args>, '<bang>' == '!')]]
-    )
   end
 end
 

@@ -7,4 +7,5 @@ return {
     shadafile = "NONE",
   },
   repos = "bentoml/bentoml",
+  reset_cache = false,
 }

@@ -101,8 +101,9 @@ function config.nvim_treesitter()
     },
   })
 
-  local parser_config = _G.__lazy.require_on_exported_call("nvim-treesitter.parsers").get_parser_configs
-  parser_config().markdown.filetype_to_parsername = "octo"
+  local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+
+  parser_config.markdown.filetype_to_parsername = "octo"
 end
 
 function config.autotag()

@@ -35,11 +35,8 @@ function M.setup_autocmds()
       { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
       { "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
-      {
-        "FileType",
-        "dashboard",
-        "set showtabline=0 | autocmd WinLeave <buffer> set showtabline=2",
-      },
+      { "FileType", "dashboard", "set showtabline=0 laststatus=0" },
+      { "WinLeave", "<buffer>", "set showtabline=2 laststatus=2" },
     },
     yank = {
       {

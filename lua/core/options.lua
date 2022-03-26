@@ -68,7 +68,6 @@ function M.setup_options()
     sessionoptions = "curdir,help,tabpages,winsize",
     history = 2000,
     shada = "!,'300,<50,@100,s10,h",
-    shadafile = "NONE",
     backupskip = "/tmp/*,$TMPDIR/*,$TMP/*,$TEMP/*,*/shm/*,/private/var/*,.vault.vim",
     shiftround = true,
     updatetime = 100,
@@ -103,8 +102,9 @@ function M.setup_options()
     listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←",
     winblend = 10,
     autowrite = true,
-    python3_host_prog = config.options.python3_host_prog,
   }
+
+  vim.g.python3_host_prog = config.options.python3_host_prog
 
   if _G.__editor_global.is_mac then
     vim.g.clipboard = {
@@ -118,6 +118,13 @@ function M.setup_options()
   for name, value in pairs(vim_opt) do
     vim.o[name] = value
   end
+
+  --Defer loading shada until after startup_
+  vim.opt.shadafile = "NONE"
+  vim.schedule(function()
+    vim.opt.shadafile = _G.__editor_config.options.shadafile
+    vim.cmd([[ silent! rsh ]])
+  end)
 end
 
 return M

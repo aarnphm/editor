@@ -1,7 +1,7 @@
-local nvim_load_mapping = _G.__lazy.require_on_exported_call("mapping.bind").nvim_load_mapping
-local map_cr = _G.__lazy.require_on_exported_call("mapping.bind").map_cr
-local map_cu = _G.__lazy.require_on_exported_call("mapping.bind").map_cu
-local map_cmd = _G.__lazy.require_on_exported_call("mapping.bind").map_cmd
+local nvim_load_mapping = require("mapping.bind").nvim_load_mapping
+local map_cr = require("mapping.bind").map_cr
+local map_cu = require("mapping.bind").map_cu
+local map_cmd = require("mapping.bind").map_cmd
 
 require("mapping.config")
 
@@ -45,17 +45,17 @@ function M.setup_mapping()
 
   local plug_map = {
     -- reload and edit config
-    ["n|<Leader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
-    ["n|<Leader>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),
-    ["n|<Leader>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
+    ["n|<Space>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
+    ["n|<Space>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),
+    ["n|<Space>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<Space><Space>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<Space><Space>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
     -- Bufferline
     ["n|<Space>bp"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
     ["n|<Space>bc"] = map_cr("BufferLinePickClose"):with_noremap():with_silent(),
-    ["n|<A-j>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
-    ["n|<A-k>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
+    ["n|<Space>j"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
+    ["n|<Space>k"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
     ["n|<leader>be"] = map_cr("BufferLineSortByExtension"):with_noremap(),
     ["n|<leader>bd"] = map_cr("BufferLineSortByDirectory"):with_noremap(),
     ["n|1gt"] = map_cr("BufferLineGoToBuffer 1"):with_noremap():with_silent(),
@@ -67,13 +67,10 @@ function M.setup_mapping()
     ["n|7gt"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),
     ["n|8gt"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
     ["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
-    -- minimap
-    ["n|mm"] = map_cr("MinimapToggle"):with_noremap():with_silent(),
-    ["n|mr"] = map_cr("MinimapRefresh"):with_noremap():with_silent(),
     -- Packer
     ["n|<Space>ps"] = map_cu("lua require('core.pack').sync()"):with_silent():with_noremap():with_nowait(),
     ["n|<Space>pu"] = map_cu("lua require('core.pack').update()"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pc"] = map_cu("lua require('core.pack').magic_compile()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>pc"] = map_cu("lua require('core.pack').compile()"):with_silent():with_noremap():with_nowait(),
     ["n|<Space>pcc"] = map_cu("lua require('core.pack').clean()"):with_silent():with_noremap():with_nowait(),
     -- Lsp mapp work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
@@ -90,10 +87,8 @@ function M.setup_mapping()
     ["n|gd"] = map_cr("Lspsaga preview_definition"):with_noremap():with_silent(),
     ["n|gD"] = map_cr("lua vim.lsp.buf.definition()"):with_noremap():with_silent(),
     ["n|gh"] = map_cr("lua vim.lsp.buf.references()"):with_noremap():with_silent(),
-    ["n|ft"] = map_cu('lua require("FTerm").toggle()'):with_noremap():with_silent(),
-    ["t|ft"] = map_cu([[<C-\><C-n><CMD>lua require("FTerm").toggle()]]):with_noremap():with_silent(),
-    ["t|fc"] = map_cu([[<C-\><C-n><CMD>lua require("FTerm").exit()]]):with_noremap():with_silent(),
-    ["n|<F5>"] = map_cu("lua require('core.utils').gitui()"):with_noremap():with_silent(),
+    ["n|<F5>"] = map_cu("lua require('core.utils').create_float_term({cmd = 'gitui'})"):with_noremap():with_silent(),
+    ["n|<F6>"] = map_cu("lua require('core.utils).create_float_term()"):with_noremap():with_silent(),
     ["n|<Leader>G"] = map_cu("Git"):with_noremap():with_silent(),
     ["n|gps"] = map_cr("G push"):with_noremap():with_silent(),
     ["n|gpl"] = map_cr("G pull"):with_noremap():with_silent(),
@@ -132,7 +127,7 @@ function M.setup_mapping()
     -- Plugin zen-mode
     ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
     -- Plugin dap
-    ["n|<F6>"] = map_cr("lua require('dap').continue()"):with_noremap():with_silent(),
+    ["n|<F7>"] = map_cr("lua require('dap').continue()"):with_noremap():with_silent(),
     ["n|<leader>dr"] = map_cr("lua require('dap').continue()"):with_noremap():with_silent(),
     ["n|<leader>dd"] = map_cr("lua require('dap').terminate() require('dapui').close()"):with_noremap():with_silent(),
     ["n|<leader>db"] = map_cr("lua require('dap').toggle_breakpoint()"):with_noremap():with_silent(),

@@ -55,6 +55,7 @@ function rhs_options:with_nowait()
 end
 
 local pbind = {}
+pbind.__index = pbind
 
 function pbind.map_cr(cmd_string)
   local ro = rhs_options:new()

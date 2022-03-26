@@ -1,10 +1,4 @@
-local mapping = _G.__lazy.require_on_exported_call("mapping").setup_mapping
-local options = _G.__lazy.require_on_exported_call("core.options").setup_options
-local events = _G.__lazy.require_on_exported_call("core.events").setup_autocmds
-
 local M = {}
-
-M.__index = M
 
 -- Create cache dir and subs dir
 local function create_dir()
@@ -25,13 +19,6 @@ local function create_dir()
       end
     end
   end
-end
-
-local function minimap_config()
-  vim.g.minimap_auto_start = 0
-  vim.g.minimap_block_filetypes = { "aerial", "NvimTree" }
-  vim.g.minimap_git_colors = 1
-  vim.g.minimap_auto_start_win_enter = 1
 end
 
 local function dashboard_config()
@@ -193,12 +180,11 @@ function M:setup()
 
   pack.ensure_plugins()
 
-  minimap_config()
   dashboard_config()
 
-  mapping()
-  options()
-  events()
+  require("core.events").setup_autocmds()
+  require("core.options").setup_options()
+  require("mapping").setup_mapping()
 
   pack.load_compile()
 end

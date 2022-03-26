@@ -25,7 +25,6 @@ ui["j-hui/fidget.nvim"] = {
   end,
   after = "nvim-gps",
 }
-ui["glepnir/dashboard-nvim"] = { event = { "BufWinEnter", "BufNewFile" } }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle", "NvimTreeOpen" },
@@ -41,10 +40,6 @@ ui["lewis6991/gitsigns.nvim"] = {
   event = { "BufRead", "BufNewFile" },
   config = conf.gitsigns,
   requires = { "nvim-lua/plenary.nvim", opt = true },
-}
-ui["wfxr/minimap.vim"] = {
-  opt = true,
-  event = "BufRead",
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
   opt = true,
