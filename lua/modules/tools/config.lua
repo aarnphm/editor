@@ -52,17 +52,15 @@ function config.telescope()
     },
   }
 
-  vim.defer_fn(function()
-    setup(telescope_config)
-    load_extension("fzf")
-    load_extension("zoxide")
-    load_extension("frecency")
-    load_extension("ui-select")
-    load_extension("file_browser")
-    load_extension("project")
-    load_extension("notify")
-    load_extension("emoji")
-  end, 0)
+  setup(telescope_config)
+  load_extension("fzf")
+  load_extension("zoxide")
+  load_extension("frecency")
+  load_extension("ui-select")
+  load_extension("file_browser")
+  load_extension("project")
+  load_extension("notify")
+  load_extension("emoji")
 end
 
 function config.octo()

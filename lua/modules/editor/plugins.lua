@@ -152,9 +152,6 @@ editor["andymass/vim-matchup"] = {
   opt = true,
   after = "nvim-treesitter",
   config = conf.matchup,
-  setup = function()
-    require("core.utils").packer_lazy_load("vim-matchup")
-  end,
 }
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,

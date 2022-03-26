@@ -33,7 +33,9 @@ function Packer:load_preflight_plugins(use)
   use({ "lewis6991/impatient.nvim" })
   use({ "nathom/filetype.nvim" })
   use({ "kyazdani42/nvim-web-devicons" })
-  use({ "stevearc/dressing.nvim", event = "BufEnter" })
+  -- Needed while issue https://github.com/neovim/neovim/issues/12587 is still open
+  use({ "antoinemadec/FixCursorHold.nvim" })
+  use({ "stevearc/dressing.nvim" })
 
   use({ "wbthomason/packer.nvim", opt = true })
 
