@@ -1,25 +1,29 @@
 local M = {}
-local packer = nil
 local lazy = require("lazy")
 
--- load plugin after entering vim ui
-M.packer_lazy_load = function(plugin, timer)
-  if plugin then
-    timer = timer or 0
-    if not packer then
-      vim.cmd([[packadd packer.nvim]])
-      packer = require("packer")
-    end
-
-    vim.defer_fn(function()
-      packer.loader(plugin)
-    end, timer)
-  end
+local create_term = function(config)
+  vim.cmd([[packadd toggleterm]])
+  local ft = require("toggleterm.terminal").Terminal:new(config)
+  ft:toggle()
 end
 
-M.create_float_term = function(...)
-  local Terminal = require("toggleterm.terminal").Terminal
+M.create_float_term = function()
   local config = {
+    hidden = true,
+    direction = "float",
+    float_opts = {
+      border = "double",
+    },
+    on_open = function(term)
+      vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+    end,
+  }
+  create_term(config)
+end
+
+M.gitui = function()
+  local config = {
+    cmd = "gitui",
     hidden = true,
     direction = "float",
     float_opts = {
@@ -30,12 +34,7 @@ M.create_float_term = function(...)
       vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
     end,
   }
-
-  if ... then
-    table.insert(config, ...)
-  end
-  local ft = Terminal:new(config)
-  ft:toggle()
+  create_term(config)
 end
 
 function M.edit_root()
@@ -44,8 +43,8 @@ function M.edit_root()
 end
 
 function M.reset_cache()
-  local impatient = _G.__luacache
-  if impatient then
+  local ok, impatient = pcall(require, "impatient")
+  if ok then
     impatient.clear_cache()
   end
 end
@@ -54,9 +53,7 @@ function M.reload()
   require("core.pack").sync()
   require("core.pack").compile()
   vim.notify("Config reloaded and compiled.")
-  if _G.__editor_config.reset_cache then
-    M:reset_cache()
-  end
+  M.reset_cache()
 end
 
 function M.hide_statusline()

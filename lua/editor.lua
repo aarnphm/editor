@@ -1,26 +1,39 @@
-local M = {}
+local function editor_variables()
+  local os_name = vim.loop.os_uname().sysname
+
+  local is_mac = os_name == "Darwin"
+  local is_linux = os_name == "Linux"
+  local is_windows = os_name == "Windows_NT"
+  local vim_path = vim.fn.stdpath("config")
+
+  local path_sep = is_windows and "\\" or "/"
+
+  local home = is_windows and os.getenv("USERPROFILE") or os.getenv("HOME")
+  local data_dir = string.format("%s/site/", vim.fn.stdpath("data"))
+
+  local cache_dir = home .. path_sep .. ".cache" .. path_sep .. "nvim" .. path_sep
+  local modules_dir = vim_path .. path_sep .. "lua" .. path_sep .. "modules"
+
+  local local_config_path = vim.fn.expand("$HOME/.editor.lua")
+
+  return {
+    os_name = os_name,
+    is_mac = is_mac,
+    is_linux = is_linux,
+    is_windows = is_windows,
+    vim_path = vim_path,
+    path_sep = path_sep,
+    home = home,
+    data_dir = data_dir,
+    cache_dir = cache_dir,
+    modules_dir = modules_dir,
+    local_config_path = local_config_path,
+  }
+end
 
 local _config = nil
 
-function M:editor_variables()
-  local os_name = vim.loop.os_uname().sysname
-
-  self.is_mac = os_name == "Darwin"
-  self.is_linux = os_name == "Linux"
-  self.is_windows = os_name == "Windows_NT"
-  self.vim_path = vim.fn.stdpath("config")
-
-  local path_sep = self.is_windows and "\\" or "/"
-  self.path_sep = path_sep
-
-  local home = self.is_windows and os.getenv("USERPROFILE") or os.getenv("HOME")
-
-  self.cache_dir = home .. path_sep .. ".cache" .. path_sep .. "nvim" .. path_sep
-  self.modules_dir = self.vim_path .. path_sep .. "modules"
-  self.home = home
-  self.data_dir = string.format("%s/site/", vim.fn.stdpath("data"))
-  self.local_config_path = vim.fn.expand("$HOME/.editor.lua")
-end
+local M = editor_variables()
 
 local function editor_config()
   if _config then
@@ -44,14 +57,9 @@ local function editor_config()
   end
 
   _config = vim.deepcopy(__config)
+  return _config
 end
-
-M:editor_variables()
-
-editor_config()
 
 _G.__editor_global = M
 
-_G.__editor_config = _config
-
-return M
+_G.__editor_config = editor_config()

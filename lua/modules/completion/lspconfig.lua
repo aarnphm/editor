@@ -7,6 +7,8 @@ vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packad efmls-configs-nvim]])
 
+local efmls = require("efmls-configs")
+
 local saga = require("lspsaga")
 local nvim_lsp = require("lspconfig")
 local lsp_installer = require("nvim-lsp-installer")
@@ -104,6 +106,7 @@ local default_options = {
 }
 
 local format_config = require("modules.completion.formatting").language_format()
+
 local servers = {
   tsserver = {
     root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
@@ -122,6 +125,9 @@ local servers = {
         },
       },
     },
+  },
+  rnix = {
+    cmd = { vim.fn.expand("$HOME/.nix-profile/bin/rnix-lsp") },
   },
   efm = {
     filetypes = vim.tbl_keys(format_config),
@@ -204,7 +210,6 @@ nvim_lsp.html.setup({
 })
 
 -- Init `efm-langserver` here.
-local efmls = require("efmls-configs")
 efmls.init({
   on_attach = on_editor_attach,
   capabilities = capabilities,

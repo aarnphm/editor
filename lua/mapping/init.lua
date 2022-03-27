@@ -11,7 +11,7 @@ function M.setup_mapping()
   -- default map
   local def_map = {
     -- Vim map
-    ["n|<C-x>k"] = map_cr("bdelete"):with_noremap():with_silent(),
+    ["n|<C-x>"] = map_cr("lua require('bufdelete').delete_buffer()"):with_noremap():with_silent(),
     ["n|<C-s>"] = map_cu("write"):with_noremap(),
     ["n|Y"] = map_cmd("y$"),
     ["n|D"] = map_cmd("d$"),
@@ -87,8 +87,8 @@ function M.setup_mapping()
     ["n|gd"] = map_cr("Lspsaga preview_definition"):with_noremap():with_silent(),
     ["n|gD"] = map_cr("lua vim.lsp.buf.definition()"):with_noremap():with_silent(),
     ["n|gh"] = map_cr("lua vim.lsp.buf.references()"):with_noremap():with_silent(),
-    ["n|<F5>"] = map_cu("lua require('core.utils').create_float_term({cmd = 'gitui'})"):with_noremap():with_silent(),
-    ["n|<F6>"] = map_cu("lua require('core.utils).create_float_term()"):with_noremap():with_silent(),
+    ["n|<F5>"] = map_cu("lua require('core.utils').gitui()"):with_noremap():with_silent(),
+    ["n|<F6>"] = map_cu("lua require('core.utils').create_float_term()"):with_noremap():with_silent(),
     ["n|<Leader>G"] = map_cu("Git"):with_noremap():with_silent(),
     ["n|gps"] = map_cr("G push"):with_noremap():with_silent(),
     ["n|gpl"] = map_cr("G pull"):with_noremap():with_silent(),
@@ -104,18 +104,20 @@ function M.setup_mapping()
     ["n|<leader>cq"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
     ["n|<leader>cl"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
     -- Plugin Telescope
-    ["n|<Leader>fp"] = map_cu("lua require('telescope').extensions.project.project{}"):with_noremap():with_silent(),
     ["n|<Leader>fr"] = map_cu("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
     ["n|<Leader>fe"] = map_cu("DashboardFindHistory"):with_noremap():with_silent(),
     ["n|<Leader>ff"] = map_cu("DashboardFindFile"):with_noremap():with_silent(),
-    ["n|<Leader>sc"] = map_cu("DashboardChangeColorscheme"):with_noremap():with_silent(),
     ["n|<Leader>fw"] = map_cu("DashboardFindWord"):with_noremap():with_silent(),
     ["n|<Leader>fn"] = map_cu("DashboardNewFile"):with_noremap():with_silent(),
     ["n|<Leader>fb"] = map_cu("Telescope file_browser"):with_noremap():with_silent(),
     ["n|<Leader>fg"] = map_cu("Telescope git_files"):with_noremap():with_silent(),
     ["n|<Leader>ft"] = map_cu("Telescope live_grep"):with_noremap():with_silent(),
-    ["n|<Leader>fz"] = map_cu("Telescope zoxide list"):with_noremap():with_silent(),
     ["n|<Leader>km"] = map_cu("Telescope keymaps"):with_noremap():with_silent(),
+    -- Plugin spectre
+    ["n|<S-F6>"] = map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
+    ["n|<Leader>sw"] = map_cr("lua require('spectre').open_visual({select_word=true})"):with_noremap():with_silent(),
+    ["n|<Leader>s"] = map_cr("lua require('spectre').open_visual()"):with_noremap():with_silent(),
+    ["n|<Leader>sp"] = map_cr("lua require('spectre').open_file_search()"):with_noremap():with_silent(),
     -- Plugin EasyAlign
     ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
     ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),

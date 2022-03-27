@@ -1,5 +1,3 @@
-local M = {}
-
 -- Create cache dir and subs dir
 local function create_dir()
   local data_dir = {
@@ -25,6 +23,7 @@ local function dashboard_config()
   local headers = nil
   vim.g.dashboard_default_executive = "telescope"
   vim.g.dashboard_custom_footer = { "🍱 github.com/aarnphm/editor" }
+  vim.g.dashboard_disable_statusline = 1
 
   if _G.__editor_config.background == "dark" then
     headers = {
@@ -96,10 +95,6 @@ local function dashboard_config()
 
   vim.g.dashboard_custom_header = headers
   vim.g.dashboard_custom_section = {
-    change_colorscheme = {
-      description = { " Scheme change              comma s c" },
-      command = "DashboardChangeColorscheme",
-    },
     find_frecency = {
       description = { " File frecency              comma f r" },
       command = "Telescope frecency",
@@ -107,10 +102,6 @@ local function dashboard_config()
     find_history = {
       description = { " File history               comma f e" },
       command = "DashboardFindHistory",
-    },
-    find_project = {
-      description = { " Project find               comma f p" },
-      command = "Telescope project",
     },
     find_text = {
       description = { " Find Text                  comma f t" },
@@ -124,22 +115,21 @@ local function dashboard_config()
       description = { " Find git files             comma f g" },
       command = "Telescope git_files",
     },
-    find_word = {
-      description = { " Word find                  comma f w" },
-      command = "DashboardFindWord",
-    },
     edit_config = {
-      description = { " Edit local config          comma e c" },
+      description = { "  Edit local config         space e c" },
       command = "e ~/.editor.lua",
     },
     edit_nvim_config = {
-      description = { " NVIM config                comma e r" },
+      description = { " NVIM config                space e r" },
       command = "lua require('core.utils').edit_root()",
     },
   }
 end
 
 local function preflight()
+  create_dir()
+  dashboard_config()
+
   -- disable some builtin vim plugins
   local disabled_built_ins = {
     "2html_plugin",
@@ -170,23 +160,19 @@ local function preflight()
   vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
   vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
 
-  create_dir()
+  vim.opt.background = _G.__editor_config.background
 end
 
-function M:setup()
+local M = {}
+
+M.setup = function()
   preflight()
 
-  local pack = require("core.pack")
-
-  pack.ensure_plugins()
-
-  dashboard_config()
-
+  require("core.pack").load()
   require("core.events").setup_autocmds()
   require("core.options").setup_options()
-  require("mapping").setup_mapping()
 
-  pack.load_compile()
+  require("mapping").setup_mapping()
 end
 
 return M
