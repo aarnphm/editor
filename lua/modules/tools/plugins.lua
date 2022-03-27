@@ -60,6 +60,13 @@ tools["sudormrfbin/cheatsheet.nvim"] = {
   },
   config = config.cheatsheet,
 }
+tools["gelguy/wilder.nvim"] = {
+  event = "CmdlineEnter",
+  config = config.wilder,
+  requires = {
+    { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
+  },
+}
 tools["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime", disable = _G.__editor_config.debug ~= true }
 tools["folke/trouble.nvim"] = {
   opt = true,

@@ -178,23 +178,6 @@ function config.cmp()
       { name = "latex_symbols" },
     },
   })
-
-  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline("/", {
-    sources = {
-      {
-        name = "buffer",
-      },
-    },
-  })
-
-  cmp.setup.cmdline(":", {
-    sources = cmp.config.sources({
-      { name = "path" },
-    }, {
-      { name = "cmdline" },
-    }),
-  })
 end
 
 function config.luasnip()
