@@ -10,18 +10,6 @@ function config.lualine()
       return ""
     end
   end
-  local mini_sections = {
-    lualine_a = {},
-    lualine_b = {},
-    lualine_c = {},
-    lualine_x = {},
-    lualine_y = {},
-    lualine_z = { "location" },
-  }
-  local minimap = {
-    sections = mini_sections,
-    filetypes = { "minimap" },
-  }
   local symbols_outline = {
     sections = {
       lualine_a = { "mode" },
@@ -71,7 +59,6 @@ function config.lualine()
       "nvim-tree",
       "toggleterm",
       "fugitive",
-      minimap,
       symbols_outline,
     },
   })

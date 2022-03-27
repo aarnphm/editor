@@ -1,7 +1,7 @@
 local config = {}
 
 function config.nvim_lsp()
-  require("modules.completion.lsp")
+  require("modules.completion.lspconfig")
 end
 
 function config.lightbulb()
@@ -52,6 +52,8 @@ function config.cmp()
   vim.cmd([[highlight CmpItemKindText guifg=#81A1C1 guibg=NONE]])
   vim.cmd([[highlight CmpItemKindFunction guifg=#B48EAD guibg=NONE]])
   vim.cmd([[highlight CmpItemKindMethod guifg=#B48EAD guibg=NONE]])
+
+  vim.cmd([[packadd cmp-under-comparator]])
 
   local t = function(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -108,14 +110,13 @@ function config.cmp()
         vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
 
         vim_item.menu = ({
-          buffer = "[BUF]",
-          orgmode = "[ORG]",
-          nvim_lsp = "[LSP]",
-          nvim_lua = "[LUA]",
-          path = "[PATH]",
-          tmux = "[TMUX]",
-          luasnip = "[SNIP]",
-          spell = "[SPELL]",
+          buffer = "[﬘ Buf]",
+          nvim_lsp = "[ LSP]",
+          luasnip = "[ LSnip]",
+          nvim_lua = "[ NvimLua]",
+          path = "[~ Path]",
+          tmux = "[ Tmux]",
+          spell = "[ Spell]",
         })[entry.source.name]
 
         return vim_item
@@ -173,11 +174,26 @@ function config.cmp()
       { name = "path" },
       { name = "spell" },
       { name = "tmux" },
-      { name = "orgmode" },
       { name = "buffer" },
       { name = "latex_symbols" },
-      -- {name = 'cmp_tabnine'}
     },
+  })
+
+  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline("/", {
+    sources = {
+      {
+        name = "buffer",
+      },
+    },
+  })
+
+  cmp.setup.cmdline(":", {
+    sources = cmp.config.sources({
+      { name = "path" },
+    }, {
+      { name = "cmdline" },
+    }),
   })
 end
 

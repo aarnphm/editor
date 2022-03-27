@@ -3,7 +3,7 @@ local config = {}
 function config.rose_pine()
   require("rose-pine").setup({
     ---@usage 'main'|'moon'
-    dark_variant = "main",
+    dark_variant = "dawn",
     bold_vert_split = false,
     dim_nc_background = false,
     disable_background = false,
@@ -31,8 +31,6 @@ function config.rose_pine()
         h5 = "pine",
         h6 = "foam",
       },
-      -- or set all headings at once
-      -- headings = 'subtle'
     },
   })
   vim.cmd([[silent! colorscheme rose-pine]])
@@ -48,8 +46,7 @@ function config.tokyonight()
 end
 
 function config.edge()
-  vim.g.background = "light"
-  vim.g.edge_style = "aura"
+  vim.g.edge_style = "light"
   vim.g.edge_enable_italic = 1
   vim.g.edge_disable_italic_comment = 1
   vim.g.edge_show_eob = 0

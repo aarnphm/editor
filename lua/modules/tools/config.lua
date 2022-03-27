@@ -1,17 +1,156 @@
 local config = {}
 
+function config.spectre()
+  require("spectre").setup({
+
+    color_devicons = true,
+    open_cmd = "vnew",
+    live_update = false, -- auto excute search again when you write any file in vim
+    line_sep_start = "┌-----------------------------------------",
+    result_padding = "¦  ",
+    line_sep = "└-----------------------------------------",
+    highlight = {
+      ui = "String",
+      search = "DiffChange",
+      replace = "DiffDelete",
+    },
+    mapping = {
+      ["toggle_line"] = {
+        map = "dd",
+        cmd = "<cmd>lua require('spectre').toggle_line()<CR>",
+        desc = "toggle current item",
+      },
+      ["enter_file"] = {
+        map = "<cr>",
+        cmd = "<cmd>lua require('spectre.actions').select_entry()<CR>",
+        desc = "goto current file",
+      },
+      ["send_to_qf"] = {
+        map = "<leader>q",
+        cmd = "<cmd>lua require('spectre.actions').send_to_qf()<CR>",
+        desc = "send all item to quickfix",
+      },
+      ["replace_cmd"] = {
+        map = "<leader>c",
+        cmd = "<cmd>lua require('spectre.actions').replace_cmd()<CR>",
+        desc = "input replace vim command",
+      },
+      ["show_option_menu"] = {
+        map = "<leader>o",
+        cmd = "<cmd>lua require('spectre').show_options()<CR>",
+        desc = "show option",
+      },
+      ["run_replace"] = {
+        map = "<leader>R",
+        cmd = "<cmd>lua require('spectre.actions').run_replace()<CR>",
+        desc = "replace all",
+      },
+      ["change_view_mode"] = {
+        map = "<leader>v",
+        cmd = "<cmd>lua require('spectre').change_view()<CR>",
+        desc = "change result view mode",
+      },
+      ["toggle_live_update"] = {
+        map = "tu",
+        cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
+        desc = "update change when vim write file.",
+      },
+      ["toggle_ignore_case"] = {
+        map = "ti",
+        cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
+        desc = "toggle ignore case",
+      },
+      ["toggle_ignore_hidden"] = {
+        map = "th",
+        cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
+        desc = "toggle search hidden",
+      },
+      -- you can put your mapping here it only use normal mode
+    },
+    find_engine = {
+      -- rg is map with finder_cmd
+      ["rg"] = {
+        cmd = "rg",
+        -- default args
+        args = {
+          "--color=never",
+          "--no-heading",
+          "--with-filename",
+          "--line-number",
+          "--column",
+        },
+        options = {
+          ["ignore-case"] = {
+            value = "--ignore-case",
+            icon = "[I]",
+            desc = "ignore case",
+          },
+          ["hidden"] = {
+            value = "--hidden",
+            desc = "hidden file",
+            icon = "[H]",
+          },
+          -- you can put any rg search option you want here it can toggle with
+          -- show_option function
+        },
+      },
+      ["ag"] = {
+        cmd = "ag",
+        args = {
+          "--vimgrep",
+          "-s",
+        },
+        options = {
+          ["ignore-case"] = {
+            value = "-i",
+            icon = "[I]",
+            desc = "ignore case",
+          },
+          ["hidden"] = {
+            value = "--hidden",
+            desc = "hidden file",
+            icon = "[H]",
+          },
+        },
+      },
+    },
+    replace_engine = {
+      ["sed"] = {
+        cmd = "sed",
+        args = nil,
+      },
+      options = {
+        ["ignore-case"] = {
+          value = "--ignore-case",
+          icon = "[I]",
+          desc = "ignore case",
+        },
+      },
+    },
+    default = {
+      find = {
+        --pick one of item in find_engine
+        cmd = "rg",
+        options = { "ignore-case" },
+      },
+      replace = {
+        --pick one of item in replace_engine
+        cmd = "sed",
+      },
+    },
+    replace_vim_cmd = "cdo",
+    is_open_target_win = true, --open file on opener window
+    is_insert_mode = false, -- start open panel on is_insert_mode
+  })
+end
+
 function config.telescope()
   vim.cmd([[packadd sqlite.lua]])
   vim.cmd([[packadd telescope-fzf-native.nvim]])
   vim.cmd([[packadd telescope-file-browser.nvim]])
-  vim.cmd([[packadd telescope-project.nvim]])
   vim.cmd([[packadd telescope-frecency.nvim]])
-  vim.cmd([[packadd telescope-zoxide]])
   vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
-
-  local load_extension = _G.__lazy.require_on_exported_call("telescope").load_extension
-  local setup = _G.__lazy.require_on_exported_call("telescope").setup
 
   local telescope_config = {
     defaults = {
@@ -52,15 +191,13 @@ function config.telescope()
     },
   }
 
-  setup(telescope_config)
-  load_extension("fzf")
-  load_extension("zoxide")
-  load_extension("frecency")
-  load_extension("ui-select")
-  load_extension("file_browser")
-  load_extension("project")
-  load_extension("notify")
-  load_extension("emoji")
+  require("telescope").setup(telescope_config)
+  require("telescope").load_extension("fzf")
+  require("telescope").load_extension("frecency")
+  require("telescope").load_extension("ui-select")
+  require("telescope").load_extension("file_browser")
+  require("telescope").load_extension("notify")
+  require("telescope").load_extension("emoji")
 end
 
 function config.octo()
@@ -189,77 +326,6 @@ function config.octo()
       },
     },
   })
-end
-
-function config.wilder()
-  vim.cmd([[
-call wilder#setup({'modes': [':', '/', '?']})
-
-call wilder#set_option('pipeline', [
-      \   wilder#branch(
-      \     wilder#python_file_finder_pipeline({
-      \       'file_command': {_, arg -> stridx(arg, '.') != -1 ? ['fd', '-tf', '-H'] : ['fd', '-tf']},
-      \       'dir_command': ['fd', '-td'],
-      \     }),
-      \     wilder#substitute_pipeline({
-      \       'pipeline': wilder#python_search_pipeline({
-      \         'skip_cmdtype_check': 1,
-      \         'pattern': wilder#python_fuzzy_pattern({
-      \           'start_at_boundary': 0,
-      \         }),
-      \       }),
-      \     }),
-      \     wilder#cmdline_pipeline({
-      \       'fuzzy': 1,
-      \       'fuzzy_filter': has('nvim') ? wilder#lua_fzy_filter() : wilder#vim_fuzzy_filter(),
-      \     }),
-      \     [
-      \       wilder#check({_, x -> empty(x)}),
-      \       wilder#history(),
-      \     ],
-      \     wilder#python_search_pipeline({
-      \       'pattern': wilder#python_fuzzy_pattern({
-      \         'start_at_boundary': 0,
-      \       }),
-      \     }),
-      \   ),
-      \ ])
-
-let s:highlighters = [
-      \ wilder#pcre2_highlighter(),
-      \ wilder#lua_fzy_highlighter(),
-      \ ]
-
-let s:popupmenu_renderer = wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
-      \ 'empty_message': wilder#popupmenu_empty_message_with_spinner(),
-      \ 'highlighter': s:highlighters,
-      \ 'left': [
-      \   ' ',
-      \   wilder#popupmenu_devicons(),
-      \   wilder#popupmenu_buffer_flags({
-      \     'flags': ' a + ',
-      \     'icons': {'+': '', 'a': '', 'h': ''},
-      \   }),
-      \ ],
-      \ 'right': [
-      \   ' ',
-      \   wilder#popupmenu_scrollbar(),
-      \ ],
-      \ }))
-
-let s:wildmenu_renderer = wilder#wildmenu_renderer({
-      \ 'highlighter': s:highlighters,
-      \ 'separator': ' · ',
-      \ 'left': [' ', wilder#wildmenu_spinner(), ' '],
-      \ 'right': [' ', wilder#wildmenu_index()],
-      \ })
-
-call wilder#set_option('renderer', wilder#renderer_mux({
-      \ ':': s:popupmenu_renderer,
-      \ '/': s:wildmenu_renderer,
-      \ 'substitute': s:wildmenu_renderer,
-      \ }))
-]])
 end
 
 function config.trouble()

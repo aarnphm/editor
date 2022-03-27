@@ -45,6 +45,7 @@ local black = { formatCommand = "black --quiet -", formatStdin = true }
 
 M.language_format = function()
   return {
+    c = { clang_format },
     css = { prettier },
     html = { prettier },
     javascript = { prettier, eslint },

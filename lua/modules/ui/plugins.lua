@@ -1,5 +1,5 @@
 local ui = {}
-local conf = require("modules.ui.config")
+local config = require("modules.ui.config")
 
 ui["folke/which-key.nvim"] = {
   opt = true,
@@ -11,50 +11,49 @@ ui["folke/which-key.nvim"] = {
 ui["SmiteshP/nvim-gps"] = {
   opt = true,
   after = "nvim-treesitter",
-  config = conf.nvim_gps,
+  config = config.nvim_gps,
 }
 ui["nvim-lualine/lualine.nvim"] = {
   opt = true,
   after = "nvim-gps",
-  config = conf.lualine,
+  config = config.lualine,
 }
 ui["j-hui/fidget.nvim"] = {
   opt = true,
   config = function()
-    require("fidget").setup({})
+    require("fidget").setup({
+      text = {
+        spinner = "dots",
+      },
+    })
   end,
   after = "nvim-gps",
 }
-ui["glepnir/dashboard-nvim"] = { event = { "BufWinEnter", "BufNewFile" } }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle", "NvimTreeOpen" },
-  config = conf.nvim_tree,
+  config = config.nvim_tree,
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
   opt = true,
   event = "BufRead",
-  config = conf.indent_blankline,
+  config = config.indent_blankline,
 }
 ui["lewis6991/gitsigns.nvim"] = {
   opt = true,
   event = { "BufRead", "BufNewFile" },
-  config = conf.gitsigns,
+  config = config.gitsigns,
   requires = { "nvim-lua/plenary.nvim", opt = true },
-}
-ui["wfxr/minimap.vim"] = {
-  opt = true,
-  event = "BufRead",
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
   opt = true,
   event = "BufRead",
-  config = conf.indent_blankline,
+  config = config.indent_blankline,
 }
 ui["akinsho/nvim-bufferline.lua"] = {
   opt = true,
   event = "BufRead",
-  config = conf.nvim_bufferline,
+  config = config.nvim_bufferline,
 }
 
 return ui

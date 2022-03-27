@@ -3,7 +3,7 @@ local config = {}
 function config.symbols_outline()
   require("symbols-outline").setup({
     highlight_hovered_item = true,
-    width = 60,
+    width = 30,
     show_guides = true,
     auto_preview = true,
     position = "right",
@@ -101,8 +101,9 @@ function config.nvim_treesitter()
     },
   })
 
-  local parser_config = _G.__lazy.require_on_exported_call("nvim-treesitter.parsers").get_parser_configs
-  parser_config().markdown.filetype_to_parsername = "octo"
+  local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+
+  parser_config.markdown.filetype_to_parsername = "octo"
 end
 
 function config.autotag()
@@ -132,7 +133,7 @@ function config.toggleterm()
         return vim.o.columns * 0.40
       end
     end,
-    open_mapping = [[<c-\>]],
+    open_mapping = [[<C-t>]],
     hide_numbers = true, -- hide the number column in toggleterm buffers
     shade_filetypes = {},
     shade_terminals = false,
