@@ -40,7 +40,6 @@ function M.setup_autocmds()
       },
       { "BufWritePost", "*.lua", "lua require('core.pack').compile()" },
     },
-
     ft = {
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },

@@ -93,7 +93,6 @@ function config.nvim_tree()
     hijack_netrw = true,
     open_on_setup = false,
     ignore_ft_on_setup = {},
-    auto_close = true,
     open_on_tab = false,
     hijack_cursor = true,
     update_cwd = false,
@@ -123,6 +122,9 @@ function config.nvim_tree()
     },
     trash = { cmd = "rip", require_confirm = true },
   })
+  vim.cmd([[
+autocmd BufEnter * ++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif
+  ]])
 end
 
 function config.gitsigns()

@@ -73,8 +73,28 @@ function config.rust_tools()
 end
 
 function config.vimtex()
+  vim.g.vimtex_view_method = "skim"
   vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
   vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
+
+  vim.cmd([[
+augroup vimtex_mac
+    autocmd!
+    autocmd User VimtexEventCompileSuccess call UpdateSkim()
+augroup END
+
+function! UpdateSkim() abort
+    let l:out = b:vimtex.out()
+    let l:src_file_path = expand('%:p')
+    let l:cmd = [g:vimtex_view_general_viewer, '-r']
+
+    if !empty(system('pgrep Skim'))
+    call extend(l:cmd, ['-g'])
+    endif
+
+    call jobstart(l:cmd + [line('.'), l:out, l:src_file_path])
+endfunction
+  ]])
 end
 
 function config.lang_go()
