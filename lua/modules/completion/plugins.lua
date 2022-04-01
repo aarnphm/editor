@@ -1,6 +1,16 @@
 local completion = {}
 local conf = require("modules.completion.config")
 
+completion["tom-doerr/vim_codex"] = {
+  opt = true,
+  after = "nvim-lspconfig",
+  config = function()
+    vim.cmd([[
+nnoremap  <C-z> :CreateCompletion<CR>
+inoremap  <C-z> <Esc>li<C-g>u<Esc>l:CreateCompletion<CR>
+ ]])
+  end,
+}
 completion["neovim/nvim-lspconfig"] = {
   event = "BufReadPre",
   config = conf.nvim_lsp,

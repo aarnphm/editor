@@ -10,5 +10,8 @@ else
 benchmark:
 	@./fixtures/benchmark.pl
 endif
-local:
+benchmark-local:
 	@./fixtures/local
+reset:
+	@\rm -rf $HOME/.local/share/nvim
+	@nvim

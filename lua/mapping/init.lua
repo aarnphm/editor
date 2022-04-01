@@ -69,9 +69,10 @@ function M.setup_mapping()
     ["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
     -- Packer
     ["n|<Space>ps"] = map_cu("lua require('core.pack').sync()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>pS"] = map_cu("lua require('core.pack').status()"):with_silent():with_noremap():with_nowait(),
     ["n|<Space>pu"] = map_cu("lua require('core.pack').update()"):with_silent():with_noremap():with_nowait(),
     ["n|<Space>pc"] = map_cu("lua require('core.pack').compile()"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pcc"] = map_cu("lua require('core.pack').clean()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>pC"] = map_cu("lua require('core.pack').clean()"):with_silent():with_noremap():with_nowait(),
     -- Lsp mapp work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<leader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),

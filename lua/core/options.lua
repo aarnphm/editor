@@ -96,7 +96,6 @@ function M.setup_options()
     cmdheight = 2,
     cmdwinheight = 5,
     equalalways = false,
-    laststatus = 2,
     display = "lastline",
     showbreak = "↳  ",
     listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←",

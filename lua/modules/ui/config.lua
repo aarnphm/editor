@@ -1,23 +1,14 @@
 local config = {}
 
 function config.lualine()
-  local gps = require("nvim-gps")
-
-  local function gps_content()
-    if gps.is_available() then
-      return gps.get_location()
-    else
-      return ""
-    end
-  end
   local symbols_outline = {
     sections = {
-      lualine_a = { "mode" },
-      lualine_b = { "filetype" },
+      lualine_a = {},
+      lualine_b = {},
       lualine_c = {},
       lualine_x = {},
-      lualine_y = {},
-      lualine_z = { "location" },
+      lualine_y = { "filetype", "location" },
+      lualine_z = { "mode" },
     },
     filetypes = { "Outline" },
   }
@@ -28,61 +19,37 @@ function config.lualine()
       theme = "auto",
       disabled_filetypes = {},
       component_separators = "|",
+      section_separators = { left = " ", right = " " },
     },
     sections = {
-      lualine_a = { "mode" },
-      lualine_b = { { "branch" }, { "diff" } },
-      lualine_c = {
-        { gps_content, cond = gps.is_available },
-      },
+      lualine_a = {},
+      lualine_b = {},
+      lualine_c = {},
       lualine_x = {
         {
           "diagnostics",
           sources = { "nvim_diagnostic" },
-          symbols = { error = " ", warn = " ", info = " " },
+          symbols = { error = "  ", warn = "  ", info = " " },
         },
       },
-      lualine_y = { "filetype", "encoding", "fileformat" },
-      lualine_z = { "progress", "location" },
+      lualine_y = { "filetype", "branch", "diff", "location", { "fileformat", padding = 1 } },
+      lualine_z = { "mode" },
     },
     inactive_sections = {
       lualine_a = {},
       lualine_b = {},
-      lualine_c = { "filename" },
-      lualine_x = { "location" },
+      lualine_c = {},
+      lualine_x = {},
       lualine_y = {},
       lualine_z = {},
     },
     tabline = {},
     extensions = {
       "quickfix",
-      "nvim-tree",
       "toggleterm",
       "fugitive",
       symbols_outline,
     },
-  })
-end
-
-function config.nvim_gps()
-  require("nvim-gps").setup({
-    icons = {
-      ["class-name"] = " ", -- Classes and class-like objects
-      ["function-name"] = " ", -- Functions
-      ["method-name"] = " ", -- Methods (functions inside class-like objects)
-    },
-    languages = {
-      -- You can disable any language individually here
-      ["c"] = true,
-      ["cpp"] = true,
-      ["go"] = true,
-      ["java"] = true,
-      ["javascript"] = true,
-      ["lua"] = true,
-      ["python"] = true,
-      ["rust"] = true,
-    },
-    separator = " » ",
   })
 end
 
@@ -107,7 +74,7 @@ function config.nvim_tree()
       ignore_list = {},
     },
     system_open = { cmd = nil, args = {} },
-    filters = { dotfiles = true, custom = {} },
+    filters = { dotfiles = false, custom = {} },
     git = { enable = true, ignore = true, timeout = 500 },
     view = {
       width = 30,
@@ -165,22 +132,22 @@ function config.gitsigns()
       -- Default keymap options
       noremap = true,
       buffer = true,
-      ["n <leader>]g"] = {
+      ["n <LocalLeader>]g"] = {
         expr = true,
         "&diff ? ']g' : '<cmd>lua require\"gitsigns\".next_hunk()<CR>'",
       },
-      ["n <leader>[g"] = {
+      ["n <LocalLeader>[g"] = {
         expr = true,
         "&diff ? '[g' : '<cmd>lua require\"gitsigns\".prev_hunk()<CR>'",
       },
-      ["n <leader>hs"] = '<cmd>lua require("gitsigns").stage_hunk()<CR>',
-      ["v <leader>hs"] = '<cmd>lua require("gitsigns").stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-      ["n <leader>hu"] = '<cmd>lua require("gitsigns").undo_stage_hunk()<CR>',
-      ["n <leader>hr"] = '<cmd>lua require("gitsigns").reset_hunk()<CR>',
-      ["v <leader>hr"] = '<cmd>lua require("gitsigns").reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-      ["n <leader>hR"] = '<cmd>lua require("gitsigns").reset_buffer()<CR>',
-      ["n <leader>hp"] = '<cmd>lua require("gitsigns").preview_hunk()<CR>',
-      ["n <leader>hb"] = '<cmd>lua require("gitsigns").blame_line(true)<CR>',
+      ["n <LocalLeader>hs"] = '<cmd>lua require("gitsigns").stage_hunk()<CR>',
+      ["v <LocalLeader>hs"] = '<cmd>lua require("gitsigns").stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
+      ["n <LocalLeader>hu"] = '<cmd>lua require("gitsigns").undo_stage_hunk()<CR>',
+      ["n <LocalLeader>hr"] = '<cmd>lua require("gitsigns").reset_hunk()<CR>',
+      ["v <LocalLeader>hr"] = '<cmd>lua require("gitsigns").reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
+      ["n <LocalLeader>hR"] = '<cmd>lua require("gitsigns").reset_buffer()<CR>',
+      ["n <LocalLeader>hp"] = '<cmd>lua require("gitsigns").preview_hunk()<CR>',
+      ["n <LocalLeader>hb"] = '<cmd>lua require("gitsigns").blame_line(true)<CR>',
       -- Text objects
       ["o ih"] = ':<C-U>lua require("gitsigns").text_object()<CR>',
       ["x ih"] = ':<C-U>lua require("gitsigns").text_object()<CR>',
@@ -276,7 +243,7 @@ function config.indent_blankline()
     space_char_blankline = " ",
   })
   -- because lazy load indent-blankline so need readd this autocmd
-  -- vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
+  vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
 end
 
 return config

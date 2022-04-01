@@ -311,6 +311,8 @@ function config.dap()
           return cwd .. "/venv/bin/python"
         elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
           return cwd .. "/.venv/bin/python"
+        elseif vim.fn.executable(vim.fn.expand("$HOME/mambaforge/bin/python")) == 1 then
+          return vim.fn.expand("$HOME/mambaforge/bin/python")
         else
           return "/usr/bin/python"
         end

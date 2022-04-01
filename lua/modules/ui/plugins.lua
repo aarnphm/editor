@@ -8,15 +8,11 @@ ui["folke/which-key.nvim"] = {
     require("which-key").setup()
   end,
 }
-ui["SmiteshP/nvim-gps"] = {
-  opt = true,
-  after = "nvim-treesitter",
-  config = config.nvim_gps,
-}
 ui["nvim-lualine/lualine.nvim"] = {
   opt = true,
-  after = "nvim-gps",
   config = config.lualine,
+  event = "BufRead",
+  after = "nvim-treesitter",
 }
 ui["j-hui/fidget.nvim"] = {
   opt = true,
@@ -27,7 +23,7 @@ ui["j-hui/fidget.nvim"] = {
       },
     })
   end,
-  after = "nvim-gps",
+  after = "nvim-treesitter",
 }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
