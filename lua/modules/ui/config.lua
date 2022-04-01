@@ -491,13 +491,14 @@ function config.lualine()
 end
 
 function config.nvim_tree()
+  vim.g.nvim_tree_root_folder_modifier = table.concat({ ":t:gs?$?/..", string.rep(" ", 1000), "?:gs?^??" })
   require("nvim-tree").setup({
     hide_root_folder = true,
     disable_netrw = true,
     hijack_netrw = true,
     open_on_setup = false,
-    ignore_ft_on_setup = {},
     open_on_tab = false,
+    ignore_ft_on_setup = { "dashboard" },
     hijack_cursor = true,
     update_cwd = false,
     update_to_buf_dir = { enable = true, auto_open = true },
@@ -516,12 +517,9 @@ function config.nvim_tree()
     view = {
       width = 30,
       height = 30,
-      hide_root_folder = false,
+      hide_root_folder = true,
       side = "left",
       auto_resize = false,
-      mappings = { custom_only = false, list = {} },
-      number = false,
-      relativenumber = false,
       signcolumn = "yes",
     },
     trash = { cmd = "rip", require_confirm = true },

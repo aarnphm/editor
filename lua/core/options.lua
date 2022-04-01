@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup_options()
-  local config = _G.__editor_config
+  local config = __editor_config
 
   local vim_opt = {
     number = true,
@@ -54,7 +54,7 @@ function M.setup_options()
     swapfile = false,
     backup = false,
     writebackup = false,
-    undodir = _G.__editor_global.cache_dir .. "undo/",
+    undodir = __editor_global.cache_dir .. "undo/",
     undolevels = 9999,
     encoding = "utf-8",
     list = true,
@@ -105,7 +105,7 @@ function M.setup_options()
 
   vim.g.python3_host_prog = config.options.python3_host_prog
 
-  if _G.__editor_global.is_mac then
+  if __editor_global.is_mac then
     vim.g.clipboard = {
       name = "macOS-clipboard",
       copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
@@ -121,7 +121,7 @@ function M.setup_options()
   --Defer loading shada until after startup_
   vim.opt.shadafile = "NONE"
   vim.schedule(function()
-    vim.opt.shadafile = _G.__editor_config.options.shadafile
+    vim.opt.shadafile = __editor_config.options.shadafile
     vim.cmd([[ silent! rsh ]])
   end)
 end

@@ -3,7 +3,7 @@ require("lazy")
 
 local exists, impatient = pcall(require, "impatient")
 
-if exists and _G.__editor_config.debug then
+if exists and __editor_config.debug then
   impatient.enable_profile()
 end
 

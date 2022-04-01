@@ -1,4 +1,6 @@
 USE_SH ?= false
+install:
+	@go install github.com/rhysd/vim-startuptime@latest
 fmt:
 	@stylua lua
 lint:
@@ -11,7 +13,7 @@ benchmark:
 	@./fixtures/benchmark.pl
 endif
 benchmark-local:
-	@./fixtures/local
+	@vim-startuptime --vimpath nvim | sort -k 2
 reset:
 	@\rm -rf ${HOME}/.local/share/nvim
 	@nvim

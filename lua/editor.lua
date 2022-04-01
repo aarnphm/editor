@@ -14,7 +14,10 @@ local function editor_variables()
   local cache_dir = home .. path_sep .. ".cache" .. path_sep .. "nvim" .. path_sep
   local modules_dir = vim_path .. path_sep .. "lua" .. path_sep .. "modules"
 
-  local local_config_path = vim.fn.expand("$HOME/.editor.lua")
+  local local_config_path = home .. path_sep .. ".editor.lua"
+
+  local packer_opt_dir = data_dir .. path_sep .. "pack" .. path_sep .. "packer" .. path_sep .. "opt" .. path_sep
+  local packer_start_dir = data_dir .. path_sep .. "pack" .. path_sep .. "packer" .. path_sep .. "start" .. path_sep
 
   return {
     os_name = os_name,
@@ -28,6 +31,10 @@ local function editor_variables()
     cache_dir = cache_dir,
     modules_dir = modules_dir,
     local_config_path = local_config_path,
+    packer = {
+      opt_dir = packer_opt_dir,
+      start_dir = packer_start_dir,
+    },
   }
 end
 
