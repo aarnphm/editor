@@ -76,6 +76,7 @@ local required_plugins = function(use)
   -- tpope
   use({ "tpope/vim-sleuth" })
   use({ "tpope/vim-surround" })
+  use({ "tpope/vim-commentary" })
 
   -- notify
   use({
@@ -92,11 +93,11 @@ local required_plugins = function(use)
 
         -- Icons for the different levels
         icons = {
-          ERROR = "",
-          WARN = "",
-          INFO = "",
-          DEBUG = "",
-          TRACE = "✎",
+          ERROR = " ",
+          WARN = " ",
+          INFO = " ",
+          DEBUG = " ",
+          TRACE = "✎ ",
         },
       }
       notify.setup(notify_config)
@@ -161,9 +162,12 @@ plugins.load = function()
   else
     assert("Missing packer compile file, run PackerCompile Or PackerInstall to fix")
   end
+
+  vim.cmd([[autocmd User PackerComplete lua require('core.pack').compile()]])
+
   vim.opt.background = _G.__editor_config.background
   if _G.__editor_config.debug then
-    vim.cmd([[command! PackerCompile lua require('core.pack').magic_compile()]])
+    vim.cmd([[command! PackerCompile lua require('core.pack').compile()]])
     vim.cmd([[command! PackerInstall lua require('core.pack').install()]])
     vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])
     vim.cmd([[command! PackerSync lua require('core.pack').sync()]])

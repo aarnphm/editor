@@ -39,6 +39,39 @@ function M.setup_autocmds()
         'lua require("core.utils").hide_statusline()',
       },
       { "BufWritePost", "*.lua", "lua require('core.pack').compile()" },
+      {
+        "BufReadPost",
+        "*",
+        [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
+      },
+      {
+        "BufEnter",
+        "*",
+        [[++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]],
+      },
+    },
+    wins = {
+      -- Highlight current line only on focused window
+      {
+        "WinEnter,BufEnter,InsertLeave",
+        "*",
+        [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]],
+      },
+      {
+        "WinLeave,BufLeave,InsertEnter",
+        "*",
+        [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]],
+      },
+      -- Force write shada on leaving nvim
+      {
+        "VimLeave",
+        "*",
+        [[if has('nvim') | wshada! | else | wviminfo! | endif]],
+      },
+      -- Check if file changed when its window is focus, more eager than 'autoread'
+      { "FocusGained", "* checktime" },
+      -- Equalize window dimensions when resizing vim window
+      { "VimResized", "*", [[tabdo wincmd =]] },
     },
     ft = {
       { "BufNewFile,BufRead", "*.toml", "setf toml" },

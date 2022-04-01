@@ -51,16 +51,6 @@ editor["alexghergh/nvim-tmux-navigation"] = {
   end,
 }
 
-editor["terrortylor/nvim-comment"] = {
-  config = function()
-    require("nvim_comment").setup({
-      hook = function()
-        require("ts_context_commentstring.internal").update_commentstring()
-      end,
-    })
-  end,
-}
-
 editor["simrat39/symbols-outline.nvim"] = {
   opt = true,
   cmd = { "SymbolsOutline", "SymbolsOutlineOpen" },
@@ -150,10 +140,6 @@ editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,
   ft = "ipynb",
   cmd = { "JupyterExecute", "JupyterExecuteAll" },
-}
-editor["famiu/bufdelete.nvim"] = {
-  opt = true,
-  cmd = { "Bdelete", "Bwipeout", "Bdelete!", "Bwipeout!" },
 }
 editor["rcarriga/nvim-dap-ui"] = {
   opt = true,
