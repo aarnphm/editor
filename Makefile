@@ -13,5 +13,5 @@ endif
 benchmark-local:
 	@./fixtures/local
 reset:
-	@\rm -rf $HOME/.local/share/nvim
+	@\rm -rf ${HOME}/.local/share/nvim
 	@nvim

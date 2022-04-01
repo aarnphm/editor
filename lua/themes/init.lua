@@ -99,4 +99,12 @@ M.setup = function(use)
   })
 end
 
+-- returns a table of colors for given or current theme
+M.get = function(theme)
+  if not theme then
+    theme = _G.__editor_config.colorscheme
+  end
+  return require(theme)
+end
+
 return M
