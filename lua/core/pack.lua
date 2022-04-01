@@ -1,8 +1,8 @@
 local uv = vim.loop
 local fn = vim.fn
 
-local packer_dir = _G.__editor_global.data_dir .. "pack/packer/opt/packer.nvim"
-local packer_compiled = _G.__editor_global.data_dir .. "lua/_compiled.lua"
+local packer_dir = __editor_global.packer.opt_dir .. "packer.nvim"
+local packer_compiled = __editor_global.data_dir .. "lua/_compiled.lua"
 
 local packer = nil
 local packer_bootstrap = nil
@@ -30,7 +30,7 @@ M.init_packer = function()
       enable = true,
     },
   }
-  if _G.__editor_global.is_mac then
+  if __editor_global.is_mac then
     packer_config.max_jobs = 20
   end
 
@@ -39,9 +39,9 @@ end
 
 local get_plugins_list = function()
   local list = {}
-  local tmp = vim.split(fn.globpath(_G.__editor_global.modules_dir, "*/plugins.lua"), "\n")
+  local tmp = vim.split(fn.globpath(__editor_global.modules_dir, "*/plugins.lua"), "\n")
   for _, f in ipairs(tmp) do
-    list[#list + 1] = f:sub(#_G.__editor_global.modules_dir - 6, -1)
+    list[#list + 1] = f:sub(#__editor_global.modules_dir - 6, -1)
   end
   return list
 end
@@ -135,7 +135,7 @@ M.install_packer = function()
       "https://github.com/wbthomason/packer.nvim",
       packer_dir,
     })
-    uv.fs_mkdir(_G.__editor_global.data_dir .. "lua", 511, function()
+    uv.fs_mkdir(__editor_global.data_dir .. "lua", 511, function()
       assert("make compile path dir failed")
     end)
     M.setup_plugins()
@@ -165,8 +165,8 @@ plugins.load = function()
 
   vim.cmd([[autocmd User PackerComplete lua require('core.pack').compile()]])
 
-  vim.opt.background = _G.__editor_config.background
-  if _G.__editor_config.debug then
+  vim.opt.background = __editor_config.background
+  if __editor_config.debug then
     vim.cmd([[command! PackerCompile lua require('core.pack').compile()]])
     vim.cmd([[command! PackerInstall lua require('core.pack').install()]])
     vim.cmd([[command! PackerUpdate lua require('core.pack').update()]])

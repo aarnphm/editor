@@ -13,6 +13,17 @@ ui["nvim-lualine/lualine.nvim"] = {
   config = config.lualine,
   event = "BufRead",
   after = "nvim-treesitter",
+  cond = function()
+    return __editor_config.plugins.statusline == "lualine"
+  end,
+}
+ui["feline-nvim/feline.nvim"] = {
+  opt = true,
+  config = config.feline,
+  after = "nvim-treesitter",
+  cond = function()
+    return __editor_config.plugins.statusline == "feline"
+  end,
 }
 ui["j-hui/fidget.nvim"] = {
   opt = true,

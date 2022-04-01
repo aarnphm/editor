@@ -71,6 +71,6 @@ lazy.require_on_exported_call = function(require_path)
   })
 end
 
-_G.__lazy = lazy
+_G.lazy = lazy
 
 return lazy

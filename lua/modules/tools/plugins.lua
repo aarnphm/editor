@@ -1,6 +1,12 @@
 local tools = {}
 local config = require("modules.tools.config")
 
+tools["renerocksai/telekasten.nvim"] = {
+  opt = true,
+  module = "telekasten",
+  config = config.telekasten,
+  requires = { "renerocksai/calendar-vim", opt = true, after = "telekasten", module = "telekasten" },
+}
 tools["windwp/nvim-spectre"] = {
   requires = { "nvim-lua/plenary.nvim" },
   module = "spectre",
@@ -63,11 +69,12 @@ tools["sudormrfbin/cheatsheet.nvim"] = {
 tools["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
   config = config.wilder,
+  run = ":UpdateRemotePlugins",
   requires = {
     { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
   },
 }
-tools["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime", disable = _G.__editor_config.debug ~= true }
+tools["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime", disable = __editor_config.debug ~= true }
 tools["folke/trouble.nvim"] = {
   opt = true,
   cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },

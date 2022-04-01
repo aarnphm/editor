@@ -1,16 +1,16 @@
 -- Create cache dir and subs dir
 local function create_dir()
   local data_dir = {
-    _G.__editor_global.cache_dir .. "backup",
-    _G.__editor_global.cache_dir .. "session",
-    _G.__editor_global.cache_dir .. "swap",
-    _G.__editor_global.cache_dir .. "tags",
-    _G.__editor_global.cache_dir .. "undo",
+    __editor_global.cache_dir .. "backup",
+    __editor_global.cache_dir .. "session",
+    __editor_global.cache_dir .. "swap",
+    __editor_global.cache_dir .. "tags",
+    __editor_global.cache_dir .. "undo",
   }
   -- There only check once that If cache_dir exists
   -- Then I don't want to check subs dir exists
-  if vim.fn.isdirectory(_G.__editor_global.cache_dir) == 0 then
-    os.execute("mkdir -p " .. _G.__editor_global.cache_dir)
+  if vim.fn.isdirectory(__editor_global.cache_dir) == 0 then
+    os.execute("mkdir -p " .. __editor_global.cache_dir)
     for _, v in pairs(data_dir) do
       if vim.fn.isdirectory(v) == 0 then
         os.execute("mkdir -p " .. v)
@@ -25,7 +25,7 @@ local function dashboard_config()
   vim.g.dashboard_custom_footer = { "🍱 github.com/aarnphm/editor" }
   vim.g.dashboard_disable_statusline = 1
 
-  if _G.__editor_config.background == "dark" then
+  if __editor_config.background == "dark" then
     headers = {
       [[⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿]],
       [[⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿]],
@@ -162,7 +162,7 @@ local function preflight()
 
   vim.cmd([[ let maplocalleader="\<Space>"]])
 
-  vim.opt.background = _G.__editor_config.background
+  vim.opt.background = __editor_config.background
 end
 
 local M = {}

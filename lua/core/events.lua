@@ -38,6 +38,7 @@ function M.setup_autocmds()
         "*",
         'lua require("core.utils").hide_statusline()',
       },
+      { "WinEnter", "*", "lua require('core.utils').install_treesitter()" },
       { "BufWritePost", "*.lua", "lua require('core.pack').compile()" },
       {
         "BufReadPost",

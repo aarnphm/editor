@@ -57,12 +57,21 @@ function config.nvim_treesitter()
 
   require("nvim-treesitter.configs").setup({
     -- 'all', 'maintained', or list of string
-    ensure_installed = { "python", "go", "nix", "hcl", "rust", "typescript", "c", "java", "lua", "javascript" },
-    highlight = { enable = true },
-    rainbow = {
+    ensure_installed = { "python", "go" },
+    incremental_selection = {
       enable = true,
-      extended_mode = true, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
-      max_file_lines = 1000, -- Do not enable for files with more than 1000 lines, int
+      keymaps = {
+        init_selection = "gnn",
+        node_incremental = "grn",
+        scope_incremental = "grc",
+        node_decremental = "grm",
+      },
+    },
+    highlight = {
+      enable = true,
+      disable = function(lang, bufnr) -- Disable in large C++ buffers
+        return lang == "cpp" and vim.api.nvim_buf_line_count(bufnr) > 50000
+      end,
     },
     context_commentstring = { enable = true, enable_autocmd = false },
     matchup = { enable = true },

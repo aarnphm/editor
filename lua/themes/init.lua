@@ -6,10 +6,10 @@ M.setup = function(use)
     "jacoborus/tender.vim",
     as = "tender",
     cond = function()
-      return _G.__editor_config.colorscheme == "tender"
+      return __editor_config.colorscheme == "tender"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "tender" then
+      if __editor_config.colorscheme == "tender" then
         vim.cmd([[packadd tender]])
       end
     end,
@@ -19,10 +19,10 @@ M.setup = function(use)
     as = "edge",
     config = config.edge,
     cond = function()
-      return _G.__editor_config.colorscheme == "edge"
+      return __editor_config.colorscheme == "edge"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "edge" then
+      if __editor_config.colorscheme == "edge" then
         vim.cmd([[packadd edge]])
       end
     end,
@@ -32,10 +32,10 @@ M.setup = function(use)
     as = "tokyonight",
     config = config.tokyonight,
     cond = function()
-      return _G.__editor_config.colorscheme == "tokyonight"
+      return __editor_config.colorscheme == "tokyonight"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "tokyonight" then
+      if __editor_config.colorscheme == "tokyonight" then
         vim.cmd([[packadd tokyonight]])
       end
     end,
@@ -45,10 +45,10 @@ M.setup = function(use)
     as = "catppuccin",
     config = config.catppuccin,
     cond = function()
-      return _G.__editor_config.colorscheme == "catppuccin"
+      return __editor_config.colorscheme == "catppuccin"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "catppuccin" then
+      if __editor_config.colorscheme == "catppuccin" then
         vim.cmd([[packadd catppuccin]])
       end
     end,
@@ -59,10 +59,10 @@ M.setup = function(use)
     as = "rose-pine",
     config = config.rose_pine,
     cond = function()
-      return _G.__editor_config.colorscheme == "rose-pine"
+      return __editor_config.colorscheme == "rose-pine"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "rose-pine" then
+      if __editor_config.colorscheme == "rose-pine" then
         vim.cmd([[packadd rose-pine]])
       end
     end,
@@ -75,10 +75,10 @@ M.setup = function(use)
       vim.cmd("color onedark")
     end,
     cond = function()
-      return _G.__editor_config.colorscheme == "onedark"
+      return __editor_config.colorscheme == "onedark"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "onedark" then
+      if __editor_config.colorscheme == "onedark" then
         vim.cmd([[packadd onedark]])
       end
     end,
@@ -89,14 +89,22 @@ M.setup = function(use)
     as = "kanagawa",
     config = config.kanagawa,
     cond = function()
-      return _G.__editor_config.colorscheme == "kanagawa"
+      return __editor_config.colorscheme == "kanagawa"
     end,
     setup = function()
-      if _G.__editor_config.colorscheme == "kanagawa" then
+      if __editor_config.colorscheme == "kanagawa" then
         vim.cmd([[packadd kanagawa]])
       end
     end,
   })
+end
+
+-- returns a table of colors for given or current theme
+M.get = function(theme)
+  if not theme then
+    theme = __editor_config.colorscheme
+  end
+  return require(theme)
 end
 
 return M
