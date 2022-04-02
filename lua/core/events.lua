@@ -1,7 +1,19 @@
 local vim = vim
 local M = {}
 
-function _G.set_terminal_keymaps()
+_G.set_tmux_keymaps = function()
+  local opts = { noremap = true, silent = true }
+  if vim.api.nvim_eval('exists("$TMUX")') ~= 0 then
+    vim.api.nvim_set_keymap("n", "<C-h>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateLeft()<cr>", opts)
+    vim.api.nvim_set_keymap("n", "<C-j>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateDown()<cr>", opts)
+    vim.api.nvim_set_keymap("n", "<C-k>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateUp()<cr>", opts)
+    vim.api.nvim_set_keymap("n", "<C-l>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateRight()<cr>", opts)
+    vim.api.nvim_set_keymap("n", "<C-\\>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateLastActive()<cr>", opts)
+    vim.api.nvim_set_keymap("n", "<C-Space>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateNext()<cr>", opts)
+  end
+end
+
+_G.set_terminal_keymaps = function()
   local opts = { noremap = true }
   vim.api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], opts)
   vim.api.nvim_buf_set_keymap(0, "t", "jk", [[<C-\><C-n>]], opts)
@@ -34,11 +46,15 @@ function M.setup_autocmds()
       { "BufWritePre", "*.tmp", "setlocal noundofile" },
       { "BufWritePre", "*.bak", "setlocal noundofile" },
       {
+        "BufEnter,WinEnter",
+        "*",
+        "lua set_tmux_keymaps()",
+      },
+      {
         "BufEnter,BufRead,BufWinEnter,FileType,WinEnter",
         "*",
         'lua require("core.utils").hide_statusline()',
       },
-      { "WinEnter", "*", "lua require('core.utils').install_treesitter()" },
       { "BufWritePost", "*.lua", "lua require('core.pack').compile()" },
       {
         "BufReadPost",

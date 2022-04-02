@@ -160,7 +160,7 @@ local function preflight()
   vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
   vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
 
-  vim.cmd([[ let maplocalleader="\<Space>"]])
+  vim.g.maplocalleader = "+"
 
   vim.opt.background = __editor_config.background
 end

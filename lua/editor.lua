@@ -16,8 +16,8 @@ local function editor_variables()
 
   local local_config_path = home .. path_sep .. ".editor.lua"
 
-  local packer_opt_dir = data_dir .. path_sep .. "pack" .. path_sep .. "packer" .. path_sep .. "opt" .. path_sep
-  local packer_start_dir = data_dir .. path_sep .. "pack" .. path_sep .. "packer" .. path_sep .. "start" .. path_sep
+  local packer_opt_dir = data_dir .. "pack" .. path_sep .. "packer" .. path_sep .. "opt" .. path_sep
+  local packer_start_dir = data_dir .. "pack" .. path_sep .. "packer" .. path_sep .. "start" .. path_sep
 
   return {
     os_name = os_name,

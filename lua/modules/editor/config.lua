@@ -57,7 +57,7 @@ function config.nvim_treesitter()
 
   require("nvim-treesitter.configs").setup({
     -- 'all', 'maintained', or list of string
-    ensure_installed = { "python", "go" },
+    ensure_installed = "maintained",
     incremental_selection = {
       enable = true,
       keymaps = {

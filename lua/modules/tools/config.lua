@@ -7,11 +7,10 @@ function config.telekasten()
 
   require("telekasten").setup({
     home = home,
-    -- if true, telekasten will be enabled when opening a note within the configured home
+    -- if trle, telekasten will be enabled when opening a note within the configured home
     take_over_my_home = true,
 
     -- auto-set telekasten filetype: if false, the telekasten filetype will not be used
-    --                               and thus the telekasten syntax will not be loaded either
     auto_set_filetype = true,
 
     -- dir names for special notes (absolute path or subdir name)

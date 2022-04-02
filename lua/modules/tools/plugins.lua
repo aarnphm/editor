@@ -1,6 +1,7 @@
 local tools = {}
 local config = require("modules.tools.config")
 
+tools["github/copilot.vim"] = { opt = true, cmd = "Copilot" }
 tools["renerocksai/telekasten.nvim"] = {
   opt = true,
   module = "telekasten",
