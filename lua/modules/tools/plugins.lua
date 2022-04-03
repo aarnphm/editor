@@ -46,7 +46,10 @@ tools["nvim-telescope/telescope-frecency.nvim"] = {
   after = "telescope.nvim",
   requires = { { "tami5/sqlite.lua", opt = false } },
 }
-tools["nvim-telescope/telescope-ui-select.nvim"] = { opt = true, after = "telescope.nvim" }
+tools["nvim-telescope/telescope-ui-select.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+}
 tools["xiyaowong/telescope-emoji.nvim"] = {
   opt = true,
   after = "telescope.nvim",
@@ -56,6 +59,7 @@ tools["pwntester/octo.nvim"] = {
   after = "telescope.nvim",
   config = config.octo,
   cmd = "Octo",
+  module = "octo",
   requires = {
     "nvim-telescope/telescope.nvim",
   },
@@ -77,7 +81,11 @@ tools["gelguy/wilder.nvim"] = {
     { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
   },
 }
-tools["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime", disable = __editor_config.debug ~= true }
+tools["dstein64/vim-startuptime"] = {
+  opt = true,
+  cmd = "StartupTime",
+  disable = __editor_config.debug ~= true,
+}
 tools["folke/trouble.nvim"] = {
   opt = true,
   cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },

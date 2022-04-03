@@ -5,7 +5,6 @@ local hidden = {
   "help",
   "NvimTree",
   "terminal",
-  "dashboard",
 }
 
 local create_term = function(config)
@@ -100,6 +99,11 @@ function M.hide_statusline()
   end
 
   vim.api.nvim_set_option("laststatus", 2)
+
+  vim.cmd([[
+  autocmd FileType dashboard set showtabline=0 laststatus=0
+  autocmd WinLeave <buffer> set showtabline=2 laststatus=2
+  ]])
 end
 
 return M

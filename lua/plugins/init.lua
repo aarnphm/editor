@@ -36,10 +36,7 @@ local required_plugins = function(use)
       require("filetype").setup({})
     end,
   })
-  use({
-    "wbthomason/packer.nvim",
-    event = "VimEnter",
-  })
+  use({ "wbthomason/packer.nvim", opt = true })
 
   use({ "kyazdani42/nvim-web-devicons" })
   use({ "stevearc/dressing.nvim", after = "nvim-web-devicons" })
@@ -48,36 +45,12 @@ local required_plugins = function(use)
   use({ "tpope/vim-sleuth" })
   use({ "tpope/vim-surround" })
   use({ "tpope/vim-commentary" })
-
-  -- notify
-  use({
-    "rcarriga/nvim-notify",
-    config = function()
-      local notify = require("notify")
-      local notify_config = {
-        -- Animation style (see below for details)
-        stages = "static",
-        -- Default timeout for notifications
-        timeout = 3000,
-        -- Minimum width for notification windows
-        minimum_width = 50,
-
-        -- Icons for the different levels
-        icons = {
-          ERROR = " ",
-          WARN = " ",
-          INFO = " ",
-          DEBUG = " ",
-          TRACE = "✎ ",
-        },
-      }
-      notify.setup(notify_config)
-      vim.notify = notify
-    end,
-  })
   use({
     "glepnir/dashboard-nvim",
-    event = { "BufWinEnter", "BufNewFile" },
+    opt = true,
+    cond = function()
+      return #vim.api.nvim_list_uis() > 0
+    end,
   })
 
   -- colorscheme

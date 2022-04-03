@@ -138,13 +138,6 @@ function M.setup_autocmds()
     },
   }
 
-  vim.cmd([[
-  autocmd FileType dashboard set showtabline=0 laststatus=0
-  autocmd WinLeave <buffer> set showtabline=2 laststatus=2
-  ]])
-
-  -- neuron.nvim cmd
-
   M.nvim_create_augroups(definitions)
 end
 
