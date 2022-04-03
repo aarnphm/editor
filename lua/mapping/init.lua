@@ -56,10 +56,10 @@ function M.setup_mapping()
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<LocalLeader><LocalLeader>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
     -- Bufferline
-    ["n|<LocalLeader>j"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
-    ["n|<LocalLeader>k"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
-    ["n|<LocalLeader>bp"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
-    ["n|<LocalLeader>bc"] = map_cr("BufferLinePickClose"):with_noremap():with_silent(),
+    ["n|<Space>j"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
+    ["n|<Space>k"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
+    ["n|<Space>bp"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
+    ["n|<Space>bc"] = map_cr("BufferLinePickClose"):with_noremap():with_silent(),
     ["n|<LocalLeader>be"] = map_cr("BufferLineSortByExtension"):with_noremap(),
     ["n|<LocalLeader>bd"] = map_cr("BufferLineSortByDirectory"):with_noremap(),
     ["n|1gt"] = map_cr("BufferLineGoToBuffer 1"):with_noremap():with_silent(),
@@ -72,11 +72,11 @@ function M.setup_mapping()
     ["n|8gt"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
     ["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
     -- Packer
-    ["n|<Space>ps"] = map_cu("lua require('core.pack').sync()"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pS"] = map_cu("lua require('core.pack').status()"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pu"] = map_cu("lua require('core.pack').update()"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pc"] = map_cu("lua require('core.pack').compile()"):with_silent():with_noremap():with_nowait(),
-    ["n|<Space>pC"] = map_cu("lua require('core.pack').clean()"):with_silent():with_noremap():with_nowait(),
+    ["n|<Space>ps"] = map_cu("lua require'plugins' require('packer').sync()"):with_noremap(),
+    ["n|<Space>pS"] = map_cu("lua require'plugins' require('packer').status()"):with_noremap(),
+    ["n|<Space>pu"] = map_cu("lua require'plugins' require('packer').update()"):with_noremap(),
+    ["n|<Space>pc"] = map_cu("lua require'plugins' require('packer').compile()"):with_noremap(),
+    ["n|<Space>pC"] = map_cu("lua require'plugins' require('packer').clean()"):with_noremap(),
     -- Lsp mapp work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<leader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),
@@ -133,24 +133,6 @@ function M.setup_mapping()
     ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
     -- Plugin zen-mode
     ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
-    -- Plugin dap
-    ["n|<F7>"] = map_cr("lua require('dap').continue()"):with_noremap():with_silent(),
-    ["n|<leader>dr"] = map_cr("lua require('dap').continue()"):with_noremap():with_silent(),
-    ["n|<leader>dd"] = map_cr("lua require('dap').terminate() require('dapui').close()"):with_noremap():with_silent(),
-    ["n|<leader>db"] = map_cr("lua require('dap').toggle_breakpoint()"):with_noremap():with_silent(),
-    ["n|<leader>dB"] = map_cr("lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))")
-      :with_noremap()
-      :with_silent(),
-    ["n|<leader>dbl"] = map_cr("lua require('dap').list_breakpoints()"):with_noremap():with_silent(),
-    ["n|<leader>drc"] = map_cr("lua require('dap').run_to_cursor()"):with_noremap():with_silent(),
-    ["n|<leader>drl"] = map_cr("lua require('dap').run_last()"):with_noremap():with_silent(),
-    ["n|<F9>"] = map_cr("lua require('dap').step_over()"):with_noremap():with_silent(),
-    ["n|<leader>dv"] = map_cr("lua require('dap').step_over()"):with_noremap():with_silent(),
-    ["n|<F10>"] = map_cr("lua require('dap').step_into()"):with_noremap():with_silent(),
-    ["n|<leader>di"] = map_cr("lua require('dap').step_into()"):with_noremap():with_silent(),
-    ["n|<F11>"] = map_cr("lua require('dap').step_out()"):with_noremap():with_silent(),
-    ["n|<leader>do"] = map_cr("lua require('dap').step_out()"):with_noremap():with_silent(),
-    ["n|<leader>dl"] = map_cr("lua require('dap').repl.open()"):with_noremap():with_silent(),
     -- Plugins telekasten
     ["n|<LocalLeader>zf"] = map_cr("lua require('telekasten').find_notes()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zd"] = map_cr("lua require('telekasten').find_daily_notes()"):with_noremap():with_silent(),
@@ -167,19 +149,17 @@ function M.setup_mapping()
     ["n|<LocalLeader>zi"] = map_cr("lua require('telekasten').paste_img_and_link()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zt"] = map_cr("lua require('telekasten').toggle_todo()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zb"] = map_cr("lua require('telekasten').show_backlinks()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zF"] = map_cr("lua require('telekasten').find_friends()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zI"] = map_cr("lua require('telekasten').insert_img_link({ i=true })")
       :with_noremap()
       :with_silent(),
-    ["n|<LocalLeader>zpi"] = map_cr("lua require('telekasten').preview_img()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zm"] = map_cr("lua require('telekasten').browse_media()"):with_noremap():with_silent(),
     ["n|<LocalLeader>za"] = map_cr("lua require('telekasten').show_tags()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zr"] = map_cr("lua require('telekasten').rename_note()"):with_noremap():with_silent(),
     ["n|<LocalLeader>zp"] = map_cr("lua require('telekasten').panel()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>#"] = map_cr("lua require('telekasten').show_tags()"):with_noremap():with_silent(),
-    -- interactive
-    ["i|<LocalLeader>["] = map_cr("lua require('telekasten').insert_link({ i=true })"):with_noremap():with_silent(),
-    ["i|<LocalLeader>#"] = map_cr("lua require('telekasten').show_tags({i = true})"):with_noremap():with_silent(),
+    ["n|<LocalLeader>z#"] = map_cr("lua require('telekasten').show_tags()"):with_noremap():with_silent(),
+    -- telekasten interactive
+    ["i|<LocalLeader>z["] = map_cr("lua require('telekasten').insert_link({ i=true })"):with_noremap():with_silent(),
+    ["i|<LocalLeader>z$"] = map_cr("lua require('telekasten').show_tags({i = true})"):with_noremap():with_silent(),
     ["i|<LocalLeader>zt"] = map_cr("lua require('telekasten').toggle_todo({ i=true })"):with_noremap():with_silent(),
   }
 

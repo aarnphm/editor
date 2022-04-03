@@ -1,6 +1,11 @@
 local lang = {}
 local conf = require("modules.lang.config")
 
+lang["mzlogin/vim-markdown-toc"] = {
+  opt = true,
+  ft = "md",
+  cmd = "GenTocGFM",
+}
 lang["fatih/vim-go"] = {
   opt = true,
   ft = "go",

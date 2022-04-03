@@ -130,7 +130,7 @@ function config.cmp()
       ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       ["<C-f>"] = cmp.mapping.scroll_docs(4),
       ["<C-e>"] = cmp.mapping.close(),
-      ["<S-Tab>"] = cmp.mapping(function(fallback)
+      ["<Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
         elseif has_words_before() then

@@ -1,5 +1,15 @@
 local config = {}
 
+config.neuron = function()
+  require("neuron").setup({
+    virtual_titles = true,
+    mappings = true,
+    run = nil, -- function to run when in neuron dir
+    neuron_dir = __editor_global.zettel_home, -- the directory of all of your notes, expanded by default (currently supports only one directory for notes, find a way to detect neuron.dhall to use any directory)
+    leader = "gz", -- the leader key to for all mappings, remember with 'go zettel'
+  })
+end
+
 function config.telekasten()
   vim.cmd([[ packadd calendar-vim ]])
 
@@ -276,7 +286,7 @@ function config.telescope()
       grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
       file_sorter = require("telescope.sorters").get_fuzzy_file,
-      file_ignore_patterns = { "__compiled.lua" },
+      file_ignore_patterns = { "packer_compiled.lua" },
       generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
       path_display = { "absolute" },
       winblend = 0,

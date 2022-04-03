@@ -1,4 +1,5 @@
 local vim = vim
+local api = vim.api
 local M = {}
 
 _G.set_tmux_keymaps = function()
@@ -23,6 +24,34 @@ _G.set_terminal_keymaps = function()
   vim.api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
 end
 
+_G.set_neuron_keymaps = function()
+  vim.cmd([[packadd neuron]])
+  local neuron = require("neuron")
+
+  local map_buf = function(key, rhs)
+    local lhs = string.format("%s%s", neuron.config.leader, key)
+    api.nvim_buf_set_keymap(0, "n", lhs, rhs, { noremap = true, silent = true })
+  end
+
+  api.nvim_buf_set_keymap(0, "n", "<CR>", ":lua require'neuron'.enter_link()<CR>", { noremap = true, silent = true })
+  map_buf("<CR>", "<cmd>lua require'neuron'.enter_link()<CR>")
+
+  map_buf("n", "<cmd>lua require'neuron.cmd'.new_edit(require'neuron'.config.neuron_dir)<CR>")
+
+  map_buf("z", "<cmd>lua require'neuron.telescope'.find_zettels()<CR>")
+  map_buf("Z", "<cmd>lua require'neuron.telescope'.find_zettels {insert = true}<CR>")
+
+  map_buf("b", "<cmd>lua require'neuron.telescope'.find_backlinks()<CR>")
+  map_buf("B", "<cmd>lua require'neuron.telescope'.find_backlinks {insert = true}<CR>")
+
+  map_buf("t", "<cmd>lua require'neuron.telescope'.find_tags()<CR>")
+
+  map_buf("s", [[<cmd>lua require'neuron'.rib {address = "127.0.0.1:8200", verbose = true}<CR>]])
+
+  map_buf("]", "<cmd>lua require'neuron'.goto_next_extmark()<CR>")
+  map_buf("[", "<cmd>lua require'neuron'.goto_prev_extmark()<CR>")
+end
+
 function M.nvim_create_augroups(definitions)
   for group_name, definition in pairs(definitions) do
     vim.api.nvim_command("augroup " .. group_name)
@@ -45,6 +74,7 @@ function M.setup_autocmds()
       { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
       { "BufWritePre", "*.tmp", "setlocal noundofile" },
       { "BufWritePre", "*.bak", "setlocal noundofile" },
+      { "BufRead", string.format("%s/*.md", __editor_global.zettel_home), "lua set_neuron_keymaps()" },
       {
         "BufEnter,WinEnter",
         "*",
@@ -55,7 +85,7 @@ function M.setup_autocmds()
         "*",
         'lua require("core.utils").hide_statusline()',
       },
-      { "BufWritePost", "*.lua", "lua require('core.pack').compile()" },
+      { "BufWritePost", "*.lua", "lua require'plugins' require('packer').compile()" },
       {
         "BufReadPost",
         "*",
@@ -98,7 +128,6 @@ function M.setup_autocmds()
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
-      { "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
     },
     yank = {
       {
@@ -113,6 +142,8 @@ function M.setup_autocmds()
   autocmd FileType dashboard set showtabline=0 laststatus=0
   autocmd WinLeave <buffer> set showtabline=2 laststatus=2
   ]])
+
+  -- neuron.nvim cmd
 
   M.nvim_create_augroups(definitions)
 end

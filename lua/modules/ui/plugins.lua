@@ -50,7 +50,6 @@ ui["lewis6991/gitsigns.nvim"] = {
   opt = true,
   event = { "BufRead", "BufNewFile" },
   config = config.gitsigns,
-  requires = { "nvim-lua/plenary.nvim", opt = true },
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
   opt = true,

@@ -78,8 +78,9 @@ function M.reset_cache()
 end
 
 function M.reload()
-  require("core.pack").sync()
-  require("core.pack").compile()
+  require("plugins")
+  require("packer").sync()
+  require("packer").compile()
   vim.notify("Config reloaded and compiled.")
 end
 

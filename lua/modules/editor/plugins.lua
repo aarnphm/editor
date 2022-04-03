@@ -107,18 +107,5 @@ editor["untitled-ai/jupyter_ascending.vim"] = {
   ft = "ipynb",
   cmd = { "JupyterExecute", "JupyterExecuteAll" },
 }
-editor["rcarriga/nvim-dap-ui"] = {
-  opt = true,
-  config = config.dapui,
-  requires = {
-    { "mfussenegger/nvim-dap", config = config.dap },
-    {
-      "Pocco81/DAPInstall.nvim",
-      opt = true,
-      cmd = { "DIInstall", "DIUninstall", "DIList" },
-      config = config.dapinstall,
-    },
-  },
-}
 
 return editor

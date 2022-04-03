@@ -19,6 +19,8 @@ local function editor_variables()
   local packer_opt_dir = data_dir .. "pack" .. path_sep .. "packer" .. path_sep .. "opt" .. path_sep
   local packer_start_dir = data_dir .. "pack" .. path_sep .. "packer" .. path_sep .. "start" .. path_sep
 
+  local zettel_home = vim_path .. path_sep .. "zettelkasten"
+
   return {
     os_name = os_name,
     is_mac = is_mac,
@@ -31,6 +33,7 @@ local function editor_variables()
     cache_dir = cache_dir,
     modules_dir = modules_dir,
     local_config_path = local_config_path,
+    zettel_home = zettel_home,
     packer = {
       opt_dir = packer_opt_dir,
       start_dir = packer_start_dir,

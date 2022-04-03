@@ -9,23 +9,28 @@ tools["renerocksai/telekasten.nvim"] = {
   requires = { "renerocksai/calendar-vim", opt = true, after = "telekasten", module = "telekasten" },
 }
 tools["windwp/nvim-spectre"] = {
-  requires = { "nvim-lua/plenary.nvim" },
   module = "spectre",
   config = config.spectre,
 }
 tools["tpope/vim-dispatch"] = { cmd = "Dispatch" }
-tools["RishabhRD/popfix"] = { opt = false }
-tools["nvim-lua/plenary.nvim"] = { opt = false }
 tools["wakatime/vim-wakatime"] = { opt = true }
+-- tools["oberblastmeister/neuron.nvim"] = {
+--   opt = true,
+--   module = "neuron",
+--   config = config.neuron,
+--   after = "telescope.nvim",
+--   requires = {
+--     { "nvim-lua/popup.nvim", opt = true },
+--     { "nvim-lua/plenary.nvim", opt = true },
+--     { "nvim-telescope/telescope.nvim", opt = true },
+--   },
+-- }
 tools["nvim-telescope/telescope.nvim"] = {
   opt = true,
   module = "telescope",
   cmd = "Telescope",
   config = config.telescope,
-  requires = {
-    { "nvim-lua/plenary.nvim", opt = false },
-    { "nvim-lua/popup.nvim", opt = false },
-  },
+  requires = { { "nvim-lua/popup.nvim" } },
 }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
   opt = true,
@@ -52,9 +57,7 @@ tools["pwntester/octo.nvim"] = {
   config = config.octo,
   cmd = "Octo",
   requires = {
-    "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope.nvim",
-    "kyazdani42/nvim-web-devicons",
   },
 }
 tools["sudormrfbin/cheatsheet.nvim"] = {
@@ -63,7 +66,6 @@ tools["sudormrfbin/cheatsheet.nvim"] = {
   requires = {
     { "nvim-telescope/telescope.nvim" },
     { "nvim-lua/popup.nvim" },
-    { "nvim-lua/plenary.nvim" },
   },
   config = config.cheatsheet,
 }

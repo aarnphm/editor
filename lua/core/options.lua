@@ -133,6 +133,8 @@ function M.setup_options()
     vim.o[name] = value
   end
 
+  vim.opt.background = __editor_config.background
+
   --Defer loading shada until after startup_
   vim.opt.shadafile = "NONE"
   vim.schedule(function()
