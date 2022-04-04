@@ -1,6 +1,6 @@
 local config = {}
 
-function config.feline()
+config.feline = function()
   -- refers to nvchad's feline config
   local present, feline = pcall(require, "feline")
   if not present then
@@ -437,7 +437,7 @@ function config.feline()
   })
 end
 
-function config.lualine()
+config.lualine = function()
   local symbols_outline = {
     sections = {
       lualine_a = {},
@@ -490,7 +490,7 @@ function config.lualine()
   })
 end
 
-function config.nvim_tree()
+config.nvim_tree = function()
   vim.g.nvim_tree_root_folder_modifier = table.concat({ ":t:gs?$?/..", string.rep(" ", 1000), "?:gs?^??" })
   require("nvim-tree").setup({
     hide_root_folder = true,
@@ -526,7 +526,7 @@ function config.nvim_tree()
   })
 end
 
-function config.gitsigns()
+config.gitsigns = function()
   require("gitsigns").setup({
     signs = {
       add = {
@@ -595,7 +595,7 @@ function config.gitsigns()
   })
 end
 
-function config.nvim_bufferline()
+config.nvim_bufferline = function()
   require("bufferline").setup({
     options = {
       number = "none",
@@ -624,7 +624,7 @@ function config.nvim_bufferline()
   })
 end
 
-function config.indent_blankline()
+config.indent_blankline = function()
   vim.opt.termguicolors = true
   vim.opt.list = true
   require("indent_blankline").setup({

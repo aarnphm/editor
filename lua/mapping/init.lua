@@ -7,7 +7,7 @@ require("mapping.config")
 
 local M = {}
 
-function M.setup_mapping()
+M.setup_mapping = function()
   -- default map
   local def_map = {
     -- Vim map

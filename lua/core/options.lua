@@ -12,7 +12,7 @@ local bind_option = function(options)
   end
 end
 
-function M.setup_options()
+M.setup_options = function()
   local local_opt = {
     undofile = true,
     synmaxcol = 2500,

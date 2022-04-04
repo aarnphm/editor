@@ -16,6 +16,7 @@ endif
 benchmark-local:
 	@vim-startuptime --vimpath nvim | sort -k 2
 reset:
-	\rm -rf ${HOME}/.local/share/nvim
+	@\rm -rf ${HOME}/.local/share/nvim
+	@\rm -rf ./plugin
 	nvim -c "autocmd User PackerComplete quitall" -c "PackerSync"
 	nvim

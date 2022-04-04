@@ -1,6 +1,6 @@
 local config = {}
 
-function config.symbols_outline()
+config.symbols_outline = function()
   require("symbols-outline").setup({
     highlight_hovered_item = true,
     width = 30,
@@ -51,7 +51,7 @@ function config.symbols_outline()
   })
 end
 
-function config.nvim_treesitter()
+config.nvim_treesitter = function()
   vim.cmd([[set foldmethod=expr]])
   vim.cmd([[set foldexpr=nvim_treesitter#foldexpr()]])
 
@@ -115,7 +115,7 @@ function config.nvim_treesitter()
   parser_config.markdown.filetype_to_parsername = "octo"
 end
 
-function config.autotag()
+config.autotag = function()
   require("nvim-ts-autotag").setup({
     filetypes = {
       "html",
@@ -128,11 +128,11 @@ function config.autotag()
   })
 end
 
-function config.matchup()
+config.matchup = function()
   vim.cmd([[let g:matchup_matchparen_offscreen = {'method': 'popup'}]])
 end
 
-function config.toggleterm()
+config.toggleterm = function()
   require("toggleterm").setup({
     -- size can be a number or function which is passed the current terminal
     size = function(term)
@@ -156,7 +156,7 @@ function config.toggleterm()
   })
 end
 
-function config.nvim_colorizer()
+config.nvim_colorizer = function()
   require("colorizer").setup({})
 end
 

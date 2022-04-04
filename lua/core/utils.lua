@@ -13,6 +13,15 @@ local create_term = function(config)
   ft:toggle()
 end
 
+-- load plugin after entering vim ui
+M.packer_lazy_load = function(plugin)
+  local timer = 0
+  vim.defer_fn(function()
+    require("plugins")
+    require("packer").loader(plugin)
+  end, timer)
+end
+
 M.create_float_term = function()
   local config = {
     hidden = true,
@@ -64,26 +73,26 @@ M.gitui = function()
   create_term(config)
 end
 
-function M.edit_root()
+M.edit_root = function()
   local files = lazy.require_on_exported_call("telescope.builtin.git").files
   files({ cwd = vim.fn.stdpath("config") })
 end
 
-function M.reset_cache()
+M.reset_cache = function()
   local ok, impatient = pcall(require, "impatient")
   if ok then
     impatient.clear_cache()
   end
 end
 
-function M.reload()
+M.reload = function()
   require("plugins")
   require("packer").sync()
   require("packer").compile()
   vim.notify("Config reloaded and compiled.")
 end
 
-function M.hide_statusline()
+M.hide_statusline = function()
   local shown = {}
   local buftype = vim.api.nvim_buf_get_option(0, "ft")
 

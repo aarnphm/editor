@@ -1,4 +1,4 @@
-local function editor_variables()
+local editor_variables = function()
   local os_name = vim.loop.os_uname().sysname
 
   local is_mac = os_name == "Darwin"
@@ -45,7 +45,7 @@ local _config = nil
 
 local M = editor_variables()
 
-local function editor_config()
+local editor_config = function()
   if _config then
     return _config
   end

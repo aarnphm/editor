@@ -52,7 +52,7 @@ _G.set_neuron_keymaps = function()
   map_buf("[", "<cmd>lua require'neuron'.goto_prev_extmark()<CR>")
 end
 
-function M.nvim_create_augroups(definitions)
+local nvim_create_augroups = function(definitions)
   for group_name, definition in pairs(definitions) do
     vim.api.nvim_command("augroup " .. group_name)
     vim.api.nvim_command("autocmd!")
@@ -64,7 +64,7 @@ function M.nvim_create_augroups(definitions)
   end
 end
 
-function M.setup_autocmds()
+M.setup_autocmds = function()
   local definitions = {
     terms = {
       { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
@@ -138,7 +138,7 @@ function M.setup_autocmds()
     },
   }
 
-  M.nvim_create_augroups(definitions)
+  nvim_create_augroups(definitions)
 end
 
 return M

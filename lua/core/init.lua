@@ -1,5 +1,5 @@
 -- Create cache dir and subs dir
-local function create_dir()
+local create_dir = function()
   local data_dir = {
     __editor_global.cache_dir .. "backup",
     __editor_global.cache_dir .. "session",
@@ -19,7 +19,7 @@ local function create_dir()
   end
 end
 
-local function dashboard_config()
+local dashboard_config = function()
   local headers = nil
   vim.g.dashboard_default_executive = "telescope"
   vim.g.dashboard_custom_footer = { "🍱 github.com/aarnphm/editor" }

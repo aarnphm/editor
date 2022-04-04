@@ -1,6 +1,6 @@
 local config = {}
 
-function config.nvim_lsp()
+config.nvim_lsp = function()
   require("modules.completion.lspconfig")
 end
 
@@ -39,7 +39,7 @@ function config.lightbulb()
   vim.cmd([[hi link LightBulbVirtualText YellowFloat]])
 end
 
-function config.cmp()
+config.cmp = function()
   vim.cmd([[highlight CmpItemAbbrDeprecated guifg=#D8DEE9 guibg=NONE gui=strikethrough]])
   vim.cmd([[highlight CmpItemKindSnippet guifg=#BF616A guibg=NONE]])
   vim.cmd([[highlight CmpItemKindUnit guifg=#D08770 guibg=NONE]])
@@ -115,8 +115,6 @@ function config.cmp()
           luasnip = "[ LSnip]",
           nvim_lua = "[ NvimLua]",
           path = "[~ Path]",
-          tmux = "[ Tmux]",
-          spell = "[ Spell]",
         })[entry.source.name]
 
         return vim_item
@@ -172,15 +170,13 @@ function config.cmp()
       { name = "nvim_lua" },
       { name = "luasnip" },
       { name = "path" },
-      { name = "spell" },
-      { name = "tmux" },
       { name = "buffer" },
       { name = "latex_symbols" },
     },
   })
 end
 
-function config.luasnip()
+config.luasnip = function()
   require("luasnip").config.set_config({
     history = true,
     updateevents = "TextChanged,TextChangedI",
@@ -188,7 +184,7 @@ function config.luasnip()
   require("luasnip/loaders/from_vscode").load()
 end
 
-function config.autopairs()
+config.autopairs = function()
   require("nvim-autopairs").setup({})
 
   -- If you want insert `(` after select function or method item
@@ -198,7 +194,8 @@ function config.autopairs()
   cmp_autopairs.lisp[#cmp_autopairs.lisp + 1] = "racket"
 end
 
-function config.nvim_lsputils()
+config.nvim_lsputils = function()
+  vim.cmd [[packadd lsputil]]
   if vim.fn.has("nvim-0.5.1") == 1 then
     vim.lsp.handlers["textDocument/codeAction"] = require("lsputil.codeAction").code_action_handler
     vim.lsp.handlers["textDocument/references"] = require("lsputil.locations").references_handler

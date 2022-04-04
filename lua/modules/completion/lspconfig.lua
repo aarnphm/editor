@@ -1,5 +1,4 @@
-require("modules.completion.formatting")
-
+vim.cmd([[packadd lspconfig]])
 vim.cmd([[packadd nvim-lsp-installer]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
@@ -7,10 +6,11 @@ vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packad efmls-configs-nvim]])
 
-local efmls = require("efmls-configs")
+require("modules.completion.formatting")
 
 local saga = require("lspsaga")
 local nvim_lsp = require("lspconfig")
+local efmls = require("efmls-configs")
 local lsp_installer = require("nvim-lsp-installer")
 
 -- Include the servers you want to have installed by default below

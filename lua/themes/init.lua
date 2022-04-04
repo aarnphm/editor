@@ -3,31 +3,6 @@ local M = {}
 
 M.setup = function(use)
   use({
-    "jacoborus/tender.vim",
-    as = "tender",
-    cond = function()
-      return __editor_config.colorscheme == "tender"
-    end,
-    setup = function()
-      if __editor_config.colorscheme == "tender" then
-        vim.cmd([[packadd tender]])
-      end
-    end,
-  })
-  use({
-    "sainnhe/edge",
-    as = "edge",
-    config = config.edge,
-    cond = function()
-      return __editor_config.colorscheme == "edge"
-    end,
-    setup = function()
-      if __editor_config.colorscheme == "edge" then
-        vim.cmd([[packadd edge]])
-      end
-    end,
-  })
-  use({
     "folke/tokyonight.nvim",
     as = "tokyonight",
     config = config.tokyonight,
@@ -67,23 +42,6 @@ M.setup = function(use)
       end
     end,
   })
-
-  use({
-    "navarasu/onedark.nvim",
-    as = "onedark",
-    config = function()
-      vim.cmd("color onedark")
-    end,
-    cond = function()
-      return __editor_config.colorscheme == "onedark"
-    end,
-    setup = function()
-      if __editor_config.colorscheme == "onedark" then
-        vim.cmd([[packadd onedark]])
-      end
-    end,
-  })
-
   use({
     "rebelot/kanagawa.nvim",
     as = "kanagawa",

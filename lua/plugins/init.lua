@@ -1,5 +1,4 @@
 local fn = vim.fn
-local uv = vim.loop
 local present, packer = pcall(require, "plugins.packerInit")
 if not present then
   return false

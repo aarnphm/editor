@@ -1,7 +1,17 @@
 local tools = {}
 local config = require("modules.tools.config")
 
-tools["github/copilot.vim"] = { opt = true, cmd = "Copilot" }
+tools["github/copilot.vim"] = {
+  opt = true,
+  cmd = "Copilot",
+  setup = function()
+    vim.cmd([[
+packadd copilot
+imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
+let g:copilot_no_tab_map = v:true
+    ]])
+  end,
+}
 tools["renerocksai/telekasten.nvim"] = {
   opt = true,
   module = "telekasten",
@@ -26,11 +36,9 @@ tools["wakatime/vim-wakatime"] = { opt = true }
 --   },
 -- }
 tools["nvim-telescope/telescope.nvim"] = {
-  opt = true,
   module = "telescope",
   cmd = "Telescope",
   config = config.telescope,
-  requires = { { "nvim-lua/popup.nvim" } },
 }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
   opt = true,
@@ -67,10 +75,6 @@ tools["pwntester/octo.nvim"] = {
 tools["sudormrfbin/cheatsheet.nvim"] = {
   opt = true,
   after = "telescope.nvim",
-  requires = {
-    { "nvim-telescope/telescope.nvim" },
-    { "nvim-lua/popup.nvim" },
-  },
   config = config.cheatsheet,
 }
 tools["gelguy/wilder.nvim"] = {

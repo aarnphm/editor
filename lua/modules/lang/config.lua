@@ -1,6 +1,6 @@
 local config = {}
 
-function config.rust_tools()
+config.rust_tools = function()
   local opts = {
     tools = {
       -- rust-tools options
@@ -72,7 +72,7 @@ function config.rust_tools()
   require("rust-tools").setup(opts)
 end
 
-function config.vimtex()
+config.vimtex = function()
   vim.g.vimtex_view_method = "skim"
   vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
   vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
@@ -97,7 +97,7 @@ endfunction
   ]])
 end
 
-function config.lang_go()
+config.lang_go = function()
   vim.g.go_doc_keywordprg_enabled = false
   vim.g.go_def_mapping_enabled = false
 end

@@ -10,7 +10,7 @@ config.neuron = function()
   })
 end
 
-function config.telekasten()
+config.telekasten = function()
   vim.cmd([[ packadd calendar-vim ]])
 
   local home = __editor_global.vim_path .. __editor_global.path_sep .. "zettelkasten"
@@ -122,7 +122,7 @@ function config.telekasten()
   })
 end
 
-function config.spectre()
+config.spectre = function()
   require("spectre").setup({
 
     color_devicons = true,
@@ -266,7 +266,7 @@ function config.spectre()
   })
 end
 
-function config.telescope()
+config.telescope = function()
   vim.cmd([[packadd sqlite.lua]])
   vim.cmd([[packadd telescope-fzf-native.nvim]])
   vim.cmd([[packadd telescope-file-browser.nvim]])
@@ -321,7 +321,7 @@ function config.telescope()
   require("telescope").load_extension("emoji")
 end
 
-function config.octo()
+config.octo = function()
   require("octo").setup({
     default_remote = { "upstream", "origin" }, -- order to try remotes
     reaction_viewer_hint_icon = "", -- marker for user reactions
@@ -449,7 +449,7 @@ function config.octo()
   })
 end
 
-function config.trouble()
+config.trouble = function()
   require("trouble").setup({
     position = "bottom", -- position of the list can be: bottom, top, left, right
     height = 10, -- height of the trouble list when position is top or bottom
@@ -497,7 +497,7 @@ function config.trouble()
   })
 end
 
-function config.cheatsheet()
+config.cheatsheet = function()
   require("cheatsheet").setup({
     -- Whether to show bundled cheatsheets
     bundled_cheatsheets = true,
@@ -514,7 +514,7 @@ function config.cheatsheet()
   })
 end
 
-function config.wilder()
+config.wilder = function()
   vim.cmd([[
 call wilder#setup({'modes': [':', '/', '?']})
 call wilder#set_option('pipeline', [

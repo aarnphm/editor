@@ -57,27 +57,27 @@ end
 local pbind = {}
 pbind.__index = pbind
 
-function pbind.map_cr(cmd_string)
+pbind.map_cr = function(cmd_string)
   local ro = rhs_options:new()
   return ro:map_cr(cmd_string)
 end
 
-function pbind.map_cmd(cmd_string)
+pbind.map_cmd = function(cmd_string)
   local ro = rhs_options:new()
   return ro:map_cmd(cmd_string)
 end
 
-function pbind.map_cu(cmd_string)
+pbind.map_cu = function(cmd_string)
   local ro = rhs_options:new()
   return ro:map_cu(cmd_string)
 end
 
-function pbind.map_args(cmd_string)
+pbind.map_args = function(cmd_string)
   local ro = rhs_options:new()
   return ro:map_args(cmd_string)
 end
 
-function pbind.nvim_load_mapping(mapping)
+pbind.nvim_load_mapping = function(mapping)
   for key, value in pairs(mapping) do
     local mode, keymap = key:match("([^|]*)|?(.*)")
     if type(value) == "table" then
