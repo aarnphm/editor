@@ -116,11 +116,11 @@ local dashboard_config = function()
       command = "Telescope git_files",
     },
     edit_config = {
-      description = { "  Edit local config         space e c" },
+      description = { "  Edit local config         kplus e c" },
       command = "e ~/.editor.lua",
     },
     edit_nvim_config = {
-      description = { " NVIM config                space e r" },
+      description = { " NVIM config                kplus e r" },
       command = "lua require('core.utils').edit_root()",
     },
   }
