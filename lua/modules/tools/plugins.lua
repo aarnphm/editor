@@ -38,6 +38,7 @@ tools["wakatime/vim-wakatime"] = { opt = true }
 tools["nvim-telescope/telescope.nvim"] = {
   module = "telescope",
   cmd = "Telescope",
+  requires = { { "tami5/sqlite.lua" } },
   config = config.telescope,
 }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
@@ -52,7 +53,6 @@ tools["nvim-telescope/telescope-file-browser.nvim"] = {
 tools["nvim-telescope/telescope-frecency.nvim"] = {
   opt = true,
   after = "telescope.nvim",
-  requires = { { "tami5/sqlite.lua", opt = false } },
 }
 tools["nvim-telescope/telescope-ui-select.nvim"] = {
   opt = true,
