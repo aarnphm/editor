@@ -126,7 +126,7 @@ local dashboard_config = function()
   }
 end
 
-local function preflight()
+local preflight = function()
   create_dir()
   dashboard_config()
 
@@ -173,9 +173,14 @@ local function preflight()
   vim.cmd("silent! command PackerUpdate lua require 'plugins' require('packer').update()")
 end
 
+local setup_global_envars = function()
+  vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
+end
+
 local M = {}
 
 M.setup = function()
+  setup_global_envars()
   preflight()
 
   require("core.events").setup_autocmds()

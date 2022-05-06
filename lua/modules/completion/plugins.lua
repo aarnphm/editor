@@ -3,31 +3,29 @@ local conf = require("modules.completion.config")
 
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
+  opt = true,
   event = "BufReadPre",
-  module = "lspconfig",
   config = conf.nvim_lsp,
 }
 completion["folke/lua-dev.nvim"] = {
   opt = true,
 }
 completion["creativenull/efmls-configs-nvim"] = {
-  opt = true,
+  opt = false,
+  requires = "neovim/nvim-lspconfig",
 }
 completion["williamboman/nvim-lsp-installer"] = {
   opt = true,
+  after = "nvim-lspconfig",
 }
 completion["RishabhRD/nvim-lsputils"] = {
   opt = true,
+  after = "nvim-lspconfig",
   config = conf.nvim_lsputils,
 }
 completion["tami5/lspsaga.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
-}
-completion["kosayoda/nvim-lightbulb"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-  config = conf.lightbulb,
 }
 completion["ray-x/lsp_signature.nvim"] = {
   opt = true,

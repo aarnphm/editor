@@ -1,42 +1,7 @@
 local config = {}
 
 config.nvim_lsp = function()
-  require("modules.completion.lspconfig")
-end
-
-function config.lightbulb()
-  require("nvim-lightbulb").setup({
-    -- LSP client names to ignore
-    ignore = { "sumneko_lua", "null-ls" },
-    sign = {
-      enabled = true,
-      -- Priority of the gutter sign
-      priority = 10,
-    },
-    float = {
-      enabled = false,
-      -- Text to show in the popup float
-      text = "💡",
-      win_opts = {},
-    },
-    virtual_text = {
-      enabled = false,
-      -- Text to show at virtual text
-      text = "💡",
-      -- highlight mode to use for virtual text (replace, combine, blend), see :help nvim_buf_set_extmark() for reference
-      hl_mode = "replace",
-    },
-    status_text = {
-      enabled = false,
-      -- Text to provide when code actions are available
-      text = "💡",
-      -- Text to provide when no actions are available
-      text_unavailable = "",
-    },
-  })
-  vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
-  vim.cmd([[hi link LightBulbFloatWin YellowFloat]])
-  vim.cmd([[hi link LightBulbVirtualText YellowFloat]])
+  require("modules.completion.lsp")
 end
 
 config.cmp = function()
@@ -195,7 +160,7 @@ config.autopairs = function()
 end
 
 config.nvim_lsputils = function()
-  vim.cmd [[packadd lsputil]]
+  vim.cmd([[packadd lsputil]])
   if vim.fn.has("nvim-0.5.1") == 1 then
     vim.lsp.handlers["textDocument/codeAction"] = require("lsputil.codeAction").code_action_handler
     vim.lsp.handlers["textDocument/references"] = require("lsputil.locations").references_handler

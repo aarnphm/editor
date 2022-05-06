@@ -1,4 +1,5 @@
-vim.cmd([[packadd lspconfig]])
+require("modules.completion.formatting")
+
 vim.cmd([[packadd nvim-lsp-installer]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
@@ -6,35 +7,20 @@ vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packad efmls-configs-nvim]])
 
-require("modules.completion.formatting")
+local lsp_installer = require("nvim-lsp-installer")
+lsp_installer.setup({
+  ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "tsserver", "pyright" },
+  automatic_installation = true,
+  ui = {
+    icons = {
+      server_installed = "✓",
+      server_pending = "➜",
+      server_uninstalled = "✗",
+    },
+  },
+})
 
 local saga = require("lspsaga")
-local nvim_lsp = require("lspconfig")
-local efmls = require("efmls-configs")
-local lsp_installer = require("nvim-lsp-installer")
-
--- Include the servers you want to have installed by default below
-local to_be_installed = {
-  "bashls",
-  "pyright",
-  "sumneko_lua",
-  "dockerls",
-  "bashls",
-  "terraformls",
-  "elmls",
-  "jedi_language_server",
-  "gopls",
-  "efm",
-}
-
-for _, name in pairs(to_be_installed) do
-  local server_is_found, server = lsp_installer.get_server(name)
-  if server_is_found and not server:is_installed() then
-    vim.notify("Installing " .. name)
-    server:install()
-  end
-end
-
 -- Override diagnostics symbol
 saga.init_lsp_saga({
   error_sign = "",
@@ -49,15 +35,7 @@ saga.init_lsp_saga({
   },
 })
 
-lsp_installer.settings({
-  ui = {
-    icons = {
-      server_installed = "✓",
-      server_pending = "➜",
-      server_uninstalled = "✗",
-    },
-  },
-})
+local nvim_lsp = require("lspconfig")
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
@@ -105,94 +83,72 @@ local default_options = {
   flags = { debounce_text_changes = 150 },
 }
 
-local format_config = require("modules.completion.formatting").language_format()
-
-local servers = {
-  tsserver = {
-    root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
-  },
-  pyright = {
-    filetypes = { "python" },
-    init_options = {
-      formatters = {
-        black = {
-          command = "black",
-          args = { "--quiet", "-" },
-          rootPatterns = { "pyproject.toml" },
-        },
-        formatFiletypes = {
-          python = { "black" },
-        },
+nvim_lsp.pyright.setup({
+  capabilities = capabilities,
+  on_attach = on_editor_attach,
+  flags = { debounce_text_changes = 150 },
+  filetypes = { "python" },
+  init_options = {
+    formatters = {
+      black = {
+        command = "black",
+        args = { "--quiet", "-" },
+        rootPatterns = { "pyproject.toml" },
+      },
+      formatFiletypes = {
+        python = { "black" },
       },
     },
   },
-  rnix = {
-    cmd = { vim.fn.expand("$HOME/.nix-profile/bin/rnix-lsp") },
-  },
-  efm = {
-    filetypes = vim.tbl_keys(format_config),
-    init_options = { documentFormatting = true },
-    root_dir = nvim_lsp.util.root_pattern({ ".git/", "." }),
-    settings = { languages = format_config },
-  },
-  sumneko_lua = require("lua-dev").setup({
-    Lua = {
-      diagnostics = { globals = { "vim" } },
-      workspace = {
-        library = {
-          [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-          [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-        },
-        maxPreload = 100000,
-        preloadFileSize = 10000,
+})
+
+local lua_config = require("lua-dev").setup({
+  Lua = {
+    diagnostics = { globals = { "vim" } },
+    workspace = {
+      library = {
+        [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+        [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
       },
-      telemetry = { enable = false },
+      maxPreload = 100000,
+      preloadFileSize = 10000,
     },
-  }),
-}
+    telemetry = { enable = false },
+  },
+})
 
-local enhance_server_opts = {
-  ["tsserver"] = function(opts)
-    -- Disable `tsserver`'s format
-    opts.on_attach = function(client)
-      client.resolved_capabilities.document_formatting = false
-      on_editor_attach(client)
-    end
+nvim_lsp.sumneko_lua.setup(lua_config)
+
+nvim_lsp.tsserver.setup({
+  on_attach = function(client)
+    client.resolved_capabilities.document_formatting = false
+    on_editor_attach(client)
   end,
-  ["dockerls"] = function(opts)
-    -- Disable `dockerls`'s format
-    opts.on_attach = function(client)
-      client.resolved_capabilities.document_formatting = false
-      on_editor_attach(client)
-    end
+  root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
+})
+nvim_lsp.dockerls.setup({
+  on_attach = function(client)
+    client.resolved_capabilities.document_formatting = false
+    on_editor_attach(client)
   end,
-  ["gopls"] = function(opts)
-    opts.settings = {
-      gopls = {
-        usePlaceholders = true,
-        analyses = {
-          nilness = true,
-          shadow = true,
-          unusedparams = true,
-          unusewrites = true,
-        },
+})
+nvim_lsp.gopls.setup({
+  on_attach = function(client)
+    client.resolved_capabilities.document_formatting = false
+    on_editor_attach(client)
+  end,
+  settings = {
+    gopls = {
+      usePlaceholders = true,
+      analyses = {
+        nilness = true,
+        shadow = true,
+        unusedparams = true,
+        unusewrites = true,
       },
-    }
-    opts.on_attach = function(client)
-      on_editor_attach(client)
-    end
-  end,
-}
-
-lsp_installer.on_server_ready(function(server)
-  local opt = servers[server.name] or {}
-  opt = vim.tbl_deep_extend("force", {}, default_options, opt)
-  if enhance_server_opts[server.name] then
-    enhance_server_opts[server.name](opt)
-  end
-
-  server:setup(opt)
-end)
+    },
+  },
+})
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
 nvim_lsp.html.setup({
@@ -210,6 +166,7 @@ nvim_lsp.html.setup({
 })
 
 -- Init `efm-langserver` here.
+local efmls = require("efmls-configs")
 efmls.init({
   on_attach = on_editor_attach,
   capabilities = capabilities,

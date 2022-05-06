@@ -7,4 +7,6 @@ if exists then
   impatient.enable_profile()
 end
 
-require("core").setup()
+if not vim.g.vscode then
+  require("core").setup()
+end

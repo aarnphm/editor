@@ -24,21 +24,14 @@ tools["windwp/nvim-spectre"] = {
 }
 tools["tpope/vim-dispatch"] = { cmd = "Dispatch" }
 tools["wakatime/vim-wakatime"] = { opt = true }
--- tools["oberblastmeister/neuron.nvim"] = {
---   opt = true,
---   module = "neuron",
---   config = config.neuron,
---   after = "telescope.nvim",
---   requires = {
---     { "nvim-lua/popup.nvim", opt = true },
---     { "nvim-lua/plenary.nvim", opt = true },
---     { "nvim-telescope/telescope.nvim", opt = true },
---   },
--- }
 tools["nvim-telescope/telescope.nvim"] = {
+  opt = true,
   module = "telescope",
   cmd = "Telescope",
-  requires = { { "tami5/sqlite.lua" } },
+  requires = {
+    { "nvim-lua/plenary.nvim", opt = false },
+    { "nvim-lua/popup.nvim", opt = true },
+  },
   config = config.telescope,
 }
 tools["nvim-telescope/telescope-fzf-native.nvim"] = {
@@ -48,11 +41,12 @@ tools["nvim-telescope/telescope-fzf-native.nvim"] = {
 }
 tools["nvim-telescope/telescope-file-browser.nvim"] = {
   opt = true,
-  after = "telescope.nvim",
+  after = "telescope-fzf-native.nvim",
 }
 tools["nvim-telescope/telescope-frecency.nvim"] = {
   opt = true,
-  after = "telescope.nvim",
+  after = "telescope-file-browser.nvim",
+  requires = { { "tami5/sqlite.lua", opt = true } },
 }
 tools["nvim-telescope/telescope-ui-select.nvim"] = {
   opt = true,
