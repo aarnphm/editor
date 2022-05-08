@@ -68,20 +68,13 @@ local function on_editor_attach(client)
     handler_opts = { "double" },
   })
 
-  if client.resolved_capabilities.document_formatting then
+  if client.server_capabilities.document_formatting then
     vim.cmd([[augroup Format]])
     vim.cmd([[autocmd! * <buffer>]])
     vim.cmd([[autocmd BufWritePost <buffer> lua require'modules.completion.formatting'.format()]])
     vim.cmd([[augroup END]])
   end
 end
-
--- Override server settings here
-local default_options = {
-  capabilities = capabilities,
-  on_attach = on_editor_attach,
-  flags = { debounce_text_changes = 150 },
-}
 
 nvim_lsp.pyright.setup({
   capabilities = capabilities,
@@ -102,52 +95,16 @@ nvim_lsp.pyright.setup({
   },
 })
 
-local lua_config = require("lua-dev").setup({
-  Lua = {
-    diagnostics = { globals = { "vim" } },
-    workspace = {
-      library = {
-        [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-        [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-      },
-      maxPreload = 100000,
-      preloadFileSize = 10000,
-    },
-    telemetry = { enable = false },
-  },
-})
+local lua_config = require("lua-dev").setup({ })
 
 nvim_lsp.sumneko_lua.setup(lua_config)
 
 nvim_lsp.tsserver.setup({
   on_attach = function(client)
-    client.resolved_capabilities.document_formatting = false
+    client.server_capabilities.document_formatting = false
     on_editor_attach(client)
   end,
   root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
-})
-nvim_lsp.dockerls.setup({
-  on_attach = function(client)
-    client.resolved_capabilities.document_formatting = false
-    on_editor_attach(client)
-  end,
-})
-nvim_lsp.gopls.setup({
-  on_attach = function(client)
-    client.resolved_capabilities.document_formatting = false
-    on_editor_attach(client)
-  end,
-  settings = {
-    gopls = {
-      usePlaceholders = true,
-      analyses = {
-        nilness = true,
-        shadow = true,
-        unusedparams = true,
-        unusewrites = true,
-      },
-    },
-  },
 })
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin

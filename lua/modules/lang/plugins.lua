@@ -1,16 +1,16 @@
 local lang = {}
-local conf = require("modules.lang.config")
+local config = require("modules.lang.config")
 
 lang["fatih/vim-go"] = {
   opt = true,
   ft = "go",
   run = ":GoInstallBinaries",
-  config = conf.lang_go,
+  config = config.lang_go,
 }
 lang["simrat39/rust-tools.nvim"] = {
   opt = true,
   ft = "rust",
-  config = conf.rust_tools,
+  config = config.rust_tools,
   requires = "nvim-lua/plenary.nvim",
 }
 lang["mzlogin/vim-markdown-toc"] = {
@@ -23,5 +23,5 @@ lang["iamcco/markdown-preview.nvim"] = {
   ft = "markdown",
   run = "cd app && yarn install",
 }
-lang["lervag/vimtex"] = { opt = true, ft = "tex", config = conf.vimtex }
+lang["lervag/vimtex"] = { opt = true, ft = "tex", config = config.vimtex }
 return lang

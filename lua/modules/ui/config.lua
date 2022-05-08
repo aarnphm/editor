@@ -517,7 +517,6 @@ config.nvim_tree = function()
       height = 30,
       hide_root_folder = true,
       side = "left",
-      auto_resize = false,
       signcolumn = "yes",
     },
     trash = { cmd = "rip", require_confirm = true },
