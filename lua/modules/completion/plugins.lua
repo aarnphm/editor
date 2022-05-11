@@ -9,19 +9,20 @@ completion["neovim/nvim-lspconfig"] = {
 }
 completion["folke/lua-dev.nvim"] = {
   opt = true,
+  after = "nvim-lspconfig",
 }
 completion["creativenull/efmls-configs-nvim"] = {
   opt = false,
-  requires = "neovim/nvim-lspconfig",
+  requires = "nvim-lspconfig",
 }
 completion["williamboman/nvim-lsp-installer"] = {
   opt = true,
   after = "nvim-lspconfig",
 }
-completion["RishabhRD/nvim-lsputils"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-  config = conf.nvim_lsputils,
+completion["kevinhwang91/nvim-bqf"] = {
+	opt = true,
+	ft = "qf",
+	config = conf.bqf,
 }
 completion["tami5/lspsaga.nvim"] = {
   opt = true,
@@ -60,4 +61,5 @@ completion["windwp/nvim-autopairs"] = {
   after = "nvim-cmp",
   config = conf.autopairs,
 }
+
 return completion

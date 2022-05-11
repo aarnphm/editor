@@ -174,6 +174,7 @@ local preflight = function()
 end
 
 local setup_global_envars = function()
+  -- quick hack for install sqlite with nix
   vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
 end
 

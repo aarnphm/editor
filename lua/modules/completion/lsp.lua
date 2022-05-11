@@ -57,10 +57,10 @@ vim.lsp.handlers["textDocument/formatting"] = function(err, result, ctx)
   end
 end
 
-local function on_editor_attach(client)
+local on_editor_attach = function(client)
   require("lsp_signature").on_attach({
     bind = true,
-    use_lspsaga = true,
+    use_lspsaga = false,
     floating_window = true,
     fix_pos = true,
     hint_enable = true,
@@ -75,6 +75,35 @@ local function on_editor_attach(client)
     vim.cmd([[augroup END]])
   end
 end
+
+local contains = function(table, value)
+     for _, val in ipairs(table) do
+        if val == value then
+            return true
+        end
+    end
+
+    return false
+end
+
+local pre_defined_lsp = {"gopls", "pyright", "sumneko_lua", "tsserver", "html"}
+
+nvim_lsp.gopls.setup({
+  on_attach = on_editor_attach,
+  flags = { debounce_text_changes = 500 },
+  capabilities = capabilities,
+  settings = {
+    gopls = {
+      usePlaceholders = true,
+      analyses = {
+        nilness = true,
+        shadow = true,
+        unusedparams = true,
+        unusewrites = true,
+      },
+    },
+  },
+})
 
 nvim_lsp.pyright.setup({
   capabilities = capabilities,
@@ -121,6 +150,18 @@ nvim_lsp.html.setup({
   capabilities = capabilities,
   on_attach = on_editor_attach,
 })
+
+for _, server in ipairs(lsp_installer.get_installed_servers()) do
+  if not contains(pre_defined_lsp, server) then
+    nvim_lsp[server.name].setup({
+			capabilities = capabilities,
+			on_attach = function(client)
+				client.server_capabilities.document_formatting = false
+				on_editor_attach(client)
+			end,
+		})
+  end
+end
 
 -- Init `efm-langserver` here.
 local efmls = require("efmls-configs")

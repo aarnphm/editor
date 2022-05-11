@@ -57,7 +57,29 @@ config.nvim_treesitter = function()
 
   require("nvim-treesitter.configs").setup({
     -- 'all', 'maintained', or list of string
-    ensure_installed = { "python", "go", "lua" },
+    ensure_installed = {
+      			"bash",
+			"c",
+			"cpp",
+			"lua",
+			"go",
+			"gomod",
+      "rust",
+			"json",
+			"yaml",
+			"latex",
+      "lua",
+      "nix",
+			"make",
+			"python",
+			"rust",
+			"html",
+			"javascript",
+			"typescript",
+			"vue",
+			"css",
+    },
+    sync_install = false,
     incremental_selection = {
       enable = true,
       keymaps = {
