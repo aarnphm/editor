@@ -33,7 +33,7 @@ local packer_config = {
     end,
     prompt_border = "single",
   },
-  git = { clone_timeout = 60, default_url_format = "git@github.com:%s" },
+  git = { clone_timeout = 500, default_url_format = "git@github.com:%s" },
   auto_clean = true,
   compile_on_sync = true,
 }

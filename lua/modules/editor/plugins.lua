@@ -26,7 +26,7 @@ editor["simrat39/symbols-outline.nvim"] = {
 editor["nvim-treesitter/nvim-treesitter"] = {
   opt = true,
   run = ":TSUpdate",
-  event = { "BufRead", "BufNewFile" },
+  event = { "BufRead" },
   config = config.nvim_treesitter,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {

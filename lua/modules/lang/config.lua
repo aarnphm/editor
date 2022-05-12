@@ -97,9 +97,4 @@ endfunction
   ]])
 end
 
-config.lang_go = function()
-  vim.g.go_doc_keywordprg_enabled = false
-  vim.g.go_def_mapping_enabled = false
-end
-
 return config
