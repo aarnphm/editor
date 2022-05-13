@@ -20,9 +20,9 @@ completion["williamboman/nvim-lsp-installer"] = {
   after = "nvim-lspconfig",
 }
 completion["kevinhwang91/nvim-bqf"] = {
-	opt = true,
-	ft = "qf",
-	config = conf.bqf,
+  opt = true,
+  ft = "qf",
+  config = conf.bqf,
 }
 completion["tami5/lspsaga.nvim"] = {
   opt = true,

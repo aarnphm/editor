@@ -112,7 +112,7 @@ nvim_lsp.pyright.setup({
   },
 })
 
-local lua_config = require("lua-dev").setup({ })
+local lua_config = require("lua-dev").setup({})
 
 nvim_lsp.sumneko_lua.setup(lua_config)
 
