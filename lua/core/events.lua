@@ -93,6 +93,7 @@ M.setup_autocmds = function()
     ft = {
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
+      { "BufNewFile,BufRead", "Dockerfile.{tpl,template,tmpl}", "setf dockerfile" },
       { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", "setf dockerfile" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
