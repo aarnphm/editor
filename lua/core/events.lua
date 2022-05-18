@@ -37,25 +37,41 @@ end
 
 M.setup_autocmds = function()
   local definitions = {
+    packer = {},
     terms = {
       { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
     },
     bufs = {
-      { "BufWritePre", "COMMIT_EDITMSG", "setlocal noundofile" },
-      { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
-      { "BufWritePre", "*.tmp", "setlocal noundofile" },
-      { "BufWritePre", "*.bak", "setlocal noundofile" },
       {
         "BufEnter,WinEnter",
         "*",
         "lua set_tmux_keymaps()",
       },
       {
-        "BufEnter,BufRead,BufWinEnter,FileType,WinEnter",
+        "BufEnter,WinEnter",
         "*",
         'lua require("core.utils").hide_statusline()',
       },
       { "BufWritePost", "*.lua", "lua require'plugins' require('packer').compile()" },
+      -- Reload vim config automatically
+      {
+        "BufWritePost",
+        [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
+      },
+      -- Reload Vim script automatically if setlocal autoread
+      {
+        "BufWritePost,FileWritePost",
+        "*.vim",
+        [[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]],
+      },
+      { "BufWritePre", "/tmp/*", "setlocal noundofile" },
+      { "BufWritePre", "COMMIT_EDITMSG", "setlocal noundofile" },
+      { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
+      { "BufWritePre", "*.tmp", "setlocal noundofile" },
+      { "BufWritePre", "*.bak", "setlocal noundofile" },
+      -- auto change directory
+      { "BufEnter", "*", "silent! lcd %:p:h" },
+      -- auto place to last edit
       {
         "BufReadPost",
         "*",
@@ -91,6 +107,11 @@ M.setup_autocmds = function()
       { "VimResized", "*", [[tabdo wincmd =]] },
     },
     ft = {
+      { "FileType", "alpha", "set showtabline=0" },
+      { "FileType", "markdown", "set wrap" },
+      { "FileType", "make", "set noexpandtab shiftwidth=8 softtabstop=0" },
+      -- Google tab style
+      { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
       { "BufNewFile,BufRead", "Dockerfile.{tpl,template,tmpl}", "setf dockerfile" },

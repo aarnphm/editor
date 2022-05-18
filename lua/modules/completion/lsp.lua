@@ -1,4 +1,4 @@
-require("modules.completion.formatting")
+local formatting = require("modules.completion.formatting")
 
 vim.cmd([[packadd nvim-lsp-installer]])
 vim.cmd([[packadd lsp_signature.nvim]])
@@ -6,10 +6,11 @@ vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packad efmls-configs-nvim]])
+vim.cmd([[packadd vim-illuminate]])
 
 local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.setup({
-  ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "tsserver", "pyright" },
+  ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "tsserver", "pyright", "dockerls" },
   automatic_installation = true,
   ui = {
     icons = {
@@ -40,23 +41,6 @@ local nvim_lsp = require("lspconfig")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 
--- Override default format setting
-vim.lsp.handlers["textDocument/formatting"] = function(err, result, ctx)
-  if err ~= nil or result == nil then
-    return
-  end
-  if vim.api.nvim_buf_get_var(ctx.bufnr, "init_changedtick") == vim.api.nvim_buf_get_var(ctx.bufnr, "changedtick") then
-    local view = vim.fn.winsaveview()
-    vim.lsp.util.apply_text_edits(result, ctx.bufnr, "utf-16")
-    vim.fn.winrestview(view)
-    if ctx.bufnr == vim.api.nvim_get_current_buf() then
-      vim.b.saving_format = true
-      vim.cmd([[update]])
-      vim.b.saving_format = false
-    end
-  end
-end
-
 local on_editor_attach = function(client)
   require("lsp_signature").on_attach({
     bind = true,
@@ -67,62 +51,122 @@ local on_editor_attach = function(client)
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
+  require("illuminate").on_attach(client)
+end
 
-  if client.server_capabilities.document_formatting then
-    vim.cmd([[augroup Format]])
-    vim.cmd([[autocmd! * <buffer>]])
-    vim.cmd([[autocmd BufWritePost <buffer> lua require'modules.completion.formatting'.format()]])
-    vim.cmd([[augroup END]])
+-- C server
+local switch_source_header_splitcmd = function(bufnr, splitcmd)
+  bufnr = nvim_lsp.util.validate_bufnr(bufnr)
+  local clangd_client = nvim_lsp.util.get_active_client_by_name(bufnr, "clangd")
+  local params = { uri = vim.uri_from_bufnr(bufnr) }
+  if clangd_client then
+    clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
+      if err then
+        error(tostring(err))
+      end
+      if not result then
+        print("Corresponding file can’t be determined")
+        return
+      end
+      vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
+    end)
+  else
+    print("method textDocument/switchSourceHeader is not supported by any servers active on the current buffer")
   end
 end
 
-nvim_lsp.gopls.setup({
-  on_attach = on_editor_attach,
-  flags = { debounce_text_changes = 500 },
-  capabilities = capabilities,
-  settings = {
-    gopls = {
-      usePlaceholders = true,
-      analyses = {
-        nilness = true,
-        shadow = true,
-        unusedparams = true,
-        unusewrites = true,
+for _, server in ipairs(lsp_installer.get_installed_servers()) do
+  if server.name == "gopls" then
+    nvim_lsp.gopls.setup({
+      on_attach = on_editor_attach,
+      flags = { debounce_text_changes = 500 },
+      capabilities = capabilities,
+      cmd = { "gopls", "-remote=auto" },
+      settings = {
+        gopls = {
+          usePlaceholders = true,
+          analyses = {
+            nilness = true,
+            shadow = true,
+            unusedparams = true,
+            unusewrites = true,
+          },
+        },
       },
-    },
-  },
-})
-
-nvim_lsp.pyright.setup({
-  capabilities = capabilities,
-  on_attach = on_editor_attach,
-  flags = { debounce_text_changes = 150 },
-  filetypes = { "python" },
-  init_options = {
-    formatters = {
-      black = {
-        command = "black",
-        args = { "--quiet", "-" },
-        rootPatterns = { "pyproject.toml" },
+    })
+  elseif server.name == "pyright" then
+    nvim_lsp.pyright.setup({
+      capabilities = capabilities,
+      on_attach = on_editor_attach,
+      flags = { debounce_text_changes = 150 },
+      filetypes = { "python" },
+      init_options = {
+        formatters = {
+          black = {
+            command = "black",
+            args = { "--quiet", "-" },
+            rootPatterns = { "pyproject.toml" },
+          },
+          formatFiletypes = {
+            python = { "black" },
+          },
+        },
       },
-      formatFiletypes = {
-        python = { "black" },
+    })
+  elseif server.name == "clangd" then
+    local c_capabilities = capabilities
+    c_capabilities.offsetEncoding = { "utf-16" }
+
+    nvim_lsp.clangd.setup({
+      capabilities = c_capabilities,
+      single_file_support = true,
+      on_attach = on_editor_attach,
+      args = {
+        "--background-index",
+        "-std=c++20",
+        "--pch-storage=memory",
+        "--clang-tidy",
+        "--suggest-missing-includes",
       },
-    },
-  },
-})
-
-local lua_config = require("lua-dev").setup({})
-
-nvim_lsp.sumneko_lua.setup(lua_config)
-
-nvim_lsp.tsserver.setup({
-  on_attach = function(client)
-    client.server_capabilities.document_formatting = false
-    on_editor_attach(client)
-  end,
-  root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
-})
+      commands = {
+        ClangdSwitchSourceHeader = {
+          function()
+            switch_source_header_splitcmd(0, "edit")
+          end,
+          description = "Open source/header in current buffer",
+        },
+        ClangdSwitchSourceHeaderVSplit = {
+          function()
+            switch_source_header_splitcmd(0, "vsplit")
+          end,
+          description = "Open source/header in a new vsplit",
+        },
+        ClangdSwitchSourceHeaderSplit = {
+          function()
+            switch_source_header_splitcmd(0, "split")
+          end,
+          description = "Open source/header in a new split",
+        },
+      },
+    })
+  elseif server.name == "sumneko_lua" then
+    local lua_config = require("lua-dev")
+    nvim_lsp.sumneko_lua.setup(lua_config.setup({}))
+  elseif server.name == "tsserver" then
+    nvim_lsp.tsserver.setup({
+      on_attach = function(client)
+        client.server_capabilities.document_formatting = false
+        on_editor_attach(client)
+      end,
+      root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
+    })
+  else
+    nvim_lsp[server.name].setup({
+      capabilities = capabilities,
+      on_attach = on_editor_attach,
+    })
+  end
+end
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
 nvim_lsp.html.setup({
@@ -149,11 +193,15 @@ efmls.init({
 
 -- Require `efmls-configs-nvim`'s config here
 
+local vint = require("efmls-configs.linters.vint")
+local clangtidy = require("efmls-configs.linters.clang_tidy")
 local eslint = require("efmls-configs.linters.eslint")
 local pylint = require("efmls-configs.linters.pylint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
 
 local black = require("efmls-configs.formatters.black")
+local luafmt = require("efmls-configs.formatters.stylua")
+local clangfmt = require("efmls-configs.formatters.clang_format")
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
 
@@ -161,8 +209,12 @@ local shfmt = require("efmls-configs.formatters.shfmt")
 
 -- Setup formatter and linter for efmls here
 efmls.setup({
-  vue = { formatter = prettier },
+  vim = { formatter = vint },
+  lua = { formatter = luafmt },
+  c = { formatter = clangfmt, linter = clangtidy },
+  cpp = { formatter = clangfmt, linter = clangtidy },
   python = { formatter = black, linter = pylint },
+  vue = { formatter = prettier },
   typescript = { formatter = prettier, linter = eslint },
   javascript = { formatter = prettier, linter = eslint },
   typescriptreact = { formatter = prettier, linter = eslint },
@@ -174,3 +226,4 @@ efmls.setup({
   sh = { formatter = shfmt, linter = shellcheck },
   markdown = { formatter = prettier },
 })
+formatting.configure_format_on_save()

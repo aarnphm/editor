@@ -65,14 +65,13 @@ config.nvim_treesitter = function()
       "go",
       "gomod",
       "rust",
+      "dockerfile",
       "json",
       "yaml",
       "latex",
-      "lua",
       "nix",
       "make",
       "python",
-      "rust",
       "html",
       "javascript",
       "typescript",
@@ -89,15 +88,9 @@ config.nvim_treesitter = function()
         node_decremental = "grm",
       },
     },
-    highlight = {
-      enable = true,
-      disable = function(lang, bufnr) -- Disable in large C++ buffers
-        return lang == "cpp" and vim.api.nvim_buf_line_count(bufnr) > 50000
-      end,
-    },
+    highlight = { enable = true },
     context_commentstring = { enable = true, enable_autocmd = false },
     matchup = { enable = true },
-    context = { enable = true, throttle = true },
     textobjects = {
       enable = true,
       select = {
@@ -132,9 +125,13 @@ config.nvim_treesitter = function()
     },
   })
 
-  local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+  require("nvim-treesitter.install").prefer_git = true
+  local parsers = require("nvim-treesitter.parsers").get_parser_configs()
+  for _, p in pairs(parsers) do
+    p.install_info.url = p.install_info.url:gsub("https://github.com/", "git@github.com:")
+  end
 
-  parser_config.markdown.filetype_to_parsername = "octo"
+  parsers.markdown.filetype_to_parsername = "octo"
 end
 
 config.autotag = function()
@@ -176,10 +173,6 @@ config.toggleterm = function()
     close_on_exit = true, -- close the terminal window when the process exits
     shell = vim.o.shell, -- change the default shell
   })
-end
-
-config.nvim_colorizer = function()
-  require("colorizer").setup({})
 end
 
 return config

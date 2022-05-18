@@ -44,13 +44,6 @@ local required_plugins = function(use)
   use({ "tpope/vim-sleuth" })
   use({ "tpope/vim-surround" })
   use({ "tpope/vim-commentary" })
-  use({
-    "glepnir/dashboard-nvim",
-    opt = true,
-    cond = function()
-      return #vim.api.nvim_list_uis() > 0
-    end,
-  })
 
   -- colorscheme
   require("themes").setup(use)

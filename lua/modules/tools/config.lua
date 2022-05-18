@@ -264,12 +264,28 @@ config.telescope = function()
   vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
 
+  local telescope_actions = require("telescope.actions.set")
+  local fixfolds = {
+    hidden = true,
+    attach_mappings = function(_)
+      telescope_actions.select:enhance({
+        post = function()
+          vim.cmd(":normal! zx")
+        end,
+      })
+      return true
+    end,
+  }
+
   local telescope_config = {
     defaults = {
+      initial_model = "insert",
+      scroll_strategy = "limit",
       prompt_prefix = "🔭 ",
       selection_caret = "» ",
+      results_title = false,
       layout_config = {
-        horizontal = { prompt_position = "bottom", results_width = 0.6 },
+        horizontal = { prompt_position = "bottom", results_width = 0.5 },
         vertical = { mirror = false },
       },
       file_previewer = require("telescope.previewers").vim_buffer_cat.new,
@@ -300,6 +316,14 @@ config.telescope = function()
         show_unindexed = true,
         ignore_patterns = { "*.git/*", "*/tmp/*" },
       },
+    },
+    pickers = {
+      buffers = fixfolds,
+      find_files = fixfolds,
+      git_files = fixfolds,
+      grep_string = fixfolds,
+      live_grep = fixfolds,
+      oldfiles = fixfolds,
     },
   }
 

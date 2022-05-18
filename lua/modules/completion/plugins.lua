@@ -1,11 +1,11 @@
 local completion = {}
-local conf = require("modules.completion.config")
+local config = require("modules.completion.config")
 
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
   opt = true,
   event = "BufReadPre",
-  config = conf.nvim_lsp,
+  config = config.nvim_lsp,
 }
 completion["folke/lua-dev.nvim"] = {
   opt = true,
@@ -16,13 +16,12 @@ completion["creativenull/efmls-configs-nvim"] = {
   requires = "nvim-lspconfig",
 }
 completion["williamboman/nvim-lsp-installer"] = {
-  opt = true,
-  after = "nvim-lspconfig",
+  opt = false,
 }
 completion["kevinhwang91/nvim-bqf"] = {
   opt = true,
   ft = "qf",
-  config = conf.bqf,
+  config = config.bqf,
 }
 completion["tami5/lspsaga.nvim"] = {
   opt = true,
@@ -41,15 +40,15 @@ completion["rafamadriz/friendly-snippets"] = {
 completion["L3MON4D3/LuaSnip"] = {
   after = "nvim-cmp",
   wants = "friendly-snippets",
-  config = conf.luasnip,
-  requires = { { "rafamadriz/friendly-snippets" } },
+  config = config.luasnip,
+  requires = "rafamadriz/friendly-snippets",
 }
 completion["hrsh7th/nvim-cmp"] = {
-  config = conf.cmp,
-  after = "friendly-snippets",
+  config = config.cmp,
+  event = "InsertEnter",
   requires = {
+    { "lukas-reineke/cmp-under-comparator" },
     { "saadparwaiz1/cmp_luasnip", after = "LuaSnip" },
-    { "lukas-reineke/cmp-under-comparator", after = "LuaSnip" },
     { "hrsh7th/cmp-nvim-lsp", after = "cmp_luasnip" },
     { "hrsh7th/cmp-nvim-lua", after = "cmp-nvim-lsp" },
     { "hrsh7th/cmp-path", after = "cmp-nvim-lua" },
@@ -59,7 +58,7 @@ completion["hrsh7th/nvim-cmp"] = {
 }
 completion["windwp/nvim-autopairs"] = {
   after = "nvim-cmp",
-  config = conf.autopairs,
+  config = config.autopairs,
 }
 
 return completion

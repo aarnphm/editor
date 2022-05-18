@@ -112,19 +112,20 @@ M.setup_mapping = function()
     ["n|<leader>cl"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
     -- Plugin Telescope
     ["n|<Leader>fr"] = map_cu("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
-    ["n|<Leader>fe"] = map_cu("DashboardFindHistory"):with_noremap():with_silent(),
-    ["n|<Leader>ff"] = map_cu("DashboardFindFile"):with_noremap():with_silent(),
-    ["n|<Leader>fw"] = map_cu("DashboardFindWord"):with_noremap():with_silent(),
-    ["n|<Leader>fn"] = map_cu("DashboardNewFile"):with_noremap():with_silent(),
+    ["n|<Leader>fe"] = map_cu("Telescope oldfiles"):with_noremap():with_silent(),
+    ["n|<Leader>ff"] = map_cu("Telescope find_files"):with_noremap():with_silent(),
+    ["n|<Leader>fw"] = map_cu("Telescope live_grep"):with_noremap():with_silent(),
+    ["n|<Leader>fn"] = map_cu("enew"):with_noremap():with_silent(),
     ["n|<Leader>fb"] = map_cu("Telescope file_browser"):with_noremap():with_silent(),
     ["n|<Leader>fg"] = map_cu("Telescope git_files"):with_noremap():with_silent(),
-    ["n|<Leader>ft"] = map_cu("Telescope live_grep"):with_noremap():with_silent(),
     ["n|<LocalLeader>km"] = map_cu("Telescope keymaps"):with_noremap():with_silent(),
     -- Plugin spectre
     ["n|<S-F6>"] = map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
     ["n|<Leader>sw"] = map_cr("lua require('spectre').open_visual({select_word=true})"):with_noremap():with_silent(),
     ["n|<Leader>s"] = map_cr("lua require('spectre').open_visual()"):with_noremap():with_silent(),
-    ["n|<Leader>sp"] = map_cr("lua require('spectre').open_file_search()"):with_noremap():with_silent(),
+    ["n|<Leader>sp"] = map_cr("lua require('spectre').open_file_search({select_word=true})")
+      :with_noremap()
+      :with_silent(),
     -- Plugin EasyAlign
     ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
     ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),

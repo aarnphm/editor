@@ -29,7 +29,6 @@ tools["nvim-telescope/telescope.nvim"] = {
   module = "telescope",
   cmd = "Telescope",
   requires = {
-    { "nvim-lua/plenary.nvim", opt = false },
     { "nvim-lua/popup.nvim", opt = true },
   },
   config = config.telescope,

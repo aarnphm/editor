@@ -11,22 +11,14 @@ ui["folke/which-key.nvim"] = {
 ui["nvim-lualine/lualine.nvim"] = {
   opt = true,
   config = config.lualine,
-  event = "BufRead",
-  after = "nvim-treesitter",
+  after = "fidget.nvim",
   cond = function()
     return __editor_config.plugins.statusline == "lualine"
   end,
 }
-ui["feline-nvim/feline.nvim"] = {
-  opt = true,
-  config = config.feline,
-  after = "nvim-treesitter",
-  cond = function()
-    return __editor_config.plugins.statusline == "feline"
-  end,
-}
 ui["j-hui/fidget.nvim"] = {
   opt = true,
+  after = "nvim-treesitter",
   config = function()
     require("fidget").setup({
       text = {
@@ -34,11 +26,18 @@ ui["j-hui/fidget.nvim"] = {
       },
     })
   end,
-  after = "nvim-treesitter",
+}
+ui["goolord/alpha-nvim"] = {
+  opt = true,
+  event = "BufWinEnter",
+  config = config.alpha,
+  cond = function()
+    return #vim.api.nvim_list_uis() > 0
+  end,
 }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
-  cmd = { "NvimTreeToggle", "NvimTreeOpen" },
+  cmd = { "NvimTreeToggle" },
   config = config.nvim_tree,
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
@@ -51,15 +50,14 @@ ui["lewis6991/gitsigns.nvim"] = {
   event = { "BufRead", "BufNewFile" },
   config = config.gitsigns,
 }
-ui["lukas-reineke/indent-blankline.nvim"] = {
-  opt = true,
-  event = "BufRead",
-  config = config.indent_blankline,
-}
 ui["akinsho/nvim-bufferline.lua"] = {
   opt = true,
   event = "BufRead",
   config = config.nvim_bufferline,
+}
+ui["mbbill/undotree"] = {
+  opt = true,
+  cmd = "UndotreeToggle",
 }
 
 return ui

@@ -22,10 +22,28 @@ editor["simrat39/symbols-outline.nvim"] = {
   cmd = { "SymbolsOutline", "SymbolsOutlineOpen" },
   config = config.symbols_outline,
 }
+editor["RRethy/vim-illuminate"] = {
+  event = "BufRead",
+  config = function()
+    vim.g.Illuminate_highlightUnderCursor = 0
+    vim.g.Illuminate_ftblacklist = {
+      "help",
+      "dashboard",
+      "alpha",
+      "packer",
+      "norg",
+      "DoomInfo",
+      "NvimTree",
+      "Outline",
+      "toggleterm",
+    }
+  end,
+}
 
 editor["nvim-treesitter/nvim-treesitter"] = {
+  opt = true,
   run = ":TSUpdate",
-  event = { "BufRead" },
+  event = "BufRead",
   config = config.nvim_treesitter,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
@@ -99,7 +117,9 @@ editor["akinsho/nvim-toggleterm.lua"] = {
 editor["norcalli/nvim-colorizer.lua"] = {
   opt = true,
   event = "BufRead",
-  config = config.nvim_colorizer,
+  config = function()
+    require("colorizer").setup({})
+  end,
 }
 editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,
