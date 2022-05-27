@@ -208,20 +208,15 @@ end
 config.nvim_tree = function()
   vim.g.nvim_tree_root_folder_modifier = table.concat({ ":t:gs?$?/..", string.rep(" ", 1000), "?:gs?^??" })
   require("nvim-tree").setup({
-    disable_netrw = true,
-    hijack_netrw = true,
-    open_on_setup = false,
-    open_on_tab = false,
-    ignore_ft_on_setup = { "dashboard" },
-    hijack_cursor = true,
-    update_cwd = false,
+    ignore_ft_on_setup = { "alpha" },
+    reload_on_bufenter = true,
     diagnostics = {
       enable = false,
       icons = { hint = "", info = "", warning = "", error = "" },
     },
     update_focused_file = {
       enable = true,
-      update_cwd = true,
+      update_cwd = false,
       ignore_list = {},
     },
     system_open = { cmd = nil, args = {} },
@@ -230,9 +225,9 @@ config.nvim_tree = function()
     view = {
       width = 30,
       height = 30,
-      hide_root_folder = true,
       side = "left",
       signcolumn = "yes",
+      relativenumber = true,
     },
     trash = { cmd = "rip", require_confirm = true },
   })
