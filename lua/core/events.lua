@@ -120,6 +120,16 @@ M.setup_autocmds = function()
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
+      {
+        "FileType",
+        "*",
+        [[setlocal formatoptions-=cro]],
+      },
+      {
+        "FileType",
+        "c,cpp",
+        "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
+      },
     },
     yank = {
       {

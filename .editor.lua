@@ -1,6 +1,13 @@
+local vim = vim
+
 return {
   background = "dark",
   colorscheme = "kanagawa",
+  schemeopts = {
+    ["rose-pine"] = {
+      dark_variant = "moon",
+    },
+  },
   debug = true,
   options = {
     shadafile = "NONE",

@@ -1,9 +1,9 @@
 local config = {}
 
 config.rose_pine = function()
-  require("rose-pine").setup({
+  local base = {
     ---@usage 'main'|'moon'
-    dark_variant = "dawn",
+    dark_variant = "moon",
     bold_vert_split = false,
     dim_nc_background = false,
     disable_background = false,
@@ -32,7 +32,11 @@ config.rose_pine = function()
         h6 = "foam",
       },
     },
-  })
+  }
+  for k, v in pairs(__editor_config.schemeopts["rose-pine"]) do
+    base[k] = v
+  end
+  require("rose-pine").setup(base)
   vim.cmd([[silent! colorscheme rose-pine]])
 end
 
