@@ -35,7 +35,7 @@ local nvim_create_augroups = function(definitions)
   end
 end
 
-M.setup_autocmds = function()
+M.setup = function()
   local definitions = {
     packer = {},
     terms = {
@@ -142,5 +142,7 @@ M.setup_autocmds = function()
 
   nvim_create_augroups(definitions)
 end
+
+M.setup()
 
 return M

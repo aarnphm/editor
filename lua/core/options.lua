@@ -1,28 +1,17 @@
 local M = {}
 
-local bind_option = function(options)
-  for k, v in pairs(options) do
-    if v == true then
-      vim.cmd("set " .. k)
-    elseif v == false then
-      vim.cmd("set no" .. k)
-    else
-      vim.cmd("set " .. k .. "=" .. v)
-    end
-  end
-end
-
-M.setup_options = function()
-  local local_opt = {
+M.setup = function()
+  vim.cmd("set nocompatible")
+  local global_opt = {
     undofile = true,
     synmaxcol = 2500,
     formatoptions = "1jcroql",
     textwidth = 80,
-    expandtab = false,
+    expandtab = true,
     autoindent = true,
     tabstop = 4,
     shiftwidth = 4,
-    softtabstop = -1,
+    softtabstop = 4,
     breakindentopt = "shift:2,min:20",
     wrap = false,
     linebreak = true,
@@ -32,16 +21,12 @@ M.setup_options = function()
     signcolumn = "yes",
     conceallevel = 0,
     concealcursor = "niv",
-  }
-
-  bind_option(local_opt)
-
-  local global_opt = {
     title = false,
     pumblend = 0,
     termguicolors = true,
     backspace = "indent,eol,start",
-    complete = ".,w,b,k",
+    -- complete = ".,w,b,k",
+    complete = "",
     smarttab = true,
     nrformats = "bin,hex",
     timeout = true,
@@ -111,11 +96,13 @@ M.setup_options = function()
     cmdheight = 1,
     cmdwinheight = 5,
     equalalways = false,
+    laststatus = 2,
     display = "lastline",
     showbreak = "↳  ",
     listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←",
     winblend = 10,
     autowrite = true,
+    background = __editor_config.background,
   }
 
   vim.g.python3_host_prog = __editor_config.global.python3_host_prog
@@ -132,15 +119,8 @@ M.setup_options = function()
   for name, value in pairs(global_opt) do
     vim.o[name] = value
   end
-
-  vim.opt.background = __editor_config.background
-
-  --Defer loading shada until after startup_
-  vim.opt.shadafile = "NONE"
-  vim.schedule(function()
-    vim.opt.shadafile = __editor_config.options.shadafile
-    vim.cmd([[ silent! rsh ]])
-  end)
 end
+
+M.setup()
 
 return M

@@ -7,7 +7,7 @@ require("mapping.config")
 
 local M = {}
 
-M.setup_mapping = function()
+M.setup = function()
   -- default map
   local def_map = {
     -- Vim map
@@ -169,5 +169,7 @@ M.setup_mapping = function()
   nvim_load_mapping(def_map)
   nvim_load_mapping(plug_map)
 end
+
+M.setup()
 
 return M

@@ -8,17 +8,9 @@ ui["folke/which-key.nvim"] = {
     require("which-key").setup()
   end,
 }
-ui["nvim-lualine/lualine.nvim"] = {
-  opt = true,
-  config = config.lualine,
-  after = "fidget.nvim",
-  cond = function()
-    return __editor_config.plugins.statusline == "lualine"
-  end,
-}
 ui["j-hui/fidget.nvim"] = {
   opt = true,
-  after = "nvim-treesitter",
+  event = "BufRead",
   config = function()
     require("fidget").setup({
       text = {
@@ -34,6 +26,12 @@ ui["goolord/alpha-nvim"] = {
   cond = function()
     return #vim.api.nvim_list_uis() > 0
   end,
+}
+ui["nvim-lualine/lualine.nvim"] = { config = config.lualine, after = "nvim-gps" }
+ui["SmiteshP/nvim-gps"] = {
+  opt = true,
+  after = "nvim-treesitter",
+  config = config.nvim_gps,
 }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
@@ -51,8 +49,9 @@ ui["lewis6991/gitsigns.nvim"] = {
   config = config.gitsigns,
 }
 ui["akinsho/nvim-bufferline.lua"] = {
-  opt = true,
   event = "BufRead",
+  opt = true,
+  tag = "*",
   config = config.nvim_bufferline,
 }
 ui["mbbill/undotree"] = {

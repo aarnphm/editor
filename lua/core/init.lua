@@ -19,47 +19,8 @@ local create_dir = function()
   end
 end
 
-local dashboard_config = function()
-  vim.g.dashboard_default_executive = "telescope"
-  vim.g.dashboard_custom_footer = { "" }
-  vim.g.dashboard_disable_statusline = 1
-
-  vim.g.dashboard_custom_header = headers
-  vim.g.dashboard_custom_section = {
-    find_frecency = {
-      description = { "              comma f r" },
-      command = "Telescope frecency",
-    },
-    find_history = {
-      description = { " File history               comma f e" },
-      command = "DashboardFindHistory",
-    },
-    find_text = {
-      description = { " Find Text                  comma f t" },
-      command = "Telescope live_grep",
-    },
-    find_file = {
-      description = { " File find                  comma f f" },
-      command = "DashboardFindFile",
-    },
-    find_git = {
-      description = { " Find git files             comma f g" },
-      command = "Telescope git_files",
-    },
-    edit_config = {
-      description = { "         kplus e c" },
-      command = "e ~/.editor.lua",
-    },
-    edit_nvim_config = {
-      description = { "                kplus e r" },
-      command = "",
-    },
-  }
-end
-
 local preflight = function()
   create_dir()
-  dashboard_config()
 
   -- disable some builtin vim plugins
   local disabled_built_ins = {
@@ -115,9 +76,10 @@ M.setup = function()
   setup_global_envars()
   preflight()
 
-  require("core.events").setup_autocmds()
-  require("core.options").setup_options()
-  require("mapping").setup_mapping()
+  require("core.events")
+  require("core.options")
+  require("core.mappings")
+  vim.cmd("colorscheme " .. __editor_config.colorscheme)
 end
 
 return M

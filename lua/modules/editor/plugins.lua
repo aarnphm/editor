@@ -68,6 +68,82 @@ editor["windwp/nvim-ts-autotag"] = {
   after = "nvim-treesitter",
   config = config.autotag,
 }
+editor["renerocksai/telekasten.nvim"] = {
+  opt = true,
+  module = "telekasten",
+  config = config.telekasten,
+  requires = { "renerocksai/calendar-vim", opt = true, after = "telekasten", module = "telekasten" },
+}
+editor["windwp/nvim-spectre"] = {
+  module = "spectre",
+  config = config.spectre,
+}
+editor["tpope/vim-dispatch"] = { cmd = "Dispatch" }
+editor["wakatime/vim-wakatime"] = { opt = true }
+editor["nvim-telescope/telescope.nvim"] = {
+  opt = true,
+  module = "telescope",
+  cmd = "Telescope",
+  requires = {
+    { "nvim-lua/popup.nvim", opt = true },
+  },
+  config = config.telescope,
+}
+editor["nvim-telescope/telescope-fzf-native.nvim"] = {
+  opt = true,
+  run = "make",
+  after = "telescope.nvim",
+}
+editor["nvim-telescope/telescope-file-browser.nvim"] = {
+  opt = true,
+  after = "telescope-fzf-native.nvim",
+}
+editor["nvim-telescope/telescope-frecency.nvim"] = {
+  opt = true,
+  after = "telescope-file-browser.nvim",
+  requires = { { "tami5/sqlite.lua", opt = true } },
+}
+editor["nvim-telescope/telescope-ui-select.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+}
+editor["xiyaowong/telescope-emoji.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+}
+editor["pwntester/octo.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+  config = config.octo,
+  cmd = "Octo",
+  module = "octo",
+  requires = {
+    "nvim-telescope/telescope.nvim",
+  },
+}
+editor["sudormrfbin/cheatsheet.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+  config = config.cheatsheet,
+}
+editor["gelguy/wilder.nvim"] = {
+  event = "CmdlineEnter",
+  config = config.wilder,
+  run = ":UpdateRemotePlugins",
+  requires = {
+    { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
+  },
+}
+editor["dstein64/vim-startuptime"] = {
+  opt = true,
+  cmd = "StartupTime",
+  disable = __editor_config.debug ~= true,
+}
+editor["folke/trouble.nvim"] = {
+  opt = true,
+  cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+  config = config.trouble,
+}
 editor["folke/twilight.nvim"] = {
   opt = true,
   config = function()

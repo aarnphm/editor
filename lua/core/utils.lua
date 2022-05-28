@@ -36,27 +36,6 @@ M.create_float_term = function()
   create_term(config)
 end
 
-M.install_treesitter = function()
-  vim.cmd([[packadd nvim-treesitter]])
-
-  local parser_dir = require("nvim-treesitter.utils").get_parser_install_dir()
-
-  local function is_installed(lang)
-    -- print(vim.fn.filereadable(require("nvim-treesitter.utils").get_parser_install_dir() .. __editor_global.path_sep .. vim.api.nvim_buf_get_option(0, "ft") .. ".so"))
-    return vim.fn.filereadable(parser_dir .. __editor_global.path_sep .. lang .. ".so") > 0
-  end
-
-  local buftype = vim.api.nvim_buf_get_option(0, "ft")
-
-  if vim.tbl_contains(hidden, buftype) then
-    return
-  end
-
-  if not is_installed(buftype) then
-    vim.cmd("TSInstall " .. buftype)
-  end
-end
-
 M.gitui = function()
   local config = {
     cmd = "gitui",

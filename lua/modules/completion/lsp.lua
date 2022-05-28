@@ -10,7 +10,7 @@ vim.cmd([[packadd vim-illuminate]])
 
 local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.setup({
-  ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "tsserver", "pyright", "dockerls" },
+  ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "tsserver", "pyright", "dockerls", "gopls" },
   automatic_installation = true,
   ui = {
     icons = {
@@ -40,8 +40,16 @@ local nvim_lsp = require("lspconfig")
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
+capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-local on_editor_attach = function(client)
+local on_editor_attach = function(client, bufnr)
+  local function buf_set_option(...)
+    vim.api.nvim_buf_set_option(bufnr, ...)
+  end
+
+  -- Enable completion triggered by <c-x><c-o>
+  buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+
   require("lsp_signature").on_attach({
     bind = true,
     use_lspsaga = false,

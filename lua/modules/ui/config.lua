@@ -153,58 +153,157 @@ config.alpha = function()
 end
 
 config.lualine = function()
-  local symbols_outline = {
-    sections = {
-      lualine_a = {},
-      lualine_b = {},
-      lualine_c = {},
-      lualine_x = {},
-      lualine_y = { "filetype", "location" },
-      lualine_z = { "mode" },
-    },
-    filetypes = { "Outline" },
+  local gps = require("nvim-gps")
+
+  local gps_content = function()
+    if gps.is_available() then
+      return gps.get_location()
+    else
+      return ""
+    end
+  end
+
+  local mini_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = { "location" },
   }
+  local simple_sections = {
+    lualine_a = { "mode" },
+    lualine_b = { "filetype" },
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = { "location" },
+  }
+  local aerial = {
+    sections = mini_sections,
+    filetypes = { "aerial" },
+  }
+  local dapui_scopes = {
+    sections = simple_sections,
+    filetypes = { "dapui_scopes" },
+  }
+
+  local dapui_breakpoints = {
+    sections = simple_sections,
+    filetypes = { "dapui_breakpoints" },
+  }
+
+  local dapui_stacks = {
+    sections = simple_sections,
+    filetypes = { "dapui_stacks" },
+  }
+
+  local dapui_watches = {
+    sections = simple_sections,
+    filetypes = { "dapui_watches" },
+  }
+  local python_venv = function()
+    local function env_cleanup(venv)
+      if string.find(venv, "/") then
+        local final_venv = venv
+        for w in venv:gmatch("([^/]+)") do
+          final_venv = w
+        end
+        venv = final_venv
+      end
+      return venv
+    end
+
+    if vim.bo.filetype == "python" then
+      local venv = os.getenv("CONDA_DEFAULT_ENV")
+      if venv then
+        return string.format("%s", env_cleanup(venv))
+      end
+      venv = os.getenv("VIRTUAL_ENV")
+      if venv then
+        return string.format("%s", env_cleanup(venv))
+      end
+    end
+    return ""
+  end
 
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = "auto",
+      theme = "rose-pine",
       disabled_filetypes = {},
       component_separators = "|",
       section_separators = { left = " ", right = " " },
     },
     sections = {
-      lualine_a = {},
-      lualine_b = {},
-      lualine_c = {},
+      lualine_a = { "mode" },
+      lualine_b = { { "branch" }, { "diff" } },
+      lualine_c = {
+        { gps_content, cond = gps.is_available },
+      },
       lualine_x = {
         {
           "diagnostics",
           sources = { "nvim_diagnostic" },
-          symbols = { error = "  ", warn = "  ", info = " " },
+          symbols = { error = " ", warn = " ", info = " " },
         },
       },
-      lualine_y = { "filetype", "branch", "diff", "location", { "fileformat", padding = 1 } },
-      lualine_z = { "mode" },
+      lualine_y = {
+        { "filetype", colored = true, icon_only = true },
+        { python_venv },
+        { "encoding" },
+        {
+          "fileformat",
+          icons_enabled = true,
+          padding = 1,
+        },
+      },
+      lualine_z = { "progress", "location" },
     },
     inactive_sections = {
       lualine_a = {},
       lualine_b = {},
-      lualine_c = {},
-      lualine_x = {},
+      lualine_c = { "filename" },
+      lualine_x = { "location" },
       lualine_y = {},
       lualine_z = {},
     },
     tabline = {},
     extensions = {
       "quickfix",
+      "nvim-tree",
       "toggleterm",
       "fugitive",
-      symbols_outline,
+      aerial,
+      dapui_scopes,
+      dapui_breakpoints,
+      dapui_stacks,
+      dapui_watches,
     },
   })
 end
 
+config.nvim_gps = function()
+  require("nvim-gps").setup({
+    icons = {
+      ["class-name"] = " ", -- Classes and class-like objects
+      ["function-name"] = " ", -- Functions
+      ["method-name"] = " ", -- Methods (functions inside class-like objects)
+    },
+    languages = {
+      -- You can disable any language individually here
+      ["c"] = true,
+      ["cpp"] = true,
+      ["go"] = true,
+      ["java"] = true,
+      ["javascript"] = true,
+      ["lua"] = true,
+      ["python"] = true,
+      ["rust"] = true,
+    },
+    separator = " > ",
+  })
+end
 config.nvim_tree = function()
   -- vim.g.nvim_tree_root_folder_modifier = table.concat({ ":t:gs?$?/..", string.rep(" ", 1000), "?:gs?^??" })
   vim.g.nvim_tree_root_folder_modifier = ":e"
@@ -377,7 +476,9 @@ config.gitsigns = function()
 end
 
 config.nvim_bufferline = function()
+  local highlights = require("rose-pine.plugins.bufferline")
   require("bufferline").setup({
+    highlights = highlights,
     options = {
       number = "none",
       modified_icon = "✥",
@@ -406,7 +507,6 @@ config.nvim_bufferline = function()
 end
 
 config.indent_blankline = function()
-  vim.opt.termguicolors = true
   vim.opt.list = true
   require("indent_blankline").setup({
     char = "│",
