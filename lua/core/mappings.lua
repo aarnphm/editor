@@ -1,1 +1,1 @@
-require("mapping")
+require("mapping").setup()

@@ -30,8 +30,8 @@ completion["github/copilot.vim"] = {
   after = "nvim-cmp",
 }
 completion["kevinhwang91/nvim-bqf"] = {
-  opt = true,
   ft = "qf",
+  cmd = { "BqfEnable", "BqfAutoToggle" },
   config = config.bqf,
 }
 completion["tami5/lspsaga.nvim"] = {
@@ -65,7 +65,11 @@ completion["hrsh7th/nvim-cmp"] = {
     { "hrsh7th/cmp-path", after = "cmp-nvim-lua" },
     { "hrsh7th/cmp-buffer", after = "cmp-path" },
     { "hrsh7th/cmp-cmdline", after = "cmp-buffer" },
+    { "hrsh7th/cmp-emoji", after = "cmp-buffer" },
+    { "andersevenrud/cmp-tmux", after = "cmp-buffer" },
     { "kdheepak/cmp-latex-symbols", after = "cmp-buffer", ft = "latex" },
+    { "f3fora/cmp-spell", after = "cmp-latex-symbols" },
+    { "tamago324/cmp-zsh", after = "cmp-buffer", ft = { "zsh", "zsh.gohtmltmpl" } },
   },
 }
 completion["windwp/nvim-autopairs"] = {

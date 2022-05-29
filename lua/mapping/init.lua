@@ -23,8 +23,8 @@ M.setup = function()
     ["n|<leader>vs"] = map_cmd(':vsplit <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
     ["n|<leader>s"] = map_cmd(':split <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
     ["n|<leader>te"] = map_cmd(':tabedit <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
-    ["n|<LocalLeader>["] = map_cr("vertical resize -5"):with_silent(),
-    ["n|<LocalLeader>]"] = map_cr("vertical resize +5"):with_silent(),
+    ["n|<LocalLeader>]"] = map_cr("vertical resize -5"):with_silent(),
+    ["n|<LocalLeader>["] = map_cr("vertical resize +5"):with_silent(),
     ["n|<LocalLeader>-"] = map_cr("resize -2"):with_silent(),
     ["n|<LocalLeader>="] = map_cr("resize +2"):with_silent(),
     ["n|<leader>o"] = map_cr("setlocal spell! spelllang=en_us"),
@@ -49,15 +49,15 @@ M.setup = function()
 
   local plug_map = {
     -- reload and edit config
-    ["n|<LocalLeader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
+    ["n|<LocalLeader>rl"] = map_cu("lua require('plugins') require('packer').sync()"):with_noremap():with_silent(),
     ["n|<LocalLeader>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),
     ["n|<LocalLeader>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<LocalLeader><LocalLeader>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
     -- Bufferline
-    ["n|<Space>j"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
-    ["n|<Space>k"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
+    ["n|<Space>l"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent(),
+    ["n|<Space>h"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
     ["n|<Space>bp"] = map_cr("BufferLinePick"):with_noremap():with_silent(),
     ["n|<Space>bc"] = map_cr("BufferLinePickClose"):with_noremap():with_silent(),
     ["n|<LocalLeader>be"] = map_cr("BufferLineSortByExtension"):with_noremap(),
@@ -106,19 +106,19 @@ M.setup = function()
     -- Plugin trouble
     ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
     ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
-    ["n|<leader>cd"] = map_cr("TroubleToggle lsp_document_diagnostics"):with_noremap():with_silent(),
-    ["n|<leader>cw"] = map_cr("TroubleToggle lsp_workspace_diagnostics"):with_noremap():with_silent(),
+    ["n|<leader>cd"] = map_cr("TroubleToggle document_diagnostics"):with_noremap():with_silent(),
+    ["n|<leader>cw"] = map_cr("TroubleToggle workspace_diagnostics"):with_noremap():with_silent(),
     ["n|<leader>cq"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
     ["n|<leader>cl"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
     -- Plugin Telescope
-    ["n|<Leader>fr"] = map_cu("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
-    ["n|<Leader>fe"] = map_cu("Telescope oldfiles"):with_noremap():with_silent(),
-    ["n|<Leader>ff"] = map_cu("Telescope find_files"):with_noremap():with_silent(),
-    ["n|<Leader>fw"] = map_cu("Telescope live_grep"):with_noremap():with_silent(),
+    ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
+    ["n|<Leader>fe"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
+    ["n|<Leader>ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
+    ["n|<Leader>fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<Leader>fn"] = map_cu("enew"):with_noremap():with_silent(),
-    ["n|<Leader>fb"] = map_cu("Telescope file_browser"):with_noremap():with_silent(),
-    ["n|<Leader>fg"] = map_cu("Telescope git_files"):with_noremap():with_silent(),
-    ["n|<LocalLeader>km"] = map_cu("Telescope keymaps"):with_noremap():with_silent(),
+    ["n|<Leader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
+    ["n|<Leader>fg"] = map_cmd("<cmd> Telescope git_files <CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),
     -- Plugin spectre
     ["n|<S-F6>"] = map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
     ["n|<Leader>sw"] = map_cr("lua require('spectre').open_visual({select_word=true})"):with_noremap():with_silent(),
@@ -169,7 +169,5 @@ M.setup = function()
   nvim_load_mapping(def_map)
   nvim_load_mapping(plug_map)
 end
-
-M.setup()
 
 return M

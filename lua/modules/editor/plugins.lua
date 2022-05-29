@@ -81,8 +81,6 @@ editor["windwp/nvim-spectre"] = {
 editor["tpope/vim-dispatch"] = { cmd = "Dispatch" }
 editor["wakatime/vim-wakatime"] = { opt = true }
 editor["nvim-telescope/telescope.nvim"] = {
-  opt = true,
-  module = "telescope",
   cmd = "Telescope",
   requires = {
     { "nvim-lua/popup.nvim", opt = true },

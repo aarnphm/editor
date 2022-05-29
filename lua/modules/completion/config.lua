@@ -82,6 +82,14 @@ config.cmp = function()
         border = border("CmpDocBorder"),
       },
     },
+    enabled = function()
+      local ctx = require("cmp.config.context")
+      if vim.api.nvim_get_mode() == "c" then
+        return true
+      else
+        return not ctx.in_treesitter_capture("comment") and not ctx.in_treesitter_capture("Comment")
+      end
+    end,
     sorting = {
       comparators = {
         cmp.config.compare.offset,
@@ -131,7 +139,11 @@ config.cmp = function()
           nvim_lsp = "[ LSP]",
           luasnip = "[ LSnip]",
           nvim_lua = "[ NvimLua]",
+          emoji = "[ Emoji]",
           path = "[~ Path]",
+          tmux = "[  Tmux]",
+          spell = "[  Spell]",
+          zsh = "[  Zsh]",
         })[entry.source.name]
 
         return vim_item
@@ -187,6 +199,10 @@ config.cmp = function()
       { name = "path" },
       { name = "buffer" },
       { name = "latex_symbols" },
+      { name = "tmux" },
+      { name = "spell" },
+      { name = "zsh" },
+      { name = "emoji" },
     },
   })
   -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
@@ -228,7 +244,7 @@ config.autopairs = function()
   cmp_autopairs.lisp[#cmp_autopairs.lisp + 1] = "racket"
 end
 
-function config.bqf()
+config.bqf = function()
   vim.cmd([[
     hi BqfPreviewBorder guifg=#F2CDCD ctermfg=71
     hi link BqfPreviewRange Search
@@ -242,7 +258,7 @@ function config.bqf()
       win_vheight = 12,
       delay_syntax = 80,
       border_chars = { "┃", "┃", "━", "━", "┏", "┓", "┗", "┛", "█" },
-      should_preview_cb = function(bufnr, qwinid)
+      should_preview_cb = function(bufnr, _)
         local ret = true
         local bufname = vim.api.nvim_buf_get_name(bufnr)
         local fsize = vim.fn.getfsize(bufname)

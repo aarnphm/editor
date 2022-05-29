@@ -51,7 +51,6 @@ ui["lewis6991/gitsigns.nvim"] = {
 ui["akinsho/nvim-bufferline.lua"] = {
   event = "BufRead",
   opt = true,
-  tag = "*",
   config = config.nvim_bufferline,
 }
 ui["mbbill/undotree"] = {

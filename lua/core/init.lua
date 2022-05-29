@@ -1,3 +1,5 @@
+local M = {}
+
 -- Create cache dir and subs dir
 local create_dir = function()
   local data_dir = {
@@ -19,42 +21,55 @@ local create_dir = function()
   end
 end
 
-local preflight = function()
-  create_dir()
+local setup_global_envars = function()
+  -- quick hack for install sqlite with nix
+  vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
+end
 
-  -- disable some builtin vim plugins
-  local disabled_built_ins = {
-    "2html_plugin",
-    "getscript",
-    "getscriptPlugin",
-    "gzip",
-    "logipat",
-    "netrw",
-    "netrwPlugin",
-    "netrwSettings",
-    "netrwFileHandlers",
-    "matchit",
-    "tar",
-    "tarPlugin",
-    "rrhelper",
-    "spellfile_plugin",
-    "vimball",
-    "vimballPlugin",
-    "zip",
-    "zipPlugin",
-  }
+local disable_distribution_plugins = function()
+  vim.g.did_load_filetypes = 1
+  vim.g.did_load_fzf = 1
+  vim.g.did_load_gtags = 1
+  vim.g.did_load_gzip = 1
+  vim.g.did_load_tar = 1
+  vim.g.did_load_tarPlugin = 1
+  vim.g.did_load_zip = 1
+  vim.g.did_load_zipPlugin = 1
+  vim.g.did_load_getscript = 1
+  vim.g.did_load_getscriptPlugin = 1
+  vim.g.did_load_vimball = 1
+  vim.g.did_load_vimballPlugin = 1
+  vim.g.did_load_matchit = 1
+  vim.g.did_load_matchparen = 1
+  vim.g.did_load_2html_plugin = 1
+  vim.g.did_load_logiPat = 1
+  vim.g.did_load_rrhelper = 1
+  vim.g.did_load_netrw = 1
+  vim.g.did_load_netrwPlugin = 1
+  vim.g.did_load_netrwSettings = 1
+  vim.g.did_load_netrwFileHandlers = 1
+end
 
-  for _, plugin in pairs(disabled_built_ins) do
-    vim.g["loaded_" .. plugin] = 1
+local check_conda = function()
+  local venv = os.getenv("CONDA_PREFIX")
+  if venv then
+    vim.g.python3_host_prog = venv .. "/bin/python"
+  elseif __editor_config.global.python3_host_prog then
+    vim.g.python3_host_prog = __editor_config.global.python3_host_prog
   end
+end
+
+M.setup = function()
+  setup_global_envars()
+  create_dir()
+  disable_distribution_plugins()
+  check_conda()
 
   vim.g.mapleader = ","
   vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
   vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
 
   vim.g.maplocalleader = "+"
-
-  vim.opt.background = __editor_config.background
 
   -- Add Packer commands because we are not loading it at startup
   vim.cmd("silent! command PackerClean lua require 'plugins' require('packer').clean()")
@@ -63,23 +78,10 @@ local preflight = function()
   vim.cmd("silent! command PackerStatus lua require 'plugins' require('packer').status()")
   vim.cmd("silent! command PackerSync lua require 'plugins' require('packer').sync()")
   vim.cmd("silent! command PackerUpdate lua require 'plugins' require('packer').update()")
-end
 
-local setup_global_envars = function()
-  -- quick hack for install sqlite with nix
-  vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
-end
-
-local M = {}
-
-M.setup = function()
-  setup_global_envars()
-  preflight()
-
-  require("core.events")
   require("core.options")
   require("core.mappings")
-  vim.cmd("colorscheme " .. __editor_config.colorscheme)
+  require("core.events")
 end
 
 return M

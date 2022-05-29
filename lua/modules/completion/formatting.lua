@@ -44,8 +44,7 @@ formatting.toggle_format_on_save = function()
   end
 end
 
-formatting.format_filter = function(clients)
-  return vim.tbl_filter(function(client)
+formatting.format_filter = function(client)
     local status_ok, formatting_supported = pcall(function()
       return client.supports_method("textDocument/formatting")
     end)
@@ -54,8 +53,7 @@ formatting.format_filter = function(clients)
     elseif client.name ~= "sumneko_lua" and client.name ~= "clangd" and client.name ~= "tsserver" then
       return status_ok and formatting_supported and client.name
     end
-  end, clients)
-end
+  end
 
 formatting.format = function(opts)
   if vim.lsp.buf.format then

@@ -23,6 +23,25 @@ _G.set_terminal_keymaps = function()
   vim.api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
 end
 
+local autocmd = vim.api.nvim_create_autocmd
+
+-- Disable statusline in dashboard
+autocmd("FileType", {
+  pattern = "alpha",
+  callback = function()
+    vim.opt.laststatus = 0
+    vim.opt.showtabline = 0
+  end,
+})
+
+autocmd("BufUnload", {
+  buffer = 0,
+  callback = function()
+    vim.opt.laststatus = 3
+    vim.opt.showtabline = 2
+  end,
+})
+
 local nvim_create_augroups = function(definitions)
   for group_name, definition in pairs(definitions) do
     vim.api.nvim_command("augroup " .. group_name)
@@ -52,8 +71,6 @@ M.setup = function()
         "*",
         'lua require("core.utils").hide_statusline()',
       },
-      { "BufWritePost", "*.lua", "lua require'plugins' require('packer').compile()" },
-      -- Reload vim config automatically
       {
         "BufWritePost",
         [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
@@ -82,6 +99,11 @@ M.setup = function()
         "*",
         [[++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]],
       },
+      {
+        "WinEnter",
+        "*",
+        [[++nested if winnr('$') == 1 && &buftype == "quickfix" | q | endif]],
+      },
     },
     wins = {
       -- Highlight current line only on focused window
@@ -107,7 +129,6 @@ M.setup = function()
       { "VimResized", "*", [[tabdo wincmd =]] },
     },
     ft = {
-      { "FileType", "alpha", "set showtabline=0" },
       { "FileType", "markdown", "set wrap" },
       { "FileType", "make", "set noexpandtab shiftwidth=8 softtabstop=0" },
       -- Google tab style

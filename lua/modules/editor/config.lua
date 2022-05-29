@@ -321,17 +321,7 @@ config.spectre = function()
 
     color_devicons = true,
     open_cmd = "vnew",
-    live_update = false, -- auto excute search again when you write any file in vim
-    -- stylua: ignore start
-    line_sep_start = "┌-----------------------------------------",
-    result_padding = "¦  ",
-    line_sep = "└-----------------------------------------",
-    -- stylua: ignore end
-    highlight = {
-      ui = "String",
-      search = "DiffChange",
-      replace = "DiffDelete",
-    },
+    live_update = true, -- auto excute search again when you write any file in vim
     mapping = {
       ["toggle_line"] = {
         map = "dd",
@@ -537,7 +527,6 @@ config.telescope = function()
       border = {},
       color_devicons = true,
       use_less = true,
-      set_env = { ["COLORTERM"] = "truecolor" },
     },
     extensions = {
       ["ui-select"] = {
@@ -782,9 +771,10 @@ config.trouble = function()
     },
     indent_lines = true, -- add an indent guide below the fold icons
     auto_open = false, -- automatically open the list when you have diagnostics
-    auto_close = false, -- automatically close the list when you have no diagnostics
+    auto_close = true, -- automatically close the list when you have no diagnostics
     auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
     auto_fold = false, -- automatically fold a file trouble list at creation
+    auto_jump = { "lsp_definitions" },
     signs = {
       -- icons / text used for a diagnostic
       error = "",

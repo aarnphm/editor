@@ -1,4 +1,3 @@
-local fn = vim.fn
 local present, packer = pcall(require, "plugins.packerInit")
 if not present then
   return false
@@ -6,7 +5,7 @@ end
 
 local get_plugins_list = function()
   local list = {}
-  local tmp = vim.split(fn.globpath(__editor_global.modules_dir, "*/plugins.lua"), "\n")
+  local tmp = vim.split(vim.fn.globpath(__editor_global.modules_dir, "*/plugins.lua"), "\n")
   for _, f in ipairs(tmp) do
     list[#list + 1] = f:sub(#__editor_global.modules_dir - 6, -1)
   end
@@ -15,8 +14,9 @@ end
 
 local get_plugins_mapping = function()
   local plugins = {}
+  local plugins_ = get_plugins_list()
 
-  for _, m in ipairs(get_plugins_list()) do
+  for _, m in ipairs(plugins_) do
     local repos = require(m:sub(0, #m - 4))
     for repo, conf in pairs(repos) do
       plugins[#plugins + 1] = vim.tbl_extend("force", { repo }, conf)
@@ -38,15 +38,23 @@ local required_plugins = function(use)
   use({ "wbthomason/packer.nvim", opt = true })
 
   use({ "kyazdani42/nvim-web-devicons" })
+
+  -- colorscheme
+  use({
+    "rose-pine/neovim",
+    as = "rose-pine",
+    tag = "v1.*",
+    config = function()
+      vim.cmd("colorscheme rose-pine")
+    end,
+  })
+
   use({ "stevearc/dressing.nvim", after = "nvim-web-devicons" })
 
   -- tpope
   use({ "tpope/vim-sleuth" })
   use({ "tpope/vim-surround" })
   use({ "tpope/vim-commentary" })
-
-  -- colorscheme
-  require("themes").setup(use)
 end
 
 return packer.startup(function(use)

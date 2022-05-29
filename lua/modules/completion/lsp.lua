@@ -158,8 +158,8 @@ for _, server in ipairs(lsp_installer.get_installed_servers()) do
       },
     })
   elseif server.name == "sumneko_lua" then
-    local lua_config = require("lua-dev")
-    nvim_lsp.sumneko_lua.setup(lua_config.setup({}))
+    local lua_config = require("lua-dev").setup()
+    nvim_lsp.sumneko_lua.setup(lua_config)
   elseif server.name == "tsserver" then
     nvim_lsp.tsserver.setup({
       on_attach = function(client)

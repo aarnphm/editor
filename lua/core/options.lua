@@ -102,7 +102,6 @@ M.setup = function()
     listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←",
     winblend = 10,
     autowrite = true,
-    background = __editor_config.background,
   }
 
   vim.g.python3_host_prog = __editor_config.global.python3_host_prog
@@ -119,6 +118,8 @@ M.setup = function()
   for name, value in pairs(global_opt) do
     vim.o[name] = value
   end
+
+  vim.o.background = __editor_config.background
 end
 
 M.setup()

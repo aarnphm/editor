@@ -1,12 +1,6 @@
 local M = {}
 local lazy = require("lazy")
 
-local hidden = {
-  "help",
-  "NvimTree",
-  "terminal",
-}
-
 local create_term = function(config)
   vim.cmd([[packadd toggleterm]])
   local ft = require("toggleterm.terminal").Terminal:new(config)
@@ -67,9 +61,15 @@ end
 M.reload = function()
   require("plugins")
   require("packer").sync()
-  require("packer").compile()
   vim.notify("Config reloaded and compiled.")
 end
+
+local hidden = {
+  "help",
+  "NvimTree",
+  "terminal",
+  "Scratch",
+}
 
 M.hide_statusline = function()
   local shown = {}
@@ -77,7 +77,7 @@ M.hide_statusline = function()
 
   -- shown table from config has the highest priority
   if vim.tbl_contains(shown, buftype) then
-    vim.api.nvim_set_option("laststatus", 2)
+    vim.api.nvim_set_option("laststatus", 3)
     return
   end
 
@@ -86,12 +86,7 @@ M.hide_statusline = function()
     return
   end
 
-  vim.api.nvim_set_option("laststatus", 2)
-
-  vim.cmd([[
-  autocmd FileType dashboard set showtabline=0 laststatus=0
-  autocmd WinLeave <buffer> set showtabline=2 laststatus=2
-  ]])
+  vim.api.nvim_set_option("laststatus", 3)
 end
 
 return M

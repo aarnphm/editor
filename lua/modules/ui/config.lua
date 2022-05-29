@@ -113,8 +113,9 @@ config.alpha = function()
     button("comma f e", "  File history", leader, "<cmd>Telescope oldfiles<cr>"),
     button("comma f w", "  Word find", leader, "<cmd>Telescope live_grep<cr>"),
     button("comma f f", "  File find", leader, "<cmd>Telescope find_files<cr>"),
-    button("kplus e c", "  edit local config", lleader, "<cmd>e ~/.editor.lua<cr>"),
-    button("kplus e r", "  NVIM config", lleader, "<cmd>lua require('core.utils').edit_root()<cr>"),
+    button("kplus e c", "  Editor", lleader, "<cmd>e ~/.editor.lua<cr>"),
+    button("kplus e r", "  NVIM access", lleader, "<cmd>lua require('core.utils').edit_root()<cr>"),
+    button("kplus e s", "  Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
   }
 
   dashboard.section.buttons.opts.hl = "String"
@@ -476,9 +477,7 @@ config.gitsigns = function()
 end
 
 config.nvim_bufferline = function()
-  local highlights = require("rose-pine.plugins.bufferline")
   require("bufferline").setup({
-    highlights = highlights,
     options = {
       number = "none",
       modified_icon = "✥",
@@ -507,7 +506,6 @@ config.nvim_bufferline = function()
 end
 
 config.indent_blankline = function()
-  vim.opt.list = true
   require("indent_blankline").setup({
     char = "│",
     show_first_indent_level = true,
