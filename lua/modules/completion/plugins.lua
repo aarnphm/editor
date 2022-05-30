@@ -11,13 +11,8 @@ completion["folke/lua-dev.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
 }
-completion["creativenull/efmls-configs-nvim"] = {
-  opt = false,
-  requires = "nvim-lspconfig",
-}
-completion["williamboman/nvim-lsp-installer"] = {
-  opt = false,
-}
+completion["creativenull/efmls-configs-nvim"] = { opt = true, requires = "nvim-lspconfig" }
+completion["williamboman/nvim-lsp-installer"] = { opt = true }
 completion["github/copilot.vim"] = {
   setup = function()
     vim.g.copilot_no_tab_map = true
@@ -77,16 +72,6 @@ completion["windwp/nvim-autopairs"] = {
   config = config.autopairs,
 }
 
-completion["fatih/vim-go"] = {
-  opt = true,
-  ft = "go",
-  run = ":GoInstallBinaries",
-  config = function()
-    vim.g.go_doc_keywordprg_enabled = 0
-    vim.g.go_def_mapping_enabled = 0
-    vim.g.go_code_completion_enabled = 0
-  end,
-}
 completion["simrat39/rust-tools.nvim"] = {
   opt = true,
   ft = "rust",

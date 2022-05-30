@@ -113,6 +113,7 @@ config.alpha = function()
     button("comma f e", "  File history", leader, "<cmd>Telescope oldfiles<cr>"),
     button("comma f w", "  Word find", leader, "<cmd>Telescope live_grep<cr>"),
     button("comma f f", "  File find", leader, "<cmd>Telescope find_files<cr>"),
+    button("comma f g", "  Project find", leader, "<cmd>lua require('telescope').extensions.project.project{}<cr>"),
     button("kplus e c", "  Editor", lleader, "<cmd>e ~/.editor.lua<cr>"),
     button("kplus e r", "  NVIM access", lleader, "<cmd>lua require('core.utils').edit_root()<cr>"),
     button("kplus e s", "  Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
@@ -307,42 +308,14 @@ config.nvim_gps = function()
 end
 config.nvim_tree = function()
   -- vim.g.nvim_tree_root_folder_modifier = table.concat({ ":t:gs?$?/..", string.rep(" ", 1000), "?:gs?^??" })
-  vim.g.nvim_tree_root_folder_modifier = ":e"
-  vim.g.nvim_tree_icon_padding = " "
-  vim.g.nvim_tree_symlink_arror = "  "
-  vim.g.nvim_tree_respect_buf_cwd = 1
 
-  vim.g.nvim_tree_icons = {
-    ["default"] = "", --
-    ["symlink"] = "",
-    ["git"] = {
-      ["unstaged"] = "",
-      ["staged"] = "", --
-      ["unmerged"] = "שׂ",
-      ["renamed"] = "", --
-      ["untracked"] = "ﲉ",
-      ["deleted"] = "",
-      ["ignored"] = "", --◌
-    },
-    ["folder"] = {
-      -- ['arrow_open'] = "",
-      -- ['arrow_closed'] = "",
-      ["arrow_open"] = "",
-      ["arrow_closed"] = "",
-      ["default"] = "",
-      ["open"] = "",
-      ["empty"] = "",
-      ["empty_open"] = "",
-      ["symlink"] = "",
-      ["symlink_open"] = "",
-    },
-  }
   require("nvim-tree").setup({
     ignore_ft_on_setup = { "alpha" },
     auto_reload_on_write = true,
     disable_netrw = false,
     hijack_cursor = true,
     hijack_netrw = true,
+    respect_buf_cwd = true,
     hijack_unnamed_buffer_when_opening = false,
     ignore_buffer_on_setup = false,
     open_on_setup = false,
@@ -350,7 +323,7 @@ config.nvim_tree = function()
     open_on_tab = false,
     sort_by = "name",
     reload_on_bufenter = true,
-    update_cwd = true,
+    update_cwd = false,
     diagnostics = {
       enable = false,
       icons = { hint = "", info = "", warning = "", error = "" },
@@ -364,6 +337,34 @@ config.nvim_tree = function()
     filters = { dotfiles = false, custom = { ".DS_Store" } },
     git = { enable = true, ignore = true, timeout = 500 },
     renderer = {
+      root_folder_modifier = ":e",
+      icons = {
+        padding = " ",
+        symlink_arrow = "  ",
+        glyphs = {
+          ["default"] = "", --
+          ["symlink"] = "",
+          ["git"] = {
+            ["unstaged"] = "",
+            ["staged"] = "", --
+            ["unmerged"] = "שׂ",
+            ["renamed"] = "", --
+            ["untracked"] = "ﲉ",
+            ["deleted"] = "",
+            ["ignored"] = "", --◌
+          },
+          ["folder"] = {
+            ["arrow_open"] = "",
+            ["arrow_closed"] = "",
+            ["default"] = "",
+            ["open"] = "",
+            ["empty"] = "",
+            ["empty_open"] = "",
+            ["symlink"] = "",
+            ["symlink_open"] = "",
+          },
+        },
+      },
       indent_markers = {
         enable = true,
         icons = {

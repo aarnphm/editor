@@ -45,15 +45,20 @@ formatting.toggle_format_on_save = function()
 end
 
 formatting.format_filter = function(client)
-    local status_ok, formatting_supported = pcall(function()
-      return client.supports_method("textDocument/formatting")
-    end)
-    if status_ok and formatting_supported and client.name == "efm" then
-      return "efm"
-    elseif client.name ~= "sumneko_lua" and client.name ~= "clangd" and client.name ~= "tsserver" then
-      return status_ok and formatting_supported and client.name
-    end
+  local status_ok, formatting_supported = pcall(function()
+    return client.supports_method("textDocument/formatting")
+  end)
+  if status_ok and formatting_supported and client.name == "efm" then
+    return "efm"
+  elseif
+    client.name ~= "sumneko_lua"
+    and client.name ~= "clangd"
+    and client.name ~= "tsserver"
+    and client.name ~= "pyright"
+  then
+    return status_ok and formatting_supported and client.name
   end
+end
 
 formatting.format = function(opts)
   if vim.lsp.buf.format then

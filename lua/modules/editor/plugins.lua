@@ -36,6 +36,8 @@ editor["RRethy/vim-illuminate"] = {
       "NvimTree",
       "Outline",
       "toggleterm",
+      "Trouble",
+      "quickfix",
     }
   end,
 }
@@ -45,6 +47,28 @@ editor["nvim-treesitter/nvim-treesitter"] = {
   run = ":TSUpdate",
   event = "BufRead",
   config = config.nvim_treesitter,
+}
+editor["ThePrimeagen/refactoring.nvim"] = {
+  module = "refactoring",
+  after = "nvim-treesitter",
+  config = function()
+    require("refactoring").setup({
+      -- prompt for return type
+      prompt_func_return_type = {
+        go = true,
+        cpp = true,
+        c = true,
+        java = true,
+      },
+      -- prompt for function parameters
+      prompt_func_param_type = {
+        go = true,
+        cpp = true,
+        c = true,
+        java = true,
+      },
+    })
+  end,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
@@ -86,6 +110,10 @@ editor["nvim-telescope/telescope.nvim"] = {
     { "nvim-lua/popup.nvim", opt = true },
   },
   config = config.telescope,
+}
+editor["nvim-telescope/telescope-project.nvim"] = {
+  opt = true,
+  after = "telescope-fzf-native.nvim",
 }
 editor["nvim-telescope/telescope-fzf-native.nvim"] = {
   opt = true,

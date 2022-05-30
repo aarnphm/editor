@@ -61,6 +61,7 @@ end
 M.reload = function()
   require("plugins")
   require("packer").sync()
+  require("packer").compile()
   vim.notify("Config reloaded and compiled.")
 end
 
@@ -69,6 +70,8 @@ local hidden = {
   "NvimTree",
   "terminal",
   "Scratch",
+  "quickfix",
+  "Trouble",
 }
 
 M.hide_statusline = function()

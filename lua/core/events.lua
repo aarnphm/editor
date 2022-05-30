@@ -102,7 +102,7 @@ M.setup = function()
       {
         "WinEnter",
         "*",
-        [[++nested if winnr('$') == 1 && &buftype == "quickfix" | q | endif]],
+        [[if winnr('$') == 1 && &buftype == "quickfix" | q | endif]],
       },
     },
     wins = {
@@ -134,6 +134,7 @@ M.setup = function()
       -- Google tab style
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
+      { "BufNewFile,BufRead", "Bentfile", "setf dockerfile.yaml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
       { "BufNewFile,BufRead", "Dockerfile.{tpl,template,tmpl}", "setf dockerfile" },
       { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", "setf dockerfile" },

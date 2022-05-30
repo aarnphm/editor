@@ -5,7 +5,7 @@ vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd lua-dev.nvim]])
-vim.cmd([[packad efmls-configs-nvim]])
+vim.cmd([[packadd efmls-configs-nvim]])
 vim.cmd([[packadd vim-illuminate]])
 
 local lsp_installer = require("nvim-lsp-installer")
@@ -37,6 +37,50 @@ saga.init_lsp_saga({
 })
 
 local nvim_lsp = require("lspconfig")
+local configs = require("lspconfig.configs")
+
+local rnix_server = "rnix_macos"
+
+local servers = require("nvim-lsp-installer.servers")
+local installer_server = require("nvim-lsp-installer.server")
+
+-- setup rnix-lsp
+local root_dir = installer_server.get_server_root_path(rnix_server)
+
+configs[rnix_server] = {
+  default_config = {
+    cmd = { "rnix-lsp" },
+    filetypes = { "nix" },
+    root_dir = function(fname)
+      local util = require("lspconfig.util")
+      return util.find_git_ancestor(fname) or vim.loop.os_homedir()
+    end,
+    settings = {},
+    init_options = {},
+  },
+  docs = {
+    description = [[
+https://github.com/nix-community/rnix-lsp
+A language server for Nix providing basic completion and formatting via nixpkgs-fmt.
+To install manually, run `cargo install rnix-lsp`. If you are using nix, rnix-lsp is in nixpkgs.
+This server accepts configuration via the `settings` key.
+    ]],
+    default_config = {
+      root_dir = "vim's starting directory",
+    },
+  },
+}
+
+local noop_installer = function(server, callback, context) end
+
+local rnix_macos = installer_server.Server:new({
+  name = rnix_server,
+  root_dir = root_dir,
+  installer = noop_installer,
+  languages = { "nix" },
+})
+
+servers.register(rnix_macos)
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
@@ -204,10 +248,8 @@ efmls.init({
 local vint = require("efmls-configs.linters.vint")
 local clangtidy = require("efmls-configs.linters.clang_tidy")
 local eslint = require("efmls-configs.linters.eslint")
-local pylint = require("efmls-configs.linters.pylint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
 
-local black = require("efmls-configs.formatters.black")
 local luafmt = require("efmls-configs.formatters.stylua")
 local clangfmt = {
   formatCommand = "clang-format -style='{BasedOnStyle: LLVM}'",
@@ -224,7 +266,6 @@ efmls.setup({
   lua = { formatter = luafmt },
   c = { formatter = clangfmt, linter = clangtidy },
   cpp = { formatter = clangfmt, linter = clangtidy },
-  python = { formatter = black, linter = pylint },
   vue = { formatter = prettier },
   typescript = { formatter = prettier, linter = eslint },
   javascript = { formatter = prettier, linter = eslint },

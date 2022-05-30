@@ -49,7 +49,7 @@ M.setup = function()
 
   local plug_map = {
     -- reload and edit config
-    ["n|<LocalLeader>rl"] = map_cu("lua require('plugins') require('packer').sync()"):with_noremap():with_silent(),
+    ["n|<LocalLeader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
     ["n|<LocalLeader>er"] = map_cu("lua require('core.utils').edit_root()"):with_noremap():with_silent(),
     ["n|<LocalLeader>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
     -- jupyter_ascending
@@ -106,11 +106,12 @@ M.setup = function()
     -- Plugin trouble
     ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
     ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
-    ["n|<leader>cd"] = map_cr("TroubleToggle document_diagnostics"):with_noremap():with_silent(),
-    ["n|<leader>cw"] = map_cr("TroubleToggle workspace_diagnostics"):with_noremap():with_silent(),
-    ["n|<leader>cq"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
-    ["n|<leader>cl"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
+    ["n|<LocalLeader>dd"] = map_cr("TroubleToggle document_diagnostics"):with_noremap():with_silent(),
+    ["n|<LocalLeader>wd"] = map_cr("TroubleToggle workspace_diagnostics"):with_noremap():with_silent(),
+    ["n|<LocalLeader>qf"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
+    ["n|<LocalLeader>ll"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
     -- Plugin Telescope
+    ["n|<Leader>fp"] = map_cu("lua require('telescope').extensions.project.project{}"):with_noremap():with_silent(),
     ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
     ["n|<Leader>fe"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
     ["n|<Leader>ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
@@ -164,6 +165,26 @@ M.setup = function()
     ["i|<LocalLeader>z["] = map_cr("lua require('telekasten').insert_link({ i=true })"):with_noremap():with_silent(),
     ["i|<LocalLeader>z$"] = map_cr("lua require('telekasten').show_tags({i = true})"):with_noremap():with_silent(),
     ["i|<LocalLeader>zt"] = map_cr("lua require('telekasten').toggle_todo({ i=true })"):with_noremap():with_silent(),
+    -- refactoring
+    ["v|<LocalLeader>re"] = map_cr("lua require('refactoring').refactor('Extract Function')")
+      :with_noremap()
+      :with_silent(),
+    ["v|<LocalLeader>rf"] = map_cr("lua require('refactoring').refactor('Extract Function To File')")
+      :with_noremap()
+      :with_silent(),
+    ["v|<LocalLeader>rv"] = map_cr("lua require('refactoring').refactor('Extract Variable')")
+      :with_noremap()
+      :with_silent(),
+    ["v|<LocalLeader>ri"] = map_cr("lua require('refactoring').refactor('Inline Variable')")
+      :with_noremap()
+      :with_silent(),
+    ["n|<LocalLeader>rb"] = map_cr("lua require('refactoring').refactor('Extract Block')"):with_noremap():with_silent(),
+    ["n|<LocalLeader>rbf"] = map_cr("lua require('refactoring').refactor('Extract Block To File')")
+      :with_noremap()
+      :with_silent(),
+    ["n|<LocalLeader>ri"] = map_cr("lua require('refactoring').refactor('Inline Variable')")
+      :with_noremap()
+      :with_silent(),
   }
 
   nvim_load_mapping(def_map)
