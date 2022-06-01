@@ -115,8 +115,13 @@ config.alpha = function()
     button("comma f f", "  File find", leader, "<cmd>Telescope find_files<cr>"),
     button("comma f g", "  Project find", leader, "<cmd>lua require('telescope').extensions.project.project{}<cr>"),
     button("kplus e c", "  Editor", lleader, "<cmd>e ~/.editor.lua<cr>"),
-    button("kplus e r", "  NVIM access", lleader, "<cmd>lua require('core.utils').edit_root()<cr>"),
     button("kplus e s", "  Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
+    button(
+      "kplus e r",
+      "  NVIM access",
+      lleader,
+      "<cmd>lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files', {cwd = vim.fn.stdpath('config')})<cr>"
+    ),
   }
 
   dashboard.section.buttons.opts.hl = "String"
@@ -232,7 +237,7 @@ config.lualine = function()
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = "rose-pine",
+      theme = "auto",
       disabled_filetypes = {},
       component_separators = "|",
       section_separators = { left = " ", right = " " },

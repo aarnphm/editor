@@ -249,7 +249,9 @@ local vint = require("efmls-configs.linters.vint")
 local clangtidy = require("efmls-configs.linters.clang_tidy")
 local eslint = require("efmls-configs.linters.eslint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
+local pylint = require("efmls-configs.linters.pylint")
 
+local black = require("efmls-configs.formatters.black")
 local luafmt = require("efmls-configs.formatters.stylua")
 local clangfmt = {
   formatCommand = "clang-format -style='{BasedOnStyle: LLVM}'",
@@ -267,6 +269,7 @@ efmls.setup({
   c = { formatter = clangfmt, linter = clangtidy },
   cpp = { formatter = clangfmt, linter = clangtidy },
   vue = { formatter = prettier },
+  python = { formatter = black, linter = pylint },
   typescript = { formatter = prettier, linter = eslint },
   javascript = { formatter = prettier, linter = eslint },
   typescriptreact = { formatter = prettier, linter = eslint },

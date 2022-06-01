@@ -44,14 +44,19 @@ local required_plugins = function(use)
     "rose-pine/neovim",
     as = "rose-pine",
     tag = "v1.*",
+  })
+  use({
+    "catppuccin/nvim",
+    as = "catppuccin",
     config = function()
-      vim.cmd("colorscheme rose-pine")
+      vim.g.catppuccin_flavour = __editor_config.schemeopt.catppuccin.flavour
     end,
   })
 
   use({ "stevearc/dressing.nvim", after = "nvim-web-devicons" })
 
   -- tpope
+  use({ "tpope/vim-repeat" })
   use({ "tpope/vim-sleuth" })
   use({ "tpope/vim-surround" })
   use({ "tpope/vim-commentary" })

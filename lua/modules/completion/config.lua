@@ -143,7 +143,6 @@ config.cmp = function()
           path = "[~ Path]",
           tmux = "[  Tmux]",
           spell = "[  Spell]",
-          zsh = "[  Zsh]",
         })[entry.source.name]
 
         return vim_item
@@ -171,6 +170,22 @@ config.cmp = function()
         end,
         c = cmp.mapping.close(),
       }),
+      ["<C-j>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
+      ["<C-k>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
       ["<C-h>"] = function(fallback)
         if require("luasnip").jumpable(-1) then
           vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
@@ -201,7 +216,6 @@ config.cmp = function()
       { name = "latex_symbols" },
       { name = "tmux" },
       { name = "spell" },
-      { name = "zsh" },
       { name = "emoji" },
     },
   })

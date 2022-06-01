@@ -82,6 +82,8 @@ M.setup = function()
   require("core.options")
   require("core.mappings")
   require("core.events")
+
+  vim.cmd("colorscheme catppuccin")
 end
 
 return M

@@ -228,5 +228,9 @@ editor["untitled-ai/jupyter_ascending.vim"] = {
   ft = "ipynb",
   cmd = { "JupyterExecute", "JupyterExecuteAll" },
 }
+editor["pappasam/nvim-repl"] = {
+  opt = true,
+  cmd = { "ReplToggle", "ReplSendLine", "ReplSendVisual" },
+}
 
 return editor

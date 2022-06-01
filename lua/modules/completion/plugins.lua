@@ -64,7 +64,6 @@ completion["hrsh7th/nvim-cmp"] = {
     { "andersevenrud/cmp-tmux", after = "cmp-buffer" },
     { "kdheepak/cmp-latex-symbols", after = "cmp-buffer", ft = "latex" },
     { "f3fora/cmp-spell", after = "cmp-latex-symbols" },
-    { "tamago324/cmp-zsh", after = "cmp-buffer", ft = { "zsh", "zsh.gohtmltmpl" } },
   },
 }
 completion["windwp/nvim-autopairs"] = {

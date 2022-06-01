@@ -30,6 +30,33 @@ M.create_float_term = function()
   create_term(config)
 end
 
+M._split = function(s, delim)
+  local res = {}
+  for match in (s .. delim):gmatch("(.-)" .. delim) do
+    table.insert(res, match)
+  end
+  return res
+end
+
+M.exec_telescope = function(telescope_path, telescope_fn, opt)
+  vim.cmd([[packadd telescope]])
+  require("telescope").setup(telescope_config)
+
+  local dir = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+  if vim.v.shell_error ~= 0 then
+    dir = vim.lsp.get_active_clients()[1].config.root_dir
+  end
+
+  local opts = opt or {}
+  if not vim.tbl_contains(opts, "cwd") then
+    opts.cwd = dir
+  end
+
+  local mod = lazy.require_on_exported_call(telescope_path)
+
+  mod[telescope_fn](opts)
+end
+
 M.gitui = function()
   local config = {
     cmd = "gitui",
@@ -44,11 +71,6 @@ M.gitui = function()
     end,
   }
   create_term(config)
-end
-
-M.edit_root = function()
-  local files = lazy.require_on_exported_call("telescope.builtin.git").files
-  files({ cwd = vim.fn.stdpath("config") })
 end
 
 M.reset_cache = function()

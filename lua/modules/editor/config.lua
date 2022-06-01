@@ -603,6 +603,8 @@ config.telescope = function()
     },
   }
 
+  _G.telescope_config = telescope_config
+
   require("telescope").setup(telescope_config)
   require("telescope").load_extension("fzf")
   require("telescope").load_extension("project")
@@ -865,7 +867,7 @@ config.wilder = function()
   wilder.set_option(
     "renderer",
     wilder.renderer_mux({
-      -- [':'] = popupmenu_renderer,
+      [":"] = popupmenu_renderer,
       ["/"] = wildmenu_renderer,
       substitute = wildmenu_renderer,
     })
