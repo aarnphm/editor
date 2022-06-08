@@ -211,10 +211,19 @@ editor["andymass/vim-matchup"] = {
   after = "nvim-treesitter",
   config = config.matchup,
 }
+editor["romainl/vim-cool"] = {
+  opt = true,
+  event = { "CursorMoved", "InsertEnter" },
+}
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
   event = "BufRead",
   config = config.toggleterm,
+}
+editor["rmagatti/auto-session"] = {
+  opt = true,
+  cmd = { "SaveSession", "RestoreSession", "DeleteSession" },
+  config = config.auto_session,
 }
 editor["norcalli/nvim-colorizer.lua"] = {
   opt = true,

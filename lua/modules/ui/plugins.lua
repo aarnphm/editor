@@ -27,12 +27,12 @@ ui["goolord/alpha-nvim"] = {
     return #vim.api.nvim_list_uis() > 0
   end,
 }
-ui["nvim-lualine/lualine.nvim"] = { config = config.lualine, after = "nvim-gps" }
 ui["SmiteshP/nvim-gps"] = {
   opt = true,
   after = "nvim-treesitter",
   config = config.nvim_gps,
 }
+ui["nvim-lualine/lualine.nvim"] = { config = config.lualine, after = "nvim-gps" }
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle" },

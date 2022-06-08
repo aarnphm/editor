@@ -237,7 +237,7 @@ config.lualine = function()
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = "auto",
+      theme = __editor_config.theme,
       disabled_filetypes = {},
       component_separators = "|",
       section_separators = { left = " ", right = " " },
@@ -278,7 +278,6 @@ config.lualine = function()
     tabline = {},
     extensions = {
       "quickfix",
-      "nvim-tree",
       "toggleterm",
       "fugitive",
       aerial,
@@ -308,12 +307,10 @@ config.nvim_gps = function()
       ["python"] = true,
       ["rust"] = true,
     },
-    separator = " > ",
+    separator = " » ",
   })
 end
 config.nvim_tree = function()
-  -- vim.g.nvim_tree_root_folder_modifier = table.concat({ ":t:gs?$?/..", string.rep(" ", 1000), "?:gs?^??" })
-
   require("nvim-tree").setup({
     ignore_ft_on_setup = { "alpha" },
     auto_reload_on_write = true,
@@ -380,7 +377,7 @@ config.nvim_tree = function()
       },
     },
     view = {
-      width = 30,
+      width = 50,
       height = 30,
       side = "left",
       relativenumber = false,

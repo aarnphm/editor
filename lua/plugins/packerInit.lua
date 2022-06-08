@@ -39,7 +39,7 @@ local packer_config = {
 }
 
 if __editor_global.is_mac then
-  packer_config.max_jobs = 50
+  packer_config.max_jobs = 70
 end
 
 packer.init(packer_config)

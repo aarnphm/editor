@@ -10,7 +10,16 @@ vim.cmd([[packadd vim-illuminate]])
 
 local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.setup({
-  ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "tsserver", "pyright", "dockerls", "gopls" },
+  ensure_installed = {
+    "rust_analyzer",
+    "sumneko_lua",
+    "bashls",
+    "tsserver",
+    "pyright",
+    "dockerls",
+    "gopls",
+    "rnix",
+  },
   automatic_installation = true,
   ui = {
     icons = {
@@ -37,50 +46,6 @@ saga.init_lsp_saga({
 })
 
 local nvim_lsp = require("lspconfig")
-local configs = require("lspconfig.configs")
-
-local rnix_server = "rnix_macos"
-
-local servers = require("nvim-lsp-installer.servers")
-local installer_server = require("nvim-lsp-installer.server")
-
--- setup rnix-lsp
-local root_dir = installer_server.get_server_root_path(rnix_server)
-
-configs[rnix_server] = {
-  default_config = {
-    cmd = { "rnix-lsp" },
-    filetypes = { "nix" },
-    root_dir = function(fname)
-      local util = require("lspconfig.util")
-      return util.find_git_ancestor(fname) or vim.loop.os_homedir()
-    end,
-    settings = {},
-    init_options = {},
-  },
-  docs = {
-    description = [[
-https://github.com/nix-community/rnix-lsp
-A language server for Nix providing basic completion and formatting via nixpkgs-fmt.
-To install manually, run `cargo install rnix-lsp`. If you are using nix, rnix-lsp is in nixpkgs.
-This server accepts configuration via the `settings` key.
-    ]],
-    default_config = {
-      root_dir = "vim's starting directory",
-    },
-  },
-}
-
-local noop_installer = function(server, callback, context) end
-
-local rnix_macos = installer_server.Server:new({
-  name = rnix_server,
-  root_dir = root_dir,
-  installer = noop_installer,
-  languages = { "nix" },
-})
-
-servers.register(rnix_macos)
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)

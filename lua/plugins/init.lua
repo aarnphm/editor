@@ -208,7 +208,7 @@ local required_plugins = function(use)
     as = "catppuccin",
     config = function()
       require("catppuccin").setup({
-        transparent_background = false,
+        transparent_background = true,
         term_colors = true,
         styles = {
           comments = "italic",
@@ -242,14 +242,14 @@ local required_plugins = function(use)
           nvimtree = {
             enabled = true,
             show_root = true,
-            transparent_panel = false,
+            transparent_panel = true,
           },
           which_key = true,
           indent_blankline = {
             enabled = true,
-            colored_indent_levels = false,
+            colored_indent_levels = true,
           },
-          dashboard = true,
+          dashboard = false,
           neogit = false,
           vim_sneak = false,
           fern = false,

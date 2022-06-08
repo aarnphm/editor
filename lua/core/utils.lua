@@ -39,9 +39,6 @@ M._split = function(s, delim)
 end
 
 M.exec_telescope = function(telescope_path, telescope_fn, opt)
-  vim.cmd([[packadd telescope]])
-  require("telescope").setup(telescope_config)
-
   local dir = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
   if vim.v.shell_error ~= 0 then
     dir = vim.lsp.get_active_clients()[1].config.root_dir
@@ -49,6 +46,7 @@ M.exec_telescope = function(telescope_path, telescope_fn, opt)
 
   local opts = opt or {}
   if not vim.tbl_contains(opts, "cwd") then
+    print("hello")
     opts.cwd = dir
   end
 

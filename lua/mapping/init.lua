@@ -78,7 +78,7 @@ M.setup = function()
     ["n|<Space>pC"] = map_cu("lua require'plugins' require('packer').clean()"):with_noremap(),
     -- Lsp mapp work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
-    ["n|<leader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),
+    ["n|<LocalLeader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),
     ["n|g["] = map_cr("Lspsaga diagnostic_jump_next"):with_noremap():with_silent(),
     ["n|g]"] = map_cr("Lspsaga diagnostic_jump_prev"):with_noremap():with_silent(),
     ["n|gs"] = map_cr("Lspsaga signature_help"):with_noremap():with_silent(),
@@ -116,12 +116,14 @@ M.setup = function()
     ["n|<LocalLeader>er"] = map_cr(
       "lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files', {cwd = vim.fn.stdpath('config')})"
     ):with_noremap():with_silent(),
+    ["n|ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files')")
       :with_noremap()
       :with_silent(),
     ["n|<Leader>ff"] = map_cr(
       "lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files', {cwd = vim.fn.expand('%:p:h')})"
     ):with_noremap():with_silent(),
+    ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>fw"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.files', 'live_grep')")
       :with_noremap()
       :with_silent(),
