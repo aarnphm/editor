@@ -9,7 +9,7 @@ local options = {
 }
 
 -- Switch to buffer 'buf' on each window from list 'windows'
-local function switch_buffer(windows, buf)
+local switch_buffer = function(windows, buf)
   local cur_win = vim.fn.winnr()
   for _, winid in ipairs(windows) do
     vim.cmd(string.format("%d wincmd w", vim.fn.win_id2win(winid)))
@@ -19,7 +19,7 @@ local function switch_buffer(windows, buf)
 end
 
 -- Select the first buffer with a number greater than given buffer
-local function get_next_buf(buf)
+local get_next_buf = function(buf)
   local next = vim.fn.bufnr("#")
   if options.next == "alternate" and vim.fn.buflisted(next) == 1 then
     return next
@@ -32,8 +32,9 @@ local function get_next_buf(buf)
   end
 end
 
+
 -- Retrieve the buffer associated to the given name or number
-local function get_buf(bufexpr)
+local get_buf = function(bufexpr)
   if not bufexpr then -- return current buffer when 'bufexpr' is nil
     return vim.fn.bufnr()
   end
@@ -46,7 +47,7 @@ local function get_buf(bufexpr)
 end
 
 -- Delete given buffer, ignoring changes if 'force' is set
-local function delete_buffer(bufexpr, force)
+local delete_buffer = function(bufexpr, force)
   if #vim.fn.getbufinfo({ buflisted = 1 }) < 2 then
     if options.quit then
       -- exit when there is only one buffer left
@@ -80,7 +81,7 @@ local function delete_buffer(bufexpr, force)
   end
 end
 
-local function setup(user_options)
+local setup = function(user_options)
   if user_options then
     options = vim.tbl_extend("force", options, user_options)
   end
