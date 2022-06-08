@@ -11,7 +11,8 @@ M.setup = function()
   -- default map
   local def_map = {
     -- Vim map
-    ["n|C-x>"] = map_cr("lua require('bufdelete').delete_buffer()"):with_noremap():with_silent(),
+    ["n|<C-x>"] = map_cr("lua require('bufdelete').delete_buffer()"):with_noremap():with_silent(),
+    ["n|<Space>x"] = map_cr("lua require('bufdelete').delete_buffer()"):with_noremap():with_silent(),
     ["n|<C-s>"] = map_cu("write"):with_noremap(),
     ["n|Y"] = map_cmd("y$"),
     ["n|D"] = map_cmd("d$"),
