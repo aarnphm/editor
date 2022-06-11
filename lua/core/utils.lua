@@ -46,6 +46,7 @@ M.exec_telescope = function(telescope_path, telescope_fn, opt)
 
   local opts = opt or {}
   if not vim.tbl_contains(opts, "cwd") then
+    print(opts.cwd)
     opts.cwd = dir
   end
 

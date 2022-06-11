@@ -83,7 +83,7 @@ M.setup = function()
   require("core.mappings")
   require("core.events")
 
-  vim.cmd("silent! colorscheme catppuccin")
+  vim.cmd("silent! colorscheme " .. __editor_config.colorscheme)
 end
 
 return M
