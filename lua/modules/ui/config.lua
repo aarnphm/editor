@@ -312,7 +312,6 @@ config.nvim_gps = function()
 end
 config.nvim_tree = function()
   require("nvim-tree").setup({
-    ignore_ft_on_setup = { "alpha" },
     auto_reload_on_write = true,
     disable_netrw = false,
     hijack_cursor = true,
@@ -325,7 +324,7 @@ config.nvim_tree = function()
     open_on_tab = false,
     sort_by = "name",
     reload_on_bufenter = true,
-    update_cwd = false,
+    update_cwd = true,
     diagnostics = {
       enable = false,
       icons = { hint = "", info = "", warning = "", error = "" },
@@ -382,6 +381,11 @@ config.nvim_tree = function()
       side = "left",
       relativenumber = false,
       signcolumn = "yes",
+      preserve_window_proportions = false,
+      number = false,
+      relativenumber = false,
+      signcolumn = "yes",
+      hide_root_folder = false,
     },
     hijack_directories = {
       enable = true,

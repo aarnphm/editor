@@ -77,7 +77,7 @@ M.setup = function()
     ["n|<Space>pu"] = map_cu("lua require'plugins' require('packer').update()"):with_noremap(),
     ["n|<Space>pc"] = map_cu("lua require'plugins' require('packer').compile()"):with_noremap(),
     ["n|<Space>pC"] = map_cu("lua require'plugins' require('packer').clean()"):with_noremap(),
-    -- Lsp mapp work when insertenter and lsp start
+    -- Lsp map work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<LocalLeader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),
     ["n|g["] = map_cr("Lspsaga diagnostic_jump_next"):with_noremap():with_silent(),
@@ -101,6 +101,8 @@ M.setup = function()
     ["n|<C-n>"] = map_cr("NvimTreeToggle"):with_noremap():with_silent(),
     ["n|<Leader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
     ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
+    -- Satellite
+    ["n|<LocalLeader>sb"] = map_cr("SatelliteEnable"):with_noremap():with_silent(),
     -- Plugin octo
     ["n|<Leader>oc"] = map_cr("Octo"):with_noremap(),
     -- Plugin trouble

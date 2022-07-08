@@ -16,6 +16,13 @@ editor["alexghergh/nvim-tmux-navigation"] = {
     return vim.api.nvim_eval('exists("$TMUX")') ~= 0
   end,
 }
+editor["lewis6991/satellite.nvim"] = {
+  opt = true,
+  config = function()
+    require("satellite").setup()
+  end,
+  cmd = { "SatelliteEnable", "SatelliteDisable" },
+}
 
 editor["simrat39/symbols-outline.nvim"] = {
   opt = true,

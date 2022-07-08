@@ -1,14 +1,14 @@
 BENCHMARK (TEST 10 Times) (Unit: millisecond)
 =============================================
 ==== Test 1, Open empty buffer ==============
-Max elapse time: 36.20
-Min elapse time: 33.92
-Avg elapse time: 34.80
+Max elapse time: 27.73
+Min elapse time: 25.87
+Avg elapse time: 26.37
 ==== Test 2, Open markdown file =============
-Max elapse time: 231.68
-Min elapse time: 215.99
-Avg elapse time: 222.18
+Max elapse time: 171.32
+Min elapse time: 158.17
+Avg elapse time: 166.77
 ==== Test 3, Open Lua code ==================
-Max elapse time: 120.43
-Min elapse time: 113.68
-Avg elapse time: 117.53
+Max elapse time: 83.24
+Min elapse time: 81.56
+Avg elapse time: 82.24

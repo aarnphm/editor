@@ -32,7 +32,6 @@ local get_next_buf = function(buf)
   end
 end
 
-
 -- Retrieve the buffer associated to the given name or number
 local get_buf = function(bufexpr)
   if not bufexpr then -- return current buffer when 'bufexpr' is nil
