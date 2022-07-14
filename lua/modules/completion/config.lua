@@ -141,7 +141,6 @@ config.cmp = function()
           nvim_lua = "[ NvimLua]",
           emoji = "[ Emoji]",
           path = "[~ Path]",
-          tmux = "[  Tmux]",
           spell = "[  Spell]",
         })[entry.source.name]
 
@@ -214,28 +213,27 @@ config.cmp = function()
       { name = "path" },
       { name = "buffer" },
       { name = "latex_symbols" },
-      { name = "tmux" },
       { name = "spell" },
       { name = "emoji" },
     },
   })
   -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline("/", {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {
-      { name = "buffer" },
-    },
-  })
+  -- cmp.setup.cmdline("/", {
+  --   mapping = cmp.mapping.preset.cmdline(),
+  --   sources = {
+  --     { name = "buffer" },
+  --   },
+  -- })
 
   -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline(":", {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = cmp.config.sources({
-      { name = "path" },
-    }, {
-      { name = "cmdline" },
-    }),
-  })
+  -- cmp.setup.cmdline(":", {
+  --   mapping = cmp.mapping.preset.cmdline(),
+  --   sources = cmp.config.sources({
+  --     { name = "path" },
+  --   }, {
+  --     { name = "cmdline" },
+  --   }),
+  -- })
 end
 
 config.luasnip = function()
