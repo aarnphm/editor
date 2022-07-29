@@ -235,8 +235,8 @@ config.autopairs = function()
   })
 
   -- If you want insert `(` after select function or method item
-  local cmp_autopairs = require("nvim-autopairs.completion.cmp")
   local cmp = require("cmp")
+  local cmp_autopairs = require("nvim-autopairs.completion.cmp")
   local handlers = require("nvim-autopairs.completion.handlers")
   cmp.event:on(
     "confirm_done",
@@ -313,20 +313,14 @@ config.mason_install = function()
     ensure_installed = {
       -- you can turn off/on auto_update per tool
       "editorconfig-checker",
-
       "lua-language-server",
       "stylua",
-
       "black",
       "pylint",
-
       "prettier",
-      "eslint",
-
       "bash-language-server",
       "shellcheck",
       "shfmt",
-
       "vint",
     },
 

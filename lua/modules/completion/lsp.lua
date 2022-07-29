@@ -3,11 +3,11 @@ local formatting = require("modules.completion.formatting")
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
-vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packadd efmls-configs-nvim]])
 vim.cmd([[packadd vim-illuminate]])
 
 local nvim_lsp = require("lspconfig")
+local saga = require("lspsaga")
 local mason = require("mason")
 local mason_lsp = require("mason-lspconfig")
 
@@ -18,17 +18,14 @@ mason_lsp.setup({
     "rust_analyzer",
     "sumneko_lua",
     "clangd",
-    "gopls",
+    "bashls",
     "tsserver",
-    "pyright",
     "dockerls",
     "gopls",
     "rnix",
-    "bashls",
   },
 })
 
-local saga = require("lspsaga")
 -- Override diagnostics symbol
 saga.init_lsp_saga({
   error_sign = "",
@@ -89,7 +86,7 @@ local switch_source_header_splitcmd = function(bufnr, splitcmd)
 end
 
 for _, server in ipairs(mason_lsp.get_installed_servers()) do
-  if server == "gopls" then
+  if server.name == "gopls" then
     nvim_lsp.gopls.setup({
       on_attach = on_editor_attach,
       flags = { debounce_text_changes = 500 },
@@ -107,12 +104,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  elseif server.name == "sumneko_lua" then
-    if vim.fn.expand("%:p:h") == vim.fn.stdpath("config") then
-      local lua_config = require("lua-dev").setup()
-      nvim_lsp.sumneko_lua.setup(lua_config)
-    end
-  elseif server.name == "pyright" then
+  elseif server == "pyright" then
     nvim_lsp.pyright.setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,
@@ -131,7 +123,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  elseif server.name == "clangd" then
+  elseif server == "clangd" then
     local c_capabilities = capabilities
     c_capabilities.offsetEncoding = { "utf-16" }
 
@@ -167,6 +159,25 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
+  elseif server == "sumneko_lua" then
+    nvim_lsp.sumneko_lua.setup({
+      capabilities = capabilities,
+      on_attach = on_editor_attach,
+      settings = {
+        Lua = {
+          diagnostics = { globals = { "vim", "packer_plugins" } },
+          workspace = {
+            library = {
+              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+              [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+            },
+            maxPreload = 100000,
+            preloadFileSize = 10000,
+          },
+          telemetry = { enable = false },
+        },
+      },
+    })
   elseif server.name == "tsserver" then
     nvim_lsp.tsserver.setup({
       on_attach = function(client)
@@ -176,7 +187,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
       root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
     })
   else
-    nvim_lsp[server.name].setup({
+    nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,
     })
@@ -222,8 +233,6 @@ local clangfmt = {
 }
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
-
--- Override default config here
 
 -- Setup formatter and linter for efmls here
 efmls.setup({

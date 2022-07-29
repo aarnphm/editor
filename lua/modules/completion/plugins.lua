@@ -8,7 +8,6 @@ completion["neovim/nvim-lspconfig"] = {
   config = config.nvim_lsp,
 }
 completion["creativenull/efmls-configs-nvim"] = { opt = true, requires = "nvim-lspconfig" }
-completion["folke/lua-dev.nvim"] = { opt = true, after = "nvim-lspconfig" }
 completion["williamboman/mason.nvim"] = {
   requires = {
     { "williamboman/mason-lspconfig.nvim" },
