@@ -7,12 +7,14 @@ completion["neovim/nvim-lspconfig"] = {
   event = "BufReadPre",
   config = config.nvim_lsp,
 }
-completion["folke/lua-dev.nvim"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-}
 completion["creativenull/efmls-configs-nvim"] = { opt = true, requires = "nvim-lspconfig" }
-completion["williamboman/nvim-lsp-installer"] = { opt = true }
+completion["folke/lua-dev.nvim"] = { opt = true, after = "nvim-lspconfig" }
+completion["williamboman/mason.nvim"] = {
+  requires = {
+    { "williamboman/mason-lspconfig.nvim" },
+    { "WhoIsSethDaniel/mason-tool-installer.nvim", config = config.mason_install },
+  },
+}
 completion["github/copilot.vim"] = {
   setup = function()
     vim.g.copilot_no_tab_map = true
@@ -21,11 +23,7 @@ completion["github/copilot.vim"] = {
   end,
   after = "nvim-cmp",
 }
-completion["kevinhwang91/nvim-bqf"] = {
-  ft = "qf",
-  cmd = { "BqfEnable", "BqfAutoToggle" },
-  config = config.bqf,
-}
+completion["kevinhwang91/nvim-bqf"] = { ft = "qf", config = config.bqf }
 completion["tami5/lspsaga.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
@@ -36,13 +34,8 @@ completion["ray-x/lsp_signature.nvim"] = {
 }
 
 -- completion
-completion["rafamadriz/friendly-snippets"] = {
-  module = "cmp_nvim_lsp",
-  event = "InsertEnter",
-}
 completion["L3MON4D3/LuaSnip"] = {
   after = "nvim-cmp",
-  wants = "friendly-snippets",
   config = config.luasnip,
   requires = "rafamadriz/friendly-snippets",
 }

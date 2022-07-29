@@ -217,23 +217,6 @@ config.cmp = function()
       { name = "emoji" },
     },
   })
-  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-  -- cmp.setup.cmdline("/", {
-  --   mapping = cmp.mapping.preset.cmdline(),
-  --   sources = {
-  --     { name = "buffer" },
-  --   },
-  -- })
-
-  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-  -- cmp.setup.cmdline(":", {
-  --   mapping = cmp.mapping.preset.cmdline(),
-  --   sources = cmp.config.sources({
-  --     { name = "path" },
-  --   }, {
-  --     { name = "cmdline" },
-  --   }),
-  -- })
 end
 
 config.luasnip = function()
@@ -241,7 +224,9 @@ config.luasnip = function()
     history = true,
     updateevents = "TextChanged,TextChangedI",
   })
-  require("luasnip/loaders/from_vscode").load()
+  require("luasnip.loaders.from_lua").lazy_load()
+  require("luasnip.loaders.from_vscode").lazy_load()
+  require("luasnip.loaders.from_snipmate").lazy_load()
 end
 
 config.autopairs = function()
@@ -252,8 +237,26 @@ config.autopairs = function()
   -- If you want insert `(` after select function or method item
   local cmp_autopairs = require("nvim-autopairs.completion.cmp")
   local cmp = require("cmp")
-  cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done({ map_char = { tex = "" } }))
-  -- cmp_autopairs.lisp[#cmp_autopairs.lisp + 1] = "racket"
+  local handlers = require("nvim-autopairs.completion.handlers")
+  cmp.event:on(
+    "confirm_done",
+    cmp_autopairs.on_confirm_done({
+      filetypes = {
+        -- "*" is an alias to all filetypes
+        ["*"] = {
+          ["("] = {
+            kind = {
+              cmp.lsp.CompletionItemKind.Function,
+              cmp.lsp.CompletionItemKind.Method,
+            },
+            handler = handlers["*"],
+          },
+        },
+        -- Disable for tex
+        tex = false,
+      },
+    })
+  )
 end
 
 config.bqf = function()
@@ -299,6 +302,44 @@ config.bqf = function()
         extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
       },
     },
+  })
+end
+
+config.mason_install = function()
+  require("mason-tool-installer").setup({
+
+    -- a list of all tools you want to ensure are installed upon
+    -- start; they should be the names Mason uses for each tool
+    ensure_installed = {
+      -- you can turn off/on auto_update per tool
+      "editorconfig-checker",
+
+      "lua-language-server",
+      "stylua",
+
+      "black",
+      "pylint",
+
+      "prettier",
+      "eslint",
+
+      "bash-language-server",
+      "shellcheck",
+      "shfmt",
+
+      "vint",
+    },
+
+    -- if set to true this will check each tool for updates. If updates
+    -- are available the tool will be updated.
+    -- Default: false
+    auto_update = false,
+
+    -- automatically install / update on startup. If set to false nothing
+    -- will happen on startup. You can use `:MasonToolsUpdate` to install
+    -- tools and check for updates.
+    -- Default: true
+    run_on_start = true,
   })
 end
 

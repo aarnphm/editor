@@ -1,6 +1,5 @@
 local formatting = require("modules.completion.formatting")
 
-vim.cmd([[packadd nvim-lsp-installer]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
@@ -8,25 +7,24 @@ vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packadd efmls-configs-nvim]])
 vim.cmd([[packadd vim-illuminate]])
 
-local lsp_installer = require("nvim-lsp-installer")
-lsp_installer.setup({
+local nvim_lsp = require("lspconfig")
+local mason = require("mason")
+local mason_lsp = require("mason-lspconfig")
+
+mason.setup()
+mason_lsp.setup({
   ensure_installed = {
+    "efm",
     "rust_analyzer",
     "sumneko_lua",
-    "bashls",
+    "clangd",
+    "gopls",
     "tsserver",
     "pyright",
     "dockerls",
     "gopls",
     "rnix",
-  },
-  automatic_installation = true,
-  ui = {
-    icons = {
-      server_installed = "✓",
-      server_pending = "➜",
-      server_uninstalled = "✗",
-    },
+    "bashls",
   },
 })
 
@@ -44,8 +42,6 @@ saga.init_lsp_saga({
     quit = { "q", "<ESC>" },
   },
 })
-
-local nvim_lsp = require("lspconfig")
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
@@ -92,8 +88,8 @@ local switch_source_header_splitcmd = function(bufnr, splitcmd)
   end
 end
 
-for _, server in ipairs(lsp_installer.get_installed_servers()) do
-  if server.name == "gopls" then
+for _, server in ipairs(mason_lsp.get_installed_servers()) do
+  if server == "gopls" then
     nvim_lsp.gopls.setup({
       on_attach = on_editor_attach,
       flags = { debounce_text_changes = 500 },
@@ -111,6 +107,11 @@ for _, server in ipairs(lsp_installer.get_installed_servers()) do
         },
       },
     })
+  elseif server.name == "sumneko_lua" then
+    if vim.fn.expand("%:p:h") == vim.fn.stdpath("config") then
+      local lua_config = require("lua-dev").setup()
+      nvim_lsp.sumneko_lua.setup(lua_config)
+    end
   elseif server.name == "pyright" then
     nvim_lsp.pyright.setup({
       capabilities = capabilities,
@@ -166,11 +167,6 @@ for _, server in ipairs(lsp_installer.get_installed_servers()) do
         },
       },
     })
-  elseif server.name == "sumneko_lua" then
-    if vim.fn.expand("%:p:h") == vim.fn.stdpath("config") then
-      local lua_config = require("lua-dev").setup()
-      nvim_lsp.sumneko_lua.setup(lua_config)
-    end
   elseif server.name == "tsserver" then
     nvim_lsp.tsserver.setup({
       on_attach = function(client)

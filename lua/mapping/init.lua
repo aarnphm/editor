@@ -117,21 +117,25 @@ M.setup = function()
     ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
     ["n|<Leader>fo"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>er"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files', {cwd = vim.fn.stdpath('config')})"
+      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files', {cwd = vim.fn.stdpath('config')})"
     ):with_noremap():with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>ff"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files')")
+    ["n|<LocalLeader>ff"] = map_cr(
+      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files')"
+    )
       :with_noremap()
       :with_silent(),
     ["n|<Leader>ff"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files', {cwd = vim.fn.expand('%:p:h')})"
+      "lua require('core.utils').exec_telescope('telescope.builtin.find_files', 'find_files', {cwd = vim.fn.expand('%:p:h')})"
     ):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.files', 'live_grep')")
+    ["n|<LocalLeader>fw"] = map_cr(
+      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep')"
+    )
       :with_noremap()
       :with_silent(),
     ["n|<Leader>fw"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.files', 'live_grep', {cwd = vim.fn.expand('%:p:h')})"
+      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep', {cwd = vim.fn.expand('%:p:h')})"
     ):with_noremap():with_silent(),
     ["n|<Leader>fn"] = map_cu("enew"):with_noremap():with_silent(),
     ["n|<Leader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),

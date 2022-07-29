@@ -120,7 +120,7 @@ config.alpha = function()
       "kplus e r",
       "  NVIM access",
       lleader,
-      "<cmd>lua require('core.utils').exec_telescope('telescope.builtin.files', 'find_files', {cwd = vim.fn.stdpath('config')})<cr>"
+      "<cmd>lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files', {cwd = vim.fn.stdpath('config')})<cr>"
     ),
   }
 

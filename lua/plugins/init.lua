@@ -247,6 +247,11 @@ local required_plugins = function(use)
       require("catppuccin").setup({
         transparent_background = true,
         term_colors = true,
+        compile = {
+          enabled = true,
+          path = vim.fn.stdpath("cache") .. "/catppuccin",
+          suffix = "_compiled",
+        },
         styles = {
           comments = "italic",
           conditionals = "italic",
