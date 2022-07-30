@@ -132,6 +132,8 @@ M.setup = function()
       { "FileType", "markdown", "set wrap" },
       { "FileType", "make", "set noexpandtab shiftwidth=8 softtabstop=0" },
       -- Google tab style
+      { "BufNewFile,BufRead", "BUILD", "setf bzl" },
+      { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "Bentfile", "setf dockerfile.yaml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },

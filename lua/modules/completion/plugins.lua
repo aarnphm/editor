@@ -14,6 +14,7 @@ completion["williamboman/mason.nvim"] = {
     { "WhoIsSethDaniel/mason-tool-installer.nvim", config = config.mason_install },
   },
 }
+completion["folke/lua-dev.nvim"] = { opt = true, requires = "nvim-lspconfig" }
 completion["github/copilot.vim"] = {
   setup = function()
     vim.g.copilot_no_tab_map = true
@@ -75,5 +76,7 @@ completion["iamcco/markdown-preview.nvim"] = {
   run = "cd app && yarn install",
 }
 completion["lervag/vimtex"] = { opt = true, ft = "tex", config = config.vimtex }
+completion["google/vim-maktaba"] = { opt = true }
+completion["bazelbuild/vim-bazel"] = { opt = true, requires = "google/vim-maktaba", ft = "bzl" }
 
 return completion

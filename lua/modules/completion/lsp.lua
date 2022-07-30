@@ -1,5 +1,6 @@
 local formatting = require("modules.completion.formatting")
 
+vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
@@ -42,16 +43,8 @@ saga.init_lsp_saga({
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
-capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-local on_editor_attach = function(client, bufnr)
-  local function buf_set_option(...)
-    vim.api.nvim_buf_set_option(bufnr, ...)
-  end
-
-  -- Enable completion triggered by <c-x><c-o>
-  buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
-
+local on_editor_attach = function(client)
   require("lsp_signature").on_attach({
     bind = true,
     use_lspsaga = false,
@@ -160,24 +153,29 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
       },
     })
   elseif server == "sumneko_lua" then
-    nvim_lsp.sumneko_lua.setup({
-      capabilities = capabilities,
-      on_attach = on_editor_attach,
-      settings = {
-        Lua = {
-          diagnostics = { globals = { "vim", "packer_plugins" } },
-          workspace = {
-            library = {
-              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-              [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+    if vim.fn.expand("%:p:h") == vim.fn.stdpath("config") then
+      local lua_config = require("lua-dev").setup()
+      nvim_lsp.sumneko_lua.setup(lua_config)
+    else
+      nvim_lsp.sumneko_lua.setup({
+        capabilities = capabilities,
+        on_attach = on_editor_attach,
+        settings = {
+          Lua = {
+            diagnostics = { globals = { "vim", "packer_plugins" } },
+            workspace = {
+              library = {
+                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+              },
+              maxPreload = 100000,
+              preloadFileSize = 10000,
             },
-            maxPreload = 100000,
-            preloadFileSize = 10000,
+            telemetry = { enable = false },
           },
-          telemetry = { enable = false },
         },
-      },
-    })
+      })
+    end
   elseif server.name == "tsserver" then
     nvim_lsp.tsserver.setup({
       on_attach = function(client)
