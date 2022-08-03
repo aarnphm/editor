@@ -13,6 +13,17 @@ ui["karb94/neoscroll.nvim"] = {
     require("neoscroll").setup()
   end,
 }
+ui["j-hui/fidget.nvim"] = {
+  opt = true,
+  event = "BufRead",
+  config = function()
+    require("fidget").setup({
+      text = {
+        spinner = "dots",
+      },
+    })
+  end,
+}
 ui["goolord/alpha-nvim"] = {
   opt = true,
   event = "BufWinEnter",

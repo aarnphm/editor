@@ -320,6 +320,7 @@ config.mason_install = function()
       "dockerfile-language-server",
       "gopls",
       "rnix-lsp",
+      "pyright",
       "bash-language-server",
       "editorconfig-checker",
       "lua-language-server",
