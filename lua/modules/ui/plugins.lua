@@ -8,15 +8,9 @@ ui["folke/which-key.nvim"] = {
     require("which-key").setup()
   end,
 }
-ui["j-hui/fidget.nvim"] = {
-  opt = true,
-  event = "BufRead",
+ui["karb94/neoscroll.nvim"] = {
   config = function()
-    require("fidget").setup({
-      text = {
-        spinner = "dots",
-      },
-    })
+    require("neoscroll").setup()
   end,
 }
 ui["goolord/alpha-nvim"] = {

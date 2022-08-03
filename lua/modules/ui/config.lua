@@ -313,7 +313,7 @@ end
 config.nvim_tree = function()
   require("nvim-tree").setup({
     auto_reload_on_write = true,
-    disable_netrw = false,
+    disable_netrw = true,
     hijack_cursor = true,
     hijack_netrw = true,
     respect_buf_cwd = true,
@@ -379,8 +379,6 @@ config.nvim_tree = function()
       width = 30,
       height = 30,
       side = "left",
-      relativenumber = false,
-      signcolumn = "yes",
       preserve_window_proportions = false,
       number = false,
       relativenumber = false,

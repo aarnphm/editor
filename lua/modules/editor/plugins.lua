@@ -109,8 +109,6 @@ editor["windwp/nvim-spectre"] = {
   module = "spectre",
   config = config.spectre,
 }
-editor["tpope/vim-dispatch"] = { cmd = "Dispatch" }
-editor["wakatime/vim-wakatime"] = { opt = true }
 editor["nvim-telescope/telescope.nvim"] = {
   cmd = "Telescope",
   requires = {
