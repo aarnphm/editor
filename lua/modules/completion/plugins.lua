@@ -7,7 +7,7 @@ completion["neovim/nvim-lspconfig"] = {
   event = "BufReadPre",
   config = config.nvim_lsp,
 }
-completion["creativenull/efmls-configs-nvim"] = { opt = true, requires = "nvim-lspconfig" }
+completion["creativenull/efmls-configs-nvim"] = { opt = true, requires = "neovim/nvim-lspconfig" }
 completion["williamboman/mason.nvim"] = {
   requires = {
     { "williamboman/mason-lspconfig.nvim" },

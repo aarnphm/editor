@@ -312,13 +312,22 @@ config.mason_install = function()
     -- start; they should be the names Mason uses for each tool
     ensure_installed = {
       -- you can turn off/on auto_update per tool
+      "efm",
+      "rust-analyzer",
+      "clangd",
+      "deno",
+      "typescript-language-server",
+      "dockerfile-language-server",
+      "gopls",
+      "rnix-lsp",
+      "bash-language-server",
       "editorconfig-checker",
       "lua-language-server",
       "stylua",
+      "selene",
       "black",
       "pylint",
       "prettier",
-      "bash-language-server",
       "shellcheck",
       "shfmt",
       "vint",
@@ -327,7 +336,7 @@ config.mason_install = function()
     -- if set to true this will check each tool for updates. If updates
     -- are available the tool will be updated.
     -- Default: false
-    auto_update = false,
+    auto_update = true,
 
     -- automatically install / update on startup. If set to false nothing
     -- will happen on startup. You can use `:MasonToolsUpdate` to install
@@ -404,7 +413,7 @@ config.rust_tools = function()
     -- all the opts to send to nvim-lspconfig
     -- these override the defaults set by rust-tools.nvim
     -- see https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#rust_analyzer
-    server = {}, -- rust-analyer options
+    server = {}, -- rust-analyzer options
   }
 
   require("rust-tools").setup(opts)

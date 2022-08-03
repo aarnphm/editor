@@ -13,19 +13,7 @@ local mason = require("mason")
 local mason_lsp = require("mason-lspconfig")
 
 mason.setup()
-mason_lsp.setup({
-  ensure_installed = {
-    "efm",
-    "rust_analyzer",
-    "sumneko_lua",
-    "clangd",
-    "bashls",
-    "tsserver",
-    "dockerls",
-    "gopls",
-    "rnix",
-  },
-})
+mason_lsp.setup()
 
 -- Override diagnostics symbol
 saga.init_lsp_saga({
@@ -212,7 +200,7 @@ local efmls = require("efmls-configs")
 efmls.init({
   on_attach = on_editor_attach,
   capabilities = capabilities,
-  init_options = { documentFormatting = true, codeAction = true },
+  init_options = { documentFormatting = true },
 })
 
 -- Require `efmls-configs-nvim`'s config here

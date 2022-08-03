@@ -15,7 +15,7 @@ config.symbols_outline = function()
       close = "<Esc>",
       goto_location = "<Cr>",
       focus_location = "o",
-      hover_symbol = "<C-space>",
+      hover_symbol = "<C-h>",
       rename_symbol = "r",
       code_actions = "a",
     },

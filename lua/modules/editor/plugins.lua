@@ -16,13 +16,6 @@ editor["alexghergh/nvim-tmux-navigation"] = {
     return vim.api.nvim_eval('exists("$TMUX")') ~= 0
   end,
 }
-editor["lewis6991/satellite.nvim"] = {
-  opt = true,
-  config = function()
-    require("satellite").setup()
-  end,
-  cmd = { "SatelliteEnable", "SatelliteDisable" },
-}
 
 editor["simrat39/symbols-outline.nvim"] = {
   opt = true,
@@ -98,12 +91,6 @@ editor["windwp/nvim-ts-autotag"] = {
   ft = { "html", "xml" },
   after = "nvim-treesitter",
   config = config.autotag,
-}
-editor["renerocksai/telekasten.nvim"] = {
-  opt = true,
-  module = "telekasten",
-  config = config.telekasten,
-  requires = { "renerocksai/calendar-vim", opt = true, after = "telekasten", module = "telekasten" },
 }
 editor["windwp/nvim-spectre"] = {
   module = "spectre",
