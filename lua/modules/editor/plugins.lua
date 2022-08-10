@@ -17,11 +17,6 @@ editor["alexghergh/nvim-tmux-navigation"] = {
   end,
 }
 
-editor["simrat39/symbols-outline.nvim"] = {
-  opt = true,
-  cmd = { "SymbolsOutline", "SymbolsOutlineOpen" },
-  config = config.symbols_outline,
-}
 editor["RRethy/vim-illuminate"] = {
   event = "BufRead",
   config = function()
@@ -40,6 +35,13 @@ editor["RRethy/vim-illuminate"] = {
       "quickfix",
     }
   end,
+}
+
+editor["phaazon/hop.nvim"] = {
+  opt = true,
+  branch = "v2",
+  event = "BufReadPost",
+  config = config.hop,
 }
 
 editor["nvim-treesitter/nvim-treesitter"] = {
@@ -86,12 +88,6 @@ editor["mfussenegger/nvim-ts-hint-textobject"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["windwp/nvim-ts-autotag"] = {
-  opt = true,
-  ft = { "html", "xml" },
-  after = "nvim-treesitter",
-  config = config.autotag,
-}
 editor["windwp/nvim-spectre"] = {
   module = "spectre",
   config = config.spectre,
@@ -102,10 +98,6 @@ editor["nvim-telescope/telescope.nvim"] = {
     { "nvim-lua/popup.nvim", opt = true },
   },
   config = config.telescope,
-}
-editor["nvim-telescope/telescope-project.nvim"] = {
-  opt = true,
-  after = "telescope-fzf-native.nvim",
 }
 editor["nvim-telescope/telescope-fzf-native.nvim"] = {
   opt = true,

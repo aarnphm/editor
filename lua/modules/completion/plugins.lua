@@ -28,6 +28,16 @@ completion["tami5/lspsaga.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
 }
+completion["stevearc/aerial.nvim"] = {
+  opt = true,
+  after = "nvim-lspconfig",
+  config = config.aerial,
+}
+completion["kosayoda/nvim-lightbulb"] = {
+  opt = true,
+  after = "nvim-lspconfig",
+  config = config.lightbulb,
+}
 completion["ray-x/lsp_signature.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
@@ -58,7 +68,12 @@ completion["windwp/nvim-autopairs"] = {
   after = "nvim-cmp",
   config = config.autopairs,
 }
-
+completion["fatih/vim-go"] = {
+  opt = true,
+  ft = "go",
+  run = ":GoInstallBinaries",
+  config = config.golang,
+}
 completion["simrat39/rust-tools.nvim"] = {
   opt = true,
   ft = "rust",

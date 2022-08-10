@@ -1,56 +1,5 @@
 local config = {}
 
-config.symbols_outline = function()
-  require("symbols-outline").setup({
-    highlight_hovered_item = true,
-    width = 20,
-    show_guides = true,
-    auto_preview = true,
-    position = "right",
-    show_numbers = true,
-    show_relative_numbers = true,
-    show_symbol_details = true,
-    preview_bg_highlight = "Pmenu",
-    keymaps = {
-      close = "<Esc>",
-      goto_location = "<Cr>",
-      focus_location = "o",
-      hover_symbol = "<C-h>",
-      rename_symbol = "r",
-      code_actions = "a",
-    },
-    lsp_blacklist = {},
-    symbols = {
-      File = { icon = "", hl = "TSURI" },
-      Module = { icon = "", hl = "TSNamespace" },
-      Namespace = { icon = "", hl = "TSNamespace" },
-      Package = { icon = "", hl = "TSNamespace" },
-      Class = { icon = "𝓒", hl = "TSType" },
-      Method = { icon = "ƒ", hl = "TSMethod" },
-      Property = { icon = "", hl = "TSMethod" },
-      Field = { icon = "", hl = "TSField" },
-      Constructor = { icon = "", hl = "TSConstructor" },
-      Enum = { icon = "ℰ", hl = "TSType" },
-      Interface = { icon = "ﰮ", hl = "TSType" },
-      Function = { icon = "", hl = "TSFunction" },
-      Variable = { icon = "", hl = "TSConstant" },
-      Constant = { icon = "", hl = "TSConstant" },
-      String = { icon = "𝓐", hl = "TSString" },
-      Number = { icon = "#", hl = "TSNumber" },
-      Boolean = { icon = "⊨", hl = "TSBoolean" },
-      Array = { icon = "", hl = "TSConstant" },
-      Object = { icon = "⦿", hl = "TSType" },
-      Key = { icon = "🔐", hl = "TSType" },
-      Null = { icon = "NULL", hl = "TSType" },
-      EnumMember = { icon = "", hl = "TSField" },
-      Struct = { icon = "𝓢", hl = "TSType" },
-      Event = { icon = "🗲", hl = "TSType" },
-      Operator = { icon = "+", hl = "TSOperator" },
-      TypeParameter = { icon = "𝙏", hl = "TSParameter" },
-    },
-  })
-end
-
 config.nvim_treesitter = function()
   vim.cmd([[set foldmethod=expr]])
   vim.cmd([[set foldexpr=nvim_treesitter#foldexpr()]])
@@ -471,7 +420,6 @@ config.telescope = function()
   vim.cmd([[packadd sqlite.lua]])
   vim.cmd([[packadd telescope-fzf-native.nvim]])
   vim.cmd([[packadd telescope-file-browser.nvim]])
-  vim.cmd([[packadd telescope-project.nvim]])
   vim.cmd([[packadd telescope-frecency.nvim]])
   vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
@@ -622,7 +570,6 @@ config.telescope = function()
 
   require("telescope").setup(telescope_config)
   require("telescope").load_extension("fzf")
-  require("telescope").load_extension("project")
   require("telescope").load_extension("frecency")
   require("telescope").load_extension("ui-select")
   require("telescope").load_extension("file_browser")
@@ -821,6 +768,10 @@ config.cheatsheet = function()
       ["<C-E>"] = require("cheatsheet.telescope.actions").edit_user_cheatsheet,
     },
   })
+end
+
+config.hop = function()
+  require("hop").setup({ keys = "etovxqpdygfblzhckisuran" })
 end
 
 config.wilder = function()

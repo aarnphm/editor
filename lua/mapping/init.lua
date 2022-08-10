@@ -101,10 +101,8 @@ M.setup = function()
     ["n|<C-n>"] = map_cr("NvimTreeToggle"):with_noremap():with_silent(),
     ["n|<Leader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
     ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
-    -- Satellite
-    ["n|<LocalLeader>sb"] = map_cr("SatelliteEnable"):with_noremap():with_silent(),
     -- Plugin octo
-    ["n|<Leader>oc"] = map_cr("Octo"):with_noremap(),
+    ["n|<LocalLeader>oc"] = map_cr("Octo"):with_noremap(),
     -- Plugin trouble
     ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
     ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
@@ -113,7 +111,6 @@ M.setup = function()
     ["n|<LocalLeader>qf"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
     ["n|<LocalLeader>ll"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
     -- Plugin Telescope
-    ["n|<Leader>fp"] = map_cu("lua require('telescope').extensions.project.project{}"):with_noremap():with_silent(),
     ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
     ["n|<Leader>fo"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>er"] = map_cr(
@@ -148,44 +145,23 @@ M.setup = function()
     ["n|<Leader>sp"] = map_cr("lua require('spectre').open_file_search({select_word=true})")
       :with_noremap()
       :with_silent(),
+    -- Plugin Hop
+    ["n|<LocalLeader>w"] = map_cu("HopWord"):with_noremap(),
+    ["n|<LocalLeader>j"] = map_cu("HopLine"):with_noremap(),
+    ["n|<LocalLeader>k"] = map_cu("HopLine"):with_noremap(),
+    ["n|<LocalLeader>c"] = map_cu("HopChar1"):with_noremap(),
+    ["n|<LocalLeader>cc"] = map_cu("HopChar2"):with_noremap(),
     -- Plugin EasyAlign
     ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
     ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),
-    -- Plugin SymbolsOutline
-    ["n|so"] = map_cr("SymbolsOutlineOpen"):with_noremap():with_silent(),
-    ["n|sc"] = map_cr("SymbolsOutlineClose"):with_noremap():with_silent(),
+    -- Plugin Aerial
+    ["n|so"] = map_cr("AerialToggle! right"):with_noremap():with_silent(),
+    -- Plugin Undotree
+    ["n|<LocalLeader>u"] = map_cr("UndotreeToggle"):with_noremap():with_silent(),
     -- Plugin MarkdownPreview
     ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
     -- Plugin zen-mode
     ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
-    -- Plugins telekasten
-    ["n|<LocalLeader>zf"] = map_cr("lua require('telekasten').find_notes()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zd"] = map_cr("lua require('telekasten').find_daily_notes()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zg"] = map_cr("lua require('telekasten').search_notes()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zz"] = map_cr("lua require('telekasten').follow_link()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zT"] = map_cr("lua require('telekasten').goto_today()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zW"] = map_cr("lua require('telekasten').goto_thisweek()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zw"] = map_cr("lua require('telekasten').find_weekly_notes()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zn"] = map_cr("lua require('telekasten').new_note()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zN"] = map_cr("lua require('telekasten').new_templated_note()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zy"] = map_cr("lua require('telekasten').yank_notelink()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zc"] = map_cr("lua require('telekasten').show_calendar()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zC"] = map_cr("CalendarT"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zi"] = map_cr("lua require('telekasten').paste_img_and_link()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zt"] = map_cr("lua require('telekasten').toggle_todo()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zb"] = map_cr("lua require('telekasten').show_backlinks()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zI"] = map_cr("lua require('telekasten').insert_img_link({ i=true })")
-      :with_noremap()
-      :with_silent(),
-    ["n|<LocalLeader>zm"] = map_cr("lua require('telekasten').browse_media()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>za"] = map_cr("lua require('telekasten').show_tags()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zr"] = map_cr("lua require('telekasten').rename_note()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>zp"] = map_cr("lua require('telekasten').panel()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>z#"] = map_cr("lua require('telekasten').show_tags()"):with_noremap():with_silent(),
-    -- telekasten interactive
-    ["i|<LocalLeader>z["] = map_cr("lua require('telekasten').insert_link({ i=true })"):with_noremap():with_silent(),
-    ["i|<LocalLeader>z$"] = map_cr("lua require('telekasten').show_tags({i = true})"):with_noremap():with_silent(),
-    ["i|<LocalLeader>zt"] = map_cr("lua require('telekasten').toggle_todo({ i=true })"):with_noremap():with_silent(),
     -- refactoring
     ["v|<LocalLeader>re"] = map_cr("lua require('refactoring').refactor('Extract Function')")
       :with_noremap()

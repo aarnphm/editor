@@ -8,11 +8,6 @@ ui["folke/which-key.nvim"] = {
     require("which-key").setup()
   end,
 }
-ui["karb94/neoscroll.nvim"] = {
-  config = function()
-    require("neoscroll").setup()
-  end,
-}
 ui["j-hui/fidget.nvim"] = {
   opt = true,
   event = "BufRead",

@@ -4,6 +4,66 @@ config.nvim_lsp = function()
   require("modules.completion.lsp")
 end
 
+config.lightbulb = function()
+  vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
+end
+
+config.aerial = function()
+  require("aerial").setup({
+    backends = { "treesitter", "lsp", "markdown" },
+    layout = {
+      -- These control the width of the aerial window.
+      -- They can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
+      -- min_width and max_width can be a list of mixed types.
+      -- max_width = {40, 0.2} means "the lesser of 40 columns or 20% of total"
+      max_width = { 40, 0.2 },
+      width = nil,
+      min_width = 20,
+
+      -- Enum: prefer_right, prefer_left, right, left, float
+      -- Determines the default direction to open the aerial window. The 'prefer'
+      -- options will open the window in the other direction *if* there is a
+      -- different buffer in the way of the preferred direction
+      default_direction = "prefer_right",
+
+      -- Enum: edge, group, window
+      --   edge   - open aerial at the far right/left of the editor
+      --   group  - open aerial to the right/left of the group of windows containing the current buffer
+      --   window - open aerial to the right/left of the current window
+      placement = "window",
+    },
+    ignore = {
+      -- Ignore unlisted buffers. See :help buflisted
+      unlisted_buffers = true,
+
+      -- List of filetypes to ignore.
+      filetypes = { "alpha", "NvimTree" },
+
+      -- Ignored buftypes.
+      -- Can be one of the following:
+      -- false or nil - No buftypes are ignored.
+      -- "special"    - All buffers other than normal buffers are ignored.
+      -- table        - A list of buftypes to ignore. See :help buftype for the
+      --                possible values.
+      -- function     - A function that returns true if the buffer should be
+      --                ignored or false if it should not be ignored.
+      --                Takes two arguments, `bufnr` and `buftype`.
+      buftypes = "special",
+
+      -- Ignored wintypes.
+      -- Can be one of the following:
+      -- false or nil - No wintypes are ignored.
+      -- "special"    - All windows other than normal windows are ignored.
+      -- table        - A list of wintypes to ignore. See :help win_gettype() for the
+      --                possible values.
+      -- function     - A function that returns true if the window should be
+      --                ignored or false if it should not be ignored.
+      --                Takes two arguments, `winid` and `wintype`.
+      wintypes = "special",
+    },
+  })
+end
+
 config.cmp = function()
   vim.cmd([[packadd cmp-under-comparator]])
 
@@ -345,6 +405,12 @@ config.mason_install = function()
     -- Default: true
     run_on_start = true,
   })
+end
+
+config.golang = function()
+  vim.g.go_doc_keywordprg_enabled = 0
+  vim.g.go_def_mapping_enabled = 0
+  vim.g.go_code_completion_enabled = 0
 end
 
 config.rust_tools = function()

@@ -113,7 +113,6 @@ config.alpha = function()
     button("comma f e", "  File history", leader, "<cmd>Telescope oldfiles<cr>"),
     button("comma f w", "  Word find", leader, "<cmd>Telescope live_grep<cr>"),
     button("comma f f", "  File find", leader, "<cmd>Telescope find_files<cr>"),
-    button("comma f g", "  Project find", leader, "<cmd>lua require('telescope').extensions.project.project{}<cr>"),
     button("kplus e c", "  Editor", lleader, "<cmd>e ~/.editor.lua<cr>"),
     button("kplus e s", "  Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
     button(
