@@ -771,7 +771,7 @@ config.cheatsheet = function()
 end
 
 config.hop = function()
-  require("hop").setup({ keys = "etovxqpdygfblzhckisuran" })
+  require("hop").setup()
 end
 
 config.wilder = function()

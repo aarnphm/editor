@@ -18,7 +18,7 @@ config.aerial = function()
       -- max_width = {40, 0.2} means "the lesser of 40 columns or 20% of total"
       max_width = { 40, 0.2 },
       width = nil,
-      min_width = 20,
+      min_width = 30,
 
       -- Enum: prefer_right, prefer_left, right, left, float
       -- Determines the default direction to open the aerial window. The 'prefer'

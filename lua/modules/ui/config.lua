@@ -334,7 +334,7 @@ config.nvim_tree = function()
       ignore_list = {},
     },
     system_open = { cmd = nil, args = {} },
-    filters = { dotfiles = false, custom = { ".DS_Store" } },
+    filters = { dotfiles = false, custom = { ".DS_Store", "__pycache__" } },
     git = { enable = true, ignore = true, timeout = 500 },
     renderer = {
       root_folder_modifier = ":e",

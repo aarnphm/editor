@@ -315,7 +315,6 @@ local required_plugins = function(use)
   -- tpope
   use({ "tpope/vim-repeat" })
   use({ "tpope/vim-sleuth" })
-  use({ "tpope/vim-surround" })
   use({ "tpope/vim-commentary" })
 end
 

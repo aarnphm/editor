@@ -1,7 +1,12 @@
 local editor = {}
 local config = require("modules.editor.config")
 
-editor["tpope/vim-fugitive"] = { opt = true, cmd = { "Git", "G", "Ggrep", "GBrowse" } }
+editor["kylechui/nvim-surround"] = {
+  config = function()
+    require("nvim-surround").setup()
+  end,
+}
+editor["tpope/vim-fugitive"] = { cmd = { "Git", "G", "Ggrep", "GBrowse" } }
 
 editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
 
