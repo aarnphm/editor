@@ -392,6 +392,7 @@ config.mason_install = function()
       "shellcheck",
       "shfmt",
       "vint",
+      "taplo",
     },
 
     -- if set to true this will check each tool for updates. If updates

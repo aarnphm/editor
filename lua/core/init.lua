@@ -50,20 +50,10 @@ local disable_distribution_plugins = function()
   vim.g.did_load_netrwFileHandlers = 1
 end
 
-local check_conda = function()
-  local venv = os.getenv("CONDA_PREFIX")
-  if venv then
-    vim.g.python3_host_prog = venv .. "/bin/python"
-  elseif __editor_config.global.python3_host_prog then
-    vim.g.python3_host_prog = __editor_config.global.python3_host_prog
-  end
-end
-
 M.setup = function()
   setup_global_envars()
   create_dir()
   disable_distribution_plugins()
-  check_conda()
 
   vim.g.mapleader = ","
   vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
