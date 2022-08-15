@@ -97,7 +97,7 @@ M.setup = function()
       {
         "BufEnter",
         "*",
-        [[++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]],
+        [[if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]],
       },
       {
         "WinEnter",
@@ -129,8 +129,20 @@ M.setup = function()
       { "VimResized", "*", [[tabdo wincmd =]] },
     },
     ft = {
+      { "FileType", "alpha", "set showtabline=0" },
       { "FileType", "markdown", "set wrap" },
       { "FileType", "make", "set noexpandtab shiftwidth=8 softtabstop=0" },
+      { "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
+      {
+        "FileType",
+        "*",
+        [[setlocal formatoptions-=cro]],
+      },
+      {
+        "FileType",
+        "c,cpp",
+        "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
+      },
       -- Google tab style
       { "BufNewFile,BufRead", "BUILD", "setf bzl" },
       { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
@@ -145,16 +157,6 @@ M.setup = function()
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
-      {
-        "FileType",
-        "*",
-        [[setlocal formatoptions-=cro]],
-      },
-      {
-        "FileType",
-        "c,cpp",
-        "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
-      },
     },
     yank = {
       {
