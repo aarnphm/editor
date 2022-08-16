@@ -7,7 +7,7 @@ completion["neovim/nvim-lspconfig"] = {
   event = "BufReadPre",
   config = config.nvim_lsp,
 }
-completion["creativenull/efmls-configs-nvim"] = { opt = true, requires = "neovim/nvim-lspconfig" }
+completion["creativenull/efmls-configs-nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
 completion["williamboman/mason.nvim"] = {
   requires = {
     { "williamboman/mason-lspconfig.nvim" },
@@ -15,29 +15,12 @@ completion["williamboman/mason.nvim"] = {
   },
 }
 completion["folke/lua-dev.nvim"] = { opt = true, requires = "nvim-lspconfig" }
-completion["github/copilot.vim"] = {
-  opt = true,
-  setup = function()
-    vim.g.copilot_no_tab_map = true
-    vim.g.copilot_assume_mapped = true
-    vim.g.copilot_tab_fallback = ""
-  end,
-  after = "nvim-cmp",
-}
+completion["github/copilot.vim"] = { opt = true, cmd = "Copilot" }
 completion["kevinhwang91/nvim-bqf"] = { ft = "qf", config = config.bqf }
-completion["tami5/lspsaga.nvim"] = {
+completion["glepnir/lspsaga.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",
-}
-completion["stevearc/aerial.nvim"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-  config = config.aerial,
-}
-completion["kosayoda/nvim-lightbulb"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-  config = config.lightbulb,
+  config = config.lspsaga,
 }
 completion["ray-x/lsp_signature.nvim"] = {
   opt = true,
@@ -81,15 +64,12 @@ completion["simrat39/rust-tools.nvim"] = {
   config = config.rust_tools,
   requires = "nvim-lua/plenary.nvim",
 }
-completion["mzlogin/vim-markdown-toc"] = {
-  opt = true,
-  ft = "md",
-  cmd = "GenTocGFM",
-}
 completion["iamcco/markdown-preview.nvim"] = {
   opt = true,
   ft = "markdown",
-  run = "cd app && yarn install",
+  run = function()
+    vim.fn["mkdp#util#install"]()
+  end,
 }
 completion["lervag/vimtex"] = { opt = true, ft = "tex", config = config.vimtex }
 completion["google/vim-maktaba"] = { opt = true }

@@ -197,118 +197,14 @@ local required_plugins = function(use)
 
   -- colorscheme
   use({
-    "rose-pine/neovim",
-    as = "rose-pine",
-    config = function()
-      require("rose-pine").setup({
-        ---@usage 'main'|'moon'
-        dark_variant = __editor_config.schemeopt.rosepine.variant,
-        bold_vert_split = false,
-        dim_nc_background = false,
-        disable_background = false,
-        disable_float_background = false,
-        disable_italics = false,
-        ---@usage string hex value or named color from rosepinetheme.com/palette
-        groups = {
-          background = "base",
-          panel = "surface",
-          border = "highlight_med",
-          comment = "muted",
-          link = "iris",
-          punctuation = "subtle",
-
-          error = "love",
-          hint = "iris",
-          info = "foam",
-          warn = "gold",
-
-          headings = {
-            h1 = "iris",
-            h2 = "foam",
-            h3 = "rose",
-            h4 = "gold",
-            h5 = "pine",
-            h6 = "foam",
-          },
-          -- or set all headings at once
-          -- headings = 'subtle'
-        },
-        -- Change specific vim highlight groups
-        highlight_groups = {
-          ColorColumn = { bg = "rose" },
-        },
-      })
-    end,
+    "mcchrish/zenbones.nvim",
+    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
+    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+    -- In Vim, compat mode is turned on as Lush only works in Neovim.
+    requires = "rktjmp/lush.nvim",
   })
-  use({
-    "catppuccin/nvim",
-    as = "catppuccin",
-    config = function()
-      require("catppuccin").setup({
-        transparent_background = true,
-        term_colors = true,
-        compile = {
-          enabled = true,
-          path = vim.fn.stdpath("cache") .. "/catppuccin",
-          suffix = "_compiled",
-        },
-        styles = {
-          comments = "italic",
-          conditionals = "italic",
-          loops = "italic",
-          functions = "italic",
-        },
-        integrations = {
-          treesitter = true,
-          native_lsp = {
-            enabled = true,
-            virtual_text = {
-              errors = "italic",
-              hints = "italic",
-              warnings = "italic",
-              information = "italic",
-            },
-            underlines = {
-              errors = "underline",
-              hints = "underline",
-              warnings = "underline",
-              information = "underline",
-            },
-          },
-          lsp_trouble = true,
-          cmp = true,
-          lsp_saga = true,
-          gitgutter = true,
-          gitsigns = true,
-          telescope = true,
-          nvimtree = {
-            enabled = true,
-            show_root = true,
-            transparent_panel = true,
-          },
-          which_key = true,
-          indent_blankline = {
-            enabled = true,
-            colored_indent_levels = true,
-          },
-          dashboard = false,
-          neogit = false,
-          vim_sneak = false,
-          fern = false,
-          barbar = false,
-          bufferline = true,
-          markdown = true,
-          lightspeed = false,
-          ts_rainbow = true,
-          hop = false,
-          notify = true,
-          telekasten = true,
-          symbols_outline = true,
-        },
-      })
-      vim.g.catppuccin_flavour = __editor_config.schemeopt.catppuccin.flavour
-    end,
-  })
+
+  use({ "rebelot/kanagawa.nvim" })
 
   use({ "stevearc/dressing.nvim", after = "nvim-web-devicons" })
 

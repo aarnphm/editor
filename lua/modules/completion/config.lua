@@ -4,84 +4,47 @@ config.nvim_lsp = function()
   require("modules.completion.lsp")
 end
 
-config.lightbulb = function()
-  vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
-end
+config.lspsaga = function()
+  -- Set icons for sidebar.
+  local diagnostic_icons = {
+    Error = " ",
+    Warn = " ",
+    Info = " ",
+    Hint = " ",
+  }
+  for type, icon in pairs(diagnostic_icons) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl })
+  end
 
-config.aerial = function()
-  require("aerial").setup({
-    backends = { "treesitter", "lsp", "markdown" },
-    layout = {
-      -- These control the width of the aerial window.
-      -- They can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
-      -- min_width and max_width can be a list of mixed types.
-      -- max_width = {40, 0.2} means "the lesser of 40 columns or 20% of total"
-      max_width = { 40, 0.2 },
-      width = nil,
-      min_width = 30,
+  local kind = require("lspsaga.lspkind")
+  kind[2][2] = " "
+  kind[4][2] = " "
+  kind[5][2] = "ﴯ "
+  kind[6][2] = " "
+  kind[7][2] = "ﰠ "
+  kind[8][2] = " "
+  kind[9][2] = " "
+  kind[10][2] = " "
+  kind[11][2] = " "
+  kind[12][2] = " "
+  kind[13][2] = " "
+  kind[15][2] = " "
+  kind[16][2] = " "
+  kind[23][2] = " "
+  kind[26][2] = " "
 
-      -- Enum: prefer_right, prefer_left, right, left, float
-      -- Determines the default direction to open the aerial window. The 'prefer'
-      -- options will open the window in the other direction *if* there is a
-      -- different buffer in the way of the preferred direction
-      default_direction = "prefer_right",
-
-      -- Enum: edge, group, window
-      --   edge   - open aerial at the far right/left of the editor
-      --   group  - open aerial to the right/left of the group of windows containing the current buffer
-      --   window - open aerial to the right/left of the current window
-      placement = "window",
-    },
-    ignore = {
-      -- Ignore unlisted buffers. See :help buflisted
-      unlisted_buffers = true,
-
-      -- List of filetypes to ignore.
-      filetypes = { "alpha", "NvimTree" },
-
-      -- Ignored buftypes.
-      -- Can be one of the following:
-      -- false or nil - No buftypes are ignored.
-      -- "special"    - All buffers other than normal buffers are ignored.
-      -- table        - A list of buftypes to ignore. See :help buftype for the
-      --                possible values.
-      -- function     - A function that returns true if the buffer should be
-      --                ignored or false if it should not be ignored.
-      --                Takes two arguments, `bufnr` and `buftype`.
-      buftypes = "special",
-
-      -- Ignored wintypes.
-      -- Can be one of the following:
-      -- false or nil - No wintypes are ignored.
-      -- "special"    - All windows other than normal windows are ignored.
-      -- table        - A list of wintypes to ignore. See :help win_gettype() for the
-      --                possible values.
-      -- function     - A function that returns true if the window should be
-      --                ignored or false if it should not be ignored.
-      --                Takes two arguments, `winid` and `wintype`.
-      wintypes = "special",
-    },
-  })
+  local saga = require("lspsaga")
+  saga.init_lsp_saga()
 end
 
 config.cmp = function()
-  vim.cmd([[packadd cmp-under-comparator]])
-
   local t = function(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
   end
   local has_words_before = function()
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-  end
-
-  local replace_termcodes = function(str)
-    return vim.api.nvim_replace_termcodes(str, true, true, true)
-  end
-
-  local check_backspace = function()
-    local col = vim.fn.col(".") - 1
-    return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
   end
 
   local border = function(hl)
@@ -103,37 +66,11 @@ config.cmp = function()
     return false
   end
 
+  local compare = require("cmp.config.compare")
+
   local cmp = require("cmp")
 
-  local tab_complete = function(fallback)
-    local copilot_keys = vim.fn["copilot#Accept"]()
-    if copilot_keys ~= "" then
-      vim.api.nvim_feedkeys(copilot_keys, "i", true)
-    elseif cmp.visible() then
-      cmp.select_next_item()
-    elseif require("luasnip").expand_or_jumpable() then
-      vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-expand-or-jump"), "")
-    elseif check_backspace() then
-      vim.fn.feedkeys(replace_termcodes("<Tab>"), "n")
-    else
-      fallback()
-    end
-  end
-
-  local s_tab_complete = function(fallback)
-    if cmp.visible() then
-      cmp.select_prev_item()
-    elseif require("luasnip").jumpable(-1) then
-      vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-jump-prev"), "")
-    elseif has_words_before() then
-      cmp.complete()
-    else
-      fallback()
-    end
-  end
-
   cmp.setup({
-    preselect = cmp.PreselectMode.None,
     window = {
       completion = {
         border = border("CmpBorder"),
@@ -142,24 +79,16 @@ config.cmp = function()
         border = border("CmpDocBorder"),
       },
     },
-    enabled = function()
-      local ctx = require("cmp.config.context")
-      if vim.api.nvim_get_mode() == "c" then
-        return true
-      else
-        return not ctx.in_treesitter_capture("comment") and not ctx.in_treesitter_capture("Comment")
-      end
-    end,
     sorting = {
       comparators = {
-        cmp.config.compare.offset,
-        cmp.config.compare.exact,
-        cmp.config.compare.score,
+        compare.offset,
+        compare.exact,
+        compare.score,
         require("cmp-under-comparator").under,
-        cmp.config.compare.kind,
-        cmp.config.compare.sort_text,
-        cmp.config.compare.length,
-        cmp.config.compare.order,
+        compare.kind,
+        compare.sort_text,
+        compare.length,
+        compare.order,
       },
     },
     formatting = {
@@ -195,41 +124,29 @@ config.cmp = function()
         vim_item.kind = string.format("%s %s", lspkind_icons[vim_item.kind], vim_item.kind)
 
         vim_item.menu = ({
-          buffer = "[﬘ Buf]",
-          nvim_lsp = "[ LSP]",
-          luasnip = "[ LSnip]",
-          nvim_lua = "[ NvimLua]",
-          emoji = "[ Emoji]",
-          path = "[~ Path]",
-          spell = "[  Spell]",
+          -- cmp_tabnine = "[TN]",
+          buffer = "[BUF]",
+          orgmode = "[ORG]",
+          nvim_lsp = "[LSP]",
+          nvim_lua = "[LUA]",
+          path = "[PATH]",
+          tmux = "[TMUX]",
+          luasnip = "[SNIP]",
+          spell = "[SPELL]",
         })[entry.source.name]
 
         return vim_item
       end,
     },
     -- You can set mappings if you want
-    mapping = {
+    mapping = cmp.mapping.preset.insert({
+      ["<CR>"] = cmp.mapping.confirm({ select = true }),
       ["<C-p>"] = cmp.mapping.select_prev_item(),
       ["<C-n>"] = cmp.mapping.select_next_item(),
       ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       ["<C-f>"] = cmp.mapping.scroll_docs(4),
-      ["<C-c>"] = cmp.mapping.abort(),
-      ["<C-g>"] = cmp.mapping.abort(),
-      ["<CR>"] = cmp.mapping.confirm({ select = false }),
-      ["<Tab>"] = tab_complete,
-      ["<S-Tab>"] = s_tab_complete,
-      ["<C-e>"] = cmp.mapping({
-        i = function(fallback)
-          local copilot_keys = vim.fn["copilot#Accept"]()
-          if copilot_keys ~= "" then
-            vim.api.nvim_feedkeys(copilot_keys, "i", true)
-          else
-            cmp.mapping.abort()(fallback)
-          end
-        end,
-        c = cmp.mapping.close(),
-      }),
-      ["<C-j>"] = cmp.mapping(function(fallback)
+      ["<C-e>"] = cmp.mapping.close(),
+      ["<Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
         elseif has_words_before() then
@@ -238,7 +155,7 @@ config.cmp = function()
           fallback()
         end
       end, { "i", "s" }),
-      ["<C-k>"] = cmp.mapping(function(fallback)
+      ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
         else
@@ -259,7 +176,7 @@ config.cmp = function()
           fallback()
         end
       end,
-    },
+    }),
     snippet = {
       expand = function(args)
         require("luasnip").lsp_expand(args.body)
@@ -271,6 +188,7 @@ config.cmp = function()
       { name = "nvim_lua" },
       { name = "luasnip" },
       { name = "path" },
+      { name = "tmux" },
       { name = "buffer" },
       { name = "latex_symbols" },
       { name = "spell" },
@@ -317,52 +235,6 @@ config.autopairs = function()
       },
     })
   )
-end
-
-config.bqf = function()
-  vim.cmd([[
-    hi BqfPreviewBorder guifg=#F2CDCD ctermfg=71
-    hi link BqfPreviewRange Search
-]])
-
-  require("bqf").setup({
-    auto_enable = true,
-    auto_resize_height = true, -- highly recommended enable
-    preview = {
-      win_height = 12,
-      win_vheight = 12,
-      delay_syntax = 80,
-      border_chars = { "┃", "┃", "━", "━", "┏", "┓", "┗", "┛", "█" },
-      should_preview_cb = function(bufnr, qwinid)
-        local ret = true
-        local bufname = vim.api.nvim_buf_get_name(bufnr)
-        local fsize = vim.fn.getfsize(bufname)
-        if fsize > 100 * 1024 then
-          -- skip file size greater than 100k
-          ret = false
-        elseif bufname:match("^fugitive://") then
-          -- skip fugitive buffer
-          ret = false
-        end
-        return ret
-      end,
-    },
-    -- make `drop` and `tab drop` to become preferred
-    func_map = {
-      drop = "o",
-      openc = "O",
-      split = "<C-s>",
-      tabdrop = "<C-t>",
-      tabc = "",
-      ptogglemode = "z,",
-    },
-    filter = {
-      fzf = {
-        action_for = { ["ctrl-s"] = "split", ["ctrl-t"] = "tab drop" },
-        extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
-      },
-    },
-  })
 end
 
 config.mason_install = function()

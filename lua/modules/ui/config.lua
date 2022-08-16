@@ -185,9 +185,9 @@ config.lualine = function()
     lualine_y = {},
     lualine_z = { "location" },
   }
-  local aerial = {
+  local outline = {
     sections = mini_sections,
-    filetypes = { "aerial" },
+    filetypes = { "lspsagaoutline" },
   }
   local dapui_scopes = {
     sections = simple_sections,
@@ -279,7 +279,7 @@ config.lualine = function()
       "quickfix",
       "toggleterm",
       "fugitive",
-      aerial,
+      outline,
       dapui_scopes,
       dapui_breakpoints,
       dapui_stacks,
@@ -532,7 +532,6 @@ config.indent_blankline = function()
       "peekaboo",
       "git",
       "TelescopePrompt",
-      "undotree",
       "flutterToolsOutline",
       "", -- for all buffers without a file type
     },

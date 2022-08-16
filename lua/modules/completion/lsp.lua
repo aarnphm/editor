@@ -2,36 +2,37 @@ local formatting = require("modules.completion.formatting")
 
 vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packadd lsp_signature.nvim]])
-vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd efmls-configs-nvim]])
-vim.cmd([[packadd aerial.nvim]])
 vim.cmd([[packadd vim-illuminate]])
 
 local nvim_lsp = require("lspconfig")
-local saga = require("lspsaga")
 local mason = require("mason")
 local mason_lsp = require("mason-lspconfig")
 
 mason.setup()
 mason_lsp.setup()
 
--- Override diagnostics symbol
-saga.init_lsp_saga({
-  error_sign = "",
-  warn_sign = "",
-  hint_sign = "",
-  infor_sign = "",
-  code_action_keys = {
-    quit = { "q", "<ESC>" },
-  },
-  rename_action_keys = {
-    quit = { "q", "<ESC>" },
-  },
-})
-
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
+
+capabilities.textDocument.completion.completionItem = {
+  documentationFormat = { "markdown", "plaintext" },
+  snippetSupport = true,
+  preselectSupport = true,
+  insertReplaceSupport = true,
+  labelDetailsSupport = true,
+  deprecatedSupport = true,
+  commitCharactersSupport = true,
+  tagSupport = { valueSet = { 1 } },
+  resolveSupport = {
+    properties = {
+      "documentation",
+      "detail",
+      "additionalTextEdits",
+    },
+  },
+}
 
 local on_editor_attach = function(client)
   require("lsp_signature").on_attach({
@@ -43,7 +44,6 @@ local on_editor_attach = function(client)
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
-  require("aerial").on_attach(client)
   require("illuminate").on_attach(client)
 end
 

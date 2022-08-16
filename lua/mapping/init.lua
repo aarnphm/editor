@@ -91,7 +91,7 @@ M.setup = function()
     ["v|<leader>ca"] = map_cu("Lspsaga range_code_action"):with_noremap():with_silent(),
     ["n|gd"] = map_cr("Lspsaga preview_definition"):with_noremap():with_silent(),
     ["n|gD"] = map_cr("lua vim.lsp.buf.definition()"):with_noremap():with_silent(),
-    ["n|gh"] = map_cr("lua vim.lsp.buf.references()"):with_noremap():with_silent(),
+    ["n|gh"] = map_cr("Lspsaga lsp_finder"):with_noremap():with_silent(),
     ["n|<F5>"] = map_cu("lua require('core.utils').gitui()"):with_noremap():with_silent(),
     ["n|<F6>"] = map_cu("lua require('core.utils').create_float_term()"):with_noremap():with_silent(),
     ["n|<Leader>G"] = map_cu("Git"):with_noremap():with_silent(),
@@ -114,26 +114,28 @@ M.setup = function()
     ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
     ["n|<Leader>fo"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>er"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files', {cwd = vim.fn.stdpath('config')})"
-    ):with_noremap():with_silent(),
+        "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files', {cwd = vim.fn.stdpath('config')})"
+      )
+      :with_noremap()
+      :with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>ff"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files')"
-    )
+    ["n|<LocalLeader>ff"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files')")
       :with_noremap()
       :with_silent(),
     ["n|<Leader>ff"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.find_files', 'find_files', {cwd = vim.fn.expand('%:p:h')})"
-    ):with_noremap():with_silent(),
+        "lua require('core.utils').exec_telescope('telescope.builtin.find_files', 'find_files', {cwd = vim.fn.expand('%:p:h')})"
+      )
+      :with_noremap()
+      :with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep')"
-    )
+    ["n|<LocalLeader>fw"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep')")
       :with_noremap()
       :with_silent(),
     ["n|<Leader>fw"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep', {cwd = vim.fn.expand('%:p:h')})"
-    ):with_noremap():with_silent(),
+        "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep', {cwd = vim.fn.expand('%:p:h')})"
+      )
+      :with_noremap()
+      :with_silent(),
     ["n|<Leader>fn"] = map_cu("enew"):with_noremap():with_silent(),
     ["n|<Leader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
     ["n|<Leader>fg"] = map_cmd("<cmd> Telescope git_files <CR>"):with_noremap():with_silent(),
@@ -154,12 +156,9 @@ M.setup = function()
     -- Plugin EasyAlign
     ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
     ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),
-    -- Plugin Aerial
-    ["n|so"] = map_cr("AerialToggle! right"):with_noremap():with_silent(),
-    -- Plugin Undotree
-    ["n|<LocalLeader>u"] = map_cr("UndotreeToggle"):with_noremap():with_silent(),
+    ["n|so"] = map_cr("LSoutlineToggle"):with_noremap():with_silent(),
     -- Plugin MarkdownPreview
-    ["n|<F12>"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
+    ["n|mpt"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
     -- Plugin zen-mode
     ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
     -- refactoring

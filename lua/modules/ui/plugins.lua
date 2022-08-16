@@ -36,7 +36,6 @@ ui["nvim-lualine/lualine.nvim"] = { config = config.lualine, after = "nvim-gps" 
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle" },
-  -- commit = "aba394896b933fc9d1cecfab591c3b7865070a41",
   config = config.nvim_tree,
 }
 ui["lukas-reineke/indent-blankline.nvim"] = {
@@ -53,10 +52,6 @@ ui["akinsho/nvim-bufferline.lua"] = {
   event = "BufRead",
   opt = true,
   config = config.nvim_bufferline,
-}
-ui["mbbill/undotree"] = {
-  opt = true,
-  cmd = "UndotreeToggle",
 }
 
 return ui
