@@ -263,8 +263,10 @@ imap jj <Esc>
 
 " Thanks to Steve Losh for this liberating tip
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
-nnoremap / /\v
-vnoremap / /\v
+if exists("plug")
+  nnoremap / /\v
+  vnoremap / /\v
+endif
 
 " We don't use arrow key in vim
 noremap <Up> <Nop>

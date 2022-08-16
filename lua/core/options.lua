@@ -107,6 +107,8 @@ M.setup = function()
     concealcursor = "niv",
   }
 
+  vim.g.python3_host_prog = __editor_config.global.python3_host_prog
+
   if __editor_global.is_mac then
     vim.g.clipboard = {
       name = "macOS-clipboard",

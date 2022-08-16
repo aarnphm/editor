@@ -7,7 +7,7 @@ M.init = function()
     vim.cmd("syntax reset")
   end
   vim.o.termguicolors = true
-  vim.g.colors_name = "catppuccin"
+  vim.g.colors_name = "rose-pine"
 end
 
 -- returns a table of colors for given or current theme

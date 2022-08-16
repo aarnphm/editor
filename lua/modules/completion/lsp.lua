@@ -87,25 +87,6 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  elseif server == "pyright" then
-    nvim_lsp.pyright.setup({
-      capabilities = capabilities,
-      on_attach = on_editor_attach,
-      flags = { debounce_text_changes = 150 },
-      filetypes = { "python" },
-      init_options = {
-        formatters = {
-          black = {
-            command = "black",
-            args = { "--quiet", "-" },
-            rootPatterns = { "pyproject.toml" },
-          },
-          formatFiletypes = {
-            python = { "black" },
-          },
-        },
-      },
-    })
   elseif server == "clangd" then
     local c_capabilities = capabilities
     c_capabilities.offsetEncoding = { "utf-16" }

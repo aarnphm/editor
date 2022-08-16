@@ -16,6 +16,7 @@ completion["williamboman/mason.nvim"] = {
 }
 completion["folke/lua-dev.nvim"] = { opt = true, requires = "nvim-lspconfig" }
 completion["github/copilot.vim"] = {
+  opt = true,
   setup = function()
     vim.g.copilot_no_tab_map = true
     vim.g.copilot_assume_mapped = true
