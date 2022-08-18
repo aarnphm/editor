@@ -1,8 +1,8 @@
 local config = {}
 
 config.nvim_treesitter = function()
-  vim.cmd([[set foldmethod=expr]])
-  vim.cmd([[set foldexpr=nvim_treesitter#foldexpr()]])
+  vim.api.nvim_set_option_value("foldmethod", "expr", {})
+  vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 
   require("nvim-treesitter.configs").setup({
     -- 'all', 'maintained', or list of string
@@ -27,7 +27,8 @@ config.nvim_treesitter = function()
       "vue",
       "css",
     },
-    sync_install = false,
+    sync_install = true,
+    highlight = { enable = true },
     incremental_selection = {
       enable = true,
       keymaps = {
@@ -37,7 +38,6 @@ config.nvim_treesitter = function()
         node_decremental = "grm",
       },
     },
-    highlight = { enable = true },
     context_commentstring = { enable = true, enable_autocmd = false },
     matchup = { enable = true },
     textobjects = {
@@ -46,7 +46,6 @@ config.nvim_treesitter = function()
         -- Automatically jump forward to textobj, similar to targets.vim
         lookahead = true,
         keymaps = {
-          -- You can use the capture groups defined in textobjects.scm
           ["af"] = "@function.outer",
           ["if"] = "@function.inner",
           ["ac"] = "@conditional.outer",
@@ -76,20 +75,20 @@ config.nvim_treesitter = function()
         enable = true,
         set_jumps = true, -- whether to set jumps in the jumplist
         goto_next_start = {
-          ["]m"] = "@function.outer",
-          ["]]"] = "@class.outer",
+          ["]["] = "@function.outer",
+          ["]m"] = "@class.outer",
         },
         goto_next_end = {
-          ["]M"] = "@function.outer",
-          ["]["] = "@class.outer",
+          ["]]"] = "@function.outer",
+          ["]M"] = "@class.outer",
         },
         goto_previous_start = {
-          ["[m"] = "@function.outer",
-          ["[["] = "@class.outer",
+          ["[["] = "@function.outer",
+          ["[m"] = "@class.outer",
         },
         goto_previous_end = {
-          ["[M"] = "@function.outer",
-          ["[]"] = "@class.outer",
+          ["[]"] = "@function.outer",
+          ["[M"] = "@class.outer",
         },
       },
       lsp_interop = {
@@ -100,6 +99,11 @@ config.nvim_treesitter = function()
           ["<leader>sD"] = "@class.outer",
         },
       },
+    },
+    rainbow = {
+      enable = true,
+      extended_mode = true, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
+      max_file_lines = 1000, -- Do not enable for files with more than 1000 lines, int
     },
   })
 
@@ -168,115 +172,15 @@ config.toggleterm = function()
   })
 end
 
-config.telekasten = function()
-  vim.cmd([[ packadd calendar-vim ]])
-
-  local home = __editor_global.vim_path .. __editor_global.path_sep .. "zettelkasten"
-
-  require("telekasten").setup({
-    home = home,
-    -- if trle, telekasten will be enabled when opening a note within the configured home
-    take_over_my_home = true,
-
-    -- auto-set telekasten filetype: if false, the telekasten filetype will not be used
-    auto_set_filetype = true,
-
-    -- dir names for special notes (absolute path or subdir name)
-    dailies = home .. __editor_global.path_sep .. "daily",
-    weeklies = home .. __editor_global.path_sep .. "weekly",
-    templates = home .. __editor_global.path_sep .. "templates",
-
-    -- image (sub)dir for pasting
-    -- dir name (absolute path or subdir name)
-    -- or nil if pasted images shouldn't go into a special subdir
-    image_subdir = "images",
-
-    -- markdown file extension
-    extension = ".md",
-
-    -- following a link to a non-existing note will create it
-    follow_creates_nonexisting = true,
-    dailies_create_nonexisting = true,
-    weeklies_create_nonexisting = true,
-    -- integrate with calendar-vim
-    plug_into_calendar = true,
-    calendar_opts = {
-      -- calendar week display mode: 1 .. 'WK01', 2 .. 'WK 1', 3 .. 'KW01', 4 .. 'KW 1', 5 .. '1'
-      weeknm = 4,
-      -- use monday as first day of week: 1 .. true, 0 .. false
-      calendar_monday = 1,
-      -- calendar mark: where to put mark for marked days: 'left', 'right', 'left-fit'
-      calendar_mark = "left-fit",
-    },
-
-    -- template for new notes (new_note, follow_link)
-    -- set to `nil` or do not specify if you do not want a template
-    template_new_note = home .. __editor_global.path_sep .. "templates" .. __editor_global.path_sep .. "new_note.md",
-
-    -- template for newly created daily notes (goto_today)
-    -- set to `nil` or do not specify if you do not want a template
-    template_new_daily = home .. __editor_global.path_sep .. "templates" .. __editor_global.path_sep .. "daily.md",
-
-    -- template for newly created weekly notes (goto_thisweek)
-    -- set to `nil` or do not specify if you do not want a template
-    template_new_weekly = home .. __editor_global.path_sep .. "templates" .. __editor_global.path_sep .. "weekly.md",
-
-    -- image link style
-    -- wiki:     ![[image name]]
-    -- markdown: ![](image_subdir/xxxxx.png)
-    image_link_style = "markdown",
-
-    -- telescope actions behavior
-    close_after_yanking = false,
-    insert_after_inserting = true,
-
-    -- tag notation: '#tag', ':tag:', 'yaml-bare'
-    tag_notation = "#tag",
-
-    -- command palette theme: dropdown (window) or ivy (bottom panel)
-    command_palette_theme = "ivy",
-
-    -- tag list theme:
-    -- get_cursor: small tag list at cursor; ivy and dropdown like above
-    show_tags_theme = "ivy",
-
-    -- when linking to a note in subdir/, create a [[subdir/title]] link
-    -- instead of a [[title only]] link
-    subdirs_in_links = true,
-
-    -- template_handling
-    -- What to do when creating a new note via `new_note()` or `follow_link()`
-    -- to a non-existing note
-    -- - prefer_new_note: use `new_note` template
-    -- - smart: if day or week is detected in title, use daily / weekly templates (default)
-    -- - always_ask: always ask before creating a note
-    template_handling = "smart",
-
-    -- path handling:
-    --   this applies to:
-    --     - new_note()
-    --     - new_templated_note()
-    --     - follow_link() to non-existing note
-    --
-    --   it does NOT apply to:
-    --     - goto_today()
-    --     - goto_thisweek()
-    --
-    --   Valid options:
-    --     - smart: put daily-looking notes in daily, weekly-looking ones in weekly,
-    --              all other ones in home, except for notes/with/subdirs/in/title.
-    --              (default)
-    --
-    --     - prefer_home: put all notes in home except for goto_today(), goto_thisweek()
-    --                    except for notes with subdirs/in/title.
-    --
-    --     - same_as_current: put all new notes in the dir of the current note if
-    --                        present or else in home
-    --                        except for notes/with/subdirs/in/title.
-    new_note_location = "smart",
-
-    -- should all links be updated when a file is renamed
-    rename_update_links = true,
+config.accelerated_jk = function()
+  require("accelerated-jk").setup({
+    mode = "time_driven",
+    enable_deceleration = false,
+    acceleration_motions = {},
+    acceleration_limit = 150,
+    acceleration_table = { 7, 12, 17, 21, 24, 26, 28, 30 },
+    -- when 'enable_deceleration = true', 'deceleration_table = { {200, 3}, {300, 7}, {450, 11}, {600, 15}, {750, 21}, {900, 9999} }'
+    deceleration_table = { { 150, 9999 } },
   })
 end
 
@@ -423,6 +327,7 @@ config.telescope = function()
   vim.cmd([[packadd telescope-frecency.nvim]])
   vim.cmd([[packadd telescope-emoji.nvim]])
   vim.cmd([[packadd telescope-ui-select.nvim]])
+  vim.cmd([[packadd telescope-live-grep-args.nvim]])
 
   local telescope_actions = require("telescope.actions.set")
   local theme = __editor_config.theme
@@ -574,6 +479,7 @@ config.telescope = function()
   require("telescope").load_extension("ui-select")
   require("telescope").load_extension("file_browser")
   require("telescope").load_extension("emoji")
+  require("telescope").load_extension("live_grep_args")
 end
 
 config.octo = function()
@@ -706,37 +612,10 @@ end
 
 config.trouble = function()
   require("trouble").setup({
-    position = "bottom", -- position of the list can be: bottom, top, left, right
-    height = 10, -- height of the trouble list when position is top or bottom
-    width = 50, -- width of the list when position is left or right
-    icons = true, -- use devicons for filenames
     mode = "document_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
     fold_open = "", -- icon used for open folds
     fold_closed = "", -- icon used for closed folds
-    action_keys = {
-      -- key mappings for actions in the trouble list
-      -- map to {} to remove a mapping, for example:
-      -- close = {},
-      close = "q", -- close the list
-      cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
-      refresh = "r", -- manually refresh
-      jump = { "<cr>", "<tab>" }, -- jump to the diagnostic or open / close folds
-      open_split = { "<c-x>" }, -- open buffer in new split
-      open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
-      open_tab = { "<c-t>" }, -- open buffer in new tab
-      jump_close = { "o" }, -- jump to the diagnostic and close the list
-      toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
-      toggle_preview = "P", -- toggle auto_preview
-      hover = "K", -- opens a small popup with the full multiline message
-      preview = "p", -- preview the diagnostic location
-      close_folds = { "zM", "zm" }, -- close all folds
-      open_folds = { "zR", "zr" }, -- open all folds
-      toggle_fold = { "zA", "za" }, -- toggle fold of current file
-      previous = "k", -- preview item
-      next = "j", -- next item
-    },
-    indent_lines = true, -- add an indent guide below the fold icons
-    auto_open = false, -- automatically open the list when you have diagnostics
+    indent_lines = false, -- add an indent guide below the fold icons
     auto_close = true, -- automatically close the list when you have no diagnostics
     auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
     auto_fold = false, -- automatically fold a file trouble list at creation
@@ -768,10 +647,6 @@ config.cheatsheet = function()
       ["<C-E>"] = require("cheatsheet.telescope.actions").edit_user_cheatsheet,
     },
   })
-end
-
-config.hop = function()
-  require("hop").setup()
 end
 
 config.wilder = function()

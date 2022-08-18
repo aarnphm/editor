@@ -49,8 +49,9 @@ M.setup = function()
   }
 
   local plug_map = {
+    ["n|ft"] = map_cr("FormatToggle"):with_noremap():with_silent(),
     -- reload and edit config
-    ["n|<LocalLeader>rl"] = map_cu("lua require('core.utils').reload()"):with_noremap():with_silent(),
+    ["n|<LocalLeader>rl"] = map_cu("lua require'plugins' require('packer').sync()"):with_noremap():with_silent(),
     ["n|<LocalLeader>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
@@ -85,16 +86,17 @@ M.setup = function()
     ["n|gs"] = map_cr("Lspsaga signature_help"):with_noremap():with_silent(),
     ["n|gr"] = map_cr("Lspsaga rename"):with_noremap():with_silent(),
     ["n|K"] = map_cr("Lspsaga hover_doc"):with_noremap():with_silent(),
-    ["n|<C-Up>"] = map_cr("lua require('lspsaga.action').smart_scroll_with_saga(-1)"):with_noremap():with_silent(),
-    ["n|<C-Down>"] = map_cr("lua require('lspsaga.action').smart_scroll_with_saga(1)"):with_noremap():with_silent(),
-    ["n|<leader>ca"] = map_cr("Lspsaga code_action"):with_noremap():with_silent(),
-    ["v|<leader>ca"] = map_cu("Lspsaga range_code_action"):with_noremap():with_silent(),
+    ["n|so"] = map_cr("LSoutlineToggle"):with_noremap():with_silent(),
+    ["n|<LocalLeader>ca"] = map_cr("Lspsaga code_action"):with_noremap():with_silent(),
+    ["v|<LocalLeader>ca"] = map_cu("Lspsaga range_code_action"):with_noremap():with_silent(),
     ["n|gd"] = map_cr("Lspsaga preview_definition"):with_noremap():with_silent(),
+    ["n|<LocalLeader>cd"] = map_cr("Lspsaga show_line_diagnostics"):with_noremap():with_silent(),
+    ["n|<Leader>cd"] = map_cr("Lspsaga show_cursor_diagnostics"):with_noremap():with_silent(),
     ["n|gD"] = map_cr("lua vim.lsp.buf.definition()"):with_noremap():with_silent(),
     ["n|gh"] = map_cr("Lspsaga lsp_finder"):with_noremap():with_silent(),
     ["n|<F5>"] = map_cu("lua require('core.utils').gitui()"):with_noremap():with_silent(),
     ["n|<F6>"] = map_cu("lua require('core.utils').create_float_term()"):with_noremap():with_silent(),
-    ["n|<Leader>G"] = map_cu("Git"):with_noremap():with_silent(),
+    ["n|<LocalLeader>G"] = map_cu("Git"):with_noremap():with_silent(),
     ["n|gps"] = map_cr("G push"):with_noremap():with_silent(),
     ["n|gpl"] = map_cr("G pull"):with_noremap():with_silent(),
     -- Plugin nvim-tree
@@ -103,6 +105,8 @@ M.setup = function()
     ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
     -- Plugin octo
     ["n|<LocalLeader>oc"] = map_cr("Octo"):with_noremap(),
+    -- Copilot
+    ["n|<LocalLeader>cp"] = map_cr("Copilot"):with_noremap(),
     -- Plugin trouble
     ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
     ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
@@ -110,35 +114,26 @@ M.setup = function()
     ["n|<LocalLeader>wd"] = map_cr("TroubleToggle workspace_diagnostics"):with_noremap():with_silent(),
     ["n|<LocalLeader>qf"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
     ["n|<LocalLeader>ll"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
+    -- Plugin accelerate-jk
+    ["n|j"] = map_cmd("v:lua.enhance_jk_move('j')"):with_silent():with_expr(),
+    ["n|k"] = map_cmd("v:lua.enhance_jk_move('k')"):with_silent():with_expr(),
+    -- Plugin vim-eft
+    ["n|f"] = map_cmd("v:lua.enhance_ft_move('f')"):with_expr(),
+    ["n|F"] = map_cmd("v:lua.enhance_ft_move('F')"):with_expr(),
+    ["n|t"] = map_cmd("v:lua.enhance_ft_move('t')"):with_expr(),
+    ["n|T"] = map_cmd("v:lua.enhance_ft_move('T')"):with_expr(),
     -- Plugin Telescope
     ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
     ["n|<Leader>fo"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>er"] = map_cr(
-        "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files', {cwd = vim.fn.stdpath('config')})"
-      )
-      :with_noremap()
-      :with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>ff"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files')")
-      :with_noremap()
-      :with_silent(),
-    ["n|<Leader>ff"] = map_cr(
-        "lua require('core.utils').exec_telescope('telescope.builtin.find_files', 'find_files', {cwd = vim.fn.expand('%:p:h')})"
-      )
-      :with_noremap()
-      :with_silent(),
+    ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files <CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>fe"] = map_cu("Telescope oldfiles"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>fw"] = map_cr("lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep')")
       :with_noremap()
       :with_silent(),
-    ["n|<Leader>fw"] = map_cr(
-        "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep', {cwd = vim.fn.expand('%:p:h')})"
-      )
-      :with_noremap()
-      :with_silent(),
-    ["n|<Leader>fn"] = map_cu("enew"):with_noremap():with_silent(),
-    ["n|<Leader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
-    ["n|<Leader>fg"] = map_cmd("<cmd> Telescope git_files <CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>fn"] = map_cu("enew"):with_noremap():with_silent(),
+    ["n|<LocalLeader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),
     -- Plugin spectre
     ["n|<S-F6>"] = map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
@@ -156,7 +151,6 @@ M.setup = function()
     -- Plugin EasyAlign
     ["n|ga"] = map_cmd("v:lua.enhance_align('nga')"):with_expr(),
     ["x|ga"] = map_cmd("v:lua.enhance_align('xga')"):with_expr(),
-    ["n|so"] = map_cr("LSoutlineToggle"):with_noremap():with_silent(),
     -- Plugin MarkdownPreview
     ["n|mpt"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
     -- Plugin zen-mode

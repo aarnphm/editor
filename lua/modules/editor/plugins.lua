@@ -1,6 +1,58 @@
 local editor = {}
 local config = require("modules.editor.config")
 
+editor["nvim-treesitter/nvim-treesitter"] = {
+  opt = true,
+  run = ":TSUpdate",
+  event = "BufRead",
+  config = config.nvim_treesitter,
+}
+editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
+  opt = true,
+  after = "nvim-treesitter",
+}
+editor["romgrk/nvim-treesitter-context"] = {
+  opt = true,
+  after = "nvim-treesitter",
+}
+editor["JoosepAlviste/nvim-ts-context-commentstring"] = {
+  opt = true,
+  after = "nvim-treesitter",
+}
+editor["mfussenegger/nvim-ts-hint-textobject"] = {
+  opt = true,
+  after = "nvim-treesitter",
+}
+editor["andymass/vim-matchup"] = {
+  opt = true,
+  after = "nvim-treesitter",
+  config = function()
+    vim.cmd([[let g:matchup_matchparen_offscreen = {'method': 'popup'}]])
+  end,
+}
+editor["ThePrimeagen/refactoring.nvim"] = {
+  module = "refactoring",
+  after = "nvim-treesitter",
+  config = function()
+    require("refactoring").setup({
+      -- prompt for return type
+      prompt_func_return_type = {
+        go = true,
+        cpp = true,
+        c = true,
+        java = true,
+      },
+      -- prompt for function parameters
+      prompt_func_param_type = {
+        go = true,
+        cpp = true,
+        c = true,
+        java = true,
+      },
+    })
+  end,
+}
+
 editor["kylechui/nvim-surround"] = {
   config = function()
     require("nvim-surround").setup()
@@ -46,52 +98,9 @@ editor["phaazon/hop.nvim"] = {
   opt = true,
   branch = "v2",
   event = "BufReadPost",
-  config = config.hop,
-}
-
-editor["nvim-treesitter/nvim-treesitter"] = {
-  opt = true,
-  run = ":TSUpdate",
-  event = "BufRead",
-  config = config.nvim_treesitter,
-}
-editor["ThePrimeagen/refactoring.nvim"] = {
-  module = "refactoring",
-  after = "nvim-treesitter",
   config = function()
-    require("refactoring").setup({
-      -- prompt for return type
-      prompt_func_return_type = {
-        go = true,
-        cpp = true,
-        c = true,
-        java = true,
-      },
-      -- prompt for function parameters
-      prompt_func_param_type = {
-        go = true,
-        cpp = true,
-        c = true,
-        java = true,
-      },
-    })
+    require("hop").setup()
   end,
-}
-editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["romgrk/nvim-treesitter-context"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["JoosepAlviste/nvim-ts-context-commentstring"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["mfussenegger/nvim-ts-hint-textobject"] = {
-  opt = true,
-  after = "nvim-treesitter",
 }
 editor["windwp/nvim-spectre"] = {
   module = "spectre",
@@ -126,6 +135,10 @@ editor["xiyaowong/telescope-emoji.nvim"] = {
   opt = true,
   after = "telescope.nvim",
 }
+editor["nvim-telescope/telescope-live-grep-args.nvim"] = {
+  opt = true,
+  after = "telescope.nvim",
+}
 editor["pwntester/octo.nvim"] = {
   opt = true,
   after = "telescope.nvim",
@@ -148,11 +161,6 @@ editor["gelguy/wilder.nvim"] = {
   requires = {
     { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
   },
-}
-editor["dstein64/vim-startuptime"] = {
-  opt = true,
-  cmd = "StartupTime",
-  disable = __editor_config.debug ~= true,
 }
 editor["folke/trouble.nvim"] = {
   opt = true,
@@ -204,6 +212,13 @@ editor["romainl/vim-cool"] = {
   opt = true,
   event = { "CursorMoved", "InsertEnter" },
 }
+editor["rainbowhxch/accelerated-jk.nvim"] = { opt = true, event = "BufWinEnter", config = config.accelerated_jk }
+editor["hrsh7th/vim-eft"] = { opt = true, event = "BufReadPost" }
+editor["luukvbaal/stabilize.nvim"] = {
+  opt = true,
+  event = "BufReadPost",
+}
+
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
   event = "BufRead",

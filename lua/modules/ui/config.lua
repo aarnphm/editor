@@ -115,18 +115,13 @@ config.alpha = function()
     button("comma f f", "  File find", leader, "<cmd>Telescope find_files<cr>"),
     button("kplus e c", "  Editor", lleader, "<cmd>e ~/.editor.lua<cr>"),
     button("kplus e s", "  Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
-    button(
-      "kplus e r",
-      "  NVIM access",
-      lleader,
-      "<cmd>lua require('core.utils').exec_telescope('telescope.builtin.__files', 'find_files', {cwd = vim.fn.stdpath('config')})<cr>"
-    ),
+    button("kplus e r", "  NVIM access", lleader, "<cmd>Telescope find_files {cwd = vim.fn.stdpath('config')}<cr>"),
   }
 
   dashboard.section.buttons.opts.hl = "String"
   local footer = function()
     local total_plugins = #vim.tbl_keys(packer_plugins)
-    return "🍱 github.com/aarnphm/editor"
+    return "🍱 github.com/aarnphm"
       .. "   v"
       .. vim.version().major
       .. "."

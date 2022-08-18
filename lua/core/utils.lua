@@ -46,7 +46,6 @@ M.exec_telescope = function(telescope_path, telescope_fn, opt)
 
   local opts = opt or {}
   if not vim.tbl_contains(opts, "cwd") then
-    print(opts.cwd)
     opts.cwd = dir
   end
 
@@ -76,13 +75,6 @@ M.reset_cache = function()
   if ok then
     impatient.clear_cache()
   end
-end
-
-M.reload = function()
-  require("plugins")
-  require("packer").sync()
-  require("packer").compile()
-  vim.notify("Config reloaded and compiled.")
 end
 
 local hidden = {

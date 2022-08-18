@@ -34,8 +34,7 @@ config.lspsaga = function()
   kind[23][2] = " "
   kind[26][2] = " "
 
-  local saga = require("lspsaga")
-  saga.init_lsp_saga()
+  require("lspsaga").init_lsp_saga()
 end
 
 config.cmp = function()
@@ -215,12 +214,15 @@ config.autopairs = function()
   -- If you want insert `(` after select function or method item
   local cmp = require("cmp")
   local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+  cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+
   local handlers = require("nvim-autopairs.completion.handlers")
+
   cmp.event:on(
     "confirm_done",
     cmp_autopairs.on_confirm_done({
       filetypes = {
-        -- "*" is an alias to all filetypes
+        -- "*" is a alias to all filetypes
         ["*"] = {
           ["("] = {
             kind = {
@@ -230,8 +232,6 @@ config.autopairs = function()
             handler = handlers["*"],
           },
         },
-        -- Disable for tex
-        tex = false,
       },
     })
   )
