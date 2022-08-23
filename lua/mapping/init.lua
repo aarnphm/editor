@@ -114,9 +114,6 @@ M.setup = function()
     ["n|<LocalLeader>wd"] = map_cr("TroubleToggle workspace_diagnostics"):with_noremap():with_silent(),
     ["n|<LocalLeader>qf"] = map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
     ["n|<LocalLeader>ll"] = map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
-    -- Plugin accelerate-jk
-    ["n|j"] = map_cmd("v:lua.enhance_jk_move('j')"):with_silent():with_expr(),
-    ["n|k"] = map_cmd("v:lua.enhance_jk_move('k')"):with_silent():with_expr(),
     -- Plugin vim-eft
     ["n|f"] = map_cmd("v:lua.enhance_ft_move('f')"):with_expr(),
     ["n|F"] = map_cmd("v:lua.enhance_ft_move('F')"):with_expr(),

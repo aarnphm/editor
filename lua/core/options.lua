@@ -3,8 +3,8 @@ local M = {}
 M.setup = function()
   vim.cmd("set nocompatible")
   local global_opt = {
-    textwidth = 80,
-    title = false,
+    textwidth = 88,
+    title = true,
     termguicolors = true,
     complete = ".,w,b,k",
     -- complete = "",

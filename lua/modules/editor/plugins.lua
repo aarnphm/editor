@@ -212,7 +212,6 @@ editor["romainl/vim-cool"] = {
   opt = true,
   event = { "CursorMoved", "InsertEnter" },
 }
-editor["rainbowhxch/accelerated-jk.nvim"] = { opt = true, event = "BufWinEnter", config = config.accelerated_jk }
 editor["hrsh7th/vim-eft"] = { opt = true, event = "BufReadPost" }
 editor["luukvbaal/stabilize.nvim"] = {
   opt = true,

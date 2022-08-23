@@ -46,6 +46,15 @@ config.cmp = function()
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
+  local replace_termcodes = function(str)
+    return vim.api.nvim_replace_termcodes(str, true, true, true)
+  end
+
+  local check_backspace = function()
+    local col = vim.fn.col(".") - 1
+    return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
+  end
+
   local border = function(hl)
     return {
       { "╭", hl },
@@ -68,6 +77,33 @@ config.cmp = function()
   local compare = require("cmp.config.compare")
 
   local cmp = require("cmp")
+
+  local tab_complete = function(fallback)
+    local copilot_keys = vim.fn["copilot#Accept"]()
+    if copilot_keys ~= "" then
+      vim.api.nvim_feedkeys(copilot_keys, "i", true)
+    elseif cmp.visible() then
+      cmp.select_next_item()
+    elseif require("luasnip").expand_or_jumpable() then
+      vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-expand-or-jump"), "")
+    elseif check_backspace() then
+      vim.fn.feedkeys(replace_termcodes("<Tab>"), "n")
+    else
+      fallback()
+    end
+  end
+
+  local s_tab_complete = function(fallback)
+    if cmp.visible() then
+      cmp.select_prev_item()
+    elseif require("luasnip").jumpable(-1) then
+      vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-jump-prev"), "")
+    elseif has_words_before() then
+      cmp.complete()
+    else
+      fallback()
+    end
+  end
 
   cmp.setup({
     window = {
@@ -144,8 +180,20 @@ config.cmp = function()
       ["<C-n>"] = cmp.mapping.select_next_item(),
       ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       ["<C-f>"] = cmp.mapping.scroll_docs(4),
-      ["<C-e>"] = cmp.mapping.close(),
-      ["<Tab>"] = cmp.mapping(function(fallback)
+      ["<Tab>"] = tab_complete,
+      ["<S-Tab>"] = s_tab_complete,
+      ["<C-e>"] = cmp.mapping({
+        i = function(fallback)
+          local copilot_keys = vim.fn["copilot#Accept"]()
+          if copilot_keys ~= "" then
+            vim.api.nvim_feedkeys(copilot_keys, "i", true)
+          else
+            cmp.mapping.abort()(fallback)
+          end
+        end,
+        c = cmp.mapping.close(),
+      }),
+      ["<C-j>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
         elseif has_words_before() then
@@ -154,7 +202,7 @@ config.cmp = function()
           fallback()
         end
       end, { "i", "s" }),
-      ["<S-Tab>"] = cmp.mapping(function(fallback)
+      ["<C-k>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
         else

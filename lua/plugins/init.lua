@@ -205,6 +205,11 @@ local required_plugins = function(use)
   })
 
   use({ "rebelot/kanagawa.nvim" })
+  use({
+    "rose-pine/neovim",
+    as = "rose-pine",
+    tag = "v1.*",
+  })
 
   use({ "stevearc/dressing.nvim", after = "nvim-web-devicons" })
 

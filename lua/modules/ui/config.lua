@@ -318,14 +318,14 @@ config.nvim_tree = function()
     open_on_tab = false,
     sort_by = "name",
     reload_on_bufenter = true,
-    update_cwd = true,
+    update_cwd = false,
     diagnostics = {
       enable = false,
       icons = { hint = "", info = "", warning = "", error = "" },
     },
     update_focused_file = {
       enable = true,
-      update_cwd = true,
+      update_cwd = false,
       ignore_list = {},
     },
     system_open = { cmd = nil, args = {} },
