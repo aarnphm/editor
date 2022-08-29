@@ -79,10 +79,7 @@ config.cmp = function()
   local cmp = require("cmp")
 
   local tab_complete = function(fallback)
-    local copilot_keys = vim.fn["copilot#Accept"]()
-    if copilot_keys ~= "" then
-      vim.api.nvim_feedkeys(copilot_keys, "i", true)
-    elseif cmp.visible() then
+    if cmp.visible() then
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
       vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-expand-or-jump"), "")
@@ -184,12 +181,7 @@ config.cmp = function()
       ["<S-Tab>"] = s_tab_complete,
       ["<C-e>"] = cmp.mapping({
         i = function(fallback)
-          local copilot_keys = vim.fn["copilot#Accept"]()
-          if copilot_keys ~= "" then
-            vim.api.nvim_feedkeys(copilot_keys, "i", true)
-          else
-            cmp.mapping.abort()(fallback)
-          end
+          cmp.mapping.abort()(fallback)
         end,
         c = cmp.mapping.close(),
       }),

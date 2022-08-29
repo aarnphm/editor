@@ -27,7 +27,7 @@ config.nvim_treesitter = function()
       "vue",
       "css",
     },
-    sync_install = true,
+    sync_install = false,
     highlight = { enable = true },
     incremental_selection = {
       enable = true,
@@ -372,8 +372,8 @@ config.telescope = function()
         height = 0.80,
         preview_cutoff = 120,
       },
-      file_ignore_patterns = { "packer_compiled.lua", "static_content/", "node_modules/", ".git/" },
-      -- file_sorter = require("telescope.sorters").get_fuzzy_file,
+      file_ignore_patterns = { "packer_compiled.lua", "static_content", "node_modules", ".git" },
+      file_sorter = require("telescope.sorters").get_fuzzy_file,
       file_previewer = require("telescope.previewers").vim_buffer_cat.new,
       grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
@@ -639,6 +639,7 @@ end
 
 config.wilder = function()
   local wilder = require("wilder")
+
   wilder.setup({ modes = { "/", "?" } })
   wilder.set_option("pipeline", {
     wilder.branch(
