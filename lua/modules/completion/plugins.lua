@@ -15,7 +15,16 @@ completion["williamboman/mason.nvim"] = {
   },
 }
 completion["folke/lua-dev.nvim"] = { opt = true, requires = "nvim-lspconfig" }
-completion["github/copilot.vim"] = { opt = true, after = "nvim-cmp", cmd = { "Copilot" } }
+completion["github/copilot.vim"] = {
+  opt = true,
+  setup = function()
+    vim.g.copilot_no_tab_map = true
+    vim.g.copilot_assume_mapped = true
+    vim.g.copilot_tab_fallback = ""
+  end,
+  after = "nvim-cmp",
+  cmd = { "Copilot" },
+}
 completion["kevinhwang91/nvim-bqf"] = { ft = "qf", config = config.bqf }
 completion["glepnir/lspsaga.nvim"] = {
   opt = true,

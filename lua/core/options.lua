@@ -107,7 +107,7 @@ M.setup = function()
     concealcursor = "niv",
   }
 
-  vim.g.python3_host_prog = __editor_config.global.python3_host_prog
+  vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
 
   if __editor_global.is_mac then
     vim.g.clipboard = {

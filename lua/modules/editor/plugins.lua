@@ -9,6 +9,7 @@ editor["nvim-treesitter/nvim-treesitter"] = {
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
   after = "nvim-treesitter",
+  commit = "761e283a8e3ab80ee5ec8daf4f19d92d23ee37e4",
 }
 editor["romgrk/nvim-treesitter-context"] = {
   opt = true,
