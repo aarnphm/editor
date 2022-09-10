@@ -2,8 +2,9 @@ local editor = {}
 local config = require("modules.editor.config")
 
 editor["nvim-treesitter/nvim-treesitter"] = {
+  opt = true,
   run = ":TSUpdate",
-  event = "BufRead",
+  event = "BufReadPost",
   config = config.nvim_treesitter,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {

@@ -154,13 +154,21 @@ config.alpha = function()
 end
 
 config.lualine = function()
-  local gps = require("nvim-gps")
+  local navic = require("nvim-navic")
 
-  local gps_content = function()
-    if gps.is_available() then
-      return gps.get_location()
-    else
-      return ""
+  local function escape_status()
+    local ok, m = pcall(require, "better_escape")
+    return ok and m.waiting and "✺ " or ""
+  end
+
+  local function diff_source()
+    local gitsigns = vim.b.gitsigns_status_dict
+    if gitsigns then
+      return {
+        added = gitsigns.added,
+        modified = gitsigns.changed,
+        removed = gitsigns.removed,
+      }
     end
   end
 
@@ -203,7 +211,8 @@ config.lualine = function()
     sections = simple_sections,
     filetypes = { "dapui_watches" },
   }
-  local python_venv = function()
+
+  local function python_venv()
     local function env_cleanup(venv)
       if string.find(venv, "/") then
         local final_venv = venv
@@ -238,11 +247,12 @@ config.lualine = function()
     },
     sections = {
       lualine_a = { "mode" },
-      lualine_b = { { "branch" }, { "diff" } },
+      lualine_b = { { "branch" }, { "diff", source = diff_source } },
       lualine_c = {
-        { gps_content, cond = gps.is_available },
+        { navic.get_location, cond = navic.is_available },
       },
       lualine_x = {
+        { escape_status },
         {
           "diagnostics",
           sources = { "nvim_diagnostic" },
@@ -256,7 +266,11 @@ config.lualine = function()
         {
           "fileformat",
           icons_enabled = true,
-          padding = 1,
+          symbols = {
+            unix = "LF",
+            dos = "CRLF",
+            mac = "CR",
+          },
         },
       },
       lualine_z = { "progress", "location" },
@@ -272,6 +286,7 @@ config.lualine = function()
     tabline = {},
     extensions = {
       "quickfix",
+      "nvim-tree",
       "toggleterm",
       "fugitive",
       outline,
@@ -283,27 +298,45 @@ config.lualine = function()
   })
 end
 
-config.nvim_gps = function()
-  require("nvim-gps").setup({
+config.nvim_navic = function()
+  vim.g.navic_silence = true
+
+  require("nvim-navic").setup({
     icons = {
-      ["class-name"] = " ", -- Classes and class-like objects
-      ["function-name"] = " ", -- Functions
-      ["method-name"] = " ", -- Methods (functions inside class-like objects)
+      Method = " ",
+      Function = " ",
+      Constructor = " ",
+      Field = " ",
+      Variable = " ",
+      Class = "ﴯ ",
+      Interface = " ",
+      Module = " ",
+      Property = "ﰠ ",
+      Enum = " ",
+      File = " ",
+      EnumMember = " ",
+      Constant = " ",
+      Struct = " ",
+      Event = " ",
+      Operator = " ",
+      TypeParameter = " ",
+      Namespace = " ",
+      Object = " ",
+      Array = " ",
+      Boolean = " ",
+      Number = " ",
+      Null = "ﳠ ",
+      Key = " ",
+      String = " ",
+      Package = " ",
     },
-    languages = {
-      -- You can disable any language individually here
-      ["c"] = true,
-      ["cpp"] = true,
-      ["go"] = true,
-      ["java"] = true,
-      ["javascript"] = true,
-      ["lua"] = true,
-      ["python"] = true,
-      ["rust"] = true,
-    },
+    highlight = true,
     separator = " » ",
+    depth_limit = 0,
+    depth_limit_indicator = "..",
   })
 end
+
 config.nvim_tree = function()
   require("nvim-tree").setup({
     disable_netrw = true,
@@ -364,6 +397,10 @@ config.nvim_tree = function()
     filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "*/packer_compiled.lua" } },
     git = { timeout = 500 },
     trash = { cmd = "rip", require_confirm = true },
+    filesystem_watchers = {
+      enable = true,
+      debounce_delay = 50,
+    },
     actions = {
       open_file = {
         resize_window = false,

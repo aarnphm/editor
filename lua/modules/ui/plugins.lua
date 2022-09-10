@@ -16,6 +16,7 @@ ui["j-hui/fidget.nvim"] = {
       text = {
         spinner = "dots",
       },
+      window = { blend = 0 },
     })
   end,
 }
@@ -27,12 +28,16 @@ ui["goolord/alpha-nvim"] = {
     return #vim.api.nvim_list_uis() > 0
   end,
 }
-ui["SmiteshP/nvim-gps"] = {
+ui["nvim-lualine/lualine.nvim"] = {
   opt = true,
-  after = "nvim-treesitter",
-  config = config.nvim_gps,
+  after = { "nvim-navic" },
+  config = config.lualine,
 }
-ui["nvim-lualine/lualine.nvim"] = { config = config.lualine, after = "nvim-gps" }
+ui["SmiteshP/nvim-navic"] = {
+  opt = true,
+  after = "nvim-lspconfig",
+  config = config.nvim_navic,
+}
 ui["kyazdani42/nvim-tree.lua"] = {
   opt = true,
   cmd = { "NvimTreeToggle" },
