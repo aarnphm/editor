@@ -1,6 +1,6 @@
 local config = {}
 
-config.nvim_lsp = function()
+config.lspconfig = function()
   require("modules.completion.lsp")
 end
 
@@ -41,8 +41,7 @@ config.lspsaga = function()
 
   local colors = get_palette()
 
-  local saga = require("lspsaga")
-  saga.init_lsp_saga({
+  require("lspsaga").init_lsp_saga({
     diagnostic_header = { " ", " ", "  ", " " },
     custom_kind = {
       File = { " ", colors.rosewater },
@@ -81,9 +80,6 @@ config.lspsaga = function()
 end
 
 config.cmp = function()
-  local t = function(str)
-    return vim.api.nvim_replace_termcodes(str, true, true, true)
-  end
   local has_words_before = function()
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
@@ -256,20 +252,6 @@ config.cmp = function()
           fallback()
         end
       end, { "i", "s" }),
-      ["<C-h>"] = function(fallback)
-        if require("luasnip").jumpable(-1) then
-          vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
-        else
-          fallback()
-        end
-      end,
-      ["<C-l>"] = function(fallback)
-        if require("luasnip").expand_or_jumpable() then
-          vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
-        else
-          fallback()
-        end
-      end,
     }),
     snippet = {
       expand = function(args)
@@ -348,8 +330,8 @@ config.mason_install = function()
       "gopls",
       "rnix-lsp",
       "pyright",
+      "jdtls",
       "bash-language-server",
-      "editorconfig-checker",
       "lua-language-server",
       "stylua",
       "selene",
@@ -360,6 +342,10 @@ config.mason_install = function()
       "shfmt",
       "vint",
       "taplo",
+      "clangd",
+      "vim-language-server",
+      "buf",
+      "tflint",
     },
 
     -- if set to true this will check each tool for updates. If updates
@@ -371,7 +357,7 @@ config.mason_install = function()
     -- will happen on startup. You can use `:MasonToolsUpdate` to install
     -- tools and check for updates.
     -- Default: true
-    run_on_start = true,
+    run_on_start = false,
   })
 end
 

@@ -73,7 +73,10 @@ M.setup = function()
   require("core.mappings")
   require("core.events")
 
-  vim.cmd.colorscheme(__editor_config.colorscheme)
+  -- plugins
+  require("trimwhite")
+
+  vim.cmd("silent! colorscheme " .. __editor_config.colorscheme)
 end
 
 return M

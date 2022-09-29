@@ -23,6 +23,12 @@ _G.set_terminal_keymaps = function()
   vim.api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
 end
 
+_G.setup_octo_autocomplete = function()
+  local opts = { noremap = true, silent = true }
+  vim.api.nvim_buf_set_keymap(0, "i", "@", "@<C-x><C-o>", opts)
+  vim.api.nvim_buf_set_keymap(0, "i", "#", "#<C-x><C-o>", opts)
+end
+
 local autocmd = vim.api.nvim_create_autocmd
 
 -- Disable statusline in dashboard
@@ -144,19 +150,20 @@ M.setup = function()
         "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
       },
       -- Google tab style
-      { "BufNewFile,BufRead", "BUILD", "setf bzl" },
+      { "BufNewFile,BufRead", "BUILD*", "setf bzl" },
       { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
+      { "BufNewFile,BufRead", "*.proto", "setf proto" },
       { "BufNewFile,BufRead", "Bentfile", "setf dockerfile.yaml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
       { "BufNewFile,BufRead", "Dockerfile.{tpl,template,tmpl}", "setf dockerfile" },
       { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", "setf dockerfile" },
       { "BufNewFile,BufRead", "FRAMEWORK_TEMPLATE_PY", "setf python" },
-      { "FileType", "rst", "set noexpandtab tabstop=3 shiftwidth=3" },
       { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
       { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
       { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
+      { "FileType", "octo", "lua setup_octo_autocomplete()" },
     },
     yank = {
       {

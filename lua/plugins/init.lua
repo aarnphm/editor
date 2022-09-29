@@ -48,7 +48,21 @@ local required_plugins = function(use)
 
   -- colorscheme
   use({ "rebelot/kanagawa.nvim" })
-  use({ "rose-pine/neovim", as = "rose-pine" })
+  use({
+    "rose-pine/neovim",
+    as = "rose-pine",
+    config = function()
+      require("rose-pine").setup({
+        --- @usage 'main' | 'moon'
+        dark_variant = "moon",
+        bold_vert_split = true,
+        dim_nc_background = false,
+        disable_background = true,
+        disable_float_background = false,
+        disable_italics = false,
+      })
+    end,
+  })
   use({
     "catppuccin/nvim",
     as = "catppuccin",
@@ -114,8 +128,10 @@ local required_plugins = function(use)
       vim.g.catppuccin_flavour = "latte" -- Set flavour here
       local cp = get_modified_palette()
 
-      local enable_compile = true -- Set to false if you would like to disable catppuccin cache. (Not recommended)
-      set_auto_compile(enable_compile)
+      if __editor_config.colorscheme == "catppuccin" then
+        local enable_compile = true -- Set to false if you would like to disable catppuccin cache. (Not recommended)
+        set_auto_compile(enable_compile)
+      end
 
       require("catppuccin").setup({
         dim_inactive = {

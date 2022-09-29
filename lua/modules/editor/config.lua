@@ -6,28 +6,8 @@ config.nvim_treesitter = function()
 
   require("nvim-treesitter.configs").setup({
     -- 'all', 'maintained', or list of string
-    ensure_installed = {
-      "bash",
-      "c",
-      "cpp",
-      "lua",
-      "go",
-      "gomod",
-      "rust",
-      "dockerfile",
-      "json",
-      "yaml",
-      "latex",
-      "nix",
-      "make",
-      "python",
-      "html",
-      "javascript",
-      "typescript",
-      "vue",
-      "css",
-    },
-    sync_install = false,
+    ensure_installed = "all",
+    ignore_install = { "phpdoc", "vala", "tiger", "slint", "eex" },
     highlight = { enable = true },
     incremental_selection = {
       enable = true,
@@ -113,6 +93,7 @@ config.nvim_treesitter = function()
     p.install_info.url = p.install_info.url:gsub("https://github.com/", "git@github.com:")
   end
 
+  -- use with octo.nvim
   parsers.markdown.filetype_to_parsername = "octo"
 end
 
@@ -142,10 +123,6 @@ config.autotag = function()
       "vue",
     },
   })
-end
-
-config.matchup = function()
-  vim.cmd([[let g:matchup_matchparen_offscreen = {'method': 'popup'}]])
 end
 
 config.toggleterm = function()
@@ -314,11 +291,8 @@ config.telescope = function()
   vim.cmd([[packadd telescope-file-browser.nvim]])
   vim.cmd([[packadd telescope-frecency.nvim]])
   vim.cmd([[packadd telescope-emoji.nvim]])
-  vim.cmd([[packadd telescope-ui-select.nvim]])
-  vim.cmd([[packadd telescope-live-grep-args.nvim]])
 
   local telescope_actions = require("telescope.actions.set")
-  local theme = __editor_config.theme
 
   local fixfolds = {
     hidden = true,
@@ -334,9 +308,9 @@ config.telescope = function()
 
   local fb_actions = require("telescope").extensions.file_browser.actions
 
-  local telescope_config = {
+  require("telescope").setup({
     defaults = {
-      initial_model = "insert",
+      initial_model = "normal",
       scroll_strategy = "limit",
       prompt_prefix = "🔭 ",
       selection_caret = "» ",
@@ -348,14 +322,15 @@ config.telescope = function()
         "--line-number",
         "--column",
         "--smart-case",
+        "--hidden",
       },
       mappings = {
         i = {
           ["<C-a>"] = { "<esc>0i", type = "command" },
           ["<Esc>"] = require("telescope.actions").close,
         },
+        n = { ["q"] = require("telescope.actions").close },
       },
-      results_title = false,
       selection_strategy = "reset",
       sorting_strategy = "ascending",
       layout_strategy = "horizontal",
@@ -394,23 +369,15 @@ config.telescope = function()
       winblend = 0,
       border = {},
       color_devicons = true,
-      use_less = true,
     },
     extensions = {
-      ["ui-select"] = {
-        require("telescope.themes").get_dropdown({}),
-      },
       file_browser = {
-        theme = theme,
         mappings = {
           ["i"] = {
             -- your custom insert mode mappings
             ["<C-h>"] = fb_actions.goto_parent_dir,
             ["<C-e>"] = fb_actions.rename,
             ["<C-c>"] = fb_actions.create,
-          },
-          ["n"] = {
-            -- your custom normal mode mappings
           },
         },
       },
@@ -419,7 +386,6 @@ config.telescope = function()
         override_generic_sorter = true, -- override the generic sorter
         override_file_sorter = true, -- override the file sorter
         case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-        -- the default case_mode is "smart_case"
       },
       frecency = {
         show_scores = true,
@@ -429,11 +395,22 @@ config.telescope = function()
     },
     pickers = {
       buffers = fixfolds,
-      find_files = fixfolds,
+      find_files = {
+        mappings = {
+          n = {
+            ["cd"] = function(prompt_bufnr)
+              local selection = require("telescope.actions.state").get_selected_entry()
+              local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+              require("telescope.actions").close(prompt_bufnr)
+              -- Depending on what you want put `cd`, `lcd`, `tcd`
+              vim.cmd(string.format("silent lcd %s", dir))
+            end,
+          },
+        },
+      },
       git_files = fixfolds,
       grep_string = fixfolds,
       live_grep = {
-        theme = theme,
         on_input_filter_cb = function(prompt)
           -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
           return { prompt = prompt:gsub("%s", ".*") }
@@ -448,11 +425,7 @@ config.telescope = function()
         end,
       },
       oldfiles = fixfolds,
-      lsp_document_symbols = {
-        theme = theme,
-      },
       diagnostics = {
-        theme = theme,
         initial_mode = "normal",
       },
       lsp_references = {
@@ -468,17 +441,11 @@ config.telescope = function()
         initial_mode = "normal",
       },
     },
-  }
-
-  _G.telescope_config = telescope_config
-
-  require("telescope").setup(telescope_config)
+  })
   require("telescope").load_extension("fzf")
   require("telescope").load_extension("frecency")
-  require("telescope").load_extension("ui-select")
   require("telescope").load_extension("file_browser")
   require("telescope").load_extension("emoji")
-  require("telescope").load_extension("live_grep_args")
 end
 
 config.octo = function()
@@ -646,73 +613,6 @@ config.cheatsheet = function()
       ["<C-E>"] = require("cheatsheet.telescope.actions").edit_user_cheatsheet,
     },
   })
-end
-
-config.wilder = function()
-  local wilder = require("wilder")
-
-  wilder.setup({ modes = { "/", "?" } })
-  wilder.set_option("pipeline", {
-    wilder.branch(
-      wilder.python_file_finder_pipeline({
-        file_command = function(_, arg)
-          if string.find(arg, ".") ~= nil then
-            return { "fdfind", "-tf", "-H" }
-          else
-            return { "fdfind", "-tf" }
-          end
-        end,
-        dir_command = { "fd", "-td" },
-      }),
-      wilder.substitute_pipeline({
-        pipeline = wilder.python_search_pipeline({
-          skip_cmdtype_check = 1,
-          pattern = wilder.python_fuzzy_pattern({
-            start_at_boundary = 0,
-          }),
-        }),
-      }),
-      { wilder.check(function(_, x)
-        return x == ""
-      end), wilder.history() },
-      wilder.python_search_pipeline({
-        pattern = wilder.python_fuzzy_pattern({ start_at_boundary = 0 }),
-      })
-    ),
-  })
-
-  local highlighters = { wilder.pcre2_highlighter(), wilder.lua_fzy_highlighter() }
-  local popupmenu_renderer = wilder.popupmenu_renderer(wilder.popupmenu_border_theme({
-    border = "rounded",
-    empty_message = wilder.popupmenu_empty_message_with_spinner(),
-    highligher = highlighters,
-    left = {
-      " ",
-      wilder.popupmenu_devicons(),
-      wilder.popupmenu_buffer_flags({
-        flags = " a + ",
-        icons = { ["+"] = "", a = "", h = "" },
-      }),
-    },
-    right = {
-      " ",
-      wilder.popupmenu_scrollbar(),
-    },
-  }))
-  local wildmenu_renderer = wilder.wildmenu_renderer({
-    highlighter = highlighters,
-    separator = " · ",
-    left = { " ", wilder.wildmenu_spinner(), " " },
-    right = { " ", wilder.wildmenu_index() },
-  })
-  wilder.set_option(
-    "renderer",
-    wilder.renderer_mux({
-      [":"] = popupmenu_renderer,
-      ["/"] = wildmenu_renderer,
-      substitute = wildmenu_renderer,
-    })
-  )
 end
 
 return config

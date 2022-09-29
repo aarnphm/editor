@@ -2,9 +2,7 @@ local editor = {}
 local config = require("modules.editor.config")
 
 editor["nvim-treesitter/nvim-treesitter"] = {
-  opt = true,
   run = ":TSUpdate",
-  event = "BufReadPost",
   config = config.nvim_treesitter,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
@@ -98,7 +96,7 @@ editor["RRethy/vim-illuminate"] = {
 editor["phaazon/hop.nvim"] = {
   opt = true,
   branch = "v2",
-  event = "BufReadPost",
+  event = "BufRead",
   config = function()
     require("hop").setup()
   end,
@@ -126,17 +124,9 @@ editor["nvim-telescope/telescope-file-browser.nvim"] = {
 editor["nvim-telescope/telescope-frecency.nvim"] = {
   opt = true,
   after = "telescope-file-browser.nvim",
-  requires = { { "tami5/sqlite.lua", opt = true } },
-}
-editor["nvim-telescope/telescope-ui-select.nvim"] = {
-  opt = true,
-  after = "telescope.nvim",
+  requires = { "kkharji/sqlite.lua" },
 }
 editor["xiyaowong/telescope-emoji.nvim"] = {
-  opt = true,
-  after = "telescope.nvim",
-}
-editor["nvim-telescope/telescope-live-grep-args.nvim"] = {
   opt = true,
   after = "telescope.nvim",
 }
@@ -150,18 +140,18 @@ editor["pwntester/octo.nvim"] = {
     "nvim-telescope/telescope.nvim",
   },
 }
+editor["sindrets/diffview.nvim"] = {
+  opt = true,
+  cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+  requires = {
+    "kyazdani42/nvim-web-devicons",
+    "nvim-lua/plenary.nvim",
+  },
+}
 editor["sudormrfbin/cheatsheet.nvim"] = {
   opt = true,
   after = "telescope.nvim",
   config = config.cheatsheet,
-}
-editor["gelguy/wilder.nvim"] = {
-  event = "CmdlineEnter",
-  config = config.wilder,
-  run = ":UpdateRemotePlugins",
-  requires = {
-    { "romgrk/fzy-lua-native", opt = true, after = "wilder.nvim" },
-  },
 }
 editor["folke/trouble.nvim"] = {
   opt = true,
@@ -240,6 +230,10 @@ editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,
   ft = "ipynb",
   cmd = { "JupyterExecute", "JupyterExecuteAll" },
+}
+editor["Stormherz/tablify"] = {
+  opt = true,
+  ft = "rst",
 }
 
 return editor

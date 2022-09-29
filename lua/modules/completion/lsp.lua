@@ -91,6 +91,26 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
+  elseif server.name == "jdtls" then
+    nvim_lsp.jdtls.setup({
+      on_attach = on_editor_attach,
+      flags = { debounce_text_changes = 500 },
+      capabilities = capabilities,
+      settings = {
+        root_dir = {
+          -- Single-module projects
+          {
+            "build.xml", -- Ant
+            "pom.xml", -- Maven
+            "settings.gradle", -- Gradle
+            "settings.gradle.kts", -- Gradle
+          },
+          -- Multi-module projects
+          { "build.gradle", "build.gradle.kts" },
+          { "$BENTOML_GIT_ROOT/docs/source/guides/snippets/grpc/java" },
+        } or vim.fn.getcwd(),
+      },
+    })
   elseif server == "clangd" then
     local c_capabilities = capabilities
     c_capabilities.offsetEncoding = { "utf-16" }

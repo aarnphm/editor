@@ -18,5 +18,4 @@ benchmark-local:
 reset:
 	@\rm -rf ${HOME}/.local/share/nvim ${HOME}/.cache/nvim
 	@\rm -rf ./plugin
-	nvim -c "autocmd User PackerComplete quitall" -c "PackerSync"
-	nvim
+	nvim -c "PackerSync"

@@ -346,7 +346,8 @@ config.nvim_tree = function()
     prefer_startup_root = true,
     respect_buf_cwd = true,
     view = {
-      adaptive_size = true,
+      adaptive_size = false,
+      width = 16,
       side = "right",
     },
     renderer = {
@@ -390,12 +391,12 @@ config.nvim_tree = function()
     hijack_directories = { enable = true, auto_open = true },
     update_focused_file = {
       enable = true,
-      update_root = true,
+      update_root = false,
       ignore_list = {},
     },
     system_open = { cmd = "open", args = {} },
-    filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "*/packer_compiled.lua" } },
-    git = { timeout = 500 },
+    filters = { dotfiles = false, custom = { "^.git$", ".DS_Store", "__pycache__", "*/packer_compiled.lua" } },
+    git = { timeout = 500, ignore = false },
     trash = { cmd = "rip", require_confirm = true },
     filesystem_watchers = {
       enable = true,

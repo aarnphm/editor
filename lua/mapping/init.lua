@@ -21,6 +21,7 @@ M.setup = function()
     ["n|<C-l>"] = map_cmd("<C-w>l"):with_noremap(),
     ["n|<C-j>"] = map_cmd("<C-w>j"):with_noremap(),
     ["n|<C-k>"] = map_cmd("<C-w>k"):with_noremap(),
+    ["n|vs"] = map_cu("vsplit"):with_noremap():with_silent(),
     ["n|<leader>vs"] = map_cmd(':vsplit <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
     ["n|<leader>s"] = map_cmd(':split <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
     ["n|<leader>te"] = map_cmd(':tabedit <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
@@ -52,7 +53,6 @@ M.setup = function()
     ["n|ft"] = map_cr("FormatToggle"):with_noremap():with_silent(),
     -- reload and edit config
     ["n|<LocalLeader>rl"] = map_cu("lua require'plugins' require('packer').sync()"):with_noremap():with_silent(),
-    ["n|<LocalLeader>ec"] = map_cu(":e ~/.editor.lua"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<LocalLeader><LocalLeader>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
@@ -88,8 +88,8 @@ M.setup = function()
     ["n|K"] = map_cr("Lspsaga hover_doc"):with_noremap():with_silent(),
     ["n|so"] = map_cr("LSoutlineToggle"):with_noremap():with_silent(),
     ["n|<LocalLeader>ca"] = map_cr("Lspsaga code_action"):with_noremap():with_silent(),
-    ["v|<LocalLeader>ca"] = map_cu("Lspsaga range_code_action"):with_noremap():with_silent(),
-    ["n|gd"] = map_cr("Lspsaga preview_definition"):with_noremap():with_silent(),
+    ["v|<LocalLeader>ca"] = map_cu("Lspsaga code_action"):with_noremap():with_silent(),
+    ["n|gd"] = map_cr("Lspsaga peek_definition"):with_noremap():with_silent(),
     ["n|<LocalLeader>cd"] = map_cr("Lspsaga show_line_diagnostics"):with_noremap():with_silent(),
     ["n|<Leader>cd"] = map_cr("Lspsaga show_cursor_diagnostics"):with_noremap():with_silent(),
     ["n|gD"] = map_cr("lua vim.lsp.buf.definition()"):with_noremap():with_silent(),
@@ -101,7 +101,7 @@ M.setup = function()
     ["n|gpl"] = map_cr("G pull"):with_noremap():with_silent(),
     -- Plugin nvim-tree
     ["n|<C-n>"] = map_cr("NvimTreeToggle"):with_noremap():with_silent(),
-    ["n|<Leader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
+    ["n|<LocalLeader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
     ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
     -- Plugin octo
     ["n|<LocalLeader>oc"] = map_cr("Octo"):with_noremap(),
@@ -120,11 +120,10 @@ M.setup = function()
     ["n|t"] = map_cmd("v:lua.enhance_ft_move('t')"):with_expr(),
     ["n|T"] = map_cmd("v:lua.enhance_ft_move('T')"):with_expr(),
     -- Plugin Telescope
-    ["n|<Leader>fr"] = map_cmd("lua require('telescope').extensions.frecency.frecency{}"):with_noremap():with_silent(),
-    ["n|<Leader>fo"] = map_cmd("<cmd> Telescope oldfiles <CR>"):with_noremap():with_silent(),
-    ["n|ff"] = map_cmd("<cmd> Telescope find_files <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fe"] = map_cu("Telescope oldfiles"):with_noremap():with_silent(),
+    ["n|fo"] = map_cmd("<cmd> Telescope oldfiles<CR>"):with_noremap():with_silent(),
+    ["n|fr"] = map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
+    ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files<CR>"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>fw"] = map_cr(
       "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep')"

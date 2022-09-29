@@ -5,7 +5,7 @@ local config = require("modules.completion.config")
 completion["neovim/nvim-lspconfig"] = {
   opt = true,
   event = "BufReadPre",
-  config = config.nvim_lsp,
+  config = config.lspconfig,
 }
 completion["creativenull/efmls-configs-nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
 completion["williamboman/mason.nvim"] = {
@@ -71,7 +71,6 @@ completion["simrat39/rust-tools.nvim"] = {
   opt = true,
   ft = "rust",
   config = config.rust_tools,
-  requires = "nvim-lua/plenary.nvim",
 }
 completion["iamcco/markdown-preview.nvim"] = {
   opt = true,
@@ -81,7 +80,6 @@ completion["iamcco/markdown-preview.nvim"] = {
   end,
 }
 completion["lervag/vimtex"] = { opt = true, ft = "tex", config = config.vimtex }
-completion["google/vim-maktaba"] = { opt = true }
-completion["bazelbuild/vim-bazel"] = { opt = true, requires = "google/vim-maktaba", ft = "bzl" }
+completion["bazelbuild/vim-bazel"] = { requires = "google/vim-maktaba", ft = "bzl" }
 
 return completion
