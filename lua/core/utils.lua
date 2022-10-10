@@ -1,19 +1,9 @@
 local M = {}
-local lazy = require("lazy")
 
 local create_term = function(config)
   vim.cmd([[packadd toggleterm]])
   local ft = require("toggleterm.terminal").Terminal:new(config)
   ft:toggle()
-end
-
--- load plugin after entering vim ui
-M.packer_lazy_load = function(plugin)
-  local timer = 0
-  vim.defer_fn(function()
-    require("plugins")
-    require("packer").loader(plugin)
-  end, timer)
 end
 
 M.create_float_term = function()
@@ -36,22 +26,6 @@ M._split = function(s, delim)
     table.insert(res, match)
   end
   return res
-end
-
-M.exec_telescope = function(telescope_path, telescope_fn, opt)
-  local dir = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-  if vim.v.shell_error ~= 0 then
-    dir = vim.lsp.get_active_clients()[1].config.root_dir
-  end
-
-  local opts = opt or {}
-  if not vim.tbl_contains(opts, "cwd") then
-    opts.cwd = dir
-  end
-
-  local mod = lazy.require_on_exported_call(telescope_path)
-
-  mod[telescope_fn](opts)
 end
 
 M.gitui = function()

@@ -105,8 +105,6 @@ M.setup = function()
     ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
     -- Plugin octo
     ["n|<LocalLeader>oc"] = map_cr("Octo"):with_noremap(),
-    -- Copilot
-    ["n|<LocalLeader>cp"] = map_cr("Copilot setup"):with_noremap(),
     -- Plugin trouble
     ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
     ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
@@ -124,12 +122,7 @@ M.setup = function()
     ["n|fr"] = map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files<CR>"):with_noremap():with_silent(),
-    ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cr(
-      "lua require('core.utils').exec_telescope('telescope.builtin.__files', 'live_grep')"
-    )
-      :with_noremap()
-      :with_silent(),
+    ["n|<LocalLeader>fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>fn"] = map_cu("enew"):with_noremap():with_silent(),
     ["n|<LocalLeader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),

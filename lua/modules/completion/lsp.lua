@@ -4,7 +4,6 @@ vim.cmd([[packadd lua-dev.nvim]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd efmls-configs-nvim]])
-vim.cmd([[packadd vim-illuminate]])
 
 local nvim_lsp = require("lspconfig")
 local mason = require("mason")
@@ -34,7 +33,7 @@ capabilities.textDocument.completion.completionItem = {
   },
 }
 
-local on_editor_attach = function(client)
+local on_editor_attach = function(client, bufnr)
   require("lsp_signature").on_attach({
     bind = true,
     use_lspsaga = false,
@@ -44,7 +43,7 @@ local on_editor_attach = function(client)
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
-  require("illuminate").on_attach(client)
+  require("nvim-navic").attach(client, bufnr)
 end
 
 -- C server
@@ -125,6 +124,12 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         "--pch-storage=memory",
         "--clang-tidy",
         "--suggest-missing-includes",
+        "--query-driver=/usr/bin/clang++,/usr/bin/**/clang-*,/bin/clang,/bin/clang++,/usr/bin/gcc,/usr/bin/g++",
+        "--all-scopes-completion",
+        "--cross-file-rename",
+        "--completion-style=detailed",
+        "--header-insertion-decorators",
+        "--header-insertion=iwyu",
       },
       commands = {
         ClangdSwitchSourceHeader = {
@@ -179,7 +184,64 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
       end,
       root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
     })
-  else
+  elseif server == "jsonls" then
+    nvim_lsp.jsonls.setup({
+      flags = { debounce_text_changes = 500 },
+      capabilities = capabilities,
+      on_attach = on_editor_attach,
+      settings = {
+        json = {
+          -- Schemas https://www.schemastore.org
+          schemas = {
+            {
+              fileMatch = { "package.json" },
+              url = "https://json.schemastore.org/package.json",
+            },
+            {
+              fileMatch = { "tsconfig*.json" },
+              url = "https://json.schemastore.org/tsconfig.json",
+            },
+            {
+              fileMatch = {
+                ".prettierrc",
+                ".prettierrc.json",
+                "prettier.config.json",
+              },
+              url = "https://json.schemastore.org/prettierrc.json",
+            },
+            {
+              fileMatch = { ".eslintrc", ".eslintrc.json" },
+              url = "https://json.schemastore.org/eslintrc.json",
+            },
+            {
+              fileMatch = {
+                ".babelrc",
+                ".babelrc.json",
+                "babel.config.json",
+              },
+              url = "https://json.schemastore.org/babelrc.json",
+            },
+            {
+              fileMatch = { "lerna.json" },
+              url = "https://json.schemastore.org/lerna.json",
+            },
+            {
+              fileMatch = {
+                ".stylelintrc",
+                ".stylelintrc.json",
+                "stylelint.config.json",
+              },
+              url = "http://json.schemastore.org/stylelintrc.json",
+            },
+            {
+              fileMatch = { "/.github/workflows/*" },
+              url = "https://json.schemastore.org/github-workflow.json",
+            },
+          },
+        },
+      },
+    })
+  elseif server ~= "efm" then
     nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,

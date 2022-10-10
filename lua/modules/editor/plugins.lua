@@ -73,26 +73,6 @@ editor["alexghergh/nvim-tmux-navigation"] = {
   end,
 }
 
-editor["RRethy/vim-illuminate"] = {
-  event = "BufRead",
-  config = function()
-    vim.g.Illuminate_highlightUnderCursor = 0
-    vim.g.Illuminate_ftblacklist = {
-      "help",
-      "dashboard",
-      "alpha",
-      "packer",
-      "norg",
-      "DoomInfo",
-      "NvimTree",
-      "Outline",
-      "toggleterm",
-      "Trouble",
-      "quickfix",
-    }
-  end,
-}
-
 editor["phaazon/hop.nvim"] = {
   opt = true,
   branch = "v2",
