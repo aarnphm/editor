@@ -1,4 +1,3 @@
-local api = vim.api
 local config = {}
 
 config.lspconfig = function()
@@ -81,13 +80,8 @@ config.lspsaga = function()
 end
 
 config.cmp = function()
-  local has_words_before = function()
-    local line, col = unpack(api.nvim_win_get_cursor(0))
-    return col ~= 0 and api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-  end
-
   local replace_termcodes = function(str)
-    return api.nvim_replace_termcodes(str, true, true, true)
+    return vim.api.nvim_replace_termcodes(str, true, true, true)
   end
 
   local check_backspace = function()
@@ -125,7 +119,7 @@ config.cmp = function()
   local tab_complete = function(fallback)
     local copilot_keys = vim.fn["copilot#Accept"]()
     if copilot_keys ~= "" then
-      api.nvim_feedkeys(copilot_keys, "i", true)
+      vim.api.nvim_feedkeys(copilot_keys, "i", true)
     elseif cmp.visible() then
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
@@ -142,8 +136,6 @@ config.cmp = function()
       cmp.select_prev_item()
     elseif require("luasnip").jumpable(-1) then
       vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-jump-prev"), "")
-    elseif has_words_before() then
-      cmp.complete()
     else
       fallback()
     end
@@ -194,7 +186,7 @@ config.cmp = function()
         i = function(fallback)
           local copilot_keys = vim.fn["copilot#Accept"]()
           if copilot_keys ~= "" then
-            api.nvim_feedkeys(copilot_keys, "i", true)
+            vim.api.nvim_feedkeys(copilot_keys, "i", true)
           else
             cmp.mapping.abort()(fallback)
           end
@@ -204,8 +196,6 @@ config.cmp = function()
       ["<C-j>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
-        elseif has_words_before() then
-          cmp.complete()
         else
           fallback()
         end
@@ -255,17 +245,15 @@ config.autopairs = function()
   })
 
   -- If you want insert `(` after select function or method item
-  local cmp = require("cmp")
   local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-  cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-
+  local cmp = require("cmp")
   local handlers = require("nvim-autopairs.completion.handlers")
 
   cmp.event:on(
     "confirm_done",
     cmp_autopairs.on_confirm_done({
       filetypes = {
-        -- "*" is a alias to all filetypes
+        -- "*" is an alias to all filetypes
         ["*"] = {
           ["("] = {
             kind = {
@@ -275,6 +263,8 @@ config.autopairs = function()
             handler = handlers["*"],
           },
         },
+        -- Disable for tex
+        tex = false,
       },
     })
   )
@@ -333,8 +323,8 @@ config.golang = function()
 end
 
 config.rust_tools = function()
-  api.nvim_command([[packadd nvim-lspconfig]])
-  api.nvim_command([[packadd lsp_signature.nvim]])
+  vim.api.nvim_command([[packadd nvim-lspconfig]])
+  vim.api.nvim_command([[packadd lsp_signature.nvim]])
 
   local opts = {
     tools = { -- rust-tools options
@@ -528,7 +518,7 @@ config.vimtex = function()
     vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
   end
 
-  api.nvim_command([[
+  vim.api.nvim_command([[
 augroup vimtex_mac
     autocmd!
     autocmd User VimtexEventCompileSuccess call UpdateSkim()

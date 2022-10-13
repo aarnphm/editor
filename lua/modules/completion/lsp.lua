@@ -3,6 +3,7 @@ local formatting = require("modules.completion.formatting")
 vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
+vim.cmd([[packadd vim-illuminate]])
 vim.cmd([[packadd efmls-configs-nvim]])
 
 local nvim_lsp = require("lspconfig")
@@ -57,7 +58,10 @@ local on_editor_attach = function(client, bufnr)
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
-  require("nvim-navic").attach(client, bufnr)
+  require("illuminate").on_attach(client)
+  if client.server_capabilities.documentSymbolProvider then
+    require("nvim-navic").attach(client, bufnr)
+  end
 end
 
 -- C server
@@ -249,6 +253,11 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
           },
         },
       },
+    })
+  elseif server ~= "efm" then
+    nvim_lsp[server].setup({
+      capabilities = capabilities,
+      on_attach = on_editor_attach,
     })
   else
     nvim_lsp[server].setup({
