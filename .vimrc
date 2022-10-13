@@ -46,9 +46,6 @@ Plug 'sheerun/vim-polyglot'
 " vscode like language server
 Plug 'tomasiser/vim-code-dark'
 
-" language packs
-Plug 'wakatime/vim-wakatime'
-
 " UI related
 Plug 'preservim/tagbar', {'on':'TagbarToggle'}
 Plug 'godlygeek/tabular'
@@ -317,8 +314,6 @@ nnoremap <leader>s :split <C-r>=expand("%:p:h")<cr>/
 nnoremap <silent><nowait> <space>l :bNext<cr>
 nnoremap <silent><nowait> <space>h :bprevious<cr>
 nnoremap <silent><nowait> <C-x> :Bclose<CR>
-vmap > gv<CR>
-vmap < gv<CR>
 vmap J :m '>+1<cr>gv=gv<CR>
 vmap K :m '<-2<cr>gv=gv<CR>
 
