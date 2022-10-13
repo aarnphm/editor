@@ -1,14 +1,19 @@
 local editor = {}
 local config = require("modules.editor.config")
 
+editor["RRethy/vim-illuminate"] = {
+  opt = true,
+  event = "BufReadPost",
+  config = config.illuminate,
+}
 editor["nvim-treesitter/nvim-treesitter"] = {
   run = ":TSUpdate",
+  event = "BufReadPost",
   config = config.nvim_treesitter,
 }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
   after = "nvim-treesitter",
-  commit = "761e283a8e3ab80ee5ec8daf4f19d92d23ee37e4",
 }
 editor["romgrk/nvim-treesitter-context"] = {
   opt = true,
@@ -25,9 +30,6 @@ editor["mfussenegger/nvim-ts-hint-textobject"] = {
 editor["andymass/vim-matchup"] = {
   opt = true,
   after = "nvim-treesitter",
-  config = function()
-    vim.cmd([[let g:matchup_matchparen_offscreen = {'method': 'popup'}]])
-  end,
 }
 editor["ThePrimeagen/refactoring.nvim"] = {
   module = "refactoring",
@@ -57,7 +59,6 @@ editor["kylechui/nvim-surround"] = {
     require("nvim-surround").setup()
   end,
 }
-editor["tpope/vim-fugitive"] = { cmd = { "Git", "G", "Ggrep", "GBrowse" } }
 
 editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
 
@@ -97,15 +98,12 @@ editor["nvim-telescope/telescope-fzf-native.nvim"] = {
   run = "make",
   after = "telescope.nvim",
 }
-editor["nvim-telescope/telescope-file-browser.nvim"] = {
-  opt = true,
-  after = "telescope-fzf-native.nvim",
-}
 editor["nvim-telescope/telescope-frecency.nvim"] = {
   opt = true,
-  after = "telescope-file-browser.nvim",
+  after = "telescope-fzf-native.nvim",
   requires = { "kkharji/sqlite.lua" },
 }
+editor["jvgrootveld/telescope-zoxide"] = { opt = true, after = "telescope-frecency.nvim" }
 editor["xiyaowong/telescope-emoji.nvim"] = {
   opt = true,
   after = "telescope.nvim",
@@ -173,11 +171,6 @@ editor["folke/zen-mode.nvim"] = {
   config = function()
     require("zen-mode").setup({})
   end,
-}
-editor["andymass/vim-matchup"] = {
-  opt = true,
-  after = "nvim-treesitter",
-  config = config.matchup,
 }
 editor["romainl/vim-cool"] = {
   opt = true,

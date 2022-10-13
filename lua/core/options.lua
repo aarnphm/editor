@@ -1,13 +1,11 @@
 local M = {}
 
 M.setup = function()
-  vim.cmd("set nocompatible")
   local global_opt = {
     textwidth = 88,
     title = true,
     termguicolors = true,
     complete = ".,w,b,k",
-    -- complete = "",
     nrformats = "bin,hex",
     wildmenu = true,
     hlsearch = true,
@@ -84,8 +82,8 @@ M.setup = function()
     display = "lastline",
     showbreak = "↳  ",
     listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←",
-    pumblend = 10,
-    winblend = 10,
+    -- pumblend = 10,
+    -- winblend = 10,
     autoread = true,
     autowrite = true,
     undofile = true,

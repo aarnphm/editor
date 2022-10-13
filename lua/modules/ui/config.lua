@@ -156,12 +156,12 @@ end
 config.lualine = function()
   local navic = require("nvim-navic")
 
-  local function escape_status()
+  local escape_status = function()
     local ok, m = pcall(require, "better_escape")
     return ok and m.waiting and "✺ " or ""
   end
 
-  local function diff_source()
+  local diff_source = function()
     local gitsigns = vim.b.gitsigns_status_dict
     if gitsigns then
       return {
@@ -212,7 +212,7 @@ config.lualine = function()
     filetypes = { "dapui_watches" },
   }
 
-  local function python_venv()
+  local python_venv = function()
     local function env_cleanup(venv)
       if string.find(venv, "/") then
         local final_venv = venv
@@ -240,7 +240,7 @@ config.lualine = function()
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = __editor_config.theme,
+      theme = "catppuccin",
       disabled_filetypes = {},
       component_separators = "|",
       section_separators = { left = " ", right = " " },
@@ -299,8 +299,6 @@ config.lualine = function()
 end
 
 config.nvim_navic = function()
-  vim.g.navic_silence = true
-
   require("nvim-navic").setup({
     icons = {
       Method = " ",
@@ -332,8 +330,6 @@ config.nvim_navic = function()
     },
     highlight = true,
     separator = " » ",
-    depth_limit = 0,
-    depth_limit_indicator = "..",
   })
 end
 
@@ -517,7 +513,6 @@ config.nvim_bufferline = function()
       end,
     },
     -- Change bufferline's highlights here! See `:h bufferline-highlights` for detailed explanation.
-    -- Note: If you use catppuccin then modify the colors below!
     highlights = {},
   }
 
@@ -530,20 +525,6 @@ config.nvim_bufferline = function()
         styles = { "italic", "bold" },
         custom = {
           mocha = {
-            -- Warnings
-            warning = { fg = cp.yellow },
-            warning_visible = { fg = cp.yellow },
-            warning_selected = { fg = cp.yellow },
-            warning_diagnostic = { fg = cp.yellow },
-            warning_diagnostic_visible = { fg = cp.yellow },
-            warning_diagnostic_selected = { fg = cp.yellow },
-            -- Infos
-            info = { fg = cp.sky },
-            info_visible = { fg = cp.sky },
-            info_selected = { fg = cp.sky },
-            info_diagnostic = { fg = cp.sky },
-            info_diagnostic_visible = { fg = cp.sky },
-            info_diagnostic_selected = { fg = cp.sky },
             -- Hint
             hint = { fg = cp.rosewater },
             hint_visible = { fg = cp.rosewater },

@@ -5,50 +5,40 @@ config.nvim_treesitter = function()
   vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 
   require("nvim-treesitter.configs").setup({
-    -- 'all', 'maintained', or list of string
-    ensure_installed = "all",
-    ignore_install = { "phpdoc", "vala", "tiger", "slint", "eex" },
-    highlight = { enable = true },
-    incremental_selection = {
+    ensure_installed = {
+      "bash",
+      "c",
+      "cpp",
+      "lua",
+      "go",
+      "gomod",
+      "json",
+      "yaml",
+      "latex",
+      "make",
+      "python",
+      "rust",
+      "html",
+      "javascript",
+      "typescript",
+      "vue",
+      "css",
+    },
+    highlight = {
       enable = true,
-      keymaps = {
-        init_selection = "gnn",
-        node_incremental = "grn",
-        scope_incremental = "grc",
-        node_decremental = "grm",
-      },
+      disable = { "vim", "help" },
+      additional_vim_regex_highlighting = false,
     },
     context_commentstring = { enable = true, enable_autocmd = false },
     matchup = { enable = true },
     textobjects = {
       select = {
         enable = true,
-        -- Automatically jump forward to textobj, similar to targets.vim
-        lookahead = true,
         keymaps = {
           ["af"] = "@function.outer",
           ["if"] = "@function.inner",
-          ["ac"] = "@conditional.outer",
-          ["ic"] = "@conditional.inner",
-          ["ai"] = "@call.outer",
-          ["ii"] = "@call.inner",
-          ["ab"] = "@block.outer",
-          ["ib"] = "@block.inner",
-          ["is"] = "@statement.inner",
-          ["as"] = "@statement.outer",
-          ["aC"] = "@class.outer",
-          ["iC"] = "@class.inner",
-          ["al"] = "@loop.outer",
-          ["il"] = "@loop.inner",
-        },
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ["<leader>a"] = "@parameter.inner",
-        },
-        swap_previous = {
-          ["<leader>A"] = "@parameter.inner",
+          ["ac"] = "@class.outer",
+          ["ic"] = "@class.inner",
         },
       },
       move = {
@@ -95,6 +85,30 @@ config.nvim_treesitter = function()
 
   -- use with octo.nvim
   parsers.markdown.filetype_to_parsername = "octo"
+end
+
+config.illuminate = function()
+  require("illuminate").configure({
+    providers = {
+      "lsp",
+      "treesitter",
+      "regex",
+    },
+    delay = 100,
+    filetypes_denylist = {
+      "alpha",
+      "dashboard",
+      "DoomInfo",
+      "fugitive",
+      "help",
+      "norg",
+      "NvimTree",
+      "Outline",
+      "packer",
+      "toggleterm",
+    },
+    under_cursor = false,
+  })
 end
 
 config.auto_session = function()
@@ -286,33 +300,32 @@ config.spectre = function()
 end
 
 config.telescope = function()
-  vim.cmd([[packadd sqlite.lua]])
-  vim.cmd([[packadd telescope-fzf-native.nvim]])
-  vim.cmd([[packadd telescope-file-browser.nvim]])
-  vim.cmd([[packadd telescope-frecency.nvim]])
-  vim.cmd([[packadd telescope-emoji.nvim]])
+  vim.api.nvim_command([[packadd sqlite.lua]])
+  vim.api.nvim_command([[packadd telescope-fzf-native.nvim]])
+  vim.api.nvim_command([[packadd telescope-frecency.nvim]])
+  vim.api.nvim_command([[packadd telescope-emoji.nvim]])
+  vim.api.nvim_command([[packadd telescope-zoxide]])
 
   local telescope_actions = require("telescope.actions.set")
-
   local fixfolds = {
     hidden = true,
     attach_mappings = function(_)
       telescope_actions.select:enhance({
         post = function()
-          vim.cmd(":normal! zx")
+          vim.api.nvim_command([[:normal! zx"]])
         end,
       })
       return true
     end,
   }
 
-  local fb_actions = require("telescope").extensions.file_browser.actions
-
   require("telescope").setup({
     defaults = {
-      initial_model = "normal",
+      initial_mode = "insert",
+      prompt_prefix = "  ",
+      entry_prefix = " ",
       scroll_strategy = "limit",
-      prompt_prefix = "🔭 ",
+      results_title = false,
       selection_caret = "» ",
       vimgrep_arguments = {
         "rg",
@@ -334,6 +347,7 @@ config.telescope = function()
       selection_strategy = "reset",
       sorting_strategy = "ascending",
       layout_strategy = "horizontal",
+      path_display = { "absolute" },
       layout_config = {
         horizontal = {
           prompt_position = "top",
@@ -371,16 +385,6 @@ config.telescope = function()
       color_devicons = true,
     },
     extensions = {
-      file_browser = {
-        mappings = {
-          ["i"] = {
-            -- your custom insert mode mappings
-            ["<C-h>"] = fb_actions.goto_parent_dir,
-            ["<C-e>"] = fb_actions.rename,
-            ["<C-c>"] = fb_actions.create,
-          },
-        },
-      },
       fzf = {
         fuzzy = true, -- false will only do exact matching
         override_generic_sorter = true, -- override the generic sorter
@@ -443,8 +447,8 @@ config.telescope = function()
     },
   })
   require("telescope").load_extension("fzf")
+  require("telescope").load_extension("zoxide")
   require("telescope").load_extension("frecency")
-  require("telescope").load_extension("file_browser")
   require("telescope").load_extension("emoji")
 end
 

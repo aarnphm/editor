@@ -122,7 +122,10 @@ M.setup = function()
     ["n|fr"] = map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files<CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
+    ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>fw"] = map_cmd(
+      "<cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist('git rev-parse --show-toplevel')[1] }<cr>"
+    ):with_noremap():with_silent(),
     ["n|<LocalLeader>fn"] = map_cu("enew"):with_noremap():with_silent(),
     ["n|<LocalLeader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),

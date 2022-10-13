@@ -1,3 +1,4 @@
+local api = vim.api
 local M = {}
 
 -- Create cache dir and subs dir
@@ -27,27 +28,38 @@ local setup_global_envars = function()
 end
 
 local disable_distribution_plugins = function()
+  vim.g.did_install_default_menus = 1
+  vim.g.did_install_syntax_menu = 1
+
   vim.g.did_load_filetypes = 1
-  vim.g.did_load_fzf = 1
-  vim.g.did_load_gtags = 1
-  vim.g.did_load_gzip = 1
-  vim.g.did_load_tar = 1
-  vim.g.did_load_tarPlugin = 1
-  vim.g.did_load_zip = 1
-  vim.g.did_load_zipPlugin = 1
-  vim.g.did_load_getscript = 1
-  vim.g.did_load_getscriptPlugin = 1
-  vim.g.did_load_vimball = 1
-  vim.g.did_load_vimballPlugin = 1
-  vim.g.did_load_matchit = 1
-  vim.g.did_load_matchparen = 1
-  vim.g.did_load_2html_plugin = 1
-  vim.g.did_load_logiPat = 1
-  vim.g.did_load_rrhelper = 1
-  vim.g.did_load_netrw = 1
-  vim.g.did_load_netrwPlugin = 1
-  vim.g.did_load_netrwSettings = 1
-  vim.g.did_load_netrwFileHandlers = 1
+
+  -- Do not load native syntax completion
+  vim.g.loaded_syntax_completion = 1
+
+  -- Do not load spell files
+  vim.g.loaded_spellfile_plugin = 1
+  -- newtrw liststyle: https://medium.com/usevim/the-netrw-style-options-3ebe91d42456
+  vim.g.netrw_liststyle = 3
+
+  -- Do not load tohtml.vim
+  vim.g.loaded_2html_plugin = 1
+
+  -- Do not load zipPlugin.vim, gzip.vim and tarPlugin.vim (all these plugins are
+  -- related to checking files inside compressed files)
+  vim.g.loaded_gzip = 1
+  vim.g.loaded_tar = 1
+  vim.g.loaded_tarPlugin = 1
+  vim.g.loaded_vimball = 1
+  vim.g.loaded_vimballPlugin = 1
+  vim.g.loaded_zip = 1
+  vim.g.loaded_zipPlugin = 1
+
+  -- Do not use builtin matchit.vim and matchparen.vim since the use of vim-matchup
+  vim.g.loaded_matchit = 1
+  vim.g.loaded_matchparen = 1
+
+  -- Disable sql omni completion.
+  vim.g.loaded_sql_completion = 1
 end
 
 M.setup = function()
@@ -62,12 +74,19 @@ M.setup = function()
   vim.g.maplocalleader = "+"
 
   -- Add Packer commands because we are not loading it at startup
-  vim.cmd("silent! command PackerClean lua require 'plugins' require('packer').clean()")
-  vim.cmd("silent! command PackerCompile lua require 'plugins' require('packer').compile()")
-  vim.cmd("silent! command PackerInstall lua require 'plugins' require('packer').install()")
-  vim.cmd("silent! command PackerStatus lua require 'plugins' require('packer').status()")
-  vim.cmd("silent! command PackerSync lua require 'plugins' require('packer').sync()")
-  vim.cmd("silent! command PackerUpdate lua require 'plugins' require('packer').update()")
+  api.nvim_command("silent! command PackerClean lua require 'plugins' require('packer').clean()")
+  api.nvim_command("silent! command PackerCompile lua require 'plugins' require('packer').compile()")
+  api.nvim_command("silent! command PackerInstall lua require 'plugins' require('packer').install()")
+  api.nvim_command("silent! command PackerStatus lua require 'plugins' require('packer').status()")
+  api.nvim_command("silent! command PackerSync lua require 'plugins' require('packer').sync()")
+  api.nvim_command("silent! command PackerUpdate lua require 'plugins' require('packer').update()")
+  api.nvim_create_autocmd("User", {
+    pattern = "PackerComplete",
+    callback = function()
+      require("plugins")
+      require("packer").compile()
+    end,
+  })
 
   require("core.options")
   require("core.mappings")
@@ -76,7 +95,7 @@ M.setup = function()
   -- plugins
   require("trimwhite")
 
-  vim.cmd("silent! colorscheme " .. __editor_config.colorscheme)
+  vim.api.nvim_command("silent! colorscheme " .. __editor_config.colorscheme)
 end
 
 return M

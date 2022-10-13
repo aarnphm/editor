@@ -1,3 +1,4 @@
+local api = vim.api
 local config = {}
 
 config.lspconfig = function()
@@ -19,7 +20,7 @@ config.lspsaga = function()
     end
   end
 
-  local function get_palette()
+  local get_palette = function()
     if vim.g.colors_name == "catppuccin" then
       -- If the colorscheme is catppuccin then use the palette.
       return require("catppuccin.palettes").get_palette()
@@ -81,12 +82,12 @@ end
 
 config.cmp = function()
   local has_words_before = function()
-    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+    local line, col = unpack(api.nvim_win_get_cursor(0))
+    return col ~= 0 and api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
   local replace_termcodes = function(str)
-    return vim.api.nvim_replace_termcodes(str, true, true, true)
+    return api.nvim_replace_termcodes(str, true, true, true)
   end
 
   local check_backspace = function()
@@ -124,7 +125,7 @@ config.cmp = function()
   local tab_complete = function(fallback)
     local copilot_keys = vim.fn["copilot#Accept"]()
     if copilot_keys ~= "" then
-      vim.api.nvim_feedkeys(copilot_keys, "i", true)
+      api.nvim_feedkeys(copilot_keys, "i", true)
     elseif cmp.visible() then
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
@@ -193,7 +194,7 @@ config.cmp = function()
         i = function(fallback)
           local copilot_keys = vim.fn["copilot#Accept"]()
           if copilot_keys ~= "" then
-            vim.api.nvim_feedkeys(copilot_keys, "i", true)
+            api.nvim_feedkeys(copilot_keys, "i", true)
           else
             cmp.mapping.abort()(fallback)
           end
@@ -286,7 +287,6 @@ config.mason_install = function()
     -- start; they should be the names Mason uses for each tool
     ensure_installed = {
       -- you can turn off/on auto_update per tool
-      "efm",
       "rust-analyzer",
       "clangd",
       "deno",
@@ -322,7 +322,7 @@ config.mason_install = function()
     -- will happen on startup. You can use `:MasonToolsUpdate` to install
     -- tools and check for updates.
     -- Default: true
-    run_on_start = false,
+    run_on_start = true,
   })
 end
 
@@ -333,8 +333,8 @@ config.golang = function()
 end
 
 config.rust_tools = function()
-  vim.cmd([[packadd nvim-lspconfig]])
-  vim.cmd([[packadd lsp_signature.nvim]])
+  api.nvim_command([[packadd nvim-lspconfig]])
+  api.nvim_command([[packadd lsp_signature.nvim]])
 
   local opts = {
     tools = { -- rust-tools options
@@ -522,11 +522,13 @@ config.rust_tools = function()
 end
 
 config.vimtex = function()
-  vim.g.vimtex_view_method = "skim"
-  vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
-  vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
+  if __editor_global.is_mac then
+    vim.g.vimtex_view_method = "skim"
+    vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
+    vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
+  end
 
-  vim.cmd([[
+  api.nvim_command([[
 augroup vimtex_mac
     autocmd!
     autocmd User VimtexEventCompileSuccess call UpdateSkim()

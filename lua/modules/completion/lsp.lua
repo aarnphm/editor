@@ -1,6 +1,6 @@
 local formatting = require("modules.completion.formatting")
 
-vim.cmd([[packadd lua-dev.nvim]])
+vim.cmd([[packadd lspsaga.nvim]])
 vim.cmd([[packadd lsp_signature.nvim]])
 vim.cmd([[packadd cmp-nvim-lsp]])
 vim.cmd([[packadd efmls-configs-nvim]])
@@ -10,7 +10,21 @@ local mason = require("mason")
 local mason_lsp = require("mason-lspconfig")
 
 mason.setup()
-mason_lsp.setup()
+mason_lsp.setup({
+  ensure_installed = {
+    "bash-language-server",
+    "efm",
+    "lua-language-server",
+    "clangd",
+    "gopls",
+    "pyright",
+    "jdtls",
+    "bash-language-server",
+    "rnix-lsp",
+    "rust-analyzer",
+    "dockerfile-language-server",
+  },
+})
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
@@ -153,29 +167,24 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
       },
     })
   elseif server == "sumneko_lua" then
-    if vim.fn.expand("%:p:h") == vim.fn.stdpath("config") then
-      local lua_config = require("lua-dev").setup()
-      nvim_lsp.sumneko_lua.setup(lua_config)
-    else
-      nvim_lsp.sumneko_lua.setup({
-        capabilities = capabilities,
-        on_attach = on_editor_attach,
-        settings = {
-          Lua = {
-            diagnostics = { globals = { "vim", "packer_plugins" } },
-            workspace = {
-              library = {
-                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-              },
-              maxPreload = 100000,
-              preloadFileSize = 10000,
+    nvim_lsp.sumneko_lua.setup({
+      capabilities = capabilities,
+      on_attach = on_editor_attach,
+      settings = {
+        Lua = {
+          diagnostics = { globals = { "vim", "packer_plugins" } },
+          workspace = {
+            library = {
+              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+              [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
             },
-            telemetry = { enable = false },
+            maxPreload = 100000,
+            preloadFileSize = 10000,
           },
+          telemetry = { enable = false },
         },
-      })
-    end
+      },
+    })
   elseif server.name == "tsserver" then
     nvim_lsp.tsserver.setup({
       on_attach = function(client)
@@ -241,7 +250,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  elseif server ~= "efm" then
+  else
     nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,
@@ -282,10 +291,7 @@ local pylint = require("efmls-configs.linters.pylint")
 
 local black = require("efmls-configs.formatters.black")
 local luafmt = require("efmls-configs.formatters.stylua")
-local clangfmt = {
-  formatCommand = "clang-format -style='{BasedOnStyle: LLVM}'",
-  formatStdin = true,
-}
+local clangfmt = { formatCommand = "clang-format -style='{BasedOnStyle: LLVM, IndentWidth: 4}'", formatStdin = true }
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
 

@@ -14,7 +14,6 @@ completion["williamboman/mason.nvim"] = {
     { "WhoIsSethDaniel/mason-tool-installer.nvim", config = config.mason_install },
   },
 }
-completion["folke/lua-dev.nvim"] = { opt = true, requires = "nvim-lspconfig" }
 completion["github/copilot.vim"] = {
   opt = true,
   setup = function()
@@ -25,25 +24,6 @@ completion["github/copilot.vim"] = {
   after = "nvim-cmp",
   cmd = { "Copilot" },
 }
--- completion["zbirenbaum/copilot.lua"] = {
---   event = "VimEnter",
---   config = function()
---     vim.defer_fn(function()
---       require("copilot").setup({
---         suggestion = {
---           enabled = true,
---           auto_trigger = true,
---         },
---       })
---     end, 100)
---   end,
--- }
--- completion["zbirenbaum/copilot-cmp"] = {
---   after = "copilot.lua",
---   config = function()
---     require("copilot_cmp").setup()
---   end,
--- }
 completion["kevinhwang91/nvim-bqf"] = { ft = "qf", config = config.bqf }
 completion["glepnir/lspsaga.nvim"] = {
   opt = true,
