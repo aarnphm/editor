@@ -379,7 +379,6 @@ config.telescope = function()
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
       generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
       buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
-      path_display = { "smart" },
       winblend = 0,
       border = {},
       color_devicons = true,

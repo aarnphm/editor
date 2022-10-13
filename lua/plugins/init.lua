@@ -171,17 +171,17 @@ local required_plugins = function(use)
           illuminate = true,
           cmp = true,
           dap = { enabled = true, enable_ui = true },
-          notify = true,
+          notify = false,
           symbols_outline = false,
           coc_nvim = false,
           leap = false,
-          neotree = { enabled = false, show_root = true, transparent_panel = false },
+          neotree = { enabled = false },
           telekasten = false,
           mini = false,
           aerial = false,
           vimwiki = true,
           beacon = false,
-          navic = { enabled = true, custom_bg = "NONE" },
+          navic = { enabled = true },
           overseer = false,
           fidget = true,
         },
@@ -263,7 +263,7 @@ local required_plugins = function(use)
             ["@type.builtin"] = { fg = cp.yellow, style = { "italic" } }, -- can comment if weird
             ["@variable.builtin"] = { fg = cp.red, style = { "italic" } },
 
-            -- ["@function"] = { fg = cp.blue },
+            ["@function"] = { fg = cp.blue },
             ["@function.macro"] = { fg = cp.red, style = {} },
             ["@parameter"] = { fg = cp.rosewater },
             ["@keyword.function"] = { fg = cp.maroon },
@@ -290,18 +290,18 @@ local required_plugins = function(use)
             ["@tag.delimiter"] = { fg = cp.maroon },
             ["@text"] = { fg = cp.text },
 
-            -- ["@text.uri"] = { fg = cp.rosewater, style = { "italic", "underline" } },
-            -- ["@text.literal"] = { fg = cp.teal, style = { "italic" } },
-            -- ["@text.reference"] = { fg = cp.lavender, style = { "bold" } },
-            -- ["@text.title"] = { fg = cp.blue, style = { "bold" } },
-            -- ["@text.emphasis"] = { fg = cp.maroon, style = { "italic" } },
-            -- ["@text.strong"] = { fg = cp.maroon, style = { "bold" } },
-            -- ["@string.escape"] = { fg = cp.pink },
+            ["@text.uri"] = { fg = cp.rosewater, style = { "italic", "underline" } },
+            ["@text.literal"] = { fg = cp.teal, style = { "italic" } },
+            ["@text.reference"] = { fg = cp.lavender, style = { "bold" } },
+            ["@text.title"] = { fg = cp.blue, style = { "bold" } },
+            ["@text.emphasis"] = { fg = cp.maroon, style = { "italic" } },
+            ["@text.strong"] = { fg = cp.maroon, style = { "bold" } },
+            ["@string.escape"] = { fg = cp.pink },
 
-            -- ["@property.toml"] = { fg = cp.blue },
-            -- ["@field.yaml"] = { fg = cp.blue },
+            ["@property.toml"] = { fg = cp.blue },
+            ["@field.yaml"] = { fg = cp.blue },
 
-            -- ["@label.json"] = { fg = cp.blue },
+            ["@label.json"] = { fg = cp.blue },
 
             ["@function.builtin.bash"] = { fg = cp.red, style = { "italic" } },
             ["@parameter.bash"] = { fg = cp.yellow, style = { "italic" } },
@@ -312,17 +312,17 @@ local required_plugins = function(use)
             ["@constant.java"] = { fg = cp.teal },
 
             ["@property.typescript"] = { fg = cp.lavender, style = { "italic" } },
-            -- ["@constructor.typescript"] = { fg = cp.lavender },
+            ["@constructor.typescript"] = { fg = cp.lavender },
 
-            -- ["@constructor.tsx"] = { fg = cp.lavender },
-            -- ["@tag.attribute.tsx"] = { fg = cp.mauve },
+            ["@constructor.tsx"] = { fg = cp.lavender },
+            ["@tag.attribute.tsx"] = { fg = cp.mauve },
 
             ["@type.css"] = { fg = cp.lavender },
             ["@property.css"] = { fg = cp.yellow, style = { "italic" } },
 
             ["@property.cpp"] = { fg = cp.text },
 
-            -- ["@symbol"] = { fg = cp.flamingo },
+            ["@symbol"] = { fg = cp.flamingo },
           },
         },
       })

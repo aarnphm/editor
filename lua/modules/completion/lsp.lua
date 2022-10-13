@@ -15,6 +15,7 @@ mason_lsp.setup({
   ensure_installed = {
     "bash-language-server",
     "efm",
+    "eslint-lsp",
     "lua-language-server",
     "clangd",
     "gopls",

@@ -208,5 +208,6 @@ editor["Stormherz/tablify"] = {
   opt = true,
   ft = "rst",
 }
+editor["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime" }
 
 return editor

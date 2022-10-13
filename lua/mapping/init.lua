@@ -72,6 +72,9 @@ M.setup = function()
     ["n|7gt"] = map_cr("BufferLineGoToBuffer 7"):with_noremap():with_silent(),
     ["n|8gt"] = map_cr("BufferLineGoToBuffer 8"):with_noremap():with_silent(),
     ["n|9gt"] = map_cr("BufferLineGoToBuffer 9"):with_noremap():with_silent(),
+    -- Gitsigns
+    ["n|<Space>wd"] = map_cr("Gitsigns toggle_word_diff"):with_noremap():with_silent(),
+    ["n|<Space>ld"] = map_cr("Gitsigns toggle_deleted"):with_noremap():with_silent(),
     -- Packer
     ["n|<Space>ps"] = map_cu("lua require'plugins' require('packer').sync()"):with_noremap(),
     ["n|<Space>pS"] = map_cu("lua require'plugins' require('packer').status()"):with_noremap(),
@@ -123,11 +126,10 @@ M.setup = function()
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files<CR>"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cmd(
-      "<cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist('git rev-parse --show-toplevel')[1] }<cr>"
-    ):with_noremap():with_silent(),
+    ["n|<LocalLeader>fw"] = map_cu("lua require('telescope.builtin').live_grep{cwd=vim.fn.systemlist('git rev-parse --show-toplevel')[1]}")
+      :with_noremap()
+      :with_silent(),
     ["n|<LocalLeader>fn"] = map_cu("enew"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fb"] = map_cmd("<cmd> Telescope file_browser <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),
     -- Plugin spectre
     ["n|<S-F6>"] = map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
