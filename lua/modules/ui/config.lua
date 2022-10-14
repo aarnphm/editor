@@ -531,12 +531,12 @@ config.indent_blankline = function()
       "peekaboo",
       "git",
       "TelescopePrompt",
+      "undotree",
       "flutterToolsOutline",
       "", -- for all buffers without a file type
     },
     buftype_exclude = { "terminal", "nofile" },
-    show_trailing_blankline_indent = true,
-    show_current_context_start = true,
+    show_trailing_blankline_indent = false,
     show_current_context = true,
     context_patterns = {
       "class",
@@ -556,8 +556,6 @@ config.indent_blankline = function()
     },
     space_char_blankline = " ",
   })
-  -- because lazy load indent-blankline so need readd this autocmd
-  vim.cmd("autocmd CursorMoved * IndentBlanklineRefresh")
 end
 
 return config

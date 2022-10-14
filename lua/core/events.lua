@@ -150,7 +150,6 @@ M.setup = function()
         "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
       },
       -- Google tab style
-      { "BufNewFile,BufRead", "BUILD*", "setf bzl" },
       { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "*.proto", "setf proto" },

@@ -52,7 +52,7 @@ M.setup = function()
   local plug_map = {
     ["n|ft"] = map_cr("FormatToggle"):with_noremap():with_silent(),
     -- reload and edit config
-    ["n|<LocalLeader>rl"] = map_cu("lua require'plugins' require('packer').sync()"):with_noremap():with_silent(),
+    ["n|<LocalLeader>rl"] = map_cr("PackerSync"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<LocalLeader><LocalLeader>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
@@ -76,11 +76,11 @@ M.setup = function()
     ["n|<Space>wd"] = map_cr("Gitsigns toggle_word_diff"):with_noremap():with_silent(),
     ["n|<Space>ld"] = map_cr("Gitsigns toggle_deleted"):with_noremap():with_silent(),
     -- Packer
-    ["n|<Space>ps"] = map_cu("lua require'plugins' require('packer').sync()"):with_noremap(),
-    ["n|<Space>pS"] = map_cu("lua require'plugins' require('packer').status()"):with_noremap(),
-    ["n|<Space>pu"] = map_cu("lua require'plugins' require('packer').update()"):with_noremap(),
-    ["n|<Space>pc"] = map_cu("lua require'plugins' require('packer').compile()"):with_noremap(),
-    ["n|<Space>pC"] = map_cu("lua require'plugins' require('packer').clean()"):with_noremap(),
+    ["n|<Space>ps"] = map_cr("PackerSync"):with_noremap(),
+    ["n|<Space>pS"] = map_cr("PackerStatus"):with_noremap(),
+    ["n|<Space>pu"] = map_cr("PackerUpdate"):with_noremap(),
+    ["n|<Space>pc"] = map_cr("PackerCompile"):with_noremap(),
+    ["n|<Space>pC"] = map_cr("PackerClean"):with_noremap(),
     -- Lsp map work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<LocalLeader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),
@@ -126,9 +126,9 @@ M.setup = function()
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files<CR>"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cu("lua require('telescope.builtin').live_grep{cwd=vim.fn.systemlist('git rev-parse --show-toplevel')[1]}")
-      :with_noremap()
-      :with_silent(),
+    ["n|<LocalLeader>fw"] = map_cu(
+      "lua require('telescope.builtin').live_grep{cwd=vim.fn.systemlist('git rev-parse --show-toplevel')[1]}"
+    ):with_noremap():with_silent(),
     ["n|<LocalLeader>fn"] = map_cu("enew"):with_noremap():with_silent(),
     ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),
     -- Plugin spectre

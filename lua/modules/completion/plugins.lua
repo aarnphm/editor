@@ -1,6 +1,7 @@
 local completion = {}
 local config = require("modules.completion.config")
 
+completion["kevinhwang91/nvim-bqf"] = { ft = "qf" }
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
   opt = true,
@@ -24,7 +25,6 @@ completion["github/copilot.vim"] = {
   after = "nvim-cmp",
   cmd = { "Copilot" },
 }
-completion["kevinhwang91/nvim-bqf"] = { ft = "qf", config = config.bqf }
 completion["glepnir/lspsaga.nvim"] = {
   opt = true,
   after = "nvim-lspconfig",

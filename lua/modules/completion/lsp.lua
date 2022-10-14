@@ -1,10 +1,10 @@
 local formatting = require("modules.completion.formatting")
 
-vim.cmd([[packadd lspsaga.nvim]])
-vim.cmd([[packadd lsp_signature.nvim]])
-vim.cmd([[packadd cmp-nvim-lsp]])
-vim.cmd([[packadd vim-illuminate]])
-vim.cmd([[packadd efmls-configs-nvim]])
+vim.api.nvim_command([[packadd lsp_signature.nvim]])
+vim.api.nvim_command([[packadd lspsaga.nvim]])
+vim.api.nvim_command([[packadd cmp-nvim-lsp]])
+vim.api.nvim_command([[packadd vim-illuminate]])
+vim.api.nvim_command([[packadd efmls-configs-nvim]])
 
 local nvim_lsp = require("lspconfig")
 local mason = require("mason")
@@ -109,6 +109,18 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
+  elseif server.name == "yamlls" then
+    nvim_lsp.yamlls.setup({
+      on_attach = on_editor_attach,
+      capabilities = capabilities,
+      settings = {
+        yaml = {
+          schemas = {
+            ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+          },
+        },
+      },
+    })
   elseif server.name == "jdtls" then
     nvim_lsp.jdtls.setup({
       on_attach = on_editor_attach,
@@ -125,7 +137,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
           },
           -- Multi-module projects
           { "build.gradle", "build.gradle.kts" },
-          { "$BENTOML_GIT_ROOT/docs/source/guides/snippets/grpc/java" },
+          { "$BENTOML_GIT_ROOT/grpc-client/java" },
         } or vim.fn.getcwd(),
       },
     })
@@ -260,11 +272,6 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
       capabilities = capabilities,
       on_attach = on_editor_attach,
     })
-  else
-    nvim_lsp[server].setup({
-      capabilities = capabilities,
-      on_attach = on_editor_attach,
-    })
   end
 end
 
@@ -288,29 +295,28 @@ local efmls = require("efmls-configs")
 efmls.init({
   on_attach = on_editor_attach,
   capabilities = capabilities,
-  init_options = { documentFormatting = true },
+  init_options = { documentFormatting = true, codeAction = true },
 })
 
 -- Require `efmls-configs-nvim`'s config here
 
 local vint = require("efmls-configs.linters.vint")
-local clangtidy = require("efmls-configs.linters.clang_tidy")
 local eslint = require("efmls-configs.linters.eslint")
 local shellcheck = require("efmls-configs.linters.shellcheck")
 local pylint = require("efmls-configs.linters.pylint")
 
 local black = require("efmls-configs.formatters.black")
 local luafmt = require("efmls-configs.formatters.stylua")
-local clangfmt = { formatCommand = "clang-format -style='{BasedOnStyle: LLVM, IndentWidth: 4}'", formatStdin = true }
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
+local clangfmt = { formatCommand = "clang-format -style='{BasedOnStyle: LLVM, IndentWidth: 4}'", formatStdin = true }
 
 -- Setup formatter and linter for efmls here
 efmls.setup({
   vim = { formatter = vint },
   lua = { formatter = luafmt },
-  c = { formatter = clangfmt, linter = clangtidy },
-  cpp = { formatter = clangfmt, linter = clangtidy },
+  c = { formatter = clangfmt },
+  cpp = { formatter = clangfmt },
   vue = { formatter = prettier },
   python = { formatter = black, linter = pylint },
   typescript = { formatter = prettier, linter = eslint },

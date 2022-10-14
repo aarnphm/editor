@@ -297,7 +297,6 @@ config.mason_install = function()
       "yamllint",
       "clang-format",
       "buf",
-      "buildifier",
       "pylint",
       "prettier",
       "shellcheck",
@@ -305,7 +304,6 @@ config.mason_install = function()
       "vint",
       "taplo",
       "vim-language-server",
-      "buf",
       "tflint",
     },
 

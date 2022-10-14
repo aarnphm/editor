@@ -110,7 +110,12 @@ function M.format_filter(clients)
     end)
     if status_ok and formatting_supported and client.name == "efm" then
       return "efm"
-    elseif client.name ~= "sumneko_lua" and client.name ~= "tsserver" and client.name ~= "clangd" then
+    elseif
+      client.name ~= "sumneko_lua"
+      and client.name ~= "tsserver"
+      and client.name ~= "clangd"
+      and client.name ~= "pyright"
+    then
       return status_ok and formatting_supported and client.name
     end
   end, clients)
