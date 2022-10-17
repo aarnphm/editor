@@ -150,7 +150,7 @@ M.setup = function()
     -- Plugin MarkdownPreview
     ["n|mpt"] = map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
     -- Plugin zen-mode
-    ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .85 }})'):with_noremap():with_silent(),
+    ["n|zm"] = map_cu('lua require("zen-mode").toggle({window = { width = .65 }})'):with_noremap():with_silent(),
     -- refactoring
     ["v|<LocalLeader>re"] = map_cr("lua require('refactoring').refactor('Extract Function')")
       :with_noremap()

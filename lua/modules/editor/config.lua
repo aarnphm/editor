@@ -5,25 +5,8 @@ config.nvim_treesitter = function()
   vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 
   require("nvim-treesitter.configs").setup({
-    ensure_installed = {
-      "bash",
-      "c",
-      "cpp",
-      "lua",
-      "go",
-      "gomod",
-      "json",
-      "yaml",
-      "latex",
-      "make",
-      "python",
-      "rust",
-      "html",
-      "javascript",
-      "typescript",
-      "vue",
-      "css",
-    },
+    ensure_installed = "all",
+    ignore_install = { "phpdoc" },
     highlight = {
       enable = true,
       disable = { "vim", "help" },

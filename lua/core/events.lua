@@ -88,18 +88,11 @@ M.setup = function()
         [[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]],
       },
       { "BufWritePre", "/tmp/*", "setlocal noundofile" },
-      { "BufWritePre", "COMMIT_EDITMSG", "setlocal noundofile" },
-      { "BufWritePre", "MERGE_MSG", "setlocal noundofile" },
       { "BufWritePre", "*.tmp", "setlocal noundofile" },
       { "BufWritePre", "*.bak", "setlocal noundofile" },
       -- auto change directory
       { "BufEnter", "*", "silent! lcd %:p:h" },
-      -- auto place to last edit
-      {
-        "BufReadPost",
-        "*",
-        [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
-      },
+      -- quit of only buffer is NvimTree
       {
         "BufEnter",
         "*",
@@ -150,6 +143,7 @@ M.setup = function()
         "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
       },
       -- Google tab style
+      { "BufNewFile,BufRead", "*.bazel", "setf bzl" },
       { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "*.proto", "setf proto" },
