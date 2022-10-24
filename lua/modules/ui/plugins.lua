@@ -38,11 +38,7 @@ ui["SmiteshP/nvim-navic"] = {
   after = "nvim-lspconfig",
   config = config.nvim_navic,
 }
-ui["kyazdani42/nvim-tree.lua"] = {
-  opt = true,
-  cmd = { "NvimTreeToggle" },
-  config = config.nvim_tree,
-}
+ui["kyazdani42/nvim-tree.lua"] = { cmd = { "NvimTreeToggle" }, config = config.nvim_tree }
 ui["lukas-reineke/indent-blankline.nvim"] = {
   opt = true,
   event = "BufRead",

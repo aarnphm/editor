@@ -9,24 +9,10 @@ vim.api.nvim_command([[packadd efmls-configs-nvim]])
 local nvim_lsp = require("lspconfig")
 local mason = require("mason")
 local mason_lsp = require("mason-lspconfig")
+local efmls = require("efmls-configs")
 
 mason.setup()
-mason_lsp.setup({
-  ensure_installed = {
-    "bash-language-server",
-    "efm",
-    "eslint-lsp",
-    "lua-language-server",
-    "clangd",
-    "gopls",
-    "pyright",
-    "jdtls",
-    "bash-language-server",
-    "rnix-lsp",
-    "rust-analyzer",
-    "dockerfile-language-server",
-  },
-})
+mason_lsp.setup({})
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
@@ -267,7 +253,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  elseif server ~= "efm" then
+  else
     nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,
@@ -291,7 +277,6 @@ nvim_lsp.html.setup({
 })
 
 -- Init `efm-langserver` here.
-local efmls = require("efmls-configs")
 efmls.init({
   on_attach = on_editor_attach,
   capabilities = capabilities,

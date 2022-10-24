@@ -1,16 +1,8 @@
 local editor = {}
 local config = require("modules.editor.config")
 
-editor["RRethy/vim-illuminate"] = {
-  opt = true,
-  event = "BufReadPost",
-  config = config.illuminate,
-}
-editor["nvim-treesitter/nvim-treesitter"] = {
-  run = ":TSUpdate",
-  event = "BufReadPost",
-  config = config.nvim_treesitter,
-}
+editor["RRethy/vim-illuminate"] = { config = config.illuminate }
+editor["nvim-treesitter/nvim-treesitter"] = { run = ":TSUpdate", config = config.nvim_treesitter }
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
   after = "nvim-treesitter",

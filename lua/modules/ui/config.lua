@@ -173,43 +173,16 @@ config.lualine = function()
   end
 
   local mini_sections = {
-    lualine_a = {},
+    lualine_a = { "filetype" },
     lualine_b = {},
     lualine_c = {},
     lualine_x = {},
     lualine_y = {},
-    lualine_z = { "location" },
-  }
-  local simple_sections = {
-    lualine_a = { "mode" },
-    lualine_b = { "filetype" },
-    lualine_c = {},
-    lualine_x = {},
-    lualine_y = {},
-    lualine_z = { "location" },
+    lualine_z = {},
   }
   local outline = {
     sections = mini_sections,
     filetypes = { "lspsagaoutline" },
-  }
-  local dapui_scopes = {
-    sections = simple_sections,
-    filetypes = { "dapui_scopes" },
-  }
-
-  local dapui_breakpoints = {
-    sections = simple_sections,
-    filetypes = { "dapui_breakpoints" },
-  }
-
-  local dapui_stacks = {
-    sections = simple_sections,
-    filetypes = { "dapui_stacks" },
-  }
-
-  local dapui_watches = {
-    sections = simple_sections,
-    filetypes = { "dapui_watches" },
   }
 
   local python_venv = function()
@@ -289,11 +262,8 @@ config.lualine = function()
       "nvim-tree",
       "toggleterm",
       "fugitive",
+      -- "nvim-dap-ui",
       outline,
-      dapui_scopes,
-      dapui_breakpoints,
-      dapui_stacks,
-      dapui_watches,
     },
   })
 end
