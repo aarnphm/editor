@@ -140,7 +140,7 @@ if &encoding ==# 'latin1' && has('gui_running')
 endif
 
 set list
-let &listchars='tab:\uBB\uBB,trail:\uB7,nbsp:~'
+" let &listchars='tab:\uBB\uBB,trail:\uB7,nbsp:~'
 if &listchars ==# 'eol:$'
     set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif

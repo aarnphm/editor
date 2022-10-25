@@ -357,7 +357,7 @@ config.nvim_tree = function()
     hijack_directories = { enable = true, auto_open = true },
     update_focused_file = {
       enable = true,
-      update_root = false,
+      update_root = true,
       ignore_list = {},
     },
     system_open = { cmd = "open", args = {} },

@@ -9,10 +9,22 @@ vim.api.nvim_command([[packadd efmls-configs-nvim]])
 local nvim_lsp = require("lspconfig")
 local mason = require("mason")
 local mason_lsp = require("mason-lspconfig")
+
+require("lspconfig.ui.windows").default_options.border = "single"
+
 local efmls = require("efmls-configs")
 
 mason.setup()
-mason_lsp.setup({})
+mason_lsp.setup({
+  ensure_installed = {
+    "bashls",
+    "efm",
+    "sumneko_lua",
+    "clangd",
+    "gopls",
+    "pyright",
+  },
+})
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
@@ -253,7 +265,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  else
+  elseif server ~= "efm" then
     nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,

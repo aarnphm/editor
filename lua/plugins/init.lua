@@ -120,6 +120,7 @@ local required_plugins = function(use)
           indent_blankline = { enabled = true, colored_indent_levels = false },
           dashboard = true,
           neogit = false,
+          mason = true,
           vim_sneak = false,
           fern = false,
           barbar = false,

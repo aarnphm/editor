@@ -365,6 +365,7 @@ config.telescope = function()
       buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
       winblend = 0,
       border = {},
+      borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
       color_devicons = true,
     },
     extensions = {
