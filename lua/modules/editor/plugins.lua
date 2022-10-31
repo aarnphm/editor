@@ -155,11 +155,8 @@ editor["folke/twilight.nvim"] = {
   end,
 }
 editor["folke/zen-mode.nvim"] = {
-  opt = true,
   after = "nvim-treesitter",
-  requires = {
-    "folke/twilight.nvim",
-  },
+  requires = { "folke/twilight.nvim" },
   config = function()
     require("zen-mode").setup({})
   end,

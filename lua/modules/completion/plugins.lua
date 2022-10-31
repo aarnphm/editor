@@ -27,7 +27,7 @@ completion["github/copilot.vim"] = {
 }
 completion["glepnir/lspsaga.nvim"] = {
   opt = true,
-  after = "nvim-lspconfig",
+  event = "LspAttach",
   config = config.lspsaga,
 }
 completion["ray-x/lsp_signature.nvim"] = {

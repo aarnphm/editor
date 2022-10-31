@@ -208,6 +208,20 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
       end,
       root_dir = nvim_lsp.util.root_pattern("tsconfig.json", "package.json", ".git"),
     })
+  elseif server == "pyright" then
+    nvim_lsp.pyright.setup({
+      on_attach = on_editor_attach,
+      flags = { debounce_text_changes = 500 },
+      capabilities = capabilities,
+      settings = {
+        python = {
+          analysis = {
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+          },
+        },
+      },
+    })
   elseif server == "jsonls" then
     nvim_lsp.jsonls.setup({
       flags = { debounce_text_changes = 500 },
@@ -265,7 +279,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  elseif server ~= "efm" then
+  else
     nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,
