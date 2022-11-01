@@ -1,8 +1,13 @@
 local editor = {}
 local config = require("modules.editor.config")
 
-editor["RRethy/vim-illuminate"] = { config = config.illuminate }
-editor["nvim-treesitter/nvim-treesitter"] = { run = ":TSUpdate", config = config.nvim_treesitter }
+editor["RRethy/vim-illuminate"] = { opt = true, event = "BufReadPost", config = config.illuminate }
+editor["nvim-treesitter/nvim-treesitter"] = {
+  opt = true,
+  run = ":TSUpdate",
+  event = "BufReadPost",
+  config = config.nvim_treesitter,
+}
 editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
   opt = true,
   after = "nvim-treesitter",
@@ -171,6 +176,16 @@ editor["luukvbaal/stabilize.nvim"] = {
   event = "BufReadPost",
 }
 
+editor["terrortylor/nvim-comment"] = {
+  opt = false,
+  config = function()
+    require("nvim_comment").setup({
+      hook = function()
+        require("ts_context_commentstring.internal").update_commentstring()
+      end,
+    })
+  end,
+}
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
   event = "BufRead",
@@ -181,12 +196,17 @@ editor["rmagatti/auto-session"] = {
   cmd = { "SaveSession", "RestoreSession", "DeleteSession" },
   config = config.auto_session,
 }
-editor["norcalli/nvim-colorizer.lua"] = {
+editor["NvChad/nvim-colorizer.lua"] = {
   opt = true,
-  event = "BufRead",
+  event = "BufReadPost",
   config = function()
-    require("colorizer").setup({})
+    require("colorizer").setup()
   end,
+}
+editor["gelguy/wilder.nvim"] = {
+  event = "CmdlineEnter",
+  config = config.wilder,
+  requires = { { "romgrk/fzy-lua-native", after = "wilder.nvim" } },
 }
 editor["untitled-ai/jupyter_ascending.vim"] = {
   opt = true,

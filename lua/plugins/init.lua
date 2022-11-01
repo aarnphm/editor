@@ -32,14 +32,7 @@ local required_plugins = function(use)
   use({
     "nathom/filetype.nvim",
     config = function()
-      require("filetype").setup({
-        overrides = {
-          shebang = {
-            -- Set the filetype of files with a dash shebang to sh
-            dash = "sh",
-          },
-        },
-      })
+      require("filetype").setup({})
     end,
   })
   use({ "wbthomason/packer.nvim", opt = true })
@@ -296,7 +289,6 @@ local required_plugins = function(use)
   -- tpope
   use({ "tpope/vim-repeat" })
   use({ "tpope/vim-sleuth" })
-  use({ "tpope/vim-commentary" })
   use({ "tpope/vim-fugitive", cmd = { "Git", "G", "Ggrep", "GBrowse" } })
 end
 

@@ -5,26 +5,26 @@ config.lspconfig = function()
 end
 
 config.lspsaga = function()
-  local set_sidebar_icons = function()
-    -- Set icons for sidebar.
-    local diagnostic_icons = {
-      Error = " ",
-      Warn = " ",
-      Info = " ",
-      Hint = " ",
-    }
-    for type, icon in pairs(diagnostic_icons) do
-      local hl = "DiagnosticSign" .. type
-      vim.fn.sign_define(hl, { text = icon, texthl = hl })
-    end
-  end
-
   local icons = {
     diagnostics = require("modules.ui.icons").get("diagnostics", true),
     kind = require("modules.ui.icons").get("kind", true),
     type = require("modules.ui.icons").get("type", true),
     ui = require("modules.ui.icons").get("ui", true),
   }
+
+  local set_sidebar_icons = function()
+    -- Set icons for sidebar.
+    local diagnostic_icons = {
+      Error = icons.diagnostics.Error_alt,
+      Warn = icons.diagnostics.Warning_alt,
+      Info = icons.diagnostics.Information_alt,
+      Hint = icons.diagnostics.Hint_alt,
+    }
+    for type, icon in pairs(diagnostic_icons) do
+      local hl = "DiagnosticSign" .. type
+      vim.fn.sign_define(hl, { text = icon, texthl = hl })
+    end
+  end
 
   local get_palette = function()
     if vim.g.colors_name == "catppuccin" then
@@ -101,9 +101,9 @@ config.cmp = function()
     return vim.api.nvim_replace_termcodes(str, true, true, true)
   end
 
-  local check_backspace = function()
-    local col = vim.fn.col(".") - 1
-    return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
+  local has_words_before = function()
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
   local border = function(hl)
@@ -130,7 +130,6 @@ config.cmp = function()
 
   local compare = require("cmp.config.compare")
   local lspkind = require("lspkind")
-
   local cmp = require("cmp")
 
   local tab_complete = function(fallback)
@@ -141,8 +140,8 @@ config.cmp = function()
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
       vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-expand-or-jump"), "")
-    elseif check_backspace() then
-      vim.fn.feedkeys(replace_termcodes("<Tab>"), "n")
+    elseif has_words_before() then
+      cmp.complete()
     else
       fallback()
     end
@@ -198,37 +197,13 @@ config.cmp = function()
     -- You can set mappings if you want
     mapping = cmp.mapping.preset.insert({
       ["<CR>"] = cmp.mapping.confirm({ select = true }),
-      ["<C-p>"] = cmp.mapping.select_prev_item(),
-      ["<C-n>"] = cmp.mapping.select_next_item(),
+      ["<C-k>"] = cmp.mapping.select_prev_item(),
+      ["<C-j>"] = cmp.mapping.select_next_item(),
       ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       ["<C-f>"] = cmp.mapping.scroll_docs(4),
-      ["<Tab>"] = tab_complete,
-      ["<S-Tab>"] = s_tab_complete,
-      ["<C-e>"] = cmp.mapping({
-        i = function(fallback)
-          local copilot_keys = vim.fn["copilot#Accept"]()
-          if copilot_keys ~= "" then
-            vim.api.nvim_feedkeys(copilot_keys, "i", true)
-          else
-            cmp.mapping.abort()(fallback)
-          end
-        end,
-        c = cmp.mapping.close(),
-      }),
-      ["<C-j>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        else
-          fallback()
-        end
-      end, { "i", "s" }),
-      ["<C-k>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        else
-          fallback()
-        end
-      end, { "i", "s" }),
+      ["<C-e>"] = cmp.mapping.close(),
+      ["<Tab>"] = cmp.mapping(tab_complete, { "i", "s" }),
+      ["<S-Tab>"] = cmp.mapping(s_tab_complete, { "i", "s" }),
     }),
     snippet = {
       expand = function(args)
@@ -244,7 +219,6 @@ config.cmp = function()
       { name = "tmux" },
       { name = "buffer" },
       { name = "latex_symbols" },
-      -- { name = "copilot" },
       { name = "spell" },
       { name = "emoji" },
     },
@@ -262,9 +236,7 @@ config.luasnip = function()
 end
 
 config.autopairs = function()
-  require("nvim-autopairs").setup({
-    disable_filetype = { "TelescopePrompt", "vim" },
-  })
+  require("nvim-autopairs").setup({})
 
   -- If you want insert `(` after select function or method item
   local cmp_autopairs = require("nvim-autopairs.completion.cmp")
@@ -324,9 +296,12 @@ config.mason_install = function()
       "shellcheck",
       "shfmt",
       "vint",
-      "taplo",
+      "buildifier",
+      -- "taplo",
       "vim-language-server",
       "tflint",
+      "jq",
+      "yamlfmt",
     },
     auto_update = true,
     run_on_start = true,
@@ -510,9 +485,6 @@ config.rust_tools = function()
       -- standalone file support
       -- setting it to false may improve startup time
       standalone = true,
-      on_attach = function(client, bufnr)
-        require("nvim-navic").attach(client, bufnr)
-      end,
     }, -- rust-analyer options
 
     -- debugging stuff

@@ -3,7 +3,6 @@ local formatting = require("modules.completion.formatting")
 vim.api.nvim_command([[packadd lsp_signature.nvim]])
 vim.api.nvim_command([[packadd lspsaga.nvim]])
 vim.api.nvim_command([[packadd cmp-nvim-lsp]])
-vim.api.nvim_command([[packadd vim-illuminate]])
 vim.api.nvim_command([[packadd efmls-configs-nvim]])
 
 local nvim_lsp = require("lspconfig")
@@ -57,10 +56,6 @@ local on_editor_attach = function(client, bufnr)
     hi_parameter = "Search",
     handler_opts = { "double" },
   })
-  require("illuminate").on_attach(client)
-  if client.server_capabilities.documentSymbolProvider then
-    require("nvim-navic").attach(client, bufnr)
-  end
 end
 
 -- C server
@@ -317,7 +312,7 @@ local shellcheck = require("efmls-configs.linters.shellcheck")
 local pylint = require("efmls-configs.linters.pylint")
 
 local black = require("efmls-configs.formatters.black")
-local luafmt = require("efmls-configs.formatters.stylua")
+local stylua = require("efmls-configs.formatters.stylua")
 local prettier = require("efmls-configs.formatters.prettier")
 local shfmt = require("efmls-configs.formatters.shfmt")
 local clangfmt = { formatCommand = "clang-format -style='{BasedOnStyle: LLVM, IndentWidth: 4}'", formatStdin = true }
@@ -325,7 +320,7 @@ local clangfmt = { formatCommand = "clang-format -style='{BasedOnStyle: LLVM, In
 -- Setup formatter and linter for efmls here
 efmls.setup({
   vim = { formatter = vint },
-  lua = { formatter = luafmt },
+  lua = { formatter = stylua },
   c = { formatter = clangfmt },
   cpp = { formatter = clangfmt },
   vue = { formatter = prettier },
