@@ -62,7 +62,6 @@ end
 
 M.setup = function()
   local definitions = {
-    packer = {},
     terms = {
       { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
     },

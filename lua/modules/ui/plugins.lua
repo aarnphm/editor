@@ -30,13 +30,8 @@ ui["goolord/alpha-nvim"] = {
 }
 ui["nvim-lualine/lualine.nvim"] = {
   opt = true,
-  after = { "nvim-navic" },
-  config = config.lualine,
-}
-ui["SmiteshP/nvim-navic"] = {
-  opt = true,
   after = "nvim-lspconfig",
-  config = config.nvim_navic,
+  config = config.lualine,
 }
 ui["kyazdani42/nvim-tree.lua"] = { cmd = { "NvimTreeToggle" }, config = config.nvim_tree }
 ui["lukas-reineke/indent-blankline.nvim"] = {
@@ -50,7 +45,8 @@ ui["lewis6991/gitsigns.nvim"] = {
   config = config.gitsigns,
 }
 ui["akinsho/nvim-bufferline.lua"] = {
-  event = "BufRead",
+  event = "BufReadPost",
+  tag = "*",
   opt = true,
   config = config.nvim_bufferline,
 }

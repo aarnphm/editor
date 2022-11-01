@@ -86,7 +86,19 @@ config.lspsaga = function()
       String = { icons.type.String, colors.green },
       -- ccls-specific iconss.
       TypeAlias = { icons.kind.TypeAlias, colors.green },
+      Parameter = { icons.kind.Parameter, colors.blue },
       StaticMethod = { icons.kind.StaticMethod, colors.peach },
+    },
+    symbol_in_winbar = {
+      enable = true,
+      in_custom = false,
+      separator = " " .. icons.ui.Separator,
+      show_file = false,
+      -- define how to customize filename, eg: %:., %
+      -- if not set, use default value `%:t`
+      -- more information see `vim.fn.expand` or `expand`
+      -- ## only valid after set `show_file = true`
+      file_formatter = "",
     },
   })
 end

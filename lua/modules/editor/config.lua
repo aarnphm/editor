@@ -14,6 +14,14 @@ config.nvim_treesitter = function()
     },
     context_commentstring = { enable = true, enable_autocmd = false },
     matchup = { enable = true },
+    lsp_interop = {
+      enable = true,
+      border = "none",
+      peek_definition_code = {
+        ["<leader>sd"] = "@function.outer",
+        ["<leader>sD"] = "@class.outer",
+      },
+    },
     textobjects = {
       select = {
         enable = true,
@@ -375,11 +383,51 @@ config.telescope = function()
     },
     pickers = {
       buffers = fixfolds,
-      find_files = fixfolds,
+      find_files = {
+        mappings = {
+          n = {
+            ["cd"] = function(prompt_bufnr)
+              local selection = require("telescope.actions.state").get_selected_entry()
+              local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+              require("telescope.actions").close(prompt_bufnr)
+              -- Depending on what you want put `cd`, `lcd`, `tcd`
+              vim.cmd(string.format("silent lcd %s", dir))
+            end,
+          },
+        },
+      },
       git_files = fixfolds,
       grep_string = fixfolds,
-      live_grep = fixfolds,
+      live_grep = {
+        on_input_filter_cb = function(prompt)
+          -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
+          return { prompt = prompt:gsub("%s", ".*") }
+        end,
+        attach_mappings = function(_)
+          telescope_actions.select:enhance({
+            post = function()
+              vim.cmd(":normal! zx")
+            end,
+          })
+          return true
+        end,
+      },
       oldfiles = fixfolds,
+      diagnostics = {
+        initial_mode = "normal",
+      },
+      lsp_references = {
+        theme = "cursor",
+        initial_mode = "normal",
+        layout_config = {
+          width = 0.8,
+          height = 0.4,
+        },
+      },
+      lsp_code_actions = {
+        theme = "cursor",
+        initial_mode = "normal",
+      },
     },
   })
   require("telescope").load_extension("fzf")
@@ -440,7 +488,7 @@ config.wilder = function()
       wilder.cmdline_pipeline({ use_python = 0, fuzzy = 1, fuzzy_filter = wilder.lua_fzy_filter() }),
       wilder.vim_search_pipeline(),
       {
-        wilder.check(function(_, x)
+        wilder.check(function(ctx, x)
           return x == ""
         end),
         wilder.history(),

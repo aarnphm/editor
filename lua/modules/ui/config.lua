@@ -154,8 +154,10 @@ config.alpha = function()
 end
 
 config.lualine = function()
-  local navic = require("nvim-navic")
-
+  local icons = {
+    diagnostics = require("modules.ui.icons").get("diagnostics", true),
+    misc = require("modules.ui.icons").get("misc", true),
+  }
   local escape_status = function()
     local ok, m = pcall(require, "better_escape")
     return ok and m.waiting and "✺ " or ""
@@ -221,15 +223,17 @@ config.lualine = function()
     sections = {
       lualine_a = { "mode" },
       lualine_b = { { "branch" }, { "diff", source = diff_source } },
-      lualine_c = {
-        { navic.get_location, cond = navic.is_available },
-      },
+      lualine_c = {},
       lualine_x = {
         { escape_status },
         {
           "diagnostics",
           sources = { "nvim_diagnostic" },
-          symbols = { error = " ", warn = " ", info = " " },
+          symbols = {
+            error = icons.diagnostics.Error,
+            warn = icons.diagnostics.Warning,
+            info = icons.diagnostics.Information,
+          },
         },
       },
       lualine_y = {
@@ -265,41 +269,6 @@ config.lualine = function()
       -- "nvim-dap-ui",
       outline,
     },
-  })
-end
-
-config.nvim_navic = function()
-  require("nvim-navic").setup({
-    icons = {
-      Method = " ",
-      Function = " ",
-      Constructor = " ",
-      Field = " ",
-      Variable = " ",
-      Class = "ﴯ ",
-      Interface = " ",
-      Module = " ",
-      Property = "ﰠ ",
-      Enum = " ",
-      File = " ",
-      EnumMember = " ",
-      Constant = " ",
-      Struct = " ",
-      Event = " ",
-      Operator = " ",
-      TypeParameter = " ",
-      Namespace = " ",
-      Object = " ",
-      Array = " ",
-      Boolean = " ",
-      Number = " ",
-      Null = "ﳠ ",
-      Key = " ",
-      String = " ",
-      Package = " ",
-    },
-    highlight = true,
-    separator = " » ",
   })
 end
 
@@ -419,13 +388,15 @@ config.gitsigns = function()
 end
 
 config.nvim_bufferline = function()
+  local icons = { ui = require("modules.ui.icons").get("ui") }
+
   local options = {
     options = {
       number = nil,
-      modified_icon = "✥",
-      buffer_close_icon = "",
-      left_trunc_marker = "",
-      right_trunc_marker = "",
+      modified_icon = icons.ui.Modified,
+      buffer_close_icon = icons.ui.Close,
+      left_trunc_marker = icons.ui.Left,
+      right_trunc_marker = icons.ui.Right,
       max_name_length = 14,
       max_prefix_length = 13,
       tab_size = 20,
@@ -441,6 +412,13 @@ config.nvim_bufferline = function()
           text = "File Explorer",
           text_align = "center",
           padding = 1,
+        },
+        {
+          filetype = "undotree",
+          text = "Undo Tree",
+          text_align = "center",
+          highlight = "Directory",
+          separator = true,
         },
       },
       diagnostics_indicator = function(count)

@@ -52,7 +52,7 @@ M.setup = function()
   local plug_map = {
     ["n|ft"] = map_cr("FormatToggle"):with_noremap():with_silent(),
     -- reload and edit config
-    ["n|<LocalLeader>rl"] = map_cr("PackerSync"):with_noremap():with_silent(),
+    ["n|<LocalLeader>rl"] = map_cr("PackerCompile"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<LocalLeader><LocalLeader>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
@@ -124,7 +124,7 @@ M.setup = function()
     ["n|fo"] = map_cmd("<cmd> Telescope oldfiles<CR>"):with_noremap():with_silent(),
     ["n|fr"] = map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>ff"] = map_cr("<cmd> Telescope git_files<CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>ff"] = map_cu("lua require('core.utils').project_files()"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>fw"] = map_cu(
       "lua require('telescope.builtin').live_grep{cwd=vim.fn.systemlist('git rev-parse --show-toplevel')[1]}"

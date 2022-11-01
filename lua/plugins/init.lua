@@ -32,7 +32,14 @@ local required_plugins = function(use)
   use({
     "nathom/filetype.nvim",
     config = function()
-      require("filetype").setup({})
+      require("filetype").setup({
+        overrides = {
+          shebang = {
+            -- Set the filetype of files with a dash shebang to sh
+            dash = "sh",
+          },
+        },
+      })
     end,
   })
   use({ "wbthomason/packer.nvim", opt = true })
@@ -134,7 +141,7 @@ local required_plugins = function(use)
           aerial = false,
           vimwiki = true,
           beacon = false,
-          navic = { enabled = true },
+          navic = false,
           overseer = false,
           fidget = true,
         },

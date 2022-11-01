@@ -24,10 +24,7 @@ editor["mfussenegger/nvim-ts-hint-textobject"] = {
   opt = true,
   after = "nvim-treesitter",
 }
-editor["andymass/vim-matchup"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
+editor["andymass/vim-matchup"] = { opt = true, after = "nvim-treesitter" }
 editor["ThePrimeagen/refactoring.nvim"] = {
   module = "refactoring",
   after = "nvim-treesitter",
