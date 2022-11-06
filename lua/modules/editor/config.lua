@@ -384,6 +384,7 @@ config.telescope = function()
     pickers = {
       buffers = fixfolds,
       find_files = {
+        hidden = true,
         mappings = {
           n = {
             ["cd"] = function(prompt_bufnr)

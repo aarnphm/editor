@@ -29,22 +29,9 @@ local required_plugins = function(use)
   use({ "RishabhRD/popfix" })
   use({ "nvim-lua/plenary.nvim" })
   use({ "lewis6991/impatient.nvim" })
-  use({
-    "nathom/filetype.nvim",
-    config = function()
-      require("filetype").setup({
-        overrides = {
-          shebang = {
-            -- Set the filetype of files with a dash shebang to sh
-            dash = "sh",
-          },
-        },
-      })
-    end,
-  })
-  use({ "wbthomason/packer.nvim", opt = true })
-
+  use({"nathom/filetype.nvim"})
   use({ "kyazdani42/nvim-web-devicons" })
+  use({ "wbthomason/packer.nvim", opt = true })
 
   -- colorscheme
   use({

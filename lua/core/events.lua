@@ -66,16 +66,8 @@ M.setup = function()
       { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
     },
     bufs = {
-      {
-        "BufEnter,WinEnter",
-        "*",
-        "lua set_tmux_keymaps()",
-      },
-      {
-        "BufEnter,WinEnter",
-        "*",
-        'lua require("core.utils").hide_statusline()',
-      },
+      { "BufEnter,WinEnter", "*", "lua set_tmux_keymaps()" },
+      { "BufEnter,WinEnter", "*", 'lua require("core.utils").hide_statusline()' },
       {
         "BufWritePost",
         [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
@@ -129,24 +121,13 @@ M.setup = function()
     ft = {
       { "FileType", "alpha", "set showtabline=0" },
       { "FileType", "markdown", "set wrap" },
-      { "FileType", "make", "set noexpandtab shiftwidth=8 softtabstop=0" },
-      { "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
-      {
-        "FileType",
-        "*",
-        [[setlocal formatoptions-=cro]],
-      },
-      {
-        "FileType",
-        "c,cpp",
-        "nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>",
-      },
+      { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
+      { "FileType", "*", [[setlocal formatoptions-=cro]] },
       -- Google tab style
       { "BufNewFile,BufRead", "*.bazel", "setf bzl" },
       { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
       { "BufNewFile,BufRead", "*.toml", "setf toml" },
       { "BufNewFile,BufRead", "*.proto", "setf proto" },
-      { "BufNewFile,BufRead", "Bentfile", "setf dockerfile.yaml" },
       { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
       { "BufNewFile,BufRead", "Dockerfile.{tpl,template,tmpl}", "setf dockerfile" },
       { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", "setf dockerfile" },
