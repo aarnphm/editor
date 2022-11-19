@@ -84,7 +84,7 @@ M.setup = function()
     pattern = "PackerComplete",
     callback = function()
       require("plugins")
-      require("packer").compile()
+      require("packer").sync()
     end,
   })
 

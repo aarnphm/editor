@@ -25,10 +25,10 @@ M.setup = function()
     ["n|<leader>vs"] = map_cmd(':vsplit <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
     ["n|<leader>s"] = map_cmd(':split <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
     ["n|<leader>te"] = map_cmd(':tabedit <C-r>=expand("%:p:h")<cr>/'):with_noremap(),
-    ["n|<LocalLeader>]"] = map_cr("vertical resize -5"):with_silent(),
-    ["n|<LocalLeader>["] = map_cr("vertical resize +5"):with_silent(),
-    ["n|<LocalLeader>-"] = map_cr("resize -2"):with_silent(),
-    ["n|<LocalLeader>="] = map_cr("resize +2"):with_silent(),
+    ["n|<LocalLeader>]"] = map_cr("vertical resize -10"):with_silent(),
+    ["n|<LocalLeader>["] = map_cr("vertical resize +10"):with_silent(),
+    ["n|<LocalLeader>-"] = map_cr("resize -4"):with_silent(),
+    ["n|<LocalLeader>="] = map_cr("resize +4"):with_silent(),
     ["n|<leader>o"] = map_cr("setlocal spell! spelllang=en_us"),
     ["n|<leader>I"] = map_cmd(":set list!<cr>"):with_noremap(),
     ["n|\\"] = map_cmd(":let @/=''<CR>:noh<CR>"):with_noremap(),
@@ -36,6 +36,7 @@ M.setup = function()
     ["n|<leader>i"] = map_cmd("gg=G<CR>"):with_noremap():with_silent(),
     ["n|<leader>l"] = map_cmd(":set list! list?<CR>"):with_noremap(),
     ["n|<leader>t"] = map_cmd(":%s/\\s\\+$//e<CR>"):with_noremap(),
+    ["n|<LocalLeader>lcd"] = map_cmd(":lcd %:p:h<CR>"):with_noremap(),
     -- Insert
     ["i|jj"] = map_cmd("<Esc>"):with_noremap(),
     ["i|<C-u>"] = map_cmd("<C-G>u<C-U>"):with_noremap(),
@@ -126,11 +127,9 @@ M.setup = function()
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cu("lua require('core.utils').project_files()"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-    ["n|<LocalLeader>fw"] = map_cu(
-      "lua require('telescope.builtin').live_grep{cwd=vim.fn.systemlist('git rev-parse --show-toplevel')[1]}"
-    ):with_noremap():with_silent(),
+    ["n|<LocalLeader>fw"] = map_cu("lua require('core.utils').live_grep()"):with_noremap():with_silent(),
     ["n|<LocalLeader>fn"] = map_cu("enew"):with_noremap():with_silent(),
-    ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps <CR>"):with_noremap():with_silent(),
+    ["n|<LocalLeader>km"] = map_cmd("<cmd> Telescope keymaps<CR>"):with_noremap():with_silent(),
     -- Plugin spectre
     ["n|<S-F6>"] = map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
     ["n|<Leader>sw"] = map_cr("lua require('spectre').open_visual({select_word=true})"):with_noremap():with_silent(),

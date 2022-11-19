@@ -29,7 +29,7 @@ local required_plugins = function(use)
   use({ "RishabhRD/popfix" })
   use({ "nvim-lua/plenary.nvim" })
   use({ "lewis6991/impatient.nvim" })
-  use({"nathom/filetype.nvim"})
+  use({ "nathom/filetype.nvim" })
   use({ "kyazdani42/nvim-web-devicons" })
   use({ "wbthomason/packer.nvim", opt = true })
 
