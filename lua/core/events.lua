@@ -16,7 +16,7 @@ end
 _G.set_terminal_keymaps = function()
   local opts = { noremap = true }
   api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], opts)
-  api.nvim_buf_set_keymap(0, "t", "jk", [[<C-\><C-n>]], opts)
+  api.nvim_buf_set_keymap(0, "t", "kk", [[<C-\><C-n>]], opts)
   api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
   api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
   api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
@@ -62,6 +62,7 @@ end
 
 M.setup = function()
   local definitions = {
+    packer = {},
     terms = {
       { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
     },

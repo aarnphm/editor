@@ -55,7 +55,7 @@ local required_plugins = function(use)
     config = function()
       require("catppuccin").setup({
         flavour = "mocha", -- Can be one of: latte, frappe, macchiato, mocha
-        background = { light = "latte", dark = "mocha" },
+        background = { light = "latte", dark = "frappe" },
         dim_inactive = {
           enabled = false,
           -- Dim inactive splits/windows/buffers.
@@ -196,60 +196,60 @@ local required_plugins = function(use)
               ["@keyword.operator"] = { fg = cp.sky },
               ["@punctuation.special"] = { fg = cp.maroon },
 
-              ["@float"] = { fg = cp.peach },
-              ["@number"] = { fg = cp.peach },
-              ["@boolean"] = { fg = cp.peach },
+              -- ["@float"] = { fg = cp.peach },
+              -- ["@number"] = { fg = cp.peach },
+              -- ["@boolean"] = { fg = cp.peach },
 
               ["@constructor"] = { fg = cp.lavender },
-              ["@constant"] = { fg = cp.peach },
-              ["@conditional"] = { fg = cp.mauve },
-              ["@repeat"] = { fg = cp.mauve },
+              -- ["@constant"] = { fg = cp.peach },
+              -- ["@conditional"] = { fg = cp.mauve },
+              -- ["@repeat"] = { fg = cp.mauve },
               ["@exception"] = { fg = cp.peach },
 
               ["@constant.builtin"] = { fg = cp.lavender },
-              ["@function.builtin"] = { fg = cp.peach, style = { "italic" } },
-              ["@type.builtin"] = { fg = cp.yellow, style = { "italic" } },
+              -- ["@function.builtin"] = { fg = cp.peach, style = { "italic" } },
+              -- ["@type.builtin"] = { fg = cp.yellow, style = { "italic" } },
               ["@variable.builtin"] = { fg = cp.red, style = { "italic" } },
 
-              ["@function"] = { fg = cp.blue },
+              -- ["@function"] = { fg = cp.blue },
               ["@function.macro"] = { fg = cp.red, style = {} },
               ["@parameter"] = { fg = cp.rosewater },
               ["@keyword.function"] = { fg = cp.maroon },
               ["@keyword"] = { fg = cp.red },
               ["@keyword.return"] = { fg = cp.pink, style = {} },
 
-              ["@text.note"] = { fg = cp.base, bg = cp.blue },
-              ["@text.warning"] = { fg = cp.base, bg = cp.yellow },
-              ["@text.danger"] = { fg = cp.base, bg = cp.red },
-              ["@constant.macro"] = { fg = cp.mauve },
+              -- ["@text.note"] = { fg = cp.base, bg = cp.blue },
+              -- ["@text.warning"] = { fg = cp.base, bg = cp.yellow },
+              -- ["@text.danger"] = { fg = cp.base, bg = cp.red },
+              -- ["@constant.macro"] = { fg = cp.mauve },
 
-              ["@label"] = { fg = cp.blue },
+              -- ["@label"] = { fg = cp.blue },
               ["@method"] = { style = { "italic" } },
               ["@namespace"] = { fg = cp.rosewater, style = {} },
 
               ["@punctuation.delimiter"] = { fg = cp.teal },
               ["@punctuation.bracket"] = { fg = cp.overlay2 },
-              ["@string"] = { fg = cp.green },
-              ["@string.regex"] = { fg = cp.peach },
-              ["@type"] = { fg = cp.yellow },
+              -- ["@string"] = { fg = cp.green },
+              -- ["@string.regex"] = { fg = cp.peach },
+              -- ["@type"] = { fg = cp.yellow },
               ["@variable"] = { fg = cp.text },
               ["@tag.attribute"] = { fg = cp.mauve, style = { "italic" } },
               ["@tag"] = { fg = cp.peach },
               ["@tag.delimiter"] = { fg = cp.maroon },
               ["@text"] = { fg = cp.text },
 
-              ["@text.uri"] = { fg = cp.rosewater, style = { "italic", "underline" } },
-              ["@text.literal"] = { fg = cp.teal, style = { "italic" } },
-              ["@text.reference"] = { fg = cp.lavender, style = { "bold" } },
-              ["@text.title"] = { fg = cp.blue, style = { "bold" } },
-              ["@text.emphasis"] = { fg = cp.maroon, style = { "italic" } },
-              ["@text.strong"] = { fg = cp.maroon, style = { "bold" } },
-              ["@string.escape"] = { fg = cp.pink },
+              -- ["@text.uri"] = { fg = cp.rosewater, style = { "italic", "underline" } },
+              -- ["@text.literal"] = { fg = cp.teal, style = { "italic" } },
+              -- ["@text.reference"] = { fg = cp.lavender, style = { "bold" } },
+              -- ["@text.title"] = { fg = cp.blue, style = { "bold" } },
+              -- ["@text.emphasis"] = { fg = cp.maroon, style = { "italic" } },
+              -- ["@text.strong"] = { fg = cp.maroon, style = { "bold" } },
+              -- ["@string.escape"] = { fg = cp.pink },
 
-              ["@property.toml"] = { fg = cp.blue },
-              ["@field.yaml"] = { fg = cp.blue },
+              -- ["@property.toml"] = { fg = cp.blue },
+              -- ["@field.yaml"] = { fg = cp.blue },
 
-              ["@label.json"] = { fg = cp.blue },
+              -- ["@label.json"] = { fg = cp.blue },
 
               ["@function.builtin.bash"] = { fg = cp.red, style = { "italic" } },
               ["@parameter.bash"] = { fg = cp.yellow, style = { "italic" } },
@@ -260,17 +260,15 @@ local required_plugins = function(use)
               ["@constant.java"] = { fg = cp.teal },
 
               ["@property.typescript"] = { fg = cp.lavender, style = { "italic" } },
-              ["@constructor.typescript"] = { fg = cp.lavender },
+              -- ["@constructor.typescript"] = { fg = cp.lavender },
 
-              ["@constructor.tsx"] = { fg = cp.lavender },
-              ["@tag.attribute.tsx"] = { fg = cp.mauve },
+              -- ["@constructor.tsx"] = { fg = cp.lavender },
+              -- ["@tag.attribute.tsx"] = { fg = cp.mauve },
 
               ["@type.css"] = { fg = cp.lavender },
               ["@property.css"] = { fg = cp.yellow, style = { "italic" } },
 
               ["@property.cpp"] = { fg = cp.text },
-
-              ["@symbol"] = { fg = cp.flamingo },
             }
           end,
         },

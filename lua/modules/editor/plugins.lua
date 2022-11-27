@@ -185,7 +185,7 @@ editor["terrortylor/nvim-comment"] = {
 }
 editor["akinsho/nvim-toggleterm.lua"] = {
   opt = true,
-  event = "BufRead",
+  event = "UIEnter",
   config = config.toggleterm,
 }
 editor["rmagatti/auto-session"] = {
