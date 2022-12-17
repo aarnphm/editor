@@ -77,11 +77,14 @@ editor["phaazon/hop.nvim"] = {
   end,
 }
 editor["windwp/nvim-spectre"] = {
+  opt = true,
   module = "spectre",
   config = config.spectre,
 }
 editor["nvim-telescope/telescope.nvim"] = {
   cmd = "Telescope",
+  opt = true,
+  module = "telescope",
   requires = {
     { "nvim-lua/popup.nvim", opt = true },
   },
@@ -195,7 +198,7 @@ editor["rmagatti/auto-session"] = {
 }
 editor["NvChad/nvim-colorizer.lua"] = {
   opt = true,
-  event = "BufReadPost",
+  after = "nvim-treesitter",
   config = function()
     require("colorizer").setup()
   end,

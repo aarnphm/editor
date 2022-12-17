@@ -63,6 +63,7 @@ local disable_distribution_plugins = function()
 end
 
 M.setup = function()
+  local pack = require("core.pack")
   setup_global_envars()
   create_dir()
   disable_distribution_plugins()
@@ -73,24 +74,11 @@ M.setup = function()
 
   vim.g.maplocalleader = "+"
 
-  -- Add Packer commands because we are not loading it at startup
-  api.nvim_command("silent! command PackerClean lua require 'plugins' require('packer').clean()")
-  api.nvim_command("silent! command PackerCompile lua require 'plugins' require('packer').compile()")
-  api.nvim_command("silent! command PackerInstall lua require 'plugins' require('packer').install()")
-  api.nvim_command("silent! command PackerStatus lua require 'plugins' require('packer').status()")
-  api.nvim_command("silent! command PackerSync lua require 'plugins' require('packer').sync()")
-  api.nvim_command("silent! command PackerUpdate lua require 'plugins' require('packer').update()")
-  api.nvim_create_autocmd("User", {
-    pattern = "PackerComplete",
-    callback = function()
-      require("plugins")
-      require("packer").sync()
-    end,
-  })
-
+  pack.ensure_plugins()
   require("core.options")
   require("core.mappings")
   require("core.events")
+  pack.load_compile()
 
   -- plugins
   require("trimwhite")

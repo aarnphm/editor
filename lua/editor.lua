@@ -38,6 +38,7 @@ local editor_variables = function()
       opt_dir = packer_opt_dir,
       start_dir = packer_start_dir,
     },
+    use_ssh = true,
   }
 end
 

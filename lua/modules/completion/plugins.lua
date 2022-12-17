@@ -72,13 +72,6 @@ completion["simrat39/rust-tools.nvim"] = {
   ft = "rust",
   config = config.rust_tools,
 }
-completion["iamcco/markdown-preview.nvim"] = {
-  opt = true,
-  ft = "markdown",
-  run = function()
-    vim.fn["mkdp#util#install"]()
-  end,
-}
 completion["lervag/vimtex"] = { opt = true, ft = "tex", config = config.vimtex }
 completion["bazelbuild/vim-bazel"] = { requires = "google/vim-maktaba", ft = "bzl" }
 
