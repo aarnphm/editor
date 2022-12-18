@@ -69,8 +69,8 @@ M.setup = function()
   disable_distribution_plugins()
 
   vim.g.mapleader = ","
-  vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
-  vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
+  api.nvim_set_keymap("n", ",", "", { noremap = true })
+  api.nvim_set_keymap("x", ",", "", { noremap = true })
 
   vim.g.maplocalleader = "+"
 
@@ -83,7 +83,7 @@ M.setup = function()
   -- plugins
   require("trimwhite")
 
-  vim.api.nvim_command("silent! colorscheme " .. __editor_config.colorscheme)
+  api.nvim_command("silent! colorscheme " .. __editor_config.colorscheme)
 end
 
 return M
