@@ -136,6 +136,7 @@ M.setup = function()
     ["n|fo"] = map_cmd("<cmd> Telescope oldfiles<CR>"):with_noremap():with_silent(),
     ["n|fr"] = map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
     ["n|ff"] = map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
+    ["n|fb"] = map_cmd("<cmd> Telescope buffers<CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>ff"] = map_cu("lua require('core.utils').project_files()"):with_noremap():with_silent(),
     ["n|fw"] = map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
     ["n|<LocalLeader>fw"] = map_cu("lua require('core.utils').live_grep()"):with_noremap():with_silent(),

@@ -2,14 +2,14 @@ local M = {}
 
 local home = os.getenv("HOME")
 
-local disabled_worksapce_path = home .. "/.config/nvim/format_disabled_dirs.txt"
-local disabled_worksapce_file = io.open(disabled_worksapce_path, "r")
-local disabled_worksapce = {}
+local disabled_workspace_path = home .. "/.config/nvim/format_disabled_dirs.txt"
+local disabled_workspace_file = io.open(disabled_workspace_path, "r")
+local disabled_workspaces = {}
 
-if disabled_worksapce_file ~= nil then
-  for line in disabled_worksapce_file:lines() do
+if disabled_workspace_file ~= nil then
+  for line in disabled_workspace_file:lines() do
     local str = line:gsub("%s+", "")
-    table.insert(disabled_worksapce, str)
+    table.insert(disabled_workspaces, str)
   end
 end
 
@@ -123,8 +123,8 @@ end
 
 function M.format(opts)
   local cwd = vim.fn.getcwd()
-  for i = 1, #disabled_worksapce do
-    if cwd.find(cwd, disabled_worksapce[i]) ~= nil then
+  for i = 1, #disabled_workspaces do
+    if cwd.find(cwd, disabled_workspaces[i]) ~= nil then
       return
     end
   end

@@ -46,7 +46,7 @@ capabilities.textDocument.completion.completionItem = {
   },
 }
 
-local on_editor_attach = function(client, bufnr)
+local on_editor_attach = function(client, _)
   require("lsp_signature").on_attach({
     bind = true,
     use_lspsaga = false,
