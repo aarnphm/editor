@@ -174,6 +174,28 @@ config.lualine = function()
     end
   end
 
+  local lspsaga_symbols = function()
+    local exclude = {
+      ["terminal"] = true,
+      ["toggleterm"] = true,
+      ["prompt"] = true,
+      ["NvimTree"] = true,
+      ["help"] = true,
+    }
+    if vim.api.nvim_win_get_config(0).zindex or exclude[vim.bo.filetype] then
+      return "" -- Excluded filetypes
+    else
+      local ok, lspsaga = pcall(require, "lspsaga.symbolwinbar")
+      if ok then
+        if lspsaga:get_winbar() ~= nil then
+          return lspsaga:get_winbar()
+        else
+          return "" -- Cannot get node
+        end
+      end
+    end
+  end
+
   local mini_sections = {
     lualine_a = { "filetype" },
     lualine_b = {},
@@ -185,6 +207,10 @@ config.lualine = function()
   local outline = {
     sections = mini_sections,
     filetypes = { "lspsagaoutline" },
+  }
+  local diffview = {
+    sections = mini_sections,
+    filetypes = { "DiffviewFiles" },
   }
 
   local python_venv = function()
@@ -223,7 +249,7 @@ config.lualine = function()
     sections = {
       lualine_a = { "mode" },
       lualine_b = { { "branch" }, { "diff", source = diff_source } },
-      lualine_c = {},
+      lualine_c = { lspsaga_symbols },
       lualine_x = {
         { escape_status },
         {
@@ -268,6 +294,7 @@ config.lualine = function()
       "fugitive",
       -- "nvim-dap-ui",
       outline,
+      diffview,
     },
   })
 end

@@ -1,7 +1,6 @@
 local completion = {}
 local config = require("modules.completion.config")
 
-completion["kevinhwang91/nvim-bqf"] = { ft = "qf" }
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
   opt = true,
@@ -10,6 +9,7 @@ completion["neovim/nvim-lspconfig"] = {
 }
 completion["creativenull/efmls-configs-nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
 completion["williamboman/mason.nvim"] = {
+  opt = false,
   requires = {
     { "williamboman/mason-lspconfig.nvim" },
     { "WhoIsSethDaniel/mason-tool-installer.nvim", config = config.mason_install },
@@ -27,13 +27,10 @@ completion["github/copilot.vim"] = {
 }
 completion["glepnir/lspsaga.nvim"] = {
   opt = true,
-  event = "LspAttach",
+  after = "nvim-lspconfig",
   config = config.lspsaga,
 }
-completion["ray-x/lsp_signature.nvim"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-}
+completion["ray-x/lsp_signature.nvim"] = { opt = true, after = "nvim-lspconfig" }
 
 -- completion
 completion["L3MON4D3/LuaSnip"] = {

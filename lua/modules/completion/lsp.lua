@@ -54,7 +54,9 @@ local on_editor_attach = function(client, _)
     fix_pos = true,
     hint_enable = true,
     hi_parameter = "Search",
-    handler_opts = { "double" },
+    handler_opts = {
+      border = "rounded",
+    },
   })
 end
 
@@ -274,7 +276,7 @@ for _, server in ipairs(mason_lsp.get_installed_servers()) do
         },
       },
     })
-  else
+  elseif server ~= "efm" then
     nvim_lsp[server].setup({
       capabilities = capabilities,
       on_attach = on_editor_attach,
