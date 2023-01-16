@@ -68,7 +68,7 @@ local function init_palette()
         crust = "#161320",
       }
 
-    palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("core.settings").palette_overwrite)
+    palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").palette_overwrite)
   end
 
   return palette

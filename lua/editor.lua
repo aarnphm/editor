@@ -39,6 +39,12 @@ local editor_variables = function()
       start_dir = packer_start_dir,
     },
     use_ssh = true,
+    ---Change the colors of the global palette here.
+    ---Settings will complete their replacement at initialization.
+    ---Parameters will be automatically completed as you type.
+    ---Example: { sky = "#04A5E5" }
+    ---@type palette
+    palette_overwrite = {},
   }
 end
 
@@ -74,3 +80,5 @@ end
 _G.__editor_global = M
 
 _G.__editor_config = editor_config()
+
+return M

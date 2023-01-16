@@ -157,21 +157,12 @@ config.lualine = function()
   local icons = {
     diagnostics = require("modules.ui.icons").get("diagnostics", true),
     misc = require("modules.ui.icons").get("misc", true),
+    ui = require("modules.ui.icons").get("ui", true),
   }
+
   local escape_status = function()
     local ok, m = pcall(require, "better_escape")
-    return ok and m.waiting and "✺ " or ""
-  end
-
-  local diff_source = function()
-    local gitsigns = vim.b.gitsigns_status_dict
-    if gitsigns then
-      return {
-        added = gitsigns.added,
-        modified = gitsigns.changed,
-        removed = gitsigns.removed,
-      }
-    end
+    return ok and m.waiting and icons.misc.EscapeST or ""
   end
 
   local lspsaga_symbols = function()
@@ -194,6 +185,26 @@ config.lualine = function()
         end
       end
     end
+  end
+
+  local diff_source = function()
+    local gitsigns = vim.b.gitsigns_status_dict
+    if gitsigns then
+      return {
+        added = gitsigns.added,
+        modified = gitsigns.changed,
+        removed = gitsigns.removed,
+      }
+    end
+  end
+
+  local get_cwd = function()
+    local cwd = vim.fn.getcwd()
+    local home = os.getenv("HOME")
+    if cwd:find(home, 1, true) == 1 then
+      cwd = "~" .. cwd:sub(#home + 1)
+    end
+    return icons.ui.RootFolderOpened .. cwd
   end
 
   local mini_sections = {
@@ -244,10 +255,10 @@ config.lualine = function()
       theme = "catppuccin",
       disabled_filetypes = {},
       component_separators = "|",
-      section_separators = { left = " ", right = " " },
+      section_separators = { left = "", right = "" },
     },
     sections = {
-      lualine_a = { "mode" },
+      lualine_a = { { "mode" } },
       lualine_b = { { "branch" }, { "diff", source = diff_source } },
       lualine_c = { lspsaga_symbols },
       lualine_x = {
@@ -261,6 +272,7 @@ config.lualine = function()
             info = icons.diagnostics.Information,
           },
         },
+        { get_cwd },
       },
       lualine_y = {
         { "filetype", colored = true, icon_only = true },
@@ -290,13 +302,20 @@ config.lualine = function()
     extensions = {
       "quickfix",
       "nvim-tree",
+      "nvim-dap-ui",
       "toggleterm",
       "fugitive",
-      -- "nvim-dap-ui",
       outline,
       diffview,
     },
   })
+
+  -- Properly set background color for lspsaga
+  local winbar_bg = require("modules.utils").hl_to_rgb("StatusLine", true, "#000000")
+  require("modules.utils").extend_hl("LspSagaWinbarSep", { bg = winbar_bg })
+  for _, hlGroup in pairs(require("lspsaga.highlight").get_kind()) do
+    require("modules.utils").extend_hl("LspSagaWinbar" .. hlGroup[1], { bg = winbar_bg })
+  end
 end
 
 config.nvim_tree = function()
