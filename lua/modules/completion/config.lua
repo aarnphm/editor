@@ -314,7 +314,7 @@ config.cmp = function()
 end
 
 config.luasnip = function()
-  local snippet_path = os.getenv("HOME") .. "/.config/nvim/snippets/"
+  local snippet_path = os.getenv("HOME") .. "/.config/nvim/custom-snippets/"
   if not vim.tbl_contains(vim.opt.rtp:get(), snippet_path) then
     vim.opt.rtp:append(snippet_path)
   end
