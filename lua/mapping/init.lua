@@ -97,7 +97,7 @@ M.setup = function()
     ["n|gd"] = map_cr("Lspsaga peek_definition"):with_noremap():with_silent(),
     ["n|<LocalLeader>cd"] = map_cr("Lspsaga show_line_diagnostics"):with_noremap():with_silent(),
     ["n|<Leader>cd"] = map_cr("Lspsaga show_cursor_diagnostics"):with_noremap():with_silent(),
-    ["n|gD"] = map_cr("lua vim.lsp.buf.definition()"):with_noremap():with_silent(),
+    ["n|gD"] = map_cr("Lspsaga goto_definition"):with_noremap():with_silent(),
     ["n|gh"] = map_cr("Lspsaga lsp_finder"):with_noremap():with_silent(),
     -- Plugin toggleterm
     ["n|<C-\\>"] = map_cr([[execute v:count . "ToggleTerm direction=horizontal"]]):with_noremap():with_silent(),
@@ -119,7 +119,7 @@ M.setup = function()
     ["n|<LocalLeader>nf"] = map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
     ["n|<Leader>nr"] = map_cr("NvimTreeRefresh"):with_noremap():with_silent(),
     -- Plugin octo
-    ["n|<LocalLeader>oc"] = map_cr("Octo"):with_noremap(),
+    ["n|<LocalLeader>ocpr"] = map_cr("Octo pr list"):with_noremap(),
     -- Plugin trouble
     ["n|gt"] = map_cr("TroubleToggle"):with_noremap():with_silent(),
     ["n|gR"] = map_cr("TroubleToggle lsp_references"):with_noremap():with_silent(),
