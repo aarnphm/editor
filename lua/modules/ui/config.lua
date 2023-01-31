@@ -168,8 +168,8 @@ config.catppuccin = function()
   local transparent_background = false -- Set background transparency here!
 
   require("catppuccin").setup({
-    flavour = "mocha", -- Can be one of: latte, frappe, macchiato, mocha
-    background = { light = "latte", dark = "mocha" },
+    flavour = "macchiato", -- Can be one of: latte, frappe, macchiato, mocha
+    background = { light = "latte", dark = "macchiato" },
     dim_inactive = {
       enabled = false,
       -- Dim inactive splits/windows/buffers.
@@ -180,7 +180,7 @@ config.catppuccin = function()
     transparent_background = transparent_background,
     show_end_of_buffer = false, -- show the '~' characters after the end of buffers
     term_colors = true,
-    compile_path = vim.fn.stdpath("cache") .. "/catppuccin",
+    compile_path = __editor_global.cache_dir  .. "/catppuccin",
     styles = {
       comments = { "italic" },
       properties = { "italic" },
