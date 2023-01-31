@@ -169,7 +169,7 @@ config.catppuccin = function()
 
   require("catppuccin").setup({
     flavour = "macchiato", -- Can be one of: latte, frappe, macchiato, mocha
-    background = { light = "latte", dark = "macchiato" },
+    background = { light = "frappe", dark = "mocha" },
     dim_inactive = {
       enabled = false,
       -- Dim inactive splits/windows/buffers.
@@ -180,7 +180,7 @@ config.catppuccin = function()
     transparent_background = transparent_background,
     show_end_of_buffer = false, -- show the '~' characters after the end of buffers
     term_colors = true,
-    compile_path = __editor_global.cache_dir  .. "/catppuccin",
+    compile_path = __editor_global.cache_dir .. __editor_global.path_sep .. "catppuccin",
     styles = {
       comments = { "italic" },
       properties = { "italic" },

@@ -30,6 +30,7 @@ config.copilot = function()
         },
       },
       filetypes = {
+        ["TelescopePrompt"] = false,
         ["dap-repl"] = false,
         ["big_file_disabled_ft"] = false,
       },
