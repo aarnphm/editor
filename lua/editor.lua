@@ -16,9 +16,6 @@ local editor_variables = function()
 
   local local_config_path = home .. path_sep .. ".editor.lua"
 
-  local packer_opt_dir = data_dir .. "pack" .. path_sep .. "packer" .. path_sep .. "opt" .. path_sep
-  local packer_start_dir = data_dir .. "pack" .. path_sep .. "packer" .. path_sep .. "start" .. path_sep
-
   local zettel_home = vim_path .. path_sep .. "zettelkasten"
 
   return {
@@ -34,10 +31,6 @@ local editor_variables = function()
     modules_dir = modules_dir,
     local_config_path = local_config_path,
     zettel_home = zettel_home,
-    packer = {
-      opt_dir = packer_opt_dir,
-      start_dir = packer_start_dir,
-    },
     use_ssh = true,
     ---Change the colors of the global palette here.
     ---Settings will complete their replacement at initialization.

@@ -4,6 +4,39 @@ config.lspconfig = function()
   require("modules.completion.lsp")
 end
 
+config.copilot = function()
+  vim.defer_fn(function()
+    require("copilot").setup({
+      cmp = {
+        enabled = true,
+        method = "getCompletionsCycling",
+      },
+      panel = {
+        -- if true, it can interfere with completions in copilot-cmp
+        enabled = true,
+        auto_refresh = true,
+      },
+      suggestion = {
+        -- if true, it can interfere with completions in copilot-cmp
+        enabled = true,
+        auto_trigger = true,
+        keymap = {
+          accept = "<Tab>",
+          accept_word = "<Tab>",
+          accept_line = "<Tab>",
+          next = "<M-]>",
+          prev = "<M-[>",
+          dismiss = "<C-]>",
+        },
+      },
+      filetypes = {
+        ["dap-repl"] = false,
+        ["big_file_disabled_ft"] = false,
+      },
+    })
+  end, 100)
+end
+
 config.lspsaga = function()
   local icons = {
     diagnostics = require("modules.ui.icons").get("diagnostics", true),
@@ -190,7 +223,11 @@ config.cmp = function()
   end
 
   local has_words_before = function()
+    if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
+      return false
+    end
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    -- return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
@@ -221,15 +258,12 @@ config.cmp = function()
   local cmp = require("cmp")
 
   local tab_complete = function(fallback)
-    local copilot_keys = vim.fn["copilot#Accept"]()
-    if copilot_keys ~= "" then
-      vim.api.nvim_feedkeys(copilot_keys, "i", true)
-    elseif cmp.visible() then
+    if require("copilot.suggestion").is_visible() then
+      require("copilot.suggestion").accept()
+    elseif cmp.visible() and has_words_before() then
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
       vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-expand-or-jump"), "")
-    elseif has_words_before() then
-      cmp.complete()
     else
       fallback()
     end
@@ -305,7 +339,7 @@ config.cmp = function()
       { name = "luasnip" },
       { name = "path" },
       { name = "tmux" },
-      { name = "buffer" },
+      -- { name = "buffer" },
       { name = "latex_symbols" },
       { name = "spell" },
       { name = "emoji" },
@@ -409,9 +443,6 @@ config.golang = function()
 end
 
 config.rust_tools = function()
-  vim.api.nvim_command([[packadd nvim-lspconfig]])
-  vim.api.nvim_command([[packadd lsp_signature.nvim]])
-
   local opts = {
     tools = { -- rust-tools options
 

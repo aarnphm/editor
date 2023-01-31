@@ -88,7 +88,6 @@ config.illuminate = function()
       "norg",
       "NvimTree",
       "Outline",
-      "packer",
       "toggleterm",
     },
     under_cursor = false,
@@ -284,12 +283,7 @@ config.spectre = function()
 end
 
 config.telescope = function()
-  vim.api.nvim_command([[packadd sqlite.lua]])
-  vim.api.nvim_command([[packadd telescope-fzf-native.nvim]])
-  vim.api.nvim_command([[packadd telescope-frecency.nvim]])
-  vim.api.nvim_command([[packadd telescope-emoji.nvim]])
-  vim.api.nvim_command([[packadd telescope-zoxide]])
-
+  local icons = { ui = require("modules.ui.icons").get("ui", true) }
   local telescope_actions = require("telescope.actions.set")
   local fixfolds = {
     hidden = true,
@@ -302,52 +296,30 @@ config.telescope = function()
       return true
     end,
   }
+  local lga_actions = require("telescope-live-grep-args.actions")
 
   require("telescope").setup({
     defaults = {
       initial_mode = "insert",
-      prompt_prefix = "  ",
+      prompt_prefix = " " .. icons.ui.Telescope .. " ",
+      selection_caret = icons.ui.ChevronRight,
       entry_prefix = " ",
       scroll_strategy = "limit",
-      borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+      results_title = false,
       layout_strategy = "horizontal",
       path_display = { "absolute" },
-      results_title = false,
-      selection_caret = "» ",
-      vimgrep_arguments = {
-        "rg",
-        "--color=never",
-        "--no-heading",
-        "--with-filename",
-        "--line-number",
-        "--column",
-        "--smart-case",
-        "--hidden",
-      },
-      mappings = {
-        i = {
-          ["<C-a>"] = { "<esc>0i", type = "command" },
-          ["<Esc>"] = require("telescope.actions").close,
-        },
-        n = { ["q"] = require("telescope.actions").close },
-      },
-      selection_strategy = "reset",
-      sorting_strategy = "ascending",
       layout_config = {
         horizontal = {
-          prompt_position = "top",
-          preview_width = 0.55,
-          results_width = 0.8,
+          preview_width = 0.5,
         },
-        vertical = {
-          mirror = false,
-        },
-        width = 0.87,
-        height = 0.80,
-        preview_cutoff = 120,
+        -- vertical = {
+        --   mirror = false,
+        -- },
+        -- width = 0.87,
+        -- height = 0.80,
+        -- preview_cutoff = 120,
       },
       file_ignore_patterns = {
-        "packer_compiled.lua",
         "static_content",
         "node_modules",
         ".git/",
@@ -358,27 +330,50 @@ config.telescope = function()
         "%.mp4",
         "%.zip",
       },
-      file_sorter = require("telescope.sorters").get_fuzzy_file,
       file_previewer = require("telescope.previewers").vim_buffer_cat.new,
       grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
+      file_sorter = require("telescope.sorters").get_fuzzy_file,
       generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
-      buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
-      winblend = 0,
-      border = {},
-      color_devicons = true,
     },
     extensions = {
       fzf = {
-        fuzzy = true, -- false will only do exact matching
-        override_generic_sorter = true, -- override the generic sorter
-        override_file_sorter = true, -- override the file sorter
-        case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+        fuzzy = false,
+        override_generic_sorter = true,
+        override_file_sorter = true,
+        case_mode = "smart_case",
       },
       frecency = {
         show_scores = true,
         show_unindexed = true,
         ignore_patterns = { "*.git/*", "*/tmp/*" },
+      },
+      live_grep_args = {
+        auto_quoting = true, -- enable/disable auto-quoting
+        -- define mappings, e.g.
+        mappings = { -- extend mappings
+          i = {
+            ["<C-k>"] = lga_actions.quote_prompt(),
+            ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+          },
+        },
+      },
+      undo = {
+        side_by_side = true,
+        layout_config = {
+          preview_height = 0.8,
+        },
+        mappings = { -- this whole table is the default
+          i = {
+            -- IMPORTANT: Note that telescope-undo must be available when telescope is configured if
+            -- you want to use the following actions. This means installing as a dependency of
+            -- telescope in it's `requirements` and loading this extension from there instead of
+            -- having the separate plugin definition as outlined above. See issue #6.
+            ["<cr>"] = require("telescope-undo.actions").yank_additions,
+            ["<S-cr>"] = require("telescope-undo.actions").yank_deletions,
+            ["<C-cr>"] = require("telescope-undo.actions").restore,
+          },
+        },
       },
     },
     pickers = {
@@ -386,42 +381,32 @@ config.telescope = function()
       find_files = fixfolds,
       git_files = fixfolds,
       grep_string = fixfolds,
-      live_grep = {
-        on_input_filter_cb = function(prompt)
-          -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
-          return { prompt = prompt:gsub("%s", ".*") }
-        end,
-        attach_mappings = function(_)
-          telescope_actions.select:enhance({
-            post = function()
-              vim.cmd(":normal! zx")
-            end,
-          })
-          return true
-        end,
-      },
+      live_grep = fixfolds,
       oldfiles = fixfolds,
-      diagnostics = {
-        initial_mode = "normal",
-      },
-      lsp_references = {
-        theme = "cursor",
-        initial_mode = "normal",
-        layout_config = {
-          width = 0.8,
-          height = 0.4,
-        },
-      },
-      lsp_code_actions = {
-        theme = "cursor",
-        initial_mode = "normal",
-      },
     },
   })
+
   require("telescope").load_extension("fzf")
+  require("telescope").load_extension("projects")
   require("telescope").load_extension("zoxide")
   require("telescope").load_extension("frecency")
+  require("telescope").load_extension("live_grep_args")
+  require("telescope").load_extension("undo")
   require("telescope").load_extension("emoji")
+end
+
+config.project = function()
+  require("project_nvim").setup({
+    manual_mode = false,
+    detection_methods = { "lsp", "pattern" },
+    patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json" },
+    ignore_lsp = { "efm", "copilot" },
+    exclude_dirs = {},
+    show_hidden = false,
+    silent_chdir = true,
+    scope_chdir = "global",
+    datapath = vim.fn.stdpath("data"),
+  })
 end
 
 config.octo = function()
@@ -520,6 +505,54 @@ config.wilder = function()
       substitute = wildmenu_renderer,
     })
   )
+end
+
+config.which_key = function()
+  local icons = {
+    ui = require("modules.ui.icons").get("ui"),
+    misc = require("modules.ui.icons").get("misc"),
+  }
+
+  require("which-key").setup({
+    plugins = {
+      presets = {
+        operators = false,
+        motions = false,
+        text_objects = false,
+        windows = false,
+        nav = false,
+        z = true,
+        g = true,
+      },
+    },
+
+    icons = {
+      breadcrumb = icons.ui.Separator,
+      separator = icons.misc.Vbar,
+      group = icons.misc.Add,
+    },
+
+    window = {
+      border = "none",
+      position = "bottom",
+      margin = { 1, 0, 1, 0 },
+      padding = { 1, 1, 1, 1 },
+      winblend = 0,
+    },
+  })
+end
+
+config.dressing = function()
+  require("dressing").setup({
+    input = {
+      enabled = true,
+    },
+    select = {
+      enabled = true,
+      backend = "telescope",
+      trim_prompt = true,
+    },
+  })
 end
 
 return config

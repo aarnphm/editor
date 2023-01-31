@@ -3,73 +3,71 @@ local config = require("modules.completion.config")
 
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
-  opt = true,
+  lazy = true,
   event = "BufReadPre",
   config = config.lspconfig,
-}
-completion["creativenull/efmls-configs-nvim"] = { opt = false, requires = "neovim/nvim-lspconfig" }
-completion["williamboman/mason.nvim"] = {
-  opt = false,
-  requires = {
+  dependencies = {
+    { "creativenull/efmls-configs-nvim" },
+    { "williamboman/mason.nvim" },
     { "williamboman/mason-lspconfig.nvim" },
     { "WhoIsSethDaniel/mason-tool-installer.nvim", config = config.mason_install },
+    { "glepnir/lspsaga.nvim", config = config.lspsaga },
+    { "ray-x/lsp_signature.nvim" },
   },
 }
-completion["github/copilot.vim"] = {
-  opt = true,
-  setup = function()
-    vim.g.copilot_no_tab_map = true
-    vim.g.copilot_assume_mapped = true
-    vim.g.copilot_tab_fallback = ""
-  end,
-  after = "nvim-cmp",
-  cmd = { "Copilot" },
+completion["zbirenbaum/copilot.lua"] = {
+  cmd = "Copilot",
+  event = "InsertEnter",
+  config = config.copilot,
 }
-completion["glepnir/lspsaga.nvim"] = {
-  opt = true,
-  after = "nvim-lspconfig",
-  config = config.lspsaga,
-}
-completion["ray-x/lsp_signature.nvim"] = { opt = true, after = "nvim-lspconfig" }
 
 -- completion
-completion["L3MON4D3/LuaSnip"] = {
-  after = "nvim-cmp",
-  config = config.luasnip,
-  requires = "rafamadriz/friendly-snippets",
-}
 completion["hrsh7th/nvim-cmp"] = {
+  lazy = false,
   config = config.cmp,
   event = "InsertEnter",
-  requires = {
+  dependencies = {
+    {
+      "L3MON4D3/LuaSnip",
+      config = config.luasnip,
+      dependencies = { "rafamadriz/friendly-snippets" },
+    },
     { "onsails/lspkind.nvim" },
     { "lukas-reineke/cmp-under-comparator" },
-    { "saadparwaiz1/cmp_luasnip", after = "LuaSnip" },
-    { "hrsh7th/cmp-nvim-lsp", after = "cmp_luasnip" },
-    { "hrsh7th/cmp-nvim-lua", after = "cmp-nvim-lsp" },
-    { "hrsh7th/cmp-path", after = "cmp-nvim-lua" },
-    { "hrsh7th/cmp-buffer", after = "cmp-path" },
-    { "hrsh7th/cmp-emoji", after = "cmp-buffer" },
-    { "kdheepak/cmp-latex-symbols", after = "cmp-buffer", ft = "latex" },
-    { "f3fora/cmp-spell", after = "cmp-latex-symbols" },
+    { "saadparwaiz1/cmp_luasnip" },
+    { "hrsh7th/cmp-nvim-lsp" },
+    { "hrsh7th/cmp-nvim-lua" },
+    { "hrsh7th/cmp-path" },
+    { "hrsh7th/cmp-buffer" },
+    { "hrsh7th/cmp-emoji" },
+    { "kdheepak/cmp-latex-symbols" },
+    { "f3fora/cmp-spell" },
+    { "windwp/nvim-autopairs", config = config.autopairs },
   },
 }
-completion["windwp/nvim-autopairs"] = {
-  after = "nvim-cmp",
-  config = config.autopairs,
-}
 completion["fatih/vim-go"] = {
-  opt = true,
+  lazy = true,
   ft = "go",
   run = ":GoInstallBinaries",
   config = config.golang,
 }
 completion["simrat39/rust-tools.nvim"] = {
-  opt = true,
+  lazy = true,
   ft = "rust",
   config = config.rust_tools,
 }
-completion["lervag/vimtex"] = { opt = true, ft = "tex", config = config.vimtex }
-completion["bazelbuild/vim-bazel"] = { requires = "google/vim-maktaba", ft = "bzl" }
+completion["iamcco/markdown-preview.nvim"] = {
+  lazy = true,
+  lazy = true,
+  ft = "markdown",
+  run = "cd app && yarn install",
+  build = "cd app && yarn install",
+}
+completion["chrisbra/csv.vim"] = {
+  lazy = true,
+  ft = "csv",
+}
+completion["lervag/vimtex"] = { lazy = true, ft = "tex", config = config.vimtex }
+completion["bazelbuild/vim-bazel"] = { dependencies = { "google/vim-maktaba" }, ft = "bzl" }
 
 return completion

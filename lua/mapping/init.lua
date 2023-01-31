@@ -53,8 +53,6 @@ M.setup = function()
 
   local plug_map = {
     ["n|ft"] = map_cr("FormatToggle"):with_noremap():with_silent(),
-    -- reload and edit config
-    ["n|<LocalLeader>rl"] = map_cr("PackerCompile"):with_noremap():with_silent(),
     -- jupyter_ascending
     ["n|<LocalLeader><LocalLeader>x"] = map_cr(":call jupyter_ascending#execute()<CR>"),
     ["n|<LocalLeader><LocalLeader>X"] = map_cr(":call jupyter_ascending#execute_all()<CR>"),
@@ -77,12 +75,6 @@ M.setup = function()
     -- Gitsigns
     ["n|<Space>wd"] = map_cr("Gitsigns toggle_word_diff"):with_noremap():with_silent(),
     ["n|<Space>ld"] = map_cr("Gitsigns toggle_deleted"):with_noremap():with_silent(),
-    -- Packer
-    ["n|<Space>ps"] = map_cr("PackerSync"):with_noremap(),
-    ["n|<Space>pS"] = map_cr("PackerStatus"):with_noremap(),
-    ["n|<Space>pu"] = map_cr("PackerUpdate"):with_noremap(),
-    ["n|<Space>pc"] = map_cr("PackerCompile"):with_noremap(),
-    ["n|<Space>pC"] = map_cr("PackerClean"):with_noremap(),
     -- Lsp map work when insertenter and lsp start
     ["n|<leader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<LocalLeader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),

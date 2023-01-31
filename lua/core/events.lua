@@ -78,7 +78,7 @@ api.nvim_create_autocmd("BufEnter", {
 
 M.setup = function()
   local definitions = {
-    packer = {},
+    lazy = {},
     terms = {
       { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
     },

@@ -1,15 +1,16 @@
 local ui = {}
 local config = require("modules.ui.config")
 
-ui["folke/which-key.nvim"] = {
-  opt = true,
-  event = "BufEnter",
-  config = function()
-    require("which-key").setup()
-  end,
+ui["nathom/filetype.nvim"] = { lazy = false }
+ui["catppuccin/nvim"] = {
+  as = "catppuccin",
+  lazy = false,
+  name = "catppuccin",
+  config = config.catppuccin,
 }
+
 ui["j-hui/fidget.nvim"] = {
-  opt = true,
+  lazy = true,
   event = "BufRead",
   config = function()
     require("fidget").setup({
@@ -21,7 +22,7 @@ ui["j-hui/fidget.nvim"] = {
   end,
 }
 ui["goolord/alpha-nvim"] = {
-  opt = true,
+  lazy = true,
   event = "BufWinEnter",
   config = config.alpha,
   cond = function()
@@ -29,25 +30,33 @@ ui["goolord/alpha-nvim"] = {
   end,
 }
 ui["nvim-lualine/lualine.nvim"] = {
-  opt = true,
-  after = "nvim-lspconfig",
+  lazy = true,
+  event = "VeryLazy",
   config = config.lualine,
 }
-ui["kyazdani42/nvim-tree.lua"] = { cmd = { "NvimTreeToggle" }, config = config.nvim_tree }
+ui["kyazdani42/nvim-tree.lua"] = {
+  cmd = {
+    "NvimTreeToggle",
+    "NvimTreeOpen",
+    "NvimTreeFindFile",
+    "NvimTreeFindFileToggle",
+    "NvimTreeRefresh",
+  },
+  config = config.nvim_tree,
+}
 ui["lukas-reineke/indent-blankline.nvim"] = {
-  opt = true,
+  lazy = true,
   event = "BufRead",
   config = config.indent_blankline,
 }
 ui["lewis6991/gitsigns.nvim"] = {
-  opt = true,
+  lazy = true,
   event = { "BufRead", "BufNewFile" },
   config = config.gitsigns,
 }
 ui["akinsho/nvim-bufferline.lua"] = {
-  event = "BufReadPost",
-  tag = "*",
-  opt = true,
+  lazy = true,
+  event = { "BufReadPost", "BufAdd", "BufNewFile" },
   config = config.nvim_bufferline,
 }
 

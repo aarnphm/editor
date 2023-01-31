@@ -102,7 +102,18 @@ M.setup = function()
     concealcursor = "niv",
   }
 
-  vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
+  local isempty = function(s)
+    return s == nil or s == ""
+  end
+
+  -- custom python provider
+  local conda_prefix = os.getenv("CONDA_PREFIX")
+  if not isempty(conda_prefix) then
+    vim.g.python_host_prog = conda_prefix .. "/bin/python"
+    vim.g.python3_host_prog = conda_prefix .. "/bin/python"
+  else
+    vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
+  end
 
   if __editor_global.is_mac then
     vim.g.clipboard = {
@@ -116,8 +127,6 @@ M.setup = function()
   for name, value in pairs(global_opt) do
     vim.o[name] = value
   end
-
-  vim.o.background = __editor_config.background
 end
 
 M.setup()

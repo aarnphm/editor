@@ -1,31 +1,34 @@
 local editor = {}
 local config = require("modules.editor.config")
 
-editor["RRethy/vim-illuminate"] = { opt = true, event = "BufReadPost", config = config.illuminate }
+-- tpope
+editor["tpope/vim-repeat"] = { lazy = false }
+editor["tpope/vim-sleuth"] = { lazy = false }
+editor["tpope/vim-fugitive"] = { lazy = true, command = { "Git", "G", "Ggrep", "GBrowse" } }
+
+editor["RRethy/vim-illuminate"] = {
+  lazy = true,
+  event = "BufReadPost",
+  config = config.illuminate,
+}
 editor["nvim-treesitter/nvim-treesitter"] = {
-  opt = true,
-  run = ":TSUpdate",
+  lazy = true,
+  build = ":TSUpdate",
   event = "BufReadPost",
   config = config.nvim_treesitter,
+  dependencies = {
+    { "nvim-treesitter/nvim-treesitter-textobjects" },
+    { "p00f/nvim-ts-rainbow" },
+    { "romgrk/nvim-treesitter-context" },
+    { "JoosepAlviste/nvim-ts-context-commentstring" },
+    { "mfussenegger/nvim-ts-hint-textobject" },
+    { "andymass/vim-matchup" },
+    { "windwp/nvim-ts-autotag", config = config.autotag },
+    { "NvChad/nvim-colorizer.lua", config = config.nvim_colorizer },
+  },
 }
-editor["nvim-treesitter/nvim-treesitter-textobjects"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["romgrk/nvim-treesitter-context"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["JoosepAlviste/nvim-ts-context-commentstring"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["mfussenegger/nvim-ts-hint-textobject"] = {
-  opt = true,
-  after = "nvim-treesitter",
-}
-editor["andymass/vim-matchup"] = { opt = true, after = "nvim-treesitter" }
 editor["ThePrimeagen/refactoring.nvim"] = {
+  lazy = true,
   module = "refactoring",
   after = "nvim-treesitter",
   config = function()
@@ -54,10 +57,10 @@ editor["kylechui/nvim-surround"] = {
   end,
 }
 
-editor["junegunn/vim-easy-align"] = { opt = true, cmd = "EasyAlign" }
+editor["junegunn/vim-easy-align"] = { lazy = true, cmd = "EasyAlign" }
 
 editor["alexghergh/nvim-tmux-navigation"] = {
-  opt = true,
+  lazy = true,
   config = function()
     require("nvim-tmux-navigation").setup({
       disable_when_zoomed = true, -- defaults to false
@@ -69,7 +72,7 @@ editor["alexghergh/nvim-tmux-navigation"] = {
 }
 
 editor["phaazon/hop.nvim"] = {
-  opt = true,
+  lazy = true,
   branch = "v2",
   event = "BufRead",
   config = function()
@@ -77,36 +80,33 @@ editor["phaazon/hop.nvim"] = {
   end,
 }
 editor["windwp/nvim-spectre"] = {
-  opt = true,
+  lazy = true,
   module = "spectre",
   config = config.spectre,
 }
 editor["nvim-telescope/telescope.nvim"] = {
   cmd = "Telescope",
-  opt = true,
+  lazy = true,
   module = "telescope",
-  requires = {
-    { "nvim-lua/popup.nvim", opt = true },
+  dependencies = {
+    { "nvim-tree/nvim-web-devicons" },
+    { "nvim-lua/plenary.nvim" },
+    { "nvim-lua/popup.nvim" },
+    { "debugloop/telescope-undo.nvim" },
+    { "ahmedkhalf/project.nvim", event = "BufReadPost", config = config.project },
+    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    { "nvim-telescope/telescope-frecency.nvim", dependencies = {
+      { "kkharji/sqlite.lua" },
+    } },
+    { "jvgrootveld/telescope-zoxide" },
+    { "nvim-telescope/telescope-live-grep-args.nvim" },
+    { "xiyaowong/telescope-emoji.nvim" },
   },
   config = config.telescope,
 }
-editor["nvim-telescope/telescope-fzf-native.nvim"] = {
-  opt = true,
-  run = "make",
-  after = "telescope.nvim",
-}
-editor["nvim-telescope/telescope-frecency.nvim"] = {
-  opt = true,
-  after = "telescope-fzf-native.nvim",
-  requires = { "kkharji/sqlite.lua" },
-}
-editor["jvgrootveld/telescope-zoxide"] = { opt = true, after = "telescope-frecency.nvim" }
-editor["xiyaowong/telescope-emoji.nvim"] = {
-  opt = true,
-  after = "telescope.nvim",
-}
+
 editor["pwntester/octo.nvim"] = {
-  opt = true,
+  lazy = true,
   after = "telescope.nvim",
   config = config.octo,
   cmd = "Octo",
@@ -116,68 +116,81 @@ editor["pwntester/octo.nvim"] = {
   },
 }
 editor["sindrets/diffview.nvim"] = {
-  opt = true,
+  lazy = true,
   cmd = { "DiffviewOpen", "DiffviewFileHistory" },
-  requires = {
-    "kyazdani42/nvim-web-devicons",
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
     "nvim-lua/plenary.nvim",
   },
 }
 editor["sudormrfbin/cheatsheet.nvim"] = {
-  opt = true,
+  lazy = true,
   after = "telescope.nvim",
   config = config.cheatsheet,
 }
 editor["folke/trouble.nvim"] = {
-  opt = true,
+  lazy = true,
   cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
   config = config.trouble,
 }
-editor["folke/twilight.nvim"] = {
-  opt = true,
-  config = function()
-    require("twilight").setup({
-      {
-        dimming = {
-          alpha = 0.5, -- amount of dimming
-          -- we try to get the foreground from the highlight groups or fallback color
-          color = { "Normal", "#ffffff" },
-          inactive = true, -- when true, other windows will be fully dimmed (unless they contain the same buffer)
-        },
-        context = 50, -- amount of lines we will try to show around the current line
-        treesitter = true, -- use treesitter when available for the filetype
-        -- treesitter is used to automatically expand the visible text,
-        -- but you can further control the types of nodes that should always be fully expanded
-        expand = { -- for treesitter, we we always try to expand to the top-most ancestor with these types
-          "function",
-          "method",
-          "table",
-          "if_statement",
-        },
-        exclude = { ".git*" }, -- exclude these filetypes
-      },
-    })
-  end,
-}
+
+editor["folke/which-key.nvim"] = { lazy = false, config = config.which_key }
+editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = config.dressing }
+
 editor["folke/zen-mode.nvim"] = {
   after = "nvim-treesitter",
-  requires = { "folke/twilight.nvim" },
+  dependencies = {
+    {
+      "folke/twilight.nvim",
+      config = function()
+        require("twilight").setup({
+          {
+            dimming = {
+              alpha = 0.5, -- amount of dimming
+              -- we try to get the foreground from the highlight groups or fallback color
+              color = { "Normal", "#ffffff" },
+              inactive = true, -- when true, other windows will be fully dimmed (unless they contain the same buffer)
+            },
+            context = 50, -- amount of lines we will try to show around the current line
+            treesitter = true, -- use treesitter when available for the filetype
+            -- treesitter is used to automatically expand the visible text,
+            -- but you can further control the types of nodes that should always be fully expanded
+            expand = { -- for treesitter, we we always try to expand to the top-most ancestor with these types
+              "function",
+              "method",
+              "table",
+              "if_statement",
+            },
+            exclude = { ".git*" }, -- exclude these filetypes
+          },
+        })
+      end,
+    },
+  },
   config = function()
     require("zen-mode").setup({})
   end,
 }
+
+editor["stevearc/dressing.nvim"] = {
+  lazy = false,
+  dependencies = {
+    { "nvim-tree/nvim-web-devicons" },
+  },
+}
+
 editor["romainl/vim-cool"] = {
-  opt = true,
+  lazy = true,
   event = { "CursorMoved", "InsertEnter" },
 }
-editor["hrsh7th/vim-eft"] = { opt = true, event = "BufReadPost" }
+editor["hrsh7th/vim-eft"] = { lazy = true, event = "BufReadPost" }
 editor["luukvbaal/stabilize.nvim"] = {
-  opt = true,
+  lazy = true,
   event = "BufReadPost",
 }
 
 editor["terrortylor/nvim-comment"] = {
-  opt = false,
+  lazy = false,
   config = function()
     require("nvim_comment").setup({
       hook = function()
@@ -187,36 +200,29 @@ editor["terrortylor/nvim-comment"] = {
   end,
 }
 editor["akinsho/nvim-toggleterm.lua"] = {
-  opt = true,
+  lazy = true,
   event = "UIEnter",
   config = config.toggleterm,
 }
 editor["rmagatti/auto-session"] = {
-  opt = true,
+  lazy = true,
   cmd = { "SaveSession", "RestoreSession", "DeleteSession" },
   config = config.auto_session,
-}
-editor["NvChad/nvim-colorizer.lua"] = {
-  opt = true,
-  after = "nvim-treesitter",
-  config = function()
-    require("colorizer").setup()
-  end,
 }
 editor["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
   config = config.wilder,
-  requires = { { "romgrk/fzy-lua-native", after = "wilder.nvim" } },
+  dependencies = { { "romgrk/fzy-lua-native" } },
 }
 editor["untitled-ai/jupyter_ascending.vim"] = {
-  opt = true,
+  lazy = true,
   ft = "ipynb",
   cmd = { "JupyterExecute", "JupyterExecuteAll" },
 }
 editor["Stormherz/tablify"] = {
-  opt = true,
+  lazy = true,
   ft = "rst",
 }
-editor["dstein64/vim-startuptime"] = { opt = true, cmd = "StartupTime" }
+editor["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" }
 
 return editor

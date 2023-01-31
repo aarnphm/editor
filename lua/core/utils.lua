@@ -2,7 +2,6 @@ local api = vim.api
 local M = {}
 
 local create_term = function(config)
-  api.nvim_command([[packadd toggleterm]])
   local ft = require("toggleterm.terminal").Terminal:new(config)
   ft:toggle()
 end
