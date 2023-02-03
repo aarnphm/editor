@@ -13,17 +13,16 @@ config.copilot = function()
       },
       panel = {
         -- if true, it can interfere with completions in copilot-cmp
-        enabled = true,
-        auto_refresh = true,
+        enabled = false,
       },
       suggestion = {
         -- if true, it can interfere with completions in copilot-cmp
         enabled = true,
-        auto_trigger = true,
+        auto_trigger = false,
         keymap = {
-          accept = "<Tab><Tab>",
-          accept_word = "<Tab>",
-          accept_line = "<Tab>",
+          accept = "<CR>",
+          accept_word = "<CR>",
+          accept_line = "<CR>",
           next = "<M-]>",
           prev = "<M-[>",
           dismiss = "<C-]>",
@@ -259,12 +258,17 @@ config.cmp = function()
   local cmp = require("cmp")
 
   local tab_complete = function(fallback)
-    if require("copilot.suggestion").is_visible() then
-      require("copilot.suggestion").accept()
-    elseif cmp.visible() and has_words_before() then
+    -- if require("copilot.suggestion").is_visible() then
+    --   require("copilot.suggestion").next()
+    local copilot_keys = vim.fn["copilot#Accept"]()
+    if copilot_keys ~= "" then
+      vim.api.nvim_feedkeys(copilot_keys, "i", true)
+    elseif cmp.visible() then
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
       vim.fn.feedkeys(replace_termcodes("<Plug>luasnip-expand-or-jump"), "")
+    elseif has_words_before() then
+      cmp.complete()
     else
       fallback()
     end
@@ -293,6 +297,8 @@ config.cmp = function()
     },
     sorting = {
       comparators = {
+        -- require("copilot_cmp.comparators").prioritize,
+        -- require("copilot_cmp.comparators").score,
         compare.offset,
         compare.exact,
         compare.score,
@@ -340,10 +346,11 @@ config.cmp = function()
       { name = "luasnip" },
       { name = "path" },
       { name = "tmux" },
-      -- { name = "buffer" },
+      { name = "buffer" },
       { name = "latex_symbols" },
       { name = "spell" },
       { name = "emoji" },
+      -- { name = "copilot" },
     },
   })
 end

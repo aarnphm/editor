@@ -1,15 +1,46 @@
 local config = {}
 
+config.bigfile = function()
+  local cmp = {
+    name = "nvim-cmp",
+    opts = { defer = false },
+    disable = function()
+      require("cmp").setup.buffer({ enabled = false })
+    end,
+  }
+
+  require("bigfile").config({
+    filesize = 1, -- size of the file in MiB
+    pattern = { "*" }, -- autocmd pattern
+    features = { -- features to disable
+      "indent_blankline",
+      "lsp",
+      "illuminate",
+      "treesitter",
+      "syntax",
+      "vimopts",
+      cmp,
+    },
+  })
+end
+
 config.nvim_treesitter = function()
   vim.api.nvim_set_option_value("foldmethod", "expr", {})
   vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 
   require("nvim-treesitter.configs").setup({
-    ensure_installed = {"lua", "python", "c", "go", "bash"},
+    ensure_installed = { "lua", "python", "c", "go", "bash" },
     ignore_install = { "phpdoc" },
     highlight = {
       enable = true,
-      disable = { "vim", "help" },
+      disable = function(ft, bufnr)
+        if vim.tbl_contains({ "vim", "help" }, ft) then
+          return true
+        end
+
+        local ok, is_large_file = pcall(vim.api.nvim_buf_get_var, bufnr, "bigfile_disable_treesitter")
+        return ok and is_large_file
+      end,
       additional_vim_regex_highlighting = false,
     },
     context_commentstring = { enable = true, enable_autocmd = false },
@@ -308,16 +339,17 @@ config.telescope = function()
       results_title = false,
       layout_strategy = "horizontal",
       path_display = { "absolute" },
+      mappings = {
+        i = {
+          ["<C-a>"] = { "<esc>0i", type = "command" },
+          ["<Esc>"] = require("telescope.actions").close,
+        },
+        n = { ["q"] = require("telescope.actions").close },
+      },
       layout_config = {
         horizontal = {
           preview_width = 0.5,
         },
-        -- vertical = {
-        --   mirror = false,
-        -- },
-        -- width = 0.87,
-        -- height = 0.80,
-        -- preview_cutoff = 120,
       },
       file_ignore_patterns = {
         "static_content",
@@ -330,11 +362,12 @@ config.telescope = function()
         "%.mp4",
         "%.zip",
       },
+      file_sorter = require("telescope.sorters").get_fuzzy_file,
       file_previewer = require("telescope.previewers").vim_buffer_cat.new,
       grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
-      file_sorter = require("telescope.sorters").get_fuzzy_file,
       generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
+      buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
     },
     extensions = {
       fzf = {
@@ -383,6 +416,21 @@ config.telescope = function()
       grep_string = fixfolds,
       live_grep = fixfolds,
       oldfiles = fixfolds,
+      diagnostics = {
+        initial_mode = "normal",
+      },
+      lsp_references = {
+        theme = "cursor",
+        initial_mode = "normal",
+        layout_config = {
+          width = 0.8,
+          height = 0.4,
+        },
+      },
+      lsp_code_actions = {
+        theme = "cursor",
+        initial_mode = "normal",
+      },
     },
   })
 

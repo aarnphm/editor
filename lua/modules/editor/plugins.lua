@@ -2,15 +2,11 @@ local editor = {}
 local config = require("modules.editor.config")
 
 -- tpope
-editor["tpope/vim-repeat"] = { lazy = false }
-editor["tpope/vim-sleuth"] = { lazy = false }
+editor["tpope/vim-repeat"] = { lazy = true }
 editor["tpope/vim-fugitive"] = { lazy = true, command = { "Git", "G", "Ggrep", "GBrowse" } }
 
-editor["RRethy/vim-illuminate"] = {
-  lazy = true,
-  event = "BufReadPost",
-  config = config.illuminate,
-}
+editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = config.illuminate }
+editor["LunarVim/bigfile.nvim"] = { lazy = false, config = config.bigfile }
 editor["nvim-treesitter/nvim-treesitter"] = {
   lazy = true,
   build = ":TSUpdate",
@@ -30,7 +26,9 @@ editor["nvim-treesitter/nvim-treesitter"] = {
 editor["ThePrimeagen/refactoring.nvim"] = {
   lazy = true,
   module = "refactoring",
-  after = "nvim-treesitter",
+  requires = {
+    "nvim-treesitter/nvim-treesiter",
+  },
   config = function()
     require("refactoring").setup({
       -- prompt for return type
@@ -52,6 +50,7 @@ editor["ThePrimeagen/refactoring.nvim"] = {
 }
 
 editor["kylechui/nvim-surround"] = {
+  lazy = false,
   config = function()
     require("nvim-surround").setup()
   end,
@@ -107,11 +106,10 @@ editor["nvim-telescope/telescope.nvim"] = {
 
 editor["pwntester/octo.nvim"] = {
   lazy = true,
-  after = "telescope.nvim",
   config = config.octo,
   cmd = "Octo",
   module = "octo",
-  requires = {
+  dependencies = {
     "nvim-telescope/telescope.nvim",
   },
 }
@@ -125,8 +123,10 @@ editor["sindrets/diffview.nvim"] = {
 }
 editor["sudormrfbin/cheatsheet.nvim"] = {
   lazy = true,
-  after = "telescope.nvim",
   config = config.cheatsheet,
+  dependencies = {
+    "nvim-telescope/telescope.nvim",
+  },
 }
 editor["folke/trouble.nvim"] = {
   lazy = true,
@@ -138,7 +138,9 @@ editor["folke/which-key.nvim"] = { lazy = false, config = config.which_key }
 editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = config.dressing }
 
 editor["folke/zen-mode.nvim"] = {
-  after = "nvim-treesitter",
+  requires = {
+    "nvim-treesitter/nvim-treesiter",
+  },
   dependencies = {
     {
       "folke/twilight.nvim",

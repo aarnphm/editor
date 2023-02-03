@@ -168,7 +168,7 @@ config.catppuccin = function()
   local transparent_background = false -- Set background transparency here!
 
   require("catppuccin").setup({
-    flavour = "macchiato", -- Can be one of: latte, frappe, macchiato, mocha
+    flavour = "mocha", -- Can be one of: latte, frappe, macchiato, mocha
     background = { light = "frappe", dark = "mocha" },
     dim_inactive = {
       enabled = false,
@@ -439,7 +439,7 @@ config.lualine = function()
   end
 
   local _cache = { context = "", bufnr = -1 }
-  local function lspsaga_symbols()
+  local lspsaga_symbols = function()
     local exclude = {
       ["terminal"] = true,
       ["toggleterm"] = true,
@@ -661,14 +661,13 @@ config.nvim_tree = function()
     },
     actions = {
       open_file = {
-        quit_on_open = false,
         resize_window = false,
         window_picker = {
           enable = true,
           chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
           exclude = {
             filetype = { "notify", "qf", "diff", "fugitive", "fugitiveblame" },
-            buftype = { "terminal", "help" },
+            buftype = { "nofile", "terminal", "help" },
           },
         },
       },

@@ -15,15 +15,23 @@ completion["neovim/nvim-lspconfig"] = {
     { "ray-x/lsp_signature.nvim" },
   },
 }
-completion["zbirenbaum/copilot.lua"] = {
-  cmd = "Copilot",
-  event = "InsertEnter",
-  config = config.copilot,
-}
+
+-- completion["zbirenbaum/copilot.lua"] = {
+--   cmd = "Copilot",
+--   event = "InsertEnter",
+--   config = config.copilot,
+--   dependencies = {
+--     {
+--       "zbirenbaum/copilot-cmp",
+--       config = function()
+--         require("copilot_cmp").setup({})
+--       end,
+--     },
+--   },
+-- }
 
 -- completion
 completion["hrsh7th/nvim-cmp"] = {
-  lazy = false,
   config = config.cmp,
   event = "InsertEnter",
   dependencies = {
@@ -31,6 +39,15 @@ completion["hrsh7th/nvim-cmp"] = {
       "L3MON4D3/LuaSnip",
       config = config.luasnip,
       dependencies = { "rafamadriz/friendly-snippets" },
+    },
+    {
+      "github/copilot.vim",
+      lazy = true,
+      config = function()
+        vim.g.copilot_no_tab_map = true
+        vim.g.copilot_assume_mapped = true
+        vim.g.copilot_tab_fallback = ""
+      end,
     },
     { "onsails/lspkind.nvim" },
     { "lukas-reineke/cmp-under-comparator" },
@@ -45,29 +62,17 @@ completion["hrsh7th/nvim-cmp"] = {
     { "windwp/nvim-autopairs", config = config.autopairs },
   },
 }
-completion["fatih/vim-go"] = {
-  lazy = true,
-  ft = "go",
-  run = ":GoInstallBinaries",
-  config = config.golang,
-}
-completion["simrat39/rust-tools.nvim"] = {
-  lazy = true,
-  ft = "rust",
-  config = config.rust_tools,
-}
+
 completion["iamcco/markdown-preview.nvim"] = {
-  lazy = true,
   lazy = true,
   ft = "markdown",
   run = "cd app && yarn install",
   build = "cd app && yarn install",
 }
-completion["chrisbra/csv.vim"] = {
-  lazy = true,
-  ft = "csv",
-}
+completion["fatih/vim-go"] = { lazy = true, ft = "go", run = ":GoInstallBinaries", config = config.golang }
+completion["simrat39/rust-tools.nvim"] = { lazy = true, ft = "rust", config = config.rust_tools }
+completion["chrisbra/csv.vim"] = { lazy = true, ft = "csv" }
 completion["lervag/vimtex"] = { lazy = true, ft = "tex", config = config.vimtex }
-completion["bazelbuild/vim-bazel"] = { dependencies = { "google/vim-maktaba" }, ft = "bzl" }
+completion["bazelbuild/vim-bazel"] = { lazy = true, dependencies = { "google/vim-maktaba" }, ft = "bzl" }
 
 return completion
