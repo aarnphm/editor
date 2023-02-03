@@ -29,7 +29,19 @@ config.nvim_treesitter = function()
   vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 
   require("nvim-treesitter.configs").setup({
-    ensure_installed = { "lua", "python", "c", "go", "bash" },
+    ensure_installed = {
+      "lua",
+      "python",
+      "c",
+      "go",
+      "bash",
+      "markdown",
+      "typescript",
+      "cpp",
+      "terraform",
+      "make",
+      "rust",
+    },
     ignore_install = { "phpdoc" },
     highlight = {
       enable = true,
@@ -327,7 +339,6 @@ config.telescope = function()
       return true
     end,
   }
-  local lga_actions = require("telescope-live-grep-args.actions")
 
   require("telescope").setup({
     defaults = {
@@ -335,10 +346,11 @@ config.telescope = function()
       prompt_prefix = " " .. icons.ui.Telescope .. " ",
       selection_caret = icons.ui.ChevronRight,
       entry_prefix = " ",
+      borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
       scroll_strategy = "limit",
-      results_title = false,
       layout_strategy = "horizontal",
       path_display = { "absolute" },
+      results_title = false,
       mappings = {
         i = {
           ["<C-a>"] = { "<esc>0i", type = "command" },
@@ -381,40 +393,26 @@ config.telescope = function()
         show_unindexed = true,
         ignore_patterns = { "*.git/*", "*/tmp/*" },
       },
-      live_grep_args = {
-        auto_quoting = true, -- enable/disable auto-quoting
-        -- define mappings, e.g.
-        mappings = { -- extend mappings
-          i = {
-            ["<C-k>"] = lga_actions.quote_prompt(),
-            ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
-          },
-        },
-      },
-      undo = {
-        side_by_side = true,
-        layout_config = {
-          preview_height = 0.8,
-        },
-        mappings = { -- this whole table is the default
-          i = {
-            -- IMPORTANT: Note that telescope-undo must be available when telescope is configured if
-            -- you want to use the following actions. This means installing as a dependency of
-            -- telescope in it's `requirements` and loading this extension from there instead of
-            -- having the separate plugin definition as outlined above. See issue #6.
-            ["<cr>"] = require("telescope-undo.actions").yank_additions,
-            ["<S-cr>"] = require("telescope-undo.actions").yank_deletions,
-            ["<C-cr>"] = require("telescope-undo.actions").restore,
-          },
-        },
-      },
     },
     pickers = {
       buffers = fixfolds,
       find_files = fixfolds,
       git_files = fixfolds,
       grep_string = fixfolds,
-      live_grep = fixfolds,
+      live_grep = {
+        on_input_filter_cb = function(prompt)
+          -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
+          return { prompt = prompt:gsub("%s", ".*") }
+        end,
+        attach_mappings = function(_)
+          telescope_actions.select:enhance({
+            post = function()
+              vim.cmd(":normal! zx")
+            end,
+          })
+          return true
+        end,
+      },
       oldfiles = fixfolds,
       diagnostics = {
         initial_mode = "normal",
@@ -435,26 +433,9 @@ config.telescope = function()
   })
 
   require("telescope").load_extension("fzf")
-  require("telescope").load_extension("projects")
   require("telescope").load_extension("zoxide")
   require("telescope").load_extension("frecency")
-  require("telescope").load_extension("live_grep_args")
-  require("telescope").load_extension("undo")
   require("telescope").load_extension("emoji")
-end
-
-config.project = function()
-  require("project_nvim").setup({
-    manual_mode = false,
-    detection_methods = { "lsp", "pattern" },
-    patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json" },
-    ignore_lsp = { "efm", "copilot" },
-    exclude_dirs = {},
-    show_hidden = false,
-    silent_chdir = true,
-    scope_chdir = "global",
-    datapath = vim.fn.stdpath("data"),
-  })
 end
 
 config.octo = function()
@@ -462,24 +443,58 @@ config.octo = function()
 end
 
 config.trouble = function()
+  local icons = {
+    ui = require("modules.ui.icons").get("ui"),
+    diagnostics = require("modules.ui.icons").get("diagnostics"),
+  }
+
   require("trouble").setup({
+    position = "bottom", -- position of the list can be: bottom, top, left, right
+    height = 10, -- height of the trouble list when position is top or bottom
+    width = 50, -- width of the list when position is left or right
+    icons = true, -- use devicons for filenames
     mode = "document_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
-    fold_open = "", -- icon used for open folds
-    fold_closed = "", -- icon used for closed folds
-    indent_lines = false, -- add an indent guide below the fold icons
-    auto_close = true, -- automatically close the list when you have no diagnostics
+    fold_open = icons.ui.ArrowOpen, -- icon used for open folds
+    fold_closed = icons.ui.ArrowClosed, -- icon used for closed folds
+    group = true, -- group results by file
+    padding = true, -- add an extra new line on top of the list
+    action_keys = {
+      -- key mappings for actions in the trouble list
+      -- map to {} to remove a mapping, for example:
+      -- close = {},
+      close = "q", -- close the list
+      cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
+      refresh = "r", -- manually refresh
+      jump = { "<cr>", "<tab>" }, -- jump to the diagnostic or open / close folds
+      open_split = { "<c-x>" }, -- open buffer in new split
+      open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
+      open_tab = { "<c-t>" }, -- open buffer in new tab
+      jump_close = { "o" }, -- jump to the diagnostic and close the list
+      toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
+      toggle_preview = "P", -- toggle auto_preview
+      hover = "K", -- opens a small popup with the full multiline message
+      preview = "p", -- preview the diagnostic location
+      close_folds = { "zM", "zm" }, -- close all folds
+      open_folds = { "zR", "zr" }, -- open all folds
+      toggle_fold = { "zA", "za" }, -- toggle fold of current file
+      previous = "k", -- preview item
+      next = "j", -- next item
+    },
+    indent_lines = true, -- add an indent guide below the fold icons
+    auto_open = false, -- automatically open the list when you have diagnostics
+    auto_close = false, -- automatically close the list when you have no diagnostics
     auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
     auto_fold = false, -- automatically fold a file trouble list at creation
-    auto_jump = { "lsp_definitions" },
+    auto_jump = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
     signs = {
       -- icons / text used for a diagnostic
-      error = "",
-      warning = "",
-      hint = "",
-      information = "",
-      other = "﫠",
+      error = icons.diagnostics.Error_alt,
+      warning = icons.diagnostics.Warning_alt,
+      hint = icons.diagnostics.Hint_alt,
+      information = icons.diagnostics.Information_alt,
+      other = icons.diagnostics.Question_alt,
     },
-    use_lsp_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
+    use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
   })
 end
 

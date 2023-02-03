@@ -7,26 +7,13 @@ end
 config.copilot = function()
   vim.defer_fn(function()
     require("copilot").setup({
-      cmp = {
-        enabled = true,
-        method = "getCompletionsCycling",
-      },
       panel = {
-        -- if true, it can interfere with completions in copilot-cmp
-        enabled = false,
+        enabled = true,
+        auto_refresh = true,
       },
       suggestion = {
-        -- if true, it can interfere with completions in copilot-cmp
         enabled = true,
-        auto_trigger = false,
-        keymap = {
-          accept = "<CR>",
-          accept_word = "<CR>",
-          accept_line = "<CR>",
-          next = "<M-]>",
-          prev = "<M-[>",
-          dismiss = "<C-]>",
-        },
+        auto_trigger = true,
       },
       filetypes = {
         ["TelescopePrompt"] = false,
@@ -74,11 +61,15 @@ config.lspsaga = function()
     },
     request_timeout = 3000,
     finder = {
-      edit = { "o", "<CR>" },
-      vsplit = "s",
-      split = "i",
-      tabe = "t",
-      quit = { "q", "<ESC>" },
+      keys = {
+        jump_to = "e",
+        edit = { "o", "<CR>" },
+        vsplit = "s",
+        split = "i",
+        tabe = "t",
+        quit = { "q", "<ESC>" },
+        close_in_preview = "<ESC>",
+      },
     },
     definition = {
       edit = "<C-c>o",
@@ -104,7 +95,8 @@ config.lspsaga = function()
     },
     diagnostic = {
       twice_into = false,
-      show_code_action = false,
+      show_code_action = true,
+      border_follow = true,
       show_source = true,
       keys = {
         exec_action = "<CR>",
@@ -227,7 +219,6 @@ config.cmp = function()
       return false
     end
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    -- return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
   end
 
@@ -258,11 +249,8 @@ config.cmp = function()
   local cmp = require("cmp")
 
   local tab_complete = function(fallback)
-    -- if require("copilot.suggestion").is_visible() then
-    --   require("copilot.suggestion").next()
-    local copilot_keys = vim.fn["copilot#Accept"]()
-    if copilot_keys ~= "" then
-      vim.api.nvim_feedkeys(copilot_keys, "i", true)
+    if require("copilot.suggestion").is_visible() then
+      require("copilot.suggestion").accept()
     elseif cmp.visible() then
       cmp.select_next_item()
     elseif require("luasnip").expand_or_jumpable() then
@@ -297,8 +285,6 @@ config.cmp = function()
     },
     sorting = {
       comparators = {
-        -- require("copilot_cmp.comparators").prioritize,
-        -- require("copilot_cmp.comparators").score,
         compare.offset,
         compare.exact,
         compare.score,
@@ -350,7 +336,6 @@ config.cmp = function()
       { name = "latex_symbols" },
       { name = "spell" },
       { name = "emoji" },
-      -- { name = "copilot" },
     },
   })
 end

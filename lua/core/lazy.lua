@@ -1,4 +1,4 @@
-local fn, api = vim.fn, vim.api
+local fn = vim.fn
 local is_mac = __editor_global.is_mac
 local vim_path = __editor_global.vim_path
 local data_dir = __editor_global.data_dir

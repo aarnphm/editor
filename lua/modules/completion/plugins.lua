@@ -11,26 +11,22 @@ completion["neovim/nvim-lspconfig"] = {
     { "williamboman/mason.nvim" },
     { "williamboman/mason-lspconfig.nvim" },
     { "WhoIsSethDaniel/mason-tool-installer.nvim", config = config.mason_install },
-    { "glepnir/lspsaga.nvim", config = config.lspsaga },
+    {
+      "glepnir/lspsaga.nvim",
+      config = config.lspsaga,
+      event = "BufRead",
+      dependencies = { { "nvim-tree/nvim-web-devicons" } },
+    },
     { "ray-x/lsp_signature.nvim" },
   },
 }
 
--- completion["zbirenbaum/copilot.lua"] = {
---   cmd = "Copilot",
---   event = "InsertEnter",
---   config = config.copilot,
---   dependencies = {
---     {
---       "zbirenbaum/copilot-cmp",
---       config = function()
---         require("copilot_cmp").setup({})
---       end,
---     },
---   },
--- }
+completion["zbirenbaum/copilot.lua"] = {
+  cmd = "Copilot",
+  event = "InsertEnter",
+  config = config.copilot,
+}
 
--- completion
 completion["hrsh7th/nvim-cmp"] = {
   config = config.cmp,
   event = "InsertEnter",
@@ -39,15 +35,6 @@ completion["hrsh7th/nvim-cmp"] = {
       "L3MON4D3/LuaSnip",
       config = config.luasnip,
       dependencies = { "rafamadriz/friendly-snippets" },
-    },
-    {
-      "github/copilot.vim",
-      lazy = true,
-      config = function()
-        vim.g.copilot_no_tab_map = true
-        vim.g.copilot_assume_mapped = true
-        vim.g.copilot_tab_fallback = ""
-      end,
     },
     { "onsails/lspkind.nvim" },
     { "lukas-reineke/cmp-under-comparator" },

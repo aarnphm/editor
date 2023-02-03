@@ -25,10 +25,6 @@ editor["nvim-treesitter/nvim-treesitter"] = {
 }
 editor["ThePrimeagen/refactoring.nvim"] = {
   lazy = true,
-  module = "refactoring",
-  requires = {
-    "nvim-treesitter/nvim-treesiter",
-  },
   config = function()
     require("refactoring").setup({
       -- prompt for return type
@@ -80,38 +76,30 @@ editor["phaazon/hop.nvim"] = {
 }
 editor["windwp/nvim-spectre"] = {
   lazy = true,
-  module = "spectre",
   config = config.spectre,
 }
+
 editor["nvim-telescope/telescope.nvim"] = {
   cmd = "Telescope",
   lazy = true,
-  module = "telescope",
+  config = config.telescope,
   dependencies = {
     { "nvim-tree/nvim-web-devicons" },
     { "nvim-lua/plenary.nvim" },
     { "nvim-lua/popup.nvim" },
-    { "debugloop/telescope-undo.nvim" },
-    { "ahmedkhalf/project.nvim", event = "BufReadPost", config = config.project },
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     { "nvim-telescope/telescope-frecency.nvim", dependencies = {
       { "kkharji/sqlite.lua" },
     } },
     { "jvgrootveld/telescope-zoxide" },
-    { "nvim-telescope/telescope-live-grep-args.nvim" },
     { "xiyaowong/telescope-emoji.nvim" },
   },
-  config = config.telescope,
 }
 
 editor["pwntester/octo.nvim"] = {
   lazy = true,
   config = config.octo,
   cmd = "Octo",
-  module = "octo",
-  dependencies = {
-    "nvim-telescope/telescope.nvim",
-  },
 }
 editor["sindrets/diffview.nvim"] = {
   lazy = true,
@@ -124,9 +112,6 @@ editor["sindrets/diffview.nvim"] = {
 editor["sudormrfbin/cheatsheet.nvim"] = {
   lazy = true,
   config = config.cheatsheet,
-  dependencies = {
-    "nvim-telescope/telescope.nvim",
-  },
 }
 editor["folke/trouble.nvim"] = {
   lazy = true,
@@ -138,9 +123,6 @@ editor["folke/which-key.nvim"] = { lazy = false, config = config.which_key }
 editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = config.dressing }
 
 editor["folke/zen-mode.nvim"] = {
-  requires = {
-    "nvim-treesitter/nvim-treesiter",
-  },
   dependencies = {
     {
       "folke/twilight.nvim",

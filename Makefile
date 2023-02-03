@@ -17,4 +17,4 @@ benchmark-local:
 	@vim-startuptime --vimpath nvim | sort -k 2
 reset:
 	@\rm -rf ${HOME}/.local/share/nvim ${HOME}/.cache/nvim
-	nvim "+Lazy sync"
+	nvim

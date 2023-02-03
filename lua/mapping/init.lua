@@ -81,6 +81,8 @@ M.setup = function()
     -- Gitsigns
     ["n|<Space>wd"] = map_cr("Gitsigns toggle_word_diff"):with_noremap():with_silent(),
     ["n|<Space>ld"] = map_cr("Gitsigns toggle_deleted"):with_noremap():with_silent(),
+    -- Copilot
+    ["n|<LocalLeader>cp"] = map_cr("Copilot panel"):with_noremap():with_silent():with_nowait(),
     -- Lsp map work when insertenter and lsp start
     ["n|<LocalLeader>li"] = map_cr("LspInfo"):with_noremap():with_silent():with_nowait(),
     ["n|<LocalLeader>lr"] = map_cr("LspRestart"):with_noremap():with_silent():with_nowait(),
