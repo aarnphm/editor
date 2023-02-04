@@ -7,4 +7,5 @@ return {
   },
   repos = "bentoml/bentoml",
   reset_cache = false,
+  format_on_save = true,
 }

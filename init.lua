@@ -1,5 +1,3 @@
-require("editor")
-
 local exists, impatient = pcall(require, "impatient")
 
 if exists then
@@ -7,5 +5,5 @@ if exists then
 end
 
 if not vim.g.vscode then
-  require("core").setup()
+  require("core")
 end
