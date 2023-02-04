@@ -1,19 +1,7 @@
 local M = {}
 
-local home = os.getenv("HOME")
-
-local disabled_workspace_path = home .. "/.config/nvim/format_disabled_dirs.txt"
-local disabled_workspace_file = io.open(disabled_workspace_path, "r")
 local disabled_workspaces = {}
-
-if disabled_workspace_file ~= nil then
-  for line in disabled_workspace_file:lines() do
-    local str = line:gsub("%s+", "")
-    table.insert(disabled_workspaces, str)
-  end
-end
-
-local format_on_save = true
+local format_on_save = __editor_config.format_on_save
 
 vim.api.nvim_create_user_command("FormatToggle", function()
   M.toggle_format_on_save()
@@ -42,7 +30,7 @@ vim.api.nvim_create_user_command("FormatterToggle", function(opts)
   end
 end, {
   nargs = 1,
-  complete = function(_, _, _)
+  complete = function()
     return {
       "markdown",
       "vim",
@@ -70,7 +58,7 @@ function M.enable_format_on_save(is_configured)
     group = "format_on_save",
     pattern = opts.pattern,
     callback = function()
-      require("modules.completion.formatting").format({ timeout_ms = opts.timeout, filter = M.format_filter })
+      require("completion.formatting").format({ timeout_ms = opts.timeout, filter = M.format_filter })
     end,
   })
   if not is_configured then
@@ -80,7 +68,9 @@ end
 
 function M.disable_format_on_save()
   pcall(vim.api.nvim_del_augroup_by_name, "format_on_save")
-  vim.notify("Disabled format-on-save", vim.log.levels.INFO, { title = "Settings modification success!" })
+  if format_on_save then
+    vim.notify("Disabled format-on-save", vim.log.levels.INFO, { title = "Settings modification success!" })
+  end
 end
 
 function M.configure_format_on_save()
@@ -92,7 +82,7 @@ function M.configure_format_on_save()
 end
 
 function M.toggle_format_on_save()
-  local status, _ = pcall(vim.api.nvim_get_autocmds, {
+  local status = pcall(vim.api.nvim_get_autocmds, {
     group = "format_on_save",
     event = "BufWritePre",
   })
@@ -110,12 +100,7 @@ function M.format_filter(clients)
     end)
     if status_ok and formatting_supported and client.name == "efm" then
       return "efm"
-    elseif
-      client.name ~= "sumneko_lua"
-      and client.name ~= "tsserver"
-      and client.name ~= "clangd"
-      and client.name ~= "pyright"
-    then
+    elseif client.name ~= "sumneko_lua" and client.name ~= "tsserver" and client.name ~= "clangd" then
       return status_ok and formatting_supported and client.name
     end
   end, clients)
