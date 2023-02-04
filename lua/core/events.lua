@@ -1,46 +1,15 @@
-local vim, api = vim, vim.api
-local M = {}
-
-_G.set_tmux_keymaps = function()
-  local opts = { noremap = true, silent = true }
-  if api.nvim_eval('exists("$TMUX")') ~= 0 then
-    api.nvim_set_keymap("n", "<C-h>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateLeft()<cr>", opts)
-    api.nvim_set_keymap("n", "<C-j>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateDown()<cr>", opts)
-    api.nvim_set_keymap("n", "<C-k>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateUp()<cr>", opts)
-    api.nvim_set_keymap("n", "<C-l>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateRight()<cr>", opts)
-    api.nvim_set_keymap("n", "<C-\\>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateLastActive()<cr>", opts)
-    api.nvim_set_keymap("n", "<C-Space>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateNext()<cr>", opts)
-  end
-end
-
-_G.set_terminal_keymaps = function()
-  local opts = { noremap = true }
-  api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], opts)
-  api.nvim_buf_set_keymap(0, "t", "kk", [[<C-\><C-n>]], opts)
-  api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
-  api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
-  api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
-  api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
-end
-
-_G.setup_octo_autocomplete = function()
-  local opts = { noremap = true, silent = true }
-  api.nvim_buf_set_keymap(0, "i", "@", "@<C-x><C-o>", opts)
-  api.nvim_buf_set_keymap(0, "i", "#", "#<C-x><C-o>", opts)
-end
-
-local autocmd = api.nvim_create_autocmd
+local api, create_autocmd = vim.api, vim.api.nvim_create_autocmd
+local create_augroup = vim.api.nvim_create_augroup
 
 -- Disable statusline in dashboard
-autocmd("FileType", {
+create_autocmd("FileType", {
   pattern = "alpha",
   callback = function()
     vim.opt.laststatus = 0
     vim.opt.showtabline = 0
   end,
 })
-
-autocmd("BufUnload", {
+create_autocmd("BufUnload", {
   buffer = 0,
   callback = function()
     vim.opt.laststatus = 3
@@ -48,27 +17,15 @@ autocmd("BufUnload", {
   end,
 })
 
-local nvim_create_augroups = function(definitions)
-  for group_name, definition in pairs(definitions) do
-    api.nvim_command("augroup " .. group_name)
-    api.nvim_command("autocmd!")
-    for _, def in ipairs(definition) do
-      local command = table.concat(vim.tbl_flatten({ "autocmd", def }), " ")
-      api.nvim_command(command)
-    end
-    api.nvim_command("augroup END")
-  end
-end
-
 -- auto close NvimTree
-api.nvim_create_autocmd("BufEnter", {
-  group = vim.api.nvim_create_augroup("NvimTreeClose", { clear = true }),
+create_autocmd("BufEnter", {
+  group = api.nvim_create_augroup("NvimTreeClose", { clear = true }),
   pattern = "NvimTree_*",
   callback = function()
-    local layout = vim.api.nvim_call_function("winlayout", {})
+    local layout = api.nvim_call_function("winlayout", {})
     if
       layout[1] == "leaf"
-      and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(layout[2]), "filetype") == "NvimTree"
+      and api.nvim_buf_get_option(api.nvim_win_get_buf(layout[2]), "filetype") == "NvimTree"
       and layout[3] == nil
     then
       vim.cmd("confirm quit")
@@ -76,91 +33,257 @@ api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
-M.setup = function()
-  local definitions = {
-    lazy = {},
-    terms = {
-      { "TermOpen", "term://*", "lua set_terminal_keymaps()" },
-    },
-    bufs = {
-      { "BufEnter,WinEnter", "*", "lua set_tmux_keymaps()" },
-      { "BufEnter,WinEnter", "*", 'lua require("core.utils").hide_statusline()' },
-      {
-        "BufWritePost",
-        [[$VIM_PATH/{*.vim,*.yaml,vimrc} nested source $MYVIMRC | redraw]],
-      },
-      -- Reload Vim script automatically if setlocal autoread
-      {
-        "BufWritePost,FileWritePost",
-        "*.vim",
-        [[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]],
-      },
-      { "BufWritePre", "/tmp/*", "setlocal noundofile" },
-      { "BufWritePre", "*.tmp", "setlocal noundofile" },
-      { "BufWritePre", "*.bak", "setlocal noundofile" },
-      -- auto change directory
-      { "BufEnter", "*", "silent! lcd %:p:h" },
-      {
-        "WinEnter",
-        "*",
-        [[if winnr('$') == 1 && &buftype == "quickfix" | q | endif]],
-      },
-    },
-    wins = {
-      -- Highlight current line only on focused window
-      {
-        "WinEnter,BufEnter,InsertLeave",
-        "*",
-        [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]],
-      },
-      {
-        "WinLeave,BufLeave,InsertEnter",
-        "*",
-        [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]],
-      },
-      -- Force write shada on leaving nvim
-      {
-        "VimLeave",
-        "*",
-        [[if has('nvim') | wshada! | else | wviminfo! | endif]],
-      },
-      -- Check if file changed when its window is focus, more eager than 'autoread'
-      { "FocusGained", "* checktime" },
-      -- Equalize window dimensions when resizing vim window
-      { "VimResized", "*", [[tabdo wincmd =]] },
-    },
-    ft = {
-      { "FileType", "alpha", "set showtabline=0" },
-      { "FileType", "markdown", "set wrap" },
-      { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
-      { "FileType", "*", [[setlocal formatoptions-=cro]] },
-      -- Google tab style
-      { "BufNewFile,BufRead", "*.bazel", "setf bzl" },
-      { "BufNewFile,BufRead", "WORKSPACE", "setf bzl" },
-      { "BufNewFile,BufRead", "*.toml", "setf toml" },
-      { "BufNewFile,BufRead", "*.proto", "setf proto" },
-      { "BufNewFile,BufRead", "Dockerfile-*", "setf dockerfile" },
-      { "BufNewFile,BufRead", "Dockerfile.{tpl,template,tmpl}", "setf dockerfile" },
-      { "BufNewFile,BufRead", "*.{Dockerfile,dockerfile}", "setf dockerfile" },
-      { "BufNewFile,BufRead", "FRAMEWORK_TEMPLATE_PY", "setf python" },
-      { "FileType", "make", "set noexpandtab shiftwidth=4 softtabstop=0" },
-      { "FileType", "lua", "set noexpandtab shiftwidth=2 tabstop=2" },
-      { "FileType", "nix", "set noexpandtab shiftwidth=2 tabstop=2" },
-      { "FileType", "c,cpp", "set expandtab tabstop=2 shiftwidth=2" },
-      { "FileType", "octo", "lua setup_octo_autocomplete()" },
-    },
-    yank = {
-      {
-        "TextYankPost",
-        "*",
-        [[silent! lua vim.highlight.on_yank({higroup="IncSearch", timeout=300})]],
-      },
-    },
-  }
+-- Make <esc> and kk in terminal mode behave like in normal mode
+create_autocmd("TermOpen", {
+  group = create_augroup("term", { clear = true }),
+  pattern = "term://*",
+  callback = function(_)
+    api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], { noremap = true })
+    api.nvim_buf_set_keymap(0, "t", "kk", [[<C-\><C-n>]], { noremap = true })
+    api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], { noremap = true })
+    api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], { noremap = true })
+    api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], { noremap = true })
+    api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], { noremap = true })
+  end,
+})
 
-  nvim_create_augroups(definitions)
-end
+local bufs_id = create_augroup("bufs", { clear = true })
+-- Hide statusline in certain buffers
+create_autocmd("BufEnter,WinEnter", {
+  group = bufs_id,
+  pattern = "*",
+  callback = function(_)
+    local shown = {}
+    local hidden = {
+      "help",
+      "NvimTree",
+      "terminal",
+      "Scratch",
+      "quickfix",
+      "Trouble",
+    }
 
-M.setup()
+    local buftype = api.nvim_buf_get_option(0, "ft")
 
-return M
+    -- shown table from config has the highest priority
+    if vim.tbl_contains(shown, buftype) then
+      api.nvim_set_option("laststatus", 3)
+      return
+    end
+
+    if vim.tbl_contains(hidden, buftype) then
+      api.nvim_set_option("laststatus", 0)
+      return
+    end
+
+    api.nvim_set_option("laststatus", 3)
+  end,
+})
+-- source vimrc on save
+create_autocmd("BufWritePost", {
+  group = bufs_id,
+  pattern = "$VIM_PATH/{*.vim,*.yaml,vimrc}",
+  command = "source $MYVIMRC | redraw",
+  nested = true,
+})
+-- Reload Vim script automatically if setlocal autoread
+create_autocmd("BufWritePost,FileWritePost", {
+  group = bufs_id,
+  pattern = "*.vim",
+  callback = function(_)
+    api.nvim_command([[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]])
+  end,
+})
+-- Set noundofile for temporary files
+create_autocmd("BufWritePre", {
+  group = bufs_id,
+  pattern = "/tmp/*",
+  callback = function(_)
+    api.nvim_command("setlocal noundofile")
+  end,
+})
+create_autocmd("BufWritePre", {
+  group = bufs_id,
+  pattern = "*.tmp",
+  callback = function(_)
+    api.nvim_command("setlocal noundofile")
+  end,
+})
+create_autocmd("BufWritePre", {
+  group = bufs_id,
+  pattern = "*.bak",
+  callback = function(_)
+    api.nvim_command("setlocal noundofile")
+  end,
+})
+-- auto change directory
+create_autocmd("BufEnter", {
+  group = bufs_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command("silent! lcd %:p:h")
+  end,
+})
+-- auto place to last edit
+create_autocmd("BufReadPost", {
+  group = bufs_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command([[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]])
+  end,
+})
+
+local wins_id = create_augroup("wins", { clear = true })
+-- Highlight current line only on focused window
+create_autocmd("WinEnter,BufEnter,InsertLeave", {
+  group = wins_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command(
+      [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]]
+    )
+  end,
+})
+-- Disable cursorline on unfocused windows
+create_autocmd("WinLeave,BufLeave,InsertEnter", {
+  group = wins_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command(
+      [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]]
+    )
+  end,
+})
+-- Force write shada on leaving nvim
+create_autocmd("VimLeave", {
+  group = wins_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command([[if has('nvim') | wshada! | else | wviminfo! | endif]])
+  end,
+})
+-- Check if file changed when its window is focus, more eager than 'autoread'
+create_autocmd("FocusGained", {
+  group = wins_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command([[checktime]])
+  end,
+})
+-- Equalize window dimensions when resizing vim window
+create_autocmd("VimResized", {
+  group = wins_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command([[tabdo wincmd =]])
+  end,
+})
+
+local ft_id = create_augroup("ft", { clear = true })
+-- set local to all filetypes to have formatoptions-=cro
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command([[setlocal formatoptions-=cro]])
+  end,
+})
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "alpha",
+  callback = function(_)
+    api.nvim_command("set showtabline=0")
+  end,
+})
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "markdown",
+  callback = function(_)
+    api.nvim_command("set wrap")
+  end,
+})
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "make",
+  callback = function(_)
+    api.nvim_command("set noexpandtab shiftwidth=8 softtabstop=0")
+  end,
+})
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "dap-repl",
+  callback = function(_)
+    api.nvim_command("lua require('dap.ext.autocompl').attach()")
+  end,
+})
+-- Google tab style for C/C++
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "c,cpp",
+  callback = function(_)
+    api.nvim_command("nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>")
+  end,
+})
+-- set filetype for bazel files
+create_autocmd("BufNewFile,BufRead", {
+  group = ft_id,
+  pattern = "*.bazel",
+  callback = function(_)
+    api.nvim_command("setf bzl")
+  end,
+})
+create_autocmd("BufNewFile,BufRead", {
+  group = ft_id,
+  pattern = "WORKSPACE",
+  callback = function(_)
+    api.nvim_command("setf bzl")
+  end,
+})
+-- set filetype for proto files
+create_autocmd("BufNewFile,BufRead", {
+  group = ft_id,
+  pattern = "*.proto",
+  callback = function(_)
+    api.nvim_command("setf proto")
+  end,
+})
+-- set filetype for docker files
+create_autocmd("BufNewFile,BufRead", {
+  group = ft_id,
+  pattern = "Dockerfile-*",
+  callback = function(_)
+    api.nvim_command("setf dockerfile")
+  end,
+})
+create_autocmd("BufNewFile,BufRead", {
+  group = ft_id,
+  pattern = "Dockerfile.{tpl,template,tmpl}",
+  callback = function(_)
+    api.nvim_command("setf dockerfile")
+  end,
+})
+create_autocmd("BufNewFile,BufRead", {
+  group = ft_id,
+  pattern = "*.{Dockerfile,dockerfile}",
+  callback = function(_)
+    api.nvim_command("setf dockerfile")
+  end,
+})
+-- set make to noexpandtab, shiftwidth=8, softtabstop=0
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "make",
+  callback = function(_)
+    api.nvim_command("set noexpandtab shiftwidth=8 softtabstop=0")
+  end,
+})
+
+local yank_id = create_augroup("yank", { clear = true })
+-- Highlight on yank
+create_autocmd("TextYankPost", {
+  group = yank_id,
+  pattern = "*",
+  callback = function(_)
+    api.nvim_command([[silent! lua vim.highlight.on_yank({higroup="IncSearch", timeout=300})]])
+  end,
+})
