@@ -1,5 +1,83 @@
 local k = require("keybind")
 
+-- nvim-bufdel by github.com/ojroques
+-- Options
+local options = {
+  next = "cycle", -- how to retrieve the next buffer
+  quit = true, -- exit when last buffer is deleted
+}
+-- Switch to buffer 'buf' on each window from list 'windows'
+local function switch_buffer(windows, buf)
+  local cur_win = vim.fn.winnr()
+  for _, winid in ipairs(windows) do
+    vim.cmd(string.format("%d wincmd w", vim.fn.win_id2win(winid)))
+    vim.cmd(string.format("buffer %d", buf))
+  end
+  vim.cmd(string.format("%d wincmd w", cur_win)) -- return to original window
+end
+
+-- Select the first buffer with a number greater than given buffer
+local function get_next_buf(buf)
+  local next = vim.fn.bufnr("#")
+  if options.next == "alternate" and vim.fn.buflisted(next) == 1 then
+    return next
+  end
+  for i = 0, vim.fn.bufnr("$") - 1 do
+    next = (buf + i) % vim.fn.bufnr("$") + 1 -- will loop back to 1
+    if vim.fn.buflisted(next) == 1 then
+      return next
+    end
+  end
+end
+
+-- Retrieve the buffer associated to the given name or number
+local function get_buf(bufexpr)
+  if not bufexpr then -- return current buffer when 'bufexpr' is nil
+    return vim.fn.bufnr()
+  end
+  if tonumber(bufexpr) then
+    return tonumber(bufexpr)
+  end
+  bufexpr = string.gsub(bufexpr, [[^['"]+]], "") -- escape any start quote
+  bufexpr = string.gsub(bufexpr, [[['"]+$]], "") -- escape any end quote
+  return vim.fn.bufnr(bufexpr)
+end
+
+-- Delete given buffer, ignoring changes if 'force' is set
+_G.delete_buffer = function(bufexpr, force)
+  if #vim.fn.getbufinfo({ buflisted = 1 }) < 2 then
+    if options.quit then
+      -- exit when there is only one buffer left
+      if force then
+        vim.cmd("qall!")
+      else
+        vim.cmd("confirm qall")
+      end
+      return
+    end
+    -- don't exit and create a new empty buffer
+    vim.cmd("enew")
+    vim.cmd("bp")
+  end
+  local buf = get_buf(bufexpr)
+  if vim.fn.buflisted(buf) == 0 then -- exit if buffer number is invalid
+    return
+  end
+  local next_buf = get_next_buf(buf)
+  local windows = vim.fn.getbufinfo(buf)[1].windows
+  switch_buffer(windows, next_buf)
+  -- force deletion of terminal buffers to avoid the prompt
+  if force or vim.fn.getbufvar(buf, "&buftype") == "terminal" then
+    vim.cmd(string.format("bd! %d", buf))
+  else
+    vim.cmd(string.format("silent! confirm bd %d", buf))
+  end
+  -- revert buffer switches if user has canceled deletion
+  if vim.fn.buflisted(buf) == 1 then
+    switch_buffer(windows, buf)
+  end
+end
+
 local t = function(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
@@ -40,8 +118,7 @@ _G.create_float_term = function()
 end
 
 _G.gitroot_project_files = function()
-  local load_telescope = require("modules.editor.config").telescope
-  load_telescope()
+  require("modules.configs.editor.nvim-telescope")()
   local opts = {} -- define here if you want to define something
   vim.fn.system("git rev-parse --is-inside-work-tree")
   if vim.v.shell_error == 0 then
@@ -52,8 +129,7 @@ _G.gitroot_project_files = function()
 end
 
 _G.gitroot_live_grep = function()
-  local load_telescope = require("modules.editor.config").telescope
-  load_telescope()
+  require("modules.configs.editor.nvim-telescope")()
   local opts = { cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }
   require("telescope.builtin").live_grep(opts)
 end
@@ -77,8 +153,8 @@ end
 -- default map
 local def_map = {
   -- Vim map
-  ["n|<C-x>"] = k.map_cr("lua require('bufdelete').delete_buffer()"):with_noremap():with_silent(),
-  ["n|<Space>x"] = k.map_cr("lua require('bufdelete').delete_buffer()"):with_noremap():with_silent(),
+  ["n|<C-x>"] = k.map_cr("lua delete_buffer()"):with_noremap():with_silent(),
+  ["n|<Space>x"] = k.map_cr("lua delete_buffer()"):with_noremap():with_silent(),
   ["n|<C-s>"] = k.map_cu("write"):with_noremap(),
   ["n|Y"] = k.map_cmd("y$"),
   ["n|D"] = k.map_cmd("d$"),

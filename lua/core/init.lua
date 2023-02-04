@@ -1,6 +1,5 @@
 -- plugins
 require("editor")
-require("trimwhite")
 
 local api = vim.api
 
