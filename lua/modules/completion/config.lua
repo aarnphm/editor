@@ -407,7 +407,6 @@ config.mason_install = function()
       "stylua",
       "selene",
       "black",
-      "taplo",
       "isort",
       "yamllint",
       "clang-format",

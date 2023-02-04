@@ -15,6 +15,7 @@ completion["neovim/nvim-lspconfig"] = {
       "glepnir/lspsaga.nvim",
       config = config.lspsaga,
       event = "BufRead",
+      commit = "f621bd86398617c93d54170de224eb7f608f21cf",
       dependencies = { { "nvim-tree/nvim-web-devicons" } },
     },
     { "ray-x/lsp_signature.nvim" },

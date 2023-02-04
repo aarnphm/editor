@@ -168,8 +168,8 @@ config.catppuccin = function()
   local transparent_background = false -- Set background transparency here!
 
   require("catppuccin").setup({
-    flavour = "mocha", -- Can be one of: latte, frappe, macchiato, mocha
-    background = { light = "frappe", dark = "mocha" },
+    flavour = __editor_config.catppuccin.flavor, -- Can be one of: latte, frappe, macchiato, mocha
+    background = { light = "latte", dark = "mocha" },
     dim_inactive = {
       enabled = false,
       -- Dim inactive splits/windows/buffers.
