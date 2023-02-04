@@ -18,7 +18,6 @@ return function()
       initial_mode = "insert",
       prompt_prefix = " " .. icons.ui.Telescope .. " ",
       selection_caret = icons.ui.ChevronRight,
-      entry_prefix = " ",
       borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
       scroll_strategy = "limit",
       layout_strategy = "horizontal",

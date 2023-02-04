@@ -9,6 +9,7 @@ editor["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnte
 editor["tpope/vim-fugitive"] = { lazy = true, command = { "Git", "G", "Ggrep", "GBrowse" } }
 editor["Stormherz/tablify"] = { lazy = true, ft = "rst" }
 editor["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" }
+editor["ojroques/nvim-bufdel"] = { lazy = true, event = "BufReadPost" }
 editor["untitled-ai/jupyter_ascending.vim"] =
   { lazy = true, ft = "ipynb", cmd = { "JupyterExecute", "JupyterExecuteAll" } }
 
@@ -94,6 +95,28 @@ editor["nvim-treesitter/nvim-treesitter"] = {
       config = function()
         require("colorizer").setup()
       end,
+    },
+  },
+}
+
+editor["mfussenegger/nvim-dap"] = {
+  lazy = true,
+  cmd = {
+    "DapSetLogLevel",
+    "DapShowLog",
+    "DapContinue",
+    "DapToggleBreakpoint",
+    "DapToggleRepl",
+    "DapStepOver",
+    "DapStepInto",
+    "DapStepOut",
+    "DapTerminate",
+  },
+  config = require("editor.dap"),
+  dependencies = {
+    {
+      "rcarriga/nvim-dap-ui",
+      config = require("editor.dap.dapui"),
     },
   },
 }
