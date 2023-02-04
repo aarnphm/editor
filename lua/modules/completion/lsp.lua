@@ -9,8 +9,8 @@ require("lspconfig.ui.windows").default_options.border = "single"
 local efmls = require("efmls-configs")
 
 local icons = {
-  ui = require("modules.ui.icons").get("ui", true),
-  misc = require("modules.ui.icons").get("misc", true),
+  ui = require("utils.icons").get("ui", true),
+  misc = require("utils.icons").get("misc", true),
 }
 
 mason.setup({

@@ -326,7 +326,7 @@ config.spectre = function()
 end
 
 config.telescope = function()
-  local icons = { ui = require("modules.ui.icons").get("ui", true) }
+  local icons = { ui = require("utils.icons").get("ui", true) }
   local telescope_actions = require("telescope.actions.set")
   local fixfolds = {
     hidden = true,
@@ -444,8 +444,8 @@ end
 
 config.trouble = function()
   local icons = {
-    ui = require("modules.ui.icons").get("ui"),
-    diagnostics = require("modules.ui.icons").get("diagnostics"),
+    ui = require("utils.icons").get("ui"),
+    diagnostics = require("utils.icons").get("diagnostics"),
   }
 
   require("trouble").setup({
@@ -572,8 +572,8 @@ end
 
 config.which_key = function()
   local icons = {
-    ui = require("modules.ui.icons").get("ui"),
-    misc = require("modules.ui.icons").get("misc"),
+    ui = require("utils.icons").get("ui"),
+    misc = require("utils.icons").get("misc"),
   }
 
   require("which-key").setup({

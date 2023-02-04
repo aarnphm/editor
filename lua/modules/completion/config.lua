@@ -26,10 +26,10 @@ end
 
 config.lspsaga = function()
   local icons = {
-    diagnostics = require("modules.ui.icons").get("diagnostics", true),
-    kind = require("modules.ui.icons").get("kind", true),
-    type = require("modules.ui.icons").get("type", true),
-    ui = require("modules.ui.icons").get("ui", true),
+    diagnostics = require("utils.icons").get("diagnostics", true),
+    kind = require("utils.icons").get("kind", true),
+    type = require("utils.icons").get("type", true),
+    ui = require("utils.icons").get("ui", true),
   }
 
   local set_sidebar_icons = function()
@@ -48,7 +48,7 @@ config.lspsaga = function()
 
   set_sidebar_icons()
 
-  local colors = require("modules.utils").get_palette()
+  local colors = require("utils").get_palette()
 
   require("lspsaga").setup({
     preview = {
@@ -206,9 +206,9 @@ end
 
 config.cmp = function()
   local icons = {
-    kind = require("modules.ui.icons").get("kind", false),
-    type = require("modules.ui.icons").get("type", false),
-    cmp = require("modules.ui.icons").get("cmp", false),
+    kind = require("utils.icons").get("kind", false),
+    type = require("utils.icons").get("type", false),
+    cmp = require("utils.icons").get("cmp", false),
   }
   local replace_termcodes = function(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)

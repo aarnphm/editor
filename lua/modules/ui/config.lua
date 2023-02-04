@@ -428,9 +428,9 @@ end
 
 config.lualine = function()
   local icons = {
-    diagnostics = require("modules.ui.icons").get("diagnostics", true),
-    misc = require("modules.ui.icons").get("misc", true),
-    ui = require("modules.ui.icons").get("ui", true),
+    diagnostics = require("utils.icons").get("diagnostics", true),
+    misc = require("utils.icons").get("misc", true),
+    ui = require("utils.icons").get("ui", true),
   }
 
   local escape_status = function()
@@ -587,11 +587,11 @@ config.lualine = function()
   })
 
   -- Properly set background color for lspsaga
-  local winbar_bg = require("modules.utils").hl_to_rgb("StatusLine", true, "#000000")
+  local winbar_bg = require("utils").hl_to_rgb("StatusLine", true, "#000000")
   for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind()) do
-    require("modules.utils").extend_hl("LspSagaWinbar" .. hlGroup[1], { bg = winbar_bg })
+    require("utils").extend_hl("LspSagaWinbar" .. hlGroup[1], { bg = winbar_bg })
   end
-  require("modules.utils").extend_hl("LspSagaWinbarSep", { bg = winbar_bg })
+  require("utils").extend_hl("LspSagaWinbarSep", { bg = winbar_bg })
 end
 
 config.nvim_tree = function()
@@ -710,7 +710,7 @@ config.gitsigns = function()
 end
 
 config.nvim_bufferline = function()
-  local icons = { ui = require("modules.ui.icons").get("ui") }
+  local icons = { ui = require("utils.icons").get("ui") }
 
   local options = {
     options = {
@@ -752,7 +752,7 @@ config.nvim_bufferline = function()
   }
 
   if vim.g.colors_name == "catppuccin" then
-    local cp = require("modules.utils").get_palette()
+    local cp = require("utils").get_palette()
     cp.none = "NONE" -- Special setting for complete transparent fg/bg.
 
     local catppuccin_hl_overwrite = {
