@@ -100,8 +100,20 @@ return function()
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = "catppuccin",
-      disabled_filetypes = {},
+      theme = "auto",
+      disabled_filetypes = {
+        "alpha",
+        "dashboard",
+        "NvimTree",
+        "prompt",
+        "toggleterm",
+        "terminal",
+        "help",
+        "lspsagaoutline",
+        "DiffviewFiles",
+        "quickfix",
+        "Trouble",
+      },
       component_separators = "|",
       section_separators = { left = " ", right = " " },
     },

@@ -1,13 +1,23 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/sumneko_lua.lua
+
+-- call neodev before setup sumneko_lua
+require("neodev").setup({
+  library = {
+    enabled = true,
+    runtime = true,
+    types = true,
+    plugins = { "dap", "nvim-dap-ui", "lualine", "nvim-treesitter", "telescope.nvim" },
+  },
+})
+
 return {
   settings = {
     Lua = {
-      diagnostics = {
-        globals = { "vim" },
-        disable = { "different-requires" },
-      },
       completion = {
         callSnippet = "Replace",
+      },
+      diagnostics = {
+        globals = { "vim" },
       },
       workspace = {
         library = {

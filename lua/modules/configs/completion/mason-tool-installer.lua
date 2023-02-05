@@ -37,7 +37,7 @@ return function()
       "jq",
       "yamlfmt",
     },
-    auto_update = false,
+    auto_update = true,
     run_on_start = true,
   })
 end
