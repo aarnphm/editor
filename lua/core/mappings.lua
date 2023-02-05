@@ -4,23 +4,20 @@ local t = function(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-_G.enhance_align = function(key)
-  local map = { ["nga"] = "<Plug>(EasyAlign)", ["xga"] = "<Plug>(EasyAlign)" }
+_G.enhance_ft_move = function(key)
+  local map = {
+    f = "<Plug>(eft-f)",
+    F = "<Plug>(eft-F)",
+    t = "<Plug>(eft-t)",
+    T = "<Plug>(eft-T)",
+    [";"] = "<Plug>(eft-repeat)",
+  }
   return t(map[key])
 end
 
-_G.create_float_term = function()
-  local config = {
-    hidden = true,
-    direction = "float",
-    float_opts = {
-      border = "double",
-    },
-    on_open = function(term)
-      vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
-    end,
-  }
-  require("toggleterm.terminal").Terminal:new(config):toggle()
+_G.enhance_align = function(key)
+  local map = { ["nga"] = "<Plug>(EasyAlign)", ["xga"] = "<Plug>(EasyAlign)" }
+  return t(map[key])
 end
 
 _G.gitroot_project_files = function()
@@ -40,20 +37,24 @@ _G.gitroot_live_grep = function()
   require("telescope.builtin").live_grep(opts)
 end
 
-_G.create_gitui = function()
-  local config = {
-    cmd = "gitui",
-    hidden = true,
-    direction = "float",
-    float_opts = {
-      border = "double",
-    },
-    on_open = function(term)
-      vim.api.nvim_command([[startinsert!]])
-      vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
-    end,
-  }
-  require("toggleterm.terminal").Terminal:new(config):toggle()
+local _lazygit = nil
+_G.lazygit = function()
+  if not _lazygit then
+    local config = {
+      cmd = "lazygit",
+      hidden = true,
+      direction = "float",
+      float_opts = {
+        border = "double",
+      },
+      on_open = function(term)
+        vim.api.nvim_command([[startinsert!]])
+        vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+      end,
+    }
+    _lazygit = require("toggleterm.terminal").Terminal:new(config)
+  end
+  _lazygit:toggle()
 end
 
 -- default map
@@ -155,9 +156,8 @@ local plug_map = {
   ["n|<C-w>t"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]]):with_noremap():with_silent(),
   ["i|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>"):with_noremap():with_silent(),
   ["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_noremap():with_silent(),
-  ["n|<S-F7>"] = k.map_cu("lua create_gitui()"):with_noremap():with_silent(),
-  ["n|<S-F8>"] = k.map_cu("lua create_float_term()"):with_noremap():with_silent(),
-  ["n|<leader>g"] = k.map_cu("Git"):with_noremap():with_silent(),
+  ["n|<S-F7>"] = k.map_cu("lua lazygit()"):with_noremap():with_silent(),
+  ["n|<LocalLeader>gg"] = k.map_cu("Git"):with_noremap():with_silent(),
   ["n|gps"] = k.map_cr("G push"):with_noremap():with_silent(),
   ["n|gpl"] = k.map_cr("G pull"):with_noremap():with_silent(),
   -- Plugin nvim-tree
@@ -199,6 +199,11 @@ local plug_map = {
   -- Plugin EasyAlign
   ["n|ga"] = k.map_cmd("v:lua.enhance_align('nga')"):with_expr(),
   ["x|ga"] = k.map_cmd("v:lua.enhance_align('xga')"):with_expr(),
+  -- Plugin vim-eft
+  ["n|f"] = k.map_cmd("v:lua.enhance_ft_move('f')"):with_expr(),
+  ["n|F"] = k.map_cmd("v:lua.enhance_ft_move('F')"):with_expr(),
+  ["n|t"] = k.map_cmd("v:lua.enhance_ft_move('t')"):with_expr(),
+  ["n|T"] = k.map_cmd("v:lua.enhance_ft_move('T')"):with_expr(),
   -- Plugin MarkdownPreview
   ["n|mpt"] = k.map_cr("MarkdownPreviewToggle"):with_noremap():with_silent(),
   -- Plugin zen-mode

@@ -5,22 +5,19 @@ return function()
     vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
   end
 
-  vim.api.nvim_command([[
-augroup vimtex_mac
-    autocmd!
-    autocmd User VimtexEventCompileSuccess call UpdateSkim()
-augroup END
+  vim.api.nvim_create_autocmd("User", {
+    group = vim.api.nvim_create_augroup("vimtext_mac", { clear = true }),
+    pattern = "VimtexEventCompileSuccess",
+    callback = function(_)
+      local out = vim.b.vimtex.out()
+      local src_file_path = vim.fn.expand("%:p")
+      local cmd = { vim.g.vimtex_view_general_viewer, "-r" }
 
-function! UpdateSkim() abort
-    let l:out = b:vimtex.out()
-    let l:src_file_path = expand('%:p')
-    let l:cmd = [g:vimtex_view_general_viewer, '-r']
+      if vim.fn.empty(vim.fn.system("pgrep Skim")) == 0 then
+        table.insert(cmd, "-g")
+      end
 
-    if !empty(system('pgrep Skim'))
-    call extend(l:cmd, ['-g'])
-    endif
-
-    call jobstart(l:cmd + [line('.'), l:out, l:src_file_path])
-endfunction
-  ]])
+      vim.fn.jobstart(vim.list_extend(cmd, { vim.fn.line("."), out, src_file_path }))
+    end,
+  })
 end

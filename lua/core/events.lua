@@ -1,4 +1,5 @@
-local api, create_autocmd = vim.api, vim.api.nvim_create_autocmd
+local api = vim.api
+local create_autocmd = vim.api.nvim_create_autocmd
 local create_augroup = vim.api.nvim_create_augroup
 
 -- Disable statusline in dashboard
@@ -90,47 +91,36 @@ create_autocmd("BufWritePost", {
 create_autocmd("BufWritePost,FileWritePost", {
   group = bufs_id,
   pattern = "*.vim",
-  callback = function(_)
-    api.nvim_command([[nested if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif]])
-  end,
+  command = "if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif",
+  nested = true,
 })
 -- Set noundofile for temporary files
 create_autocmd("BufWritePre", {
   group = bufs_id,
   pattern = "/tmp/*",
-  callback = function(_)
-    api.nvim_command("setlocal noundofile")
-  end,
+  command = "setlocal noundofile",
 })
 create_autocmd("BufWritePre", {
   group = bufs_id,
   pattern = "*.tmp",
-  callback = function(_)
-    api.nvim_command("setlocal noundofile")
-  end,
+  command = "setlocal noundofile",
 })
 create_autocmd("BufWritePre", {
   group = bufs_id,
   pattern = "*.bak",
-  callback = function(_)
-    api.nvim_command("setlocal noundofile")
-  end,
+  command = "setlocal noundofile",
 })
 -- auto change directory
 create_autocmd("BufEnter", {
   group = bufs_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command("silent! lcd %:p:h")
-  end,
+  command = "silent! lcd %:p:h",
 })
 -- auto place to last edit
 create_autocmd("BufReadPost", {
   group = bufs_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command([[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]])
-  end,
+  command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
 })
 
 local wins_id = create_augroup("wins", { clear = true })
@@ -138,45 +128,37 @@ local wins_id = create_augroup("wins", { clear = true })
 create_autocmd("WinEnter,BufEnter,InsertLeave", {
   group = wins_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command(
-      [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]]
-    )
-  end,
+  command = [[if ! &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal cursorline | endif]],
 })
 -- Disable cursorline on unfocused windows
 create_autocmd("WinLeave,BufLeave,InsertEnter", {
   group = wins_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command(
-      [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]]
-    )
-  end,
+  command = [[if &cursorline && &filetype !~# '^\(dashboard\|clap_\)' && ! &pvw | setlocal nocursorline | endif]],
 })
 -- Force write shada on leaving nvim
 create_autocmd("VimLeave", {
   group = wins_id,
   pattern = "*",
   callback = function(_)
-    api.nvim_command([[if has('nvim') | wshada! | else | wviminfo! | endif]])
+    if vim.fn.has("nvim") == 1 then
+      api.nvim_command([[wshada!]])
+    else
+      api.nvim_command([[wviminfo!]])
+    end
   end,
 })
 -- Check if file changed when its window is focus, more eager than 'autoread'
 create_autocmd("FocusGained", {
   group = wins_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command([[checktime]])
-  end,
+  command = "checktime",
 })
 -- Equalize window dimensions when resizing vim window
 create_autocmd("VimResized", {
   group = wins_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command([[tabdo wincmd =]])
-  end,
+  command = "tabdo wincmd =",
 })
 
 local ft_id = create_augroup("ft", { clear = true })
@@ -184,36 +166,28 @@ local ft_id = create_augroup("ft", { clear = true })
 create_autocmd("FileType", {
   group = ft_id,
   pattern = "*",
-  callback = function(_)
-    api.nvim_command([[setlocal formatoptions-=cro]])
-  end,
+  command = "setlocal formatoptions-=cro",
 })
 create_autocmd("FileType", {
   group = ft_id,
   pattern = "alpha",
-  callback = function(_)
-    api.nvim_command("set showtabline=0")
-  end,
+  command = "set showtabline=0 laststatus=0",
 })
 create_autocmd("FileType", {
   group = ft_id,
   pattern = "markdown",
-  callback = function(_)
-    api.nvim_command("set wrap")
-  end,
+  command = "set wrap",
 })
 create_autocmd("FileType", {
   group = ft_id,
   pattern = "make",
-  callback = function(_)
-    api.nvim_command("set noexpandtab shiftwidth=8 softtabstop=0")
-  end,
+  command = "set noexpandtab shiftwidth=8 softtabstop=0",
 })
 create_autocmd("FileType", {
   group = ft_id,
   pattern = "dap-repl",
   callback = function(_)
-    api.nvim_command("lua require('dap.ext.autocompl').attach()")
+    require("dap.ext.autocompl").attach()
   end,
 })
 -- Google tab style for C/C++
@@ -221,61 +195,57 @@ create_autocmd("FileType", {
   group = ft_id,
   pattern = "c,cpp",
   callback = function(_)
-    api.nvim_command("nnoremap <leader>h :ClangdSwitchSourceHeaderVSplit<CR>")
+    api.nvim_buf_set_keymap(0, "n", "<leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>", { noremap = true })
   end,
 })
 -- set filetype for bazel files
 create_autocmd("BufNewFile,BufRead", {
   group = ft_id,
   pattern = "*.bazel",
-  callback = function(_)
-    api.nvim_command("setf bzl")
-  end,
+  command = "setf bzl",
 })
 create_autocmd("BufNewFile,BufRead", {
   group = ft_id,
   pattern = "WORKSPACE",
-  callback = function(_)
-    api.nvim_command("setf bzl")
-  end,
+  command = "setf bzl",
 })
 -- set filetype for proto files
 create_autocmd("BufNewFile,BufRead", {
   group = ft_id,
   pattern = "*.proto",
-  callback = function(_)
-    api.nvim_command("setf proto")
-  end,
+  command = "setf proto",
 })
 -- set filetype for docker files
 create_autocmd("BufNewFile,BufRead", {
   group = ft_id,
   pattern = "Dockerfile-*",
-  callback = function(_)
-    api.nvim_command("setf dockerfile")
-  end,
+  command = "setf dockerfile",
 })
 create_autocmd("BufNewFile,BufRead", {
   group = ft_id,
   pattern = "Dockerfile.{tpl,template,tmpl}",
-  callback = function(_)
-    api.nvim_command("setf dockerfile")
-  end,
+  command = "setf dockerfile",
 })
 create_autocmd("BufNewFile,BufRead", {
   group = ft_id,
   pattern = "*.{Dockerfile,dockerfile}",
-  callback = function(_)
-    api.nvim_command("setf dockerfile")
-  end,
+  command = "setf dockerfile",
 })
 -- set make to noexpandtab, shiftwidth=8, softtabstop=0
 create_autocmd("FileType", {
   group = ft_id,
   pattern = "make",
-  callback = function(_)
-    api.nvim_command("set noexpandtab shiftwidth=8 softtabstop=0")
-  end,
+  command = "set noexpandtab shiftwidth=8 softtabstop=0",
+})
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "lua",
+  command = "set noexpandtab shiftwidth=2 tabstop=2",
+})
+create_autocmd("FileType", {
+  group = ft_id,
+  pattern = "nix",
+  command = "set noexpandtab shiftwidth=2 tabstop=2",
 })
 
 local yank_id = create_augroup("yank", { clear = true })
@@ -284,6 +254,6 @@ create_autocmd("TextYankPost", {
   group = yank_id,
   pattern = "*",
   callback = function(_)
-    api.nvim_command([[silent! lua vim.highlight.on_yank({higroup="IncSearch", timeout=300})]])
+    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 300 })
   end,
 })

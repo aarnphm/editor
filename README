@@ -9,3 +9,8 @@ I want to give recognition to glepnir/nvim (https://github.com/glepnir/nvim) and
 as they were the main inspiration for this config.
 
 This configuration currently builds on top of nvim HEAD
+
+Some env variables that can be set:
+
+- PYTHON3_HOST_PROG - python3 executable
+- SQLITE_PATH - path to sqlite shared library

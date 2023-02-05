@@ -3,7 +3,12 @@ local conda_prefix = os.getenv("CONDA_PREFIX")
 if not conda_prefix == nil or conda_prefix == "" then
   vim.g.python_host_prog = conda_prefix .. "/bin/python"
   vim.g.python3_host_prog = conda_prefix .. "/bin/python"
+elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/python") == 1 then
+  vim.g.python_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
+  vim.g.python3_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
 else
+  -- get python host prog from env
+  vim.g.python_host_prog = vim.env["PYTHON3_HOST_PROG"]
   vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
 end
 

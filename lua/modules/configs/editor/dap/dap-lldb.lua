@@ -1,13 +1,11 @@
 local dap = require("dap")
+local utils = require("utils")
 
 local find_lldb_path = function()
-  local cwd = vim.fn.getcwd()
-  if vim.fn.executable(cwd .. "/venv/bin/lldb-vscode") == 1 then
-    return cwd .. "/venv/bin/lldb-vscode"
-  elseif vim.fn.executable(cwd .. "/.venv/bin/lldb-vscode") == 1 then
-    return cwd .. "/.venv/bin/lldb-vscode"
-  elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/lldb-vscode") == 1 then
-    return vim.env.HOME .. "/.pyenv/shims/lldb-vscode"
+  -- currently lock on the version 1.8.1
+  -- @todo: find a way to get vscode extension path
+  if utils.get_binary_path("lldb-vscode") then
+    return utils.get_binary_path("lldb-vscode")
   else
     return "/usr/bin/lldb-vscode"
   end

@@ -17,6 +17,7 @@ return function()
       "rust",
     },
     ignore_install = { "phpdoc" },
+    indent = { enable = false },
     highlight = {
       enable = true,
       disable = function(ft, bufnr)

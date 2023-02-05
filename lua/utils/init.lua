@@ -34,7 +34,7 @@ local palette = nil
 
 ---Initialize the palette
 ---@return palette
-local function init_palette()
+local init_palette = function()
   if not palette then
     palette = vim.g.colors_name == "catppuccin" and require("catppuccin.palettes").get_palette()
       or {
@@ -77,7 +77,7 @@ end
 ---Generate universal highlight groups
 ---@param overwrite palette? @The color to be overwritten | highest priority
 ---@return palette
-function M.get_palette(overwrite)
+M.get_palette = function(overwrite)
   if not overwrite then
     return init_palette()
   else
@@ -86,7 +86,7 @@ function M.get_palette(overwrite)
 end
 
 ---@param c string @The color in hexadecimal.
-local function hexToRgb(c)
+local hexToRgb = function(c)
   c = string.lower(c)
   return { tonumber(c:sub(2, 3), 16), tonumber(c:sub(4, 5), 16), tonumber(c:sub(6, 7), 16) }
 end
@@ -110,7 +110,7 @@ end
 ---Wrapper function for nvim_get_hl_by_name
 ---@param hl_group string @Highlight group name
 ---@return table
-local function get_highlight(hl_group)
+local get_highlight = function(hl_group)
   local hl = vim.api.nvim_get_hl_by_name(hl_group, true)
   if hl.link then
     return get_highlight(hl.link)
@@ -133,7 +133,7 @@ end
 ---@param foreground string @The foreground color
 ---@param background string @The background color to blend with
 ---@param alpha number|string @Number between 0 and 1 for blending amount.
-function M.blend(foreground, background, alpha)
+M.blend = function(foreground, background, alpha)
   alpha = type(alpha) == "string" and (tonumber(alpha, 16) / 0xff) or alpha
   local bg = hexToRgb(background)
   local fg = hexToRgb(foreground)
@@ -151,7 +151,7 @@ end
 ---@param use_bg boolean @Returns background or not
 ---@param fallback_hl? string @Fallback value if the hl group is not defined
 ---@return string
-function M.hl_to_rgb(hl_group, use_bg, fallback_hl)
+M.hl_to_rgb = function(hl_group, use_bg, fallback_hl)
   local hex = fallback_hl or "#000000"
   local hlexists = pcall(vim.api.nvim_get_hl_by_name, hl_group, true)
 
@@ -170,7 +170,7 @@ end
 ---Extend a highlight group
 ---@param name string @Target highlight group name
 ---@param def table @Attributes to be extended
-function M.extend_hl(name, def)
+M.extend_hl = function(name, def)
   local hlexists = pcall(vim.api.nvim_get_hl_by_name, name, true)
   if not hlexists then
     -- Do nothing if highlight group not found
@@ -185,7 +185,7 @@ end
 ---Convert number (0/1) to boolean
 ---@param value number @The value to check
 ---@return boolean|nil @Returns nil if failed
-function M.tobool(value)
+M.tobool = function(value)
   if value == 0 then
     return false
   elseif value == 1 then
@@ -198,6 +198,19 @@ function M.tobool(value)
     )
     return nil
   end
+end
+
+M.get_binary_path = function(binary)
+  local path = nil
+  if __editor_global.is_mac or __editor_global.is_linux then
+    path = vim.fn.trim(vim.fn.system("which " .. binary))
+  elseif __editor_global.is_windows then
+    path = vim.fn.trim(vim.fn.system("where " .. binary))
+  end
+  if vim.v.shell_error ~= 0 then
+    path = nil
+  end
+  return path
 end
 
 return M

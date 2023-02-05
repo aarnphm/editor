@@ -1,5 +1,10 @@
+local codelldb_extension_path = vim.env.HOME .. "/.vscode/extensions/vadimcn.vscode-lldb-1.8.1/"
+local codelldb_path = codelldb_extension_path .. "adapter/codelldb"
+local liblldb_path = __editor_global.is_mac and codelldb_extension_path .. "lldb/lib/liblldb.dylib"
+  or codelldb_extension_path .. "lldb/lib/liblldb.so"
+
 return function()
-  local opts = {
+  require("rust-tools").setup({
     tools = { -- rust-tools options
 
       -- how to execute terminal commands
@@ -170,13 +175,7 @@ return function()
 
     -- debugging stuff
     dap = {
-      adapter = {
-        type = "executable",
-        command = "lldb-vscode",
-        name = "rt_lldb",
-      },
+      adapter = require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path),
     },
-  }
-
-  require("rust-tools").setup(opts)
+  })
 end
