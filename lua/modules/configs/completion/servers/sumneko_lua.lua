@@ -6,7 +6,17 @@ require("neodev").setup({
     enabled = true,
     runtime = true,
     types = true,
-    plugins = { "dap", "nvim-dap-ui", "lualine", "nvim-treesitter", "telescope.nvim" },
+    plugins = {
+      "dap",
+      "nvim-dap-ui",
+      "lualine",
+      "nvim-treesitter",
+      "telescope.nvim",
+      "efmls-configs",
+      "mason",
+      "nvim-cmp",
+      "copilot.lua",
+    },
   },
 })
 

@@ -143,7 +143,6 @@ return function()
   })
 
   -- Require `efmls-configs-nvim`'s config here
-
   local vint = require("efmls-configs.linters.vint")
   local eslint = require("efmls-configs.linters.eslint")
   local shellcheck = require("efmls-configs.linters.shellcheck")
@@ -155,7 +154,6 @@ return function()
   local shfmt = require("efmls-configs.formatters.shfmt")
 
   -- Add your own config for formatter and linter here
-
   local rustfmt = require("completion.efm.formatters.rustfmt")
   local clangfmt = require("completion.efm.formatters.clangfmt")
 

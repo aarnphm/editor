@@ -49,7 +49,7 @@ return function()
   local get_cwd = function()
     local cwd = vim.fn.getcwd()
     local home = os.getenv("HOME")
-    if cwd:find(home, 1, true) == 1 then
+    if home and cwd:find(home, 1, true) == 1 then
       cwd = "~" .. cwd:sub(#home + 1)
     end
     return icons.ui.RootFolderOpened .. cwd
@@ -99,23 +99,23 @@ return function()
 
   require("lualine").setup({
     options = {
-      icons_enabled = true,
-      theme = "auto",
       disabled_filetypes = {
-        "alpha",
-        "dashboard",
-        "NvimTree",
-        "prompt",
-        "toggleterm",
-        "terminal",
-        "help",
-        "lspsagaoutline",
-        "DiffviewFiles",
-        "quickfix",
-        "Trouble",
+        statusline = {
+          "alpha",
+          "dashboard",
+          "NvimTree",
+          "prompt",
+          "toggleterm",
+          "terminal",
+          "help",
+          "lspsagaoutline",
+          "DiffviewFiles",
+          "quickfix",
+          "Trouble",
+        },
       },
-      component_separators = "|",
-      section_separators = { left = " ", right = " " },
+      -- component_separators = "|",
+      -- section_separators = { left = " ", right = " " },
     },
     sections = {
       lualine_a = { { "mode" } },

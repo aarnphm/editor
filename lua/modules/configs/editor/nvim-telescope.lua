@@ -45,6 +45,7 @@ return function()
         "%.mkv",
         "%.mp4",
         "%.zip",
+        "*/lazy-lock.json",
       },
       file_sorter = require("telescope.sorters").get_fuzzy_file,
       file_previewer = require("telescope.previewers").vim_buffer_cat.new,
