@@ -6,6 +6,9 @@ return {
         globals = { "vim" },
         disable = { "different-requires" },
       },
+      completion = {
+        callSnippet = "Replace",
+      },
       workspace = {
         library = {
           [vim.fn.expand("$VIMRUNTIME/lua")] = true,

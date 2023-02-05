@@ -2,25 +2,36 @@ local editor = {}
 
 -- tpope
 editor["tpope/vim-repeat"] = { lazy = true }
-editor["hrsh7th/vim-eft"] = { lazy = true, event = "BufReadPost" }
+editor["Stormherz/tablify"] = { lazy = true }
 editor["junegunn/vim-easy-align"] = { lazy = true, cmd = "EasyAlign" }
 editor["luukvbaal/stabilize.nvim"] = { lazy = true, event = "BufReadPost" }
 editor["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } }
 editor["tpope/vim-fugitive"] = { lazy = true, command = { "Git", "G", "Ggrep", "GBrowse" } }
-editor["Stormherz/tablify"] = { lazy = true, ft = "rst" }
 editor["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" }
 editor["ojroques/nvim-bufdel"] = { lazy = true, event = "BufReadPost" }
-editor["untitled-ai/jupyter_ascending.vim"] =
-  { lazy = true, ft = "ipynb", cmd = { "JupyterExecute", "JupyterExecuteAll" } }
+editor["sindrets/diffview.nvim"] = {
+  lazy = true,
+  cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
+    "nvim-lua/plenary.nvim",
+  },
+}
 
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require("editor.vim-illuminate") }
 editor["LunarVim/bigfile.nvim"] = { lazy = false, config = require("editor.bigfile") }
 editor["sudormrfbin/cheatsheet.nvim"] = { lazy = true, config = require("editor.cheatsheet") }
 editor["windwp/nvim-spectre"] = { lazy = true, config = require("editor.nvim-spectre") }
+editor["folke/which-key.nvim"] = { lazy = false, config = require("editor.which-key") }
+editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = require("editor.dressing") }
 editor["akinsho/nvim-toggleterm.lua"] = { lazy = true, event = "UIEnter", config = require("editor.nvim-toggleterm") }
 editor["rmagatti/auto-session"] =
   { lazy = true, cmd = { "SaveSession", "RestoreSession", "DeleteSession" }, config = require("editor.auto-session") }
-
+editor["folke/trouble.nvim"] = {
+  lazy = true,
+  cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+  config = require("editor.trouble"),
+}
 editor["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
   config = require("editor.wilder"),
@@ -39,14 +50,6 @@ editor["phaazon/hop.nvim"] = {
   config = function()
     require("hop").setup()
   end,
-}
-editor["sindrets/diffview.nvim"] = {
-  lazy = true,
-  cmd = { "DiffviewOpen", "DiffviewFileHistory" },
-  dependencies = {
-    "nvim-tree/nvim-web-devicons",
-    "nvim-lua/plenary.nvim",
-  },
 }
 editor["pwntester/octo.nvim"] = {
   lazy = true,
@@ -138,13 +141,6 @@ editor["nvim-telescope/telescope.nvim"] = {
   },
 }
 
-editor["folke/trouble.nvim"] = {
-  lazy = true,
-  cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
-  config = require("editor.trouble"),
-}
-editor["folke/which-key.nvim"] = { lazy = false, config = require("editor.which-key") }
-editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = require("editor.dressing") }
 editor["folke/zen-mode.nvim"] = {
   dependencies = {
     {

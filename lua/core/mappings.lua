@@ -4,25 +4,9 @@ local t = function(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-_G.enhance_ft_move = function(key)
-  local map = {
-    f = "<Plug>(eft-f)",
-    F = "<Plug>(eft-F)",
-    t = "<Plug>(eft-t)",
-    T = "<Plug>(eft-T)",
-    [";"] = "<Plug>(eft-repeat)",
-  }
-  return t(map[key])
-end
-
 _G.enhance_align = function(key)
   local map = { ["nga"] = "<Plug>(EasyAlign)", ["xga"] = "<Plug>(EasyAlign)" }
   return t(map[key])
-end
-
-local create_term = function(config)
-  local ft = require("toggleterm.terminal").Terminal:new(config)
-  ft:toggle()
 end
 
 _G.create_float_term = function()
@@ -36,7 +20,7 @@ _G.create_float_term = function()
       vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
     end,
   }
-  create_term(config)
+  require("toggleterm.terminal").Terminal:new(config):toggle()
 end
 
 _G.gitroot_project_files = function()
@@ -69,7 +53,7 @@ _G.create_gitui = function()
       vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
     end,
   }
-  create_term(config)
+  require("toggleterm.terminal").Terminal:new(config):toggle()
 end
 
 -- default map
@@ -189,11 +173,6 @@ local plug_map = {
   ["n|<LocalLeader>wd"] = k.map_cr("TroubleToggle workspace_diagnostics"):with_noremap():with_silent(),
   ["n|<LocalLeader>qf"] = k.map_cr("TroubleToggle quickfix"):with_noremap():with_silent(),
   ["n|<LocalLeader>ll"] = k.map_cr("TroubleToggle loclist"):with_noremap():with_silent(),
-  -- Plugin vim-eft
-  ["n|f"] = k.map_cmd("v:lua.enhance_ft_move('f')"):with_expr(),
-  ["n|F"] = k.map_cmd("v:lua.enhance_ft_move('F')"):with_expr(),
-  ["n|t"] = k.map_cmd("v:lua.enhance_ft_move('t')"):with_expr(),
-  ["n|T"] = k.map_cmd("v:lua.enhance_ft_move('T')"):with_expr(),
   -- Plugin Telescope
   ["n|fo"] = k.map_cmd("<cmd> Telescope oldfiles<CR>"):with_noremap():with_silent(),
   ["n|fr"] = k.map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),

@@ -21,7 +21,7 @@ completion["neovim/nvim-lspconfig"] = {
 }
 
 completion["hrsh7th/nvim-cmp"] = {
-  config = require("completion.cmp"),
+  config = require("completion.nvim-cmp"),
   event = "InsertEnter",
   dependencies = {
     {
@@ -39,7 +39,7 @@ completion["hrsh7th/nvim-cmp"] = {
     { "hrsh7th/cmp-emoji" },
     { "kdheepak/cmp-latex-symbols" },
     { "f3fora/cmp-spell" },
-    { "windwp/nvim-autopairs", config = require("completion.autopairs") },
+    { "windwp/nvim-autopairs", config = require("completion.nvim-autopairs") },
   },
 }
 

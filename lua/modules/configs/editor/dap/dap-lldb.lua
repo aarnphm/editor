@@ -1,8 +1,21 @@
 local dap = require("dap")
 
+local find_lldb_path = function()
+  local cwd = vim.fn.getcwd()
+  if vim.fn.executable(cwd .. "/venv/bin/lldb-vscode") == 1 then
+    return cwd .. "/venv/bin/lldb-vscode"
+  elseif vim.fn.executable(cwd .. "/.venv/bin/lldb-vscode") == 1 then
+    return cwd .. "/.venv/bin/lldb-vscode"
+  elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/lldb-vscode") == 1 then
+    return vim.env.HOME .. "/.pyenv/shims/lldb-vscode"
+  else
+    return "/usr/bin/lldb-vscode"
+  end
+end
+
 dap.adapters.lldb = {
   type = "executable",
-  command = "/usr/bin/lldb-vscode",
+  command = find_lldb_path(),
   name = "lldb",
 }
 dap.configurations.cpp = {
