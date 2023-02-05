@@ -1,9 +1,11 @@
 neovim config. opinionated, yet fast.
 
+Current benchmarks: 31ms startup time (See ./fixtures/benchmark.txt) [Running on M1 Max, 32GB RAM]
+
 This comes as a full package, and I don't have any intention to make it modular.
 If you want to use something more customizable refer to NvChad (https://github.com/NvChad/NvChad), SpaceVim (https://github.com/SpaceVim/SpaceVim)
 
-I want to give recognition to the thw two repositories that I used as a base for this config:
-glepnir/nvim (https://github.com/glepnir/nvim) and ayamir/nvimdots (https://github.com/ayamir/nvimdots)
+I want to give recognition to glepnir/nvim (https://github.com/glepnir/nvim) and ayamir/nvimdots (https://github.com/ayamir/nvimdots)
+as they were the main inspiration for this config.
 
 This configuration currently builds on top of nvim HEAD
