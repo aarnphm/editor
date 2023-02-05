@@ -51,14 +51,16 @@ end, {
   end,
 })
 
-function M.enable_format_on_save(is_configured)
+M.enable_format_on_save = function(is_configured)
   local opts = { pattern = "*", timeout = 1000 }
   vim.api.nvim_create_augroup("format_on_save", {})
   vim.api.nvim_create_autocmd("BufWritePre", {
     group = "format_on_save",
     pattern = opts.pattern,
     callback = function()
-      require("completion.formatting").format({ timeout_ms = opts.timeout, filter = M.format_filter })
+      if not vim.tbl_contains({ "gitcommit" }, vim.bo.filetype) then
+        require("completion.formatting").format({ timeout_ms = opts.timeout, filter = M.format_filter })
+      end
     end,
   })
   if not is_configured then
@@ -66,14 +68,14 @@ function M.enable_format_on_save(is_configured)
   end
 end
 
-function M.disable_format_on_save()
+M.disable_format_on_save = function()
   pcall(vim.api.nvim_del_augroup_by_name, "format_on_save")
   if format_on_save then
     vim.notify("Disabled format-on-save", vim.log.levels.INFO, { title = "Settings modification success!" })
   end
 end
 
-function M.configure_format_on_save()
+M.configure_format_on_save = function()
   if format_on_save then
     M.enable_format_on_save(true)
   else
@@ -81,7 +83,7 @@ function M.configure_format_on_save()
   end
 end
 
-function M.toggle_format_on_save()
+M.toggle_format_on_save = function()
   local status = pcall(vim.api.nvim_get_autocmds, {
     group = "format_on_save",
     event = "BufWritePre",
@@ -93,7 +95,7 @@ function M.toggle_format_on_save()
   end
 end
 
-function M.format_filter(clients)
+M.format_filter = function(clients)
   return vim.tbl_filter(function(client)
     local status_ok, formatting_supported = pcall(function()
       return client.supports_method("textDocument/formatting")
@@ -106,7 +108,7 @@ function M.format_filter(clients)
   end, clients)
 end
 
-function M.format(opts)
+M.format = function(opts)
   local cwd = vim.fn.getcwd()
   for i = 1, #disabled_workspaces do
     if cwd.find(cwd, disabled_workspaces[i]) ~= nil then
