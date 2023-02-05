@@ -13,7 +13,7 @@ require("neodev").setup({
       "nvim-treesitter",
       "telescope.nvim",
       "efmls-configs",
-      "mason",
+      "mason.nvim",
       "nvim-cmp",
       "copilot.lua",
       "lazy.nvim",

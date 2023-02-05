@@ -7,9 +7,8 @@ return function()
   }
   require("nvim-tree").setup({
     create_in_closed_folder = false,
-    respect_buf_cwd = false, -- set to true if you want to open the tree relative to the current buffer's directory
     auto_reload_on_write = true,
-    disable_netrw = false, -- set to true if you don't want to hijack netrw
+    disable_netrw = true, -- set to true if you don't want to hijack netrw
     hijack_cursor = true,
     hijack_netrw = true,
     hijack_unnamed_buffer_when_opening = true,
@@ -18,6 +17,9 @@ return function()
     open_on_setup_file = false,
     open_on_tab = false,
     sort_by = "name", -- "name" | "extension" | "size" | "relative_path" | "modified" | "created" | "accessed"
+    reload_on_bufenter = true,
+    prefer_startup_root = true,
+    respect_buf_cwd = true,
     sync_root_with_cwd = true,
     view = {
       adaptive_size = false,
@@ -41,8 +43,6 @@ return function()
         },
       },
     },
-    reload_on_bufenter = true,
-    prefer_startup_root = true,
     renderer = {
       add_trailing = false,
       group_empty = true,

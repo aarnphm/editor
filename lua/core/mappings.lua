@@ -180,7 +180,8 @@ local plug_map = {
     :with_silent(),
   ["n|<LocalLeader>fu"] = k.map_cr("lua require('telescope').extensions.undo.undo()"):with_noremap():with_silent(),
   ["n|<LocalLeader>fn"] = k.map_cu("enew"):with_noremap():with_silent(),
-  ["n|<LocalLeader>km"] = k.map_cmd("<cmd> Telescope keymaps<CR>"):with_noremap():with_silent(),
+  -- Plugin cheatsheet
+  ["n|<LocalLeader>km"] = k.map_cr("Cheatsheet"):with_noremap():with_silent(),
   -- Plugin spectre
   ["n|<S-F6>"] = k.map_cr("lua require('spectre').open()"):with_noremap():with_silent(),
   ["n|<Leader>sw"] = k.map_cr("lua require('spectre').open_visual({select_word=true})"):with_noremap():with_silent(),

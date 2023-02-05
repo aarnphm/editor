@@ -45,9 +45,9 @@ editor["gelguy/wilder.nvim"] = {
   dependencies = { { "romgrk/fzy-lua-native" } },
 }
 editor["sudormrfbin/cheatsheet.nvim"] = {
-  lazy = true,
+  event = "VeryLazy",
   config = require("editor.cheatsheet"),
-  command = { "CheatSheet", "CheatSheetEdit" },
+  command = { "Cheatsheet", "CheatsheetEdit" },
   dependencies = {
     { "nvim-telescope/telescope.nvim" },
     { "nvim-lua/popup.nvim" },
