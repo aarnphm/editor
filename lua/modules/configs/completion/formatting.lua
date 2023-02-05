@@ -58,7 +58,7 @@ M.enable_format_on_save = function(is_configured)
     group = "format_on_save",
     pattern = opts.pattern,
     callback = function()
-      if vim.tbl_contains({ "gitcommit" }, vim.bo.filetype) then
+      if not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype) then
         return nil
       else
         require("completion.formatting").format({ timeout_ms = opts.timeout, filter = M.format_filter })

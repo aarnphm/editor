@@ -54,6 +54,9 @@ ui["rcarriga/nvim-notify"] = {
   lazy = true,
   event = "VeryLazy",
   config = require("ui.nvim-notify"),
+  cond = function()
+    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+  end,
 }
 
 return ui
