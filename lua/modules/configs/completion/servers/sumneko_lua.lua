@@ -16,6 +16,7 @@ require("neodev").setup({
       "mason",
       "nvim-cmp",
       "copilot.lua",
+      "lazy.nvim",
     },
   },
 })

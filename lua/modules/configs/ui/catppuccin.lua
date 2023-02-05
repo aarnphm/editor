@@ -170,18 +170,18 @@ return function()
           -- ["@boolean"] = { fg = cp.peach },
 
           ["@constructor"] = { fg = cp.lavender },
-          -- ["@constant"] = { fg = cp.peach },
-          -- ["@conditional"] = { fg = cp.mauve },
-          -- ["@repeat"] = { fg = cp.mauve },
+          ["@constant"] = { fg = cp.peach },
+          ["@conditional"] = { fg = cp.mauve },
+          ["@repeat"] = { fg = cp.mauve },
           ["@exception"] = { fg = cp.peach },
 
           ["@constant.builtin"] = { fg = cp.lavender },
-          -- ["@function.builtin"] = { fg = cp.peach, style = { "italic" } },
-          -- ["@type.builtin"] = { fg = cp.yellow, style = { "italic" } },
+          ["@function.builtin"] = { fg = cp.peach, style = { "italic" } },
+          ["@type.builtin"] = { fg = cp.yellow, style = { "italic" } },
           ["@type.qualifier"] = { link = "@keyword" },
           ["@variable.builtin"] = { fg = cp.red, style = { "italic" } },
 
-          -- ["@function"] = { fg = cp.blue },
+          ["@function"] = { fg = cp.blue },
           ["@function.macro"] = { fg = cp.red, style = {} },
           ["@parameter"] = { fg = cp.rosewater },
           ["@keyword"] = { fg = cp.red, style = { "italic" } },
@@ -240,9 +240,9 @@ return function()
           ["@property.typescript"] = { fg = cp.lavender, style = { "italic" } },
 
           -- @uncomment start
-          -- ["@constructor.typescript"] = { fg = cp.lavender },
-          -- ["@constructor.tsx"] = { fg = cp.lavender },
-          -- ["@tag.attribute.tsx"] = { fg = cp.mauve },
+          ["@constructor.typescript"] = { fg = cp.lavender },
+          ["@constructor.tsx"] = { fg = cp.lavender },
+          ["@tag.attribute.tsx"] = { fg = cp.mauve },
           -- @uncomment stop
 
           ["@type.css"] = { fg = cp.lavender },

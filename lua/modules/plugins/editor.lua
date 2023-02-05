@@ -28,7 +28,6 @@ editor["sindrets/diffview.nvim"] = {
 
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require("editor.vim-illuminate") }
 editor["LunarVim/bigfile.nvim"] = { lazy = false, config = require("editor.bigfile") }
-editor["sudormrfbin/cheatsheet.nvim"] = { lazy = true, config = require("editor.cheatsheet") }
 editor["windwp/nvim-spectre"] = { lazy = true, config = require("editor.nvim-spectre") }
 editor["folke/which-key.nvim"] = { lazy = false, config = require("editor.which-key") }
 editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = require("editor.dressing") }
@@ -44,6 +43,16 @@ editor["gelguy/wilder.nvim"] = {
   event = "CmdlineEnter",
   config = require("editor.wilder"),
   dependencies = { { "romgrk/fzy-lua-native" } },
+}
+editor["sudormrfbin/cheatsheet.nvim"] = {
+  lazy = true,
+  config = require("editor.cheatsheet"),
+  command = { "CheatSheet", "CheatSheetEdit" },
+  dependencies = {
+    { "nvim-telescope/telescope.nvim" },
+    { "nvim-lua/popup.nvim" },
+    { "nvim-lua/plenary.nvim" },
+  },
 }
 editor["kylechui/nvim-surround"] = {
   lazy = false,
@@ -68,24 +77,11 @@ editor["pwntester/octo.nvim"] = {
 }
 editor["ThePrimeagen/refactoring.nvim"] = {
   lazy = true,
-  config = function()
-    require("refactoring").setup({
-      -- prompt for return type
-      prompt_func_return_type = {
-        go = true,
-        cpp = true,
-        c = true,
-        java = true,
-      },
-      -- prompt for function parameters
-      prompt_func_param_type = {
-        go = true,
-        cpp = true,
-        c = true,
-        java = true,
-      },
-    })
-  end,
+  config = require("editor.refactoring"),
+  dependencies = {
+    { "nvim-lua/plenary.nvim" },
+    { "nvim-treesitter/nvim-treesitter" },
+  },
 }
 
 editor["nvim-treesitter/nvim-treesitter"] = {
@@ -140,12 +136,15 @@ editor["nvim-telescope/telescope.nvim"] = {
     { "nvim-tree/nvim-web-devicons" },
     { "nvim-lua/plenary.nvim" },
     { "nvim-lua/popup.nvim" },
+    { "debugloop/telescope-undo.nvim" },
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     { "nvim-telescope/telescope-frecency.nvim", dependencies = {
       { "kkharji/sqlite.lua" },
     } },
     { "jvgrootveld/telescope-zoxide" },
     { "xiyaowong/telescope-emoji.nvim" },
+    { "ahmedkhalf/project.nvim", event = "BufReadPost", config = require("editor.project") },
+    { "nvim-telescope/telescope-live-grep-args.nvim" },
   },
 }
 

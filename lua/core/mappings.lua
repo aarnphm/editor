@@ -31,12 +31,6 @@ _G.gitroot_project_files = function()
   end
 end
 
-_G.gitroot_live_grep = function()
-  require("modules.configs.editor.nvim-telescope")()
-  local opts = { cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }
-  require("telescope.builtin").live_grep(opts)
-end
-
 local _lazygit = nil
 _G.lazygit = function()
   if not _lazygit then
@@ -158,8 +152,8 @@ local plug_map = {
   ["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_noremap():with_silent(),
   ["n|<S-F7>"] = k.map_cu("lua lazygit()"):with_noremap():with_silent(),
   ["n|<LocalLeader>gg"] = k.map_cu("Git"):with_noremap():with_silent(),
-  ["n|gps"] = k.map_cr("G push"):with_noremap():with_silent(),
-  ["n|gpl"] = k.map_cr("G pull"):with_noremap():with_silent(),
+  ["n|gps"] = k.map_cmd("G push<CR>"):with_noremap():with_silent(),
+  ["n|gpl"] = k.map_cmd("G pull<CR>"):with_noremap():with_silent(),
   -- Plugin nvim-tree
   ["n|<C-n>"] = k.map_cr("NvimTreeToggle"):with_noremap():with_silent(),
   ["n|<LocalLeader>nf"] = k.map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
@@ -176,11 +170,15 @@ local plug_map = {
   -- Plugin Telescope
   ["n|fo"] = k.map_cmd("<cmd> Telescope oldfiles<CR>"):with_noremap():with_silent(),
   ["n|fr"] = k.map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
-  ["n|ff"] = k.map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
   ["n|fb"] = k.map_cmd("<cmd> Telescope buffers<CR>"):with_noremap():with_silent(),
+  ["n|ff"] = k.map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
+  ["n|fp"] = k.map_cu("lua require('telescope').extensions.projects.projects{}"):with_noremap():with_silent(),
   ["n|<LocalLeader>ff"] = k.map_cu("lua gitroot_project_files()"):with_noremap():with_silent(),
   ["n|fw"] = k.map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),
-  ["n|<LocalLeader>fw"] = k.map_cu("lua gitroot_live_grep()"):with_noremap():with_silent(),
+  ["n|<LocalLeader>fw"] = k.map_cu("lua require('telescope').extensions.live_grep_args.live_grep_args{}")
+    :with_noremap()
+    :with_silent(),
+  ["n|<LocalLeader>fu"] = k.map_cr("lua require('telescope').extensions.undo.undo()"):with_noremap():with_silent(),
   ["n|<LocalLeader>fn"] = k.map_cu("enew"):with_noremap():with_silent(),
   ["n|<LocalLeader>km"] = k.map_cmd("<cmd> Telescope keymaps<CR>"):with_noremap():with_silent(),
   -- Plugin spectre
