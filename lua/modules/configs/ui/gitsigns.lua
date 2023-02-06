@@ -1,33 +1,112 @@
 return function()
   require("gitsigns").setup({
-    keymaps = {
-      -- Default keymap options
-      noremap = true,
-      buffer = true,
-      ["n <LocalLeader>]g"] = {
-        expr = true,
-        "&diff ? ']g' : '<cmd>lua require\"gitsigns\".next_hunk()<CR>'",
-      },
-      ["n <LocalLeader>[g"] = {
-        expr = true,
-        "&diff ? '[g' : '<cmd>lua require\"gitsigns\".prev_hunk()<CR>'",
-      },
-      ["v <LocalLeader>shl"] = '<cmd>lua require("gitsigns").stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-      ["v <LocalLeader>rhl"] = '<cmd>lua require("gitsigns").reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-      ["n <LocalLeader>sh"] = '<cmd>lua require("gitsigns").stage_hunk()<CR>',
-      ["n <LocalLeader>ush"] = '<cmd>lua require("gitsigns").undo_stage_hunk()<CR>',
-      ["n <LocalLeader>rh"] = '<cmd>lua require("gitsigns").reset_hunk()<CR>',
-      ["n <LocalLeader>rb"] = '<cmd>lua require("gitsigns").reset_buffer()<CR>',
-      ["n <LocalLeader>ph"] = '<cmd>lua require("gitsigns").preview_hunk()<CR>',
-      ["n <LocalLeader>bl"] = '<cmd>lua require("gitsigns").blame_line({full = true})<CR>',
-      -- Text objects
-      ["o ih"] = ':<C-U>lua require("gitsigns").text_object()<CR>',
-      ["x ih"] = ':<C-U>lua require("gitsigns").text_object()<CR>',
-    },
     numhl = true,
     word_diff = true,
+    watch_gitdir = { interval = 1000, follow_files = true },
+    sign_priority = 6,
+    update_debounce = 100,
     current_line_blame = true,
     current_line_blame_opts = { delay = 1000, virtual_text_pos = "eol" },
     diff_opts = { internal = true },
+    signs = {
+      add = {
+        hl = "GitSignsAdd",
+        text = "│",
+        numhl = "GitSignsAddNr",
+        linehl = "GitSignsAddLn",
+      },
+      change = {
+        hl = "GitSignsChange",
+        text = "│",
+        numhl = "GitSignsChangeNr",
+        linehl = "GitSignsChangeLn",
+      },
+      delete = {
+        hl = "GitSignsDelete",
+        text = "_",
+        numhl = "GitSignsDeleteNr",
+        linehl = "GitSignsDeleteLn",
+      },
+      topdelete = {
+        hl = "GitSignsDelete",
+        text = "‾",
+        numhl = "GitSignsDeleteNr",
+        linehl = "GitSignsDeleteLn",
+      },
+      changedelete = {
+        hl = "GitSignsChange",
+        text = "~",
+        numhl = "GitSignsChangeNr",
+        linehl = "GitSignsChangeLn",
+      },
+    },
+    on_attach = function(bufnr)
+      local k = require("keybind")
+
+      k.nvim_load_mapping({
+        ["n|]g"] = k.map_callback(function()
+          if vim.wo.diff then
+            return "]g"
+          end
+          vim.schedule(function()
+            require("gitsigns.actions").next_hunk()
+          end)
+          return "<Ignore>"
+        end)
+          :with_buffer(bufnr)
+          :with_expr(),
+        ["n|[g"] = k.map_callback(function()
+          if vim.wo.diff then
+            return "[g"
+          end
+          vim.schedule(function()
+            require("gitsigns.actions").prev_hunk()
+          end)
+          return "<Ignore>"
+        end)
+          :with_buffer(bufnr)
+          :with_expr(),
+        ["n|<Space>hs"] = k.map_callback(function()
+          require("gitsigns.actions").stage_hunk()
+        end):with_buffer(bufnr),
+        ["v|<Space>hs"] = k.map_callback(function()
+          require("gitsigns.actions").stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end):with_buffer(bufnr),
+        ["n|<Space>hu"] = k.map_callback(function()
+          require("gitsigns.actions").undo_stage_hunk()
+        end):with_buffer(bufnr),
+        ["n|<Space>hr"] = k.map_callback(function()
+          require("gitsigns.actions").reset_hunk()
+        end):with_buffer(bufnr),
+        ["v|<Space>hr"] = k.map_callback(function()
+          require("gitsigns.actions").reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end):with_buffer(bufnr),
+        ["n|<Space>hR"] = k.map_callback(function()
+          require("gitsigns.actions").reset_buffer()
+        end):with_buffer(bufnr),
+        ["n|<Space>hp"] = k.map_callback(function()
+          require("gitsigns.actions").preview_hunk()
+        end):with_buffer(bufnr),
+        ["n|<Space>hb"] = k.map_callback(function()
+          require("gitsigns.actions").blame_line({ full = true })
+        end):with_buffer(bufnr),
+        ["n|<Space>hbl"] = k.map_callback(function()
+          require("gitsigns.actions").toggle_current_line_blame()
+        end):with_buffer(bufnr),
+        ["n|<Space>hwd"] = k.map_callback(function()
+          require("gitsigns.actions").toggle_word_diff()
+        end):with_buffer(bufnr),
+        ["n|<Space>hd"] = k.map_callback(function()
+          require("gitsigns.actions").toggle_deleted()
+        end):with_buffer(bufnr),
+        -- Text objects
+        ["o|ih"] = k.map_callback(function()
+          require("gitsigns.actions").text_object()
+        end):with_buffer(bufnr),
+        ["x|ih"] = k.map_callback(function()
+          require("gitsigns.actions").text_object()
+        end):with_buffer(bufnr),
+      })
+    end,
   })
 end

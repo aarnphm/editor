@@ -70,8 +70,8 @@ function RHS:with_nowait()
   return self
 end
 
-function RHS:with_buffer(num)
-  self.buffer = num
+function RHS:with_buffer(bufnr)
+  self.buffer = bufnr
   return self
 end
 

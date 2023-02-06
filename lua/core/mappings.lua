@@ -1,30 +1,8 @@
 local k = require("keybind")
-
 -- a local reference for ToggleTerm
 local _lazygit = nil
 
-local t = function(str)
-  return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-_G.enhance_ft_move = function(key)
-  local map = {
-    f = "<Plug>(eft-f)",
-    F = "<Plug>(eft-F)",
-    t = "<Plug>(eft-t)",
-    T = "<Plug>(eft-T)",
-    [";"] = "<Plug>(eft-repeat)",
-  }
-  return t(map[key])
-end
-
-_G.enhance_align = function(key)
-  local map = { ["nga"] = "<Plug>(EasyAlign)", ["xga"] = "<Plug>(EasyAlign)" }
-  return t(map[key])
-end
-
--- default map
-local def_map = {
+local mapping = {
   ["n|<C-s>"] = k.map_cu("write"):with_noremap(),
   ["n|Y"] = k.map_cmd("y$"),
   ["n|D"] = k.map_cmd("d$"),
@@ -33,15 +11,13 @@ local def_map = {
   ["n|<C-l>"] = k.map_cmd("<C-w>l"):with_noremap(),
   ["n|<C-j>"] = k.map_cmd("<C-w>j"):with_noremap(),
   ["n|<C-k>"] = k.map_cmd("<C-w>k"):with_noremap(),
-  ["n|<LocalLeader>vs"] = k.map_cu("vsplit"):with_defaults(),
-  ["n|<LocalLeader>hs"] = k.map_cu("split"):with_defaults(),
-  ["n|<leader>vs"] = k.map_cr('vsplit <C-r>=expand("%:p:h")'):with_noremap(),
-  ["n|<leader>hs"] = k.map_cr('split <C-r>=expand("%:p:h")'):with_noremap(),
+  ["n|<leader>vs"] = k.map_cu("vsplit"):with_defaults(),
+  ["n|<leader>hs"] = k.map_cu("split"):with_defaults(),
   ["n|<leader>te"] = k.map_cr('tabedit <C-r>=expand("%:p:h")'):with_noremap(),
   ["n|<LocalLeader>]"] = k.map_cr("vertical resize -10"):with_silent(),
   ["n|<LocalLeader>["] = k.map_cr("vertical resize +10"):with_silent(),
-  ["n|<LocalLeader>-"] = k.map_cr("resize -4"):with_silent(),
-  ["n|<LocalLeader>="] = k.map_cr("resize +4"):with_silent(),
+  ["n|<LocalLeader>-"] = k.map_cr("resize -5"):with_silent(),
+  ["n|<LocalLeader>="] = k.map_cr("resize +5"):with_silent(),
   ["n|<leader>o"] = k.map_cr("setlocal spell! spelllang=en_us"),
   ["n|<leader>I"] = k.map_cmd(":set list!<CR>"):with_noremap(),
   ["n|\\"] = k.map_cmd(":let @/=''<CR>:noh<CR>"):with_noremap(),
@@ -61,30 +37,30 @@ local def_map = {
   ["v|K"] = k.map_cmd(":m '<-2<CR>gv=gv"),
   ["v|<"] = k.map_cmd("<gv"),
   ["v|>"] = k.map_cmd(">gv"),
-}
-
-local plug_map = {
   ["n|ft"] = k.map_cr("FormatToggle"):with_defaults(),
+
+  -- Start mapping for plugins
   -- jupyter_ascending
-  ["n|<LocalLeader><LocalLeader>x"] = k.map_cr(":call jupyter_ascending#execute()<CR>"),
-  ["n|<LocalLeader><LocalLeader>X"] = k.map_cr(":call jupyter_ascending#execute_all()<CR>"),
+  ["n|<LocalLeader><LocalLeader>x"] = k.map_cr(":call jupyter_ascending#execute()<CR>")
+    :with_desc("Execute notebook shell"),
+  ["n|<LocalLeader><LocalLeader>X"] = k.map_cr(":call jupyter_ascending#execute_all()<CR>")
+    :with_desc("Exceute all notebook shells"),
   -- ojroques/nvim-bufdel
   ["n|<C-x>"] = k.map_cr("BufDel"):with_defaults(),
   ["n|<Space>x"] = k.map_cr("BufDel"):with_defaults(),
   -- Bufferline
-  ["n|<Space>l"] = k.map_cr("BufferLineCycleNext"):with_defaults(),
-  ["n|<Space>h"] = k.map_cr("BufferLineCyclePrev"):with_defaults(),
   ["n|<Space>bp"] = k.map_cr("BufferLinePick"):with_defaults(),
   ["n|<Space>bc"] = k.map_cr("BufferLinePickClose"):with_defaults(),
   ["n|<Space>be"] = k.map_cr("BufferLineSortByExtension"):with_noremap(),
   ["n|<Space>bd"] = k.map_cr("BufferLineSortByDirectory"):with_noremap(),
+  ["n|<LocalLeader>l"] = k.map_cr("BufferLineCycleNext"):with_defaults():with_desc("buffer: Cycle to next buffer"),
+  ["n|<LocalLeader>h"] = k.map_cr("BufferLineCyclePrev"):with_defaults():with_desc("buffer: Cycle to previous buffer"),
   -- Lazy
-  ["n|<Space>ls"] = k.map_cr("Lazy sync"):with_defaults(),
-  ["n|<Space>lc"] = k.map_cr("Lazy clean"):with_defaults(),
-  ["n|<Space>lu"] = k.map_cr("Lazy update"):with_defaults(),
-  ["n|<Space>lcc"] = k.map_cr("Lazy check"):with_defaults(),
-  ["n|<Space>lh"] = k.map_cr("Lazy home"):with_defaults(),
-  -- Gitsigns
+  ["n|<Space>ps"] = k.map_cr("Lazy sync"):with_defaults(),
+  ["n|<Space>pc"] = k.map_cr("Lazy clean"):with_defaults(),
+  ["n|<Space>pu"] = k.map_cr("Lazy update"):with_defaults(),
+  ["n|<Space>pcc"] = k.map_cr("Lazy check"):with_defaults(),
+  ["n|<Space>ph"] = k.map_cr("Lazy home"):with_defaults(),
   ["n|<Space>wd"] = k.map_cr("Gitsigns toggle_word_diff"):with_defaults(),
   ["n|<Space>ld"] = k.map_cr("Gitsigns toggle_deleted"):with_defaults(),
   -- Copilot
@@ -134,6 +110,7 @@ local plug_map = {
   end):with_defaults(),
   ["n|<LocalLeader>gg"] = k.map_cu("Git"):with_defaults(),
   -- Plugin tpope/vim-fugitive
+  ["n|<LocalLeader>G"] = k.map_cr("G"):with_defaults(),
   ["n|<LocalLeader>gaa"] = k.map_cr("G add ."):with_defaults(),
   ["n|<LocalLeader>gcm"] = k.map_cr("G commit"):with_defaults(),
   ["n|<LocalLeader>gps"] = k.map_cr("G push"):with_defaults(),
@@ -203,13 +180,25 @@ local plug_map = {
   ["n|<LocalLeader>c"] = k.map_cu("HopChar1"):with_noremap(),
   ["n|<LocalLeader>cc"] = k.map_cu("HopChar2"):with_noremap(),
   -- Plugin EasyAlign
-  ["n|ga"] = k.map_cmd("v:lua.enhance_align('nga')"):with_expr(),
-  ["x|ga"] = k.map_cmd("v:lua.enhance_align('xga')"):with_expr(),
+  ["n|gea"] = k.map_callback(function()
+    return vim.api.nvim_replace_termcodes("<Plug>(EasyAlign)", true, true, true)
+  end):with_expr(),
+  ["x|gea"] = k.map_callback(function()
+    return vim.api.nvim_replace_termcodes("<Plug>(EasyAlign)", true, true, true)
+  end):with_expr(),
   -- Plugin vim-eft
-  ["n|f"] = k.map_cmd("v:lua.enhance_ft_move('f')"):with_expr(),
-  ["n|F"] = k.map_cmd("v:lua.enhance_ft_move('F')"):with_expr(),
-  ["n|t"] = k.map_cmd("v:lua.enhance_ft_move('t')"):with_expr(),
-  ["n|T"] = k.map_cmd("v:lua.enhance_ft_move('T')"):with_expr(),
+  ["n|f"] = k.map_callback(function()
+    return vim.api.nvim_replace_termcodes("<Plug>(eft-f)", true, true, true)
+  end):with_expr(),
+  ["n|F"] = k.map_callback(function()
+    return vim.api.nvim_replace_termcodes("<Plug>(eft-F)", true, true, true)
+  end):with_expr(),
+  ["n|t"] = k.map_callback(function()
+    return vim.api.nvim_replace_termcodes("<Plug>(eft-t)", true, true, true)
+  end):with_expr(),
+  ["n|T"] = k.map_callback(function()
+    return vim.api.nvim_replace_termcodes("<Plug>(eft-T)", true, true, true)
+  end):with_expr(),
   -- Plugin MarkdownPreview
   ["n|mpt"] = k.map_cr("MarkdownPreviewToggle"):with_defaults(),
   -- Plugin zen-mode
@@ -276,9 +265,8 @@ local plug_map = {
   -- Plugin Legendary
   ["n|<C-p>"] = k.map_cr("Legendary"):with_defaults(),
   -- Plugin Diffview
-  ["n|<leader>D"] = k.map_cr("DiffviewOpen"):with_defaults(),
-  ["n|<leader><leader>D"] = k.map_cr("DiffviewClose"):with_defaults(),
+  ["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen"):with_defaults(),
+  ["n|<LocalLeader><LocalLeader>D"] = k.map_cr("DiffviewClose"):with_defaults(),
 }
 
-k.nvim_load_mapping(def_map)
-k.nvim_load_mapping(plug_map)
+k.nvim_load_mapping(mapping)
