@@ -172,6 +172,7 @@ local plug_map = {
   ["n|fr"] = k.map_cmd("<cmd> Telescope frecency<CR>"):with_noremap():with_silent(),
   ["n|fb"] = k.map_cmd("<cmd> Telescope buffers<CR>"):with_noremap():with_silent(),
   ["n|ff"] = k.map_cmd("<cmd> Telescope find_files<CR>"):with_noremap():with_silent(),
+  ["n|fkm"] = k.map_cr("<cmd> Telescope keymaps<CR>"):with_noremap():with_silent(),
   ["n|fp"] = k.map_cu("lua require('telescope').extensions.projects.projects{}"):with_noremap():with_silent(),
   ["n|<LocalLeader>ff"] = k.map_cu("lua gitroot_project_files()"):with_noremap():with_silent(),
   ["n|fw"] = k.map_cmd("<cmd> Telescope live_grep <CR>"):with_noremap():with_silent(),

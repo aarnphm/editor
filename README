@@ -1,6 +1,7 @@
 neovim config. opinionated, yet fast.
 
 Current benchmarks: 31ms startup time (See ./fixtures/benchmark.txt) [Running on M1 Max, 32GB RAM]
+                    26ms with `vim-startuptime`
 
 This comes as a full package, and I don't have any intention to make it modular.
 If you want to use something more customizable refer to NvChad (https://github.com/NvChad/NvChad), SpaceVim (https://github.com/SpaceVim/SpaceVim)

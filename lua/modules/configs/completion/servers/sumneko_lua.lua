@@ -17,6 +17,7 @@ require("neodev").setup({
       "nvim-cmp",
       "copilot.lua",
       "lazy.nvim",
+      "gitsigns.nvim"
     },
   },
 })
