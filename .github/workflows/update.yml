@@ -24,6 +24,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Install jq, curl and tree
+        run: sudo apt-get install -y jq curl tree
       - uses: andstor/file-existence-action@v2
         id: check_lockfile
         with:
@@ -43,10 +45,11 @@ jobs:
           cp -r "${GITHUB_WORKSPACE}/custom-snippets" "${HOME}/.config/nvim/custom-snippets"
           cp -r "${GITHUB_WORKSPACE}/init.lua" "${HOME}/.config/nvim/init.lua"
 
+          tree $HOME/.config/nvim
+
+
           nvim --headless "+Lazy! update" +qa
           cp -pv "${HOME}/.config/nvim/lazy-lock.json" .
-      - name: Install jq and curl
-        run: sudo apt-get install -y jq curl
       - name: Get infos
         id: meta
         run: |
