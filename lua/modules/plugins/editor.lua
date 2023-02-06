@@ -29,11 +29,29 @@ editor["sindrets/diffview.nvim"] = {
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require("editor.vim-illuminate") }
 editor["LunarVim/bigfile.nvim"] = { lazy = false, config = require("editor.bigfile") }
 editor["windwp/nvim-spectre"] = { lazy = true, config = require("editor.nvim-spectre") }
-editor["folke/which-key.nvim"] = { lazy = false, config = require("editor.which-key") }
-editor["stevearc/dressing.nvim"] = { lazy = false, event = "VeryLazy", config = require("editor.dressing") }
 editor["akinsho/nvim-toggleterm.lua"] = { lazy = true, event = "UIEnter", config = require("editor.nvim-toggleterm") }
 editor["rmagatti/auto-session"] =
   { lazy = true, cmd = { "SaveSession", "RestoreSession", "DeleteSession" }, config = require("editor.auto-session") }
+
+editor["mrjones2014/legendary.nvim"] = {
+  lazy = true,
+  cmd = "Legendary",
+  config = require("editor.legendary"),
+  dependencies = {
+    { "kkharji/sqlite.lua" },
+    {
+      "stevearc/dressing.nvim",
+      event = "VeryLazy",
+      config = require("editor.dressing"),
+    },
+    -- Please don't remove which-key.nvim otherwise you need to set timeoutlen=300 at `lua/core/options.lua`
+    {
+      "folke/which-key.nvim",
+      event = "VeryLazy",
+      config = require("editor.which-key"),
+    },
+  },
+}
 editor["folke/trouble.nvim"] = {
   lazy = true,
   cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
