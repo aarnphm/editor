@@ -275,6 +275,9 @@ local plug_map = {
   end):with_silent(),
   -- Plugin Legendary
   ["n|<C-p>"] = k.map_cr("Legendary"):with_defaults(),
+  -- Plugin Diffview
+  ["n|<leader>D"] = k.map_cr("DiffviewOpen"):with_defaults(),
+  ["n|<leader><leader>D"] = k.map_cr("DiffviewClose"):with_defaults(),
 }
 
 k.nvim_load_mapping(def_map)

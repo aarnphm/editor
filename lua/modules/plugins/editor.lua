@@ -19,11 +19,8 @@ editor["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" }
 editor["ojroques/nvim-bufdel"] = { lazy = true, event = "BufReadPost" }
 editor["sindrets/diffview.nvim"] = {
   lazy = true,
-  cmd = { "DiffviewOpen", "DiffviewFileHistory" },
-  dependencies = {
-    "nvim-tree/nvim-web-devicons",
-    "nvim-lua/plenary.nvim",
-  },
+  cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
+  dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
 }
 
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require("editor.vim-illuminate") }
