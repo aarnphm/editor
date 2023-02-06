@@ -26,8 +26,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Install jq, curl and tree
-        run: sudo apt-get install -y jq curl tree
+      - name: Install jq, curl
+        run: sudo apt-get install -y jq curl
       - uses: andstor/file-existence-action@v2
         id: check_lockfile
         with:
@@ -41,15 +41,16 @@ jobs:
         run: |
           mkdir -p "${HOME}/.config/nvim"
 
+          # copy default user config for this jobs only
+          cp "${GITHUB_WORKSPACE}/.editor.lua" "${HOME}/.editor.lua"
+          cp "${GITHUB_WORKSPACE}/init.lua" "${HOME}/.config/nvim/init.lua"
+          # setup directory of the config
           cp -r "${GITHUB_WORKSPACE}/lua" "${HOME}/.config/nvim/lua"
           cp -r "${GITHUB_WORKSPACE}/after" "${HOME}/.config/nvim/after"
           cp -r "${GITHUB_WORKSPACE}/syntax" "${HOME}/.config/nvim/syntax"
           cp -r "${GITHUB_WORKSPACE}/custom-snippets" "${HOME}/.config/nvim/custom-snippets"
-          cp -r "${GITHUB_WORKSPACE}/init.lua" "${HOME}/.config/nvim/init.lua"
 
-          tree $HOME/.config/nvim
-
-
+          # Run update
           nvim --headless "+Lazy! update" +qa
           cp -pv "${HOME}/.config/nvim/lazy-lock.json" .
       - name: Get infos
