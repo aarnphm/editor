@@ -179,6 +179,7 @@ local mapping = {
   ["n|ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc("find: File in project"),
   ["n|fz"] = k.map_cu("Telescope zoxide list"):with_defaults():with_desc("editn: Change current direrctory by zoxide"),
   ["n|<LocalLeader>ff"] = k.map_cu("Telescope git_files"):with_defaults():with_desc("find: file in git project"),
+  ["n|<LocalLeader>fw"] = k.map_cu("Telescope live_grep"):with_defaults():with_desc("find: Word in current directory"),
   ["n|fp"] = k.map_callback(function()
     require("telescope").extensions.projects.projects({})
   end)
