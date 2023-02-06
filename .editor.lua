@@ -1,11 +1,11 @@
 return {
-  background = "dark",
-  colorscheme = "kanagawa",
   debug = true,
+  reset_cache = false,
+  background = "light",
+  colorscheme = "catppuccin",
   catppuccin = {
     flavor = "latte",
   },
   repos = "bentoml/bentoml",
-  reset_cache = false,
   format_on_save = true,
 }
