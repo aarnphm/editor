@@ -148,6 +148,7 @@ pbind.map_callback = function(callback)
   return ro:map_callback(callback)
 end
 
+---@param mapping table<string, RhsContainer>
 pbind.nvim_load_mapping = function(mapping)
   for key, value in pairs(mapping) do
     local mode, keymap = key:match("([^|]*)|?(.*)")
