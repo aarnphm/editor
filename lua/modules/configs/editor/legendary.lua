@@ -30,7 +30,7 @@ return function()
 
   require("which-key").register({
     ["<Space>"] = {
-      -- plugin bufferline.nvim
+      -- bufferline.nvim
       x = "buffer: Close current buffer",
       b = {
         name = "Bufferline commands",
@@ -39,7 +39,7 @@ return function()
         c = "buffer: Pick buffer to close",
         p = "buffer: Switch to pick buffer",
       },
-      -- plugin lazy.nvim
+      -- lazy.nvim
       p = {
         name = "Lazy commands",
         s = "Lazy: sync plugins",
@@ -48,92 +48,10 @@ return function()
         cc = "Lazy: check for updates plugins",
         h = "Lazy: open home panel",
       },
-      -- plugin gitsigns.nvim
-      h = {
-        name = "Gitsigns commands",
-        b = "git: Blame line",
-        p = "git: Preview hunk",
-        s = "git: Stage hunk",
-        u = "git: Undo stage hunk",
-        r = "git: Reset hunk",
-        R = "git: Reset buffer",
-        wd = "git: Toggle word diff",
-        ld = "git: Toggle deleted diff",
-      },
+      -- gitsigns.nvim
+      h = { name = "Gitsigns commands" },
     },
-    ["]g"] = "git: Goto next hunk",
-    ["[g"] = "git: Goto prev hunk",
-    ["<LocalLeader>"] = {
-      ["]"] = "windows: resize",
-      -- Plugin dap
-      ["<F6>"] = "debug: Run/Continue",
-      ["<F7>"] = "debug: Terminate debug session",
-      ["<F8>"] = "debug: Toggle breakpoint",
-      ["<F9>"] = "debug: Step into",
-      ["<F10>"] = "debug: Step out",
-      ["<F11>"] = "debug: Step over",
-      d = {
-        name = "Dap commands",
-        b = "debug: Set breakpoint with condition",
-        c = "debug: Run to cursor",
-        l = "debug: Run last",
-        o = "debug: Open repl",
-      },
-      -- Plugin legendary
-      ["<C-p>"] = "utils: Show keymap legends",
-      -- Plugin telescope
-      f = {
-        name = "Telescope commands",
-        p = "find: Project",
-        w = "find: Word",
-        r = "find: File by frecency",
-        e = "find: File by history",
-        c = "ui: Change color scheme",
-        z = "edit: Change current directory by zoxide",
-        f = "find: File under current work directory",
-        g = "find: File under current git directory",
-        n = "edit: New file",
-        b = "find: Buffer opened",
-      },
-      l = {
-        name = "LSP commands",
-        i = "lsp: LSP Info",
-        r = "lsp: LSP Restart",
-      },
-      n = {
-        name = "NvimTree commands",
-        f = "filetree: NvimTree find file",
-        r = "filetree: NvimTree refresh",
-      },
-      p = {
-        name = "Package commands",
-        h = "package: Show",
-        s = "package: Sync",
-        i = "package: Install",
-        c = "package: Check",
-        d = "package: Debug",
-        l = "package: Log",
-        p = "package: Profile",
-        r = "package: Restore",
-        x = "package: Clean",
-        u = "package: Update",
-      },
-      s = {
-        c = "lsp: Show cursor disgnostics",
-        l = "lsp: Show line disgnostics",
-        s = "sesson: Save session",
-        r = "sesson: Restore session",
-        d = "sesson: Delete session",
-      },
-      t = {
-        name = "Trouble commands",
-        d = "lsp: Show document diagnostics",
-        w = "lsp: Show workspace diagnostics",
-        q = "lsp: Show quickfix list",
-        l = "lsp: Show loclist",
-        r = "lsp: Show lsp references",
-      },
-    },
+    -- Lspsaga and nvim-lsp
     ["g"] = {
       a = "lsp: Code action",
       d = "lsp: Preview definition",
@@ -142,31 +60,173 @@ return function()
       o = "lsp: Toggle outline",
       r = "lsp: Rename in file range",
       R = "lsp: Rename in project range",
-      s = "lsp: Signature help",
       t = "lsp: Toggle trouble list",
+      ["["] = "lsp: Goto prev diagnostic",
+      ["]"] = "lsp: Goto next diagnostic",
       b = "buffer: Buffer pick",
-      p = {
+    },
+    K = "lsp: Show documentation",
+    ["<LocalLeader>"] = {
+      l = {
+        name = "LSP commands",
+        i = "lsp: LSP Info",
+        r = "lsp: LSP Restart",
+      },
+      sc = "lsp: Show cursor disgnostics",
+      sl = "lsp: Show line disgnostics",
+      ci = "lsp: Incoming calls",
+      co = "lsp: Outgoing calls",
+      -- vim-fugitive
+      G = "git: Show fugitive",
+      g = {
         name = "git commands",
-        s = "git: Push",
-        l = "git: Pull",
+        aa = "git: Add .",
+        cm = "git: Commit",
+        p = {
+          s = "git: Push",
+          l = "git: Pull",
+        },
+      },
+      -- copilot.lua
+      cp = "copilot: Open panel",
+      -- nvim-dap
+      d = {
+        name = "Dap commands",
+        b = "debug: Set breakpoint with condition",
+        c = "debug: Run to cursor",
+        l = "debug: Run last",
+        o = "debug: Open repl",
+      },
+      -- legendary.nvim
+      ["<C-p>"] = "utils: Show keymap legends",
+      -- octo.nvim
+      oc = {
+        name = "Octo commands",
+        pr = "octo: Pull request",
+      },
+      -- trouble.nvim
+      t = {
+        name = "Trouble commands",
+        d = "lsp: Show document diagnostics",
+        w = "lsp: Show workspace diagnostics",
+        q = "lsp: Show quickfix list",
+        l = "lsp: Show loclist",
+        r = "lsp: Show lsp references",
+      },
+      -- telescope.nvim
+      f = {
+        name = "Telescope commands",
+        e = "find: File by history",
+        c = "ui: Change color scheme",
+        f = "find: File under current git directory",
+        w = "find: Word with regex",
+        u = "edit: Show undo history",
+        z = "edit: Change current directory by zoxide",
+        n = "edit: New file",
+      },
+      -- refactoring.nvim
+      r = {
+        name = "Refactoring commands",
+        e = "refactor: Extract function",
+        f = "refactor: Extract function to file",
+        v = "refactor: Extract variable",
+        i = "refactor: Inline variable",
+        b = "refactor: Extract block",
+        bf = "refactor: Extract block to file",
+      },
+      -- cheatsheet.nvim
+      km = "cheatsheet: Show panel",
+      -- hop.nvim
+      w = "jump: Goto word",
+      j = "jump: Goto line",
+      k = "jump: Goto line",
+      c = "jump: Goto one char",
+      cc = "jump: Goto two char",
+      -- general vim motion
+      ["]"] = "windows: resize right 10px",
+      ["["] = "windows: resize left 10px",
+      ["-"] = "windows: resize up 5px",
+      ["="] = "windows: resize down 5px",
+      lcd = "edit: Change to current directory",
+    },
+    ["<Leader>"] = {
+      o = "editor: set local for spell checker",
+      I = "editor: set list",
+      vs = "windows: Split vertical",
+      hs = "windows: Split horizontal",
+      p = "edit: remove last search words",
+      i = "edit: indent current buffer",
+      l = "editor: toggle list",
+      t = "editor: remove trailing whitespaces",
+      r = "tool: Code snip run",
+      -- nvim-tree.lua
+      n = {
+        name = "NvimTree commands",
+        f = "filetree: NvimTree find file",
+        r = "filetree: NvimTree refresh",
+      },
+      -- nvim-spectre and nvim-treesitter
+      s = {
+        o = "replace: Open panel",
+        w = "replace: Replace word under cursor",
+        p = "replace: Replace word under file search",
+        d = "jump: Goto outer function definition",
+        D = "jump: Goto outer class definition",
+      },
+      -- crates.nvim
+      c = {
+        name = "Crates commands",
+        t = "crates: toggle",
+        r = "crates: reload",
+        v = "crates: show versions popup",
+        f = "crates: show features popup",
+        d = "crates: show dependencies popup",
+        u = "crates: update crates",
+        a = "crates: update all crates",
+        U = "crates: upgrade crates",
+        A = "crates: upgrade all crates",
+        H = "crates: show homepage",
+        R = "crates: show repository",
+        D = "crates: show documentation",
+        C = "crates: open crates.io",
       },
     },
-    ["<leader>G"] = "git: Show fugitive",
-    ["<leader>g"] = "git: Show lazygit",
-    ["<leader>D"] = "git: Show diff",
-    ["<leader><leader>D"] = "git: Close diff",
-    ["g["] = "lsp: Goto prev diagnostic",
-    ["g]"] = "lsp: Goto next diagnostic",
-    ["<leader>ci"] = "lsp: Incoming calls",
-    ["<leader>co"] = "lsp: Outgoing calls",
-    ["<leader>w"] = "jump: Goto word",
-    ["<leader>j"] = "jump: Goto line",
-    ["<leader>k"] = "jump: Goto line",
-    ["<leader>c"] = "jump: Goto one char",
-    ["<leader>cc"] = "jump: Goto two chars",
-    ["<leader>o"] = "edit: Check spell",
-    ["<leader>u"] = "edit: Show undo history",
-    ["<leader>r"] = "tool: Code snip run",
-    ["<F12>"] = "tool: Markdown preview",
+    ["<C-n>"] = "filetree: NvimTree open",
+    f = {
+      o = "find: Old files",
+      r = "find: File by frecency",
+      b = "find: Buffer opened",
+      p = "find: Project",
+      w = "find: Word",
+      f = "find: File under current work directory",
+      t = "buffer: Format toggle",
+    },
+    [";"] = "mode: enter command mode",
+    ["<C-h>"] = "navigation: Move to left buffer",
+    ["<C-l>"] = "navigation: Move to right buffer",
+    ["<C-j>"] = "navigation: Move to down buffer",
+    ["<C-k>"] = "navigation: Move to up buffer",
+    ["<"] = "edit: outdent 1 step",
+    [">"] = "edit: indent 1 step",
+    ["\\"] = "edit: clean hightlight",
+    Y = "edit: Yank to eol",
+    D = "edit: Delete to eol",
+    ["<C-s>"] = "edit: Save file",
+    -- toggleterm.nvim
+    ["<C-t>"] = "term: Create vertical terminal",
+    ["<C-\\>"] = "term: Create horizontal terminal",
+    -- zen-mode.nvim
+    zm = "zenmode: Toggle",
+    -- markdown-preview.nvim
+    mpt = "markdown: preview",
+    -- vim-easy-align
+    gea = "easy-align: Align by char",
+    slg = "git: Show lazygit",
+    ["<F6>"] = "debug: Run/Continue",
+    ["<F7>"] = "debug: Terminate debug session",
+    ["<F8>"] = "debug: Toggle breakpoint",
+    ["<F9>"] = "debug: Step into",
+    ["<F10>"] = "debug: Step out",
+    ["<F11>"] = "debug: Step over",
   })
 end

@@ -85,47 +85,22 @@ return function()
     },
   })
 
-  vim.api.nvim_set_keymap("n", "<leader>ct", "", { noremap = true, silent = true, callback = crates.toggle })
-  vim.api.nvim_set_keymap("n", "<leader>cr", "", { noremap = true, silent = true, callback = crates.reload })
-
-  vim.api.nvim_set_keymap(
-    "n",
-    "<leader>cv",
-    "",
-    { noremap = true, silent = true, callback = crates.show_versions_popup }
-  )
-  vim.api.nvim_set_keymap(
-    "n",
-    "<leader>cf",
-    "",
-    { noremap = true, silent = true, callback = crates.show_features_popup }
-  )
-  vim.api.nvim_set_keymap(
-    "n",
-    "<leader>cd",
-    "",
-    { noremap = true, silent = true, callback = crates.show_dependencies_popup }
-  )
-
-  vim.api.nvim_set_keymap("n", "<leader>cu", "", { noremap = true, silent = true, callback = crates.update_crate })
-  vim.api.nvim_set_keymap("v", "<leader>cu", "", { noremap = true, silent = true, callback = crates.update_crates })
-  vim.api.nvim_set_keymap("n", "<leader>ca", "", { noremap = true, silent = true, callback = crates.update_all_crates })
-  vim.api.nvim_set_keymap("n", "<leader>cU", "", { noremap = true, silent = true, callback = crates.upgrade_crate })
-  vim.api.nvim_set_keymap("v", "<leader>cU", "", { noremap = true, silent = true, callback = crates.upgrade_crates })
-  vim.api.nvim_set_keymap(
-    "n",
-    "<leader>cA",
-    "",
-    { noremap = true, silent = true, callback = crates.upgrade_all_crates }
-  )
-
-  vim.api.nvim_set_keymap("n", "<leader>cH", "", { noremap = true, silent = true, callback = crates.open_homepage })
-  vim.api.nvim_set_keymap("n", "<leader>cR", "", { noremap = true, silent = true, callback = crates.open_repository })
-  vim.api.nvim_set_keymap(
-    "n",
-    "<leader>cD",
-    "",
-    { noremap = true, silent = true, callback = crates.open_documentation }
-  )
-  vim.api.nvim_set_keymap("n", "<leader>cC", "", { noremap = true, silent = true, callback = crates.open_crates_io })
+  local k = require("keybind")
+  k.nvim_load_mapping({
+    ["n|<Leader>ct"] = k.map_callback(crates.toggle):with_defaults(),
+    ["n|<Leader>cr"] = k.map_callback(crates.reload):with_defaults(),
+    ["n|<Leader>cv"] = k.map_callback(crates.show_versions_popup):with_defaults(),
+    ["n|<Leader>cf"] = k.map_callback(crates.show_features_popup):with_defaults(),
+    ["n|<Leader>cd"] = k.map_callback(crates.show_dependencies_popup):with_defaults(),
+    ["n|<Leader>cu"] = k.map_callback(crates.update_crate):with_defaults(),
+    ["v|<Leader>cu"] = k.map_callback(crates.update_crates):with_defaults(),
+    ["n|<Leader>ca"] = k.map_callback(crates.update_all_crates):with_defaults(),
+    ["n|<Leader>cU"] = k.map_callback(crates.upgrade_crate):with_defaults(),
+    ["v|<Leader>cU"] = k.map_callback(crates.upgrade_crates):with_defaults(),
+    ["n|<Leader>cA"] = k.map_callback(crates.upgrade_all_crates):with_defaults(),
+    ["n|<Leader>cH"] = k.map_callback(crates.open_homepage):with_defaults(),
+    ["n|<Leader>cR"] = k.map_callback(crates.open_repository):with_defaults(),
+    ["n|<Leader>cD"] = k.map_callback(crates.open_documentation):with_defaults(),
+    ["n|<Leader>cC"] = k.map_callback(crates.open_crates_io):with_defaults(),
+  })
 end

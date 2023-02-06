@@ -160,7 +160,7 @@ api.nvim_create_autocmd("FileType", {
   group = ft_id,
   pattern = "c,cpp",
   callback = function(_)
-    api.nvim_buf_set_keymap(0, "n", "<leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>", { noremap = true })
+    api.nvim_buf_set_keymap(0, "n", "<Leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>", { noremap = true })
   end,
 })
 -- set filetype for bazel files
