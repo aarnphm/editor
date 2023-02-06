@@ -16,12 +16,14 @@ env:
 
 jobs:
   update-lockfile:
-    if: github.repository_owner == "aarnphm"
+    if: github.repository_owner == 'aarnphm'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: andstor/file-existence-action@v2
         id: check_lockfile
         with:
@@ -33,6 +35,14 @@ jobs:
         if: steps.check_lockfile.outputs.files_exists == 'true'
         timeout-minutes: 5
         run: |
+          mkdir -p "${HOME}/.config/nvim"
+
+          cp -r "${GITHUB_WORKSPACE}/lua" "${HOME}/.config/nvim/lua"
+          cp -r "${GITHUB_WORKSPACE}/after" "${HOME}/.config/nvim/after"
+          cp -r "${GITHUB_WORKSPACE}/syntax" "${HOME}/.config/nvim/syntax"
+          cp -r "${GITHUB_WORKSPACE}/custom-snippets" "${HOME}/.config/nvim/custom-snippets"
+          cp -r "${GITHUB_WORKSPACE}/init.lua" "${HOME}/.config/nvim/init.lua"
+
           nvim --headless "+Lazy! update" +qa
           cp -pv "${HOME}/.config/nvim/lazy-lock.json" .
       - name: Install jq and curl
@@ -52,4 +62,4 @@ jobs:
           commit_user_email: ${{ env.GIT_AUTHOR_EMAIL }}
           commit_author: ${{ env.GIT_AUTHOR_NAME }} <${{ env.GIT_AUTHOR_EMAIL }}>
           file_pattern: "lazy-lock.json"
-          commit_options: '--signoff'
+          commit_options: "--signoff"
