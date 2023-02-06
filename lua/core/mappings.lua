@@ -143,8 +143,11 @@ local plug_map = {
   ["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_noremap():with_silent(),
   ["n|<S-F7>"] = k.map_cu("lua lazygit()"):with_noremap():with_silent(),
   ["n|<LocalLeader>gg"] = k.map_cu("Git"):with_noremap():with_silent(),
-  ["n|gps"] = k.map_cmd("G push<CR>"):with_noremap():with_silent(),
-  ["n|gpl"] = k.map_cmd("G pull<CR>"):with_noremap():with_silent(),
+  -- Plugin tpope/vim-fugitive
+  ["n|<LocalLeader>gaa"] = k.map_cr("G add ."):with_noremap():with_silent(),
+  ["n|<LocalLeader>gcm"] = k.map_cr("G commit"):with_noremap():with_silent(),
+  ["n|<LocalLeader>gps"] = k.map_cr("G push"):with_noremap():with_silent(),
+  ["n|<LocalLeader>gpl"] = k.map_cr("G pull"):with_noremap():with_silent(),
   -- Plugin nvim-tree
   ["n|<C-n>"] = k.map_cr("NvimTreeToggle"):with_noremap():with_silent(),
   ["n|<LocalLeader>nf"] = k.map_cr("NvimTreeFindFile"):with_noremap():with_silent(),
