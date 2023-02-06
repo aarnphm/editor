@@ -32,26 +32,9 @@ editor["max397574/better-escape.nvim"] =
   { lazy = true, event = { "BufReadPost", "BufEnter" }, config = require("editor.better-escape") }
 editor["rmagatti/auto-session"] =
   { lazy = true, cmd = { "SaveSession", "RestoreSession", "DeleteSession" }, config = require("editor.auto-session") }
+editor["folke/which-key.nvim"] = { event = "VeryLazy", config = require("editor.which-key") }
+editor["stevearc/dressing.nvim"] = { event = "VeryLazy", config = require("editor.dressing") }
 
-editor["mrjones2014/legendary.nvim"] = {
-  lazy = true,
-  cmd = "Legendary",
-  config = require("editor.legendary"),
-  dependencies = {
-    { "kkharji/sqlite.lua" },
-    {
-      "stevearc/dressing.nvim",
-      event = "VeryLazy",
-      config = require("editor.dressing"),
-    },
-    -- Please don't remove which-key.nvim otherwise you need to set timeoutlen=300 at `lua/core/options.lua`
-    {
-      "folke/which-key.nvim",
-      event = "VeryLazy",
-      config = require("editor.which-key"),
-    },
-  },
-}
 editor["folke/trouble.nvim"] = {
   lazy = true,
   cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },

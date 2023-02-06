@@ -31,6 +31,4 @@ return function()
       winblend = 0,
     },
   })
-
-  require("utils").annotate_mapping()
 end
