@@ -5,8 +5,16 @@ completion["neovim/nvim-lspconfig"] = {
   lazy = true,
   event = { "BufReadPost", "BufAdd", "BufNewFile" },
   config = require("completion.nvim-lspconfig"),
+  cond = function()
+    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+  end,
   dependencies = {
-    { "creativenull/efmls-configs-nvim" },
+    {
+      "creativenull/efmls-configs-nvim",
+      cond = function()
+        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+      end,
+    },
     {
       "williamboman/mason.nvim",
       cond = function()
@@ -30,7 +38,10 @@ completion["neovim/nvim-lspconfig"] = {
       "glepnir/lspsaga.nvim",
       config = require("completion.lspsaga"),
       event = "BufRead",
-      dependencies = { { "nvim-tree/nvim-web-devicons" } },
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      cond = function()
+        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+      end,
     },
     { "ray-x/lsp_signature.nvim" },
   },
@@ -57,12 +68,18 @@ completion["hrsh7th/nvim-cmp"] = {
     { "f3fora/cmp-spell" },
     { "windwp/nvim-autopairs", config = require("completion.nvim-autopairs") },
   },
+  cond = function()
+    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+  end,
 }
 
 completion["zbirenbaum/copilot.lua"] = {
   cmd = "Copilot",
   event = "InsertEnter",
   config = require("completion.copilot"),
+  cond = function()
+    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+  end,
 }
 
 return completion
