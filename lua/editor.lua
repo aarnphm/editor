@@ -41,6 +41,15 @@ local editor_variables = function()
   }
 end
 
+---@class Editor: table<str, any>
+---@field debug boolean: Enable debug mode
+---@field format_on_save boolean: Enable format on save
+---@field reset_cache boolean: Reset cache
+---@field background string: Set background type, "light" or "dark"
+---@field colorscheme string: Set colorscheme
+---@field repos string: Set repos
+---@field load_big_files_faster boolean: Load big files faster using LunarVim/bigfile.nvim
+---@field plugins table<string, table|any>: Set plugins
 local _config = nil
 
 local M = editor_variables()
@@ -54,15 +63,24 @@ local editor_config = function()
 
   if not ok then
     if not string.find(__config, "No such file or directory") then
-      vim.notify("WARNING: user config file is invalid")
+      vim.notify("WARNING: user config file is invalid", vim.log.levels.ERROR, { title = "editor: configuration" })
       vim.notify(__config)
     end
+    local default_config = nil
     local default_config_file = io.open(M.vim_path .. M.path_sep .. ".editor.lua", "r")
-    local default_config = default_config_file:read("*a")
-    default_config_file:close()
+    if default_config_file then
+      default_config = default_config_file:read("*a")
+      default_config_file:close()
+    end
     local local_config_file = io.open(config_path, "w")
+    assert(
+      local_config_file ~= nil,
+      vim.notify("Could not create local config file", vim.log.levels.ERROR, { title = "editor: configuration" })
+    )
+    assert(default_config ~= nil, "Could not find default config file")
     local_config_file:write(default_config)
     local_config_file:close()
+    local_config_file = nil
     __config = dofile(config_path)
   end
 

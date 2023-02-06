@@ -24,11 +24,12 @@ editor["nmac427/guess-indent.nvim"] = {
   end,
 }
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require("editor.vim-illuminate") }
-editor["LunarVim/bigfile.nvim"] = { lazy = false, config = require("editor.bigfile") }
+editor["LunarVim/bigfile.nvim"] =
+  { lazy = false, config = require("editor.bigfile"), cond = __editor_config.load_big_files_faster }
 editor["windwp/nvim-spectre"] = { lazy = true, config = require("editor.nvim-spectre") }
 editor["akinsho/nvim-toggleterm.lua"] = { lazy = true, event = "UIEnter", config = require("editor.nvim-toggleterm") }
 editor["max397574/better-escape.nvim"] =
-  { lazy = true, event = "BufReadPost", config = require("editor.better-escape") }
+  { lazy = true, event = { "BufReadPost", "BufEnter" }, config = require("editor.better-escape") }
 editor["rmagatti/auto-session"] =
   { lazy = true, cmd = { "SaveSession", "RestoreSession", "DeleteSession" }, config = require("editor.auto-session") }
 

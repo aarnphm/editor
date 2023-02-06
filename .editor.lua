@@ -5,6 +5,7 @@ return {
   colorscheme = "catppuccin",
   repos = "bentoml/bentoml",
   format_on_save = true,
+  load_big_files_faster = true,
   plugins = {
     catppuccin = {
       flavor = "latte",
