@@ -7,18 +7,6 @@ ui["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", co
 ui["akinsho/nvim-bufferline.lua"] =
   { lazy = true, event = { "BufReadPost", "BufAdd", "BufNewFile" }, config = require("ui.nvim-bufferline") }
 
-ui["j-hui/fidget.nvim"] = {
-  lazy = true,
-  event = "BufRead",
-  config = function()
-    require("fidget").setup({
-      text = {
-        spinner = "dots",
-      },
-      window = { blend = 0 },
-    })
-  end,
-}
 ui["zbirenbaum/neodim"] = {
   lazy = true,
   event = "LspAttach",
@@ -54,6 +42,19 @@ ui["rcarriga/nvim-notify"] = {
   lazy = true,
   event = "VeryLazy",
   config = require("ui.nvim-notify"),
+}
+
+ui["j-hui/fidget.nvim"] = {
+  lazy = true,
+  event = "BufRead",
+  config = function()
+    require("fidget").setup({
+      text = {
+        spinner = "dots",
+      },
+      window = { blend = 0 },
+    })
+  end,
 }
 
 return ui

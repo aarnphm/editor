@@ -1,9 +1,8 @@
 return function()
-  local formatting = require("completion.formatting")
-
   local nvim_lsp = require("lspconfig")
   local mason = require("mason")
   local mason_lspconfig = require("mason-lspconfig")
+  local efmls = require("efmls-configs")
 
   require("lspconfig.ui.windows").default_options.border = "single"
 
@@ -64,6 +63,25 @@ return function()
     capabilities = capabilities,
   }
 
+  local setup_lsp = function(lsp_name)
+    return function()
+      local ok, config = pcall(require, ("completion.servers.%s"):format(lsp_name))
+      if ok then
+        local final_options = vim.tbl_extend("keep", config, options)
+        nvim_lsp[lsp_name].setup(final_options)
+      else
+        vim.notify(
+          ("LSP config %s is not supported. Make sure it is available under lua/core/modules/configs/completion/servers/%s.lua"):format(
+            lsp_name,
+            lsp_name
+          ),
+          vim.log.levels.ERROR,
+          { title = "LSP config not found" }
+        )
+      end
+    end
+  end
+
   mason_lspconfig.setup_handlers({
     function(server)
       require("lspconfig")[server].setup({
@@ -72,55 +90,30 @@ return function()
       })
     end,
 
-    bashls = function()
-      nvim_lsp.bashls.setup(vim.tbl_deep_extend("keep", require("completion.servers.bashls"), options))
+    efm = function()
+      -- Do not setup efm
     end,
-
     clangd = function()
-      nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require("completion.servers.clangd"), {
+      local config = require("completion.servers.clangd")
+      nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", config, {
         on_attach = options.on_attach,
         capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, capabilities),
       }))
     end,
-
-    efm = function()
-      -- Do not setup efm
-    end,
-
-    gopls = function()
-      nvim_lsp.gopls.setup(vim.tbl_deep_extend("keep", require("completion.servers.gopls"), options))
-    end,
-
-    jsonls = function()
-      nvim_lsp.jsonls.setup(vim.tbl_deep_extend("keep", require("completion.servers.jsonls"), options))
-    end,
-
-    jdtls = function()
-      nvim_lsp.jdtls.setup(vim.tbl_deep_extend("keep", require("completion.servers.jdtls"), options))
-    end,
-
-    sumneko_lua = function()
-      nvim_lsp.sumneko_lua.setup(vim.tbl_deep_extend("keep", require("completion.servers.sumneko_lua"), options))
-    end,
-
-    yamlls = function()
-      nvim_lsp.yamlls.setup(vim.tbl_deep_extend("keep", require("completion.servers.yamlls"), options))
-    end,
-
-    tsserver = function()
-      nvim_lsp.tsserver.setup(vim.tbl_deep_extend("keep", require("completion.servers.tsserver"), options))
-    end,
-
-    pyright = function()
-      nvim_lsp.pyright.setup(vim.tbl_deep_extend("keep", require("completion.servers.pyright"), options))
-    end,
+    bashls = setup_lsp("bashls"),
+    gopls = setup_lsp("gopls"),
+    jsonls = setup_lsp("jsonls"),
+    jdtls = setup_lsp("jdtls"),
+    sumneko_lua = setup_lsp("sumneko_lua"),
+    yamlls = setup_lsp("yamlls"),
+    tsserver = setup_lsp("tsserver"),
+    pyright = setup_lsp("pyright"),
   })
 
   if vim.fn.executable("html-languageserver") then
-    nvim_lsp.html.setup(vim.tbl_deep_extend("keep", require("completion.servers.html"), options))
+    local config = require("completion.servers.html")
+    nvim_lsp.html.setup(vim.tbl_deep_extend("keep", config, options))
   end
-
-  local efmls = require("efmls-configs")
 
   -- Init `efm-langserver` here.
   efmls.init({
@@ -152,8 +145,17 @@ return function()
     cpp = { formatter = require("completion.efm.formatters.clangfmt") },
     rust = { formatter = require("completion.efm.formatters.rustfmt") },
     python = { formatter = require("efmls-configs.formatters.black"), linter = require("efmls-configs.linters.pylint") },
+    rst = { linter = require("efmls-configs.linters.vale") },
     sh = { formatter = require("efmls-configs.formatters.shfmt"), linter = require("efmls-configs.linters.shellcheck") },
+    bash = {
+      formatter = require("efmls-configs.formatters.shfmt"),
+      linter = require("efmls-configs.linters.shellcheck"),
+    },
+    zsh = {
+      formatter = require("efmls-configs.formatters.shfmt"),
+      linter = require("efmls-configs.linters.shellcheck"),
+    },
   })
 
-  formatting.configure_format_on_save()
+  require("completion._utils.formatting").configure_format_on_save()
 end
