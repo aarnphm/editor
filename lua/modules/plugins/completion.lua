@@ -1,47 +1,24 @@
 local completion = {}
 
+local disabled_filetypes = { "gitcommit", "gitrebase", "gitconfig" }
+
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
   lazy = true,
   event = { "BufReadPost", "BufAdd", "BufNewFile" },
   config = require("completion.nvim-lspconfig"),
   cond = function()
-    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+    return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype)
   end,
   dependencies = {
-    {
-      "creativenull/efmls-configs-nvim",
-      cond = function()
-        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-      end,
-    },
-    {
-      "williamboman/mason.nvim",
-      cond = function()
-        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-      end,
-    },
-    {
-      "williamboman/mason-lspconfig.nvim",
-      cond = function()
-        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-      end,
-    },
-    {
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
-      config = require("completion.mason-tool-installer"),
-      cond = function()
-        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-      end,
-    },
+    { "creativenull/efmls-configs-nvim" },
+    { "williamboman/mason.nvim" },
+    { "williamboman/mason-lspconfig.nvim" },
     {
       "glepnir/lspsaga.nvim",
       config = require("completion.lspsaga"),
       event = "BufRead",
       dependencies = { "nvim-tree/nvim-web-devicons" },
-      cond = function()
-        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-      end,
     },
     { "ray-x/lsp_signature.nvim" },
   },
@@ -68,18 +45,12 @@ completion["hrsh7th/nvim-cmp"] = {
     { "f3fora/cmp-spell" },
     { "windwp/nvim-autopairs", config = require("completion.nvim-autopairs") },
   },
-  cond = function()
-    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-  end,
 }
 
 completion["zbirenbaum/copilot.lua"] = {
   cmd = "Copilot",
   event = "InsertEnter",
   config = require("completion.copilot"),
-  cond = function()
-    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-  end,
 }
 
 return completion

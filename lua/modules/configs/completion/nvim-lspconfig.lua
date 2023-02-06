@@ -37,10 +37,17 @@ return function()
       "clangd",
       "efm",
       "gopls",
+      "ruff_lsp",
       "pyright",
       "sumneko_lua",
       "taplo",
       "rust_analyzer",
+      "tsserver",
+      "eslint",
+      "efm",
+      "bashls",
+      "zk",
+      "spectral"
     },
     automatic_installation = true,
   })

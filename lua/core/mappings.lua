@@ -102,8 +102,6 @@ local mapping = {
   ["n|<LocalLeader>ci"] = k.map_cr("Lspsaga incoming_calls"):with_defaults():with_desc("lsp: Show incoming calls"),
   ["n|<LocalLeader>co"] = k.map_cr("Lspsaga outgoing_calls"):with_defaults():with_desc("lsp: Show outgoing calls"),
   -- toggleterm
-  ["t|<Esc><Esc>"] = k.map_cmd([[<C-\><C-n>]]):with_silent(), -- switch to normal mode in terminal.
-  ["t|jk"] = k.map_cmd([[<C-\><C-n>]]):with_silent(), -- switch to normal mode in terminal.
   ["n|<C-\\>"] = k.map_cr([[execute v:count . "ToggleTerm direction=horizontal"]])
     :with_defaults()
     :with_desc("terminal: Toggle horizontal"),
