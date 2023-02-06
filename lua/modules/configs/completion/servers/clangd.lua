@@ -43,7 +43,7 @@ return {
     "--background-index",
     "--pch-storage=memory",
     -- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-    "--query-driver=" .. get_binary_path_list({ "clang++", "clang", "clang++", "gcc", "g++" }),
+    "--query-driver=" .. get_binary_path_list({ "clang++", "clang", "gcc", "g++" }),
     "--clang-tidy",
     "--all-scopes-completion",
     "--completion-style=detailed",
