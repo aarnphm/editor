@@ -116,25 +116,11 @@ local mapping = {
 	["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
 	["n|slg"] = k.map_callback(function()
 		if not _lazygit then
-			local config = {
+			_lazygit = require("toggleterm.terminal").Terminal:new {
 				cmd = require("utils").get_binary_path "lazygit",
 				hidden = true,
 				direction = "float",
-				float_opts = {
-					border = "double",
-				},
-				on_open = function(term)
-					vim.api.nvim_command [[startinsert!]]
-					vim.api.nvim_buf_set_keymap(
-						term.bufnr,
-						"n",
-						"q",
-						"<cmd>close<CR>",
-						{ noremap = true, silent = true }
-					)
-				end,
 			}
-			_lazygit = require("toggleterm.terminal").Terminal:new(config)
 		end
 		_lazygit:toggle()
 	end)
@@ -204,7 +190,7 @@ local mapping = {
 	["n|<Leader>sw"] = k.map_callback(function() require("spectre").open_visual { select_word = true } end)
 		:with_defaults()
 		:with_desc "replace: Replace word under cursor",
-	["n|<Leader>sp"] = k.map_callback(function() require("spectre").open_file_search { select_word = true } end)
+	["n|<Leader>sp"] = k.map_callback(function() require("spectre").open_file_search() end)
 		:with_defaults()
 		:with_desc "replace: Replace word under file search",
 	-- Hop

@@ -36,10 +36,17 @@ return {
 			diagnostics = {
 				globals = { "vim" },
 			},
+			runtime = {
+				version = "LuaJIT",
+				special = {
+					reload = "require",
+				},
+			},
 			workspace = {
 				library = {
-					[vim.fn.expand "$VIMRUNTIME/lua"] = true,
-					[vim.fn.expand "$VIMRUNTIME/lua/vim/lsp"] = true,
+					vim.fn.expand "$VIMRUNTIME/lua",
+					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
+					require("neodev.config").types(),
 				},
 				maxPreload = 100000,
 				preloadFileSize = 10000,
