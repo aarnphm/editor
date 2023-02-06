@@ -214,7 +214,7 @@ M.get_binary_path = function(binary)
 end
 
 M.annotate_mapping = function()
-  ok, _ = pcall(require, "which-key")
+  local ok, _ = pcall(require, "which-key")
   if ok then
     -- sync with mappings.lua
     require("which-key").register({
@@ -335,12 +335,12 @@ M.annotate_mapping = function()
         ["-"] = "windows: resize up 5px",
         ["="] = "windows: resize down 5px",
         lcd = "edit: Change to current directory",
+        vs = "windows: Split vertical",
+        hs = "windows: Split horizontal",
       },
       ["<Leader>"] = {
         o = "editor: set local for spell checker",
         I = "editor: set list",
-        vs = "windows: Split vertical",
-        hs = "windows: Split horizontal",
         p = "edit: remove last search words",
         i = "edit: indent current buffer",
         l = "editor: toggle list",
@@ -418,5 +418,4 @@ M.annotate_mapping = function()
     })
   end
 end
-
 return M

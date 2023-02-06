@@ -27,5 +27,6 @@ return function()
     -- Log level, one of 'trace', 'debug', 'info', 'warn', 'error', 'fatal'
     log_level = "info",
   })
+
   require("utils").annotate_mapping()
 end

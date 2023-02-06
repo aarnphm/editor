@@ -4,7 +4,6 @@ local _lazygit = nil
 
 local mapping = {
   -- Insert
-  ["i|jj"] = k.map_cmd("<Esc>"):with_noremap(),
   ["i|<C-u>"] = k.map_cmd("<C-G>u<C-U>"):with_noremap(),
   -- command line
   ["c|<C-t>"] = k.map_cmd([[<C-R>=expand("%:p:h") . "/" <CR>]]):with_noremap(),
@@ -30,10 +29,10 @@ local mapping = {
   ["n|<LocalLeader>-"] = k.map_cr("resize -5"):with_silent(),
   ["n|<LocalLeader>="] = k.map_cr("resize +5"):with_silent(),
   ["n|<LocalLeader>lcd"] = k.map_cmd(":lcd %:p:h<CR>"):with_noremap(),
+  ["n|<LocalLeader>vs"] = k.map_cu("vsplit"):with_defaults(),
+  ["n|<LocalLeader>hs"] = k.map_cu("split"):with_defaults(),
   ["n|<Leader>o"] = k.map_cr("setlocal spell! spelllang=en_us"),
   ["n|<Leader>I"] = k.map_cmd(":set list!<CR>"):with_noremap(),
-  ["n|<Leader>vs"] = k.map_cu("vsplit"):with_defaults(),
-  ["n|<Leader>hs"] = k.map_cu("split"):with_defaults(),
   ["n|<Leader>p"] = k.map_cmd(":%s///g<CR>"):with_defaults(),
   ["n|<Leader>i"] = k.map_cmd("gg=G<CR>"):with_defaults(),
   ["n|<Leader>l"] = k.map_cmd(":set list! list?<CR>"):with_noremap(),

@@ -21,6 +21,8 @@ require("neodev").setup({
       "gitsigns.nvim",
       "crates.nvim",
       "toggleterm.nvim",
+      "which-key.nvim",
+      "better-escape.nvim",
     },
   },
 })

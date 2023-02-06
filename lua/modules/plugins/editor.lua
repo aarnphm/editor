@@ -3,13 +3,6 @@ local editor = {}
 -- tpope
 editor["tpope/vim-repeat"] = { lazy = true }
 editor["Stormherz/tablify"] = { lazy = true }
-editor["nmac427/guess-indent.nvim"] = {
-  lazy = true,
-  event = "BufEnter",
-  config = function()
-    require("guess-indent").setup({})
-  end,
-}
 editor["jinh0/eyeliner.nvim"] = { lazy = true, event = "BufReadPost" }
 editor["junegunn/vim-easy-align"] = { lazy = true, cmd = "EasyAlign" }
 editor["luukvbaal/stabilize.nvim"] = { lazy = true, event = "BufReadPost" }
@@ -23,10 +16,19 @@ editor["sindrets/diffview.nvim"] = {
   dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
 }
 
+editor["nmac427/guess-indent.nvim"] = {
+  lazy = true,
+  event = "BufEnter",
+  config = function()
+    require("guess-indent").setup({})
+  end,
+}
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require("editor.vim-illuminate") }
 editor["LunarVim/bigfile.nvim"] = { lazy = false, config = require("editor.bigfile") }
 editor["windwp/nvim-spectre"] = { lazy = true, config = require("editor.nvim-spectre") }
 editor["akinsho/nvim-toggleterm.lua"] = { lazy = true, event = "UIEnter", config = require("editor.nvim-toggleterm") }
+editor["max397574/better-escape.nvim"] =
+  { lazy = true, event = "BufReadPost", config = require("editor.better-escape") }
 editor["rmagatti/auto-session"] =
   { lazy = true, cmd = { "SaveSession", "RestoreSession", "DeleteSession" }, config = require("editor.auto-session") }
 
