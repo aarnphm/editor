@@ -10,7 +10,7 @@ editor["nmac427/guess-indent.nvim"] = {
     require("guess-indent").setup({})
   end,
 }
-editor["hrsh7th/vim-eft"] = { lazy = true, event = "BufReadPost" }
+editor["jinh0/eyeliner.nvim"] = { lazy = true, event = "BufReadPost" }
 editor["junegunn/vim-easy-align"] = { lazy = true, cmd = "EasyAlign" }
 editor["luukvbaal/stabilize.nvim"] = { lazy = true, event = "BufReadPost" }
 editor["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } }
