@@ -4,6 +4,8 @@ on:
     - cron: "30 01 * * *"
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#defaultsrun
 defaults:

@@ -14,7 +14,7 @@ editor["hrsh7th/vim-eft"] = { lazy = true, event = "BufReadPost" }
 editor["junegunn/vim-easy-align"] = { lazy = true, cmd = "EasyAlign" }
 editor["luukvbaal/stabilize.nvim"] = { lazy = true, event = "BufReadPost" }
 editor["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } }
-editor["tpope/vim-fugitive"] = { lazy = true, command = { "Git", "G", "Ggrep", "GBrowse" } }
+editor["tpope/vim-fugitive"] = { lazy = false, command = { "Git", "G", "Ggrep", "GBrowse" } }
 editor["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" }
 editor["ojroques/nvim-bufdel"] = { lazy = true, event = "BufReadPost" }
 editor["sindrets/diffview.nvim"] = {
