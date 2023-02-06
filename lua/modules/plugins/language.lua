@@ -5,7 +5,7 @@ language["folke/neodev.nvim"] = { lazy = true, ft = "lua" }
 language["lervag/vimtex"] = { lazy = true, ft = "tex", config = require("language.vimtex") }
 language["bazelbuild/vim-bazel"] = { lazy = true, dependencies = { "google/vim-maktaba" }, ft = "bzl" }
 language["simrat39/rust-tools.nvim"] = { lazy = true, ft = "rust", config = require("language.rust-tools") }
-language["saecki/crates.nvim"] = { lazy = true, ft = "rust", config = require("language.crates") }
+language["saecki/crates.nvim"] = { lazy = true, config = require("language.crates") }
 language["fatih/vim-go"] = { lazy = true, ft = "go", run = ":GoInstallBinaries", config = require("language.vim-go") }
 language["untitled-ai/jupyter_ascending.vim"] =
   { lazy = true, ft = "ipynb", cmd = { "JupyterExecute", "JupyterExecuteAll" } }
