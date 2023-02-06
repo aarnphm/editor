@@ -5,22 +5,23 @@ return function()
     git = require("utils.icons").get("git"),
     ui = require("utils.icons").get("ui"),
   }
+
   require("nvim-tree").setup({
-    create_in_closed_folder = false,
     auto_reload_on_write = true,
-    disable_netrw = true, -- set to true if you don't want to hijack netrw
+    disable_netrw = false, -- set to true if you don't want to hijack netrw
     hijack_cursor = true,
     hijack_netrw = true,
     hijack_unnamed_buffer_when_opening = true,
     ignore_buffer_on_setup = false,
     open_on_setup = false,
     open_on_setup_file = false,
-    open_on_tab = false,
+    create_in_closed_folder = false,
     sort_by = "name", -- "name" | "extension" | "size" | "relative_path" | "modified" | "created" | "accessed"
+    prefer_startup_root = false,
+    sync_root_with_cwd = false,
     reload_on_bufenter = true,
-    prefer_startup_root = true,
     respect_buf_cwd = true,
-    sync_root_with_cwd = true,
+    open_on_tab = false,
     view = {
       adaptive_size = false,
       centralize_selection = false,
@@ -87,10 +88,8 @@ return function()
             ignored = icons.git.Ignore, --◌
           },
           folder = {
-            -- arrow_open = "",
-            -- arrow_closed = "",
-            arrow_open = "",
-            arrow_closed = "",
+            arrow_open = icons.ui.ArrowOpen,
+            arrow_closed = icons.ui.ArrowClosed,
             default = icons.ui.Folder,
             open = icons.ui.FolderOpen,
             empty = icons.ui.EmptyFolder,

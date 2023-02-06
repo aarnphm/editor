@@ -5,9 +5,6 @@ completion["neovim/nvim-lspconfig"] = {
   lazy = true,
   event = { "BufReadPost", "BufAdd", "BufNewFile" },
   config = require("completion.nvim-lspconfig"),
-  cond = function()
-    return vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-  end,
   dependencies = {
     { "creativenull/efmls-configs-nvim" },
     { "williamboman/mason.nvim" },

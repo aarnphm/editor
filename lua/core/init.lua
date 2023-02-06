@@ -42,6 +42,8 @@ vim.g.loaded_syntax_completion = 1
 vim.g.loaded_spellfile_plugin = 1
 
 -- newtrw liststyle: https://medium.com/usevim/the-netrw-style-options-3ebe91d42456
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 vim.g.netrw_liststyle = 3
 
 -- Do not load tohtml.vim

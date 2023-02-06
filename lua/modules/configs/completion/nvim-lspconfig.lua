@@ -73,17 +73,14 @@ return function()
     end,
 
     bashls = function()
-      local _opts = require("completion.servers.bashls")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.bashls.setup(final_opts)
+      nvim_lsp.bashls.setup(vim.tbl_deep_extend("keep", require("completion.servers.bashls"), options))
     end,
 
     clangd = function()
-      local _capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, capabilities)
-      local _opts = require("completion.servers.clangd")
-      local final_opts =
-        vim.tbl_deep_extend("keep", _opts, { on_attach = options.on_attach, capabilities = _capabilities })
-      nvim_lsp.clangd.setup(final_opts)
+      nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require("completion.servers.clangd"), {
+        on_attach = options.on_attach,
+        capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, capabilities),
+      }))
     end,
 
     efm = function()
@@ -91,52 +88,36 @@ return function()
     end,
 
     gopls = function()
-      local _opts = require("completion.servers.gopls")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.gopls.setup(final_opts)
+      nvim_lsp.gopls.setup(vim.tbl_deep_extend("keep", require("completion.servers.gopls"), options))
     end,
 
     jsonls = function()
-      local _opts = require("completion.servers.jsonls")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.jsonls.setup(final_opts)
+      nvim_lsp.jsonls.setup(vim.tbl_deep_extend("keep", require("completion.servers.jsonls"), options))
     end,
 
     jdtls = function()
-      local _opts = require("completion.servers.jdtls")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.jdtls.setup(final_opts)
+      nvim_lsp.jdtls.setup(vim.tbl_deep_extend("keep", require("completion.servers.jdtls"), options))
     end,
 
     sumneko_lua = function()
-      local _opts = require("completion.servers.sumneko_lua")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.sumneko_lua.setup(final_opts)
+      nvim_lsp.sumneko_lua.setup(vim.tbl_deep_extend("keep", require("completion.servers.sumneko_lua"), options))
     end,
 
     yamlls = function()
-      local _opts = require("completion.servers.yamlls")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.yamlls.setup(final_opts)
+      nvim_lsp.yamlls.setup(vim.tbl_deep_extend("keep", require("completion.servers.yamlls"), options))
     end,
 
     tsserver = function()
-      local _opts = require("completion.servers.tsserver")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.tsserver.setup(final_opts)
+      nvim_lsp.tsserver.setup(vim.tbl_deep_extend("keep", require("completion.servers.tsserver"), options))
     end,
 
     pyright = function()
-      local _opts = require("completion.servers.pyright")
-      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-      nvim_lsp.pyright.setup(final_opts)
+      nvim_lsp.pyright.setup(vim.tbl_deep_extend("keep", require("completion.servers.pyright"), options))
     end,
   })
 
   if vim.fn.executable("html-languageserver") then
-    local _opts = require("completion.servers.html")
-    local final_opts = vim.tbl_deep_extend("keep", _opts, options)
-    nvim_lsp.html.setup(final_opts)
+    nvim_lsp.html.setup(vim.tbl_deep_extend("keep", require("completion.servers.html"), options))
   end
 
   local efmls = require("efmls-configs")
@@ -149,40 +130,29 @@ return function()
   })
 
   -- Require `efmls-configs-nvim`'s config here
-  local vint = require("efmls-configs.linters.vint")
   local eslint = require("efmls-configs.linters.eslint")
-  local shellcheck = require("efmls-configs.linters.shellcheck")
-  local pylint = require("efmls-configs.linters.pylint")
-
-  local black = require("efmls-configs.formatters.black")
-  local stylua = require("efmls-configs.formatters.stylua")
   local prettier = require("efmls-configs.formatters.prettier")
-  local shfmt = require("efmls-configs.formatters.shfmt")
-
-  -- Add your own config for formatter and linter here
-  local rustfmt = require("completion.efm.formatters.rustfmt")
-  local clangfmt = require("completion.efm.formatters.clangfmt")
 
   -- Setup formatter and linter for efmls here
 
   efmls.setup({
-    vim = { formatter = vint },
-    lua = { formatter = stylua },
-    c = { formatter = clangfmt },
-    cpp = { formatter = clangfmt },
-    python = { formatter = black, linter = pylint },
     vue = { formatter = prettier },
-    typescript = { formatter = prettier, linter = eslint },
-    javascript = { formatter = prettier, linter = eslint },
-    typescriptreact = { formatter = prettier, linter = eslint },
-    javascriptreact = { formatter = prettier, linter = eslint },
     yaml = { formatter = prettier },
     html = { formatter = prettier },
     css = { formatter = prettier },
     scss = { formatter = prettier },
-    sh = { formatter = shfmt, linter = shellcheck },
     markdown = { formatter = prettier },
-    rust = { formatter = rustfmt },
+    typescript = { formatter = prettier, linter = eslint },
+    javascript = { formatter = prettier, linter = eslint },
+    typescriptreact = { formatter = prettier, linter = eslint },
+    javascriptreact = { formatter = prettier, linter = eslint },
+    vim = { formatter = require("efmls-configs.linters.vint") },
+    lua = { formatter = require("efmls-configs.formatters.stylua") },
+    c = { formatter = require("completion.efm.formatters.clangfmt") },
+    cpp = { formatter = require("completion.efm.formatters.clangfmt") },
+    rust = { formatter = require("completion.efm.formatters.rustfmt") },
+    python = { formatter = require("efmls-configs.formatters.black"), linter = require("efmls-configs.linters.pylint") },
+    sh = { formatter = require("efmls-configs.formatters.shfmt"), linter = require("efmls-configs.linters.shellcheck") },
   })
 
   formatting.configure_format_on_save()
