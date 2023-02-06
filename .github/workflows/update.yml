@@ -35,6 +35,8 @@ jobs:
         if: steps.check_lockfile.outputs.files_exists == 'true'
         timeout-minutes: 5
         run: |
+          mkdir -p "${HOME}/.config/nvim"
+
           cp -r "${GITHUB_WORKSPACE}/lua" "${HOME}/.config/nvim/lua"
           cp -r "${GITHUB_WORKSPACE}/after" "${HOME}/.config/nvim/after"
           cp -r "${GITHUB_WORKSPACE}/syntax" "${HOME}/.config/nvim/syntax"
