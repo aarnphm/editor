@@ -4,9 +4,9 @@ local completion = {}
 completion["neovim/nvim-lspconfig"] = {
   lazy = true,
   event = { "BufReadPost", "BufAdd", "BufNewFile" },
-  config = require("completion.lsp"),
+  config = require("completion.nvim-lspconfig"),
   cond = function()
-    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+    return vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
   end,
   dependencies = {
     { "creativenull/efmls-configs-nvim" },
@@ -26,9 +26,6 @@ completion["neovim/nvim-lspconfig"] = {
 completion["hrsh7th/nvim-cmp"] = {
   config = require("completion.nvim-cmp"),
   event = "InsertEnter",
-  cond = function()
-    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-  end,
   dependencies = {
     {
       "L3MON4D3/LuaSnip",
@@ -53,9 +50,6 @@ completion["zbirenbaum/copilot.lua"] = {
   cmd = "Copilot",
   event = "InsertEnter",
   config = require("completion.copilot"),
-  cond = function()
-    return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-  end,
 }
 
 return completion

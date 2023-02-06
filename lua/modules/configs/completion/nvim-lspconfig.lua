@@ -41,7 +41,9 @@ return function()
       "pyright",
       "sumneko_lua",
       "taplo",
+      "rust_analyzer",
     },
+    automatic_installation = true,
   })
 
   local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -56,9 +58,7 @@ return function()
         fix_pos = true,
         hint_enable = true,
         hi_parameter = "Search",
-        handler_opts = {
-          border = "rounded",
-        },
+        handler_opts = { border = "rounded" },
       })
     end,
     capabilities = capabilities,
@@ -118,6 +118,12 @@ return function()
       local _opts = require("completion.servers.yamlls")
       local final_opts = vim.tbl_deep_extend("keep", _opts, options)
       nvim_lsp.yamlls.setup(final_opts)
+    end,
+
+    tsserver = function()
+      local _opts = require("completion.servers.tsserver")
+      local final_opts = vim.tbl_deep_extend("keep", _opts, options)
+      nvim_lsp.tsserver.setup(final_opts)
     end,
 
     pyright = function()

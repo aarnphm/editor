@@ -1,27 +1,8 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/sumneko_lua.lua
+local neodev = require("modules.configs.language.neodev")
 
 -- call neodev before setup sumneko_lua
-require("neodev").setup({
-  library = {
-    enabled = true,
-    runtime = true,
-    types = true,
-    plugins = {
-      "dap",
-      "nvim-dap-ui",
-      "lualine",
-      "nvim-treesitter",
-      "telescope.nvim",
-      "efmls-configs",
-      "mason.nvim",
-      "nvim-cmp",
-      "copilot.lua",
-      "lazy.nvim",
-      "gitsigns.nvim"
-    },
-  },
-})
-
+neodev()
 return {
   settings = {
     Lua = {
