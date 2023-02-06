@@ -7,9 +7,25 @@ completion["neovim/nvim-lspconfig"] = {
   config = require("completion.nvim-lspconfig"),
   dependencies = {
     { "creativenull/efmls-configs-nvim" },
-    { "williamboman/mason.nvim" },
-    { "williamboman/mason-lspconfig.nvim" },
-    { "WhoIsSethDaniel/mason-tool-installer.nvim", config = require("completion.mason-tool-installer") },
+    {
+      "williamboman/mason.nvim",
+      cond = function()
+        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+      end,
+    },
+    {
+      "williamboman/mason-lspconfig.nvim",
+      cond = function()
+        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+      end,
+    },
+    {
+      "WhoIsSethDaniel/mason-tool-installer.nvim",
+      config = require("completion.mason-tool-installer"),
+      cond = function()
+        return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+      end,
+    },
     {
       "glepnir/lspsaga.nvim",
       config = require("completion.lspsaga"),

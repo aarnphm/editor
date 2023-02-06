@@ -1,8 +1,27 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/sumneko_lua.lua
-local neodev = require("modules.configs.language.neodev")
-
 -- call neodev before setup sumneko_lua
-neodev()
+require("neodev").setup({
+  library = {
+    enabled = true,
+    runtime = true,
+    types = true,
+    plugins = {
+      "dap",
+      "nvim-dap-ui",
+      "lualine",
+      "nvim-treesitter",
+      "telescope.nvim",
+      "efmls-configs",
+      "mason.nvim",
+      "mason-lspconfig.nvim",
+      "cmp-nvim-lsp",
+      "nvim-cmp",
+      "copilot.lua",
+      "lazy.nvim",
+      "gitsigns.nvim",
+    },
+  },
+})
 return {
   settings = {
     Lua = {
@@ -11,14 +30,6 @@ return {
       },
       diagnostics = {
         globals = { "vim" },
-      },
-      workspace = {
-        library = {
-          [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-          [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-        },
-        maxPreload = 100000,
-        preloadFileSize = 10000,
       },
       telemetry = { enable = false },
       -- Do not override treesitter lua highlighting with sumneko lua highlighting

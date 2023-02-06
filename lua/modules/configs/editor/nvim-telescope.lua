@@ -46,7 +46,7 @@ return function()
         "%.mkv",
         "%.mp4",
         "%.zip",
-        "*/lazy-lock.json",
+        "/lazy-lock.json",
       },
       file_sorter = require("telescope.sorters").get_fuzzy_file,
       file_previewer = require("telescope.previewers").vim_buffer_cat.new,
@@ -65,7 +65,7 @@ return function()
       frecency = {
         show_scores = true,
         show_unindexed = true,
-        ignore_patterns = { "*.git/*", "*/tmp/*" },
+        ignore_patterns = { "*.git/*", "*/tmp/*", "/lazy-lock.json" },
       },
       live_grep_args = {
         auto_quoting = true, -- enable/disable auto-quoting
@@ -88,9 +88,9 @@ return function()
             -- you want to use the following actions. This means installing as a dependency of
             -- telescope in it's `requirements` and loading this extension from there instead of
             -- having the separate plugin definition as outlined above. See issue #6.
-            ["<cr>"] = require("telescope-undo.actions").yank_additions,
-            ["<S-cr>"] = require("telescope-undo.actions").yank_deletions,
-            ["<C-cr>"] = require("telescope-undo.actions").restore,
+            ["<CR>"] = require("telescope-undo.actions").yank_additions,
+            ["<S-CR>"] = require("telescope-undo.actions").yank_deletions,
+            ["<C-CR>"] = require("telescope-undo.actions").restore,
           },
         },
       },
