@@ -1,24 +1,24 @@
 -- custom python provider
-local conda_prefix = os.getenv("CONDA_PREFIX")
+local conda_prefix = os.getenv "CONDA_PREFIX"
 if not conda_prefix == nil or conda_prefix == "" then
-  vim.g.python_host_prog = conda_prefix .. "/bin/python"
-  vim.g.python3_host_prog = conda_prefix .. "/bin/python"
+	vim.g.python_host_prog = conda_prefix .. "/bin/python"
+	vim.g.python3_host_prog = conda_prefix .. "/bin/python"
 elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/python") == 1 then
-  vim.g.python_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
-  vim.g.python3_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
+	vim.g.python_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
+	vim.g.python3_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
 else
-  -- get python host prog from env
-  vim.g.python_host_prog = vim.env["PYTHON3_HOST_PROG"]
-  vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
+	-- get python host prog from env
+	vim.g.python_host_prog = vim.env["PYTHON3_HOST_PROG"]
+	vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
 end
 
 if __editor_global.is_mac then
-  vim.g.clipboard = {
-    name = "macOS-clipboard",
-    copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
-    paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
-    cache_enabled = 0,
-  }
+	vim.g.clipboard = {
+		name = "macOS-clipboard",
+		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
+		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
+		cache_enabled = 0,
+	}
 end
 
 vim.o.termguicolors = true
@@ -44,7 +44,7 @@ vim.o.sessionoptions = "curdir,help,tabpages,winsize"
 vim.o.clipboard = "unnamedplus"
 vim.o.wildignorecase = true
 vim.o.wildignore =
-  ".git,.hg,.svn,*.pyc,*.o,*.out,*.jpg,*.jpeg,*.png,*.gif,*.zip,**/tmp/**,*.DS_Store,**/node_modules/**,**/bower_modules/**"
+	".git,.hg,.svn,*.pyc,*.o,*.out,*.jpg,*.jpeg,*.png,*.gif,*.zip,**/tmp/**,*.DS_Store,**/node_modules/**,**/bower_modules/**"
 vim.o.backup = false
 vim.o.writebackup = false
 vim.o.swapfile = false
