@@ -20,6 +20,7 @@ require("neodev").setup({
       "lazy.nvim",
       "gitsigns.nvim",
       "crates.nvim",
+      "toggleterm.nvim",
     },
   },
 })
