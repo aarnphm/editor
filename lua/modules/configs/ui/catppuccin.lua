@@ -2,7 +2,7 @@ return function()
   local transparent_background = false -- Set background transparency here!
 
   require("catppuccin").setup({
-    flavour = __editor_config.catppuccin.flavor, -- Can be one of: latte, frappe, macchiato, mocha
+    flavour = __editor_config.plugins.catppuccin.flavor, -- Can be one of: latte, frappe, macchiato, mocha
     background = { light = "latte", dark = "mocha" },
     dim_inactive = {
       enabled = false,

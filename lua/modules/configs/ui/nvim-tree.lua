@@ -108,7 +108,7 @@ return function()
     },
     system_open = { cmd = "open", args = {} },
     filters = { dotfiles = false, custom = { "^.git$", ".DS_Store", "__pycache__", "*/lazy-lock.json" } },
-    git = { timeout = 500, ignore = false },
+    git = { timeout = 500, ignore = __editor_config.plugins.nvim_tree.git.ignore },
     diagnostics = {
       enable = false,
       show_on_dirs = false,

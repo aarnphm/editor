@@ -105,8 +105,8 @@ local plug_map = {
   ["n|<Space>h"] = k.map_cr("BufferLineCyclePrev"):with_noremap():with_silent(),
   ["n|<Space>bp"] = k.map_cr("BufferLinePick"):with_noremap():with_silent(),
   ["n|<Space>bc"] = k.map_cr("BufferLinePickClose"):with_noremap():with_silent(),
-  ["n|<LocalLeader>be"] = k.map_cr("BufferLineSortByExtension"):with_noremap(),
-  ["n|<LocalLeader>bd"] = k.map_cr("BufferLineSortByDirectory"):with_noremap(),
+  ["n|<Space>be"] = k.map_cr("BufferLineSortByExtension"):with_noremap(),
+  ["n|<Space>bd"] = k.map_cr("BufferLineSortByDirectory"):with_noremap(),
   -- Lazy
   ["n|<Space>ls"] = k.map_cr("Lazy sync"):with_noremap():with_silent(),
   ["n|<Space>lc"] = k.map_cr("Lazy clean"):with_noremap():with_silent(),
