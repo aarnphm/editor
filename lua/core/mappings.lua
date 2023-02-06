@@ -234,7 +234,7 @@ local mapping = {
     require("dap").repl.open()
   end):with_defaults(),
   -- Legendary
-  ["n|<C-p>"] = k.map_cr("Legendary"):with_defaults(),
+  ["n|<C-p>"] = k.map_cr("Legendary"):with_defaults():with_desc("utils: Show keymap legends"),
   -- Diffview
   ["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen"):with_defaults():with_desc("git: Show diff view"),
   ["n|<LocalLeader><LocalLeader>D"] = k.map_cr("DiffviewClose"):with_defaults():with_desc("git: Close diff view"),

@@ -31,4 +31,6 @@ return function()
       winblend = 0,
     },
   })
+  -- we need to register said mapping since we are assigning keymap dynamically
+  require("utils").annotate_mapping()
 end
