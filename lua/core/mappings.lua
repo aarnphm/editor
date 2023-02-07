@@ -1,4 +1,5 @@
 local k = require "keybind"
+local _lazygit = nil
 
 --- remove weird characters from telescope keymaps
 local command_panel = function()
@@ -118,8 +119,8 @@ local mapping = {
 		:with_desc "terminal: Toggle vertical",
 	["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
 	["n|slg"] = k.map_callback(function()
-		require("toggleterm.terminal").Terminal
-			:new({
+		if not _lazygit then
+			_lazygit = require("toggleterm.terminal").Terminal:new {
 				cmd = require("utils").get_binary_path "lazygit",
 				hidden = true,
 				direction = "float",
@@ -135,8 +136,9 @@ local mapping = {
 						{ noremap = true, silent = true }
 					)
 				end,
-			})
-			:toggle()
+			}
+		end
+		_lazygit:toggle()
 	end)
 		:with_defaults()
 		:with_desc "git: Toggle lazygit",
