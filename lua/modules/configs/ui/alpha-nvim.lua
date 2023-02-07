@@ -111,16 +111,26 @@ return function()
 	dashboard.section.buttons.val = {
 		button("space f r", icons.misc.Rocket .. "File frecency", leader, "<cmd>Telescope frecency<cr>"),
 		button("space f e", icons.ui.History .. "File history", leader, "<cmd>Telescope oldfiles<cr>"),
-		button("space f w", icons.misc.WordFind .. "Word find", leader, "<cmd>Telescope live_grep<cr>"),
-		button("space f f", icons.misc.FindFile .. "File find", leader, "<cmd>Telescope find_files<cr>"),
+		button("space f w", icons.misc.WordFind .. "Word find", leader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() require("utils").safegit_live_grep {} end,
+		}),
+		button("space f f", icons.misc.FindFile .. "File find", leader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() require("utils").safegit_find_files {} end,
+		}),
 		button("kplus e c", icons.misc.MultipleWheels .. "Editor config", lleader, "<cmd>e ~/.editor.lua<cr>"),
 		button("kplus e s", icons.misc.SingleWheel .. "Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
-		button(
-			"kplus e r",
-			icons.misc.SimpleVim .. "Edit NVIM config",
-			lleader,
-			"<cmd>Telescope find_files {cwd = vim.fn.stdpath('config')}<cr>"
-		),
+		button("kplus e r", icons.misc.SimpleVim .. "Edit NVIM config", lleader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() require("utils").safegit_find_files { cwd = vim.fn.stdpath "config" } end,
+		}),
 	}
 
 	dashboard.section.buttons.opts.hl = "String"

@@ -3,11 +3,11 @@ local _lazygit = nil
 
 --- remove weird characters from telescope keymaps
 local command_panel = function()
-	local opts = {
+	require("telescope.builtin").keymaps {
 		lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
 	}
-	require("telescope.builtin").keymaps(opts)
 end
+
 local mapping = {
 	["n|<S-Tab>"] = k.map_cr("normal za"):with_defaults():with_desc "editn: Toggle code fold",
 	-- Insert
@@ -171,13 +171,17 @@ local mapping = {
 	["n|<Space>fr"] = k.map_callback(function() require("telescope").extensions.frecency.frecency() end)
 		:with_defaults()
 		:with_desc "find: File by frecency",
-	["n|<LocalLeader>fw"] = k.map_cu("Telescope live_grep"):with_defaults():with_desc "find: Word in current directory",
+	["n|<LocalLeader>fw"] = k.map_callback(function() require("utils").safegit_live_grep {} end)
+		:with_defaults()
+		:with_desc "find: Word in current directory",
 	["n|<Space>fw"] = k.map_callback(function() require("telescope").extensions.live_grep_args.live_grep_args {} end)
 		:with_defaults()
 		:with_desc "find: Word in project",
 	["n|<Space>fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
 	["n|<Space>ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
-	["n|<LocalLeader>ff"] = k.map_cu("Telescope git_files"):with_defaults():with_desc "find: file in git project",
+	["n|<LocalLeader>ff"] = k.map_callback(function() require("utils").safegit_find_files {} end)
+		:with_defaults()
+		:with_desc "find: file in git project",
 	["n|<Space>fz"] = k.map_cu("Telescope zoxide list")
 		:with_defaults()
 		:with_desc "editn: Change current direrctory by zoxide",
@@ -187,6 +191,7 @@ local mapping = {
 	["n|<Space>fc"] = k.map_cu("Telescope colorscheme")
 		:with_defaults()
 		:with_desc "ui: Change colorscheme for current session",
+	["n|<Space>fs"] = k.map_cu("Telescope grep_string"):with_noremap():with_silent():with_desc "find: Current word",
 	["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
 	["n|<C-p>"] = k.map_callback(command_panel):with_defaults():with_desc "tools: Show keymap legends",
 	-- cheatsheet

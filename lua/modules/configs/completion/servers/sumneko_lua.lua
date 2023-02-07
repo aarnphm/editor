@@ -24,6 +24,7 @@ require("neodev").setup {
 			"which-key.nvim",
 			"better-escape.nvim",
 			"nvim-spectre",
+			"alpha-nvim",
 		},
 	},
 }
