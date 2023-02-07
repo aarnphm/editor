@@ -9,7 +9,7 @@ return function()
 			delay = 100,
 		},
 		hide = {
-			virtual_text = true,
+			virtual_text = false,
 			signs = false,
 			underline = false,
 		},

@@ -13,9 +13,11 @@ return function()
 		---@usage Function called when a window is closed
 		on_close = nil,
 		---@usage timeout for notifications in ms, default 5000
-		timeout = 2000,
+		timeout = 3000,
 		-- @usage User render fps value
 		fps = 60,
+		max_height = function() return math.floor(vim.o.lines * 0.75) end,
+		max_width = function() return math.floor(vim.o.columns * 0.75) end,
 		-- Render function for notifications. See notify-render()
 		render = "default",
 		---@usage highlight behind the window for stages that change opacity

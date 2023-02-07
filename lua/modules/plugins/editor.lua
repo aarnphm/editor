@@ -1,6 +1,7 @@
 local editor = {}
 
 -- tpope
+editor["lewis6991/impatient.nvim"] = { lazy = false }
 editor["tpope/vim-repeat"] = { lazy = true }
 editor["Stormherz/tablify"] = { lazy = true }
 editor["jinh0/eyeliner.nvim"] = { lazy = true, event = "BufReadPost" }
@@ -132,7 +133,6 @@ editor["nvim-telescope/telescope.nvim"] = {
 		{ "nvim-telescope/telescope-frecency.nvim", dependencies = { { "kkharji/sqlite.lua" } } },
 		{ "jvgrootveld/telescope-zoxide" },
 		{ "xiyaowong/telescope-emoji.nvim" },
-		{ "ahmedkhalf/project.nvim", event = "BufReadPost", config = require "editor.project" },
 		{ "nvim-telescope/telescope-live-grep-args.nvim" },
 	},
 }

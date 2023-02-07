@@ -36,7 +36,7 @@ return function()
 				"%.mkv",
 				"%.mp4",
 				"%.zip",
-				"/lazy-lock.json",
+				"lazy-lock.json",
 			},
 			file_sorter = require("telescope.sorters").get_fuzzy_file,
 			file_previewer = require("telescope.previewers").vim_buffer_cat.new,
@@ -120,7 +120,6 @@ return function()
 	telescope.load_extension "fzf"
 	telescope.load_extension "zoxide"
 	telescope.load_extension "frecency"
-	telescope.load_extension "projects"
 	telescope.load_extension "live_grep_args"
 	telescope.load_extension "undo"
 	telescope.load_extension "emoji"

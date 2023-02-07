@@ -4,6 +4,16 @@ return function()
 	local mason_lspconfig = require "mason-lspconfig"
 	local efmls = require "efmls-configs"
 
+	-- Configuring native diagnostics
+	vim.diagnostic.config {
+		virtual_text = {
+			source = "always",
+		},
+		float = {
+			source = "always",
+		},
+	}
+
 	require("lspconfig.ui.windows").default_options.border = "single"
 
 	local icons = {
@@ -34,20 +44,28 @@ return function()
 	mason_lspconfig.setup {
 		ensure_installed = {
 			"bashls",
+			"bufls",
 			"clangd",
+			"dockerls",
 			"efm",
+			"eslint",
 			"gopls",
-			"ruff_lsp",
+			"grammarly",
+			"html",
+			"jdtls",
+			"jsonls",
 			"pyright",
+			"rnix",
+			"ruff_lsp",
+			"rust_analyzer",
+			"spectral",
 			"sumneko_lua",
 			"taplo",
-			"rust_analyzer",
+			"tflint",
 			"tsserver",
-			"eslint",
-			"efm",
-			"bashls",
+			"vimls",
+			"yamlls",
 			"zk",
-			"spectral",
 		},
 		automatic_installation = true,
 	}
@@ -59,7 +77,7 @@ return function()
 		on_attach = function()
 			require("lsp_signature").on_attach {
 				bind = true,
-				use_lspsaga = false,
+				use_lspsaga = true,
 				floating_window = true,
 				fix_pos = true,
 				hint_enable = true,
@@ -97,9 +115,6 @@ return function()
 			}
 		end,
 
-		efm = function()
-			-- Do not setup efm
-		end,
 		clangd = function()
 			local config = require "completion.servers.clangd"
 			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", config, {

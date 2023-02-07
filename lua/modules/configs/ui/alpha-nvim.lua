@@ -110,7 +110,6 @@ return function()
 	local lleader = "kplus"
 	dashboard.section.buttons.val = {
 		button("space f r", icons.misc.Rocket .. "File frecency", leader, "<cmd>Telescope frecency<cr>"),
-		button("space f p", icons.ui.Project .. "Project find", leader, "<cmd>Telescope projects<CR>"),
 		button("space f e", icons.ui.History .. "File history", leader, "<cmd>Telescope oldfiles<cr>"),
 		button("space f w", icons.misc.WordFind .. "Word find", leader, "<cmd>Telescope live_grep<cr>"),
 		button("space f f", icons.misc.FindFile .. "File find", leader, "<cmd>Telescope find_files<cr>"),

@@ -1,5 +1,36 @@
 local api = vim.api
 
+--- Add custom filetype extension
+vim.filetype.add {
+	extension = {
+		conf = "conf",
+		mdx = "markdown",
+		mjml = "html",
+	},
+	pattern = {
+		["%.(%a+)"] = function(_, _, ext)
+			if vim.tbl_contains({ "Dockerfile", "dockerfile" }, ext) then
+				return "dockerfile"
+			elseif vim.tbl_contains({ "j2", "jinja", "tpl", "template" }, ext) then
+				return "html"
+			elseif vim.tbl_contains({ "bazel", "bzl" }, ext) then
+				return "bzl"
+			end
+		end,
+		["Dockerfile.(%a+)$"] = function(_, _, ext)
+			if vim.tbl_contains({ "template", "tpl", "tmpl" }, ext) then
+				return "dockerfile"
+			end
+		end,
+		[".*%.env.*"] = "sh",
+		["ignore$"] = "conf",
+	},
+	filename = {
+		["yup.lock"] = "yaml",
+		["WORKSPACE"] = "bzl",
+	},
+}
+
 -- Fix fold issue of files opened by telescope
 api.nvim_create_autocmd("BufRead", {
 	callback = function()
@@ -7,6 +38,29 @@ api.nvim_create_autocmd("BufRead", {
 			once = true,
 			command = "normal! zx",
 		})
+	end,
+})
+
+-- close some filetypes with <q>
+api.nvim_create_autocmd("FileType", {
+	pattern = {
+		"qf",
+		"help",
+		"man",
+		"notify",
+		"lspinfo",
+		"terminal",
+		"prompt",
+		"toggleterm",
+		"copilot",
+		"spectre_panel",
+		"startuptime",
+		"tsplayground",
+		"PlenaryTestPopup",
+	},
+	callback = function(event)
+		vim.bo[event.buf].buflisted = false
+		vim.keymap.set("n", "q", "<CMD>close<CR>", { buffer = event.buf, silent = true })
 	end,
 })
 
@@ -26,21 +80,7 @@ api.nvim_create_autocmd("BufEnter", {
 	end,
 })
 
--- Make <esc> and kk in terminal mode behave like in normal mode
-api.nvim_create_autocmd("TermOpen", {
-	group = api.nvim_create_augroup("term", { clear = true }),
-	pattern = "term://*",
-	callback = function(_)
-		api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], { noremap = true })
-		api.nvim_buf_set_keymap(0, "t", "kk", [[<C-\><C-n>]], { noremap = true })
-		api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], { noremap = true })
-		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], { noremap = true })
-		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], { noremap = true })
-		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], { noremap = true })
-	end,
-})
-
-local bufs_id = api.nvim_create_augroup("bufs", { clear = true })
+local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
 -- source vimrc on save
 api.nvim_create_autocmd("BufWritePost", {
 	group = bufs_id,
@@ -74,7 +114,7 @@ api.nvim_create_autocmd("BufReadPost", {
 	command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
 })
 
-local wins_id = api.nvim_create_augroup("wins", { clear = true })
+local wins_id = api.nvim_create_augroup("EditorWins", { clear = true })
 -- Highlight current line only on focused window
 api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave" }, {
 	group = wins_id,
@@ -109,8 +149,8 @@ api.nvim_create_autocmd("VimLeave", {
 		end
 	end,
 })
--- Check if file changed when its window is focus, more eager than 'autoread'
-api.nvim_create_autocmd("FocusGained", {
+-- Check if we need to reload the file when it changed
+api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 	group = wins_id,
 	pattern = "*",
 	command = "checktime",
@@ -122,7 +162,7 @@ api.nvim_create_autocmd("VimResized", {
 	command = "tabdo wincmd =",
 })
 
-local ft_id = api.nvim_create_augroup("ft", { clear = true })
+local ft_id = api.nvim_create_augroup("EditorFt", { clear = true })
 -- set local to all filetypes to have formatoptions-=cro
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,
@@ -167,12 +207,6 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	pattern = { "*.bazel", "WORKSPACE" },
 	command = "setf bzl",
 })
--- set filetype for proto files
-api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-	group = ft_id,
-	pattern = "*.proto",
-	command = "setf proto",
-})
 -- set filetype for docker files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = ft_id,
@@ -184,6 +218,14 @@ api.nvim_create_autocmd("FileType", {
 	group = ft_id,
 	pattern = { "lua", "nix" },
 	command = "set noexpandtab shiftwidth=2 tabstop=2",
+})
+vim.api.nvim_create_autocmd("FileType", {
+	group = ft_id,
+	pattern = { "gitcommit", "markdown" },
+	callback = function()
+		vim.opt_local.wrap = true
+		vim.opt_local.spell = true
+	end,
 })
 
 local yank_id = api.nvim_create_augroup("yank", { clear = true })

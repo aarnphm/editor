@@ -9,7 +9,7 @@ local command_panel = function()
 	require("telescope.builtin").keymaps(opts)
 end
 local mapping = {
-	["n|nza"] = k.map_cr("normal za"):with_defaults():with_desc "editn: Toggle code fold",
+	["n|<S-Tab>"] = k.map_cr("normal za"):with_defaults():with_desc "editn: Toggle code fold",
 	-- Insert
 	["i|<C-u>"] = k.map_cmd("<C-G>u<C-U>"):with_noremap():with_desc "editi: Delete previous block",
 	["i|<C-b>"] = k.map_cmd("<Left>"):with_noremap():with_desc "editi: Move cursor to left",
@@ -25,8 +25,8 @@ local mapping = {
 	-- yank to end of line
 	["n|Y"] = k.map_cmd("y$"):with_desc "editn: Yank text to EOL",
 	["n|D"] = k.map_cmd("d$"):with_desc "editn: Delete text to EOL",
-	["n|n"] = k.map_cmd("nzzzv"):with_noremap():with_desc "editn: Next search result",
-	["n|N"] = k.map_cmd("Nzzzv"):with_noremap():with_desc "editn: Prev search result",
+	["n|sn"] = k.map_cmd("nzzzv"):with_noremap():with_desc "editn: Next search result",
+	["n|sN"] = k.map_cmd("Nzzzv"):with_noremap():with_desc "editn: Prev search result",
 	["n|J"] = k.map_cmd("mzJ`z"):with_noremap():with_desc "editn: Join next line",
 	["n|<C-h>"] = k.map_cmd("<C-w>h"):with_noremap():with_desc "window: Focus left",
 	["n|<C-l>"] = k.map_cmd("<C-w>l"):with_noremap():with_desc "window: Focus right",
@@ -85,6 +85,7 @@ local mapping = {
 	-- Lsp mapping (lspsaga, nvim-lspconfig, nvim-lsp, mason-lspconfig)
 	["n|<LocalLeader>li"] = k.map_cr("LspInfo"):with_defaults():with_nowait():with_desc "lsp: Info",
 	["n|<LocalLeader>lr"] = k.map_cr("LspRestart"):with_defaults():with_nowait():with_desc "lsp: Restart",
+	["n|<LocalLeader>lp"] = k.map_cr("Mason"):with_defaults():with_nowait():with_desc "lsp: Open Mason",
 	["n|go"] = k.map_cr("Lspsaga outline"):with_defaults():with_desc "lsp: Toggle outline",
 	["n|g["] = k.map_cr("Lspsaga diagnostic_jump_prev"):with_defaults():with_desc "lsp: Prev diagnostic",
 	["n|g]"] = k.map_cr("Lspsaga diagnostic_jump_next"):with_defaults():with_desc "lsp: Next diagnostic",
@@ -94,7 +95,7 @@ local mapping = {
 		:with_desc "lsp: Cursor diagnostic",
 	["n|gs"] = k.map_callback(vim.lsp.buf.signature_help):with_defaults():with_desc "lsp: Signature help",
 	["n|gr"] = k.map_cr("Lspsaga rename"):with_defaults():with_desc "lsp: Rename in file range",
-	["n|gR"] = k.map_cr("Lspsaga rename ++project"):with_defaults():with_desc "lsp: Rename in project range",
+	["n|grr"] = k.map_cr("Lspsaga rename ++project"):with_defaults():with_desc "lsp: Rename in project range",
 	["n|K"] = k.map_cr("Lspsaga hover_doc"):with_defaults():with_desc "lsp: Show doc",
 	["n|ga"] = k.map_cr("Lspsaga code_action"):with_defaults():with_desc "lsp: Code action for cursor",
 	["v|ga"] = k.map_cu("Lspsaga code_action"):with_defaults():with_desc "lsp: Code action for range",
@@ -111,13 +112,13 @@ local mapping = {
 		:with_defaults()
 		:with_desc "terminal: Toggle horizontal",
 	["t|<C-\\>"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle horizontal",
-	["n|<C-w>t"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
+	["n|<LocalLeader>\\"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
 		:with_defaults()
 		:with_desc "terminal: Toggle vertical",
-	["i|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
+	["i|<LocalLeader>\\"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
 		:with_defaults()
 		:with_desc "terminal: Toggle vertical",
-	["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
+	["t|<LocalLeader>\\"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
 	["n|slg"] = k.map_callback(function()
 		if not _lazygit then
 			_lazygit = require("toggleterm.terminal").Terminal:new {
@@ -156,9 +157,7 @@ local mapping = {
 	["n|<LocalLeader>ocpr"] = k.map_cr("Octo pr list"):with_noremap():with_desc "octo: List pull request",
 	-- trouble
 	["n|gt"] = k.map_cr("TroubleToggle"):with_defaults():with_desc "lsp: Toggle trouble list",
-	["n|<LocalLeader>tr"] = k.map_cr("TroubleToggle lsp_references")
-		:with_defaults()
-		:with_desc "lsp: Show lsp references",
+	["n|gR"] = k.map_cr("TroubleToggle lsp_references"):with_defaults():with_desc "lsp: Show lsp references",
 	["n|<LocalLeader>td"] = k.map_cr("TroubleToggle document_diagnostics")
 		:with_defaults()
 		:with_desc "lsp: Show document diagnostics",
@@ -182,13 +181,10 @@ local mapping = {
 	["n|<Space>fz"] = k.map_cu("Telescope zoxide list")
 		:with_defaults()
 		:with_desc "editn: Change current direrctory by zoxide",
-	["n|<Space>fp"] = k.map_callback(function() require("telescope").extensions.projects.projects {} end)
-		:with_defaults()
-		:with_desc "find: Project",
-	["n|<LocalLeader>fu"] = k.map_callback(function() require("telescope").extensions.undo.undo() end)
+	["n|<Space>fu"] = k.map_callback(function() require("telescope").extensions.undo.undo() end)
 		:with_defaults()
 		:with_desc "editn: Show undo history",
-	["n|<LocalLeader>fc"] = k.map_cu("Telescope colorscheme")
+	["n|<Space>fc"] = k.map_cu("Telescope colorscheme")
 		:with_defaults()
 		:with_desc "ui: Change colorscheme for current session",
 	["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
