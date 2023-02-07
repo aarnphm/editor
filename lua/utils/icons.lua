@@ -158,6 +158,13 @@ local data = {
 		Ghost = "",
 		ManUp = "",
 		Vim = "",
+		SimpleVim = "",
+		SingleWheel = "",
+		MultipleWheels = "",
+		FindFile = "",
+		WordFind = "",
+		Rocket = "",
+		BentoBox = "🍱",
 	},
 	cmp = {
 		Copilot = "",

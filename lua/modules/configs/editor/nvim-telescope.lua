@@ -1,18 +1,10 @@
 return function()
+	local telescope = require "telescope"
 	local icons = { ui = require("utils.icons").get("ui", true) }
 	local lga_actions = require "telescope-live-grep-args.actions"
 	local telescope_actions = require "telescope.actions.set"
-	local fixfolds = {
-		hidden = true,
-		attach_mappings = function(_)
-			telescope_actions.select:enhance {
-				post = function() vim.api.nvim_command [[:normal! zx"]] end,
-			}
-			return true
-		end,
-	}
 
-	require("telescope").setup {
+	telescope.setup {
 		defaults = {
 			initial_mode = "insert",
 			prompt_prefix = " " .. icons.ui.Telescope .. " ",
@@ -91,10 +83,9 @@ return function()
 			},
 		},
 		pickers = {
-			buffers = fixfolds,
-			find_files = fixfolds,
-			git_files = fixfolds,
-			grep_string = fixfolds,
+			keymaps = {
+				theme = "dropdown",
+			},
 			live_grep = {
 				on_input_filter_cb = function(prompt)
 					-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
@@ -107,7 +98,6 @@ return function()
 					return true
 				end,
 			},
-			oldfiles = fixfolds,
 			diagnostics = {
 				initial_mode = "normal",
 			},
@@ -126,12 +116,12 @@ return function()
 		},
 	}
 
-	require("telescope").load_extension "notify"
-	require("telescope").load_extension "fzf"
-	require("telescope").load_extension "zoxide"
-	require("telescope").load_extension "frecency"
-	require("telescope").load_extension "projects"
-	require("telescope").load_extension "live_grep_args"
-	require("telescope").load_extension "undo"
-	require("telescope").load_extension "emoji"
+	telescope.load_extension "notify"
+	telescope.load_extension "fzf"
+	telescope.load_extension "zoxide"
+	telescope.load_extension "frecency"
+	telescope.load_extension "projects"
+	telescope.load_extension "live_grep_args"
+	telescope.load_extension "undo"
+	telescope.load_extension "emoji"
 end

@@ -142,13 +142,10 @@ editor["folke/zen-mode.nvim"] = {
 	config = function() require("zen-mode").setup {} end,
 }
 
-editor["terrortylor/nvim-comment"] = {
-	lazy = false,
-	config = function()
-		require("nvim_comment").setup {
-			hook = function() require("ts_context_commentstring.internal").update_commentstring() end,
-		}
-	end,
+editor["numToStr/Comment.nvim"] = {
+	lazy = true,
+	event = { "BufNewFile", "BufReadPre" },
+	config = require "editor.comment",
 }
 
 return editor

@@ -22,7 +22,7 @@ return function()
 				guifg = floatborder_hl,
 			},
 		},
-		open_mapping = [[<C-t>]], -- [[<c-\>]],
+		open_mapping = false, -- [[<C-t>]],
 		hide_numbers = true, -- hide the number column in toggleterm buffers
 		shade_filetypes = {},
 		shade_terminals = false,

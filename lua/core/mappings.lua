@@ -1,7 +1,12 @@
 local k = require "keybind"
--- a local reference for ToggleTerm
-local _lazygit = nil
 
+--- remove weird characters from telescope keymaps
+local command_panel = function()
+	local opts = {
+		lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+	}
+	require("telescope.builtin").keymaps(opts)
+end
 local mapping = {
 	["n|nza"] = k.map_cr("normal za"):with_defaults():with_desc "editn: Toggle code fold",
 	-- Insert
@@ -86,9 +91,7 @@ local mapping = {
 	["n|<LocalLeader>sc"] = k.map_cr("Lspsaga show_cursor_diagnostics")
 		:with_defaults()
 		:with_desc "lsp: Cursor diagnostic",
-	["n|gs"] = k.map_callback(function() vim.lsp.buf.signature_help() end)
-		:with_defaults()
-		:with_desc "lsp: Signature help",
+	["n|gs"] = k.map_callback(vim.lsp.buf.signature_help):with_defaults():with_desc "lsp: Signature help",
 	["n|gr"] = k.map_cr("Lspsaga rename"):with_defaults():with_desc "lsp: Rename in file range",
 	["n|gR"] = k.map_cr("Lspsaga rename ++project"):with_defaults():with_desc "lsp: Rename in project range",
 	["n|K"] = k.map_cr("Lspsaga hover_doc"):with_defaults():with_desc "lsp: Show doc",
@@ -115,14 +118,25 @@ local mapping = {
 		:with_desc "terminal: Toggle vertical",
 	["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
 	["n|slg"] = k.map_callback(function()
-		if not _lazygit then
-			_lazygit = require("toggleterm.terminal").Terminal:new {
+		require("toggleterm.terminal").Terminal
+			:new({
 				cmd = require("utils").get_binary_path "lazygit",
 				hidden = true,
 				direction = "float",
-			}
-		end
-		_lazygit:toggle()
+				float_opts = {
+					border = "double",
+				},
+				on_open = function(term)
+					vim.api.nvim_buf_set_keymap(
+						term.bufnr,
+						"n",
+						"q",
+						"<cmd>close<CR>",
+						{ noremap = true, silent = true }
+					)
+				end,
+			})
+			:toggle()
 	end)
 		:with_defaults()
 		:with_desc "git: Toggle lazygit",
@@ -152,19 +166,21 @@ local mapping = {
 	["n|<LocalLeader>tq"] = k.map_cr("TroubleToggle quickfix"):with_defaults():with_desc "lsp: Show quickfix list",
 	["n|<LocalLeader>tl"] = k.map_cr("TroubleToggle loclist"):with_defaults():with_desc "lsp: Show loclist",
 	-- Telescope
-	["n|fo"] = k.map_cu("Telescope oldfiles"):with_defaults():with_desc "find: File by history",
-	["n|fr"] = k.map_callback(function() require("telescope").extensions.frecency.frecency() end)
+	["n|<Space>fo"] = k.map_cu("Telescope oldfiles"):with_defaults():with_desc "find: File by history",
+	["n|<Space>fr"] = k.map_callback(function() require("telescope").extensions.frecency.frecency() end)
 		:with_defaults()
 		:with_desc "find: File by frecency",
-	["n|fw"] = k.map_callback(function() require("telescope").extensions.live_grep_args.live_grep_args {} end)
+	["n|<LocalLeader>fw"] = k.map_cu("Telescope live_grep"):with_defaults():with_desc "find: Word in current directory",
+	["n|<Space>fw"] = k.map_callback(function() require("telescope").extensions.live_grep_args.live_grep_args {} end)
 		:with_defaults()
 		:with_desc "find: Word in project",
-	["n|fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
-	["n|ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
-	["n|fz"] = k.map_cu("Telescope zoxide list"):with_defaults():with_desc "editn: Change current direrctory by zoxide",
+	["n|<Space>fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
+	["n|<Space>ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
 	["n|<LocalLeader>ff"] = k.map_cu("Telescope git_files"):with_defaults():with_desc "find: file in git project",
-	["n|<LocalLeader>fw"] = k.map_cu("Telescope live_grep"):with_defaults():with_desc "find: Word in current directory",
-	["n|fp"] = k.map_callback(function() require("telescope").extensions.projects.projects {} end)
+	["n|<Space>fz"] = k.map_cu("Telescope zoxide list")
+		:with_defaults()
+		:with_desc "editn: Change current direrctory by zoxide",
+	["n|<Space>fp"] = k.map_callback(function() require("telescope").extensions.projects.projects {} end)
 		:with_defaults()
 		:with_desc "find: Project",
 	["n|<LocalLeader>fu"] = k.map_callback(function() require("telescope").extensions.undo.undo() end)
@@ -174,7 +190,7 @@ local mapping = {
 		:with_defaults()
 		:with_desc "ui: Change colorscheme for current session",
 	["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
-	["n|<C-p>"] = k.map_cr("Telescope keymaps"):with_defaults():with_desc "tools: Show keymap legends",
+	["n|<C-p>"] = k.map_callback(command_panel):with_defaults():with_desc "tools: Show keymap legends",
 	-- cheatsheet
 	["n|<LocalLeader>km"] = k.map_cr("Cheatsheet"):with_defaults():with_desc "cheatsheet: open",
 	-- SnipRun

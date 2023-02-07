@@ -1,7 +1,9 @@
 return function()
 	local alpha = require "alpha"
 	local dashboard = require "alpha.themes.dashboard"
+
 	local headers = nil
+	local icons = { misc = require("utils.icons").get("misc", true), ui = require("utils.icons").get("ui", true) }
 
 	if __editor_config.background == "dark" then
 		headers = {
@@ -104,18 +106,19 @@ return function()
 	end
 
 	dashboard.section.header.val = headers
-	local leader = "comma"
+	local leader = "space"
 	local lleader = "kplus"
 	dashboard.section.buttons.val = {
-		button("comma f r", "  File frecency", leader, "<cmd>Telescope frecency<cr>"),
-		button("comma f e", "  File history", leader, "<cmd>Telescope oldfiles<cr>"),
-		button("comma f w", "  Word find", leader, "<cmd>Telescope live_grep<cr>"),
-		button("comma f f", "  File find", leader, "<cmd>Telescope find_files<cr>"),
-		button("kplus e c", "  Editor", lleader, "<cmd>e ~/.editor.lua<cr>"),
-		button("kplus e s", "  Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
+		button("space f r", icons.misc.Rocket .. "File frecency", leader, "<cmd>Telescope frecency<cr>"),
+		button("space f p", icons.ui.Project .. "Project find", leader, "<cmd>Telescope projects<CR>"),
+		button("space f e", icons.ui.History .. "File history", leader, "<cmd>Telescope oldfiles<cr>"),
+		button("space f w", icons.misc.WordFind .. "Word find", leader, "<cmd>Telescope live_grep<cr>"),
+		button("space f f", icons.misc.FindFile .. "File find", leader, "<cmd>Telescope find_files<cr>"),
+		button("kplus e c", icons.misc.MultipleWheels .. "Editor config", lleader, "<cmd>e ~/.editor.lua<cr>"),
+		button("kplus e s", icons.misc.SingleWheel .. "Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
 		button(
 			"kplus e r",
-			"  NVIM access",
+			icons.misc.SimpleVim .. "Edit NVIM config",
 			lleader,
 			"<cmd>Telescope find_files {cwd = vim.fn.stdpath('config')}<cr>"
 		),
@@ -125,7 +128,8 @@ return function()
 	local footer = function()
 		local stats = require("lazy").stats()
 		local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-		return "🍱 github.com/aarnphm"
+		return icons.misc.BentoBox
+			.. "github.com/aarnphm"
 			.. "   v"
 			.. vim.version().major
 			.. "."
