@@ -49,6 +49,7 @@ end
 ---@field colorscheme string: Set colorscheme
 ---@field repos string: Set repos
 ---@field load_big_files_faster boolean: Load big files faster using LunarVim/bigfile.nvim
+---@field use_ssh boolean: Use ssh to clone repos
 ---@field plugins table<string, table|any>: Set plugins
 local _config = nil
 

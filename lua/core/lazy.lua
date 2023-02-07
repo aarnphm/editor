@@ -15,9 +15,9 @@ local icons = {
 	misc = require("utils.icons").get "misc",
 }
 
-local Lazy = {}
+local M = {}
 
-function Lazy:load_plugins()
+M.load_plugins = function(self)
 	self.modules = {}
 
 	local append_nativertp = function()
@@ -53,7 +53,7 @@ function Lazy:load_plugins()
 	end
 end
 
-function Lazy:load_lazy()
+M.load_lazy = function(self)
 	if not vim.loop.fs_stat(lazy_path) then
 		local lazy_repo = use_ssh and "git@github.com:folke/lazy.nvim.git " or "https://github.com/folke/lazy.nvim.git "
 		vim.api.nvim_command("!git clone --filter=blob:none --branch=stable " .. lazy_repo .. lazy_path)
@@ -71,7 +71,7 @@ function Lazy:load_lazy()
 		install = {
 			-- install missing plugins on startup. This doesn't increase startup time.
 			missing = true,
-			colorscheme = { "catppuccin" },
+			colorscheme = { __editor_config.colorscheme },
 		},
 		ui = {
 			-- a number <1 is a percentage., >1 is a fixed size
@@ -125,4 +125,4 @@ function Lazy:load_lazy()
 	require("lazy").setup(self.modules, lazy_settings)
 end
 
-Lazy:load_lazy()
+M:load_lazy()

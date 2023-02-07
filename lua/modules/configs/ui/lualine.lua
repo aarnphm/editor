@@ -99,6 +99,7 @@ return function()
 
 	require("lualine").setup {
 		options = {
+			theme = __editor_config.colorscheme,
 			disabled_filetypes = {
 				statusline = {
 					"alpha",
@@ -108,7 +109,7 @@ return function()
 					"toggleterm",
 					"terminal",
 					"help",
-					"lspsagaoutline",
+					"lspsagaoutine",
 					"DiffviewFiles",
 					"quickfix",
 					"Trouble",

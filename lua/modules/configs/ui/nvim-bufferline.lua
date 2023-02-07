@@ -60,6 +60,11 @@ return function()
 		}
 
 		options = vim.tbl_deep_extend("force", options, catppuccin_hl_overwrite)
+	elseif vim.g.colors_name == "rose-pine" then
+		local rp_hl_overwrite = {
+			highlights = require "rose-pine.plugins.bufferline",
+		}
+		options = vim.tbl_deep_extend("force", options, rp_hl_overwrite)
 	end
 
 	require("bufferline").setup(options)
