@@ -36,8 +36,12 @@ local palette = nil
 ---@return palette
 local init_palette = function()
 	if not palette then
-		palette = vim.g.colors_name == "catppuccin" and require("catppuccin.palettes").get_palette()
-			or {
+		if vim.g.colors_name == "catppuccin" then
+			palette = require("catppuccin.palettes").get_palette()
+		elseif vim.g.colors_name == "rose-pine" then
+			palette = require "rose-pine.palette"
+		else
+			palette = {
 				rosewater = "#DC8A78",
 				flamingo = "#DD7878",
 				mauve = "#CBA6F7",
@@ -67,6 +71,7 @@ local init_palette = function()
 				mantle = "#1C1C19",
 				crust = "#161320",
 			}
+		end
 
 		palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").palette_overwrite)
 	end
@@ -94,7 +99,7 @@ end
 ---Parse the `style` string into nvim_set_hl options
 ---@param style string @The style config
 ---@return table
-local function parse_style(style)
+local parse_style = function(style)
 	if not style or style == "NONE" then
 		return {}
 	end

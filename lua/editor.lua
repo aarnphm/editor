@@ -16,8 +16,6 @@ local editor_variables = function()
 
 	local local_config_path = home .. path_sep .. ".editor.lua"
 
-	local zettel_home = vim_path .. path_sep .. "zettelkasten"
-
 	return {
 		os_name = os_name,
 		is_mac = is_mac,
@@ -30,7 +28,6 @@ local editor_variables = function()
 		cache_dir = cache_dir,
 		modules_dir = modules_dir,
 		local_config_path = local_config_path,
-		zettel_home = zettel_home,
 		use_ssh = true,
 		---Change the colors of the global palette here.
 		---Settings will complete their replacement at initialization.

@@ -10,7 +10,7 @@
 ---@field buffer boolean|number
 local RHS = {}
 
-function RHS:new()
+RHS.new = function(self)
 	local instance = {
 		cmd = "",
 		options = {
@@ -29,28 +29,28 @@ function RHS:new()
 end
 
 ---@param cmd_string string
-function RHS:map_cmd(cmd_string)
+RHS.map_cmd = function(self, cmd_string)
 	self.cmd = cmd_string
 	return self
 end
 
 ---@param cmd_string string
 ---@return RhsContainer
-function RHS:map_cr(cmd_string)
+RHS.map_cr = function(self, cmd_string)
 	self.cmd = (":%s<CR>"):format(cmd_string)
 	return self
 end
 
 ---@param cmd_string string
 ---@return RhsContainer
-function RHS:map_args(cmd_string)
+RHS.map_args = function(self, cmd_string)
 	self.cmd = (":%s<Space>"):format(cmd_string)
 	return self
 end
 
 ---@param cmd_string string
 ---@return RhsContainer
-function RHS:map_cu(cmd_string)
+RHS.map_cu = function(self, cmd_string)
 	self.cmd = (":<C-u>%s<CR>"):format(cmd_string)
 	return self
 end
@@ -58,14 +58,14 @@ end
 ---@param callback fun():nil
 --- Takes a callback that will be called when the key is pressed
 ---@return RhsContainer
-function RHS:map_callback(callback)
+RHS.map_callback = function(self, callback)
 	self.cmd = ""
 	self.options.callback = callback
 	return self
 end
 
 ---@return RhsContainer
-function RHS:with_defaults()
+RHS.with_defaults = function(self)
 	-- this defaults include noremap and silent
 	self.options.noremap = true
 	self.options.silent = true
@@ -73,39 +73,39 @@ function RHS:with_defaults()
 end
 
 ---@return RhsContainer
-function RHS:with_silent()
+RHS.with_silent = function(self)
 	self.options.silent = true
 	return self
 end
 
 ---@return RhsContainer
-function RHS:with_noremap()
+RHS.with_noremap = function(self)
 	self.options.noremap = true
 	return self
 end
 
 ---@return RhsContainer
-function RHS:with_expr()
+RHS.with_expr = function(self)
 	self.options.expr = true
 	return self
 end
 
 ---@return RhsContainer
-function RHS:with_nowait()
+RHS.with_nowait = function(self)
 	self.options.nowait = true
 	return self
 end
 
 ---@param bufnr number
 ---@return RhsContainer
-function RHS:with_buffer(bufnr)
+RHS.with_buffer = function(self, bufnr)
 	self.buffer = bufnr
 	return self
 end
 
 ---@param desc_string string
 ---@return RhsContainer
-function RHS:with_desc(desc_string)
+RHS.with_desc = function(self, desc_string)
 	self.options.desc = desc_string
 	return self
 end
@@ -115,38 +115,23 @@ pbind.__index = pbind
 
 ---@param cmd_string string
 ---@return RhsContainer
-pbind.map_cr = function(cmd_string)
-	local ro = RHS:new()
-	return ro:map_cr(cmd_string)
-end
+pbind.map_cr = function(cmd_string) return RHS:new():map_cr(cmd_string) end
 
 ---@param cmd_string string
 ---@return RhsContainer
-pbind.map_cmd = function(cmd_string)
-	local ro = RHS:new()
-	return ro:map_cmd(cmd_string)
-end
+pbind.map_cmd = function(cmd_string) return RHS:new():map_cmd(cmd_string) end
 
 ---@param cmd_string string
 ---@return RhsContainer
-pbind.map_cu = function(cmd_string)
-	local ro = RHS:new()
-	return ro:map_cu(cmd_string)
-end
+pbind.map_cu = function(cmd_string) return RHS:new():map_cu(cmd_string) end
 
 ---@param cmd_string string
 ---@return RhsContainer
-pbind.map_args = function(cmd_string)
-	local ro = RHS:new()
-	return ro:map_args(cmd_string)
-end
+pbind.map_args = function(cmd_string) return RHS:new():map_args(cmd_string) end
 
 ---@param callback function
 ---@return RhsContainer
-pbind.map_callback = function(callback)
-	local ro = RHS:new()
-	return ro:map_callback(callback)
-end
+pbind.map_callback = function(callback) return RHS:new():map_callback(callback) end
 
 ---@param mapping table<string, RhsContainer>
 pbind.nvim_load_mapping = function(mapping)

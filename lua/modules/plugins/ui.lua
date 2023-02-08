@@ -7,6 +7,7 @@ ui["lewis6991/gitsigns.nvim"] = { lazy = true, event = { "BufRead", "BufNewFile"
 ui["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" }
 ui["akinsho/nvim-bufferline.lua"] =
 	{ lazy = true, event = { "BufReadPost", "BufAdd", "BufNewFile" }, config = require "ui.nvim-bufferline" }
+ui["bfredl/nvim-luadev"] = { lazy = true, cmd = "Luadev" }
 
 ui["zbirenbaum/neodim"] = {
 	lazy = true,

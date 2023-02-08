@@ -11,10 +11,16 @@ return {
 		catppuccin = {
 			flavor = "latte",
 		},
+		["rose-pine"] = {
+			dark_variant = "moon",
+		},
 		nvim_tree = {
 			git = {
 				ignore = false,
 			},
+		},
+		lualine = {
+			globalstatus = true,
 		},
 	},
 }

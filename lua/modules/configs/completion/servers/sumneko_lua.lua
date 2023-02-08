@@ -25,6 +25,8 @@ require("neodev").setup {
 			"better-escape.nvim",
 			"nvim-spectre",
 			"alpha-nvim",
+			"catppuccin",
+			"rose-pine",
 		},
 	},
 }

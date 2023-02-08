@@ -115,6 +115,9 @@ return function()
 					"Trouble",
 				},
 			},
+			component_separators = "|",
+			section_separators = { left = "", right = "" },
+			globalstatus = __editor_config.plugins.lualine.globalstatus,
 		},
 		sections = {
 			lualine_a = { { "mode" } },

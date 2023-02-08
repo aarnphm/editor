@@ -1,36 +1,5 @@
 local api = vim.api
 
---- Add custom filetype extension
-vim.filetype.add {
-	extension = {
-		conf = "conf",
-		mdx = "markdown",
-		mjml = "html",
-	},
-	pattern = {
-		["%.(%a+)"] = function(_, _, ext)
-			if vim.tbl_contains({ "Dockerfile", "dockerfile" }, ext) then
-				return "dockerfile"
-			elseif vim.tbl_contains({ "j2", "jinja", "tpl", "template" }, ext) then
-				return "html"
-			elseif vim.tbl_contains({ "bazel", "bzl" }, ext) then
-				return "bzl"
-			end
-		end,
-		["Dockerfile.(%a+)$"] = function(_, _, ext)
-			if vim.tbl_contains({ "template", "tpl", "tmpl" }, ext) then
-				return "dockerfile"
-			end
-		end,
-		[".*%.env.*"] = "sh",
-		["ignore$"] = "conf",
-	},
-	filename = {
-		["yup.lock"] = "yaml",
-		["WORKSPACE"] = "bzl",
-	},
-}
-
 -- Fix fold issue of files opened by telescope
 api.nvim_create_autocmd("BufRead", {
 	callback = function()
@@ -212,6 +181,11 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = ft_id,
 	pattern = { "Dockerfile-*", "Dockerfile.{tpl,template,tmpl}", "*.{Dockerfile,dockerfile}" },
 	command = "setf dockerfile",
+})
+api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+	group = ft_id,
+	pattern = { "*.{tpl,template,tmpl,j2,jinja}" },
+	command = "setf html",
 })
 -- set shiftwidth and tabstop for lua and nix files
 api.nvim_create_autocmd("FileType", {

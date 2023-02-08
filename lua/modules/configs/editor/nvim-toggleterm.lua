@@ -1,6 +1,15 @@
 return function()
 	local colors = require("utils").get_palette()
-	local floatborder_hl = require("utils").hl_to_rgb("FloatBorder", false, colors.blue)
+	local highlights = nil
+	if vim.g.colors_name == "catppuccin" then
+		highlights = {
+			FloatBorder = {
+				guifg = require("utils").hl_to_rgb("FloatBorder", false, colors.blue),
+			},
+		}
+	elseif vim.g.colors_name == "rose-pine" then
+		highlights = require "rose-pine.plugins.toggleterm"
+	end
 
 	require("toggleterm").setup {
 		-- size can be a number or function which is passed the current terminal
@@ -17,11 +26,7 @@ return function()
 			vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
 			vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
 		end,
-		highlights = {
-			FloatBorder = {
-				guifg = floatborder_hl,
-			},
-		},
+		highlights = highlights,
 		open_mapping = false, -- [[<C-t>]],
 		hide_numbers = true, -- hide the number column in toggleterm buffers
 		shade_filetypes = {},

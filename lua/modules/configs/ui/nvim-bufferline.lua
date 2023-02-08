@@ -10,13 +10,13 @@ return function()
 			right_trunc_marker = icons.ui.Right,
 			max_name_length = 14,
 			max_prefix_length = 13,
-			tab_size = 20,
+			tab_size = 19,
 			show_buffer_close_icons = true,
 			show_buffer_icons = true,
 			show_tab_indicators = true,
 			diagnostics = "nvim_lsp",
 			always_show_bufferline = true,
-			separator_style = "thin",
+			separator_style = "thick",
 			offsets = {
 				{
 					filetype = "NvimTree",
@@ -42,7 +42,7 @@ return function()
 		local cp = require("utils").get_palette()
 		cp.none = "NONE" -- Special setting for complete transparent fg/bg.
 
-		local catppuccin_hl_overwrite = {
+		options = vim.tbl_deep_extend("force", options, {
 			highlights = require("catppuccin.groups.integrations.bufferline").get {
 				styles = { "italic", "bold" },
 				custom = {
@@ -57,14 +57,11 @@ return function()
 					},
 				},
 			},
-		}
-
-		options = vim.tbl_deep_extend("force", options, catppuccin_hl_overwrite)
+		})
 	elseif vim.g.colors_name == "rose-pine" then
-		local rp_hl_overwrite = {
+		options = vim.tbl_deep_extend("force", options, {
 			highlights = require "rose-pine.plugins.bufferline",
-		}
-		options = vim.tbl_deep_extend("force", options, rp_hl_overwrite)
+		})
 	end
 
 	require("bufferline").setup(options)

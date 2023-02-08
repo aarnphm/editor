@@ -1,3 +1,20 @@
+--- Add custom filetype extension
+vim.filetype.add {
+	extension = {
+		conf = "conf",
+		mdx = "markdown",
+		mjml = "html",
+	},
+	pattern = {
+		[".*%.env.*"] = "sh",
+		["ignore$"] = "conf",
+	},
+	filename = {
+		["yup.lock"] = "yaml",
+		["WORKSPACE"] = "bzl",
+	},
+}
+
 -- plugins
 require "editor"
 

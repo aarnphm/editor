@@ -18,6 +18,7 @@ completion["neovim/nvim-lspconfig"] = {
 			event = "BufRead",
 			dependencies = { "nvim-tree/nvim-web-devicons" },
 		},
+		{ "WhoIsSethDaniel/mason-tool-installer.nvim", config = require "completion.mason-tool-installer" },
 		{ "ray-x/lsp_signature.nvim" },
 	},
 }
