@@ -33,6 +33,20 @@ api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+-- Makes switching between buffer and termmode feels like normal mode
+api.nvim_create_autocmd("TermOpen", {
+	pattern = "term://*",
+	callback = function()
+		local opts = { noremap = true, silent = true }
+		api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], opts)
+		api.nvim_buf_set_keymap(0, "t", "kk", [[<C-\><C-n>]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
+	end,
+})
+
 -- auto close NvimTree
 api.nvim_create_autocmd("BufEnter", {
 	group = api.nvim_create_augroup("NvimTreeClose", { clear = true }),

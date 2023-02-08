@@ -13,7 +13,6 @@ return function()
 			"shfmt",
 			"black",
 			"isort",
-			"pylint",
 			"buildifier",
 			"buf",
 			"ruff",

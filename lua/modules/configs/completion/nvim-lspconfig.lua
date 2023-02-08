@@ -165,10 +165,7 @@ return function()
 		c = { formatter = require "completion.efm.formatters.clangfmt" },
 		cpp = { formatter = require "completion.efm.formatters.clangfmt" },
 		rust = { formatter = require "completion.efm.formatters.rustfmt" },
-		python = {
-			formatter = require "efmls-configs.formatters.black",
-			linter = require "efmls-configs.linters.pylint",
-		},
+		python = { formatter = require "efmls-configs.formatters.black" },
 		rst = { linter = require "efmls-configs.linters.vale" },
 		sh = {
 			formatter = require "efmls-configs.formatters.shfmt",
