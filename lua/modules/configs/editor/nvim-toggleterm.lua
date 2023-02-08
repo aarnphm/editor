@@ -7,8 +7,6 @@ return function()
 				guifg = require("utils").hl_to_rgb("FloatBorder", false, colors.blue),
 			},
 		}
-	elseif vim.g.colors_name == "rose-pine" then
-		highlights = require "rose-pine.plugins.toggleterm"
 	end
 
 	require("toggleterm").setup {

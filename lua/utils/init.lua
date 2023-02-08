@@ -38,8 +38,6 @@ local init_palette = function()
 	if not palette then
 		if vim.g.colors_name == "catppuccin" then
 			palette = require("catppuccin.palettes").get_palette()
-		elseif vim.g.colors_name == "rose-pine" then
-			palette = require "rose-pine.palette"
 		else
 			palette = {
 				rosewater = "#DC8A78",

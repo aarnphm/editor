@@ -2,8 +2,13 @@ return function()
 	local transparent_background = false -- Set background transparency here!
 
 	require("catppuccin").setup {
-		flavour = __editor_config.plugins.catppuccin.flavor, -- Can be one of: latte, frappe, macchiato, mocha
-		background = { light = "latte", dark = "mocha" },
+		-- Can be one of: latte, frappe, macchiato, mocha
+		flavour = vim.o.background == "dark" and __editor_config.plugins.catppuccin.dark_variant
+			or __editor_config.plugins.catppuccin.light_variant,
+		background = {
+			light = __editor_config.plugins.catppuccin.light_variant,
+			dark = __editor_config.plugins.catppuccin.dark_variant,
+		},
 		dim_inactive = {
 			enabled = false,
 			-- Dim inactive splits/windows/buffers.
@@ -81,7 +86,7 @@ return function()
 			symbols_outline = false,
 			telekasten = false,
 			telescope = true,
-			treesitter_context = false,
+			treesitter_context = true,
 			ts_rainbow = true,
 			vim_sneak = false,
 			vimwiki = false,
@@ -165,9 +170,9 @@ return function()
 					["@keyword.operator"] = { fg = cp.sky },
 					["@punctuation.special"] = { fg = cp.maroon },
 
-					-- ["@float"] = { fg = cp.peach },
-					-- ["@number"] = { fg = cp.peach },
-					-- ["@boolean"] = { fg = cp.peach },
+					["@float"] = { fg = cp.peach },
+					["@number"] = { fg = cp.peach },
+					["@boolean"] = { fg = cp.peach },
 
 					["@constructor"] = { fg = cp.lavender },
 					["@constant"] = { fg = cp.peach },

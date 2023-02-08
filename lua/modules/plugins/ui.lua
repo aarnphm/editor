@@ -1,8 +1,6 @@
 local ui = {}
 
 ui["nathom/filetype.nvim"] = { lazy = false }
-ui["catppuccin/nvim"] = { as = "catppuccin", lazy = false, name = "catppuccin", config = require "ui.catppuccin" }
-ui["rose-pine/neovim"] = { as = "rose-pine", lazy = false, name = "rose-pine", config = require "ui.rose-pine" }
 ui["lewis6991/gitsigns.nvim"] = { lazy = true, event = { "BufRead", "BufNewFile" }, config = require "ui.gitsigns" }
 ui["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" }
 ui["akinsho/nvim-bufferline.lua"] =
@@ -56,6 +54,21 @@ ui["j-hui/fidget.nvim"] = {
 			window = { blend = 0 },
 		}
 	end,
+}
+
+ui["catppuccin/nvim"] = {
+	as = "catppuccin",
+	lazy = false,
+	name = "catppuccin",
+	config = require "ui.catppuccin",
+	cond = function() return __editor_config.colorscheme == "catppuccin" end,
+}
+ui["rose-pine/neovim"] = {
+	as = "rose-pine",
+	lazy = false,
+	name = "rose-pine",
+	config = require "ui.rose-pine",
+	cond = function() return __editor_config.colorscheme == "rose-pine" end,
 }
 
 return ui

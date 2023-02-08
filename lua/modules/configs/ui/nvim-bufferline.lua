@@ -1,7 +1,7 @@
 return function()
 	local icons = { ui = require("utils.icons").get "ui" }
 
-	local options = {
+	require("bufferline").setup {
 		options = {
 			number = nil,
 			modified_icon = icons.ui.Modified,
@@ -16,7 +16,7 @@ return function()
 			show_tab_indicators = true,
 			diagnostics = "nvim_lsp",
 			always_show_bufferline = true,
-			separator_style = "thick",
+			separator_style = { "|", "|" },
 			offsets = {
 				{
 					filetype = "NvimTree",
@@ -35,34 +35,28 @@ return function()
 			diagnostics_indicator = function(count) return "(" .. count .. ")" end,
 		},
 		-- Change bufferline's highlights here! See `:h bufferline-highlights` for detailed explanation.
-		highlights = {},
-	}
+		highlights = (function()
+			local highlights = {}
+			local cp = require("utils").get_palette()
 
-	if vim.g.colors_name == "catppuccin" then
-		local cp = require("utils").get_palette()
-		cp.none = "NONE" -- Special setting for complete transparent fg/bg.
-
-		options = vim.tbl_deep_extend("force", options, {
-			highlights = require("catppuccin.groups.integrations.bufferline").get {
-				styles = { "italic", "bold" },
-				custom = {
-					mocha = {
-						-- Hint
-						hint = { fg = cp.rosewater },
-						hint_visible = { fg = cp.rosewater },
-						hint_selected = { fg = cp.rosewater },
-						hint_diagnostic = { fg = cp.rosewater },
-						hint_diagnostic_visible = { fg = cp.rosewater },
-						hint_diagnostic_selected = { fg = cp.rosewater },
+			if vim.g.colors_name == "catppuccin" then
+				cp.none = "NONE" -- Special setting for complete transparent fg/bg.
+				highlights = require("catppuccin.groups.integrations.bufferline").get {
+					styles = { "italic", "bold" },
+					custom = {
+						mocha = {
+							-- Hint
+							hint = { fg = cp.rosewater },
+							hint_visible = { fg = cp.rosewater },
+							hint_selected = { fg = cp.rosewater },
+							hint_diagnostic = { fg = cp.rosewater },
+							hint_diagnostic_visible = { fg = cp.rosewater },
+							hint_diagnostic_selected = { fg = cp.rosewater },
+						},
 					},
-				},
-			},
-		})
-	elseif vim.g.colors_name == "rose-pine" then
-		options = vim.tbl_deep_extend("force", options, {
-			highlights = require "rose-pine.plugins.bufferline",
-		})
-	end
-
-	require("bufferline").setup(options)
+				}()
+			end
+			return highlights
+		end)(),
+	}
 end

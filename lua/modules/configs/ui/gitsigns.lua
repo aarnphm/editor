@@ -1,7 +1,7 @@
 return function()
 	require("gitsigns").setup {
 		numhl = true,
-		word_diff = true,
+		word_diff = false,
 		watch_gitdir = { interval = 1000, follow_files = true },
 		sign_priority = 6,
 		update_debounce = 100,
