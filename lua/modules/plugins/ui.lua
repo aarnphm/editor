@@ -1,7 +1,6 @@
 local ui = {}
 
 ui["nathom/filetype.nvim"] = { lazy = false }
-ui["bfredl/nvim-luadev"] = { lazy = true, cmd = "Luadev" }
 ui["karb94/neoscroll.nvim"] = { lazy = true, event = "BufReadPost", config = require "ui.neoscroll" }
 ui["lewis6991/gitsigns.nvim"] = { lazy = true, event = { "BufRead", "BufNewFile" }, config = require "ui.gitsigns" }
 ui["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" }
