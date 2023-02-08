@@ -113,13 +113,13 @@ local mapping = {
 		:with_defaults()
 		:with_desc "terminal: Toggle horizontal",
 	["t|<C-\\>"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle horizontal",
-	["n|<LocalLeader>\\"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
+	["n|<C-w>t"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
 		:with_defaults()
 		:with_desc "terminal: Toggle vertical",
-	["i|<LocalLeader>\\"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
+	["i|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
 		:with_defaults()
 		:with_desc "terminal: Toggle vertical",
-	["t|<LocalLeader>\\"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
+	["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults():with_desc "terminal: Toggle vertical",
 	["n|slg"] = k.map_callback(function()
 		if not _lazygit then
 			_lazygit = require("toggleterm.terminal").Terminal:new {
