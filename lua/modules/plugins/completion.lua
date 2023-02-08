@@ -22,7 +22,6 @@ completion["neovim/nvim-lspconfig"] = {
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 			config = require "completion.mason-tool-installer",
 			cmd = { "MasonToolInstall", "MasonToolUpdate" },
-			build = ":MasonToolUpdate",
 		},
 		{ "ray-x/lsp_signature.nvim" },
 	},
