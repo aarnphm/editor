@@ -5,7 +5,7 @@ local disabled_filetypes = { "gitcommit", "gitrebase", "gitconfig" }
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
 	lazy = true,
-	event = { "BufReadPost", "BufAdd", "BufNewFile" },
+	event = { "BufReadPre", "BufNewFile" },
 	config = require "completion.nvim-lspconfig",
 	cond = function() return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype) end,
 	dependencies = {
@@ -18,12 +18,18 @@ completion["neovim/nvim-lspconfig"] = {
 			event = "BufRead",
 			dependencies = { "nvim-tree/nvim-web-devicons" },
 		},
-		{ "WhoIsSethDaniel/mason-tool-installer.nvim", config = require "completion.mason-tool-installer" },
+		{
+			"WhoIsSethDaniel/mason-tool-installer.nvim",
+			config = require "completion.mason-tool-installer",
+			cmd = { "MasonToolInstall", "MasonToolUpdate" },
+			build = ":MasonToolUpdate",
+		},
 		{ "ray-x/lsp_signature.nvim" },
 	},
 }
 
 completion["hrsh7th/nvim-cmp"] = {
+	lazy = true,
 	config = require "completion.nvim-cmp",
 	event = "InsertEnter",
 	dependencies = {
@@ -47,6 +53,7 @@ completion["hrsh7th/nvim-cmp"] = {
 }
 
 completion["zbirenbaum/copilot.lua"] = {
+	lazy = true,
 	cmd = "Copilot",
 	event = "InsertEnter",
 	config = require "completion.copilot",

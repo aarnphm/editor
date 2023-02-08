@@ -116,7 +116,7 @@ return function()
 				},
 			},
 			component_separators = "|",
-			section_separators = { left = "", right = "" },
+			section_separators = { left = "", right = "" },
 			globalstatus = __editor_config.plugins.lualine.globalstatus,
 		},
 		sections = {

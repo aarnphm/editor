@@ -1,7 +1,6 @@
 return function()
 	local nvim_lsp = require "lspconfig"
 	local mason = require "mason"
-	local mason_lspconfig = require "mason-lspconfig"
 	local efmls = require "efmls-configs"
 
 	-- Configuring native diagnostics
@@ -41,7 +40,7 @@ return function()
 			},
 		},
 	}
-	mason_lspconfig.setup {
+	require("mason-lspconfig").setup {
 		ensure_installed = {
 			"bashls",
 			"bufls",
@@ -107,7 +106,7 @@ return function()
 		end
 	end
 
-	mason_lspconfig.setup_handlers {
+	require("mason-lspconfig").setup_handlers {
 		function(server)
 			require("lspconfig")[server].setup {
 				capabilities = options.capabilities,

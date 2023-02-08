@@ -1,12 +1,13 @@
 local k = require "keybind"
 local _lazygit = nil
-
 --- remove weird characters from telescope keymaps
 local command_panel = function()
 	require("telescope.builtin").keymaps {
 		lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
 	}
 end
+
+local t = function(str) return vim.api.nvim_replace_termcodes(str, true, true, true) end
 
 local mapping = {
 	["n|<S-Tab>"] = k.map_cr("normal za"):with_defaults():with_desc "editn: Toggle code fold",
@@ -219,14 +220,10 @@ local mapping = {
 	["n|<LocalLeader>c"] = k.map_cu("HopChar1"):with_noremap():with_desc "jump: Goto one char",
 	["n|<LocalLeader>cc"] = k.map_cu("HopChar2"):with_noremap():with_desc "jump: Goto two chars",
 	-- EasyAlign
-	["n|gea"] = k.map_callback(
-		function() return vim.api.nvim_replace_termcodes("<Plug>(EasyAlign)", true, true, true) end
-	)
+	["n|gea"] = k.map_callback(function() return t "<Plug>(EasyAlign)" end)
 		:with_expr()
 		:with_desc "editn: Align by char",
-	["x|gea"] = k.map_callback(
-		function() return vim.api.nvim_replace_termcodes("<Plug>(EasyAlign)", true, true, true) end
-	)
+	["x|gea"] = k.map_callback(function() return t "<Plug>(EasyAlign)" end)
 		:with_expr()
 		:with_desc "editn: Align by char",
 	-- MarkdownPreview
@@ -286,9 +283,41 @@ local mapping = {
 	["n|<leader>do"] = k.map_callback(function() require("dap").repl.open() end)
 		:with_defaults()
 		:with_desc "debug: Open REPL",
+	["o|m"] = k.map_callback(function() require("tsht").nodes() end):with_silent(),
 	-- Diffview
 	["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen"):with_defaults():with_desc "git: Show diff view",
 	["n|<LocalLeader><LocalLeader>D"] = k.map_cr("DiffviewClose"):with_defaults():with_desc "git: Close diff view",
+	-- Plugin Comment.nvim
+	["n|gcc"] = k.map_callback(
+		function()
+			return vim.v.count == 0 and t "<Plug>(comment_toggle_linewise_current)"
+				or t "<Plug>(comment_toggle_linewise_count)"
+		end
+	)
+		:with_defaults()
+		:with_expr()
+		:with_desc "editn: Toggle comment for line",
+	["n|gbc"] = k.map_callback(
+		function()
+			return vim.v.count == 0 and t "<Plug>(comment_toggle_blockwise_current)"
+				or t "<Plug>(comment_toggle_blockwise_count)"
+		end
+	)
+		:with_defaults()
+		:with_expr()
+		:with_desc "editn: Toggle comment for block",
+	["n|gc"] = k.map_cmd("<Plug>(comment_toggle_linewise)")
+		:with_defaults()
+		:with_desc "editn: Toggle comment for line with operator",
+	["n|gb"] = k.map_cmd("<Plug>(comment_toggle_blockwise)")
+		:with_defaults()
+		:with_desc "editn: Toggle comment for block with operator",
+	["x|gc"] = k.map_cmd("<Plug>(comment_toggle_linewise_visual)")
+		:with_defaults()
+		:with_desc "editx: Toggle comment for line with selection",
+	["x|gb"] = k.map_cmd("<Plug>(comment_toggle_blockwise_visual)")
+		:with_defaults()
+		:with_desc "editx: Toggle comment for block with selection",
 }
 
 k.nvim_load_mapping(mapping)
