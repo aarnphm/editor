@@ -8,6 +8,7 @@ return function()
 
 	require("nvim-tree").setup {
 		auto_reload_on_write = true,
+		create_in_closed_folder = false,
 		disable_netrw = false, -- set to true if you don't want to hijack netrw
 		hijack_cursor = true,
 		hijack_netrw = true,
@@ -15,12 +16,11 @@ return function()
 		ignore_buffer_on_setup = false,
 		open_on_setup = false,
 		open_on_setup_file = false,
-		create_in_closed_folder = false,
 		sort_by = "name", -- "name" | "extension" | "size" | "relative_path" | "modified" | "created" | "accessed"
 		prefer_startup_root = false,
 		sync_root_with_cwd = false,
 		reload_on_bufenter = true,
-		respect_buf_cwd = true,
+		respect_buf_cwd = false,
 		open_on_tab = false,
 		view = {
 			adaptive_size = false,

@@ -52,11 +52,6 @@ return function()
 				override_file_sorter = true,
 				case_mode = "smart_case",
 			},
-			frecency = {
-				show_scores = true,
-				show_unindexed = true,
-				ignore_patterns = { "*.git/*", "*/tmp/*", "/lazy-lock.json" },
-			},
 			live_grep_args = {
 				auto_quoting = true, -- enable/disable auto-quoting
 				-- define mappings, e.g.
@@ -101,26 +96,12 @@ return function()
 			diagnostics = {
 				initial_mode = "normal",
 			},
-			lsp_references = {
-				theme = "cursor",
-				initial_mode = "normal",
-				layout_config = {
-					width = 0.8,
-					height = 0.4,
-				},
-			},
-			lsp_code_actions = {
-				theme = "cursor",
-				initial_mode = "normal",
-			},
 		},
 	}
 
-	telescope.load_extension "notify"
 	telescope.load_extension "fzf"
-	telescope.load_extension "zoxide"
-	telescope.load_extension "frecency"
 	telescope.load_extension "live_grep_args"
+	telescope.load_extension "zoxide"
+	telescope.load_extension "notify"
 	telescope.load_extension "undo"
-	telescope.load_extension "emoji"
 end

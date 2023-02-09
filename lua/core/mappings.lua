@@ -145,6 +145,13 @@ local mapping = {
 	["n|<LocalLeader>gcm"] = k.map_cr("G commit"):with_defaults():with_desc "git: Commit",
 	["n|<LocalLeader>gps"] = k.map_cr("G push"):with_defaults():with_desc "git: push",
 	["n|<LocalLeader>gpl"] = k.map_cr("G pull"):with_defaults():with_desc "git: pull",
+	-- ssr.nvim
+	["n|<LocalLeader>sr"] = k.map_callback(function() require("ssr").open() end)
+		:with_defaults()
+		:with_desc "edit: search and replace",
+	["x|<LocalLeader>sr"] = k.map_callback(function() require("ssr").open() end)
+		:with_defaults()
+		:with_desc "edit: search and replace",
 	-- nvim-tree
 	["n|<C-n>"] = k.map_cr("NvimTreeToggle"):with_defaults():with_desc "file-explorer: Toggle",
 	["n|<Leader>nf"] = k.map_cr("NvimTreeFindFile"):with_defaults():with_desc "file-explorer: Find file",
@@ -221,10 +228,6 @@ local mapping = {
 		:with_desc "editn: Align by char",
 	-- MarkdownPreview
 	["n|mpt"] = k.map_cr("MarkdownPreviewToggle"):with_defaults():with_desc "markdown: preview",
-	-- zen-mode
-	["n|zm"] = k.map_callback(function() require("zen-mode").toggle { window = { width = 0.75 } } end)
-		:with_defaults()
-		:with_desc "zenmode: Toggle",
 	-- dap
 	["n|<F6>"] = k.map_callback(function() require("dap").continue() end)
 		:with_defaults()

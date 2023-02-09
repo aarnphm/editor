@@ -11,11 +11,16 @@ return function()
 			max_name_length = 14,
 			max_prefix_length = 13,
 			tab_size = 19,
-			show_buffer_close_icons = true,
+			color_icons = true,
 			show_buffer_icons = true,
+			show_buffer_close_icons = true,
+			show_buffer_default_icon = true,
+			show_close_icon = true,
 			show_tab_indicators = true,
 			diagnostics = "nvim_lsp",
 			always_show_bufferline = true,
+			enforce_regular_tabs = false,
+			persist_buffer_sort = true,
 			separator_style = { "|", "|" },
 			offsets = {
 				{
