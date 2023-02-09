@@ -109,7 +109,6 @@ return function()
 	local leader = "space"
 	local lleader = "kplus"
 	dashboard.section.buttons.val = {
-		button("space f r", icons.misc.Rocket .. "File frecency", leader, "<cmd>Telescope frecency<cr>"),
 		button("space f e", icons.ui.History .. "File history", leader, "<cmd>Telescope oldfiles<cr>"),
 		button("space f w", icons.misc.WordFind .. "Word find", leader, nil, {
 			noremap = true,

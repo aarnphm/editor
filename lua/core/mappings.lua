@@ -171,9 +171,6 @@ local mapping = {
 	["n|<LocalLeader>tl"] = k.map_cr("TroubleToggle loclist"):with_defaults():with_desc "lsp: Show loclist",
 	-- Telescope
 	["n|<Space>fo"] = k.map_cu("Telescope oldfiles"):with_defaults():with_desc "find: File by history",
-	["n|<Space>fr"] = k.map_callback(function() require("telescope").extensions.frecency.frecency() end)
-		:with_defaults()
-		:with_desc "find: File by frecency",
 	["n|<LocalLeader>fw"] = k.map_callback(function() require("utils").safegit_live_grep {} end)
 		:with_defaults()
 		:with_desc "find: Word in current directory",

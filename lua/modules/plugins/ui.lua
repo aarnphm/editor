@@ -60,14 +60,12 @@ ui["catppuccin/nvim"] = {
 	lazy = false,
 	name = "catppuccin",
 	config = require "ui.catppuccin",
-	cond = function() return __editor_config.colorscheme == "catppuccin" end,
 }
 ui["rose-pine/neovim"] = {
 	as = "rose-pine",
 	lazy = false,
 	name = "rose-pine",
 	config = require "ui.rose-pine",
-	cond = function() return __editor_config.colorscheme == "rose-pine" end,
 }
 
 return ui

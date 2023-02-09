@@ -5,7 +5,7 @@ local disabled_filetypes = { "gitcommit", "gitrebase", "gitconfig" }
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
 	lazy = true,
-	event = { "BufReadPost", "BufNewFile" },
+	event = { "BufReadPre", "BufNewFile" },
 	config = require "completion.nvim-lspconfig",
 	cond = function() return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype) end,
 	dependencies = {

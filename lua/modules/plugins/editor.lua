@@ -50,6 +50,21 @@ editor["cshuaimin/ssr.nvim"] = {
 		}
 	end,
 }
+editor["stevearc/dressing.nvim"] = {
+	event = "VeryLazy",
+	config = function()
+		require("dressing").setup {
+			input = {
+				enabled = true,
+			},
+			select = {
+				enabled = true,
+				backend = "telescope",
+				trim_prompt = true,
+			},
+		}
+	end,
+}
 
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require "editor.vim-illuminate" }
 editor["LunarVim/bigfile.nvim"] =
@@ -81,6 +96,20 @@ editor["pwntester/octo.nvim"] = {
 	lazy = true,
 	config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
 	cmd = "Octo",
+}
+editor["numToStr/Comment.nvim"] = {
+	lazy = true,
+	event = { "BufNewFile", "BufReadPre" },
+	config = require "editor.comment",
+}
+
+editor["michaelb/sniprun"] = {
+	lazy = true,
+	-- You need to cd to `~/.local/share/nvim/site/lazy/sniprun/` and execute `bash ./install.sh`,
+	-- if you encountered error about no executable sniprun found.
+	build = "bash ./install.sh",
+	cmd = { "SnipRun" },
+	config = require "editor.sniprun",
 }
 
 editor["nvim-treesitter/nvim-treesitter"] = {
@@ -160,12 +189,6 @@ editor["nvim-telescope/telescope.nvim"] = {
 		{ "jvgrootveld/telescope-zoxide" },
 		{ "nvim-telescope/telescope-live-grep-args.nvim" },
 	},
-}
-
-editor["numToStr/Comment.nvim"] = {
-	lazy = true,
-	event = { "BufNewFile", "BufReadPre" },
-	config = require "editor.comment",
 }
 
 return editor
