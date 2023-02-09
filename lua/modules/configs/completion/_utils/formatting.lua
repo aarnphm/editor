@@ -161,7 +161,7 @@ M.format = function(opts)
 			vim.lsp.util.apply_text_edits(result.result, bufnr, client.offset_encoding)
 			vim.notify(
 				string.format("Format successfully with %s!", client.name),
-				vim.log.levels.INFO,
+				vim.log.levels.DEBUG,
 				{ title = "LSP Format Success!" }
 			)
 		elseif err then

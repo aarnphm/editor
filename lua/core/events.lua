@@ -17,6 +17,7 @@ api.nvim_create_autocmd("FileType", {
 		"help",
 		"man",
 		"notify",
+		"nofile",
 		"lspinfo",
 		"terminal",
 		"prompt",

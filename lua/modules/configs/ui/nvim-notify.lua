@@ -25,7 +25,7 @@ return function()
 		---@usage minimum width for notification windows
 		minimum_width = 50,
 		---@usage notifications with level lower than this would be ignored. [ERROR > WARN > INFO > DEBUG > TRACE]
-		level = "INFO",
+		level = __editor_config.debug and "DEBUG" or "INFO",
 		---@usage Icons for the different levels
 		icons = {
 			ERROR = icons.diagnostics.Error,

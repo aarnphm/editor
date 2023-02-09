@@ -1,15 +1,14 @@
 return function()
 	require("sniprun").setup {
 		selected_interpreters = {}, -- " use those instead of the default for the current filetype
-		repl_enable = {}, -- " enable REPL-like behavior for the given interpreters
+		repl_enable = { "Python3_original", "Lua_nvim" }, -- " enable REPL-like behavior for the given interpreters
 		repl_disable = {}, -- " disable REPL-like behavior for the given interpreters
 		interpreter_options = {}, -- " intepreter-specific options, consult docs / :SnipInfo <name>
 		-- " you can combo different display modes as desired
 		display = {
 			"TempFloatingWindowOk", -- display ok results in the floating window
 			"NvimNotifyErr", -- display err results with the nvim-notify plugin
-			-- "Classic", -- display results in the command line"
-			-- "VirtualText", -- display results in virtual text"
+			"VirtualText", -- display results in virtual text"
 			-- "LongTempFloatingWindow", -- display results in the long floating window
 			-- "Terminal" -- display results in a vertical split
 			-- "TerminalWithCode" -- display results and code history in a vertical split
