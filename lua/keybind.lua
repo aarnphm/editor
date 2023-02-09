@@ -29,6 +29,7 @@ RHS.new = function(self)
 end
 
 ---@param cmd_string string
+---@return RhsContainer
 RHS.map_cmd = function(self, cmd_string)
 	self.cmd = cmd_string
 	return self
@@ -138,7 +139,12 @@ pbind.nvim_load_mapping = function(mapping)
 	for key, value in pairs(mapping) do
 		local mode, keymap = key:match "([^|]*)|?(.*)"
 		if type(value) == "table" then
-			vim.api.nvim_set_keymap(mode, keymap, value.cmd, value.options)
+			local buffer = value.buffer
+			if buffer and type(buffer) == "number" then
+				vim.api.nvim_buf_set_keymap(buffer, mode, keymap, value.cmd, value.options)
+			else
+				vim.api.nvim_set_keymap(mode, keymap, value.cmd, value.options)
+			end
 		end
 	end
 end
