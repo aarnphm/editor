@@ -1,3 +1,4 @@
+local k = require "keybind"
 local icons = {
 	kind = require("utils.icons").get "kind",
 	documents = require("utils.icons").get "documents",
@@ -14,7 +15,7 @@ if not vim.loop.fs_stat(lazy_path) then
 		or "https://github.com/folke/lazy.nvim.git "
 	vim.api.nvim_command("!git clone --filter=blob:none --branch=stable " .. lazy_repo .. lazy_path)
 end
----@returns table<string, table>
+---@return table<string, table> list of plugins
 local get_plugins_list = function()
 	local list = {}
 	local plugins_list = vim.split(vim.fn.glob(__editor_global.modules_dir .. "/plugins/*.lua"), "\n")
@@ -98,10 +99,10 @@ require("lazy").setup(modules, {
 	performance = {
 		cache = {
 			enabled = true,
-			path = vim.fn.stdpath "cache" .. "/lazy/cache",
+			path = vim.fn.stdpath "cache" .. __editor_global.path_sep .. "lazy" .. __editor_global.path_sep .. "cache",
 			-- Once one of the following events triggers, caching will be disabled.
 			-- To cache all modules, set this to `{}`, but that is not recommended.
-			disable_events = { "UIEnter", "BufReadPre" },
+			disable_events = {},
 			ttl = 3600 * 24 * 2, -- keep unused modules for up to 2 days
 		},
 		reset_packpath = true, -- reset the package path to improve startup time
@@ -124,3 +125,16 @@ require("lazy").setup(modules, {
 		},
 	},
 })
+
+k.nvim_load_mapping {
+	["n|<Space>ph"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
+	["n|<Space>ps"] = k.map_cr("Lazy sync"):with_defaults():with_nowait():with_desc "package: Sync",
+	["n|<Space>pu"] = k.map_cr("Lazy update"):with_defaults():with_nowait():with_desc "package: Update",
+	["n|<Space>pi"] = k.map_cr("Lazy install"):with_defaults():with_nowait():with_desc "package: Install",
+	["n|<Space>pl"] = k.map_cr("Lazy log"):with_defaults():with_nowait():with_desc "package: Log",
+	["n|<Space>pc"] = k.map_cr("Lazy check"):with_defaults():with_nowait():with_desc "package: Check",
+	["n|<Space>pd"] = k.map_cr("Lazy debug"):with_defaults():with_nowait():with_desc "package: Debug",
+	["n|<Space>pp"] = k.map_cr("Lazy profile"):with_defaults():with_nowait():with_desc "package: Profile",
+	["n|<Space>pr"] = k.map_cr("Lazy restore"):with_defaults():with_nowait():with_desc "package: Restore",
+	["n|<Space>px"] = k.map_cr("Lazy clean"):with_defaults():with_nowait():with_desc "package: Clean",
+}

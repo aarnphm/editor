@@ -45,16 +45,4 @@ k.nvim_load_mapping {
 	["n|<Leader>l"] = k.map_cmd(":set list! list?<CR>"):with_noremap():with_desc "editn: toggle list",
 	["n|<Leader>t"] = k.map_cmd(":%s/\\s\\+$//e<CR>"):with_noremap():with_desc "editn: trim trailing whitespace",
 	["n|<LocalLeader>ft"] = k.map_cr("FormatToggle"):with_defaults():with_desc "lsp: toggle format",
-
-	-- Lazy.nvim
-	["n|<Space>ph"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
-	["n|<Space>ps"] = k.map_cr("Lazy sync"):with_defaults():with_nowait():with_desc "package: Sync",
-	["n|<Space>pu"] = k.map_cr("Lazy update"):with_defaults():with_nowait():with_desc "package: Update",
-	["n|<Space>pi"] = k.map_cr("Lazy install"):with_defaults():with_nowait():with_desc "package: Install",
-	["n|<Space>pl"] = k.map_cr("Lazy log"):with_defaults():with_nowait():with_desc "package: Log",
-	["n|<Space>pc"] = k.map_cr("Lazy check"):with_defaults():with_nowait():with_desc "package: Check",
-	["n|<Space>pd"] = k.map_cr("Lazy debug"):with_defaults():with_nowait():with_desc "package: Debug",
-	["n|<Space>pp"] = k.map_cr("Lazy profile"):with_defaults():with_nowait():with_desc "package: Profile",
-	["n|<Space>pr"] = k.map_cr("Lazy restore"):with_defaults():with_nowait():with_desc "package: Restore",
-	["n|<Space>px"] = k.map_cr("Lazy clean"):with_defaults():with_nowait():with_desc "package: Clean",
 }
