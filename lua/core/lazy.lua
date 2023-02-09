@@ -62,6 +62,11 @@ require("lazy").setup(modules, {
 		missing = true,
 		colorscheme = { __editor_config.colorscheme },
 	},
+	checker = {
+		enabled = true, -- automatically check for updates
+		concurrency = __editor_global.is_mac and 30 or nil,
+		frequency = 3600 * 24, -- check for updates every day
+	},
 	ui = {
 		-- a number <1 is a percentage., >1 is a fixed size
 		size = { width = 0.88, height = 0.8 },

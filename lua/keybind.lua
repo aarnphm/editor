@@ -1,4 +1,4 @@
----@class RhsContainer
+---@class RHS
 ---@field cmd string
 ---@field options table
 ---@field options.noremap boolean
@@ -29,28 +29,28 @@ RHS.new = function(self)
 end
 
 ---@param cmd_string string
----@return RhsContainer
+---@return RHS
 RHS.map_cmd = function(self, cmd_string)
 	self.cmd = cmd_string
 	return self
 end
 
 ---@param cmd_string string
----@return RhsContainer
+---@return RHS
 RHS.map_cr = function(self, cmd_string)
 	self.cmd = (":%s<CR>"):format(cmd_string)
 	return self
 end
 
 ---@param cmd_string string
----@return RhsContainer
+---@return RHS
 RHS.map_args = function(self, cmd_string)
 	self.cmd = (":%s<Space>"):format(cmd_string)
 	return self
 end
 
 ---@param cmd_string string
----@return RhsContainer
+---@return RHS
 RHS.map_cu = function(self, cmd_string)
 	self.cmd = (":<C-u>%s<CR>"):format(cmd_string)
 	return self
@@ -58,14 +58,14 @@ end
 
 ---@param callback fun():nil
 --- Takes a callback that will be called when the key is pressed
----@return RhsContainer
+---@return RHS
 RHS.map_callback = function(self, callback)
 	self.cmd = ""
 	self.options.callback = callback
 	return self
 end
 
----@return RhsContainer
+---@return RHS
 RHS.with_defaults = function(self)
 	-- this defaults include noremap and silent
 	self.options.noremap = true
@@ -73,69 +73,69 @@ RHS.with_defaults = function(self)
 	return self
 end
 
----@return RhsContainer
+---@return RHS
 RHS.with_silent = function(self)
 	self.options.silent = true
 	return self
 end
 
----@return RhsContainer
+---@return RHS
 RHS.with_noremap = function(self)
 	self.options.noremap = true
 	return self
 end
 
----@return RhsContainer
+---@return RHS
 RHS.with_expr = function(self)
 	self.options.expr = true
 	return self
 end
 
----@return RhsContainer
+---@return RHS
 RHS.with_nowait = function(self)
 	self.options.nowait = true
 	return self
 end
 
 ---@param bufnr number
----@return RhsContainer
+---@return RHS
 RHS.with_buffer = function(self, bufnr)
 	self.buffer = bufnr
 	return self
 end
 
 ---@param desc_string string
----@return RhsContainer
+---@return RHS
 RHS.with_desc = function(self, desc_string)
 	self.options.desc = desc_string
 	return self
 end
 
-local pbind = {}
-pbind.__index = pbind
+local bind = {}
+bind.__index = bind
 
 ---@param cmd_string string
----@return RhsContainer
-pbind.map_cr = function(cmd_string) return RHS:new():map_cr(cmd_string) end
+---@return RHS
+bind.map_cr = function(cmd_string) return RHS:new():map_cr(cmd_string) end
 
 ---@param cmd_string string
----@return RhsContainer
-pbind.map_cmd = function(cmd_string) return RHS:new():map_cmd(cmd_string) end
+---@return RHS
+bind.map_cmd = function(cmd_string) return RHS:new():map_cmd(cmd_string) end
 
 ---@param cmd_string string
----@return RhsContainer
-pbind.map_cu = function(cmd_string) return RHS:new():map_cu(cmd_string) end
+---@return RHS
+bind.map_cu = function(cmd_string) return RHS:new():map_cu(cmd_string) end
 
 ---@param cmd_string string
----@return RhsContainer
-pbind.map_args = function(cmd_string) return RHS:new():map_args(cmd_string) end
+---@return RHS
+bind.map_args = function(cmd_string) return RHS:new():map_args(cmd_string) end
 
 ---@param callback function
----@return RhsContainer
-pbind.map_callback = function(callback) return RHS:new():map_callback(callback) end
+---@return RHS
+bind.map_callback = function(callback) return RHS:new():map_callback(callback) end
 
----@param mapping table<string, RhsContainer>
-pbind.nvim_load_mapping = function(mapping)
+---@param mapping table<string, RHS>
+bind.nvim_load_mapping = function(mapping)
 	for key, value in pairs(mapping) do
 		local mode, keymap = key:match "([^|]*)|?(.*)"
 		if type(value) == "table" then
@@ -149,4 +149,7 @@ pbind.nvim_load_mapping = function(mapping)
 	end
 end
 
-return pbind
+--- remove weird characters from telescope keymaps
+bind.t = function(str) return vim.api.nvim_replace_termcodes(str, true, true, true) end
+
+return bind
