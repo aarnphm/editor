@@ -341,12 +341,7 @@ return {
 			"DapTerminate",
 		},
 		config = require "editor.nvim-dap",
-		dependencies = {
-			{
-				"rcarriga/nvim-dap-ui",
-				config = require "editor.nvim-dap.nvim-dap-ui",
-			},
-		},
+		dependencies = { { "rcarriga/nvim-dap-ui", config = require "editor.nvim-dap-ui" } },
 		init = function()
 			k.nvim_load_mapping {
 				["n|<F6>"] = k.map_callback(function() require("dap").continue() end)

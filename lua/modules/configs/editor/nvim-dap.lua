@@ -28,7 +28,7 @@ return function()
 	vim.fn.sign_define("DapLogPoint", { text = icons.dap.LogPoint, texthl = "DapLogPoint", linehl = "", numhl = "" })
 
 	-- Config lang adaptors
-	require "editor.nvim-dap.dap-lldb"
-	require "editor.nvim-dap.dap-debugpy"
-	require "editor.nvim-dap.dap-dlv"
+	require "editor.lang-adapters.dap-lldb"
+	require "editor.lang-adapters.dap-debugpy"
+	require "editor.lang-adapters.dap-dlv"
 end
