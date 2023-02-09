@@ -5,7 +5,7 @@ local disabled_filetypes = { "gitcommit", "gitrebase", "gitconfig" }
 -- lspconfig
 completion["neovim/nvim-lspconfig"] = {
 	lazy = true,
-	event = { "BufReadPre", "BufNewFile" },
+	event = { "BufReadPost", "BufNewFile" },
 	config = require "completion.nvim-lspconfig",
 	cond = function() return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype) end,
 	dependencies = {
@@ -46,7 +46,6 @@ completion["hrsh7th/nvim-cmp"] = {
 		{ "hrsh7th/cmp-buffer" },
 		{ "hrsh7th/cmp-emoji" },
 		{ "kdheepak/cmp-latex-symbols" },
-		{ "f3fora/cmp-spell" },
 		{ "windwp/nvim-autopairs", config = require "completion.nvim-autopairs" },
 	},
 }

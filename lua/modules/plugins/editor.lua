@@ -3,7 +3,6 @@ local editor = {}
 -- tpope
 editor["lewis6991/impatient.nvim"] = { lazy = false }
 editor["tpope/vim-repeat"] = { lazy = true }
-editor["Stormherz/tablify"] = { lazy = true }
 editor["jinh0/eyeliner.nvim"] = { lazy = true, event = "BufReadPost" }
 editor["junegunn/vim-easy-align"] = { lazy = true, cmd = "EasyAlign" }
 editor["luukvbaal/stabilize.nvim"] = { lazy = true, event = "BufReadPost" }
@@ -24,13 +23,11 @@ editor["nmac427/guess-indent.nvim"] = {
 }
 editor["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require "editor.vim-illuminate" }
 editor["LunarVim/bigfile.nvim"] =
-	{ lazy = false, config = require "editor.bigfile", cond = __editor_config.load_big_files_faster }
+	{ lazy = true, config = require "editor.bigfile", cond = __editor_config.load_big_files_faster }
 editor["nvim-pack/nvim-spectre"] = { lazy = true, config = require "editor.nvim-spectre" }
 editor["akinsho/nvim-toggleterm.lua"] = { lazy = true, event = "UIEnter", config = require "editor.nvim-toggleterm" }
 editor["max397574/better-escape.nvim"] =
 	{ lazy = true, event = { "BufReadPost", "BufEnter" }, config = require "editor.better-escape" }
-editor["rmagatti/auto-session"] =
-	{ lazy = true, cmd = { "SaveSession", "RestoreSession", "DeleteSession" }, config = require "editor.auto-session" }
 editor["folke/which-key.nvim"] = { event = "VeryLazy", config = require "editor.which-key" }
 editor["stevearc/dressing.nvim"] = { event = "VeryLazy", config = require "editor.dressing" }
 
@@ -43,16 +40,6 @@ editor["gelguy/wilder.nvim"] = {
 	event = "CmdlineEnter",
 	config = require "editor.wilder",
 	dependencies = { { "romgrk/fzy-lua-native" } },
-}
-editor["sudormrfbin/cheatsheet.nvim"] = {
-	event = "VeryLazy",
-	config = require "editor.cheatsheet",
-	command = { "Cheatsheet", "CheatsheetEdit" },
-	dependencies = {
-		{ "nvim-telescope/telescope.nvim" },
-		{ "nvim-lua/popup.nvim" },
-		{ "nvim-lua/plenary.nvim" },
-	},
 }
 editor["kylechui/nvim-surround"] = {
 	lazy = false,
@@ -69,14 +56,6 @@ editor["pwntester/octo.nvim"] = {
 	config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
 	cmd = "Octo",
 }
-editor["ThePrimeagen/refactoring.nvim"] = {
-	lazy = true,
-	config = require "editor.refactoring",
-	dependencies = {
-		{ "nvim-lua/plenary.nvim" },
-		{ "nvim-treesitter/nvim-treesitter" },
-	},
-}
 
 editor["nvim-treesitter/nvim-treesitter"] = {
 	lazy = true,
@@ -85,12 +64,10 @@ editor["nvim-treesitter/nvim-treesitter"] = {
 	config = require "editor.nvim-treesitter",
 	dependencies = {
 		{ "nvim-treesitter/nvim-treesitter-textobjects" },
-		{ "p00f/nvim-ts-rainbow" },
 		{ "romgrk/nvim-treesitter-context" },
 		{ "JoosepAlviste/nvim-ts-context-commentstring" },
 		{ "mfussenegger/nvim-ts-hint-textobject" },
 		{ "andymass/vim-matchup" },
-		{ "windwp/nvim-ts-autotag", config = require "editor.nvim-ts-autotag" },
 		{
 			"NvChad/nvim-colorizer.lua",
 			config = function() require("colorizer").setup() end,

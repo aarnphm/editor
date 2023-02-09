@@ -121,10 +121,8 @@ return function()
 			{ name = "nvim_lua" },
 			{ name = "luasnip" },
 			{ name = "path" },
-			{ name = "tmux" },
 			{ name = "buffer" },
 			{ name = "latex_symbols" },
-			{ name = "spell" },
 			{ name = "emoji" },
 		},
 	}

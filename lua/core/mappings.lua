@@ -56,11 +56,6 @@ local mapping = {
 
 	-- Start mapping for plugins
 	["n|ft"] = k.map_cr("FormatToggle"):with_defaults():with_desc "lsp: toggle format",
-	-- jupyter_ascending
-	["n|<LocalLeader><LocalLeader>x"] = k.map_cr(":call jupyter_ascending#execute()<CR>")
-		:with_desc "jupyter_ascending: Execute notebook shell",
-	["n|<LocalLeader><LocalLeader>X"] = k.map_cr(":call jupyter_ascending#execute_all()<CR>")
-		:with_desc "jupyter_ascending: Exceute all notebook shells",
 	-- ojroques/nvim-bufdel
 	["n|<C-x>"] = k.map_cr("BufDel"):with_defaults():with_desc "bufdel: Delete current buffer",
 	-- Bufferline
@@ -195,8 +190,6 @@ local mapping = {
 	["n|<Space>fs"] = k.map_cu("Telescope grep_string"):with_noremap():with_silent():with_desc "find: Current word",
 	["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
 	["n|<C-p>"] = k.map_callback(command_panel):with_defaults():with_desc "tools: Show keymap legends",
-	-- cheatsheet
-	["n|<LocalLeader>km"] = k.map_cr("Cheatsheet"):with_defaults():with_desc "cheatsheet: open",
 	-- SnipRun
 	["v|<Leader>r"] = k.map_cr("SnipRun"):with_defaults():with_desc "tool: Run code by range",
 	["n|<Leader>r"] = k.map_cu([[%SnipRun]]):with_defaults():with_desc "tool: Run code by file",
@@ -232,25 +225,6 @@ local mapping = {
 	["n|zm"] = k.map_callback(function() require("zen-mode").toggle { window = { width = 0.75 } } end)
 		:with_defaults()
 		:with_desc "zenmode: Toggle",
-	-- refactoring
-	["v|<LocalLeader>re"] = k.map_callback(function() require("refactoring").refactor "Extract Function" end)
-		:with_defaults()
-		:with_desc "refactor: Extract Function",
-	["v|<LocalLeader>rf"] = k.map_callback(function() require("refactoring").refactor "Extract Function To File" end)
-		:with_defaults()
-		:with_desc "refactor: Extract Function To File",
-	["v|<LocalLeader>rv"] = k.map_callback(function() require("refactoring").refactor "Extract Variable" end)
-		:with_defaults()
-		:with_desc "refactor: Extract Variable",
-	["v|<LocalLeader>ri"] = k.map_callback(function() require("refactoring").refactor "Inline Variable" end)
-		:with_defaults()
-		:with_desc "refactor: Inline Variable",
-	["n|<LocalLeader>rb"] = k.map_callback(function() require("refactoring").refactor "Extract Block" end)
-		:with_defaults()
-		:with_desc "refactor: Extract Block",
-	["n|<LocalLeader>rbf"] = k.map_callback(function() require("refactoring").refactor "Extract Block To File" end)
-		:with_defaults()
-		:with_desc "refactor: Extract Block to File",
 	-- dap
 	["n|<F6>"] = k.map_callback(function() require("dap").continue() end)
 		:with_defaults()

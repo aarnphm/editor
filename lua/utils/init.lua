@@ -38,6 +38,39 @@ local init_palette = function()
 	if not palette then
 		if vim.g.colors_name == "catppuccin" then
 			palette = require("catppuccin.palettes").get_palette()
+		elseif vim.g.colors_name == "rose-pine" then
+			local rp = require "rose-pine.palette"
+			-- mapping 1-1 to catppuccin variables
+			palette = {
+				rosewater = rp.rose,
+				flamingo = rp.love,
+				mauve = rp.iris,
+				pink = rp.rose,
+				red = rp.love,
+				maroon = rp.love,
+				peacch = "#f2b122",
+				yellow = rp.gold,
+				green = rp.foam,
+				sapphire = "#36D0E0",
+				blue = "#3e8fb0",
+				sky = "#04A5E5",
+				teal = rp.pine,
+				lavender = "#e0def4",
+
+				text = rp.text,
+				subtext1 = "#BAC2DE",
+				subtext0 = "#BAC2DE",
+				overlay2 = rp.overlay,
+				overlay1 = rp.overlay,
+				overlay0 = rp.overlay,
+				surface2 = rp.surface,
+				surface1 = rp.surface,
+				surface0 = rp.surface,
+
+				base = rp.base,
+				mantle = rp.highlight_high,
+				crust = rp.highlight_low,
+			}
 		else
 			palette = {
 				rosewater = "#DC8A78",

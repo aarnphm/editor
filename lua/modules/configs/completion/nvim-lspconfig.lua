@@ -76,7 +76,7 @@ return function()
 		on_attach = function()
 			require("lsp_signature").on_attach {
 				bind = true,
-				use_lspsaga = true,
+				use_lspsaga = false,
 				floating_window = true,
 				fix_pos = true,
 				hint_enable = true,
@@ -114,6 +114,9 @@ return function()
 			}
 		end,
 
+		efm = function()
+			-- do not setup efm here, use efmls.init
+		end,
 		clangd = function()
 			local config = require "completion.servers.clangd"
 			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", config, {
@@ -121,6 +124,7 @@ return function()
 				capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, capabilities),
 			}))
 		end,
+		html = function() nvim_lsp.html.setup(vim.tbl_deep_extend("keep", require "completion.servers.html", options)) end,
 		bashls = setup_lsp "bashls",
 		gopls = setup_lsp "gopls",
 		jsonls = setup_lsp "jsonls",
@@ -130,11 +134,6 @@ return function()
 		tsserver = setup_lsp "tsserver",
 		pyright = setup_lsp "pyright",
 	}
-
-	if vim.fn.executable "html-languageserver" then
-		local config = require "completion.servers.html"
-		nvim_lsp.html.setup(vim.tbl_deep_extend("keep", config, options))
-	end
 
 	-- Init `efm-langserver` here.
 	efmls.init {
@@ -175,10 +174,7 @@ return function()
 			formatter = require "efmls-configs.formatters.shfmt",
 			linter = require "efmls-configs.linters.shellcheck",
 		},
-		zsh = {
-			formatter = require "efmls-configs.formatters.shfmt",
-			linter = require "efmls-configs.linters.shellcheck",
-		},
+		zsh = { formatter = require "efmls-configs.formatters.shfmt" },
 	}
 
 	require("completion._utils.formatting").configure_format_on_save()
