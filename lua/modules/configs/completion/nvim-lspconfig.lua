@@ -145,8 +145,16 @@ return function()
 	-- Require `efmls-configs-nvim`'s config here
 	local eslint = require "efmls-configs.linters.eslint"
 	local prettier = require "efmls-configs.formatters.prettier"
+	local flake8 = require "efmls-configs.linters.flake8"
 
 	-- Setup formatter and linter for efmls here
+	flake8 = vim.tbl_extend("force", flake8, {
+		prefix = "flake8: max-line-length=90, ignore E501 and W505",
+		lintStdin = true,
+		lintIgnoreExitCode = true,
+		lintFormats = { "%f:%l:%c: %t%n%n%n %m" },
+		lintCommand = "flake8 --extend-ignore E501,W505 --max-line-length 90 --format '%(path)s:%(row)d:%(col)d: %(code)s %(code)s %(text)s' --stdin-display-name ${INPUT} -",
+	})
 
 	efmls.setup {
 		vue = { formatter = prettier },
@@ -164,7 +172,10 @@ return function()
 		c = { formatter = require "completion.efm.formatters.clangfmt" },
 		cpp = { formatter = require "completion.efm.formatters.clangfmt" },
 		rust = { formatter = require "completion.efm.formatters.rustfmt" },
-		python = { formatter = require "efmls-configs.formatters.black" },
+		python = {
+			formatter = require "efmls-configs.formatters.black",
+			linter = flake8,
+		},
 		rst = { linter = require "efmls-configs.linters.vale" },
 		sh = {
 			formatter = require "efmls-configs.formatters.shfmt",
