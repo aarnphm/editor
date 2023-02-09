@@ -149,11 +149,11 @@ return function()
 
 	-- Setup formatter and linter for efmls here
 	flake8 = vim.tbl_extend("force", flake8, {
-		prefix = "flake8: max-line-length=90, ignore E501 and W505",
+		prefix = "flake8: max-line-length=90, ignore=E501,W505,E402",
 		lintStdin = true,
 		lintIgnoreExitCode = true,
 		lintFormats = { "%f:%l:%c: %t%n%n%n %m" },
-		lintCommand = "flake8 --extend-ignore E501,W505 --max-line-length 90 --format '%(path)s:%(row)d:%(col)d: %(code)s %(code)s %(text)s' --stdin-display-name ${INPUT} -",
+		lintCommand = "flake8 --extend-ignore E501,W505,E402 --max-line-length 90 --format '%(path)s:%(row)d:%(col)d: %(code)s %(code)s %(text)s' --stdin-display-name ${INPUT} -",
 	})
 
 	efmls.setup {
