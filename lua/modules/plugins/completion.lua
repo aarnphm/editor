@@ -57,9 +57,6 @@ return {
 							:with_defaults()
 							:with_desc "lsp: Signature help",
 						["n|gr"] = k.map_cr("Lspsaga rename"):with_defaults():with_desc "lsp: Rename in file range",
-						["n|grr"] = k.map_cr("Lspsaga rename ++project")
-							:with_defaults()
-							:with_desc "lsp: Rename in project range",
 						["n|K"] = k.map_cr("Lspsaga hover_doc"):with_defaults():with_desc "lsp: Show doc",
 						["n|ga"] = k.map_cr("Lspsaga code_action")
 							:with_defaults()

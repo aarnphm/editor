@@ -110,6 +110,12 @@ return function()
 	local lleader = "kplus"
 	dashboard.section.buttons.val = {
 		button("space f e", icons.ui.History .. "File history", leader, "<cmd>Telescope oldfiles<cr>"),
+		button("space f r", icons.misc.Rocket .. "File frecency", leader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() require("telescope").extensions.frecency.frecency() end,
+		}),
 		button("space f w", icons.misc.WordFind .. "Word find", leader, nil, {
 			noremap = true,
 			silent = true,
@@ -135,7 +141,6 @@ return function()
 	dashboard.section.buttons.opts.hl = "String"
 	local footer = function()
 		local stats = require("lazy").stats()
-		local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
 		return icons.misc.BentoBox
 			.. "github.com/aarnphm"
 			.. "   v"
@@ -147,7 +152,7 @@ return function()
 			.. "   "
 			.. stats.count
 			.. " plugins in "
-			.. ms
+			.. stats.startuptime
 			.. "ms"
 	end
 

@@ -23,5 +23,21 @@ return {
 		lualine = {
 			globalstatus = true,
 		},
+		telescope = {
+			defaults = {
+				file_ignore_patterns = {
+					"static_content",
+					"node_modules",
+					".git/",
+					".cache",
+					"%.class",
+					"%.pdf",
+					"%.mkv",
+					"%.mp4",
+					"%.zip",
+					"lazy-lock.json",
+				},
+			},
+		},
 	},
 }

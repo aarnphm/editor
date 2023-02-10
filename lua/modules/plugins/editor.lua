@@ -13,7 +13,6 @@ local cmd = {
 return {
 	--- NOTE: add stablize.nvim if you are not using nvim-nightly
 	["tpope/vim-repeat"] = { lazy = true },
-	["jinh0/eyeliner.nvim"] = { lazy = true, event = "BufReadPost" },
 	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
 	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
 	["junegunn/vim-easy-align"] = {
@@ -23,10 +22,10 @@ return {
 			k.nvim_load_mapping {
 				["n|gea"] = k.map_callback(function() return k.t "<Plug>(EasyAlign)" end)
 					:with_expr()
-					:with_desc "editn: Align by char",
+					:with_desc "edit: Align by char",
 				["x|gea"] = k.map_callback(function() return k.t "<Plug>(EasyAlign)" end)
 					:with_expr()
-					:with_desc "editn: Align by char",
+					:with_desc "edit: Align by char",
 			}
 		end,
 	},
@@ -263,8 +262,40 @@ return {
 		lazy = true,
 		branch = "v2",
 		event = "BufRead",
-		config = function() require("hop").setup() end,
+		config = function() require("hop").setup { keys = "etovxqpdygfblzhckisuran" } end,
 		init = function()
+			-- set f/F to use hop
+			local hop = require "hop"
+			local directions = require("hop.hint").HintDirection
+			vim.keymap.set(
+				"",
+				"f",
+				function() hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true } end,
+				{ remap = true }
+			)
+			vim.keymap.set(
+				"",
+				"F",
+				function() hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true } end,
+				{ remap = true }
+			)
+			vim.keymap.set(
+				"",
+				"t",
+				function()
+					hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 }
+				end,
+				{ remap = true }
+			)
+			vim.keymap.set(
+				"",
+				"T",
+				function()
+					hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 }
+				end,
+				{ remap = true }
+			)
+
 			k.nvim_load_mapping {
 				["n|<LocalLeader>w"] = k.map_cu("HopWord"):with_noremap():with_desc "jump: Goto word",
 				["n|<LocalLeader>j"] = k.map_cu("HopLine"):with_noremap():with_desc "jump: Goto line",
@@ -298,7 +329,7 @@ return {
 				)
 					:with_defaults()
 					:with_expr()
-					:with_desc "editn: Toggle comment for line",
+					:with_desc "edit: Toggle comment for line",
 				["n|gbc"] = k.map_callback(
 					function()
 						return vim.v.count == 0 and k.t "<Plug>(comment_toggle_blockwise_current)"
@@ -307,19 +338,19 @@ return {
 				)
 					:with_defaults()
 					:with_expr()
-					:with_desc "editn: Toggle comment for block",
+					:with_desc "edit: Toggle comment for block",
 				["n|gc"] = k.map_cmd("<Plug>(comment_toggle_linewise)")
 					:with_defaults()
-					:with_desc "editn: Toggle comment for line with operator",
+					:with_desc "edit: Toggle comment for line with operator",
 				["n|gb"] = k.map_cmd("<Plug>(comment_toggle_blockwise)")
 					:with_defaults()
-					:with_desc "editn: Toggle comment for block with operator",
+					:with_desc "edit: Toggle comment for block with operator",
 				["x|gc"] = k.map_cmd("<Plug>(comment_toggle_linewise_visual)")
 					:with_defaults()
-					:with_desc "editx: Toggle comment for line with selection",
+					:with_desc "edit: Toggle comment for line with selection",
 				["x|gb"] = k.map_cmd("<Plug>(comment_toggle_blockwise_visual)")
 					:with_defaults()
-					:with_desc "editx: Toggle comment for block with selection",
+					:with_desc "edit: Toggle comment for block with selection",
 			}
 		end,
 	},
@@ -345,6 +376,7 @@ return {
 		dependencies = {
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "romgrk/nvim-treesitter-context" },
+			{ "mrjones2014/nvim-ts-rainbow" },
 			{ "JoosepAlviste/nvim-ts-context-commentstring" },
 			{ "mfussenegger/nvim-treehopper" },
 			{
@@ -437,7 +469,6 @@ return {
 	["nvim-telescope/telescope.nvim"] = {
 		cmd = "Telescope",
 		lazy = true,
-		event = "VeryLazy",
 		config = require "editor.nvim-telescope",
 		dependencies = {
 			{ "nvim-tree/nvim-web-devicons" },
@@ -447,6 +478,7 @@ return {
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "jvgrootveld/telescope-zoxide" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 		},
 		init = function()
 			local command_panel = function()
@@ -470,6 +502,9 @@ return {
 				)
 					:with_defaults()
 					:with_desc "find: Word in project",
+				["n|<Space>fr"] = k.map_callback(function() require("telescope").extensions.frecency.frecency() end)
+					:with_defaults()
+					:with_desc "find: File by frecency",
 				["n|<Space>fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
 				["n|<Space>ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
 				["n|<LocalLeader>ff"] = k.map_callback(require("utils").safegit_find_files)
@@ -477,10 +512,10 @@ return {
 					:with_desc "find: file in git project",
 				["n|<Space>fz"] = k.map_cu("Telescope zoxide list")
 					:with_defaults()
-					:with_desc "editn: Change current direrctory by zoxide",
+					:with_desc "edit: Change current direrctory by zoxide",
 				["n|<Space>fu"] = k.map_callback(function() require("telescope").extensions.undo.undo() end)
 					:with_defaults()
-					:with_desc "editn: Show undo history",
+					:with_desc "edit: Show undo history",
 				["n|<Space>fc"] = k.map_cu("Telescope colorscheme")
 					:with_defaults()
 					:with_desc "ui: Change colorscheme for current session",

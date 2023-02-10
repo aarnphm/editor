@@ -1,10 +1,9 @@
 return function()
-	local telescope = require "telescope"
 	local icons = { ui = require("utils.icons").get("ui", true) }
 	local lga_actions = require "telescope-live-grep-args.actions"
 	local telescope_actions = require "telescope.actions.set"
 
-	telescope.setup {
+	require("telescope").setup(vim.tbl_deep_extend("keep", __editor_config.plugins.telescope, {
 		defaults = {
 			initial_mode = "insert",
 			prompt_prefix = " " .. icons.ui.Telescope .. " ",
@@ -26,18 +25,6 @@ return function()
 					preview_width = 0.5,
 				},
 			},
-			file_ignore_patterns = {
-				"static_content",
-				"node_modules",
-				".git/",
-				".cache",
-				"%.class",
-				"%.pdf",
-				"%.mkv",
-				"%.mp4",
-				"%.zip",
-				"lazy-lock.json",
-			},
 			file_sorter = require("telescope.sorters").get_fuzzy_file,
 			file_previewer = require("telescope.previewers").vim_buffer_cat.new,
 			grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
@@ -51,6 +38,11 @@ return function()
 				override_generic_sorter = true,
 				override_file_sorter = true,
 				case_mode = "smart_case",
+			},
+			frecency = {
+				show_scores = true,
+				show_unindexed = true,
+				ignore_patterns = { "*.git/*", "*/tmp/*", "*/lazy-lock.json" },
 			},
 			live_grep_args = {
 				auto_quoting = true, -- enable/disable auto-quoting
@@ -97,11 +89,12 @@ return function()
 				initial_mode = "normal",
 			},
 		},
-	}
+	}))
 
-	telescope.load_extension "fzf"
-	telescope.load_extension "live_grep_args"
-	telescope.load_extension "zoxide"
-	telescope.load_extension "notify"
-	telescope.load_extension "undo"
+	require("telescope").load_extension "frecency"
+	require("telescope").load_extension "fzf"
+	require("telescope").load_extension "live_grep_args"
+	require("telescope").load_extension "zoxide"
+	require("telescope").load_extension "notify"
+	require("telescope").load_extension "undo"
 end
