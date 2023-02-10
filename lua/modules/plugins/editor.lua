@@ -1,5 +1,14 @@
 local k = require "keybind"
-local _lazygit = nil
+
+---@class ToogleTermCmd toggleterm command cache object
+---@field lazygit Terminal | nil
+---@field btop Terminal | nil
+---@field ipython Terminal | nil
+local cmd = {
+	lazygit = nil,
+	btop = nil,
+	ipython = nil,
+}
 
 return {
 	--- NOTE: add stablize.nvim if you are not using nvim-nightly
@@ -118,18 +127,51 @@ return {
 		end,
 	},
 
-	-- see lua/modules/configs/editor/
 	["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require "editor.vim-illuminate" },
 	["LunarVim/bigfile.nvim"] = {
 		lazy = true,
 		config = require "editor.bigfile",
 		cond = __editor_config.load_big_files_faster,
 	},
-	["akinsho/nvim-toggleterm.lua"] = {
+	["akinsho/toggleterm.nvim"] = {
 		lazy = true,
 		event = "UIEnter",
-		config = require "editor.nvim-toggleterm",
+		config = require "editor.toggleterm",
 		init = function()
+			local program_term = function(name, opts)
+				opts = opts or {}
+				local path = require("utils").get_binary_path(name)
+
+				if vim.tbl_contains(cmd, name) then
+					if not cmd[name] then
+						cmd[name] = require("toggleterm.terminal").Terminal:new(vim.tbl_extend("keep", opts, {
+							cmd = path and path or name,
+							hidden = true,
+							direction = "float",
+							float_opts = {
+								border = "double",
+							},
+							on_open = function(term)
+								vim.api.nvim_buf_set_keymap(
+									term.bufnr,
+									"n",
+									"q",
+									"<cmd>close<CR>",
+									{ noremap = true, silent = true }
+								)
+							end,
+						}))
+					end
+					cmd[name]:toggle()
+				else
+					vim.notify(
+						string.format("[%s] not found!. Make sure to include it in PATH.", name),
+						vim.log.levels.ERROR,
+						{ title = "toggleterm.nvim" }
+					)
+				end
+			end
+
 			k.nvim_load_mapping {
 				["n|<C-\\>"] = k.map_cr([[execute v:count . "ToggleTerm direction=horizontal"]])
 					:with_defaults()
@@ -149,30 +191,24 @@ return {
 				["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>")
 					:with_defaults()
 					:with_desc "terminal: Toggle vertical",
-				["n|slg"] = k.map_callback(function()
-					if not _lazygit then
-						_lazygit = require("toggleterm.terminal").Terminal:new {
-							cmd = require("utils").get_binary_path "lazygit",
-							hidden = true,
-							direction = "float",
-							float_opts = {
-								border = "double",
-							},
-							on_open = function(term)
-								vim.api.nvim_buf_set_keymap(
-									term.bufnr,
-									"n",
-									"q",
-									"<cmd>close<CR>",
-									{ noremap = true, silent = true }
-								)
-							end,
-						}
-					end
-					_lazygit:toggle()
-				end)
+				["n|slg"] = k.map_callback(function() program_term "lazygit" end)
 					:with_defaults()
 					:with_desc "git: Toggle lazygit",
+				["t|slg"] = k.map_callback(function() program_term "lazygit" end)
+					:with_defaults()
+					:with_desc "git: Toggle lazygit",
+				["n|sbt"] = k.map_callback(function() program_term "btop" end)
+					:with_defaults()
+					:with_desc "git: Toggle btop",
+				["t|sbt"] = k.map_callback(function() program_term "btop" end)
+					:with_defaults()
+					:with_desc "git: Toggle btop",
+				["n|sipy"] = k.map_callback(function() program_term "ipython" end)
+					:with_defaults()
+					:with_desc "git: Toggle ipython",
+				["t|sipy"] = k.map_callback(function() program_term "ipython" end)
+					:with_defaults()
+					:with_desc "git: Toggle ipython",
 			}
 		end,
 	},
@@ -386,6 +422,7 @@ return {
 	["nvim-telescope/telescope.nvim"] = {
 		cmd = "Telescope",
 		lazy = true,
+		event = "VeryLazy",
 		config = require "editor.nvim-telescope",
 		dependencies = {
 			{ "nvim-tree/nvim-web-devicons" },
@@ -400,12 +437,17 @@ return {
 			local command_panel = function()
 				require("telescope.builtin").keymaps {
 					lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+					layout_config = {
+						width = 0.6,
+						height = 0.6,
+						prompt_position = "top",
+					},
 				}
 			end
 
 			k.nvim_load_mapping {
 				["n|<Space>fo"] = k.map_cu("Telescope oldfiles"):with_defaults():with_desc "find: File by history",
-				["n|<LocalLeader>fw"] = k.map_callback(function() require("utils").safegit_live_grep {} end)
+				["n|<LocalLeader>fw"] = k.map_callback(require("utils").safegit_live_grep)
 					:with_defaults()
 					:with_desc "find: Word in current directory",
 				["n|<Space>fw"] = k.map_callback(
@@ -415,7 +457,7 @@ return {
 					:with_desc "find: Word in project",
 				["n|<Space>fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
 				["n|<Space>ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
-				["n|<LocalLeader>ff"] = k.map_callback(function() require("utils").safegit_find_files {} end)
+				["n|<LocalLeader>ff"] = k.map_callback(require("utils").safegit_find_files)
 					:with_defaults()
 					:with_desc "find: file in git project",
 				["n|<Space>fz"] = k.map_cu("Telescope zoxide list")

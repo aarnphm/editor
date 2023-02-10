@@ -28,6 +28,7 @@ require("neodev").setup {
 			"catppuccin",
 			"rose-pine",
 			"efmls-configs-nvim",
+			"toggleterm.nvim",
 		},
 	},
 }
