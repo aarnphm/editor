@@ -74,11 +74,11 @@ return {
 	},
 	["max397574/better-escape.nvim"] = {
 		lazy = true,
-		event = { "BufReadPost", "BufEnter" },
+		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("better_escape").setup {
 				mapping = { "jj", "jk" }, -- a table with mappings to use
-				timeout = vim.o.timeoutlen, -- the time in which the keys must be hit in ms. Use option timeoutlen by default
+				timeout = 200, -- the time in which the keys must be hit in ms. Use option timeoutlen by default
 				clear_empty_lines = true, -- clear line after escaping if there is only whitespace
 				keys = "<Esc>", -- the keys to use for escaping
 			}
@@ -127,7 +127,11 @@ return {
 		end,
 	},
 
-	["RRethy/vim-illuminate"] = { lazy = true, event = "BufReadPost", config = require "editor.vim-illuminate" },
+	["RRethy/vim-illuminate"] = {
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		config = require "editor.vim-illuminate",
+	},
 	["LunarVim/bigfile.nvim"] = {
 		lazy = true,
 		config = require "editor.bigfile",
@@ -135,17 +139,24 @@ return {
 	},
 	["akinsho/toggleterm.nvim"] = {
 		lazy = true,
-		event = "UIEnter",
+		cmd = {
+			"ToggleTerm",
+			"ToggleTermSetName",
+			"ToggleTermToggleAll",
+			"ToggleTermSendVisualLines",
+			"ToggleTermSendCurrentLine",
+			"ToggleTermSendVisualSelection",
+		},
 		config = require "editor.toggleterm",
 		init = function()
 			local program_term = function(name, opts)
 				opts = opts or {}
 				local path = require("utils").get_binary_path(name)
 
-				if vim.tbl_contains(cmd, name) then
+				if path then
 					if not cmd[name] then
 						cmd[name] = require("toggleterm.terminal").Terminal:new(vim.tbl_extend("keep", opts, {
-							cmd = path and path or name,
+							cmd = path,
 							hidden = true,
 							direction = "float",
 							float_opts = {
@@ -165,7 +176,7 @@ return {
 					cmd[name]:toggle()
 				else
 					vim.notify(
-						string.format("[%s] not found!. Make sure to include it in PATH.", name),
+						string.format("'%s' not found!. Make sure to include it in PATH.", name),
 						vim.log.levels.ERROR,
 						{ title = "toggleterm.nvim" }
 					)
@@ -182,13 +193,13 @@ return {
 				["t|<C-\\>"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>")
 					:with_defaults()
 					:with_desc "terminal: Toggle horizontal",
-				["n|<C-w>t"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
+				["n|<C-t>"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
 					:with_defaults()
 					:with_desc "terminal: Toggle vertical",
-				["i|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
+				["i|<C-t>"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
 					:with_defaults()
 					:with_desc "terminal: Toggle vertical",
-				["t|<C-w>t"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>")
+				["t|<C-t>"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>")
 					:with_defaults()
 					:with_desc "terminal: Toggle vertical",
 				["n|slg"] = k.map_callback(function() program_term "lazygit" end)
@@ -212,7 +223,11 @@ return {
 			}
 		end,
 	},
-	["folke/which-key.nvim"] = { event = "VeryLazy", config = require "editor.which-key" },
+	["folke/which-key.nvim"] = {
+		lazy = true,
+		event = "VeryLazy",
+		config = require "editor.which-key",
+	},
 	["folke/trouble.nvim"] = {
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -271,7 +286,7 @@ return {
 	},
 	["numToStr/Comment.nvim"] = {
 		lazy = true,
-		event = { "BufNewFile", "BufReadPre" },
+		event = { "CursorHold", "CursorHoldI" },
 		config = require "editor.comment",
 		init = function()
 			k.nvim_load_mapping {
@@ -325,7 +340,7 @@ return {
 	["nvim-treesitter/nvim-treesitter"] = {
 		lazy = true,
 		build = ":TSUpdate",
-		event = "BufReadPost",
+		event = { "CursorHold", "CursorHoldI" },
 		config = require "editor.nvim-treesitter",
 		dependencies = {
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },

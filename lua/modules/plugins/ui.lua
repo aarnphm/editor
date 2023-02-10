@@ -52,9 +52,13 @@ return {
 		end,
 	},
 
-	["lewis6991/gitsigns.nvim"] = { lazy = true, event = { "BufRead", "BufNewFile" }, config = require "ui.gitsigns" },
 	["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" },
 	["zbirenbaum/neodim"] = { lazy = true, event = "LspAttach", config = require "ui.neodim" },
+	["lewis6991/gitsigns.nvim"] = {
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		config = require "ui.gitsigns",
+	},
 	["goolord/alpha-nvim"] = {
 		lazy = true,
 		event = "BufWinEnter",

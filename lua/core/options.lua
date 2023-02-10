@@ -96,7 +96,7 @@ vim.o.tabstop = 4
 vim.o.termguicolors = true
 vim.o.timeout = true
 -- You will feel delay when you input <Space> at lazygit interface if you set it a positive value like 300(ms).
-vim.o.timeoutlen = 500
+vim.o.timeoutlen = 0
 vim.o.ttimeout = true
 vim.o.ttimeoutlen = 0
 vim.o.undodir = __editor_global.cache_dir .. "undo/"
