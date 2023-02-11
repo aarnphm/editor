@@ -66,14 +66,13 @@ require("lazy").setup(modules, {
 	install = {
 		-- install missing plugins on startup. This doesn't increase startup time.
 		missing = true,
-		colorscheme = { { "un" } },
+		colorscheme = {  "un"  },
 	},
 	checker = {
 		enabled = true, -- automatically check for updates
 		concurrency = require("editor").global.is_mac and 30 or nil,
 		frequency = 3600 * 24, -- check for updates every day
 	},
-	change_detection = { notify = false },
 	ui = {
 		-- a number <1 is a percentage., >1 is a fixed size
 		size = { width = 0.88, height = 0.8 },

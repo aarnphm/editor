@@ -15,11 +15,6 @@ vim.filetype.add {
 	},
 }
 
--- plugins
-require "editor"
-
-local api = vim.api
-
 -- Create cache dir and subs dir
 local data_dir = {
 	require("editor").global.cache_dir .. "backup",
@@ -43,13 +38,25 @@ vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
 -- map leader to , and localeader to +
 vim.g.mapleader = ","
 vim.g.maplocalleader = "+"
-api.nvim_set_keymap("n", ",", "", { noremap = true })
-api.nvim_set_keymap("x", ",", "", { noremap = true })
+vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
+vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
 
 require "core.options"
 require "core.mappings"
 require "core.events"
 require "core.lazy"
 
-api.nvim_command("set background=" .. require("editor").config.background)
-api.nvim_command("silent! colorscheme " .. require("editor").config.colorscheme)
+-- set background in lua
+
+vim.go.background = require("editor").config.background
+local ok, _ = pcall(require, require("editor").config.colorscheme)
+if not ok then
+	vim.notify(
+		"WARNING: colorscheme " .. require("editor").config.colorscheme .. " not found",
+		vim.log.levels.ERROR,
+		{ title = "editor: configuration" }
+	)
+	vim.cmd.colorscheme "un"
+else
+	vim.cmd.colorscheme(require("editor").config.colorscheme)
+end

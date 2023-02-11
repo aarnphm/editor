@@ -9,13 +9,17 @@ return function()
 
 	local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
+	require("mason-null-ls").setup { automatic_setup = true }
 	require("null-ls").setup {
 		debug = false,
 		update_in_insert = false,
 		diagnostics_format = "[#{c}] #{m} (#{s})",
 		sources = {
 			-- NOTE: formatting
-			f.prettierd.with { extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } },
+			f.prettierd.with {
+				extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
+				extra_filetypes = { "jsonc", "astro", "svelte" },
+			},
 			f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 			f.black,
 			f.ruff,
@@ -62,7 +66,9 @@ return function()
 					callback = function()
 						vim.lsp.buf.format {
 							bufnr = bufnr,
-							name = "null-ls",
+							filter = function(lspclient)
+								return lspclient.name == "null-ls" or lspclient.name == "denols"
+							end,
 						}
 						vim.notify(
 							string.format("[%s] Format successfully!", client.name),
@@ -74,4 +80,5 @@ return function()
 			end
 		end,
 	}
+	require("mason-null-ls").setup_handlers {}
 end

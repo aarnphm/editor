@@ -31,6 +31,7 @@ require("neodev").setup {
 			"todo-comments.nvim",
 			"nvim-bufferline.lua",
 			"vim-bazel",
+			"mason-null-ls.nvim",
 		},
 	},
 }
