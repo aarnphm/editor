@@ -66,7 +66,6 @@ return function()
 			"tsserver",
 			"vimls",
 			"yamlls",
-			"zk",
 		},
 		automatic_installation = true,
 	}
