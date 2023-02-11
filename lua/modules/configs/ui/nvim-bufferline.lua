@@ -40,11 +40,11 @@ return function()
 			diagnostics_indicator = function(count) return "(" .. count .. ")" end,
 		},
 		-- Change bufferline's highlights here! See `:h bufferline-highlights` for detailed explanation.
-		highlights = (function()
+		highlights = (function(colorscheme)
 			local highlights = {}
 			local cp = require("utils").get_palette()
 
-			if vim.g.colors_name == "catppuccin" then
+			if colorscheme == "catppuccin" then
 				cp.none = "NONE" -- Special setting for complete transparent fg/bg.
 				highlights = require("catppuccin.groups.integrations.bufferline").get {
 					styles = { "italic", "bold" },
@@ -60,8 +60,23 @@ return function()
 						},
 					},
 				}()
+			elseif colorscheme == "rose-pine" then
+				local p = require "rose-pine.palette"
+				cp.none = "NONE" -- Special setting for complete transparent fg/bg.
+				highlights = {
+					buffer_visible = {
+						fg = p.subtle,
+						bg = p.base,
+					},
+					buffer_selected = {
+						fg = p.text,
+						bg = p.surface,
+						bold = true,
+						italic = true,
+					},
+				}
 			end
 			return highlights
-		end)(),
+		end)(vim.g.colors_name),
 	}
 end

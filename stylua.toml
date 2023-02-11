@@ -1,6 +1,6 @@
+column_width = 100  # NOTE: conform with Linux max line length
 indent_width = 4
 line_endings = "Unix"
-# AutoPreferDouble
 quote_style = "ForceDouble"
 call_parentheses = "None"
-collapse_simple_statement = "FunctionOnly"
+collapse_simple_statement = "Always"

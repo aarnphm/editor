@@ -52,9 +52,7 @@ return function()
 		on_attach = function(client, bufnr)
 			local cwd = vim.fn.getcwd()
 			for i = 1, #disabled_workspaces do
-				if cwd.find(cwd, disabled_workspaces[i]) ~= nil then
-					return
-				end
+				if cwd.find(cwd, disabled_workspaces[i]) ~= nil then return end
 			end
 			if client.supports_method "textDocument/formatting" and format_on_save then
 				vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }

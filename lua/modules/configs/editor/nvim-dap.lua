@@ -20,12 +20,18 @@ return function()
 		"DapBreakpointCondition",
 		{ text = icons.dap.BreakpointCondition, texthl = "DapBreakpoint", linehl = "", numhl = "" }
 	)
-	vim.fn.sign_define("DapStopped", { text = icons.dap.Stopped, texthl = "DapStopped", linehl = "", numhl = "" })
+	vim.fn.sign_define(
+		"DapStopped",
+		{ text = icons.dap.Stopped, texthl = "DapStopped", linehl = "", numhl = "" }
+	)
 	vim.fn.sign_define(
 		"DapBreakpointRejected",
 		{ text = icons.dap.BreakpointRejected, texthl = "DapBreakpoint", linehl = "", numhl = "" }
 	)
-	vim.fn.sign_define("DapLogPoint", { text = icons.dap.LogPoint, texthl = "DapLogPoint", linehl = "", numhl = "" })
+	vim.fn.sign_define(
+		"DapLogPoint",
+		{ text = icons.dap.LogPoint, texthl = "DapLogPoint", linehl = "", numhl = "" }
+	)
 
 	-- Config lang adaptors
 	require "editor.lang-adapters.dap-lldb"

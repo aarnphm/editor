@@ -107,7 +107,10 @@ return function()
 			ignore_list = {},
 		},
 		system_open = { cmd = "open", args = {} },
-		filters = { dotfiles = false, custom = { "^.git$", ".DS_Store", "__pycache__", "*/lazy-lock.json" } },
+		filters = {
+			dotfiles = false,
+			custom = { "^.git$", ".DS_Store", "__pycache__", "*/lazy-lock.json" },
+		},
 		actions = {
 			use_system_clipboard = true,
 			change_dir = {
@@ -121,7 +124,15 @@ return function()
 					enable = true,
 					chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
 					exclude = {
-						filetype = { "notify", "qf", "diff", "fugitive", "fugitiveblame", "alpha", "Trouble" },
+						filetype = {
+							"notify",
+							"qf",
+							"diff",
+							"fugitive",
+							"fugitiveblame",
+							"alpha",
+							"Trouble",
+						},
 						buftype = { "nofile", "terminal", "help" },
 					},
 				},

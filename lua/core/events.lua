@@ -20,7 +20,6 @@ api.nvim_create_autocmd("FileType", {
 		"help",
 		"man",
 		"notify",
-		"nofile",
 		"lspinfo",
 		"terminal",
 		"prompt",
@@ -33,7 +32,7 @@ api.nvim_create_autocmd("FileType", {
 	},
 	callback = function(event)
 		vim.bo[event.buf].buflisted = false
-		vim.keymap.set("n", "q", "<CMD>close<CR>", { buffer = event.buf, silent = true })
+		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<CMD>close<CR>", { silent = true })
 	end,
 })
 
@@ -107,9 +106,12 @@ local wins_id = api.nvim_create_augroup("EditorWins", { clear = true })
 api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave" }, {
 	group = wins_id,
 	pattern = "*",
-	-- command = [[if ! &cursorline && &filetype !~# '^\(dashboard\|alpha\)' && ! &pvw | setlocal cursorline | endif]],
 	callback = function(_)
-		if not vim.o.cursorline and not vim.bo.filetype ~= "^(dashboard|alpha)" and not vim.o.pvw then
+		if
+			not vim.o.cursorline
+			and not vim.bo.filetype ~= "^(dashboard|alpha)"
+			and not vim.o.pvw
+		then
 			vim.o.cursorline = true
 		end
 	end,
@@ -119,11 +121,14 @@ api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter" }, {
 	group = wins_id,
 	pattern = "*",
 	callback = function(_)
-		if not vim.o.cursorline and not vim.bo.filetype ~= "^(dashboard|alpha)" and not vim.o.pvw then
+		if
+			not vim.o.cursorline
+			and not vim.bo.filetype ~= "^(dashboard|alpha)"
+			and not vim.o.pvw
+		then
 			vim.o.cursorline = false
 		end
 	end,
-	-- command = [[if &cursorline && &filetype !~# '^\(dashboard\|alpha\)' && ! &pvw | setlocal nocursorline | endif]],
 })
 -- Force write shada on leaving nvim
 api.nvim_create_autocmd("VimLeave", {
@@ -186,7 +191,13 @@ api.nvim_create_autocmd("FileType", {
 	group = ft_id,
 	pattern = "c,cpp",
 	callback = function(_)
-		api.nvim_buf_set_keymap(0, "n", "<Leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>", { noremap = true })
+		api.nvim_buf_set_keymap(
+			0,
+			"n",
+			"<Leader>h",
+			":ClangdSwitchSourceHeaderVSplit<CR>",
+			{ noremap = true }
+		)
 	end,
 })
 -- set filetype for bazel files

@@ -29,7 +29,10 @@ return {
 				"williamboman/mason-lspconfig.nvim",
 				init = function()
 					k.nvim_load_mapping {
-						["n|<LocalLeader>li"] = k.map_cr("LspInfo"):with_defaults():with_nowait():with_desc "lsp: Info",
+						["n|<LocalLeader>li"] = k.map_cr("LspInfo")
+							:with_defaults()
+							:with_nowait()
+							:with_desc "lsp: Info",
 						["n|<LocalLeader>lr"] = k.map_cr("LspRestart")
 							:with_defaults()
 							:with_nowait()
@@ -44,7 +47,9 @@ return {
 				dependencies = { "nvim-tree/nvim-web-devicons" },
 				init = function()
 					k.nvim_load_mapping {
-						["n|go"] = k.map_cr("Lspsaga outline"):with_defaults():with_desc "lsp: Toggle outline",
+						["n|go"] = k.map_cr("Lspsaga outline")
+							:with_defaults()
+							:with_desc "lsp: Toggle outline",
 						["n|g["] = k.map_cr("Lspsaga diagnostic_jump_prev")
 							:with_defaults()
 							:with_desc "lsp: Prev diagnostic",
@@ -60,8 +65,12 @@ return {
 						["n|gs"] = k.map_callback(vim.lsp.buf.signature_help)
 							:with_defaults()
 							:with_desc "lsp: Signature help",
-						["n|gr"] = k.map_cr("Lspsaga rename"):with_defaults():with_desc "lsp: Rename in file range",
-						["n|K"] = k.map_cr("Lspsaga hover_doc"):with_defaults():with_desc "lsp: Show doc",
+						["n|gr"] = k.map_cr("Lspsaga rename")
+							:with_defaults()
+							:with_desc "lsp: Rename in file range",
+						["n|K"] = k.map_cr("Lspsaga hover_doc")
+							:with_defaults()
+							:with_desc "lsp: Show doc",
 						["n|ga"] = k.map_cr("Lspsaga code_action")
 							:with_defaults()
 							:with_desc "lsp: Code action for cursor",
@@ -71,8 +80,12 @@ return {
 						["n|gd"] = k.map_cr("Lspsaga peek_definition")
 							:with_defaults()
 							:with_desc "lsp: Preview definition",
-						["n|gD"] = k.map_cr("Lspsaga goto_definition"):with_defaults():with_desc "lsp: Goto definition",
-						["n|gh"] = k.map_cr("Lspsaga lsp_finder"):with_defaults():with_desc "lsp: Show reference",
+						["n|gD"] = k.map_cr("Lspsaga goto_definition")
+							:with_defaults()
+							:with_desc "lsp: Goto definition",
+						["n|gh"] = k.map_cr("Lspsaga lsp_finder")
+							:with_defaults()
+							:with_desc "lsp: Show reference",
 						["n|<LocalLeader>ci"] = k.map_cr("Lspsaga incoming_calls")
 							:with_defaults()
 							:with_desc "lsp: Show incoming calls",
@@ -111,7 +124,11 @@ return {
 			{ "hrsh7th/cmp-buffer" },
 			{ "hrsh7th/cmp-emoji" },
 			{ "kdheepak/cmp-latex-symbols" },
-			{ "windwp/nvim-autopairs", branch = "master", config = require "completion.nvim-autopairs" },
+			{
+				"windwp/nvim-autopairs",
+				branch = "master",
+				config = require "completion.nvim-autopairs",
+			},
 		},
 	},
 

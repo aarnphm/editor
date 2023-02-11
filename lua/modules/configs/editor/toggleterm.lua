@@ -7,6 +7,15 @@ return function()
 				guifg = require("utils").hl_to_rgb("FloatBorder", false, colors.blue),
 			},
 		}
+	elseif vim.g.colors_name == "rose-pine" then
+		highlights = {
+			Normal = { link = "Normal" },
+			NormalFloat = { link = "Normal" },
+			FloatBorder = { link = "FloatBorder" },
+			SignColumn = { link = "SignColumn" },
+			StatusLine = { link = "StatusLine" },
+			StatusLineNC = { link = "StatusLineNC" },
+		}
 	end
 
 	require("toggleterm").setup {

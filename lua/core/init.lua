@@ -33,9 +33,7 @@ local data_dir = {
 if vim.fn.isdirectory(require("editor").global.cache_dir) == 0 then
 	os.execute("mkdir -p " .. require("editor").global.cache_dir)
 	for _, v in pairs(data_dir) do
-		if vim.fn.isdirectory(v) == 0 then
-			os.execute("mkdir -p " .. v)
-		end
+		if vim.fn.isdirectory(v) == 0 then os.execute("mkdir -p " .. v) end
 	end
 end
 

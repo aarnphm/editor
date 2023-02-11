@@ -10,6 +10,7 @@ return {
 	["rose-pine/neovim"] = {
 		as = "rose-pine",
 		lazy = false,
+		branch = "canary",
 		name = "rose-pine",
 		config = require "ui.rose-pine",
 	},
@@ -23,8 +24,12 @@ return {
 		config = require "ui.nvim-bufferline",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<Space>bp"] = k.map_cr("BufferLinePick"):with_defaults():with_desc "buffer: Pick",
-				["n|<Space>bc"] = k.map_cr("BufferLinePickClose"):with_defaults():with_desc "buffer: Close",
+				["n|<Space>bp"] = k.map_cr("BufferLinePick")
+					:with_defaults()
+					:with_desc "buffer: Pick",
+				["n|<Space>bc"] = k.map_cr("BufferLinePickClose")
+					:with_defaults()
+					:with_desc "buffer: Close",
 				["n|<Space>be"] = k.map_cr("BufferLineSortByExtension")
 					:with_noremap()
 					:with_desc "buffer: Sort by extension",
@@ -59,18 +64,26 @@ return {
 		config = function() require("todo-comments").setup {} end,
 		init = function()
 			k.nvim_load_mapping {
-				["n|<Space>tqf"] = k.map_cr("TodoQuickFix"):with_defaults():with_desc "todo-comments: Open quickfix",
+				["n|<Space>tqf"] = k.map_cr("TodoQuickFix")
+					:with_defaults()
+					:with_desc "todo-comments: Open quickfix",
 				["n|]t"] = k.map_callback(function() require("todo-comments").jump_next() end)
 					:with_defaults()
 					:with_desc "todo-comments: Next",
 				["n|[t"] = k.map_callback(function() require("todo-comments").jump_prev() end)
 					:with_defaults()
 					:with_desc "todo-comments: Previous",
-				["n|<Space>tt"] = k.map_cr("TodoTelescope"):with_defaults():with_desc "todo-comments: Telescope",
+				["n|<Space>tt"] = k.map_cr("TodoTelescope")
+					:with_defaults()
+					:with_desc "todo-comments: Telescope",
 			}
 		end,
 	},
-	["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" },
+	["lukas-reineke/indent-blankline.nvim"] = {
+		lazy = true,
+		event = "BufRead",
+		config = require "ui.indent-blankline",
+	},
 	["zbirenbaum/neodim"] = { lazy = true, event = "LspAttach", config = require "ui.neodim" },
 	["lewis6991/gitsigns.nvim"] = {
 		lazy = true,
@@ -83,7 +96,11 @@ return {
 		config = require "ui.alpha-nvim",
 		cond = function() return #vim.api.nvim_list_uis() > 0 end,
 	},
-	["nvim-lualine/lualine.nvim"] = { lazy = true, event = "VeryLazy", config = require "ui.lualine" },
+	["nvim-lualine/lualine.nvim"] = {
+		lazy = true,
+		event = "VeryLazy",
+		config = require "ui.lualine",
+	},
 	["kyazdani42/nvim-tree.lua"] = {
 		cmd = {
 			"NvimTreeToggle",
@@ -95,9 +112,15 @@ return {
 		config = require "ui.nvim-tree",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<C-n>"] = k.map_cr("NvimTreeToggle"):with_defaults():with_desc "file-explorer: Toggle",
-				["n|<Leader>nf"] = k.map_cr("NvimTreeFindFile"):with_defaults():with_desc "file-explorer: Find file",
-				["n|<Leader>nr"] = k.map_cr("NvimTreeRefresh"):with_defaults():with_desc "file-explorer: Refresh",
+				["n|<C-n>"] = k.map_cr("NvimTreeToggle")
+					:with_defaults()
+					:with_desc "file-explorer: Toggle",
+				["n|<Leader>nf"] = k.map_cr("NvimTreeFindFile")
+					:with_defaults()
+					:with_desc "file-explorer: Find file",
+				["n|<Leader>nr"] = k.map_cr("NvimTreeRefresh")
+					:with_defaults()
+					:with_desc "file-explorer: Refresh",
 			}
 		end,
 	},
@@ -105,6 +128,8 @@ return {
 		lazy = true,
 		event = "VeryLazy",
 		config = require "ui.nvim-notify",
-		cond = function() return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype) end,
+		cond = function()
+			return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+		end,
 	},
 }

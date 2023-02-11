@@ -3,7 +3,8 @@ return function()
 
 	require("catppuccin").setup {
 		-- Can be one of: latte, frappe, macchiato, mocha
-		flavour = vim.o.background == "dark" and require("editor").config.plugins.catppuccin.dark_variant
+		flavour = vim.o.background == "dark"
+				and require("editor").config.plugins.catppuccin.dark_variant
 			or require("editor").config.plugins.catppuccin.light_variant,
 		background = {
 			light = require("editor").config.plugins.catppuccin.light_variant,
@@ -19,7 +20,9 @@ return function()
 		transparent_background = transparent_background,
 		show_end_of_buffer = false, -- show the '~' characters after the end of buffers
 		term_colors = true,
-		compile_path = require("editor").global.cache_dir .. require("editor").global.path_sep .. "catppuccin",
+		compile_path = require("editor").global.cache_dir
+			.. require("editor").global.path_sep
+			.. "catppuccin",
 		styles = {
 			comments = { "italic" },
 			properties = { "italic" },
@@ -133,7 +136,10 @@ return function()
 			mocha = function(cp)
 				return {
 					-- For base configs.
-					NormalFloat = { fg = cp.text, bg = transparent_background and cp.none or cp.base },
+					NormalFloat = {
+						fg = cp.text,
+						bg = transparent_background and cp.none or cp.base,
+					},
 					CursorLineNr = { fg = cp.green },
 					Search = { bg = cp.surface1, fg = cp.pink, style = { "bold" } },
 					IncSearch = { bg = cp.pink, fg = cp.surface1 },

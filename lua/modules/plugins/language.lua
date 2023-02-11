@@ -5,13 +5,21 @@ return {
 	["Stormherz/tablify"] = { lazy = true, ft = "rst" },
 	["lervag/vimtex"] = { lazy = true, ft = "tex", config = require "language.vimtex" },
 	["bazelbuild/vim-bazel"] = { lazy = true, dependencies = { "google/vim-maktaba" }, ft = "bzl" },
-	["simrat39/rust-tools.nvim"] = { lazy = true, ft = "rust", config = require "language.rust-tools" },
-	["fatih/vim-go"] = { lazy = true, ft = "go", run = ":GoInstallBinaries", config = function ()
-		
-	vim.g.go_doc_keywordprg_enabled = 0
-	vim.g.go_def_mapping_enabled = 0
-	vim.g.go_code_completion_enabled = 0
-	end },
+	["simrat39/rust-tools.nvim"] = {
+		lazy = true,
+		ft = "rust",
+		config = require "language.rust-tools",
+	},
+	["fatih/vim-go"] = {
+		lazy = true,
+		ft = "go",
+		run = ":GoInstallBinaries",
+		config = function()
+			vim.g.go_doc_keywordprg_enabled = 0
+			vim.g.go_def_mapping_enabled = 0
+			vim.g.go_code_completion_enabled = 0
+		end,
+	},
 	["iamcco/markdown-preview.nvim"] = {
 		lazy = true,
 		ft = "markdown",
@@ -19,7 +27,9 @@ return {
 		build = "cd app && yarn install",
 		init = function()
 			k.nvim_load_mapping {
-				["n|mpt"] = k.map_cr("MarkdownPreviewToggle"):with_defaults():with_desc "markdown: preview",
+				["n|mpt"] = k.map_cr("MarkdownPreviewToggle")
+					:with_defaults()
+					:with_desc "markdown: preview",
 			}
 		end,
 	},

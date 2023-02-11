@@ -127,10 +127,18 @@ return function()
 		clangd = function()
 			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require "completion.servers.clangd", {
 				on_attach = options.on_attach,
-				capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, capabilities),
+				capabilities = vim.tbl_deep_extend(
+					"keep",
+					{ offsetEncoding = { "utf-16", "utf-8" } },
+					capabilities
+				),
 			}))
 		end,
-		html = function() nvim_lsp.html.setup(vim.tbl_deep_extend("keep", require "completion.servers.html", options)) end,
+		html = function()
+			nvim_lsp.html.setup(
+				vim.tbl_deep_extend("keep", require "completion.servers.html", options)
+			)
+		end,
 		marksman = setup_lsp "marksman",
 		bufls = setup_lsp "bufls",
 		bashls = setup_lsp "bashls",

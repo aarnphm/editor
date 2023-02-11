@@ -5,7 +5,11 @@ return function()
 	}
 
 	require("dapui").setup {
-		icons = { expanded = icons.ui.ArrowOpen, collapsed = icons.ui.ArrowClosed, current_frame = icons.ui.Indicator },
+		icons = {
+			expanded = icons.ui.ArrowOpen,
+			collapsed = icons.ui.ArrowClosed,
+			current_frame = icons.ui.Indicator,
+		},
 		mappings = {
 			-- Use a table to apply multiple mappings
 			expand = { "<CR>", "<2-LeftMouse>" },

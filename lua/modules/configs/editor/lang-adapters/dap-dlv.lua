@@ -15,7 +15,10 @@ dap.adapters.go = function(callback)
 		handle:close()
 		if code ~= 0 then
 			vim.notify(
-				string.format("\"dlv\" exited with code: %d, please check your configs for correctness.", code),
+				string.format(
+					"\"dlv\" exited with code: %d, please check your configs for correctness.",
+					code
+				),
 				vim.log.levels.WARN,
 				{ title = "[go] DAP Warning!" }
 			)
@@ -24,9 +27,7 @@ dap.adapters.go = function(callback)
 	assert(handle, "Error running dlv: " .. tostring(pid_or_err))
 	stdout:read_start(function(err, chunk)
 		assert(not err, err)
-		if chunk then
-			vim.schedule(function() require("dap.repl").append(chunk) end)
-		end
+		if chunk then vim.schedule(function() require("dap.repl").append(chunk) end) end
 	end)
 	-- Wait for delve to start
 	vim.defer_fn(function() callback { type = "server", host = "127.0.0.1", port = port } end, 100)

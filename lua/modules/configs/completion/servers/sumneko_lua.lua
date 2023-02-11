@@ -29,6 +29,8 @@ require("neodev").setup {
 			"null-ls.nvim",
 			"nvim-spectre",
 			"todo-comments.nvim",
+			"nvim-bufferline.lua",
+			"vim-bazel",
 		},
 	},
 }

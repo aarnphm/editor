@@ -54,10 +54,14 @@ return {
 				["n|<Space>so"] = k.map_callback(function() require("spectre").open() end)
 					:with_defaults()
 					:with_desc "replace: Open panel",
-				["n|<Space>sw"] = k.map_callback(function() require("spectre").open_visual { select_word = true } end)
+				["n|<Space>sw"] = k.map_callback(
+					function() require("spectre").open_visual { select_word = true } end
+				)
 					:with_defaults()
 					:with_desc "replace: Replace word under cursor",
-				["n|<Space>sp"] = k.map_callback(function() require("spectre").open_file_search() end)
+				["n|<Space>sp"] = k.map_callback(
+					function() require("spectre").open_file_search() end
+				)
 					:with_defaults()
 					:with_desc "replace: Replace word under file search",
 			}
@@ -82,9 +86,15 @@ return {
 		command = { "Git", "G", "Ggrep", "GBrowse" },
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>G"] = k.map_cr("G"):with_defaults():with_desc "git: Open git-fugitive",
-				["n|<LocalLeader>gaa"] = k.map_cr("G add ."):with_defaults():with_desc "git: Add all files",
-				["n|<LocalLeader>gcm"] = k.map_cr("G commit"):with_defaults():with_desc "git: Commit",
+				["n|<LocalLeader>G"] = k.map_cr("G")
+					:with_defaults()
+					:with_desc "git: Open git-fugitive",
+				["n|<LocalLeader>gaa"] = k.map_cr("G add .")
+					:with_defaults()
+					:with_desc "git: Add all files",
+				["n|<LocalLeader>gcm"] = k.map_cr("G commit")
+					:with_defaults()
+					:with_desc "git: Commit",
 				["n|<LocalLeader>gps"] = k.map_cr("G push"):with_defaults():with_desc "git: push",
 				["n|<LocalLeader>gpl"] = k.map_cr("G pull"):with_defaults():with_desc "git: pull",
 			}
@@ -96,7 +106,9 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen"):with_defaults():with_desc "git: Show diff view",
+				["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen")
+					:with_defaults()
+					:with_desc "git: Show diff view",
 				["n|<LocalLeader><LocalLeader>D"] = k.map_cr("DiffviewClose")
 					:with_defaults()
 					:with_desc "git: Close diff view",
@@ -110,7 +122,9 @@ return {
 		event = "BufReadPost",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<C-x>"] = k.map_cr("BufDel"):with_defaults():with_desc "bufdel: Delete current buffer",
+				["n|<C-x>"] = k.map_cr("BufDel")
+					:with_defaults()
+					:with_desc "bufdel: Delete current buffer",
 			}
 		end,
 	},
@@ -202,23 +216,25 @@ return {
 
 				if path then
 					if not cmd[name] then
-						cmd[name] = require("toggleterm.terminal").Terminal:new(vim.tbl_extend("keep", opts, {
-							cmd = path,
-							hidden = true,
-							direction = "float",
-							float_opts = {
-								border = "double",
-							},
-							on_open = function(term)
-								vim.api.nvim_buf_set_keymap(
-									term.bufnr,
-									"n",
-									"q",
-									"<cmd>close<CR>",
-									{ noremap = true, silent = true }
-								)
-							end,
-						}))
+						cmd[name] = require("toggleterm.terminal").Terminal:new(
+							vim.tbl_extend("keep", opts, {
+								cmd = path,
+								hidden = true,
+								direction = "float",
+								float_opts = {
+									border = "double",
+								},
+								on_open = function(term)
+									vim.api.nvim_buf_set_keymap(
+										term.bufnr,
+										"n",
+										"q",
+										"<cmd>close<CR>",
+										{ noremap = true, silent = true }
+									)
+								end,
+							})
+						)
 					end
 					cmd[name]:toggle()
 				else
@@ -281,8 +297,12 @@ return {
 		config = require "editor.trouble",
 		init = function()
 			k.nvim_load_mapping {
-				["n|gt"] = k.map_cr("TroubleToggle"):with_defaults():with_desc "lsp: Toggle trouble list",
-				["n|gR"] = k.map_cr("TroubleToggle lsp_references"):with_defaults():with_desc "lsp: Show lsp references",
+				["n|gt"] = k.map_cr("TroubleToggle")
+					:with_defaults()
+					:with_desc "lsp: Toggle trouble list",
+				["n|gR"] = k.map_cr("TroubleToggle lsp_references")
+					:with_defaults()
+					:with_desc "lsp: Show lsp references",
 				["n|<LocalLeader>td"] = k.map_cr("TroubleToggle document_diagnostics")
 					:with_defaults()
 					:with_desc "lsp: Show document diagnostics",
@@ -292,7 +312,9 @@ return {
 				["n|<LocalLeader>tq"] = k.map_cr("TroubleToggle quickfix")
 					:with_defaults()
 					:with_desc "lsp: Show quickfix list",
-				["n|<LocalLeader>tl"] = k.map_cr("TroubleToggle loclist"):with_defaults():with_desc "lsp: Show loclist",
+				["n|<LocalLeader>tl"] = k.map_cr("TroubleToggle loclist")
+					:with_defaults()
+					:with_desc "lsp: Show loclist",
 			}
 		end,
 	},
@@ -318,20 +340,28 @@ return {
 			vim.keymap.set(
 				"",
 				"f",
-				function() hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true } end,
+				function()
+					hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true }
+				end,
 				{ remap = true }
 			)
 			vim.keymap.set(
 				"",
 				"F",
-				function() hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true } end,
+				function()
+					hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true }
+				end,
 				{ remap = true }
 			)
 			vim.keymap.set(
 				"",
 				"t",
 				function()
-					hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 }
+					hop.hint_char1 {
+						direction = directions.AFTER_CURSOR,
+						current_line_only = true,
+						hint_offset = -1,
+					}
 				end,
 				{ remap = true }
 			)
@@ -339,17 +369,31 @@ return {
 				"",
 				"T",
 				function()
-					hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 }
+					hop.hint_char1 {
+						direction = directions.BEFORE_CURSOR,
+						current_line_only = true,
+						hint_offset = 1,
+					}
 				end,
 				{ remap = true }
 			)
 
 			k.nvim_load_mapping {
-				["n|<LocalLeader>w"] = k.map_cu("HopWord"):with_noremap():with_desc "jump: Goto word",
-				["n|<LocalLeader>j"] = k.map_cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-				["n|<LocalLeader>k"] = k.map_cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-				["n|<LocalLeader>c"] = k.map_cu("HopChar1"):with_noremap():with_desc "jump: Goto one char",
-				["n|<LocalLeader>cc"] = k.map_cu("HopChar2"):with_noremap():with_desc "jump: Goto two chars",
+				["n|<LocalLeader>w"] = k.map_cu("HopWord")
+					:with_noremap()
+					:with_desc "jump: Goto word",
+				["n|<LocalLeader>j"] = k.map_cu("HopLine")
+					:with_noremap()
+					:with_desc "jump: Goto line",
+				["n|<LocalLeader>k"] = k.map_cu("HopLine")
+					:with_noremap()
+					:with_desc "jump: Goto line",
+				["n|<LocalLeader>c"] = k.map_cu("HopChar1")
+					:with_noremap()
+					:with_desc "jump: Goto one char",
+				["n|<LocalLeader>cc"] = k.map_cu("HopChar2")
+					:with_noremap()
+					:with_desc "jump: Goto two chars",
 			}
 		end,
 	},
@@ -359,7 +403,9 @@ return {
 		config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>ocpr"] = k.map_cr("Octo pr list"):with_noremap():with_desc "octo: List pull request",
+				["n|<LocalLeader>ocpr"] = k.map_cr("Octo pr list")
+					:with_noremap()
+					:with_desc "octo: List pull request",
 			}
 		end,
 	},
@@ -416,17 +462,19 @@ return {
 		config = require "editor.sniprun",
 		init = function()
 			k.nvim_load_mapping {
-				["v|<Leader>r"] = k.map_cr("SnipRun"):with_defaults():with_desc "tool: Run code by range",
-				["n|<Leader>r"] = k.map_cu([[%SnipRun]]):with_defaults():with_desc "tool: Run code by file",
+				["v|<Leader>r"] = k.map_cr("SnipRun")
+					:with_defaults()
+					:with_desc "tool: Run code by range",
+				["n|<Leader>r"] = k.map_cu([[%SnipRun]])
+					:with_defaults()
+					:with_desc "tool: Run code by file",
 			}
 		end,
 	},
 	["nvim-treesitter/nvim-treesitter"] = {
 		lazy = true,
 		build = function()
-			if #vim.api.nvim_list_uis() ~= 0 then
-				vim.api.nvim_command "TSUpdate"
-			end
+			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
 		end,
 		event = { "CursorHold", "CursorHoldI" },
 		config = require "editor.nvim-treesitter",
@@ -439,7 +487,9 @@ return {
 			{
 				"andymass/vim-matchup",
 				event = "BufReadPost",
-				config = function() vim.g.matchup_matchparen_offscreen = { method = "status_manual" } end,
+				config = function()
+					vim.g.matchup_matchparen_offscreen = { method = "status_manual" }
+				end,
 			},
 			{
 				"NvChad/nvim-colorizer.lua",
@@ -552,7 +602,9 @@ return {
 			end
 
 			k.nvim_load_mapping {
-				["n|<Space>fo"] = k.map_cu("Telescope oldfiles"):with_defaults():with_desc "find: File by history",
+				["n|<Space>fo"] = k.map_cu("Telescope oldfiles")
+					:with_defaults()
+					:with_desc "find: File by history",
 				["n|<LocalLeader>fw"] = k.map_callback(require("utils").safegit_live_grep)
 					:with_defaults()
 					:with_desc "find: Word in current directory",
@@ -561,12 +613,20 @@ return {
 				)
 					:with_defaults()
 					:with_desc "find: Word in project",
-				["n|<Space>fr"] = k.map_callback(function() require("telescope").extensions.frecency.frecency() end)
+				["n|<Space>fr"] = k.map_callback(
+					function() require("telescope").extensions.frecency.frecency() end
+				)
 					:with_defaults()
 					:with_desc "find: File by frecency",
-				["n|<Space>fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
-				["n|<Space>ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
-				["n|<Space>fp"] = k.map_callback(function() require("telescope").extensions.projects.projects {} end)
+				["n|<Space>fb"] = k.map_cu("Telescope buffers")
+					:with_defaults()
+					:with_desc "find: Buffer opened",
+				["n|<Space>ff"] = k.map_cu("Telescope find_files")
+					:with_defaults()
+					:with_desc "find: File in project",
+				["n|<Space>fp"] = k.map_callback(
+					function() require("telescope").extensions.projects.projects {} end
+				)
 					:with_defaults()
 					:with_desc "find: Project",
 				["n|<LocalLeader>ff"] = k.map_callback(require("utils").safegit_find_files)
@@ -575,16 +635,26 @@ return {
 				["n|<Space>fz"] = k.map_cu("Telescope zoxide list")
 					:with_defaults()
 					:with_desc "edit: Change current direrctory by zoxide",
-				["n|<Space>fu"] = k.map_callback(function() require("telescope").extensions.undo.undo() end)
+				["n|<Space>fu"] = k.map_callback(
+					function() require("telescope").extensions.undo.undo() end
+				)
 					:with_defaults()
 					:with_desc "edit: Show undo history",
-				["n|<Space>fc"] = k.map_cu("Telescope colorscheme"):with_defaults():with_desc "ui: Change colorscheme",
-				["n|<Space>fs"] = k.map_cu("Telescope grep_string"):with_defaults():with_desc "find: Current word",
-				["n|<Space>gpr"] = k.map_callback(function() require("telescope").extensions.gh.pull_request() end)
+				["n|<Space>fc"] = k.map_cu("Telescope colorscheme")
+					:with_defaults()
+					:with_desc "ui: Change colorscheme",
+				["n|<Space>fs"] = k.map_cu("Telescope grep_string")
+					:with_defaults()
+					:with_desc "find: Current word",
+				["n|<Space>gpr"] = k.map_callback(
+					function() require("telescope").extensions.gh.pull_request() end
+				)
 					:with_defaults()
 					:with_desc "gh: Open Pull request",
 				["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
-				["n|<C-p>"] = k.map_callback(command_panel):with_defaults():with_desc "tools: Show keymap legends",
+				["n|<C-p>"] = k.map_callback(command_panel)
+					:with_defaults()
+					:with_desc "tools: Show keymap legends",
 			}
 		end,
 	},

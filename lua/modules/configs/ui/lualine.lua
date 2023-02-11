@@ -53,9 +53,7 @@ return function()
 		local cwd = vim.fn.getcwd()
 		if not require("editor").global.is_windows then
 			local home = os.getenv "HOME"
-			if home and cwd:find(home, 1, true) == 1 then
-				cwd = "~" .. cwd:sub(#home + 1)
-			end
+			if home and cwd:find(home, 1, true) == 1 then cwd = "~" .. cwd:sub(#home + 1) end
 		end
 		return icons.ui.RootFolderOpened .. cwd
 	end
@@ -91,13 +89,9 @@ return function()
 
 		if vim.bo.filetype == "python" then
 			local venv = os.getenv "CONDA_DEFAULT_ENV"
-			if venv then
-				return string.format(icons.misc.PyEnv .. ":(%s)", env_cleanup(venv))
-			end
+			if venv then return string.format(icons.misc.PyEnv .. ":(%s)", env_cleanup(venv)) end
 			venv = os.getenv "VIRTUAL_ENV"
-			if venv then
-				return string.format(icons.misc.PyEnv .. ":(%s)", env_cleanup(venv))
-			end
+			if venv then return string.format(icons.misc.PyEnv .. ":(%s)", env_cleanup(venv)) end
 		end
 		return ""
 	end

@@ -21,11 +21,11 @@ return function()
 	end
 
 	local has_words_before = function()
-		if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
-			return false
-		end
+		if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
 		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-		return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match "^%s*$" == nil
+		return col ~= 0
+			and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match "^%s*$"
+				== nil
 	end
 
 	local check_backspace = function()
@@ -47,7 +47,8 @@ return function()
 	compare.lsp_scores = function(entry1, entry2)
 		local diff
 		if entry1.completion_item.score and entry2.completion_item.score then
-			diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
+			diff = (entry2.completion_item.score * entry2.score)
+				- (entry1.completion_item.score * entry1.score)
 		else
 			diff = entry2.score - entry1.score
 		end

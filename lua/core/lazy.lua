@@ -8,7 +8,10 @@ local icons = {
 }
 
 local modules = {}
-local lazy_path = require("editor").global.data_dir .. "lazy" .. require("editor").global.path_sep .. "lazy.nvim"
+local lazy_path = require("editor").global.data_dir
+	.. "lazy"
+	.. require("editor").global.path_sep
+	.. "lazy.nvim"
 
 if not vim.loop.fs_stat(lazy_path) then
 	local lazy_repo = require("editor").config.use_ssh and "git@github.com:folke/lazy.nvim.git "
@@ -18,7 +21,8 @@ end
 ---@return table<string, table> list of plugins
 local get_plugins_list = function()
 	local list = {}
-	local plugins_list = vim.split(vim.fn.glob(require("editor").global.modules_dir .. "/plugins/*.lua"), "\n")
+	local plugins_list =
+		vim.split(vim.fn.glob(require("editor").global.modules_dir .. "/plugins/*.lua"), "\n")
 	if type(plugins_list) == "table" then
 		for _, f in ipairs(plugins_list) do
 			-- fill list with `plugins/*.lua`'s path used for later `require` like this:
@@ -56,18 +60,20 @@ require("lazy").setup(modules, {
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 300,
-		url_format = require("editor").config.use_ssh and "git@github.com:%s.git" or "https://github.com/%s.git",
+		url_format = require("editor").config.use_ssh and "git@github.com:%s.git"
+			or "https://github.com/%s.git",
 	},
 	install = {
 		-- install missing plugins on startup. This doesn't increase startup time.
 		missing = true,
-		colorscheme = { require("editor").config.colorscheme },
+		colorscheme = { { "un" } },
 	},
 	checker = {
 		enabled = true, -- automatically check for updates
 		concurrency = require("editor").global.is_mac and 30 or nil,
 		frequency = 3600 * 24, -- check for updates every day
 	},
+	change_detection = { notify = false },
 	ui = {
 		-- a number <1 is a percentage., >1 is a fixed size
 		size = { width = 0.88, height = 0.8 },
@@ -99,7 +105,11 @@ require("lazy").setup(modules, {
 	performance = {
 		cache = {
 			enabled = true,
-			path = vim.fn.stdpath "cache" .. require("editor").global.path_sep .. "lazy" .. require("editor").global.path_sep .. "cache",
+			path = vim.fn.stdpath "cache"
+				.. require("editor").global.path_sep
+				.. "lazy"
+				.. require("editor").global.path_sep
+				.. "cache",
 			-- Once one of the following events triggers, caching will be disabled.
 			-- To cache all modules, set this to `{}`, but that is not recommended.
 			disable_events = {},
@@ -129,12 +139,33 @@ require("lazy").setup(modules, {
 k.nvim_load_mapping {
 	["n|<Space>ph"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
 	["n|<Space>ps"] = k.map_cr("Lazy sync"):with_defaults():with_nowait():with_desc "package: Sync",
-	["n|<Space>pu"] = k.map_cr("Lazy update"):with_defaults():with_nowait():with_desc "package: Update",
-	["n|<Space>pi"] = k.map_cr("Lazy install"):with_defaults():with_nowait():with_desc "package: Install",
+	["n|<Space>pu"] = k.map_cr("Lazy update")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Update",
+	["n|<Space>pi"] = k.map_cr("Lazy install")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Install",
 	["n|<Space>pl"] = k.map_cr("Lazy log"):with_defaults():with_nowait():with_desc "package: Log",
-	["n|<Space>pc"] = k.map_cr("Lazy check"):with_defaults():with_nowait():with_desc "package: Check",
-	["n|<Space>pd"] = k.map_cr("Lazy debug"):with_defaults():with_nowait():with_desc "package: Debug",
-	["n|<Space>pp"] = k.map_cr("Lazy profile"):with_defaults():with_nowait():with_desc "package: Profile",
-	["n|<Space>pr"] = k.map_cr("Lazy restore"):with_defaults():with_nowait():with_desc "package: Restore",
-	["n|<Space>px"] = k.map_cr("Lazy clean"):with_defaults():with_nowait():with_desc "package: Clean",
+	["n|<Space>pc"] = k.map_cr("Lazy check")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Check",
+	["n|<Space>pd"] = k.map_cr("Lazy debug")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Debug",
+	["n|<Space>pp"] = k.map_cr("Lazy profile")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Profile",
+	["n|<Space>pr"] = k.map_cr("Lazy restore")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Restore",
+	["n|<Space>px"] = k.map_cr("Lazy clean")
+		:with_defaults()
+		:with_nowait()
+		:with_desc "package: Clean",
 }

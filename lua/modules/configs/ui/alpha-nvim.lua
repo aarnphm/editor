@@ -3,7 +3,10 @@ return function()
 	local dashboard = require "alpha.themes.dashboard"
 
 	local headers = nil
-	local icons = { misc = require("utils.icons").get("misc", true), ui = require("utils.icons").get("ui", true) }
+	local icons = {
+		misc = require("utils.icons").get("misc", true),
+		ui = require("utils.icons").get("ui", true),
+	}
 
 	if require("editor").config.background == "dark" then
 		headers = {
@@ -90,9 +93,7 @@ return function()
 			hl_shortcut = "Keyword",
 		}
 
-		if nil == keybind then
-			keybind = k_after
-		end
+		if nil == keybind then keybind = k_after end
 		keybind_opts = vim.F.if_nil(keybind_opts, { noremap = true, silent = true, nowait = true })
 		opts.keymap = { "n", k_after, keybind, keybind_opts }
 
@@ -147,13 +148,25 @@ return function()
 			nowait = true,
 			callback = function() vim.api.nvim_command "enew" end,
 		}),
-		button("kplus e c", icons.misc.MultipleWheels .. "Editor config", lleader, "<cmd>e ~/.editor.lua<cr>"),
-		button("kplus e s", icons.misc.SingleWheel .. "Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),
+		button(
+			"kplus e c",
+			icons.misc.MultipleWheels .. "Editor config",
+			lleader,
+			"<cmd>e ~/.editor.lua<cr>"
+		),
+		button(
+			"kplus e s",
+			icons.misc.SingleWheel .. "Settings",
+			lleader,
+			":e $MYVIMRC | :cd %:p:h <CR>"
+		),
 		button("kplus e r", icons.misc.SimpleVim .. "Edit NVIM config", lleader, nil, {
 			noremap = true,
 			silent = true,
 			nowait = true,
-			callback = function() require("utils").safegit_find_files { cwd = vim.fn.stdpath "config" } end,
+			callback = function()
+				require("utils").safegit_find_files { cwd = vim.fn.stdpath "config" }
+			end,
 		}),
 	}
 
@@ -180,7 +193,9 @@ return function()
 	dashboard.section.footer.opts.hl = "Function"
 
 	local head_butt_padding = 2
-	local occu_height = #dashboard.section.header.val + 2 * #dashboard.section.buttons.val + head_butt_padding
+	local occu_height = #dashboard.section.header.val
+		+ 2 * #dashboard.section.buttons.val
+		+ head_butt_padding
 	local header_padding = math.max(0, math.ceil((vim.fn.winheight "$" - occu_height) * 0.25))
 	local foot_butt_padding = 1
 

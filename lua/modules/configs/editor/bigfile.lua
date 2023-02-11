@@ -2,7 +2,9 @@ return function()
 	local ftdetect = {
 		name = "ftdetect",
 		opts = { defer = true },
-		disable = function() vim.api.nvim_set_option_value("filetype", "big_file_disabled_ft", { scope = "local" }) end,
+		disable = function()
+			vim.api.nvim_set_option_value("filetype", "big_file_disabled_ft", { scope = "local" })
+		end,
 	}
 
 	local cmp = {

@@ -42,24 +42,24 @@ local init_palette = function()
 			local rp = require "rose-pine.palette"
 			-- mapping 1-1 to catppuccin variables
 			palette = {
-				rosewater = rp.rose,
-				flamingo = rp.love,
+				rosewater = rp.love,
+				flamingo = rp.rose,
 				mauve = rp.iris,
 				pink = rp.rose,
 				red = rp.love,
 				maroon = rp.love,
-				peacch = "#f2b122",
-				yellow = rp.gold,
+				peach = "#ea9a97",
+				yellow = "#f6c177",
 				green = rp.foam,
-				sapphire = "#36D0E0",
-				blue = "#3e8fb0",
-				sky = "#04A5E5",
+				sapphire = rp.pine,
+				blue = rp.pine,
+				sky = rp.foam,
 				teal = rp.pine,
-				lavender = "#e0def4",
+				lavender = rp.iris,
 
 				text = rp.text,
-				subtext1 = "#BAC2DE",
-				subtext0 = "#BAC2DE",
+				subtext1 = rp.base,
+				subtext0 = rp.base,
 				overlay2 = rp.overlay,
 				overlay1 = rp.overlay,
 				overlay0 = rp.overlay,
@@ -104,7 +104,12 @@ local init_palette = function()
 			}
 		end
 
-		palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").config.palette_overwrite)
+		palette = vim.tbl_extend(
+			"force",
+			{ none = "NONE" },
+			palette,
+			require("editor").config.palette_overwrite
+		)
 	end
 
 	return palette
@@ -131,9 +136,7 @@ end
 ---@param style string @The style config
 ---@return table
 local parse_style = function(style)
-	if not style or style == "NONE" then
-		return {}
-	end
+	if not style or style == "NONE" then return {} end
 
 	local result = {}
 	for field in string.gmatch(style, "([^,]+)") do
@@ -148,16 +151,19 @@ end
 ---@return table
 local get_highlight = function(hl_group)
 	local hl = vim.api.nvim_get_hl_by_name(hl_group, true)
-	if hl.link then
-		return get_highlight(hl.link)
-	end
+	if hl.link then return get_highlight(hl.link) end
 
 	local result = parse_style(hl.style)
 	result.fg = hl.foreground and string.format("#%06x", hl.foreground)
 	result.bg = hl.background and string.format("#%06x", hl.background)
 	result.sp = hl.special and string.format("#%06x", hl.special)
 	for attr, val in pairs(hl) do
-		if type(attr) == "string" and attr ~= "foreground" and attr ~= "background" and attr ~= "special" then
+		if
+			type(attr) == "string"
+			and attr ~= "foreground"
+			and attr ~= "background"
+			and attr ~= "special"
+		then
 			result[attr] = val
 		end
 	end
@@ -243,9 +249,7 @@ M.get_binary_path = function(binary)
 	elseif require("editor").global.is_windows then
 		path = vim.fn.trim(vim.fn.system("where " .. binary))
 	end
-	if vim.v.shell_error ~= 0 then
-		path = nil
-	end
+	if vim.v.shell_error ~= 0 then path = nil end
 	return path
 end
 
@@ -255,9 +259,13 @@ M.safegit_find_files = function(opts)
 
 	vim.fn.system "git rev-parse --is-inside-work-tree"
 	if vim.v.shell_error == 0 then
-		require("telescope.builtin").git_files(vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope))
+		require("telescope.builtin").git_files(
+			vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
+		)
 	else
-		require("telescope.builtin").find_files(vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope))
+		require("telescope.builtin").find_files(
+			vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
+		)
 	end
 end
 
@@ -268,7 +276,9 @@ M.safegit_live_grep = function(opts)
 	if vim.v.shell_error == 0 then
 		opts.cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
 	end
-	require("telescope.builtin").live_grep(vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope))
+	require("telescope.builtin").live_grep(
+		vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
+	)
 end
 
 return M
