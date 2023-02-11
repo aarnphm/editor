@@ -26,7 +26,9 @@ return function()
 			b.formatting.ruff,
 			b.formatting.isort,
 			b.formatting.stylua,
-			b.formatting.shfmt,
+			b.formatting.shfmt.with {
+				extra_args = { "-i", 4, "-ci", "-sr" },
+			},
 			b.formatting.markdownlint,
 			b.formatting.cbfmt,
 			b.formatting.beautysh,

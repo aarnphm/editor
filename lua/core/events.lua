@@ -1,7 +1,9 @@
 local api = vim.api
 
+local misc_id = api.nvim_create_augroup("MiscBufs", { clear = true })
 -- Fix fold issue of files opened by telescope
 api.nvim_create_autocmd("BufRead", {
+	group = misc_id,
 	callback = function()
 		api.nvim_create_autocmd("BufWinEnter", {
 			once = true,
@@ -12,6 +14,7 @@ api.nvim_create_autocmd("BufRead", {
 
 -- close some filetypes with <q>
 api.nvim_create_autocmd("FileType", {
+	group = misc_id,
 	pattern = {
 		"qf",
 		"help",
@@ -36,6 +39,7 @@ api.nvim_create_autocmd("FileType", {
 
 -- Makes switching between buffer and termmode feels like normal mode
 api.nvim_create_autocmd("TermOpen", {
+	group = misc_id,
 	pattern = "term://*",
 	callback = function()
 		local opts = { noremap = true, silent = true }

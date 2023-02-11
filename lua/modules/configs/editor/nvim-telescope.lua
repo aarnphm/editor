@@ -98,4 +98,5 @@ return function()
 	require("telescope").load_extension "zoxide"
 	require("telescope").load_extension "notify"
 	require("telescope").load_extension "undo"
+	require("telescope").load_extension "gh"
 end

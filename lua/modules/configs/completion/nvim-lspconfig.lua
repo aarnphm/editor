@@ -75,7 +75,14 @@ return function()
 	capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 	local options = {
-		on_attach = function(_, _)
+		on_attach = function(client, _)
+			--- NOTE: Avoid LSP foratting, since it will be handled by null-ls
+			client.server_capabilities.documentFormattingProvider = false
+			client.server_capabilities.documentRangeFormattingProvider = false
+
+			---Disable |lsp-semantic_tokens| (conflicting with TS highlights)
+			client.server_capabilities.semanticTokensProvider = nil
+
 			require("lsp_signature").on_attach {
 				bind = true,
 				use_lspsaga = false,

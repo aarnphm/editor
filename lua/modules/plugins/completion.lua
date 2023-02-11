@@ -98,6 +98,7 @@ return {
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",
+				lazy = true,
 				config = require "completion.luasnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
 			},

@@ -15,6 +15,26 @@ return {
 	["tpope/vim-repeat"] = { lazy = true },
 	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
 	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
+	["nvim-pack/nvim-spectre"] = {
+		lazy = true,
+		config = require "editor.nvim-spectre",
+		init = function()
+			k.nvim_load_mapping {
+				["n|<Space>s"] = k.map_callback(function() require("spectre").open_visual() end)
+					:with_defaults()
+					:with_desc "replace: Open visual replace",
+				["n|<Space>so"] = k.map_callback(function() require("spectre").open() end)
+					:with_defaults()
+					:with_desc "replace: Open panel",
+				["n|<Space>sw"] = k.map_callback(function() require("spectre").open_visual { select_word = true } end)
+					:with_defaults()
+					:with_desc "replace: Replace word under cursor",
+				["n|<Space>sp"] = k.map_callback(function() require("spectre").open_file_search() end)
+					:with_defaults()
+					:with_desc "replace: Replace word under file search",
+			}
+		end,
+	},
 	["junegunn/vim-easy-align"] = {
 		lazy = true,
 		cmd = "EasyAlign",
@@ -489,6 +509,7 @@ return {
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
 			{ "ahmedkhalf/project.nvim", event = "BufReadPost", config = require "editor.project" },
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
+			{ "nvim-telescope/telescope-github.nvim" },
 		},
 		init = function()
 			local command_panel = function()
@@ -529,13 +550,11 @@ return {
 				["n|<Space>fu"] = k.map_callback(function() require("telescope").extensions.undo.undo() end)
 					:with_defaults()
 					:with_desc "edit: Show undo history",
-				["n|<Space>fc"] = k.map_cu("Telescope colorscheme")
+				["n|<Space>fc"] = k.map_cu("Telescope colorscheme"):with_defaults():with_desc "ui: Change colorscheme",
+				["n|<Space>fs"] = k.map_cu("Telescope grep_string"):with_defaults():with_desc "find: Current word",
+				["n|<Space>gpr"] = k.map_callback(function() require("telescope").extensions.gh.pull_request() end)
 					:with_defaults()
-					:with_desc "ui: Change colorscheme for current session",
-				["n|<Space>fs"] = k.map_cu("Telescope grep_string")
-					:with_noremap()
-					:with_silent()
-					:with_desc "find: Current word",
+					:with_desc "gh: Open Pull request",
 				["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
 				["n|<C-p>"] = k.map_callback(command_panel):with_defaults():with_desc "tools: Show keymap legends",
 			}

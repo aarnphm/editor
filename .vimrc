@@ -1,5 +1,3 @@
-set nocompatible
-
 filetype plugin indent on
 
 syntax enable
@@ -10,11 +8,14 @@ syntax enable
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " auto source vimrc
-autocmd! BufWritePost $MYVIMRC source $MYVIMRC | echom "Reloaded $MYVIMRC"
+augroup vimrc
+  autocmd!
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  autocmd! BufWritePost $MYVIMRC source $MYVIMRC | echom "Reloaded $MYVIMRC"
+augroup END
 
 call plug#begin('~/.vim/plugged')
 " tpope plugins =)
@@ -36,7 +37,6 @@ Plug 'bling/vim-bufferline'
 Plug 'lambdalisue/suda.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'thaerkh/vim-indentguides'
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
@@ -55,7 +55,7 @@ Plug 'lervag/vimtex'
 
 call plug#end()
 
-let mapleader=','
+let mapleader='<Space>'
 let maplocalleader='+'
 let g:is_gui=has('gui_running')
 let g:is_termguicolors = has('termguicolors') && !g:is_gui && $COLORTERM isnot# 'xterm-256color'
@@ -145,7 +145,7 @@ if &listchars ==# 'eol:$'
     set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif
 
-if v:version > 703 || v:version == 703 && has("patch541")
+if v:version > 703 || v:version == 703 && has('patch541')
     set formatoptions+=j " Delete comment character when joining commented lines
 endif
 
@@ -199,7 +199,7 @@ endfunction
 function! s:Bclose(bang, buffer)
   if empty(a:buffer)
     let btarget = bufnr('%')
-  elseif a:buffer =~ '^\d\+$'
+  elseif a:buffer =~? '^\d\+$'
     let btarget = bufnr(str2nr(a:buffer))
   else
     let btarget = bufnr(a:buffer)
@@ -247,11 +247,6 @@ endfunction
 command! -bang -complete=buffer -nargs=? Bclose call <SID>Bclose(<q-bang>, <q-args>)
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Filetype
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let python_highlight_all = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Mapping
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Mapping
@@ -260,7 +255,7 @@ imap jj <Esc>
 
 " Thanks to Steve Losh for this liberating tip
 " See http://stevelosh.com/blog/2010/09/coming-home-to-vim
-if exists("plug")
+if exists('plug')
   nnoremap / /\v
   vnoremap / /\v
 endif
@@ -335,7 +330,7 @@ nnoremap pc :PlugClean<cr>
 nnoremap pi :PlugInstall<cr>
 nnoremap pu :PlugUpdate<cr>
 nnoremap <F3> :TagbarToggle<CR>
-if exists(":Tabularize")
+if exists(':Tabularize')
     nmap <leader>a= :Tabularize /=<CR>
     vmap <leader>a= :Tabularize /=<CR>
     nmap <Leader>a: :Tabularize /:<CR>
@@ -366,27 +361,27 @@ endfunction
 " Use substitute() instead of printf() to handle '%%s' modeline in LaTeX
 " files.
 function! AppendModeLine()
-    let l:modeline = printf("vim: set ft=%s ts=%d sw=%d tw=%d %set :",
+    let l:modeline = printf('vim: set ft=%s ts=%d sw=%d tw=%d %set :',
                 \ &filetype, &tabstop, &shiftwidth, &textwidth, &expandtab ? '' : 'no')
-    let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
-    call append(line("$"), l:modeline)
+    let l:modeline = substitute(&commentstring, '%s', l:modeline, '')
+    call append(line('$'), l:modeline)
 endfunction
 
 function! CmdLine(str)
-    call feedkeys(":" . a:str)
+    call feedkeys(':' . a:str)
 endfunction
 
 function! VisualSelection(direction, extra_filter) range
     let l:saved_reg = @"
-    execute "normal! vgvy"
+    execute 'normal! vgvy'
 
     let l:pattern = escape(@", "\\/.*'$^~[]")
-    let l:pattern = substitute(l:pattern, "\n$", "", "")
+    let l:pattern = substitute(l:pattern, '\n$', '', '')
 
-    if a:direction == 'gv'
+    if a:direction ==? 'gv'
         call CmdLine("Ack '" . l:pattern . "' " )
-    elseif a:direction == 'replace'
-        call CmdLine("%s" . '/'. l:pattern . '/')
+    elseif a:direction ==? 'replace'
+        call CmdLine('%s' . '/'. l:pattern . '/')
     endif
 
     let @/ = l:pattern
@@ -613,7 +608,10 @@ function! ShowDocumentation()
 endfunction
 
 " Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
+augroup CocGroup
+  autocmd!
+  autocmd CursorHold * silent call CocActionAsync('highlight')
+augroup end
 
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
@@ -622,7 +620,7 @@ nmap <leader>rn <Plug>(coc-rename)
 xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
 
-augroup typescript
+augroup TypeScript
   autocmd!
   " Setup formatexpr specified filetype(s).
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
@@ -714,14 +712,17 @@ let NERDTreeShowHidden = 1
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeRespectWildIgnore=1
-let g:NERDTreeWinPos = "right"
+let g:NERDTreeWinPos = 'right'
 let NERDTreeIgnore = ['node_modules','\dist','\build','\.pyc$', '__pycache__','\.class$','\.egg_info$','.git']
 let g:NERDTreeWinSize=35
 nnoremap <C-n> :NERDTreeToggle<cr>
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-" Start NERDTree when Vim starts with a directory argument.
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
-" Exit Vim if NERDTree is the only window left.
-autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) || &buftype == 'quickfix' | q | endif
+augroup NERDTree
+  autocmd!
+  autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+  " Start NERDTree when Vim starts with a directory argument.
+  autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+  " Exit Vim if NERDTree is the only window left.
+  autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) || &buftype == 'quickfix' | q | endif
+augroup END
 
 "vim: set ft=vim ts=4 sw=4 tw=78 et :

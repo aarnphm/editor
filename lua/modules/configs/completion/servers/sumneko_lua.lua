@@ -27,6 +27,7 @@ require("neodev").setup {
 			"toggleterm.nvim",
 			"lspsaga.nvim",
 			"null-ls.nvim",
+			"nvim-spectre",
 			"todo-comments.nvim",
 		},
 	},
