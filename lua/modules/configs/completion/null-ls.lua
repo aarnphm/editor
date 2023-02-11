@@ -1,5 +1,5 @@
 return function()
-	local disabled_worksapces = {}
+	local disabled_workspaces = {}
 	local format_on_save = __editor_config.format_on_save
 
 	-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
@@ -59,8 +59,8 @@ return function()
 		},
 		on_attach = function(client, bufnr)
 			local cwd = vim.fn.getcwd()
-			for i = 1, #disabled_worksapces do
-				if cwd.find(cwd, disabled_worksapces[i]) ~= nil then
+			for i = 1, #disabled_workspaces do
+				if cwd.find(cwd, disabled_workspaces[i]) ~= nil then
 					return
 				end
 			end
