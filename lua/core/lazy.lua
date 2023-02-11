@@ -75,7 +75,8 @@ require("lazy").setup(modules, {
 		frequency = 3600 * 24, -- check for updates every day
 	},
 	dev = {
-		path = vim.env.WORKSPACE .. "/neovim-plugins/",
+		path = vim.NIL ~= vim.fn.getenv "WORKSPACE" and vim.env.WORKSPACE .. "/neovim-plugins/"
+			or "~/",
 	},
 	ui = {
 		-- a number <1 is a percentage., >1 is a fixed size
