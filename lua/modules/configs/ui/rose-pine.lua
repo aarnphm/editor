@@ -1,7 +1,7 @@
 return function()
 	require("rose-pine").setup {
 		--- @usage 'main' | 'moon'
-		dark_variant = __editor_config.plugins["rose-pine"].dark_variant,
+		dark_variant = require("editor").config.plugins["rose-pine"].dark_variant,
 		bold_vert_split = false,
 		dim_nc_background = false,
 		disable_background = true,

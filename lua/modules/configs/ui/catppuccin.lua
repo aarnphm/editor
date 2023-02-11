@@ -3,11 +3,11 @@ return function()
 
 	require("catppuccin").setup {
 		-- Can be one of: latte, frappe, macchiato, mocha
-		flavour = vim.o.background == "dark" and __editor_config.plugins.catppuccin.dark_variant
-			or __editor_config.plugins.catppuccin.light_variant,
+		flavour = vim.o.background == "dark" and require("editor").config.plugins.catppuccin.dark_variant
+			or require("editor").config.plugins.catppuccin.light_variant,
 		background = {
-			light = __editor_config.plugins.catppuccin.light_variant,
-			dark = __editor_config.plugins.catppuccin.dark_variant,
+			light = require("editor").config.plugins.catppuccin.light_variant,
+			dark = require("editor").config.plugins.catppuccin.dark_variant,
 		},
 		dim_inactive = {
 			enabled = false,
@@ -19,7 +19,7 @@ return function()
 		transparent_background = transparent_background,
 		show_end_of_buffer = false, -- show the '~' characters after the end of buffers
 		term_colors = true,
-		compile_path = __editor_global.cache_dir .. __editor_global.path_sep .. "catppuccin",
+		compile_path = require("editor").global.cache_dir .. require("editor").global.path_sep .. "catppuccin",
 		styles = {
 			comments = { "italic" },
 			properties = { "italic" },

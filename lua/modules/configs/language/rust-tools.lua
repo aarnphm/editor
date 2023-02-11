@@ -1,6 +1,6 @@
 local codelldb_extension_path = vim.env.HOME .. "/.vscode/extensions/vadimcn.vscode-lldb-1.8.1/"
 local codelldb_path = codelldb_extension_path .. "adapter/codelldb"
-local liblldb_path = __editor_global.is_mac and codelldb_extension_path .. "lldb/lib/liblldb.dylib"
+local liblldb_path = require("editor").global.is_mac and codelldb_extension_path .. "lldb/lib/liblldb.dylib"
 	or codelldb_extension_path .. "lldb/lib/liblldb.so"
 
 return function()

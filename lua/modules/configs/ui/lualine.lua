@@ -51,7 +51,7 @@ return function()
 
 	local get_cwd = function()
 		local cwd = vim.fn.getcwd()
-		if not __editor_global.is_windows then
+		if not require("editor").global.is_windows then
 			local home = os.getenv "HOME"
 			if home and cwd:find(home, 1, true) == 1 then
 				cwd = "~" .. cwd:sub(#home + 1)
@@ -104,7 +104,7 @@ return function()
 
 	require("lualine").setup {
 		options = {
-			theme = __editor_config.colorscheme,
+			theme = require("editor").config.colorscheme,
 			disabled_filetypes = {
 				statusline = {
 					"alpha",
@@ -122,7 +122,7 @@ return function()
 			},
 			component_separators = "|",
 			section_separators = { left = "", right = "" },
-			globalstatus = __editor_config.plugins.lualine.globalstatus,
+			globalstatus = require("editor").config.plugins.lualine.globalstatus,
 		},
 		sections = {
 			lualine_a = { { "mode" } },

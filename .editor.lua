@@ -1,4 +1,12 @@
 return {
+	---Change the colors of the global palette here.
+	---Settings will complete their replacement at initialization.
+	---Example: { sky = "#04A5E5" }
+	---@type palette
+	palette_overwrite = {},
+	---@type string[]
+	disabled_workspaces = {},
+	---@type boolean whether to enable debug
 	debug = true,
 	reset_cache = false,
 	background = "dark",

@@ -5,7 +5,7 @@ return function()
 	local headers = nil
 	local icons = { misc = require("utils.icons").get("misc", true), ui = require("utils.icons").get("ui", true) }
 
-	if __editor_config.background == "dark" then
+	if require("editor").config.background == "dark" then
 		headers = {
 			[[⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿]],
 			[[⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿]],
@@ -171,6 +171,9 @@ return function()
 			.. "   "
 			.. stats.count
 			.. " plugins"
+			.. " in "
+			.. stats.startuptime
+			.. "ms"
 	end
 
 	dashboard.section.footer.val = footer()

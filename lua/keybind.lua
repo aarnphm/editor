@@ -135,6 +135,10 @@ bind.map_args = function(cmd_string) return RHS:new():map_args(cmd_string) end
 bind.map_callback = function(callback) return RHS:new():map_callback(callback) end
 
 ---@param mapping table<string, RHS>
+--- This functions takes the mapping tables and loads them into the neovim
+--- keymap. The mapping table should be in the following format: [mode|keymap] = RHS
+--- For example:
+--- ["n|<Space>ph"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
 bind.nvim_load_mapping = function(mapping)
 	for key, value in pairs(mapping) do
 		local mode, keymap = key:match "([^|]*)|?(.*)"
@@ -149,7 +153,10 @@ bind.nvim_load_mapping = function(mapping)
 	end
 end
 
---- remove weird characters from telescope keymaps
+--- Replaces terminal codes and |keycodes| (<CR>, <Esc>, ...) in a string with
+--- the internal representation.
+---@param str string
+---@return string
 bind.t = function(str) return vim.api.nvim_replace_termcodes(str, true, true, true) end
 
 return bind

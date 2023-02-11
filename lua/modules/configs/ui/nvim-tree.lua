@@ -149,7 +149,7 @@ return function()
 			enable = true,
 			show_on_dirs = true,
 			timeout = 500,
-			ignore = __editor_config.plugins.nvim_tree.git.ignore,
+			ignore = require("editor").config.plugins.nvim_tree.git.ignore,
 		},
 		trash = {
 			cmd = require("utils").get_binary_path "rip",

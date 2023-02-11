@@ -17,7 +17,35 @@ return {
 	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
 	["nvim-pack/nvim-spectre"] = {
 		lazy = true,
-		config = require "editor.nvim-spectre",
+		build = "./build.sh nvim-oxi",
+		config = function()
+			require("spectre").setup {
+				color_devicons = true,
+				open_cmd = "vnew",
+				live_update = true, -- auto excute search again when you write any file in vim
+				line_sep_start = "┌-----------------------------------------",
+				result_padding = "¦  ",
+				line_sep = "└-----------------------------------------",
+				highlight = {
+					ui = "String",
+					search = "DiffChange",
+					replace = "DiffDelete",
+				},
+				default = {
+					find = {
+						--pick one of item in find_engine
+						cmd = "rg",
+						options = { "ignore-case" },
+					},
+					replace = {
+						--pick one of item in replace_engine
+						cmd = "oxi",
+					},
+				},
+				is_open_target_win = true, --open file on opener window
+				is_insert_mode = false, -- start open panel on is_insert_mode
+			}
+		end,
 		init = function()
 			k.nvim_load_mapping {
 				["n|<Space>s"] = k.map_callback(function() require("spectre").open_visual() end)
@@ -154,7 +182,7 @@ return {
 	["LunarVim/bigfile.nvim"] = {
 		lazy = true,
 		config = require "editor.bigfile",
-		cond = __editor_config.load_big_files_faster,
+		cond = require("editor").config.load_big_files_faster,
 	},
 	["akinsho/toggleterm.nvim"] = {
 		lazy = true,

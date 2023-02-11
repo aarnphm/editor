@@ -104,7 +104,7 @@ local init_palette = function()
 			}
 		end
 
-		palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").palette_overwrite)
+		palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").config.palette_overwrite)
 	end
 
 	return palette
@@ -238,9 +238,9 @@ end
 
 M.get_binary_path = function(binary)
 	local path = nil
-	if __editor_global.is_mac or __editor_global.is_linux then
+	if require("editor").global.is_mac or require("editor").global.is_linux then
 		path = vim.fn.trim(vim.fn.system("which " .. binary))
-	elseif __editor_global.is_windows then
+	elseif require("editor").global.is_windows then
 		path = vim.fn.trim(vim.fn.system("where " .. binary))
 	end
 	if vim.v.shell_error ~= 0 then
@@ -255,9 +255,9 @@ M.safegit_find_files = function(opts)
 
 	vim.fn.system "git rev-parse --is-inside-work-tree"
 	if vim.v.shell_error == 0 then
-		require("telescope.builtin").git_files(vim.tbl_deep_extend("keep", opts, __editor_config.plugins.telescope))
+		require("telescope.builtin").git_files(vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope))
 	else
-		require("telescope.builtin").find_files(vim.tbl_deep_extend("keep", opts, __editor_config.plugins.telescope))
+		require("telescope.builtin").find_files(vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope))
 	end
 end
 
@@ -268,7 +268,7 @@ M.safegit_live_grep = function(opts)
 	if vim.v.shell_error == 0 then
 		opts.cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
 	end
-	require("telescope.builtin").live_grep(vim.tbl_deep_extend("keep", opts, __editor_config.plugins.telescope))
+	require("telescope.builtin").live_grep(vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope))
 end
 
 return M

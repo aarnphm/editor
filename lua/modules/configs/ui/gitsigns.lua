@@ -2,7 +2,7 @@ return function()
 	require("gitsigns").setup {
 		numhl = true,
 		---@diagnostic disable-next-line: undefined-global
-		word_diff = __editor_config.plugins.gitsigns.word_diff,
+		word_diff = require("editor").config.plugins.gitsigns.word_diff,
 		watch_gitdir = { interval = 1000, follow_files = true },
 		sign_priority = 6,
 		update_debounce = 100,

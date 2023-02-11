@@ -22,16 +22,16 @@ local api = vim.api
 
 -- Create cache dir and subs dir
 local data_dir = {
-	__editor_global.cache_dir .. "backup",
-	__editor_global.cache_dir .. "session",
-	__editor_global.cache_dir .. "swap",
-	__editor_global.cache_dir .. "tags",
-	__editor_global.cache_dir .. "undo",
+	require("editor").global.cache_dir .. "backup",
+	require("editor").global.cache_dir .. "session",
+	require("editor").global.cache_dir .. "swap",
+	require("editor").global.cache_dir .. "tags",
+	require("editor").global.cache_dir .. "undo",
 }
 -- There only check once that If cache_dir exists
 -- Then I don't want to check subs dir exists
-if vim.fn.isdirectory(__editor_global.cache_dir) == 0 then
-	os.execute("mkdir -p " .. __editor_global.cache_dir)
+if vim.fn.isdirectory(require("editor").global.cache_dir) == 0 then
+	os.execute("mkdir -p " .. require("editor").global.cache_dir)
 	for _, v in pairs(data_dir) do
 		if vim.fn.isdirectory(v) == 0 then
 			os.execute("mkdir -p " .. v)
@@ -53,5 +53,5 @@ require "core.mappings"
 require "core.events"
 require "core.lazy"
 
-api.nvim_command("set background=" .. __editor_config.background)
-api.nvim_command("silent! colorscheme " .. __editor_config.colorscheme)
+api.nvim_command("set background=" .. require("editor").config.background)
+api.nvim_command("silent! colorscheme " .. require("editor").config.colorscheme)

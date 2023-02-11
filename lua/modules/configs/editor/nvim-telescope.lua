@@ -3,7 +3,7 @@ return function()
 	local lga_actions = require "telescope-live-grep-args.actions"
 	local telescope_actions = require "telescope.actions.set"
 
-	require("telescope").setup(vim.tbl_deep_extend("keep", __editor_config.plugins.telescope, {
+	require("telescope").setup(vim.tbl_deep_extend("keep", require("editor").config.plugins.telescope, {
 		defaults = {
 			initial_mode = "insert",
 			prompt_prefix = " " .. icons.ui.Telescope .. " ",

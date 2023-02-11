@@ -1,17 +1,13 @@
 return function()
-	local disabled_workspaces = {}
-	local format_on_save = __editor_config.format_on_save
+	local disabled_workspaces = require("editor").config.disabled_workspaces
+	local format_on_save = require("editor").config.format_on_save
 
 	-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
-	local b = require("null-ls").builtins
+	local f = require("null-ls").builtins.formatting
+	local d = require("null-ls").builtins.diagnostics
+	local ca = require("null-ls").builtins.code_actions
 
 	local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
-	local with_diagnostics_code = function(builtin)
-		return builtin.with {
-			diagnostics_format = "#{m} [#{c}]",
-		}
-	end
 
 	require("null-ls").setup {
 		debug = false,
@@ -19,45 +15,39 @@ return function()
 		diagnostics_format = "[#{c}] #{m} (#{s})",
 		sources = {
 			-- NOTE: formatting
-			b.formatting.prettierd.with {
-				extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
-			},
-			b.formatting.black,
-			b.formatting.ruff,
-			b.formatting.isort,
-			b.formatting.stylua,
-			b.formatting.shfmt.with {
-				extra_args = { "-i", 4, "-ci", "-sr" },
-			},
-			b.formatting.markdownlint,
-			b.formatting.cbfmt,
-			b.formatting.beautysh,
-			b.formatting.yamlfmt,
-			b.formatting.rustfmt,
-			b.formatting.jq,
-			b.formatting.buf,
-			b.formatting.buildifier,
+			f.prettierd.with { extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } },
+			f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
+			f.black,
+			f.ruff,
+			f.isort,
+			f.stylua,
+			f.markdownlint,
+			f.cbfmt,
+			f.beautysh,
+			f.yamlfmt,
+			f.rustfmt,
+			f.jq,
+			f.buf,
+			f.buildifier,
 
 			-- NOTE: diagnostics
-			b.diagnostics.eslint_d,
-			b.diagnostics.ruff,
-			with_diagnostics_code(b.diagnostics.shellcheck),
-			b.diagnostics.selene,
-			b.diagnostics.markdownlint.with {
-				extra_args = { "--disable MD033" },
-			},
-			b.diagnostics.zsh,
-			b.diagnostics.buf,
-			b.diagnostics.buildifier,
-			b.diagnostics.yamllint,
-			b.diagnostics.vulture,
-			b.diagnostics.vale,
-			b.diagnostics.vint,
+			d.eslint_d,
+			d.ruff,
+			d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
+			d.selene,
+			d.markdownlint.with { extra_args = { "--disable MD033" } },
+			d.zsh,
+			d.buf,
+			d.buildifier,
+			d.yamllint,
+			d.vulture,
+			d.vale,
+			d.vint,
 
 			-- NOTE: code actions
-			b.code_actions.gitrebase,
-			b.code_actions.gitsigns, -- retrieve code actions from lewis6991/gitsigns.nvim
-			b.code_actions.shellcheck,
+			ca.gitrebase,
+			ca.gitsigns, -- retrieve code actions from lewis6991/gitsigns.nvim
+			ca.shellcheck,
 		},
 		on_attach = function(client, bufnr)
 			local cwd = vim.fn.getcwd()

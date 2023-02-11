@@ -8,22 +8,22 @@ local icons = {
 }
 
 local modules = {}
-local lazy_path = __editor_global.data_dir .. "lazy" .. __editor_global.path_sep .. "lazy.nvim"
+local lazy_path = require("editor").global.data_dir .. "lazy" .. require("editor").global.path_sep .. "lazy.nvim"
 
 if not vim.loop.fs_stat(lazy_path) then
-	local lazy_repo = __editor_config.use_ssh and "git@github.com:folke/lazy.nvim.git "
+	local lazy_repo = require("editor").config.use_ssh and "git@github.com:folke/lazy.nvim.git "
 		or "https://github.com/folke/lazy.nvim.git "
 	vim.api.nvim_command("!git clone --filter=blob:none --branch=stable " .. lazy_repo .. lazy_path)
 end
 ---@return table<string, table> list of plugins
 local get_plugins_list = function()
 	local list = {}
-	local plugins_list = vim.split(vim.fn.glob(__editor_global.modules_dir .. "/plugins/*.lua"), "\n")
+	local plugins_list = vim.split(vim.fn.glob(require("editor").global.modules_dir .. "/plugins/*.lua"), "\n")
 	if type(plugins_list) == "table" then
 		for _, f in ipairs(plugins_list) do
 			-- fill list with `plugins/*.lua`'s path used for later `require` like this:
 			-- list[#list + 1] = "plugins/completion.lua"
-			list[#list + 1] = f:sub(#__editor_global.modules_dir - 6, -1)
+			list[#list + 1] = f:sub(#require("editor").global.modules_dir - 6, -1)
 		end
 	end
 	return list
@@ -32,8 +32,8 @@ end
 package.path = package.path
 	.. string.format(
 		";%s;%s",
-		__editor_global.modules_dir .. "/configs/?.lua",
-		__editor_global.modules_dir .. "/configs/?/init.lua"
+		require("editor").global.modules_dir .. "/configs/?.lua",
+		require("editor").global.modules_dir .. "/configs/?/init.lua"
 	)
 
 for _, m in ipairs(get_plugins_list()) do
@@ -50,22 +50,22 @@ end
 vim.opt.rtp:prepend(lazy_path)
 
 require("lazy").setup(modules, {
-	root = __editor_global.data_dir .. "lazy", -- directory where plugins will be installed
+	root = require("editor").global.data_dir .. "lazy", -- directory where plugins will be installed
 	defaults = { lazy = true },
-	concurrency = __editor_global.is_mac and 30 or nil,
+	concurrency = require("editor").global.is_mac and 30 or nil,
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 300,
-		url_format = __editor_config.use_ssh and "git@github.com:%s.git" or "https://github.com/%s.git",
+		url_format = require("editor").config.use_ssh and "git@github.com:%s.git" or "https://github.com/%s.git",
 	},
 	install = {
 		-- install missing plugins on startup. This doesn't increase startup time.
 		missing = true,
-		colorscheme = { __editor_config.colorscheme },
+		colorscheme = { require("editor").config.colorscheme },
 	},
 	checker = {
 		enabled = true, -- automatically check for updates
-		concurrency = __editor_global.is_mac and 30 or nil,
+		concurrency = require("editor").global.is_mac and 30 or nil,
 		frequency = 3600 * 24, -- check for updates every day
 	},
 	ui = {
@@ -99,7 +99,7 @@ require("lazy").setup(modules, {
 	performance = {
 		cache = {
 			enabled = true,
-			path = vim.fn.stdpath "cache" .. __editor_global.path_sep .. "lazy" .. __editor_global.path_sep .. "cache",
+			path = vim.fn.stdpath "cache" .. require("editor").global.path_sep .. "lazy" .. require("editor").global.path_sep .. "cache",
 			-- Once one of the following events triggers, caching will be disabled.
 			-- To cache all modules, set this to `{}`, but that is not recommended.
 			disable_events = {},
