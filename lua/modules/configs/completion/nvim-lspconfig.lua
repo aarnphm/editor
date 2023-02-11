@@ -49,9 +49,9 @@ return function()
 			"clangd",
 			"dockerls",
 			"efm",
-			"eslint",
 			"gopls",
 			"grammarly",
+			"marksman",
 			"html",
 			"jdtls",
 			"jsonls",
@@ -127,6 +127,7 @@ return function()
 			}))
 		end,
 		html = function() nvim_lsp.html.setup(vim.tbl_deep_extend("keep", require "completion.servers.html", options)) end,
+		marksman = setup_lsp "marksman",
 		bufls = setup_lsp "bufls",
 		bashls = setup_lsp "bashls",
 		gopls = setup_lsp "gopls",

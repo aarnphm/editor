@@ -3,6 +3,10 @@ return {
 	settings = {
 		python = {
 			analysis = {
+				inlayHints = {
+					variableTypes = true,
+					functionReturnTypes = true,
+				},
 				autoSearchPaths = true,
 				useLibraryCodeForTypes = true,
 			},

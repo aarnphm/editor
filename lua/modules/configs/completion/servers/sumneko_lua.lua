@@ -29,6 +29,7 @@ require("neodev").setup {
 			"rose-pine",
 			"efmls-configs-nvim",
 			"toggleterm.nvim",
+			"lspsaga.nvim",
 		},
 	},
 }

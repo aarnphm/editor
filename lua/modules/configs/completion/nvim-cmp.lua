@@ -41,6 +41,7 @@ return function()
 		info.scrollable = false
 		return info
 	end
+	vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#57fa85" })
 
 	local compare = require "cmp.config.compare"
 	compare.lsp_scores = function(entry1, entry2)
@@ -52,6 +53,7 @@ return function()
 		end
 		return (diff < 0)
 	end
+
 	local lspkind = require "lspkind"
 	local cmp = require "cmp"
 

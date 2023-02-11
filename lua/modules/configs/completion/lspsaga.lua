@@ -27,7 +27,7 @@ return function()
 	require("lspsaga").setup {
 		preview = {
 			lines_above = 1,
-			lines_below = 12,
+			lines_below = 17,
 		},
 		scroll_preview = {
 			scroll_down = "<C-j>",
