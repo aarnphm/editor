@@ -57,6 +57,18 @@ return {
 		dependencies = { "nvim-lua/plenary.nvim" },
 		event = "BufRead",
 		config = function() require("todo-comments").setup {} end,
+		init = function()
+			k.nvim_load_mapping {
+				["n|<Space>tqf"] = k.map_cr("TodoQuickFix"):with_defaults():with_desc "todo-comments: Open quickfix",
+				["n|]t"] = k.map_callback(function() require("todo-comments").jump_next() end)
+					:with_defaults()
+					:with_desc "todo-comments: Next",
+				["n|[t"] = k.map_callback(function() require("todo-comments").jump_prev() end)
+					:with_defaults()
+					:with_desc "todo-comments: Previous",
+				["n|<Space>tt"] = k.map_cr("TodoTelescope"):with_defaults():with_desc "todo-comments: Telescope",
+			}
+		end,
 	},
 	["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" },
 	["zbirenbaum/neodim"] = { lazy = true, event = "LspAttach", config = require "ui.neodim" },

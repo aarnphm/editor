@@ -170,9 +170,7 @@ return function()
 			.. vim.version().patch
 			.. "   "
 			.. stats.count
-			.. " plugins in "
-			.. stats.startuptime
-			.. "ms"
+			.. " plugins"
 	end
 
 	dashboard.section.footer.val = footer()
