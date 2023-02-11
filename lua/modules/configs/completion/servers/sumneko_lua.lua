@@ -1,5 +1,5 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/sumneko_lua.lua
--- call neodev before setup sumneko_lua
+-- NOTE: call neodev before setup sumneko_lua
 require("neodev").setup {
 	library = {
 		enabled = true,
@@ -11,7 +11,6 @@ require("neodev").setup {
 			"lualine",
 			"nvim-treesitter",
 			"telescope.nvim",
-			"efmls-configs",
 			"mason.nvim",
 			"mason-lspconfig.nvim",
 			"cmp-nvim-lsp",
@@ -27,9 +26,9 @@ require("neodev").setup {
 			"ssr.nvim",
 			"catppuccin",
 			"rose-pine",
-			"efmls-configs-nvim",
 			"toggleterm.nvim",
 			"lspsaga.nvim",
+			"null-ls.nvim",
 		},
 	},
 }

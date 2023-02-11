@@ -4,26 +4,29 @@ return function()
 		-- a list of all tools you want to ensure are installed upon
 		-- start; they should be the names Mason uses for each tool
 		ensure_installed = {
-			-- Linters
-			"eslint_d",
-			"prettierd",
+			-- NOTE: Formatter
 			"stylua",
-			"selene",
-			"luacheck",
-			"shellcheck",
-			"shfmt",
+			"prettierd",
 			"black",
-			"flake8",
+			"shfmt",
 			"isort",
-			"buildifier",
-			"buf",
-			"ruff",
+			"buf", -- proto
+			"buildifier", -- bazel
+			"markdownlint", -- style checker for markdownj
+			"cbfmt", -- format codeblocks in markdown
+			"beautysh", -- bash formatter
+			"yamlfmt",
+			"rustfmt",
+			"jq",
+
+			-- NOTE: Linters
+			"selene",
+			"eslint_d",
+			"shellcheck",
+			"flake8",
 			"tflint",
 			"yamllint",
-			"yamlfmt",
 			"vulture",
-			"jq",
-			"rustfmt",
 			"vale",
 			"vint",
 		},

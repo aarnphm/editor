@@ -5,11 +5,15 @@ return {
 	-- lspconfig
 	["neovim/nvim-lspconfig"] = {
 		lazy = true,
-		event = { "BufReadPre", "BufReadPost", "BufNewFile" },
+		event = { "BufAdd", "BufReadPost", "BufNewFile" },
 		config = require "completion.nvim-lspconfig",
 		cond = function() return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype) end,
 		dependencies = {
-			{ "creativenull/efmls-configs-nvim" },
+			{
+				"jose-elias-alvarez/null-ls.nvim",
+				dependencies = { "nvim-lua/plenary.nvim" },
+				config = require "completion.null-ls",
+			},
 			{
 				"williamboman/mason.nvim",
 				init = function()

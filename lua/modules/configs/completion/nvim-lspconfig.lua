@@ -1,7 +1,6 @@
 return function()
 	local nvim_lsp = require "lspconfig"
 	local mason = require "mason"
-	local efmls = require "efmls-configs"
 
 	-- Configuring native diagnostics
 	vim.diagnostic.config {
@@ -48,7 +47,6 @@ return function()
 			"bufls",
 			"clangd",
 			"dockerls",
-			"efm",
 			"gopls",
 			"grammarly",
 			"marksman",
@@ -116,8 +114,6 @@ return function()
 			}
 		end,
 
-		-- do not setup efm here, use efmls.init
-		efm = function() end,
 		-- TODO: support starlark-rust
 		clangd = function()
 			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require "completion.servers.clangd", {
@@ -137,59 +133,4 @@ return function()
 		tsserver = setup_lsp "tsserver",
 		pyright = setup_lsp "pyright",
 	}
-
-	-- Init `efm-langserver` here.
-	efmls.init {
-		on_attach = options.on_attach,
-		capabilities = capabilities,
-		init_options = { documentFormatting = true, codeAction = true },
-	}
-
-	-- Require `efmls-configs-nvim`'s config here
-	local eslint = require "efmls-configs.linters.eslint"
-	local prettier = require "efmls-configs.formatters.prettier"
-	local flake8 = require "efmls-configs.linters.flake8"
-
-	-- Setup formatter and linter for efmls here
-	flake8 = vim.tbl_extend("force", flake8, {
-		prefix = "flake8: max-line-length=90, ignore=E501,W505,E402",
-		lintStdin = true,
-		lintIgnoreExitCode = true,
-		lintFormats = { "%f:%l:%c: %t%n%n%n %m" },
-		lintCommand = "flake8 --extend-ignore E501,W505,E402 --max-line-length 90 --format '%(path)s:%(row)d:%(col)d: %(code)s %(code)s %(text)s' --stdin-display-name ${INPUT} -",
-	})
-
-	efmls.setup {
-		vue = { formatter = prettier },
-		yaml = { formatter = prettier },
-		html = { formatter = prettier },
-		css = { formatter = prettier },
-		scss = { formatter = prettier },
-		markdown = { formatter = prettier },
-		typescript = { formatter = prettier, linter = eslint },
-		javascript = { formatter = prettier, linter = eslint },
-		typescriptreact = { formatter = prettier, linter = eslint },
-		javascriptreact = { formatter = prettier, linter = eslint },
-		vim = { formatter = require "efmls-configs.linters.vint" },
-		lua = { formatter = require "efmls-configs.formatters.stylua" },
-		c = { formatter = require "completion.efm.formatters.clangfmt" },
-		cpp = { formatter = require "completion.efm.formatters.clangfmt" },
-		rust = { formatter = require "completion.efm.formatters.rustfmt" },
-		python = {
-			formatter = require "efmls-configs.formatters.black",
-			linter = flake8,
-		},
-		rst = { linter = require "efmls-configs.linters.vale" },
-		sh = {
-			formatter = require "efmls-configs.formatters.shfmt",
-			linter = require "efmls-configs.linters.shellcheck",
-		},
-		bash = {
-			formatter = require "efmls-configs.formatters.shfmt",
-			linter = require "efmls-configs.linters.shellcheck",
-		},
-		zsh = { formatter = require "efmls-configs.formatters.shfmt" },
-	}
-
-	require("completion._utils.formatting").configure_format_on_save()
 end

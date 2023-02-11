@@ -377,7 +377,7 @@ return {
 		lazy = true,
 		build = function()
 			if #vim.api.nvim_list_uis() ~= 0 then
-				vim.cmd "TSUpdate"
+				vim.api.nvim_command "TSUpdate"
 			end
 		end,
 		event = { "CursorHold", "CursorHoldI" },
