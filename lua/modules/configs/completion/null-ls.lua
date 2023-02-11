@@ -22,7 +22,8 @@ return function()
 			b.formatting.prettierd.with {
 				extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
 			},
-			b.formatting.black.with { extra_args = { "--fast" } },
+			b.formatting.black,
+			b.formatting.ruff,
 			b.formatting.isort,
 			b.formatting.stylua,
 			b.formatting.shfmt,
@@ -37,22 +38,9 @@ return function()
 
 			-- NOTE: diagnostics
 			b.diagnostics.eslint_d,
+			b.diagnostics.ruff,
 			with_diagnostics_code(b.diagnostics.shellcheck),
 			b.diagnostics.selene,
-			b.diagnostics.flake8.with {
-				format = "%f:%l:%c: %t%n%n%n %m",
-				args = {
-					"--extend-ignore",
-					"E501,W505,E402",
-					"--max-line-length",
-					"90",
-					"--format",
-					"'%(path)s:%(row)d:%(col)d: %(code)s %(code)s %(text)s'",
-					"--stdin-display-name",
-					"${INPUT} -",
-				},
-			},
-			b.diagnostics.pyproject_flake8,
 			b.diagnostics.markdownlint.with {
 				extra_args = { "--disable MD033" },
 			},
@@ -87,7 +75,7 @@ return function()
 							name = "null-ls",
 						}
 						vim.notify(
-							string.format("Format successfully with [%s]!", client.name),
+							string.format("[%s] Format successfully!", client.name),
 							vim.log.levels.INFO,
 							{ title = "LspFormat" }
 						)

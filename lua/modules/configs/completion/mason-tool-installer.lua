@@ -18,12 +18,12 @@ return function()
 			"yamlfmt",
 			"rustfmt",
 			"jq",
+			"ruff",
 
 			-- NOTE: Linters
 			"selene",
 			"eslint_d",
 			"shellcheck",
-			"flake8",
 			"tflint",
 			"yamllint",
 			"vulture",

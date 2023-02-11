@@ -15,6 +15,8 @@ local find_python_path = function()
 		return cwd .. "/venv/bin/python"
 	elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
 		return cwd .. "/.venv/bin/python"
+	elseif not isempty(vim.env.CONDA_PREFIX) then
+		return vim.env.CONDA_PREFIX .. "/bin/python"
 	elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/python") == 1 then
 		return vim.env.HOME .. "/.pyenv/shims/python"
 	else

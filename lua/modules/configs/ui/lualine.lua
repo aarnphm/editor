@@ -1,7 +1,10 @@
 return function()
+	local colors = require("utils").get_palette()
+
 	local icons = {
 		diagnostics = require("utils.icons").get("diagnostics", true),
 		misc = require("utils.icons").get("misc", true),
+		git = require("utils.icons").get "git",
 		ui = require("utils.icons").get("ui", true),
 	}
 
@@ -28,7 +31,7 @@ return function()
 				_cache.context = lspsaga:get_winbar()
 				_cache.bufnr = currbuf
 			elseif _cache.bufnr ~= currbuf then
-				_cache.context = "" -- Reset [invalid] cache (usually from another buffer)
+				_cache.context = "" -- NOTE: Reset [invalid] cache (usually from another buffer)
 			end
 
 			return _cache.context
@@ -48,9 +51,11 @@ return function()
 
 	local get_cwd = function()
 		local cwd = vim.fn.getcwd()
-		local home = os.getenv "HOME"
-		if home and cwd:find(home, 1, true) == 1 then
-			cwd = "~" .. cwd:sub(#home + 1)
+		if not __editor_global.is_windows then
+			local home = os.getenv "HOME"
+			if home and cwd:find(home, 1, true) == 1 then
+				cwd = "~" .. cwd:sub(#home + 1)
+			end
 		end
 		return icons.ui.RootFolderOpened .. cwd
 	end
@@ -87,11 +92,11 @@ return function()
 		if vim.bo.filetype == "python" then
 			local venv = os.getenv "CONDA_DEFAULT_ENV"
 			if venv then
-				return string.format("%s", env_cleanup(venv))
+				return string.format(icons.misc.PyEnv .. ":(%s)", env_cleanup(venv))
 			end
 			venv = os.getenv "VIRTUAL_ENV"
 			if venv then
-				return string.format("%s", env_cleanup(venv))
+				return string.format(icons.misc.PyEnv .. ":(%s)", env_cleanup(venv))
 			end
 		end
 		return ""
@@ -121,7 +126,10 @@ return function()
 		},
 		sections = {
 			lualine_a = { { "mode" } },
-			lualine_b = { { "branch" }, { "diff", source = diff_source } },
+			lualine_b = {
+				{ "branch", icons_enabled = true, icon = icons.git.Branch },
+				{ "diff", source = diff_source },
+			},
 			lualine_c = { lspsaga_symbols },
 			lualine_x = {
 				{ escape_status },
@@ -173,7 +181,7 @@ return function()
 	}
 
 	-- Properly set background color for lspsaga
-	local winbar_bg = require("utils").hl_to_rgb("StatusLine", true, "#000000")
+	local winbar_bg = require("utils").hl_to_rgb("StatusLine", true, colors.mantle)
 	for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind()) do
 		require("utils").extend_hl("LspSagaWinbar" .. hlGroup[1], { bg = winbar_bg })
 	end
