@@ -27,7 +27,6 @@ return function()
 			"tflint",
 			"yamllint",
 			"vulture",
-			"vale",
 			"vint",
 		},
 	}

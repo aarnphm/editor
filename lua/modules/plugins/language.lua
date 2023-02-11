@@ -4,7 +4,12 @@ return {
 	["folke/neodev.nvim"] = { lazy = true, ft = "lua" },
 	["Stormherz/tablify"] = { lazy = true, ft = "rst" },
 	["lervag/vimtex"] = { lazy = true, ft = "tex", config = require "language.vimtex" },
-	["bazelbuild/vim-bazel"] = { lazy = true, dependencies = { "google/vim-maktaba" }, ft = "bzl" },
+	["bazelbuild/vim-bazel"] = {
+		lazy = true,
+		dependencies = { "google/vim-maktaba" },
+		ft = "bzl",
+		init = function() end,
+	},
 	["simrat39/rust-tools.nvim"] = {
 		lazy = true,
 		ft = "rust",

@@ -18,6 +18,7 @@ if not vim.loop.fs_stat(lazy_path) then
 		or "https://github.com/folke/lazy.nvim.git "
 	vim.api.nvim_command("!git clone --filter=blob:none --branch=stable " .. lazy_repo .. lazy_path)
 end
+
 ---@return table<string, table> list of plugins
 local get_plugins_list = function()
 	local list = {}
@@ -66,12 +67,15 @@ require("lazy").setup(modules, {
 	install = {
 		-- install missing plugins on startup. This doesn't increase startup time.
 		missing = true,
-		colorscheme = {  "un"  },
+		colorscheme = { "un" },
 	},
 	checker = {
 		enabled = true, -- automatically check for updates
 		concurrency = require("editor").global.is_mac and 30 or nil,
 		frequency = 3600 * 24, -- check for updates every day
+	},
+	dev = {
+		path = vim.env.WORKSPACE .. "/neovim-plugins/",
 	},
 	ui = {
 		-- a number <1 is a percentage., >1 is a fixed size

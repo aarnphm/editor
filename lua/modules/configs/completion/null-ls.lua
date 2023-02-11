@@ -45,7 +45,6 @@ return function()
 			d.buildifier,
 			d.yamllint,
 			d.vulture,
-			d.vale,
 			d.vint,
 
 			-- NOTE: code actions

@@ -50,7 +50,6 @@ return function()
 			"clangd",
 			"dockerls",
 			"gopls",
-			"grammarly",
 			"marksman",
 			"html",
 			"jdtls",
