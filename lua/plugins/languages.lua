@@ -1,4 +1,14 @@
 return {
+	{ "akinsho/nvim-bufferline.lua",
+	lazy = true,
+	branch = "main",
+	event = {"BufReadPost", "BufRead"},
+	config = function() require("bufferline").setup {} end,
+	},
+	{"kylechui/nvim-surround",
+	lazy = false,
+	config = function() require("nvim-surround").setup() end,
+},
 	-- Setup language servers.
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 	{
