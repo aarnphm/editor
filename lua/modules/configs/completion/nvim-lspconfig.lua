@@ -76,7 +76,7 @@ return function()
 	capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 	local options = {
-		on_attach = function(client, bufnr)
+		on_attach = function(_, _)
 			require("lsp_signature").on_attach {
 				bind = true,
 				use_lspsaga = false,
@@ -119,7 +119,7 @@ return function()
 
 		-- do not setup efm here, use efmls.init
 		efm = function() end,
-		starlark_rust = function() end,
+		["starlark-rust"] = function() end,
 		clangd = function()
 			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require "completion.servers.clangd", {
 				on_attach = options.on_attach,

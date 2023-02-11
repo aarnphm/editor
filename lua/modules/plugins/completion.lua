@@ -106,7 +106,7 @@ return {
 			{ "hrsh7th/cmp-buffer" },
 			{ "hrsh7th/cmp-emoji" },
 			{ "kdheepak/cmp-latex-symbols" },
-			{ "windwp/nvim-autopairs", config = require "completion.nvim-autopairs" },
+			{ "windwp/nvim-autopairs", branch = "master", config = require "completion.nvim-autopairs" },
 		},
 	},
 

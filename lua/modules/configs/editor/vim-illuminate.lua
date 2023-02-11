@@ -10,6 +10,7 @@ return function()
 			"alpha",
 			"dashboard",
 			"DoomInfo",
+			"startuptime",
 			"fugitive",
 			"help",
 			"norg",

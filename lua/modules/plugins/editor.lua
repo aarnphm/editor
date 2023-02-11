@@ -354,6 +354,11 @@ return {
 			}
 		end,
 	},
+	["ibhagwan/smartyank.nvim"] = {
+		lazy = true,
+		event = "BufReadPost",
+		config = require "editor.smartyank",
+	},
 	["michaelb/sniprun"] = {
 		lazy = true,
 		-- You need to cd to `~/.local/share/nvim/site/lazy/sniprun/` and execute `bash ./install.sh`,
@@ -478,6 +483,7 @@ return {
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "jvgrootveld/telescope-zoxide" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{ "ahmedkhalf/project.nvim", event = "BufReadPost", config = require "editor.project" },
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 		},
 		init = function()
@@ -507,6 +513,9 @@ return {
 					:with_desc "find: File by frecency",
 				["n|<Space>fb"] = k.map_cu("Telescope buffers"):with_defaults():with_desc "find: Buffer opened",
 				["n|<Space>ff"] = k.map_cu("Telescope find_files"):with_defaults():with_desc "find: File in project",
+				["n|<Space>fp"] = k.map_callback(function() require("telescope").extensions.projects.projects {} end)
+					:with_defaults()
+					:with_desc "find: Project",
 				["n|<LocalLeader>ff"] = k.map_callback(require("utils").safegit_find_files)
 					:with_defaults()
 					:with_desc "find: file in git project",

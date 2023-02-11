@@ -9,19 +9,19 @@ return function()
 	require("nvim-tree").setup {
 		auto_reload_on_write = true,
 		create_in_closed_folder = false,
-		disable_netrw = false, -- set to true if you don't want to hijack netrw
+		disable_netrw = false,
 		hijack_cursor = true,
 		hijack_netrw = true,
 		hijack_unnamed_buffer_when_opening = true,
 		ignore_buffer_on_setup = false,
 		open_on_setup = false,
 		open_on_setup_file = false,
-		sort_by = "name", -- "name" | "extension" | "size" | "relative_path" | "modified" | "created" | "accessed"
 		prefer_startup_root = false,
-		sync_root_with_cwd = false,
 		reload_on_bufenter = true,
-		respect_buf_cwd = false,
 		open_on_tab = false,
+		respect_buf_cwd = false,
+		sort_by = "name", -- "name" | "extension" | "size" | "relative_path" | "modified" | "created" | "accessed"
+		sync_root_with_cwd = true,
 		view = {
 			adaptive_size = false,
 			centralize_selection = false,
@@ -108,7 +108,28 @@ return function()
 		},
 		system_open = { cmd = "open", args = {} },
 		filters = { dotfiles = false, custom = { "^.git$", ".DS_Store", "__pycache__", "*/lazy-lock.json" } },
-		git = { timeout = 500, ignore = __editor_config.plugins.nvim_tree.git.ignore },
+		actions = {
+			use_system_clipboard = true,
+			change_dir = {
+				enable = true,
+				global = false,
+			},
+			open_file = {
+				quit_on_open = false,
+				resize_window = false,
+				window_picker = {
+					enable = true,
+					chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+					exclude = {
+						filetype = { "notify", "qf", "diff", "fugitive", "fugitiveblame", "alpha", "Trouble" },
+						buftype = { "nofile", "terminal", "help" },
+					},
+				},
+			},
+			remove_file = {
+				close_window = true,
+			},
+		},
 		diagnostics = {
 			enable = false,
 			show_on_dirs = false,
@@ -120,19 +141,36 @@ return function()
 				error = icons.diagnostics.Error_alt,
 			},
 		},
-		trash = { cmd = require("utils").get_binary_path "rip", require_confirm = true },
-		filesystem_watchers = { enable = true, debounce_delay = 50 },
-		actions = {
-			open_file = {
-				resize_window = false,
-				window_picker = {
-					enable = true,
-					chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-					exclude = {
-						filetype = { "notify", "qf", "diff", "fugitive", "fugitiveblame", "alpha", "Trouble" },
-						buftype = { "nofile", "terminal", "help" },
-					},
-				},
+		filesystem_watchers = {
+			enable = true,
+			debounce_delay = 50,
+		},
+		git = {
+			enable = true,
+			show_on_dirs = true,
+			timeout = 500,
+			ignore = __editor_config.plugins.nvim_tree.git.ignore,
+		},
+		trash = {
+			cmd = require("utils").get_binary_path "rip",
+			require_confirm = true,
+		},
+		live_filter = {
+			prefix = "[FILTER]: ",
+			always_show_folders = true,
+		},
+		log = {
+			enable = false,
+			truncate = false,
+			types = {
+				all = false,
+				config = false,
+				copy_paste = false,
+				dev = false,
+				diagnostics = false,
+				git = false,
+				profile = false,
+				watcher = false,
 			},
 		},
 	}

@@ -18,7 +18,8 @@ return {
 
 	["akinsho/nvim-bufferline.lua"] = {
 		lazy = true,
-		event = { "BufReadPost", "BufAdd", "BufNewFile" },
+		branch = "main",
+		event = { "BufReadPost", "BufAdd", "BufRead", "BufNewFile" },
 		config = require "ui.nvim-bufferline",
 		init = function()
 			k.nvim_load_mapping {
@@ -52,6 +53,11 @@ return {
 		end,
 	},
 
+	["folke/todo-comments.nvim"] = {
+		dependencies = { "nvim-lua/plenary.nvim" },
+		event = "BufRead",
+		config = function() require("todo-comments").setup {} end,
+	},
 	["lukas-reineke/indent-blankline.nvim"] = { lazy = true, event = "BufRead", config = require "ui.indent-blankline" },
 	["zbirenbaum/neodim"] = { lazy = true, event = "LspAttach", config = require "ui.neodim" },
 	["lewis6991/gitsigns.nvim"] = {

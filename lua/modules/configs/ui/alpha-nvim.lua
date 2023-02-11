@@ -74,11 +74,10 @@ return function()
 	end
 
 	local button = function(sc, txt, leader_txt, keybind, keybind_opts)
-		local sc_after = sc:gsub("%s", ""):gsub(leader_txt, "<leader>")
+		local k_after = sc:gsub("%s", ""):gsub(leader_txt, "<leader>")
 
 		local on_press = function()
-			-- local key = vim.api.nvim_replace_termcodes(keybind .. '<Ignore>', true, false, true)
-			local key = vim.api.nvim_replace_termcodes(sc_after .. "<Ignore>", true, false, true)
+			local key = vim.api.nvim_replace_termcodes(k_after .. "<Ignore>", true, false, true)
 			vim.api.nvim_feedkeys(key, "t", false)
 		end
 
@@ -92,10 +91,10 @@ return function()
 		}
 
 		if nil == keybind then
-			keybind = sc_after
+			keybind = k_after
 		end
 		keybind_opts = vim.F.if_nil(keybind_opts, { noremap = true, silent = true, nowait = true })
-		opts.keymap = { "n", sc_after, keybind, keybind_opts }
+		opts.keymap = { "n", k_after, keybind, keybind_opts }
 
 		return {
 			type = "button",
@@ -106,15 +105,29 @@ return function()
 	end
 
 	dashboard.section.header.val = headers
+	dashboard.section.header.opts.hl = "Type"
+
 	local leader = "space"
 	local lleader = "kplus"
+
 	dashboard.section.buttons.val = {
-		button("space f e", icons.ui.History .. "File history", leader, "<cmd>Telescope oldfiles<cr>"),
+		button("space f e", icons.ui.History .. "File history", leader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() require("telescope.builtin").oldfiles() end,
+		}),
 		button("space f r", icons.misc.Rocket .. "File frecency", leader, nil, {
 			noremap = true,
 			silent = true,
 			nowait = true,
 			callback = function() require("telescope").extensions.frecency.frecency() end,
+		}),
+		button("space f p", icons.ui.List .. "Project find", leader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() require("telescope").extensions.projects.projects {} end,
 		}),
 		button("space f w", icons.misc.WordFind .. "Word find", leader, nil, {
 			noremap = true,
@@ -127,6 +140,12 @@ return function()
 			silent = true,
 			nowait = true,
 			callback = function() require("utils").safegit_find_files {} end,
+		}),
+		button("space f n", icons.ui.NewFile .. "File new", leader, nil, {
+			noremap = true,
+			silent = true,
+			nowait = true,
+			callback = function() vim.api.nvim_command "enew" end,
 		}),
 		button("kplus e c", icons.misc.MultipleWheels .. "Editor config", lleader, "<cmd>e ~/.editor.lua<cr>"),
 		button("kplus e s", icons.misc.SingleWheel .. "Settings", lleader, ":e $MYVIMRC | :cd %:p:h <CR>"),

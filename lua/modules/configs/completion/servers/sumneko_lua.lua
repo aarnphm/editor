@@ -39,16 +39,19 @@ return {
 				callSnippet = "Replace",
 			},
 			diagnostics = {
+				enable = true,
 				globals = { "vim" },
 			},
 			runtime = {
 				version = "LuaJIT",
+				path = vim.split(package.path, ";"),
 				special = {
 					reload = "require",
 				},
 			},
 			workspace = {
 				library = {
+					vim.env.VIMRUNTIME,
 					vim.fn.expand "$VIMRUNTIME/lua",
 					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
 					require("neodev.config").types(),

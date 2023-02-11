@@ -20,6 +20,19 @@ return function()
 		}
 	end
 
+	local has_words_before = function()
+		if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
+			return false
+		end
+		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+		return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match "^%s*$" == nil
+	end
+
+	local check_backspace = function()
+		local col = vim.fn.col "." - 1
+		return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
+	end
+
 	local cmp_window = require "cmp.utils.window"
 
 	cmp_window.info_ = cmp_window.info
@@ -45,10 +58,12 @@ return function()
 	local tab_complete = function(fallback)
 		if require("copilot.suggestion").is_visible() then
 			require("copilot.suggestion").accept()
-		elseif cmp.visible() then
-			cmp.select_next_item()
+		elseif cmp.visible() and has_words_before() then
+			cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
 		elseif require("luasnip").expand_or_jumpable() then
 			vim.fn.feedkeys(k.t "<Plug>luasnip-expand-or-jump", "")
+		elseif check_backspace() then
+			vim.fn.feedkeys(k.t "<Tab>", "n")
 		else
 			fallback()
 		end
@@ -59,12 +74,15 @@ return function()
 			cmp.select_prev_item()
 		elseif require("luasnip").jumpable(-1) then
 			vim.fn.feedkeys(k.t "<Plug>luasnip-jump-prev", "")
+		elseif has_words_before() then
+			cmp.complete()
 		else
 			fallback()
 		end
 	end
 
 	cmp.setup {
+		preselect = cmp.PreselectMode.None,
 		window = {
 			completion = {
 				border = border "Normal",
@@ -109,14 +127,14 @@ return function()
 		},
 		-- You can set mappings if you want
 		mapping = cmp.mapping.preset.insert {
-			["<CR>"] = cmp.mapping.confirm { select = true },
+			["<CR>"] = cmp.mapping.confirm { behavior = cmp.ConfirmBehavior.Replace, select = true },
 			["<C-k>"] = cmp.mapping.select_prev_item(),
 			["<C-j>"] = cmp.mapping.select_next_item(),
-			["<C-d>"] = cmp.mapping.scroll_docs(-4),
-			["<C-f>"] = cmp.mapping.scroll_docs(4),
+			["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
+			["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
 			["<C-e>"] = cmp.mapping.close(),
-			["<Tab>"] = cmp.mapping(tab_complete, { "i", "s" }),
-			["<S-Tab>"] = cmp.mapping(s_tab_complete, { "i", "s" }),
+			["<Tab>"] = tab_complete,
+			["<S-Tab>"] = s_tab_complete,
 		},
 		snippet = {
 			expand = function(args) require("luasnip").lsp_expand(args.body) end,
