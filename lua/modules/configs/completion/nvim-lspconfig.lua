@@ -6,11 +6,13 @@ return function()
 	vim.diagnostic.config {
 		signs = true,
 		update_in_insert = true,
+		underline = true,
 		virtual_text = {
 			source = "true",
 		},
 		float = {
-			source = "always",
+			source = "if_many",
+			focusable = true,
 		},
 	}
 
