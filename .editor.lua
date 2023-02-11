@@ -23,6 +23,9 @@ return {
 		lualine = {
 			globalstatus = true,
 		},
+		gitsigns = {
+			word_diff = false,
+		},
 		telescope = {
 			defaults = {
 				file_ignore_patterns = {

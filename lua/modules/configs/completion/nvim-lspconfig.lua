@@ -119,7 +119,7 @@ return function()
 
 		-- do not setup efm here, use efmls.init
 		efm = function() end,
-		["starlark-rust"] = function() end,
+		-- TODO: support starlark-rust
 		clangd = function()
 			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require "completion.servers.clangd", {
 				on_attach = options.on_attach,
