@@ -50,6 +50,7 @@ return {
 		"--header-insertion-decorators",
 		"--header-insertion=iwyu",
 	},
+	filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
 	commands = {
 		ClangdSwitchSourceHeader = {
 			function() switch_source_header_splitcmd(0, "edit") end,

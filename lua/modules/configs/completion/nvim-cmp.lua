@@ -1,18 +1,11 @@
+local k = require "keybind"
+
 return function()
 	local icons = {
-		kind = require("utils.icons").get("kind", false),
-		type = require("utils.icons").get("type", false),
-		cmp = require("utils.icons").get("cmp", false),
+		kind = require("utils.icons").get "kind",
+		type = require("utils.icons").get "type",
+		cmp = require("utils.icons").get "cmp",
 	}
-	local replace_termcodes = function(str) return vim.api.nvim_replace_termcodes(str, true, true, true) end
-
-	local has_words_before = function()
-		if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
-			return false
-		end
-		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-		return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
-	end
 
 	local border = function(hl)
 		return {
@@ -37,6 +30,15 @@ return function()
 	end
 
 	local compare = require "cmp.config.compare"
+	compare.lsp_scores = function(entry1, entry2)
+		local diff
+		if entry1.completion_item.score and entry2.completion_item.score then
+			diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
+		else
+			diff = entry2.score - entry1.score
+		end
+		return (diff < 0)
+	end
 	local lspkind = require "lspkind"
 	local cmp = require "cmp"
 
@@ -46,9 +48,7 @@ return function()
 		elseif cmp.visible() then
 			cmp.select_next_item()
 		elseif require("luasnip").expand_or_jumpable() then
-			vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
-		elseif has_words_before() then
-			cmp.complete()
+			vim.fn.feedkeys(k.t "<Plug>luasnip-expand-or-jump", "")
 		else
 			fallback()
 		end
@@ -58,7 +58,7 @@ return function()
 		if cmp.visible() then
 			cmp.select_prev_item()
 		elseif require("luasnip").jumpable(-1) then
-			vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
+			vim.fn.feedkeys(k.t "<Plug>luasnip-jump-prev", "")
 		else
 			fallback()
 		end
@@ -76,10 +76,11 @@ return function()
 			},
 		},
 		sorting = {
+			priority_weight = 2,
 			comparators = {
 				compare.offset,
 				compare.exact,
-				compare.score,
+				compare.lsp_scores,
 				require("cmp-under-comparator").under,
 				compare.kind,
 				compare.sort_text,
@@ -100,6 +101,11 @@ return function()
 				kind.menu = "    (" .. strings[2] .. ")"
 				return kind
 			end,
+		},
+		experimental = {
+			ghost_text = {
+				hl_group = "LspCodeLens",
+			},
 		},
 		-- You can set mappings if you want
 		mapping = cmp.mapping.preset.insert {

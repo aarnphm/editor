@@ -5,7 +5,7 @@ return {
 	-- lspconfig
 	["neovim/nvim-lspconfig"] = {
 		lazy = true,
-		event = { "BufReadPre", "BufNewFile" },
+		event = { "BufReadPre", "BufReadPost", "BufNewFile" },
 		config = require "completion.nvim-lspconfig",
 		cond = function() return not vim.tbl_contains(disabled_filetypes, vim.bo.filetype) end,
 		dependencies = {

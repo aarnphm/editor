@@ -112,6 +112,14 @@ M.format_filter = function(clients)
 	end, clients)
 end
 
+local resolve_bufnr = function(bufnr)
+	vim.validate { bufnr = { bufnr, "n", true } }
+	if bufnr == nil or bufnr == 0 then
+		return vim.api.nvim_get_current_buf()
+	end
+	return bufnr
+end
+
 M.format = function(opts)
 	local cwd = vim.fn.getcwd()
 	for i = 1, #disabled_workspaces do
@@ -121,7 +129,7 @@ M.format = function(opts)
 	end
 
 	local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-	local clients = vim.lsp.buf_get_clients(bufnr)
+	local clients = vim.lsp.get_active_clients { bufnr = resolve_bufnr(bufnr) }
 
 	if opts.filter then
 		clients = opts.filter(clients)

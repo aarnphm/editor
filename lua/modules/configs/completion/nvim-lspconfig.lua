@@ -5,8 +5,10 @@ return function()
 
 	-- Configuring native diagnostics
 	vim.diagnostic.config {
+		signs = true,
+		update_in_insert = true,
 		virtual_text = {
-			source = "always",
+			source = "true",
 		},
 		float = {
 			source = "always",
@@ -71,9 +73,10 @@ return function()
 
 	local capabilities = vim.lsp.protocol.make_client_capabilities()
 	capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+	capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 	local options = {
-		on_attach = function()
+		on_attach = function(client, bufnr)
 			require("lsp_signature").on_attach {
 				bind = true,
 				use_lspsaga = false,
@@ -114,17 +117,17 @@ return function()
 			}
 		end,
 
-		efm = function()
-			-- do not setup efm here, use efmls.init
-		end,
+		-- do not setup efm here, use efmls.init
+		efm = function() end,
+		starlark_rust = function() end,
 		clangd = function()
-			local config = require "completion.servers.clangd"
-			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", config, {
+			nvim_lsp.clangd.setup(vim.tbl_deep_extend("keep", require "completion.servers.clangd", {
 				on_attach = options.on_attach,
 				capabilities = vim.tbl_deep_extend("keep", { offsetEncoding = { "utf-16", "utf-8" } }, capabilities),
 			}))
 		end,
 		html = function() nvim_lsp.html.setup(vim.tbl_deep_extend("keep", require "completion.servers.html", options)) end,
+		bufls = setup_lsp "bufls",
 		bashls = setup_lsp "bashls",
 		gopls = setup_lsp "gopls",
 		jsonls = setup_lsp "jsonls",
