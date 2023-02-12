@@ -4,6 +4,9 @@ return function()
 		-- a list of all tools you want to ensure are installed upon
 		-- start; they should be the names Mason uses for each tool
 		ensure_installed = {
+			-- NOTE: LSP
+			"lua-language-server",
+
 			-- NOTE: Formatter
 			"stylua",
 			"prettierd",
@@ -33,14 +36,15 @@ return function()
 	vim.api.nvim_create_autocmd("User", {
 		pattern = "MasonToolsUpdateCompleted",
 		callback = function()
-			vim.schedule(function()
-				print "mason-tool-installer has finished"
-				vim.notify(
-					"mason-tool-installer has finished!",
-					vim.log.levels.DEBUG,
-					{ title = "MasonToolsInstaller" }
-				)
-			end)
+			vim.schedule(
+				function()
+					vim.notify(
+						"mason-tool-installer has finished!",
+						vim.log.levels.DEBUG,
+						{ title = "MasonToolsInstaller" }
+					)
+				end
+			)
 		end,
 	})
 end

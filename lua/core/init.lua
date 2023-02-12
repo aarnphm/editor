@@ -1,4 +1,7 @@
---- Add custom filetype extension
+--- requires some globals
+require "core.globals"
+
+--- Add custom filet+pe extension
 vim.filetype.add {
 	extension = {
 		conf = "conf",
@@ -33,9 +36,25 @@ if vim.fn.isdirectory(require("editor").global.cache_dir) == 0 then
 end
 
 -- quick hack for install sqlite with nix
-vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
+vim.g.sqlite_clib_path = vim.NIL ~= vim.fn.getenv "SQLITE_PATH" and vim.env["SQLITE_PATH"]
+	or print "SQLITE_PATH is not set. Telescope will not work"
 
--- map leader to , and localeader to +
+-- neovide config
+if vim.g.neovide then
+	vim.api.nvim_set_option_value("guifont", "JetBrainsMono Nerd Font:h15", {})
+	vim.g.neovide_refresh_rate = 120
+	vim.g.neovide_cursor_vfx_mode = "railgun"
+	vim.g.neovide_no_idle = true
+	vim.g.neovide_cursor_animation_length = 0.03
+	vim.g.neovide_cursor_trail_length = 0.05
+	vim.g.neovide_cursor_antialiasing = true
+	vim.g.neovide_cursor_vfx_opacity = 200.0
+	vim.g.neovide_cursor_vfx_particle_lifetime = 1.2
+	vim.g.neovide_cursor_vfx_particle_speed = 20.0
+	vim.g.neovide_cursor_vfx_particle_density = 5.0
+end
+
+-- map leader to <Space> and localeader to +
 vim.g.mapleader = " "
 vim.g.maplocalleader = "+"
 vim.api.nvim_set_keymap("n", " ", "", { noremap = true })

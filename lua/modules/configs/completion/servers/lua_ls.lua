@@ -1,5 +1,5 @@
--- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/sumneko_lua.lua
--- NOTE: call neodev before setup sumneko_lua
+-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/lua_ls.lua
+-- NOTE: call neodev before setup lua_ls
 require("neodev").setup {
 	library = {
 		enabled = true,
@@ -55,6 +55,7 @@ return {
 			workspace = {
 				library = {
 					vim.env.VIMRUNTIME,
+					vim.api.nvim_get_runtime_file("", true),
 					vim.fn.expand "$VIMRUNTIME/lua",
 					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
 					require("neodev.config").types(),

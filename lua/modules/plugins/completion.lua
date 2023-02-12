@@ -12,6 +12,7 @@ return {
 			{ "williamboman/mason.nvim" },
 			{ "ray-x/lsp_signature.nvim" },
 			{ "williamboman/mason-lspconfig.nvim" },
+			{ "WhoIsSethDaniel/mason-tool-installer.nvim", config = require "completion.mason-tool-installer" },
 			{
 				"jose-elias-alvarez/null-ls.nvim",
 				dependencies = { "nvim-lua/plenary.nvim", "jayp0521/mason-null-ls.nvim" },
@@ -39,11 +40,6 @@ return {
 						["n|<LocalLeader>co"] = k.cr("Lspsaga outgoing_calls"):with_defaults "lsp: Show outgoing calls",
 					}
 				end,
-			},
-			{
-				"WhoIsSethDaniel/mason-tool-installer.nvim",
-				config = require "completion.mason-tool-installer",
-				cmd = { "MasonToolInstall", "MasonToolUpdate" },
 			},
 		},
 	},
