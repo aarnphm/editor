@@ -33,6 +33,10 @@ return function()
 			f.jq,
 			f.buf,
 			f.buildifier,
+			-- NOTE: format with 4 spaces
+			f.taplo.with {
+				extra_args = { "fmt", "-o", "indent_string='" .. string.rep(" ", 4) .. "'" },
+			},
 
 			-- NOTE: diagnostics
 			d.eslint_d,
