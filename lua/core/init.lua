@@ -1,5 +1,7 @@
 --- requires some globals
 require "core.globals"
+--- Light REPL for convenience
+require "core.repl"
 
 --- Add custom filet+pe extension
 vim.filetype.add {

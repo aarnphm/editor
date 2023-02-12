@@ -59,7 +59,7 @@ local data = {
 		Git = "",
 		Ignore = "",
 		Mod = "M",
-		Mod_alt = "",
+		ModHolo = "",
 		Remove = "",
 		Rename = "",
 		Repo = "",
@@ -81,7 +81,7 @@ local data = {
 		ChevronRight = "",
 		Circle = "",
 		Close = "",
-		Close_alt = "",
+		CloseHolo = "",
 		CloudDownload = "",
 		Comment = "",
 		CodeAction = "",
@@ -104,7 +104,7 @@ local data = {
 		SymlinkFolder = "",
 		Lock = "",
 		Modified = "✥",
-		Modified_alt = "",
+		ModifiedHolo = "",
 		NewFile = "",
 		Newspaper = "",
 		Note = "",
@@ -134,11 +134,11 @@ local data = {
 		Question = "",
 		Hint = "",
 		-- Holo version
-		Error_alt = "",
-		Warning_alt = "",
-		Information_alt = "",
-		Question_alt = "",
-		Hint_alt = "",
+		ErrorHolo = "",
+		WarningHolo = "",
+		InformationHolo = "",
+		QuestionHolo = "",
+		HintHolo = "",
 	},
 	misc = {
 		Campass = "",
@@ -168,7 +168,7 @@ local data = {
 	},
 	cmp = {
 		Copilot = "",
-		Copilot_alt = "",
+		CopilotHolo = "",
 		nvim_lsp = "",
 		nvim_lua = "",
 		path = "",
@@ -197,7 +197,7 @@ local data = {
 ---Get a specific icon set.
 ---@param category "kind"|"type"|"documents"|"git"|"ui"|"diagnostics"|"misc"|"cmp"|"dap"
 ---@param add_space? boolean @Add trailing space after the icon.
-function icons.get(category, add_space)
+icons.get = function(category, add_space)
 	if add_space then
 		return setmetatable({}, {
 			__index = function(_, key) return data[category][key] .. " " end,

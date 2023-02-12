@@ -1,6 +1,4 @@
 return function()
-	local colors = require("utils").get_palette()
-
 	local icons = {
 		diagnostics = require("utils.icons").get("diagnostics", true),
 		misc = require("utils.icons").get("misc", true),
@@ -109,6 +107,7 @@ return function()
 					"terminal",
 					"help",
 					"lspsagaoutine",
+					"_sagaoutline",
 					"DiffviewFiles",
 					"quickfix",
 					"Trouble",
@@ -175,9 +174,8 @@ return function()
 	}
 
 	-- Properly set background color for lspsaga
-	local winbar_bg = require("utils").hl_to_rgb("StatusLine", true, colors.mantle)
 	for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind()) do
-		require("utils").extend_hl("LspSagaWinbar" .. hlGroup[1], { bg = winbar_bg })
+		require("utils").extend_hl("LspSagaWinbar" .. hlGroup[1])
 	end
-	require("utils").extend_hl("LspSagaWinbarSep", { bg = winbar_bg })
+	require("utils").extend_hl "LspSagaWinbarSep"
 end

@@ -44,11 +44,11 @@ return function()
 		auto_jump = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
 		signs = {
 			-- icons / text used for a diagnostic
-			error = icons.diagnostics.Error_alt,
-			warning = icons.diagnostics.Warning_alt,
-			hint = icons.diagnostics.Hint_alt,
-			information = icons.diagnostics.Information_alt,
-			other = icons.diagnostics.Question_alt,
+			error = icons.diagnostics.ErrorHolo,
+			warning = icons.diagnostics.WarningHolo,
+			hint = icons.diagnostics.HintHolo,
+			information = icons.diagnostics.InformationHolo,
+			other = icons.diagnostics.QuestionHolo,
 		},
 		use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
 	}

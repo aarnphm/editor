@@ -13,7 +13,6 @@ local cmd = {
 return {
 	--- NOTE: add stablize.nvim if you are not using nvim-nightly
 	["jghauser/mkdir.nvim"] = { lazy = false },
-	["tpope/vim-repeat"] = { lazy = true },
 	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
 	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
 	["nmac427/guess-indent.nvim"] = {
@@ -24,21 +23,22 @@ return {
 	["folke/which-key.nvim"] = {
 		lazy = true,
 		event = "VeryLazy",
-		config = require "editor.which-key",
+		config = require "editting.which-key",
 	},
 	["gelguy/wilder.nvim"] = {
 		lazy = true,
 		event = "CmdlineEnter",
-		config = require "editor.wilder",
+		config = require "editting.wilder",
 		dependencies = { "romgrk/fzy-lua-native" },
 	},
 	["ibhagwan/smartyank.nvim"] = {
 		lazy = true,
 		event = "BufReadPost",
-		config = require "editor.smartyank",
+		config = require "editting.smartyank",
 	},
 	["kylechui/nvim-surround"] = {
-		lazy = false,
+		lazy = true,
+		event = "InsertEnter",
 		config = function() require("nvim-surround").setup() end,
 	},
 	["nvim-pack/nvim-spectre"] = {
@@ -108,7 +108,7 @@ return {
 		end,
 	},
 	["tpope/vim-fugitive"] = {
-		lazy = false,
+		lazy = true,
 		command = { "Git", "G", "Ggrep", "GBrowse" },
 		init = function()
 			k.nvim_register_mapping {
@@ -131,7 +131,6 @@ return {
 			}
 		end,
 	},
-
 	-- plugins with simple setup
 	["ojroques/nvim-bufdel"] = {
 		lazy = true,
@@ -195,15 +194,55 @@ return {
 			}
 		end,
 	},
-
 	["RRethy/vim-illuminate"] = {
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
-		config = require "editor.vim-illuminate",
+		config = function()
+			require("illuminate").configure {
+				filetypes_denylist = {
+					"alpha",
+					"dashboard",
+					"DoomInfo",
+					"startuptime",
+					"fugitive",
+					"help",
+					"norg",
+					"NvimTree",
+					"Outline",
+					"lspsagafinder",
+					"toggleterm",
+				},
+			}
+		end,
 	},
 	["LunarVim/bigfile.nvim"] = {
 		lazy = true,
-		config = require "editor.bigfile",
+		config = function()
+			require("bigfile").config {
+				filesize = 1, -- size of the file in MiB
+				pattern = { "*" }, -- autocmd pattern
+				features = { -- features to disable
+					"indent_blankline",
+					"lsp",
+					"illuminate",
+					"treesitter",
+					"syntax",
+					"vimopts",
+					{
+						name = "ftdetect",
+						opts = { defer = true },
+						disable = function()
+							vim.api.nvim_set_option_value("filetype", "big_file_disabled_ft", { scope = "local" })
+						end,
+					},
+					{
+						name = "nvim-cmp",
+						opts = { defer = true },
+						disable = function() require("cmp").setup.buffer { enabled = false } end,
+					},
+				},
+			}
+		end,
 		cond = require("editor").config.load_big_files_faster,
 	},
 	["akinsho/toggleterm.nvim"] = {
@@ -216,7 +255,28 @@ return {
 			"ToggleTermSendCurrentLine",
 			"ToggleTermSendVisualSelection",
 		},
-		config = require "editor.toggleterm",
+		config = function()
+			require("toggleterm").setup {
+				-- size can be a number or function which is passed the current terminal
+				size = function(term)
+					if term.direction == "horizontal" then
+						return 15
+					elseif term.direction == "vertical" then
+						return vim.o.columns * 0.40
+					end
+				end,
+				on_open = function()
+					-- Prevent infinite calls from freezing neovim.
+					-- Only set these options specific to this terminal buffer.
+					vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
+					vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
+				end,
+				open_mapping = false, -- [[<C-t>]],
+				shade_terminals = false,
+				shading_factor = vim.o.background == "dark" and "1" or "3",
+				direction = "horizontal",
+			}
+		end,
 		init = function()
 			local program_term = function(name, opts)
 				opts = opts or {}
@@ -275,7 +335,7 @@ return {
 	["folke/trouble.nvim"] = {
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
-		config = require "editor.trouble",
+		config = require "editting.trouble",
 		init = function()
 			k.nvim_register_mapping {
 				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
@@ -364,7 +424,7 @@ return {
 	["numToStr/Comment.nvim"] = {
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
-		config = require "editor.comment",
+		config = require "editting.comment",
 		init = function()
 			k.nvim_register_mapping {
 				["n|gcc"] = k.callback(
@@ -400,7 +460,7 @@ return {
 			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
 		end,
 		event = { "CursorHold", "CursorHoldI" },
-		config = require "editor.nvim-treesitter",
+		config = require "editting.nvim-treesitter",
 		dependencies = {
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "romgrk/nvim-treesitter-context" },
@@ -451,8 +511,8 @@ return {
 			"DapStepOut",
 			"DapTerminate",
 		},
-		config = require "editor.nvim-dap",
-		dependencies = { { "rcarriga/nvim-dap-ui", config = require "editor.nvim-dap-ui" } },
+		config = require "editting.nvim-dap",
+		dependencies = { { "rcarriga/nvim-dap-ui", config = require "editting.nvim-dap-ui" } },
 		init = function()
 			k.nvim_register_mapping {
 				["n|<F6>"] = k.callback(function() require("dap").continue() end):with_defaults "debug: Run/Continue",
@@ -480,7 +540,7 @@ return {
 	["nvim-telescope/telescope.nvim"] = {
 		cmd = "Telescope",
 		lazy = true,
-		config = require "editor.nvim-telescope",
+		config = require "editting.nvim-telescope",
 		dependencies = {
 			{ "nvim-tree/nvim-web-devicons" },
 			{ "nvim-lua/plenary.nvim" },
@@ -489,7 +549,11 @@ return {
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "jvgrootveld/telescope-zoxide" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
-			{ "ahmedkhalf/project.nvim", event = "BufReadPost", config = require "editor.project" },
+			{
+				"ahmedkhalf/project.nvim",
+				event = "BufReadPost",
+				config = require "editting.project",
+			},
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 		},
 		init = function()
@@ -514,18 +578,8 @@ return {
 				["n|<Leader>b"] = k.cu("Telescope buffers"):with_defaults "find: Buffer opened",
 				["n|<Leader>\\"] = k.callback(function() require("telescope").extensions.projects.projects {} end)
 					:with_defaults "find: Project",
-				["n|<Leader>f"] = k.callback(
-					function()
-						require("telescope.builtin").find_files {
-							previewer = false,
-							shorten_path = true,
-							layout_strategy = "horizontal",
-							find_command = 1 == vim.fn.executable "fd"
-									and { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" }
-								or nil,
-						}
-					end
-				):with_defaults "find: file in project",
+				["n|<Leader>f"] = k.callback(function() require("utils").find_files(false) end)
+					:with_defaults "find: file in project",
 				["n|<Leader>'"] = k.cu("Telescope zoxide list")
 					:with_defaults "edit: Change current direrctory by zoxide",
 				["n|<Leader>u"] = k.callback(function() require("telescope").extensions.undo.undo() end)

@@ -52,12 +52,12 @@ vim.opt.rtp:prepend(lazy_path)
 
 require("lazy").setup(modules, {
 	root = require("editor").global.data_dir .. "lazy", -- directory where plugins will be installed
-	defaults = { lazy = true },
+	defaults = { lazy = false },
 	concurrency = require("editor").global.is_mac and 30 or nil,
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 300,
-		url_format = require("editor").config.use_ssh and "git@github.com:%s.git" or "https://github.com/%s.git",
+		url_format = "https://github.com/%s.git",
 	},
 	install = {
 		-- install missing plugins on startup. This doesn't increase startup time.
@@ -110,11 +110,10 @@ require("lazy").setup(modules, {
 				.. "cache",
 			-- Once one of the following events triggers, caching will be disabled.
 			-- To cache all modules, set this to `{}`, but that is not recommended.
-			disable_events = {},
+			disable_events = { "UIEnter", "BufReadPre" },
 			ttl = 3600 * 24 * 2, -- keep unused modules for up to 2 days
 		},
 		reset_packpath = true, -- reset the package path to improve startup time
-		defaults = { lazy = true },
 		rtp = {
 			reset = true, -- reset the runtime path to $VIMRUNTIME and the config directory
 			---@type string[]

@@ -3,15 +3,9 @@ return function()
 		numhl = true,
 		---@diagnostic disable-next-line: undefined-global
 		word_diff = require("editor").config.plugins.gitsigns.word_diff,
-		watch_gitdir = { interval = 1000, follow_files = true },
-		sign_priority = 6,
-		update_debounce = 100,
-		current_line_blame = true,
-		current_line_blame_opts = {
-			virt_text = true,
-			delay = 1000,
-			virtual_text_pos = "overlay", -- overlay | eol | right_align
-		},
+		-- NOTE: disable line blame for rust
+		current_line_blame = false,
+		current_line_blame_opts = { virtual_text_pos = "eol" },
 		diff_opts = { internal = true },
 		signs = {
 			add = {
@@ -47,7 +41,6 @@ return function()
 		},
 		on_attach = function(bufnr)
 			local k = require "keybind"
-
 			k.nvim_register_mapping {
 				["n|]g"] = k.callback(function()
 					if vim.wo.diff then return "]g" end

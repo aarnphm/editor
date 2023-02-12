@@ -1,5 +1,18 @@
 local api = vim.api
 
+-- set better diagnostics icons
+local diagnostics = require("utils.icons").get("diagnostics", true)
+local diagnostic_icons = {
+	Error = diagnostics.ErrorHolo,
+	Warn = diagnostics.WarningHolo,
+	Info = diagnostics.InformationHolo,
+	Hint = diagnostics.HintHolo,
+}
+for type, icon in pairs(diagnostic_icons) do
+	local hl = string.format("DiagnosticSign%s", type)
+	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
 local misc_id = api.nvim_create_augroup("MiscBufs", { clear = true })
 -- Fix fold issue of files opened by telescope
 api.nvim_create_autocmd("BufRead", {
@@ -155,11 +168,6 @@ api.nvim_create_autocmd("FileType", {
 	command = "setlocal formatoptions-=cro",
 })
 -- attach repl to send command to terminal
-api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = "*",
-	callback = function(_) require "core.repl" end,
-})
 -- Disable statusline in dashboard
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,
@@ -173,11 +181,6 @@ api.nvim_create_autocmd("FileType", {
 	group = ft_id,
 	pattern = "markdown",
 	command = "set wrap",
-})
-api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = "make",
-	command = "set noexpandtab shiftwidth=8 softtabstop=0",
 })
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,

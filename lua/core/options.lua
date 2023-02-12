@@ -33,7 +33,7 @@ vim.o.clipboard = "unnamedplus"
 vim.o.cmdheight = 1 -- 0, 1,
 vim.o.cmdwinheight = 5
 vim.o.complete = ".,w,b,k"
-vim.o.completeopt = "menuone,noselect"
+vim.opt.completeopt = { "menuone", "noselect" }
 vim.o.concealcursor = "niv"
 vim.o.conceallevel = 0
 vim.o.cursorcolumn = true
@@ -108,7 +108,7 @@ vim.o.virtualedit = "block"
 vim.o.visualbell = true
 vim.o.whichwrap = "h,l,<,>,[,],~"
 vim.o.wildchar = 9
--- vim.o.wildmenu = true
+vim.o.wildmenu = false
 vim.o.wildignore =
 	".git,.hg,.svn,*.pyc,*.o,*.out,*.jpg,*.jpeg,*.png,*.gif,*.zip,**/tmp/**,*.DS_Store,**/node_modules/**,**/bower_modules/**"
 vim.o.wildignorecase = true

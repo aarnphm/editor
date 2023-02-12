@@ -3,30 +3,7 @@ return function()
 	vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 
 	require("nvim-treesitter.configs").setup {
-		ensure_installed = {
-			"lua",
-			"python",
-			"c",
-			"cpp",
-			"go",
-			"bash",
-			"markdown",
-			"markdown_inline",
-			"javascript",
-			"typescript",
-			"terraform",
-			"make",
-			"nix",
-			"rust",
-			"query",
-			"regex",
-			"tsx",
-			"vim",
-			"yaml",
-			"llvm",
-			"toml",
-			"proto",
-		},
+		ensure_installed = "all",
 		ignore_install = { "phpdoc" },
 		indent = { enable = false },
 		highlight = {

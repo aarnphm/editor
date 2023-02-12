@@ -6,8 +6,6 @@ return {
 	palette_overwrite = {},
 	---@type string[]
 	disabled_workspaces = {},
-	---@type boolean whether to use custom headers
-	custom_headers = true,
 	background = "dark",
 	colorscheme = "catppuccin",
 	repos = "bentoml/bentoml",

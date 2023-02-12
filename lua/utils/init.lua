@@ -201,17 +201,15 @@ end
 
 ---Extend a highlight group
 ---@param name string @Target highlight group name
----@param def table @Attributes to be extended
+---@param def? table @Attributes to be extended
 M.extend_hl = function(name, def)
+	def = def or {}
 	local hlexists = pcall(vim.api.nvim_get_hl_by_name, name, true)
 	if not hlexists then
 		-- Do nothing if highlight group not found
 		return
 	end
-	local current_def = get_highlight(name)
-	local combined_def = vim.tbl_deep_extend("force", current_def, def)
-
-	vim.api.nvim_set_hl(0, name, combined_def)
+	vim.api.nvim_set_hl(0, name, vim.tbl_deep_extend("force", get_highlight(name), def))
 end
 
 M.get_binary_path = function(binary)
@@ -262,4 +260,14 @@ M.find_files = function(opts, safe_git)
 	end
 end
 
+M.has_words_before = function()
+	if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+	local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+	return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match "^%s*$" == nil
+end
+
+M.check_backspace = function()
+	local col = vim.fn.col "." - 1
+	return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
+end
 return M

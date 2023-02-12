@@ -11,7 +11,6 @@ local local_config_path = home .. path_sep .. ".editor.lua"
 ---@class Editor: table<str, any>
 ---@field debug boolean: Enable debug mode
 ---@field format_on_save boolean: Enable format on save
----@field custom_headers boolean: Whether to use custom headers
 ---@field background string: Set background type, "light" or "dark"
 ---@field colorscheme string: Set colorscheme
 ---@field repos string: Set repos
@@ -19,6 +18,7 @@ local local_config_path = home .. path_sep .. ".editor.lua"
 ---@field use_ssh boolean: Use ssh to clone repos
 ---@field plugins table<string, table|any>: Set plugins
 ---@field palette_overwrite table<string, string>: Set palette overwrite
+---@field disabled_workspaces table<string, string>: A table of disabled_workspaces.
 local _config = nil
 
 return {
@@ -31,7 +31,7 @@ return {
 		path_sep = path_sep,
 		home = home,
 		data_dir = string.format("%s/site/", vim.fn.stdpath "data"),
-		cache_dir = home .. path_sep .. ".cache" .. path_sep .. "nvim" .. path_sep,
+		cache_dir = vim.fn.stdpath "cache" .. path_sep,
 		modules_dir = vim_path .. path_sep .. "lua" .. path_sep .. "modules",
 		local_config_path = local_config_path,
 	},
