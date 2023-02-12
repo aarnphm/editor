@@ -214,24 +214,6 @@ M.extend_hl = function(name, def)
 	vim.api.nvim_set_hl(0, name, combined_def)
 end
 
----Convert number (0/1) to boolean
----@param value number @The value to check
----@return boolean|nil @Returns nil if failed
-M.tobool = function(value)
-	if value == 0 then
-		return false
-	elseif value == 1 then
-		return true
-	else
-		vim.notify(
-			"Attempt to convert data of type '" .. type(value) .. "' [other than 0 or 1] to boolean",
-			vim.log.levels.ERROR,
-			{ title = "[utils] Runtime error" }
-		)
-		return nil
-	end
-end
-
 M.get_binary_path = function(binary)
 	local path = nil
 	if require("editor").global.is_mac or require("editor").global.is_linux then
@@ -278,16 +260,6 @@ M.find_files = function(opts, safe_git)
 	else
 		find_files()
 	end
-end
-
----@param opts table<string, any>
-M.safegit_live_grep = function(opts)
-	opts = opts or {}
-	vim.fn.system "git rev-parse --is-inside-work-tree"
-	if vim.v.shell_error == 0 then opts.cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] end
-	require("telescope.builtin").live_grep(
-		vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
-	)
 end
 
 return M
