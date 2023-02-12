@@ -52,6 +52,8 @@ Plug 'godlygeek/tabular'
 Plug 'preservim/nerdtree'
 Plug 'jiangmiao/auto-pairs'
 Plug 'lervag/vimtex'
+Plug 'google/vim-maktaba'
+Plug 'bazelbuild/vim-bazel'
 
 call plug#end()
 
@@ -67,8 +69,8 @@ let g:netrw_liststyle=3
 let g:vimtex_view_method = 'Preview'
 
 " Minimal
-colorscheme codedark
-set background=dark
+colorscheme rose-pine-dawn
+set background=light
 set number
 set relativenumber
 
