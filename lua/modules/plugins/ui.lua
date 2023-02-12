@@ -24,24 +24,45 @@ return {
 		config = require "ui.nvim-bufferline",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<Space>bp"] = k.map_cr("BufferLinePick")
+				["n|<LocalLeader>p"] = k.map_cr("BufferLinePick")
 					:with_defaults()
 					:with_desc "buffer: Pick",
-				["n|<Space>bc"] = k.map_cr("BufferLinePickClose")
+				["n|<Space>c"] = k.map_cr("BufferLinePickClose")
 					:with_defaults()
 					:with_desc "buffer: Close",
-				["n|<Space>be"] = k.map_cr("BufferLineSortByExtension")
-					:with_noremap()
-					:with_desc "buffer: Sort by extension",
-				["n|<Space>bd"] = k.map_cr("BufferLineSortByDirectory")
-					:with_noremap()
-					:with_desc "buffer: Sort by direrctory",
 				["n|<Space>."] = k.map_cr("BufferLineCycleNext")
 					:with_defaults()
 					:with_desc "buffer: Cycle to next buffer",
-				["n|<Space>n"] = k.map_cr("BufferLineCyclePrev")
+				["n|<Space>,"] = k.map_cr("BufferLineCyclePrev")
 					:with_defaults()
 					:with_desc "buffer: Cycle to previous buffer",
+				["n|<Space>1"] = k.map_cr("BufferLineGoToBuffer 1")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 1",
+				["n|<Space>2"] = k.map_cr("BufferLineGoToBuffer 2")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 2",
+				["n|<Space>3"] = k.map_cr("BufferLineGoToBuffer 3")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 3",
+				["n|<Space>4"] = k.map_cr("BufferLineGoToBuffer 4")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 4",
+				["n|<Space>5"] = k.map_cr("BufferLineGoToBuffer 5")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 5",
+				["n|<Space>6"] = k.map_cr("BufferLineGoToBuffer 6")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 6",
+				["n|<Space>7"] = k.map_cr("BufferLineGoToBuffer 7")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 7",
+				["n|<Space>8"] = k.map_cr("BufferLineGoToBuffer 8")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 8",
+				["n|<Space>9"] = k.map_cr("BufferLineGoToBuffer 9")
+					:with_defaults()
+					:with_desc "buffer: Goto buffer 9",
 			}
 		end,
 	},

@@ -24,24 +24,14 @@ return {
 				color_devicons = true,
 				open_cmd = "vnew",
 				live_update = true, -- auto excute search again when you write any file in vim
-				line_sep_start = "┌-----------------------------------------",
-				result_padding = "¦  ",
-				line_sep = "└-----------------------------------------",
 				highlight = {
 					ui = "String",
 					search = "DiffChange",
 					replace = "DiffDelete",
 				},
 				default = {
-					find = {
-						--pick one of item in find_engine
-						cmd = "rg",
-						options = { "ignore-case" },
-					},
-					replace = {
-						--pick one of item in replace_engine
-						cmd = "oxi",
-					},
+					find = { cmd = "rg" },
+					replace = { cmd = not require("editor").global.is_mac and "oxi" or "sed" },
 				},
 				is_open_target_win = true, --open file on opener window
 				is_insert_mode = false, -- start open panel on is_insert_mode
@@ -49,7 +39,7 @@ return {
 		end,
 		init = function()
 			k.nvim_load_mapping {
-				["n|<Space>s"] = k.map_callback(function() require("spectre").open_visual() end)
+				["n|<Space>sv"] = k.map_callback(function() require("spectre").open_visual() end)
 					:with_defaults()
 					:with_desc "replace: Open visual replace",
 				["n|<Space>so"] = k.map_callback(function() require("spectre").open() end)
@@ -337,47 +327,49 @@ return {
 		init = function()
 			-- set f/F to use hop
 			local hop = require "hop"
-			local directions = require("hop.hint").HintDirection
-			vim.keymap.set(
-				"",
-				"f",
-				function()
-					hop.hint_char1 { direction = directions.AFTER_CURSOR, current_line_only = true }
-				end,
-				{ remap = true }
-			)
-			vim.keymap.set(
-				"",
-				"F",
-				function()
-					hop.hint_char1 { direction = directions.BEFORE_CURSOR, current_line_only = true }
-				end,
-				{ remap = true }
-			)
-			vim.keymap.set(
-				"",
-				"t",
-				function()
+			local d = require("hop.hint").HintDirection
+			vim.api.nvim_set_keymap("", "f", "", {
+				noremap = false,
+				callback = function()
 					hop.hint_char1 {
-						direction = directions.AFTER_CURSOR,
+						direction = d.AFTER_CURSOR,
+						current_line_only = true,
+					}
+				end,
+				desc = "motion: f 1 char",
+			})
+			vim.api.nvim_set_keymap("", "F", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.BEFORE_CURSOR,
+						current_line_only = true,
+					}
+				end,
+				desc = "motion: F 1 char",
+			})
+			vim.api.nvim_set_keymap("", "t", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.AFTER_CURSOR,
 						current_line_only = true,
 						hint_offset = -1,
 					}
 				end,
-				{ remap = true }
-			)
-			vim.keymap.set(
-				"",
-				"T",
-				function()
+				desc = "motion: t 1 char",
+			})
+			vim.api.nvim_set_keymap("", "T", "", {
+				noremap = false,
+				callback = function()
 					hop.hint_char1 {
-						direction = directions.BEFORE_CURSOR,
+						direction = d.BEFORE_CURSOR,
 						current_line_only = true,
 						hint_offset = 1,
 					}
 				end,
-				{ remap = true }
-			)
+				desc = "motion: T 1 char",
+			})
 
 			k.nvim_load_mapping {
 				["n|<LocalLeader>w"] = k.map_cu("HopWord")
@@ -588,7 +580,6 @@ return {
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
 			{ "ahmedkhalf/project.nvim", event = "BufReadPost", config = require "editor.project" },
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
-			{ "nvim-telescope/telescope-github.nvim" },
 		},
 		init = function()
 			local command_panel = function()
@@ -603,56 +594,50 @@ return {
 			end
 
 			k.nvim_load_mapping {
-				["n|<Space>fo"] = k.map_cu("Telescope oldfiles")
-					:with_defaults()
-					:with_desc "find: File by history",
-				["n|<LocalLeader>fw"] = k.map_callback(require("utils").safegit_live_grep)
-					:with_defaults()
-					:with_desc "find: Word in current directory",
-				["n|<Space>fw"] = k.map_callback(
+				["n|<Space>/"] = k.map_callback(
 					function() require("telescope").extensions.live_grep_args.live_grep_args {} end
 				)
 					:with_defaults()
 					:with_desc "find: Word in project",
-				["n|<Space>fr"] = k.map_callback(
+				["n|<Space>r"] = k.map_callback(
 					function() require("telescope").extensions.frecency.frecency() end
 				)
 					:with_defaults()
 					:with_desc "find: File by frecency",
-				["n|<Space>fb"] = k.map_cu("Telescope buffers")
+				["n|<Space>b"] = k.map_cu("Telescope buffers")
 					:with_defaults()
 					:with_desc "find: Buffer opened",
-				["n|<Space>ff"] = k.map_cu("Telescope find_files")
-					:with_defaults()
-					:with_desc "find: File in project",
-				["n|<Space>fp"] = k.map_callback(
+				["n|<Space>\\"] = k.map_callback(
 					function() require("telescope").extensions.projects.projects {} end
 				)
 					:with_defaults()
 					:with_desc "find: Project",
-				["n|<LocalLeader>ff"] = k.map_callback(require("utils").safegit_find_files)
+				["n|<Space>f"] = k.map_callback(
+					function()
+						require("telescope.builtin").find_files {
+							previewer = false,
+							shorten_path = true,
+							layout_strategy = "horizontal",
+							find_command = 1 == vim.fn.executable "fd"
+									and { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" }
+								or nil,
+						}
+					end
+				)
 					:with_defaults()
-					:with_desc "find: file in git project",
-				["n|<Space>fz"] = k.map_cu("Telescope zoxide list")
+					:with_desc "find: file in project",
+				["n|<Space>'"] = k.map_cu("Telescope zoxide list")
 					:with_defaults()
 					:with_desc "edit: Change current direrctory by zoxide",
-				["n|<Space>fu"] = k.map_callback(
+				["n|<Space>u"] = k.map_callback(
 					function() require("telescope").extensions.undo.undo() end
 				)
 					:with_defaults()
 					:with_desc "edit: Show undo history",
-				["n|<Space>fc"] = k.map_cu("Telescope colorscheme")
-					:with_defaults()
-					:with_desc "ui: Change colorscheme",
-				["n|<Space>fs"] = k.map_cu("Telescope grep_string")
+				["n|<Space>w"] = k.map_cu("Telescope grep_string")
 					:with_defaults()
 					:with_desc "find: Current word",
-				["n|<Space>gpr"] = k.map_callback(
-					function() require("telescope").extensions.gh.pull_request() end
-				)
-					:with_defaults()
-					:with_desc "gh: Open Pull request",
-				["n|<LocalLeader>fn"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
+				["n|<Space>n"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
 				["n|<C-p>"] = k.map_callback(command_panel)
 					:with_defaults()
 					:with_desc "tools: Show keymap legends",

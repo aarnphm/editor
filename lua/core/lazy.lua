@@ -141,34 +141,34 @@ require("lazy").setup(modules, {
 })
 
 k.nvim_load_mapping {
-	["n|<Space>ph"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
-	["n|<Space>ps"] = k.map_cr("Lazy sync"):with_defaults():with_nowait():with_desc "package: Sync",
-	["n|<Space>pu"] = k.map_cr("Lazy update")
+	["n|<Space>lh"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
+	["n|<Space>ls"] = k.map_cr("Lazy sync"):with_defaults():with_nowait():with_desc "package: Sync",
+	["n|<Space>lu"] = k.map_cr("Lazy update")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Update",
-	["n|<Space>pi"] = k.map_cr("Lazy install")
+	["n|<Space>li"] = k.map_cr("Lazy install")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Install",
-	["n|<Space>pl"] = k.map_cr("Lazy log"):with_defaults():with_nowait():with_desc "package: Log",
-	["n|<Space>pc"] = k.map_cr("Lazy check")
+	["n|<Space>ll"] = k.map_cr("Lazy log"):with_defaults():with_nowait():with_desc "package: Log",
+	["n|<Space>lc"] = k.map_cr("Lazy check")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Check",
-	["n|<Space>pd"] = k.map_cr("Lazy debug")
+	["n|<Space>ld"] = k.map_cr("Lazy debug")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Debug",
-	["n|<Space>pp"] = k.map_cr("Lazy profile")
+	["n|<Space>lp"] = k.map_cr("Lazy profile")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Profile",
-	["n|<Space>pr"] = k.map_cr("Lazy restore")
+	["n|<Space>lr"] = k.map_cr("Lazy restore")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Restore",
-	["n|<Space>px"] = k.map_cr("Lazy clean")
+	["n|<Space>lx"] = k.map_cr("Lazy clean")
 		:with_defaults()
 		:with_nowait()
 		:with_desc "package: Clean",

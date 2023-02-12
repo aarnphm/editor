@@ -112,19 +112,13 @@ return function()
 	local lleader = "kplus"
 
 	dashboard.section.buttons.val = {
-		button("space f e", icons.ui.History .. "File history", leader, nil, {
-			noremap = true,
-			silent = true,
-			nowait = true,
-			callback = function() require("telescope.builtin").oldfiles() end,
-		}),
-		button("space f r", icons.misc.Rocket .. "File frecency", leader, nil, {
+		button("space r", icons.misc.Rocket .. "File frecency", leader, nil, {
 			noremap = true,
 			silent = true,
 			nowait = true,
 			callback = function() require("telescope").extensions.frecency.frecency() end,
 		}),
-		button("space f p", icons.ui.List .. "Project find", leader, nil, {
+		button("space \\", icons.ui.List .. "Project find", leader, nil, {
 			noremap = true,
 			silent = true,
 			nowait = true,
