@@ -1,7 +1,7 @@
 local k = require "keybind"
 
 k.nvim_load_mapping {
-	["n|<S-Tab>"] = k.map_cr("normal za"):with_defaults():with_desc "edit: Toggle code fold",
+	["n|<S-Tab>"] = k.map_cr("normal za"):with_defaults "edit: Toggle code fold",
 	-- Insert
 	["i|<C-u>"] = k.map_cmd("<C-G>u<C-U>"):with_noremap():with_desc "editi: Delete previous block",
 	["i|<C-b>"] = k.map_cmd("<Left>"):with_noremap():with_desc "editi: Move cursor to left",
@@ -35,27 +35,15 @@ k.nvim_load_mapping {
 		:with_desc "windows: resize left 10px",
 	["n|<LocalLeader>-"] = k.map_cr("resize -5"):with_silent():with_desc "windows: resize down 5px",
 	["n|<LocalLeader>="] = k.map_cr("resize +5"):with_silent():with_desc "windows: resize up 5px",
-	["n|<LocalLeader>lcd"] = k.map_cmd(":lcd %:p:h<CR>")
-		:with_noremap()
-		:with_desc "edit: change directory to current file",
-	["n|<LocalLeader>vs"] = k.map_cu("vsplit")
-		:with_defaults()
-		:with_desc "edit: split window vertically",
-	["n|<LocalLeader>hs"] = k.map_cu("split")
-		:with_defaults()
-		:with_desc "edit: split window horizontally",
-	["n|<Leader>o"] = k.map_cr("setlocal spell! spelllang=en_us")
-		:with_desc "edit: toggle spell check",
-	["n|<Leader>I"] = k.map_cmd(":set list!<CR>")
+	["n|<LocalLeader>vs"] = k.map_cu("vsplit"):with_defaults "edit: split window vertically",
+	["n|<LocalLeader>hs"] = k.map_cu("split"):with_defaults "edit: split window horizontally",
+	["n|<Leader>p"] = k.map_cmd(":%s///g<CR>")
+		:with_defaults "edit: remove all last search occurence",
+	["n|<Leader>i"] = k.map_cmd("gg=G<CR>"):with_defaults "edit: indent file",
+	["n|<Leader>l"] = k.map_cmd(":set list! list?<CR>")
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
-	["n|<Leader>p"] = k.map_cmd(":%s///g<CR>")
-		:with_defaults()
-		:with_desc "edit: replace all occurences of the word under cursor",
-	["n|<Leader>i"] = k.map_cmd("gg=G<CR>"):with_defaults():with_desc "edit: indent file",
-	["n|<Leader>l"] = k.map_cmd(":set list! list?<CR>"):with_noremap():with_desc "edit: toggle list",
 	["n|<Leader>t"] = k.map_cmd(":%s/\\s\\+$//e<CR>")
 		:with_noremap()
 		:with_desc "edit: trim trailing whitespace",
-	["n|<LocalLeader>ft"] = k.map_cr("FormatToggle"):with_defaults():with_desc "lsp: toggle format",
 }

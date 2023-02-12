@@ -253,19 +253,40 @@ M.get_binary_path = function(binary)
 	return path
 end
 
----@param opts table<string, any>
-M.safegit_find_files = function(opts)
-	opts = opts or {}
+---@param opts? table<string, any> telescope options. Default to {}.
+--- See |telescope.builtin.find_files| and |telescope.builtin.git_files| for opts
+---@param safe_git? boolean whether to use git_files or not. Default to true
+---@overload fun(opts: table<string, any>): nil
+---@overload fun(safe_git: boolean): nil
+M.find_files = function(opts, safe_git)
+	safe_git = safe_git or true
 
-	vim.fn.system "git rev-parse --is-inside-work-tree"
-	if vim.v.shell_error == 0 then
-		require("telescope.builtin").git_files(
-			vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
-		)
-	else
+	opts = vim.tbl_extend("keep", opts or {}, {
+		previewer = false,
+		shorten_path = true,
+		layout_strategy = "horizontal",
+	})
+
+	local find_files = function()
+		opts.find_command = 1 == vim.fn.executable "fd"
+				and { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" }
+			or nil
 		require("telescope.builtin").find_files(
 			vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
 		)
+	end
+
+	if safe_git then
+		vim.fn.system "git rev-parse --is-inside-work-tree"
+		if vim.v.shell_error == 0 then
+			require("telescope.builtin").git_files(
+				vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
+			)
+		else
+			find_files()
+		end
+	else
+		find_files()
 	end
 end
 

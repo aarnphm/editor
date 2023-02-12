@@ -40,21 +40,16 @@ return {
 		init = function()
 			k.nvim_load_mapping {
 				["n|<Space>sv"] = k.map_callback(function() require("spectre").open_visual() end)
-					:with_defaults()
-					:with_desc "replace: Open visual replace",
+					:with_defaults "replace: Open visual replace",
 				["n|<Space>so"] = k.map_callback(function() require("spectre").open() end)
-					:with_defaults()
-					:with_desc "replace: Open panel",
+					:with_defaults "replace: Open panel",
 				["n|<Space>sw"] = k.map_callback(
 					function() require("spectre").open_visual { select_word = true } end
-				)
-					:with_defaults()
-					:with_desc "replace: Replace word under cursor",
+				):with_defaults "replace: Replace word under cursor",
 				["n|<Space>sp"] = k.map_callback(
 					function() require("spectre").open_file_search() end
 				)
-					:with_defaults()
-					:with_desc "replace: Replace word under file search",
+					:with_defaults "replace: Replace word under file search",
 			}
 		end,
 	},
@@ -77,17 +72,11 @@ return {
 		command = { "Git", "G", "Ggrep", "GBrowse" },
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>G"] = k.map_cr("G")
-					:with_defaults()
-					:with_desc "git: Open git-fugitive",
-				["n|<LocalLeader>gaa"] = k.map_cr("G add .")
-					:with_defaults()
-					:with_desc "git: Add all files",
-				["n|<LocalLeader>gcm"] = k.map_cr("G commit")
-					:with_defaults()
-					:with_desc "git: Commit",
-				["n|<LocalLeader>gps"] = k.map_cr("G push"):with_defaults():with_desc "git: push",
-				["n|<LocalLeader>gpl"] = k.map_cr("G pull"):with_defaults():with_desc "git: pull",
+				["n|<LocalLeader>G"] = k.map_cr("G"):with_defaults "git: Open git-fugitive",
+				["n|<LocalLeader>gaa"] = k.map_cr("G add ."):with_defaults "git: Add all files",
+				["n|<LocalLeader>gcm"] = k.map_cr("G commit"):with_defaults "git: Commit",
+				["n|<LocalLeader>gps"] = k.map_cr("G push"):with_defaults "git: push",
+				["n|<LocalLeader>gpl"] = k.map_cr("G pull"):with_defaults "git: pull",
 			}
 		end,
 	},
@@ -97,12 +86,9 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen")
-					:with_defaults()
-					:with_desc "git: Show diff view",
+				["n|<LocalLeader>D"] = k.map_cr("DiffviewOpen"):with_defaults "git: Show diff view",
 				["n|<LocalLeader><LocalLeader>D"] = k.map_cr("DiffviewClose")
-					:with_defaults()
-					:with_desc "git: Close diff view",
+					:with_defaults "git: Close diff view",
 			}
 		end,
 	},
@@ -113,9 +99,7 @@ return {
 		event = "BufReadPost",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<C-x>"] = k.map_cr("BufDel")
-					:with_defaults()
-					:with_desc "bufdel: Delete current buffer",
+				["n|<C-x>"] = k.map_cr("BufDel"):with_defaults "bufdel: Delete current buffer",
 			}
 		end,
 	},
@@ -158,8 +142,7 @@ return {
 		init = function()
 			k.nvim_load_mapping {
 				["n|<LocalLeader>sr"] = k.map_callback(function() require("ssr").open() end)
-					:with_defaults()
-					:with_desc "edit: search and replace",
+					:with_defaults "edit: search and replace",
 			}
 		end,
 	},
@@ -239,41 +222,29 @@ return {
 
 			k.nvim_load_mapping {
 				["n|<C-\\>"] = k.map_cr([[execute v:count . "ToggleTerm direction=horizontal"]])
-					:with_defaults()
-					:with_desc "terminal: Toggle horizontal",
+					:with_defaults "terminal: Toggle horizontal",
 				["i|<C-\\>"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
-					:with_defaults()
-					:with_desc "terminal: Toggle horizontal",
+					:with_defaults "terminal: Toggle horizontal",
 				["t|<C-\\>"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>")
-					:with_defaults()
-					:with_desc "terminal: Toggle horizontal",
+					:with_defaults "terminal: Toggle horizontal",
 				["n|<C-t>"] = k.map_cr([[execute v:count . "ToggleTerm direction=vertical"]])
-					:with_defaults()
-					:with_desc "terminal: Toggle vertical",
+					:with_defaults "terminal: Toggle vertical",
 				["i|<C-t>"] = k.map_cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
-					:with_defaults()
-					:with_desc "terminal: Toggle vertical",
+					:with_defaults "terminal: Toggle vertical",
 				["t|<C-t>"] = k.map_cmd("<Esc><Cmd>ToggleTerm<CR>")
-					:with_defaults()
-					:with_desc "terminal: Toggle vertical",
+					:with_defaults "terminal: Toggle vertical",
 				["n|slg"] = k.map_callback(function() program_term "lazygit" end)
-					:with_defaults()
-					:with_desc "git: Toggle lazygit",
+					:with_defaults "git: Toggle lazygit",
 				["t|slg"] = k.map_callback(function() program_term "lazygit" end)
-					:with_defaults()
-					:with_desc "git: Toggle lazygit",
+					:with_defaults "git: Toggle lazygit",
 				["n|sbt"] = k.map_callback(function() program_term "btop" end)
-					:with_defaults()
-					:with_desc "git: Toggle btop",
+					:with_defaults "git: Toggle btop",
 				["t|sbt"] = k.map_callback(function() program_term "btop" end)
-					:with_defaults()
-					:with_desc "git: Toggle btop",
+					:with_defaults "git: Toggle btop",
 				["n|sipy"] = k.map_callback(function() program_term "ipython" end)
-					:with_defaults()
-					:with_desc "git: Toggle ipython",
+					:with_defaults "git: Toggle ipython",
 				["t|sipy"] = k.map_callback(function() program_term "ipython" end)
-					:with_defaults()
-					:with_desc "git: Toggle ipython",
+					:with_defaults "git: Toggle ipython",
 			}
 		end,
 	},
@@ -288,24 +259,17 @@ return {
 		config = require "editor.trouble",
 		init = function()
 			k.nvim_load_mapping {
-				["n|gt"] = k.map_cr("TroubleToggle")
-					:with_defaults()
-					:with_desc "lsp: Toggle trouble list",
+				["n|gt"] = k.map_cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
 				["n|gR"] = k.map_cr("TroubleToggle lsp_references")
-					:with_defaults()
-					:with_desc "lsp: Show lsp references",
+					:with_defaults "lsp: Show lsp references",
 				["n|<LocalLeader>td"] = k.map_cr("TroubleToggle document_diagnostics")
-					:with_defaults()
-					:with_desc "lsp: Show document diagnostics",
+					:with_defaults "lsp: Show document diagnostics",
 				["n|<LocalLeader>tw"] = k.map_cr("TroubleToggle workspace_diagnostics")
-					:with_defaults()
-					:with_desc "lsp: Show workspace diagnostics",
+					:with_defaults "lsp: Show workspace diagnostics",
 				["n|<LocalLeader>tq"] = k.map_cr("TroubleToggle quickfix")
-					:with_defaults()
-					:with_desc "lsp: Show quickfix list",
+					:with_defaults "lsp: Show quickfix list",
 				["n|<LocalLeader>tl"] = k.map_cr("TroubleToggle loclist")
-					:with_defaults()
-					:with_desc "lsp: Show loclist",
+					:with_defaults "lsp: Show loclist",
 			}
 		end,
 	},
@@ -396,7 +360,7 @@ return {
 		config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>ocpr"] = k.map_cr("Octo pr list")
+				["n|<Space>o"] = k.map_cmd("Octo")
 					:with_noremap()
 					:with_desc "octo: List pull request",
 			}
@@ -414,30 +378,24 @@ return {
 							or k.t "<Plug>(comment_toggle_linewise_count)"
 					end
 				)
-					:with_defaults()
 					:with_expr()
-					:with_desc "edit: Toggle comment for line",
+					:with_defaults "edit: Toggle comment for line",
 				["n|gbc"] = k.map_callback(
 					function()
 						return vim.v.count == 0 and k.t "<Plug>(comment_toggle_blockwise_current)"
 							or k.t "<Plug>(comment_toggle_blockwise_count)"
 					end
 				)
-					:with_defaults()
 					:with_expr()
-					:with_desc "edit: Toggle comment for block",
+					:with_defaults "edit: Toggle comment for block",
 				["n|gc"] = k.map_cmd("<Plug>(comment_toggle_linewise)")
-					:with_defaults()
-					:with_desc "edit: Toggle comment for line with operator",
+					:with_defaults "edit: Toggle comment for line with operator",
 				["n|gb"] = k.map_cmd("<Plug>(comment_toggle_blockwise)")
-					:with_defaults()
-					:with_desc "edit: Toggle comment for block with operator",
+					:with_defaults "edit: Toggle comment for block with operator",
 				["x|gc"] = k.map_cmd("<Plug>(comment_toggle_linewise_visual)")
-					:with_defaults()
-					:with_desc "edit: Toggle comment for line with selection",
+					:with_defaults "edit: Toggle comment for line with selection",
 				["x|gb"] = k.map_cmd("<Plug>(comment_toggle_blockwise_visual)")
-					:with_defaults()
-					:with_desc "edit: Toggle comment for block with selection",
+					:with_defaults "edit: Toggle comment for block with selection",
 			}
 		end,
 	},
@@ -455,12 +413,8 @@ return {
 		config = require "editor.sniprun",
 		init = function()
 			k.nvim_load_mapping {
-				["v|<Leader>r"] = k.map_cr("SnipRun")
-					:with_defaults()
-					:with_desc "tool: Run code by range",
-				["n|<Leader>r"] = k.map_cu([[%SnipRun]])
-					:with_defaults()
-					:with_desc "tool: Run code by file",
+				["v|<Leader>r"] = k.map_cr("SnipRun"):with_defaults "tool: Run code by range",
+				["n|<Leader>r"] = k.map_cu([[%SnipRun]]):with_defaults "tool: Run code by file",
 			}
 		end,
 	},
@@ -528,40 +482,28 @@ return {
 		init = function()
 			k.nvim_load_mapping {
 				["n|<F6>"] = k.map_callback(function() require("dap").continue() end)
-					:with_defaults()
-					:with_desc "debug: Run/Continue",
+					:with_defaults "debug: Run/Continue",
 				["n|<F7>"] = k.map_callback(function()
 					require("dap").terminate()
 					require("dapui").close()
-				end)
-					:with_defaults()
-					:with_desc "debug: Stop",
+				end):with_defaults "debug: Stop",
 				["n|<F8>"] = k.map_callback(function() require("dap").toggle_breakpoint() end)
-					:with_defaults()
-					:with_desc "debug: Toggle breakpoint",
+					:with_defaults "debug: Toggle breakpoint",
 				["n|<F9>"] = k.map_callback(function() require("dap").step_into() end)
-					:with_defaults()
-					:with_desc "debug: Step into",
+					:with_defaults "debug: Step into",
 				["n|<F10>"] = k.map_callback(function() require("dap").step_out() end)
-					:with_defaults()
-					:with_desc "debug: Step out",
+					:with_defaults "debug: Step out",
 				["n|<F11>"] = k.map_callback(function() require("dap").step_over() end)
-					:with_defaults()
-					:with_desc "debug: Step over",
+					:with_defaults "debug: Step over",
 				["n|<Space>db"] = k.map_callback(
 					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
-				)
-					:with_defaults()
-					:with_desc "debug: Set breakpoint with condition",
+				):with_defaults "debug: Set breakpoint with condition",
 				["n|<Space>dc"] = k.map_callback(function() require("dap").run_to_cursor() end)
-					:with_defaults()
-					:with_desc "debug: Run to cursor",
+					:with_defaults "debug: Run to cursor",
 				["n|<Space>dl"] = k.map_callback(function() require("dap").run_last() end)
-					:with_defaults()
-					:with_desc "debug: Run last",
+					:with_defaults "debug: Run last",
 				["n|<Space>do"] = k.map_callback(function() require("dap").repl.open() end)
-					:with_defaults()
-					:with_desc "debug: Open REPL",
+					:with_defaults "debug: Open REPL",
 				["o|m"] = k.map_callback(function() require("tsht").nodes() end):with_silent(),
 			}
 		end,
@@ -596,22 +538,14 @@ return {
 			k.nvim_load_mapping {
 				["n|<Space>/"] = k.map_callback(
 					function() require("telescope").extensions.live_grep_args.live_grep_args {} end
-				)
-					:with_defaults()
-					:with_desc "find: Word in project",
+				):with_defaults "find: Word in project",
 				["n|<Space>r"] = k.map_callback(
 					function() require("telescope").extensions.frecency.frecency() end
-				)
-					:with_defaults()
-					:with_desc "find: File by frecency",
-				["n|<Space>b"] = k.map_cu("Telescope buffers")
-					:with_defaults()
-					:with_desc "find: Buffer opened",
+				):with_defaults "find: File by frecency",
+				["n|<Space>b"] = k.map_cu("Telescope buffers"):with_defaults "find: Buffer opened",
 				["n|<Space>\\"] = k.map_callback(
 					function() require("telescope").extensions.projects.projects {} end
-				)
-					:with_defaults()
-					:with_desc "find: Project",
+				):with_defaults "find: Project",
 				["n|<Space>f"] = k.map_callback(
 					function()
 						require("telescope.builtin").find_files {
@@ -623,24 +557,21 @@ return {
 								or nil,
 						}
 					end
-				)
-					:with_defaults()
-					:with_desc "find: file in project",
+				):with_defaults "find: file in project",
 				["n|<Space>'"] = k.map_cu("Telescope zoxide list")
-					:with_defaults()
-					:with_desc "edit: Change current direrctory by zoxide",
+					:with_defaults "edit: Change current direrctory by zoxide",
 				["n|<Space>u"] = k.map_callback(
 					function() require("telescope").extensions.undo.undo() end
 				)
-					:with_defaults()
-					:with_desc "edit: Show undo history",
+					:with_defaults "edit: Show undo history",
 				["n|<Space>w"] = k.map_cu("Telescope grep_string")
-					:with_defaults()
-					:with_desc "find: Current word",
-				["n|<Space>n"] = k.map_cu("enew"):with_defaults():with_desc "buffer: New",
+					:with_defaults "find: Current word",
+				["n|<Space>n"] = k.map_cu("enew"):with_defaults "buffer: New",
 				["n|<C-p>"] = k.map_callback(command_panel)
-					:with_defaults()
-					:with_desc "tools: Show keymap legends",
+					:with_defaults "tools: Show keymap legends",
+				["n|<Space>e"] = k.map_callback(
+					function() require("utils").find_files { cwd = vim.fn.stdpath "config" } end
+				):with_defaults "tools: edit NVIM config",
 			}
 		end,
 	},

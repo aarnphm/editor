@@ -141,35 +141,14 @@ require("lazy").setup(modules, {
 })
 
 k.nvim_load_mapping {
-	["n|<Space>lh"] = k.map_cr("Lazy"):with_defaults():with_nowait():with_desc "package: Show",
-	["n|<Space>ls"] = k.map_cr("Lazy sync"):with_defaults():with_nowait():with_desc "package: Sync",
-	["n|<Space>lu"] = k.map_cr("Lazy update")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Update",
-	["n|<Space>li"] = k.map_cr("Lazy install")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Install",
-	["n|<Space>ll"] = k.map_cr("Lazy log"):with_defaults():with_nowait():with_desc "package: Log",
-	["n|<Space>lc"] = k.map_cr("Lazy check")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Check",
-	["n|<Space>ld"] = k.map_cr("Lazy debug")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Debug",
-	["n|<Space>lp"] = k.map_cr("Lazy profile")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Profile",
-	["n|<Space>lr"] = k.map_cr("Lazy restore")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Restore",
-	["n|<Space>lx"] = k.map_cr("Lazy clean")
-		:with_defaults()
-		:with_nowait()
-		:with_desc "package: Clean",
+	["n|<Space>lh"] = k.map_cr("Lazy"):with_nowait():with_defaults "package: Show",
+	["n|<Space>ls"] = k.map_cr("Lazy sync"):with_nowait():with_defaults "package: Sync",
+	["n|<Space>lu"] = k.map_cr("Lazy update"):with_nowait():with_defaults "package: Update",
+	["n|<Space>li"] = k.map_cr("Lazy install"):with_nowait():with_defaults "package: Install",
+	["n|<Space>ll"] = k.map_cr("Lazy log"):with_nowait():with_defaults "package: Log",
+	["n|<Space>lc"] = k.map_cr("Lazy check"):with_nowait():with_defaults "package: Check",
+	["n|<Space>ld"] = k.map_cr("Lazy debug"):with_nowait():with_defaults "package: Debug",
+	["n|<Space>lp"] = k.map_cr("Lazy profile"):with_nowait():with_defaults "package: Profile",
+	["n|<Space>lr"] = k.map_cr("Lazy restore"):with_nowait():with_defaults "package: Restore",
+	["n|<Space>lx"] = k.map_cr("Lazy clean"):with_nowait():with_defaults "package: Clean",
 }

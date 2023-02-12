@@ -57,8 +57,8 @@ RHS.map_cu = function(self, cmd_string)
 end
 
 ---@param callback fun():nil
---- Takes a callback that will be called when the key is pressed
 ---@return RHS
+--- Takes a callback that will be called when the key is pressed
 RHS.map_callback = function(self, callback)
 	self.cmd = ""
 	self.options.callback = callback
@@ -66,32 +66,28 @@ RHS.map_callback = function(self, callback)
 end
 
 ---@return RHS
-RHS.with_defaults = function(self)
-	-- this defaults include noremap and silent
-	self.options.noremap = true
-	self.options.silent = true
-	return self
-end
-
----@return RHS
+--- Set silent to true
 RHS.with_silent = function(self)
 	self.options.silent = true
 	return self
 end
 
 ---@return RHS
+--- Set noremap to true
 RHS.with_noremap = function(self)
 	self.options.noremap = true
 	return self
 end
 
 ---@return RHS
+--- Whether the keymap is an expression
 RHS.with_expr = function(self)
 	self.options.expr = true
 	return self
 end
 
 ---@return RHS
+--- Set nowait to true
 RHS.with_nowait = function(self)
 	self.options.nowait = true
 	return self
@@ -99,6 +95,7 @@ end
 
 ---@param bufnr number
 ---@return RHS
+--- Assigning a buffer to a keymap.
 RHS.with_buffer = function(self, bufnr)
 	self.buffer = bufnr
 	return self
@@ -106,8 +103,19 @@ end
 
 ---@param desc_string string
 ---@return RHS
+--- Assigning a description to a keymap.
 RHS.with_desc = function(self, desc_string)
 	self.options.desc = desc_string
+	return self
+end
+
+---@param desc_string string
+---@return RHS
+--- Sets noremap and silent to true and assigns a description to a keymap.
+RHS.with_defaults = function(self, desc_string)
+	self.options.noremap = true
+	self.options.silent = true
+	self:with_desc(desc_string)
 	return self
 end
 

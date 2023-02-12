@@ -32,9 +32,7 @@ return {
 		build = "cd app && yarn install",
 		init = function()
 			k.nvim_load_mapping {
-				["n|mpt"] = k.map_cr("MarkdownPreviewToggle")
-					:with_defaults()
-					:with_desc "markdown: preview",
+				["n|mpt"] = k.map_cr("MarkdownPreviewToggle"):with_defaults "markdown: preview",
 			}
 		end,
 	},
@@ -46,65 +44,50 @@ return {
 		init = function()
 			k.nvim_load_mapping {
 				["n|<Leader>ct"] = k.map_callback(require("crates").toggle)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: Toggle",
+					:with_defaults "crates: Toggle",
 				["n|<Leader>cr"] = k.map_callback(require("crates").reload)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: reload",
+					:with_defaults "crates: reload",
 				["n|<Leader>cv"] = k.map_callback(require("crates").show_versions_popup)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: show versions popup",
+					:with_defaults "crates: show versions popup",
 				["n|<Leader>cf"] = k.map_callback(require("crates").show_features_popup)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: show features popup",
+					:with_defaults "crates: show features popup",
 				["n|<Leader>cd"] = k.map_callback(require("crates").show_dependencies_popup)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: show dependencies popup",
+					:with_defaults "crates: show dependencies popup",
 				["n|<Leader>cu"] = k.map_callback(require("crates").update_crate)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: update crate",
+					:with_defaults "crates: update crate",
 				["v|<Leader>cu"] = k.map_callback(require("crates").update_crates)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: update crates",
+					:with_defaults "crates: update crates",
 				["n|<Leader>ca"] = k.map_callback(require("crates").update_all_crates)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: update all crates",
+					:with_defaults "crates: update all crates",
 				["n|<Leader>cU"] = k.map_callback(require("crates").upgrade_crate)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: upgrade crate",
+					:with_defaults "crates: upgrade crate",
 				["v|<Leader>cU"] = k.map_callback(require("crates").upgrade_crates)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: upgrade crates",
+					:with_defaults "crates: upgrade crates",
 				["n|<Leader>cA"] = k.map_callback(require("crates").upgrade_all_crates)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: upgrade all crates",
+					:with_defaults "crates: upgrade all crates",
 				["n|<Leader>cH"] = k.map_callback(require("crates").open_homepage)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: show homepage",
+					:with_defaults "crates: show homepage",
 				["n|<Leader>cR"] = k.map_callback(require("crates").open_repository)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: show repository",
+					:with_defaults "crates: show repository",
 				["n|<Leader>cD"] = k.map_callback(require("crates").open_documentation)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: show documentation",
+					:with_defaults "crates: show documentation",
 				["n|<Leader>cC"] = k.map_callback(require("crates").open_crates_io)
-					:with_defaults()
 					:with_buffer(0)
-					:with_desc "crates: open crates.io",
+					:with_defaults "crates: open crates.io",
 			}
 		end,
 	},

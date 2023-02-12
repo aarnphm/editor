@@ -24,45 +24,30 @@ return {
 		config = require "ui.nvim-bufferline",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<LocalLeader>p"] = k.map_cr("BufferLinePick")
-					:with_defaults()
-					:with_desc "buffer: Pick",
-				["n|<Space>c"] = k.map_cr("BufferLinePickClose")
-					:with_defaults()
-					:with_desc "buffer: Close",
+				["n|<LocalLeader>p"] = k.map_cr("BufferLinePick"):with_defaults "buffer: Pick",
+				["n|<Space>c"] = k.map_cr("BufferLinePickClose"):with_defaults "buffer: Close",
 				["n|<Space>."] = k.map_cr("BufferLineCycleNext")
-					:with_defaults()
-					:with_desc "buffer: Cycle to next buffer",
+					:with_defaults "buffer: Cycle to next buffer",
 				["n|<Space>,"] = k.map_cr("BufferLineCyclePrev")
-					:with_defaults()
-					:with_desc "buffer: Cycle to previous buffer",
+					:with_defaults "buffer: Cycle to previous buffer",
 				["n|<Space>1"] = k.map_cr("BufferLineGoToBuffer 1")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 1",
+					:with_defaults "buffer: Goto buffer 1",
 				["n|<Space>2"] = k.map_cr("BufferLineGoToBuffer 2")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 2",
+					:with_defaults "buffer: Goto buffer 2",
 				["n|<Space>3"] = k.map_cr("BufferLineGoToBuffer 3")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 3",
+					:with_defaults "buffer: Goto buffer 3",
 				["n|<Space>4"] = k.map_cr("BufferLineGoToBuffer 4")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 4",
+					:with_defaults "buffer: Goto buffer 4",
 				["n|<Space>5"] = k.map_cr("BufferLineGoToBuffer 5")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 5",
+					:with_defaults "buffer: Goto buffer 5",
 				["n|<Space>6"] = k.map_cr("BufferLineGoToBuffer 6")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 6",
+					:with_defaults "buffer: Goto buffer 6",
 				["n|<Space>7"] = k.map_cr("BufferLineGoToBuffer 7")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 7",
+					:with_defaults "buffer: Goto buffer 7",
 				["n|<Space>8"] = k.map_cr("BufferLineGoToBuffer 8")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 8",
+					:with_defaults "buffer: Goto buffer 8",
 				["n|<Space>9"] = k.map_cr("BufferLineGoToBuffer 9")
-					:with_defaults()
-					:with_desc "buffer: Goto buffer 9",
+					:with_defaults "buffer: Goto buffer 9",
 			}
 		end,
 	},
@@ -86,17 +71,12 @@ return {
 		init = function()
 			k.nvim_load_mapping {
 				["n|<Space>tqf"] = k.map_cr("TodoQuickFix")
-					:with_defaults()
-					:with_desc "todo-comments: Open quickfix",
+					:with_defaults "todo-comments: Open quickfix",
 				["n|]t"] = k.map_callback(function() require("todo-comments").jump_next() end)
-					:with_defaults()
-					:with_desc "todo-comments: Next",
+					:with_defaults "todo-comments: Next",
 				["n|[t"] = k.map_callback(function() require("todo-comments").jump_prev() end)
-					:with_defaults()
-					:with_desc "todo-comments: Previous",
-				["n|<Space>tt"] = k.map_cr("TodoTelescope")
-					:with_defaults()
-					:with_desc "todo-comments: Telescope",
+					:with_defaults "todo-comments: Previous",
+				["n|<Space>tt"] = k.map_cr("TodoTelescope"):with_defaults "todo-comments: Telescope",
 			}
 		end,
 	},
@@ -133,15 +113,11 @@ return {
 		config = require "ui.nvim-tree",
 		init = function()
 			k.nvim_load_mapping {
-				["n|<C-n>"] = k.map_cr("NvimTreeToggle")
-					:with_defaults()
-					:with_desc "file-explorer: Toggle",
+				["n|<C-n>"] = k.map_cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
 				["n|<Leader>nf"] = k.map_cr("NvimTreeFindFile")
-					:with_defaults()
-					:with_desc "file-explorer: Find file",
+					:with_defaults "file-explorer: Find file",
 				["n|<Leader>nr"] = k.map_cr("NvimTreeRefresh")
-					:with_defaults()
-					:with_desc "file-explorer: Refresh",
+					:with_defaults "file-explorer: Refresh",
 			}
 		end,
 	},
