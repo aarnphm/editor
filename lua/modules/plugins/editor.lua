@@ -12,6 +12,7 @@ local cmd = {
 
 return {
 	--- NOTE: add stablize.nvim if you are not using nvim-nightly
+	["jghauser/mkdir.nvim"] = { lazy = false },
 	["tpope/vim-repeat"] = { lazy = true },
 	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
 	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
