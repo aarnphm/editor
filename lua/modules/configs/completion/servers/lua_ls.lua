@@ -55,17 +55,16 @@ return {
 			workspace = {
 				library = {
 					vim.env.VIMRUNTIME,
-					vim.api.nvim_get_runtime_file("", true),
 					vim.fn.expand "$VIMRUNTIME/lua",
 					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
 					require("neodev.config").types(),
+					vim.api.nvim_get_runtime_file("", true),
 				},
+				checkThirdParty = false,
 				maxPreload = 100000,
 				preloadFileSize = 10000,
 			},
 			telemetry = { enable = false },
-			-- Do not override treesitter lua highlighting with sumneko lua highlighting
-			semantic = { enable = false },
 		},
 	},
 }
