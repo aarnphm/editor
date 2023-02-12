@@ -1,4 +1,3 @@
-column_width = 100  # NOTE: conform with Linux max line length
 indent_width = 4
 line_endings = "Unix"
 quote_style = "ForceDouble"

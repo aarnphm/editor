@@ -23,9 +23,7 @@ return function()
 	local has_words_before = function()
 		if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
 		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-		return col ~= 0
-			and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match "^%s*$"
-				== nil
+		return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match "^%s*$" == nil
 	end
 
 	local check_backspace = function()
@@ -47,8 +45,7 @@ return function()
 	compare.lsp_scores = function(entry1, entry2)
 		local diff
 		if entry1.completion_item.score and entry2.completion_item.score then
-			diff = (entry2.completion_item.score * entry2.score)
-				- (entry1.completion_item.score * entry1.score)
+			diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
 		else
 			diff = entry2.score - entry1.score
 		end
@@ -64,9 +61,9 @@ return function()
 		elseif cmp.visible() and has_words_before() then
 			cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
 		elseif require("luasnip").expand_or_jumpable() then
-			vim.fn.feedkeys(k.t "<Plug>luasnip-expand-or-jump", "")
+			vim.fn.feedkeys(k.replace_termcodes "<Plug>luasnip-expand-or-jump", "")
 		elseif check_backspace() then
-			vim.fn.feedkeys(k.t "<Tab>", "n")
+			vim.fn.feedkeys(k.replace_termcodes "<Tab>", "n")
 		else
 			fallback()
 		end
@@ -76,7 +73,7 @@ return function()
 		if cmp.visible() then
 			cmp.select_prev_item()
 		elseif require("luasnip").jumpable(-1) then
-			vim.fn.feedkeys(k.t "<Plug>luasnip-jump-prev", "")
+			vim.fn.feedkeys(k.replace_termcodes "<Plug>luasnip-jump-prev", "")
 		elseif has_words_before() then
 			cmp.complete()
 		else

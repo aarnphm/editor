@@ -8,11 +8,7 @@ local switch_source_header_splitcmd = function(bufnr, splitcmd)
 		clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
 			if err then error(tostring(err)) end
 			if not result then
-				vim.notify(
-					"Corresponding file can’t be determined",
-					vim.log.levels.ERROR,
-					{ title = "LSP Error!" }
-				)
+				vim.notify("Corresponding file can’t be determined", vim.log.levels.ERROR, { title = "LSP Error!" })
 				return
 			end
 			vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))

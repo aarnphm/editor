@@ -107,11 +107,7 @@ api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave" }, {
 	group = wins_id,
 	pattern = "*",
 	callback = function(_)
-		if
-			not vim.o.cursorline
-			and not vim.bo.filetype ~= "^(dashboard|alpha)"
-			and not vim.o.pvw
-		then
+		if not vim.o.cursorline and not vim.bo.filetype ~= "^(dashboard|alpha)" and not vim.o.pvw then
 			vim.o.cursorline = true
 		end
 	end,
@@ -121,11 +117,7 @@ api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter" }, {
 	group = wins_id,
 	pattern = "*",
 	callback = function(_)
-		if
-			not vim.o.cursorline
-			and not vim.bo.filetype ~= "^(dashboard|alpha)"
-			and not vim.o.pvw
-		then
+		if not vim.o.cursorline and not vim.bo.filetype ~= "^(dashboard|alpha)" and not vim.o.pvw then
 			vim.o.cursorline = false
 		end
 	end,
@@ -191,13 +183,7 @@ api.nvim_create_autocmd("FileType", {
 	group = ft_id,
 	pattern = "c,cpp",
 	callback = function(_)
-		api.nvim_buf_set_keymap(
-			0,
-			"n",
-			"<Leader>h",
-			":ClangdSwitchSourceHeaderVSplit<CR>",
-			{ noremap = true }
-		)
+		api.nvim_buf_set_keymap(0, "n", "<Leader><Leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>", { noremap = true })
 	end,
 })
 -- set filetype for bazel files

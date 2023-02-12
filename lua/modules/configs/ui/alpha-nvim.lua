@@ -168,9 +168,7 @@ return function()
 
 	local head_butt_padding = 2
 	local foot_butt_padding = 1
-	local occu_height = #dashboard.section.header.val
-		+ 2 * #dashboard.section.buttons.val
-		+ head_butt_padding
+	local occu_height = #dashboard.section.header.val + 2 * #dashboard.section.buttons.val + head_butt_padding
 
 	dashboard.config.layout = {
 		{

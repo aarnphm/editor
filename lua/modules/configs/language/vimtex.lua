@@ -1,8 +1,7 @@
 return function()
 	if require("editor").global.is_mac then
 		vim.g.vimtex_view_method = "skim"
-		vim.g.vimtex_view_general_viewer =
-			"/Applications/Skim.app/Contents/SharedSupport/displayline"
+		vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
 		vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
 	end
 

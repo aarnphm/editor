@@ -36,10 +36,10 @@ end
 vim.g.sqlite_clib_path = vim.env["SQLITE_PATH"]
 
 -- map leader to , and localeader to +
-vim.g.mapleader = ","
+vim.g.mapleader = " "
 vim.g.maplocalleader = "+"
-vim.api.nvim_set_keymap("n", ",", "", { noremap = true })
-vim.api.nvim_set_keymap("x", ",", "", { noremap = true })
+vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
+vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
 
 require "core.options"
 require "core.mappings"

@@ -104,12 +104,7 @@ local init_palette = function()
 			}
 		end
 
-		palette = vim.tbl_extend(
-			"force",
-			{ none = "NONE" },
-			palette,
-			require("editor").config.palette_overwrite
-		)
+		palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").config.palette_overwrite)
 	end
 
 	return palette
@@ -158,12 +153,7 @@ local get_highlight = function(hl_group)
 	result.bg = hl.background and string.format("#%06x", hl.background)
 	result.sp = hl.special and string.format("#%06x", hl.special)
 	for attr, val in pairs(hl) do
-		if
-			type(attr) == "string"
-			and attr ~= "foreground"
-			and attr ~= "background"
-			and attr ~= "special"
-		then
+		if type(attr) == "string" and attr ~= "foreground" and attr ~= "background" and attr ~= "special" then
 			result[attr] = val
 		end
 	end
@@ -294,9 +284,7 @@ end
 M.safegit_live_grep = function(opts)
 	opts = opts or {}
 	vim.fn.system "git rev-parse --is-inside-work-tree"
-	if vim.v.shell_error == 0 then
-		opts.cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-	end
+	if vim.v.shell_error == 0 then opts.cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] end
 	require("telescope.builtin").live_grep(
 		vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
 	)

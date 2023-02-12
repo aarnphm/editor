@@ -8,10 +8,7 @@ local icons = {
 }
 
 local modules = {}
-local lazy_path = require("editor").global.data_dir
-	.. "lazy"
-	.. require("editor").global.path_sep
-	.. "lazy.nvim"
+local lazy_path = require("editor").global.data_dir .. "lazy" .. require("editor").global.path_sep .. "lazy.nvim"
 
 if not vim.loop.fs_stat(lazy_path) then
 	local lazy_repo = require("editor").config.use_ssh and "git@github.com:folke/lazy.nvim.git "
@@ -22,8 +19,7 @@ end
 ---@return table<string, table> list of plugins
 local get_plugins_list = function()
 	local list = {}
-	local plugins_list =
-		vim.split(vim.fn.glob(require("editor").global.modules_dir .. "/plugins/*.lua"), "\n")
+	local plugins_list = vim.split(vim.fn.glob(require("editor").global.modules_dir .. "/plugins/*.lua"), "\n")
 	if type(plugins_list) == "table" then
 		for _, f in ipairs(plugins_list) do
 			-- fill list with `plugins/*.lua`'s path used for later `require` like this:
@@ -61,8 +57,7 @@ require("lazy").setup(modules, {
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 300,
-		url_format = require("editor").config.use_ssh and "git@github.com:%s.git"
-			or "https://github.com/%s.git",
+		url_format = require("editor").config.use_ssh and "git@github.com:%s.git" or "https://github.com/%s.git",
 	},
 	install = {
 		-- install missing plugins on startup. This doesn't increase startup time.
@@ -75,8 +70,7 @@ require("lazy").setup(modules, {
 		frequency = 3600 * 24, -- check for updates every day
 	},
 	dev = {
-		path = vim.NIL ~= vim.fn.getenv "WORKSPACE" and vim.env.WORKSPACE .. "/neovim-plugins/"
-			or "~/",
+		path = vim.NIL ~= vim.fn.getenv "WORKSPACE" and vim.env.WORKSPACE .. "/neovim-plugins/" or "~/",
 	},
 	ui = {
 		-- a number <1 is a percentage., >1 is a fixed size
@@ -140,15 +134,15 @@ require("lazy").setup(modules, {
 	},
 })
 
-k.nvim_load_mapping {
-	["n|<Space>lh"] = k.map_cr("Lazy"):with_nowait():with_defaults "package: Show",
-	["n|<Space>ls"] = k.map_cr("Lazy sync"):with_nowait():with_defaults "package: Sync",
-	["n|<Space>lu"] = k.map_cr("Lazy update"):with_nowait():with_defaults "package: Update",
-	["n|<Space>li"] = k.map_cr("Lazy install"):with_nowait():with_defaults "package: Install",
-	["n|<Space>ll"] = k.map_cr("Lazy log"):with_nowait():with_defaults "package: Log",
-	["n|<Space>lc"] = k.map_cr("Lazy check"):with_nowait():with_defaults "package: Check",
-	["n|<Space>ld"] = k.map_cr("Lazy debug"):with_nowait():with_defaults "package: Debug",
-	["n|<Space>lp"] = k.map_cr("Lazy profile"):with_nowait():with_defaults "package: Profile",
-	["n|<Space>lr"] = k.map_cr("Lazy restore"):with_nowait():with_defaults "package: Restore",
-	["n|<Space>lx"] = k.map_cr("Lazy clean"):with_nowait():with_defaults "package: Clean",
+k.nvim_register_mapping {
+	["n|<Leader>lh"] = k.cr("Lazy"):with_nowait():with_defaults "package: Show",
+	["n|<Leader>ls"] = k.cr("Lazy sync"):with_nowait():with_defaults "package: Sync",
+	["n|<Leader>lu"] = k.cr("Lazy update"):with_nowait():with_defaults "package: Update",
+	["n|<Leader>li"] = k.cr("Lazy install"):with_nowait():with_defaults "package: Install",
+	["n|<Leader>ll"] = k.cr("Lazy log"):with_nowait():with_defaults "package: Log",
+	["n|<Leader>lc"] = k.cr("Lazy check"):with_nowait():with_defaults "package: Check",
+	["n|<Leader>ld"] = k.cr("Lazy debug"):with_nowait():with_defaults "package: Debug",
+	["n|<Leader>lp"] = k.cr("Lazy profile"):with_nowait():with_defaults "package: Profile",
+	["n|<Leader>lr"] = k.cr("Lazy restore"):with_nowait():with_defaults "package: Restore",
+	["n|<Leader>lx"] = k.cr("Lazy clean"):with_nowait():with_defaults "package: Clean",
 }

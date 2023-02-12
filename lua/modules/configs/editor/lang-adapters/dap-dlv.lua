@@ -15,10 +15,7 @@ dap.adapters.go = function(callback)
 		handle:close()
 		if code ~= 0 then
 			vim.notify(
-				string.format(
-					"\"dlv\" exited with code: %d, please check your configs for correctness.",
-					code
-				),
+				string.format("\"dlv\" exited with code: %d, please check your configs for correctness.", code),
 				vim.log.levels.WARN,
 				{ title = "[go] DAP Warning!" }
 			)

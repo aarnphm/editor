@@ -23,31 +23,20 @@ return {
 		event = { "BufReadPost", "BufAdd", "BufRead", "BufNewFile" },
 		config = require "ui.nvim-bufferline",
 		init = function()
-			k.nvim_load_mapping {
-				["n|<LocalLeader>p"] = k.map_cr("BufferLinePick"):with_defaults "buffer: Pick",
-				["n|<Space>c"] = k.map_cr("BufferLinePickClose"):with_defaults "buffer: Close",
-				["n|<Space>."] = k.map_cr("BufferLineCycleNext")
-					:with_defaults "buffer: Cycle to next buffer",
-				["n|<Space>,"] = k.map_cr("BufferLineCyclePrev")
-					:with_defaults "buffer: Cycle to previous buffer",
-				["n|<Space>1"] = k.map_cr("BufferLineGoToBuffer 1")
-					:with_defaults "buffer: Goto buffer 1",
-				["n|<Space>2"] = k.map_cr("BufferLineGoToBuffer 2")
-					:with_defaults "buffer: Goto buffer 2",
-				["n|<Space>3"] = k.map_cr("BufferLineGoToBuffer 3")
-					:with_defaults "buffer: Goto buffer 3",
-				["n|<Space>4"] = k.map_cr("BufferLineGoToBuffer 4")
-					:with_defaults "buffer: Goto buffer 4",
-				["n|<Space>5"] = k.map_cr("BufferLineGoToBuffer 5")
-					:with_defaults "buffer: Goto buffer 5",
-				["n|<Space>6"] = k.map_cr("BufferLineGoToBuffer 6")
-					:with_defaults "buffer: Goto buffer 6",
-				["n|<Space>7"] = k.map_cr("BufferLineGoToBuffer 7")
-					:with_defaults "buffer: Goto buffer 7",
-				["n|<Space>8"] = k.map_cr("BufferLineGoToBuffer 8")
-					:with_defaults "buffer: Goto buffer 8",
-				["n|<Space>9"] = k.map_cr("BufferLineGoToBuffer 9")
-					:with_defaults "buffer: Goto buffer 9",
+			k.nvim_register_mapping {
+				["n|<Leader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
+				["n|<Leader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
+				["n|<Leader>."] = k.cr("BufferLineCycleNext"):with_defaults "buffer: Cycle to next buffer",
+				["n|<Leader>,"] = k.cr("BufferLineCyclePrev"):with_defaults "buffer: Cycle to previous buffer",
+				["n|<Leader>1"] = k.cr("BufferLineGoToBuffer 1"):with_defaults "buffer: Goto buffer 1",
+				["n|<Leader>2"] = k.cr("BufferLineGoToBuffer 2"):with_defaults "buffer: Goto buffer 2",
+				["n|<Leader>3"] = k.cr("BufferLineGoToBuffer 3"):with_defaults "buffer: Goto buffer 3",
+				["n|<Leader>4"] = k.cr("BufferLineGoToBuffer 4"):with_defaults "buffer: Goto buffer 4",
+				["n|<Leader>5"] = k.cr("BufferLineGoToBuffer 5"):with_defaults "buffer: Goto buffer 5",
+				["n|<Leader>6"] = k.cr("BufferLineGoToBuffer 6"):with_defaults "buffer: Goto buffer 6",
+				["n|<Leader>7"] = k.cr("BufferLineGoToBuffer 7"):with_defaults "buffer: Goto buffer 7",
+				["n|<Leader>8"] = k.cr("BufferLineGoToBuffer 8"):with_defaults "buffer: Goto buffer 8",
+				["n|<Leader>9"] = k.cr("BufferLineGoToBuffer 9"):with_defaults "buffer: Goto buffer 9",
 			}
 		end,
 	},
@@ -69,14 +58,13 @@ return {
 		event = "BufRead",
 		config = function() require("todo-comments").setup {} end,
 		init = function()
-			k.nvim_load_mapping {
-				["n|<Space>tqf"] = k.map_cr("TodoQuickFix")
-					:with_defaults "todo-comments: Open quickfix",
-				["n|]t"] = k.map_callback(function() require("todo-comments").jump_next() end)
+			k.nvim_register_mapping {
+				["n|<Leader>tqf"] = k.cr("TodoQuickFix"):with_defaults "todo-comments: Open quickfix",
+				["n|]t"] = k.callback(function() require("todo-comments").jump_next() end)
 					:with_defaults "todo-comments: Next",
-				["n|[t"] = k.map_callback(function() require("todo-comments").jump_prev() end)
+				["n|[t"] = k.callback(function() require("todo-comments").jump_prev() end)
 					:with_defaults "todo-comments: Previous",
-				["n|<Space>tt"] = k.map_cr("TodoTelescope"):with_defaults "todo-comments: Telescope",
+				["n|<Leader>tt"] = k.cr("TodoTelescope"):with_defaults "todo-comments: Telescope",
 			}
 		end,
 	},
@@ -112,12 +100,9 @@ return {
 		},
 		config = require "ui.nvim-tree",
 		init = function()
-			k.nvim_load_mapping {
-				["n|<C-n>"] = k.map_cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
-				["n|<Leader>nf"] = k.map_cr("NvimTreeFindFile")
-					:with_defaults "file-explorer: Find file",
-				["n|<Leader>nr"] = k.map_cr("NvimTreeRefresh")
-					:with_defaults "file-explorer: Refresh",
+			k.nvim_register_mapping {
+				["n|<C-n>"] = k.cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
+				["n|<LocalLeader>nr"] = k.cr("NvimTreeRefresh"):with_defaults "file-explorer: Refresh",
 			}
 		end,
 	},
@@ -125,8 +110,6 @@ return {
 		lazy = true,
 		event = "VeryLazy",
 		config = require "ui.nvim-notify",
-		cond = function()
-			return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-		end,
+		cond = function() return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype) end,
 	},
 }
