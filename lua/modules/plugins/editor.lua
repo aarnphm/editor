@@ -505,7 +505,7 @@ return {
 			end
 
 			k.nvim_register_mapping {
-				["n|<Leader>/"] = k.callback(
+				["n|<Leader>w"] = k.callback(
 					function() require("telescope").extensions.live_grep_args.live_grep_args {} end
 				)
 					:with_defaults "find: Word in project",
@@ -530,10 +530,10 @@ return {
 					:with_defaults "edit: Change current direrctory by zoxide",
 				["n|<Leader>u"] = k.callback(function() require("telescope").extensions.undo.undo() end)
 					:with_defaults "edit: Show undo history",
-				["n|<Leader>w"] = k.cu("Telescope grep_string"):with_defaults "find: Current word",
+				["n|<Leader>/"] = k.cu("Telescope grep_string"):with_defaults "find: Current word",
 				["n|<Leader>n"] = k.cu("enew"):with_defaults "buffer: New",
 				["n|<C-p>"] = k.callback(command_panel):with_defaults "tools: Show keymap legends",
-				["n|<Leader>e"] = k.callback(
+				["n|<LocalLeader>e"] = k.callback(
 					function() require("utils").find_files { cwd = vim.fn.stdpath "config" } end
 				)
 					:with_defaults "tools: edit NVIM config",

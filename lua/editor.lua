@@ -11,7 +11,7 @@ local local_config_path = home .. path_sep .. ".editor.lua"
 ---@class Editor: table<str, any>
 ---@field debug boolean: Enable debug mode
 ---@field format_on_save boolean: Enable format on save
----@field reset_cache boolean: Reset cache
+---@field custom_headers boolean: Whether to use custom headers
 ---@field background string: Set background type, "light" or "dark"
 ---@field colorscheme string: Set colorscheme
 ---@field repos string: Set repos

@@ -23,21 +23,19 @@ end
 
 vim.api.nvim_set_keymap(
 	"n",
-	"<space>qs",
+	"<Leader>qs",
 	"",
-	{ noremap = true, callback = function() require("core.repl").set_job_id() end }
+	{ noremap = true, callback = function() require("core.repl").set_job_id() end, desc = "repl: Set job id" }
 )
-vim.api.nvim_set_keymap(
-	"n",
-	"<space>qc",
-	"",
-	{ noremap = true, callback = function() require("core.repl").set_job_command() end }
-)
-vim.api.nvim_set_keymap(
-	"n",
-	"<space>qi",
-	"",
-	{ noremap = true, callback = function() require("core.repl").send_to_term() end }
-)
+vim.api.nvim_set_keymap("n", "<Leader>qc", "", {
+	noremap = true,
+	callback = function() require("core.repl").set_job_command() end,
+	desc = "repl: Set command to send",
+})
+vim.api.nvim_set_keymap("n", "<Leader>qi", "", {
+	noremap = true,
+	callback = function() require("core.repl").send_to_term() end,
+	desc = "repl: Send inputs to channel",
+})
 
 return M

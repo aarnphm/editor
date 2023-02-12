@@ -6,9 +6,8 @@ return {
 	palette_overwrite = {},
 	---@type string[]
 	disabled_workspaces = {},
-	---@type boolean whether to enable debug
-	debug = true,
-	reset_cache = false,
+	---@type boolean whether to use custom headers
+	custom_headers = true,
 	background = "dark",
 	colorscheme = "catppuccin",
 	repos = "bentoml/bentoml",

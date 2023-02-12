@@ -154,6 +154,12 @@ api.nvim_create_autocmd("FileType", {
 	pattern = "*",
 	command = "setlocal formatoptions-=cro",
 })
+-- attach repl to send command to terminal
+api.nvim_create_autocmd("FileType", {
+	group = ft_id,
+	pattern = "*",
+	callback = function(_) require "core.repl" end,
+})
 -- Disable statusline in dashboard
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,
