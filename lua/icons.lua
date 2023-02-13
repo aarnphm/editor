@@ -1,5 +1,3 @@
-local icons = {}
-
 local data = {
 	kind = {
 		Class = "ﴯ",
@@ -197,14 +195,14 @@ local data = {
 ---Get a specific icon set.
 ---@param category "kind"|"type"|"documents"|"git"|"ui"|"diagnostics"|"misc"|"cmp"|"dap"
 ---@param add_space? boolean @Add trailing space after the icon.
-icons.get = function(category, add_space)
-	if add_space then
-		return setmetatable({}, {
-			__index = function(_, key) return data[category][key] .. " " end,
-		})
-	else
-		return data[category]
-	end
-end
-
-return icons
+return {
+	get = function(category, add_space)
+		if add_space then
+			return setmetatable({}, {
+				__index = function(_, key) return data[category][key] .. " " end,
+			})
+		else
+			return data[category]
+		end
+	end,
+}

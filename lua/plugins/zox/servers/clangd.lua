@@ -1,8 +1,13 @@
 local utils = require "utils"
 
 local switch_source_header_splitcmd = function(bufnr, splitcmd)
-	bufnr = require("lspconfig").util.validate_bufnr(bufnr)
-	local clangd_client = require("lspconfig").util.get_active_client_by_name(bufnr, "clangd")
+	local ok, lspconfig = pcall(require, "lspconfig")
+	if not ok then
+		vim.notify("nvim-lspconfig is not loaded properly", vim.log.levels.ERROR, { title = "LSP Error!" })
+		return
+	end
+	bufnr = lspconfig.util.validate_bufnr(bufnr)
+	local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
 	local params = { uri = vim.uri_from_bufnr(bufnr) }
 	if clangd_client then
 		clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
@@ -50,15 +55,15 @@ return {
 	commands = {
 		ClangdSwitchSourceHeader = {
 			function() switch_source_header_splitcmd(0, "edit") end,
-			description = "Open source/header in current buffer",
+			description = "cpp: Open source/header in current buffer",
 		},
 		ClangdSwitchSourceHeaderVSplit = {
 			function() switch_source_header_splitcmd(0, "vsplit") end,
-			description = "Open source/header in a new vsplit",
+			description = "cpp: Open source/header in a new vsplit",
 		},
 		ClangdSwitchSourceHeaderSplit = {
 			function() switch_source_header_splitcmd(0, "split") end,
-			description = "Open source/header in a new split",
+			description = "cpp: Open source/header in a new split",
 		},
 	},
 }

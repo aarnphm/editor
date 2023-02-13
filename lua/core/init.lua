@@ -9,6 +9,7 @@ vim.filetype.add {
 		conf = "conf",
 		mdx = "markdown",
 		mjml = "html",
+		sh = "bash",
 	},
 	pattern = {
 		[".*%.env.*"] = "sh",

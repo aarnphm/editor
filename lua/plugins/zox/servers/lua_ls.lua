@@ -9,6 +9,7 @@ require("neodev").setup {
 			"dap",
 			"nvim-dap-ui",
 			"lualine",
+			"nvim-lspconfig",
 			"nvim-treesitter",
 			"telescope.nvim",
 			"mason.nvim",
@@ -24,6 +25,7 @@ require("neodev").setup {
 			"lspsaga.nvim",
 			"null-ls.nvim",
 			"nvim-bufferline.lua",
+			"rust-tools.nvim",
 		},
 	},
 }

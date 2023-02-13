@@ -12,10 +12,11 @@ local icons = {
 
 return {
 	-- NOTE: Language-specific plugins
-	["chrisbra/csv.vim"] = { lazy = true, ft = "csv" },
-	["folke/neodev.nvim"] = { lazy = true, ft = "lua" },
-	["Stormherz/tablify"] = { lazy = true, ft = "rst" },
-	["bazelbuild/vim-bazel"] = {
+	{ "chrisbra/csv.vim", lazy = true, ft = "csv" },
+	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
+	{ "Stormherz/tablify", lazy = true, ft = "rst" },
+	{
+		"bazelbuild/vim-bazel",
 		lazy = true,
 		dependencies = { "google/vim-maktaba" },
 		cmd = { "Bazel" },
@@ -30,7 +31,8 @@ return {
 			}
 		end,
 	},
-	["fatih/vim-go"] = {
+	{
+		"fatih/vim-go",
 		lazy = true,
 		ft = "go",
 		run = ":GoInstallBinaries",
@@ -40,7 +42,8 @@ return {
 			vim.g.go_code_completion_enabled = 0
 		end,
 	},
-	["iamcco/markdown-preview.nvim"] = {
+	{
+		"iamcco/markdown-preview.nvim",
 		lazy = true,
 		ft = "markdown",
 		run = "cd app && yarn install",
@@ -51,7 +54,8 @@ return {
 			}
 		end,
 	},
-	["lervag/vimtex"] = {
+	{
+		"lervag/vimtex",
 		lazy = true,
 		ft = "tex",
 		config = function()
@@ -78,8 +82,10 @@ return {
 			})
 		end,
 	},
-	["p00f/clangd_extensions.nvim"] = { lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-	["saecki/crates.nvim"] = {
+	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
+	{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust", dependencies = { "nvim-lua/plenary.nvim" } },
+	{
+		"saecki/crates.nvim",
 		lazy = true,
 		event = "BufReadPost Cargo.toml",
 		cond = function() return vim.fn.expand "%:t" == "Cargo.toml" end,
@@ -186,7 +192,8 @@ return {
 		end,
 	},
 
-	["mfussenegger/nvim-dap"] = {
+	{
+		"mfussenegger/nvim-dap",
 		lazy = true,
 		cmd = {
 			"DapSetLogLevel",
@@ -260,7 +267,7 @@ return {
 
 			-- Config lang adaptors
 			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
-				local ok, _ = pcall(require, "languages.adapters." .. dbg)
+				local ok, _ = pcall(require, string.format("plugins.zox.adapters.%s", dbg))
 				if not ok then
 					vim.notify_once("Failed to load " .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
 				end
@@ -291,7 +298,8 @@ return {
 	},
 
 	-- NOTE: Native LSP configuration
-	["neovim/nvim-lspconfig"] = {
+	{
+		"neovim/nvim-lspconfig",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
 		dependencies = {
@@ -315,6 +323,7 @@ return {
 				end,
 			},
 			{ "williamboman/mason.nvim" },
+			{ "ray-x/lsp_signature.nvim" },
 			{ "williamboman/mason-lspconfig.nvim", lazy = true, event = { "CursorHold", "CursorHoldI" } },
 			{ "jay-babu/mason-nvim-dap.nvim", lazy = true, event = { "CursorHold", "CursorHoldI" } },
 			{
@@ -329,7 +338,6 @@ return {
 				branch = "main",
 				events = "VeryLazy",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
-				cond = function() return vim.bo.filetype ~= "rust" end,
 				config = function()
 					require("lspsaga").setup {
 						finder = { keys = { jump_to = "e" } },
@@ -530,36 +538,61 @@ return {
 			capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 			local ih = require "inlay-hints"
-			local options = {
-				---@diagnostic disable-next-line: unused_variable
-				on_attach = function(client, bufnr)
-					--- NOTE: Avoid LSP foratting, since it will be handled by null-ls
-					client.server_capabilities.documentFormattingProvider = false
-					client.server_capabilities.documentRangeFormattingProvider = false
+			local on_attach = function(client, bufnr)
+				--- NOTE: Avoid LSP foratting, since it will be handled by null-ls
+				client.server_capabilities.documentFormattingProvider = false
+				client.server_capabilities.documentRangeFormattingProvider = false
 
-					---Disable |lsp-semantic_tokens| (conflicting with TS highlights)
-					client.server_capabilities.semanticTokensProvider = nil
-				end,
-				capabilities = capabilities,
-			}
+				require("lsp_signature").on_attach({
+					floating_window_off_x = 5, -- adjust float windows x position.
+					floating_window_off_y = function() -- adjust float windows y position. e.g. set to -2 can make floating window move up 2 lines
+						local pumheight = vim.o.pumheight
+						local winline = vim.fn.winline() -- line number in the window
+						local winheight = vim.fn.winheight(0)
+						-- window top
+						if winline - 1 < pumheight then return pumheight end
+						-- window bottom
+						if winheight - winline < pumheight then return -pumheight end
+						return 0
+					end,
+					hint_enable = false,
+					toggle_key = "<Leader>a",
+					select_signature_key = "<LocalLeader>a",
+					hi_parameter = "Search",
+					handler_opts = { border = "rounded" },
+				}, bufnr)
+			end
+			local options = { on_attach = on_attach, capabilities = capabilities }
 
-			local lsp_callback = function(lsp_name)
+			--- A small wrapper to setup lsp with nvim-lspconfig
+			--- Supports inlay-hints with `ih.on_attach`
+			---@overload fun(lsp_name: string, enable_inlay_hints?: boolean): fun():nil
+			---@overload fun(lsp_name: string): fun():nil
+			local lsp_callback = function(lsp_name, enable_inlay_hints)
+				enable_inlay_hints = enable_inlay_hints or false
+				if enable_inlay_hints then
+					options.on_attach = function(client, bufnr)
+						ih.on_attach(client, bufnr)
+						on_attach(client, bufnr)
+					end
+				end
+
 				return function()
-					local config
-					ok, config = pcall(require, ("languages.servers.%s"):format(lsp_name))
-					if ok then
-						local final_options = vim.tbl_extend("keep", config, options)
-						nvim_lsp[lsp_name].setup(final_options)
+					local healthy, lspconfig = pcall(require, ("plugins.zox.servers.%s"):format(lsp_name))
+					if healthy then
+						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
 					else
-						vim.notify(
-							("LSP config %s is not supported. Make sure it is available under lua/core/modules/configs/completion/servers/%s.lua. Using default setup."):format(
-								lsp_name,
-								lsp_name
-							),
-							vim.log.levels.DEBUG,
-							{ title = "nvim-lspconfig" }
-						)
-						nvim_lsp[lsp_name].setup {}
+						if require("editor").config.debug then
+							vim.notify(
+								(
+									"LSP config %s does not exists. Using default setup. If "
+									.. "you wish to add configuration, make sure it is available "
+									.. "under modules/languages/servers/%s.lua."
+								):format(lsp_name, lsp_name),
+								vim.log.levels.INFO,
+								{ title = "nvim-lspconfig" }
+							)
+						end
 					end
 				end
 			end
@@ -574,7 +607,17 @@ return {
 
 				-- TODO: support starlark-rust for bazel
 				-- NOTE: Let clangd_extensions setup clangd
-				clangd = function() end,
+				clangd = function()
+					capabilities.offsetEncoding = { "utf-16", "utf-8" }
+					require("clangd_extensions").setup {
+						server = vim.tbl_deep_extend("keep", require "plugins.zox.servers.clangd", {
+							on_attach = options.on_attach,
+							capabilities = capabilities,
+						}),
+						extensions = { other_hints_prefix = ":: ", show_parameter_hints = false },
+					}
+				end,
+				rust_analyzer = lsp_callback "rust_analyzer",
 				html = lsp_callback "html",
 				marksman = lsp_callback "marksman",
 				bufls = lsp_callback "bufls",
@@ -582,89 +625,15 @@ return {
 				jsonls = lsp_callback "jsonls",
 				jdtls = lsp_callback "jdtls",
 				yamlls = lsp_callback "yamlls",
-				gopls = function()
-					nvim_lsp.gopls.setup(vim.tbl_deep_extend("keep", require "languages.servers.gopls", {
-						on_attach = function(client, bufnr)
-							options.on_attach(client, bufnr)
-							ih.on_attach(client, bufnr)
-						end,
-						capabilities = options.capabilities,
-						settings = {
-							gopls = {
-								hints = {
-									assignVariableTypes = true,
-									compositeLiteralFields = true,
-									compositeLiteralTypes = true,
-									constantValues = true,
-									functionTypeParameters = true,
-									parameterNames = true,
-									rangeVariableTypes = true,
-								},
-							},
-						},
-					}))
-				end,
-				lua_ls = function()
-					nvim_lsp.lua_ls.setup(vim.tbl_deep_extend("keep", require "languages.servers.lua_ls", {
-						on_attach = function(client, bufnr)
-							options.on_attach(client, bufnr)
-							ih.on_attach(client, bufnr)
-						end,
-						capabilities = options.capabilities,
-					}))
-				end,
-				tsserver = function()
-					nvim_lsp.tsserver.setup(vim.tbl_deep_extend("keep", require "languages.servers.tsserver", {
-						on_attach = function(client, bufnr)
-							options.on_attach(client, bufnr)
-							ih.on_attach(client, bufnr)
-						end,
-						capabilities = options.capabilities,
-						settings = {
-							javascript = {
-								inlayHints = {
-									includeInlayEnumMemberValueHints = true,
-									includeInlayFunctionLikeReturnTypeHints = true,
-									includeInlayFunctionParameterTypeHints = true,
-									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-									includeInlayPropertyDeclarationTypeHints = true,
-									includeInlayVariableTypeHints = true,
-								},
-							},
-							typescript = {
-								inlayHints = {
-									includeInlayEnumMemberValueHints = true,
-									includeInlayFunctionLikeReturnTypeHints = true,
-									includeInlayFunctionParameterTypeHints = true,
-									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-									includeInlayPropertyDeclarationTypeHints = true,
-									includeInlayVariableTypeHints = true,
-								},
-							},
-						},
-					}))
-				end,
 				pyright = lsp_callback "pyright",
-			}
-
-			require("clangd_extensions").setup {
-				server = vim.tbl_deep_extend("keep", require "languages.servers.clangd", {
-					on_attach = options.on_attach,
-					capabilities = vim.tbl_deep_extend(
-						"keep",
-						{ offsetEncoding = { "utf-16", "utf-8" } },
-						capabilities
-					),
-				}),
-				extensions = {
-					other_hints_prefix = ":: ",
-				},
+				gopls = lsp_callback("gopls", true),
+				lua_ls = lsp_callback("lua_ls", true),
+				tsserver = lsp_callback("tsserver", true),
 			}
 		end,
 	},
-	["hrsh7th/nvim-cmp"] = {
+	{
+		"hrsh7th/nvim-cmp",
 		lazy = true,
 		event = "InsertEnter",
 		dependencies = {

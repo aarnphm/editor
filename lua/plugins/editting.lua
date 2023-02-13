@@ -4,11 +4,7 @@ local k = require "keybind"
 ---@field lazygit Terminal | nil
 ---@field btop Terminal | nil
 ---@field ipython Terminal | nil
-local cmd = {
-	lazygit = nil,
-	btop = nil,
-	ipython = nil,
-}
+local cmd = { lazygit = nil, btop = nil, ipython = nil }
 local icons = {
 	ui = require("icons").get "ui",
 	ui_space = require("icons").get("ui", true),
@@ -18,52 +14,85 @@ local icons = {
 }
 
 return {
-	["jghauser/mkdir.nvim"] = {},
-	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
-	["asiryk/auto-hlsearch.nvim"] = {
+	{ "jghauser/mkdir.nvim" },
+	{ "dstein64/vim-startuptime", lazy = true, cmd = "StartupTime" },
+	{
+		"asiryk/auto-hlsearch.nvim",
 		lazy = true,
 		event = "InsertEnter",
 		config = function() require("auto-hlsearch").setup() end,
 	},
-	["nmac427/guess-indent.nvim"] = {
+	{
+		"nmac427/guess-indent.nvim",
 		lazy = true,
 		event = "BufEnter",
 		config = function() require("guess-indent").setup {} end,
 	},
-	["folke/which-key.nvim"] = {
+	{
+		"folke/which-key.nvim",
 		lazy = true,
 		event = "VeryLazy",
 		config = function()
 			require("which-key").setup {
 				plugins = {
-					presets = { operators = false, motions = true, text_objects = false, windows = false, nav = false },
+					presets = { operators = false, motions = false, text_objects = false, windows = false, nav = false },
 				},
 				icons = { breadcrumb = icons.ui.Separator, separator = icons.misc.Vbar, group = icons.misc.Add },
-				window = {
-					border = "none",
-					position = "bottom",
-					margin = { 1, 0, 1, 0 },
-					padding = { 1, 1, 1, 1 },
-					winblend = 0,
+				disable = { filetypes = { "help", "lspsagaoutine", "_sagaoutline" } },
+			}
+		end,
+	},
+	{
+		"ojroques/nvim-bufdel",
+		lazy = true,
+		event = "BufReadPost",
+		init = function()
+			k.nvim_register_mapping {
+				["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
+			}
+		end,
+	},
+	{
+		"m4xshen/autoclose.nvim",
+		lazy = true,
+		event = "InsertEnter",
+		config = function() require("autoclose").setup() end,
+	},
+	{
+		"stevearc/dressing.nvim",
+		event = "VeryLazy",
+		config = function()
+			require("dressing").setup {
+				input = {
+					enabled = true,
 				},
-				disable = {
-					filetypes = { "help", "lspsagaoutine", "_sagaoutline" },
+				select = {
+					enabled = true,
+					backend = "telescope",
+					trim_prompt = true,
 				},
 			}
 		end,
 	},
-	["gelguy/wilder.nvim"] = {
-		lazy = true,
-		event = "CmdlineEnter",
-		config = require "editting.wilder",
-		dependencies = { "romgrk/fzy-lua-native" },
-	},
-	["kylechui/nvim-surround"] = {
+	{
+		"kylechui/nvim-surround",
 		lazy = true,
 		event = "InsertEnter",
 		config = function() require("nvim-surround").setup() end,
 	},
-	["nvim-pack/nvim-spectre"] = {
+	{
+		"pwntester/octo.nvim",
+		lazy = true,
+		cmd = "Octo",
+		config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
+		init = function()
+			k.nvim_register_mapping {
+				["n|<Leader>o"] = k.args("Octo"):with_defaults "octo: List pull request",
+			}
+		end,
+	},
+	{
+		"nvim-pack/nvim-spectre",
 		lazy = true,
 		build = "./build.sh",
 		config = function()
@@ -115,7 +144,8 @@ return {
 			}
 		end,
 	},
-	["junegunn/vim-easy-align"] = {
+	{
+		"junegunn/vim-easy-align",
 		cmd = "EasyAlign",
 		init = function()
 			k.nvim_register_mapping {
@@ -128,7 +158,8 @@ return {
 			}
 		end,
 	},
-	["tpope/vim-fugitive"] = {
+	{
+		"tpope/vim-fugitive",
 		command = { "Git", "G", "Ggrep", "GBrowse" },
 		init = function()
 			k.nvim_register_mapping {
@@ -140,7 +171,8 @@ return {
 			}
 		end,
 	},
-	["sindrets/diffview.nvim"] = {
+	{
+		"sindrets/diffview.nvim",
 		lazy = true,
 		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
@@ -152,21 +184,8 @@ return {
 		end,
 	},
 	-- plugins with simple setup
-	["ojroques/nvim-bufdel"] = {
-		lazy = true,
-		event = "BufReadPost",
-		init = function()
-			k.nvim_register_mapping {
-				["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
-			}
-		end,
-	},
-	["m4xshen/autoclose.nvim"] = {
-		lazy = true,
-		event = "InsertEnter",
-		config = function() require("autoclose").setup() end,
-	},
-	["max397574/better-escape.nvim"] = {
+	{
+		"max397574/better-escape.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
 		config = function()
@@ -178,7 +197,8 @@ return {
 			}
 		end,
 	},
-	["cshuaimin/ssr.nvim"] = {
+	{
+		"cshuaimin/ssr.nvim",
 		lazy = true,
 		module = "ssr",
 		-- Calling setup is optional.
@@ -204,22 +224,8 @@ return {
 			}
 		end,
 	},
-	["stevearc/dressing.nvim"] = {
-		event = "VeryLazy",
-		config = function()
-			require("dressing").setup {
-				input = {
-					enabled = true,
-				},
-				select = {
-					enabled = true,
-					backend = "telescope",
-					trim_prompt = true,
-				},
-			}
-		end,
-	},
-	["LunarVim/bigfile.nvim"] = {
+	{
+		"LunarVim/bigfile.nvim",
 		lazy = true,
 		config = function()
 			require("bigfile").config {
@@ -249,7 +255,8 @@ return {
 		end,
 		cond = require("editor").config.load_big_files_faster,
 	},
-	["akinsho/toggleterm.nvim"] = {
+	{
+		"akinsho/toggleterm.nvim",
 		lazy = true,
 		cmd = {
 			"ToggleTerm",
@@ -336,7 +343,8 @@ return {
 			}
 		end,
 	},
-	["folke/trouble.nvim"] = {
+	{
+		"folke/trouble.nvim",
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
 		config = function()
@@ -372,7 +380,8 @@ return {
 			}
 		end,
 	},
-	["phaazon/hop.nvim"] = {
+	{
+		"phaazon/hop.nvim",
 		lazy = true,
 		branch = "v2",
 		event = { "CursorHold", "CursorHoldI" },
@@ -436,17 +445,71 @@ return {
 			end
 		end,
 	},
-	["pwntester/octo.nvim"] = {
+	{
+		"gelguy/wilder.nvim",
 		lazy = true,
-		cmd = "Octo",
-		config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
-		init = function()
-			k.nvim_register_mapping {
-				["n|<Leader>o"] = k.args("Octo"):with_defaults "octo: List pull request",
+		event = "CmdlineEnter",
+		dependencies = { "romgrk/fzy-lua-native" },
+		config = function()
+			local wilder = require "wilder"
+			wilder.setup { modes = { ":", "/", "?" } }
+			wilder.set_option("use_python_remote_plugin", 0)
+			wilder.set_option("pipeline", {
+				wilder.branch(
+					wilder.cmdline_pipeline {
+						use_python = 0,
+						fuzzy = 1,
+						fuzzy_filter = wilder.lua_fzy_filter(),
+					},
+					wilder.vim_search_pipeline(),
+					{
+						wilder.check(function(_, x) return x == "" end),
+						wilder.history(),
+						wilder.result {
+							draw = {
+								function(_, x) return " " .. x end,
+							},
+						},
+					}
+				),
+			})
+
+			local popupmenu_renderer = wilder.popupmenu_renderer(wilder.popupmenu_border_theme {
+				border = "rounded",
+				empty_message = wilder.popupmenu_empty_message_with_spinner(),
+				highlighter = wilder.lua_fzy_highlighter(),
+				left = {
+					" ",
+					wilder.popupmenu_devicons(),
+					wilder.popupmenu_buffer_flags {
+						flags = " a + ",
+						icons = { ["+"] = "", a = "", h = "" },
+					},
+				},
+				right = {
+					" ",
+					wilder.popupmenu_scrollbar(),
+				},
+			})
+			local wildmenu_renderer = wilder.wildmenu_renderer {
+				highlighter = wilder.lua_fzy_highlighter(),
+				apply_incsearch_fix = true,
+				separator = " | ",
+				left = { " ", wilder.wildmenu_spinner(), " " },
+				right = { " ", wilder.wildmenu_index() },
 			}
+			wilder.set_option(
+				"renderer",
+				wilder.renderer_mux {
+					[":"] = popupmenu_renderer,
+					["/"] = wildmenu_renderer,
+					substitute = wildmenu_renderer,
+				}
+			)
 		end,
 	},
-	["numToStr/Comment.nvim"] = {
+	{
+		"numToStr/Comment.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
 		config = function()
@@ -483,13 +546,13 @@ return {
 			}
 		end,
 	},
-	["nvim-treesitter/nvim-treesitter"] = {
+	{
+		"nvim-treesitter/nvim-treesitter",
 		lazy = true,
 		build = function()
 			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
 		end,
 		event = { "CursorHold", "CursorHoldI" },
-		config = require "editting.nvim-treesitter",
 		dependencies = {
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "romgrk/nvim-treesitter-context" },
@@ -516,27 +579,103 @@ return {
 							hsl_fn = true, -- CSS hsl() and hsla() functions
 							css = false, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
 							css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-							-- Available modes: foreground, background
-							-- Available modes for `mode`: foreground, background,  virtualtext
-							mode = "background", -- Set the display mode.
+							mode = "background", -- `mode`: foreground, background,  virtualtext
 							virtualtext = "■",
 						},
 					}
 				end,
 			},
 		},
+		config = function()
+			vim.api.nvim_set_option_value("foldmethod", "expr", {})
+			vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
+
+			require("nvim-treesitter.configs").setup {
+				ensure_installed = "all",
+				ignore_install = { "phpdoc" },
+				indent = { enable = false },
+				highlight = {
+					enable = true,
+					disable = function(ft, bufnr)
+						if vim.tbl_contains({ "vim", "help" }, ft) then return true end
+						local ok, is_large_file = pcall(vim.api.nvim_buf_get_var, bufnr, "bigfile_disable_treesitter")
+						return ok and is_large_file
+					end,
+					additional_vim_regex_highlighting = false,
+				},
+				-- NOTE: Highlight (extended mode) also non-parentheses delimiters, boolean or table: lang -> boolean
+				rainbow = { enable = true, extended_mode = true },
+				context_commentstring = { enable = true, enable_autocmd = false },
+				matchup = { enable = true },
+				textobjects = {
+					select = {
+						enable = true,
+						keymaps = {
+							["af"] = "@function.outer",
+							["if"] = "@function.inner",
+							["ac"] = "@class.outer",
+							["ic"] = "@class.inner",
+						},
+					},
+					move = {
+						enable = true,
+						set_jumps = true, -- whether to set jumps in the jumplist
+						goto_next_start = {
+							["]["] = "@function.outer",
+							["]m"] = "@class.outer",
+						},
+						goto_next_end = {
+							["]]"] = "@function.outer",
+							["]M"] = "@class.outer",
+						},
+						goto_previous_start = {
+							["[["] = "@function.outer",
+							["[m"] = "@class.outer",
+						},
+						goto_previous_end = {
+							["[]"] = "@function.outer",
+							["[M"] = "@class.outer",
+						},
+					},
+				},
+			}
+
+			require("nvim-treesitter.install").prefer_git = true
+			local parsers = require "nvim-treesitter.parsers"
+			local parsers_config = parsers.get_parser_configs()
+			for _, p in pairs(parsers_config) do
+				p.install_info.url = p.install_info.url:gsub("https://github.com/", "git@github.com:")
+			end
+
+			-- set octo.nvim to use treesitter
+			if vim.api.nvim_get_commands({})["Octo"] then parsers.filetype_to_parsername.octo = "markdown" end
+		end,
 	},
-	["nvim-telescope/telescope.nvim"] = {
+	{
+		"nvim-telescope/telescope.nvim",
 		cmd = "Telescope",
 		lazy = true,
 		dependencies = {
-			{ "nvim-tree/nvim-web-devicons" },
+			{
+				"nvim-tree/nvim-web-devicons",
+				config = function()
+					require("nvim-web-devicons").setup {
+						override = {
+							zsh = { icon = "", color = "#428850", cterm_color = "65", name = "Zsh" },
+						},
+						-- globally enable default icons (default to false)
+						-- will get overriden by `get_icons` option
+						default = true,
+					}
+				end,
+			},
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-lua/popup.nvim" },
 			{ "debugloop/telescope-undo.nvim" },
-			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "jvgrootveld/telescope-zoxide" },
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 			{
 				"ahmedkhalf/project.nvim",
 				event = "BufReadPost",
@@ -549,7 +688,6 @@ return {
 					}
 				end,
 			},
-			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 		},
 		config = function()
 			require("telescope").setup(vim.tbl_deep_extend("keep", require("editor").config.plugins.telescope, {
@@ -627,7 +765,7 @@ return {
 				},
 			}))
 
-			for _, v in ipairs { "fzf", "projects", "frecency", "live_grep_args", "zoxide", "notify", "undo" } do
+			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify", "undo", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,

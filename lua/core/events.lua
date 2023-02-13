@@ -137,6 +137,12 @@ api.nvim_create_autocmd("BufReadPost", {
 	pattern = "*",
 	command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
 })
+-- set filetype for header files
+api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+	group = bufs_id,
+	pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" },
+	command = "setlocal filetype=c",
+})
 
 local wins_id = api.nvim_create_augroup("EditorWins", { clear = true })
 -- Highlight current line only on focused window
@@ -211,12 +217,32 @@ api.nvim_create_autocmd("FileType", {
 	pattern = "dap-repl",
 	callback = function(_) require("dap.ext.autocompl").attach() end,
 })
--- Google tab style for C/C++
+-- Set mapping for switching header and source file
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,
 	pattern = "c,cpp",
-	callback = function(_)
-		api.nvim_buf_set_keymap(0, "n", "<Leader><Leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>", { noremap = true })
+	callback = function(event)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>h",
+			":ClangdSwitchSourceHeaderVSplit<CR>",
+			{ noremap = true }
+		)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>v",
+			":ClangdSwitchSourceHeaderSplit<CR>",
+			{ noremap = true }
+		)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>oh",
+			":ClangdSwitchSourceHeader<CR>",
+			{ noremap = true }
+		)
 	end,
 })
 -- set filetype for bazel files
