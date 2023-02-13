@@ -1,126 +1,5 @@
 local M = {}
 
----@class palette
----@field rosewater string
----@field flamingo string
----@field mauve string
----@field pink string
----@field red string
----@field maroon string
----@field peach string
----@field yellow string
----@field green string
----@field sapphire string
----@field blue string
----@field sky string
----@field teal string
----@field lavender string
----@field text string
----@field subtext1 string
----@field subtext0 string
----@field overlay2 string
----@field overlay1 string
----@field overlay0 string
----@field surface2 string
----@field surface1 string
----@field surface0 string
----@field base string
----@field mantle string
----@field crust string
----@field none "NONE"
-
----@type palette
-local palette = nil
-
----Initialize the palette
----@return palette
-local init_palette = function()
-	if not palette then
-		if vim.g.colors_name == "catppuccin" then
-			palette = require("catppuccin.palettes").get_palette()
-		elseif vim.g.colors_name == "rose-pine" then
-			local rp = require "rose-pine.palette"
-			-- mapping 1-1 to catppuccin variables
-			palette = {
-				rosewater = rp.love,
-				flamingo = rp.rose,
-				mauve = rp.iris,
-				pink = rp.rose,
-				red = rp.love,
-				maroon = rp.love,
-				peach = "#ea9a97",
-				yellow = "#f6c177",
-				green = rp.foam,
-				sapphire = rp.pine,
-				blue = rp.pine,
-				sky = rp.foam,
-				teal = rp.pine,
-				lavender = rp.iris,
-
-				text = rp.text,
-				subtext1 = rp.base,
-				subtext0 = rp.base,
-				overlay2 = rp.overlay,
-				overlay1 = rp.overlay,
-				overlay0 = rp.overlay,
-				surface2 = rp.surface,
-				surface1 = rp.surface,
-				surface0 = rp.surface,
-
-				base = rp.base,
-				mantle = rp.highlight_high,
-				crust = rp.highlight_low,
-			}
-		else
-			palette = {
-				rosewater = "#DC8A78",
-				flamingo = "#DD7878",
-				mauve = "#CBA6F7",
-				pink = "#F5C2E7",
-				red = "#E95678",
-				maroon = "#B33076",
-				peach = "#FF8700",
-				yellow = "#F7BB3B",
-				green = "#AFD700",
-				sapphire = "#36D0E0",
-				blue = "#61AFEF",
-				sky = "#04A5E5",
-				teal = "#B5E8E0",
-				lavender = "#7287FD",
-
-				text = "#F2F2BF",
-				subtext1 = "#BAC2DE",
-				subtext0 = "#A6ADC8",
-				overlay2 = "#C3BAC6",
-				overlay1 = "#988BA2",
-				overlay0 = "#6E6B6B",
-				surface2 = "#6E6C7E",
-				surface1 = "#575268",
-				surface0 = "#302D41",
-
-				base = "#1D1536",
-				mantle = "#1C1C19",
-				crust = "#161320",
-			}
-		end
-
-		palette = vim.tbl_extend("force", { none = "NONE" }, palette, require("editor").config.palette_overwrite)
-	end
-
-	return palette
-end
-
----Generate universal highlight groups
----@param overwrite palette? @The color to be overwritten | highest priority
----@return palette
-M.get_palette = function(overwrite)
-	if not overwrite then
-		return init_palette()
-	else
-		return vim.tbl_extend("force", init_palette(), overwrite)
-	end
-end
-
 ---@param c string @The color in hexadecimal.
 local hexToRgb = function(c)
 	c = string.lower(c)
@@ -230,12 +109,13 @@ end
 ---@overload fun(safe_git: boolean): nil
 M.find_files = function(opts, safe_git)
 	safe_git = safe_git or true
+	opts = opts or {}
 
-	opts = vim.tbl_extend("keep", opts or {}, {
+	opts = vim.tbl_extend("force", {
 		previewer = false,
 		shorten_path = true,
 		layout_strategy = "horizontal",
-	})
+	}, opts)
 
 	local find_files = function()
 		opts.find_command = 1 == vim.fn.executable "fd"

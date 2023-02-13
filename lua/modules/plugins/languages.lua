@@ -556,6 +556,9 @@ return {
 						capabilities
 					),
 				}),
+				extensions = {
+					other_hints_prefix = ":: ",
+				},
 			}
 		end,
 	},
@@ -607,8 +610,6 @@ return {
 										handler = handlers["*"],
 									},
 								},
-								-- Disable for tex
-								tex = false,
 							},
 						}
 					)

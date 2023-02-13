@@ -17,7 +17,6 @@ local local_config_path = home .. path_sep .. ".editor.lua"
 ---@field load_big_files_faster boolean: Load big files faster using LunarVim/bigfile.nvim
 ---@field use_ssh boolean: Use ssh to clone repos
 ---@field plugins table<string, table|any>: Set plugins
----@field palette_overwrite table<string, string>: Set palette overwrite
 ---@field disabled_workspaces table<string, string>: A table of disabled_workspaces.
 local _config = nil
 

@@ -96,7 +96,7 @@ return function()
 
 	require("lualine").setup {
 		options = {
-			theme = require("editor").config.colorscheme,
+			theme = "auto",
 			disabled_filetypes = {
 				statusline = {
 					"alpha",

@@ -52,7 +52,7 @@ vim.opt.rtp:prepend(lazy_path)
 
 require("lazy").setup(modules, {
 	root = require("editor").global.data_dir .. "lazy", -- directory where plugins will be installed
-	defaults = { lazy = false },
+	defaults = { lazy = true },
 	concurrency = require("editor").global.is_mac and 30 or nil,
 	git = {
 		log = { "-10" }, -- show the last 10 commits
@@ -110,7 +110,8 @@ require("lazy").setup(modules, {
 				.. "cache",
 			-- Once one of the following events triggers, caching will be disabled.
 			-- To cache all modules, set this to `{}`, but that is not recommended.
-			disable_events = { "UIEnter", "BufReadPre" },
+			--- { "UIEnter", "BufReadPre" } to make sure everything will be loaded accordingly
+			disable_events = {},
 			ttl = 3600 * 24 * 2, -- keep unused modules for up to 2 days
 		},
 		reset_packpath = true, -- reset the package path to improve startup time

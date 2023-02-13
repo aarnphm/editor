@@ -18,11 +18,8 @@ require("neodev").setup {
 			"lazy.nvim",
 			"gitsigns.nvim",
 			"toggleterm.nvim",
-			"which-key.nvim",
 			"better-escape.nvim",
 			"alpha-nvim",
-			"ssr.nvim",
-			"catppuccin",
 			"rose-pine",
 			"lspsaga.nvim",
 			"null-ls.nvim",
@@ -45,17 +42,15 @@ return {
 			runtime = {
 				version = "LuaJIT",
 				path = vim.split(package.path, ";"),
-				special = {
-					reload = "require",
-				},
+				special = { reload = "require" },
 			},
 			workspace = {
 				library = {
 					vim.env.VIMRUNTIME,
 					vim.fn.expand "$VIMRUNTIME/lua",
-					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
 					require("neodev.config").types(),
-					vim.api.nvim_get_runtime_file("", true),
+					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
+					vim.fn.stdpath "config" .. "/lua/modules/configs",
 				},
 				checkThirdParty = false,
 				maxPreload = 100000,

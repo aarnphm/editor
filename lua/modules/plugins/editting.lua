@@ -9,6 +9,13 @@ local cmd = {
 	btop = nil,
 	ipython = nil,
 }
+local icons = {
+	ui = require("utils.icons").get "ui",
+	ui_space = require("utils.icons").get("ui", true),
+	misc = require("utils.icons").get "misc",
+	diagnostics = require("utils.icons").get "diagnostics",
+	dap = require("utils.icons").get "dap",
+}
 
 return {
 	--- NOTE: add stablize.nvim if you are not using nvim-nightly
@@ -23,7 +30,35 @@ return {
 	["folke/which-key.nvim"] = {
 		lazy = true,
 		event = "VeryLazy",
-		config = require "editting.which-key",
+		config = function()
+			require("which-key").setup {
+				plugins = {
+					presets = { operators = false, motions = true, text_objects = false, windows = false, nav = false },
+				},
+				icons = { breadcrumb = icons.ui.Separator, separator = icons.misc.Vbar, group = icons.misc.Add },
+				window = {
+					border = "none",
+					position = "bottom",
+					margin = { 1, 0, 1, 0 },
+					padding = { 1, 1, 1, 1 },
+					winblend = 0,
+				},
+				disable = {
+					filetypes = { "help", "lspsagaoutine", "_sagaoutline" },
+				},
+			}
+		end,
+	},
+	["ibhagwan/smartyank.nvim"] = {
+		lazy = true,
+		event = "BufReadPost",
+		config = function()
+			require("smartyank").setup {
+				highlight = { enabled = false },
+				tmux = { enabled = false },
+				osc52 = { enabled = false },
+			}
+		end,
 	},
 	["gelguy/wilder.nvim"] = {
 		lazy = true,
@@ -31,18 +66,13 @@ return {
 		config = require "editting.wilder",
 		dependencies = { "romgrk/fzy-lua-native" },
 	},
-	["ibhagwan/smartyank.nvim"] = {
-		lazy = true,
-		event = "BufReadPost",
-		config = require "editting.smartyank",
-	},
 	["kylechui/nvim-surround"] = {
 		lazy = true,
 		event = "InsertEnter",
 		config = function() require("nvim-surround").setup() end,
 	},
 	["nvim-pack/nvim-spectre"] = {
-		lazy = true,
+		module = "spectre",
 		build = "./build.sh",
 		config = function()
 			require("spectre").setup {
@@ -94,7 +124,6 @@ return {
 		end,
 	},
 	["junegunn/vim-easy-align"] = {
-		lazy = true,
 		cmd = "EasyAlign",
 		init = function()
 			k.nvim_register_mapping {
@@ -108,7 +137,6 @@ return {
 		end,
 	},
 	["tpope/vim-fugitive"] = {
-		lazy = true,
 		command = { "Git", "G", "Ggrep", "GBrowse" },
 		init = function()
 			k.nvim_register_mapping {
@@ -335,7 +363,26 @@ return {
 	["folke/trouble.nvim"] = {
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
-		config = require "editting.trouble",
+		config = function()
+			require("trouble").setup {
+				position = "left", -- position of the list can be: bottom, top, left, right
+				mode = "document_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
+				fold_open = icons.ui.ArrowOpen, -- icon used for open folds
+				fold_closed = icons.ui.ArrowClosed, -- icon used for closed folds
+				auto_close = true, -- automatically close the list when you have no diagnostics
+				auto_fold = false, -- automatically fold a file trouble list at creation
+				auto_jump = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
+				signs = {
+					-- icons / text used for a diagnostic
+					error = icons.diagnostics.ErrorHolo,
+					warning = icons.diagnostics.WarningHolo,
+					hint = icons.diagnostics.HintHolo,
+					information = icons.diagnostics.InformationHolo,
+					other = icons.diagnostics.QuestionHolo,
+				},
+				use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
+			}
+		end,
 		init = function()
 			k.nvim_register_mapping {
 				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
@@ -353,7 +400,7 @@ return {
 		lazy = true,
 		branch = "v2",
 		event = "BufRead",
-		config = function() require("hop").setup { keys = "etovxqpdygfblzhckisuran" } end,
+		config = function() require("hop").setup() end,
 		cond = function() return not vim.tbl_contains({ "nofile" }, vim.bo.filetype) end,
 		init = function()
 			-- set f/F to use hop
@@ -424,7 +471,11 @@ return {
 	["numToStr/Comment.nvim"] = {
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
-		config = require "editting.comment",
+		config = function()
+			require("Comment").setup {
+				pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
+			}
+		end,
 		init = function()
 			k.nvim_register_mapping {
 				["n|gcc"] = k.callback(
@@ -511,8 +562,73 @@ return {
 			"DapStepOut",
 			"DapTerminate",
 		},
-		config = require "editting.nvim-dap",
-		dependencies = { { "rcarriga/nvim-dap-ui", config = require "editting.nvim-dap-ui" } },
+		dependencies = {
+			{
+				"rcarriga/nvim-dap-ui",
+				config = function()
+					require("dapui").setup {
+						icons = {
+							expanded = icons.ui.ArrowOpen,
+							collapsed = icons.ui.ArrowClosed,
+							current_frame = icons.ui.Indicator,
+						},
+						layouts = {
+							{
+								elements = {
+									-- Provide as ID strings or tables with "id" and "size" keys
+									{
+										id = "scopes",
+										size = 0.25, -- Can be float or integer > 1
+									},
+									{ id = "breakpoints", size = 0.25 },
+									{ id = "stacks", size = 0.25 },
+									{ id = "watches", size = 0.25 },
+								},
+								size = 40,
+								position = "left",
+							},
+							{ elements = { "repl" }, size = 10, position = "bottom" },
+						},
+						controls = {
+							icons = {
+								pause = icons.dap.Pause,
+								play = icons.dap.Play,
+								step_into = icons.dap.StepInto,
+								step_over = icons.dap.StepOver,
+								step_out = icons.dap.StepOut,
+								step_back = icons.dap.StepBack,
+								run_last = icons.dap.RunLast,
+								terminate = icons.dap.Terminate,
+							},
+						},
+						windows = { indent = 1 },
+					}
+				end,
+			},
+		},
+		config = function()
+			local dap = require "dap"
+			local dapui = require "dapui"
+
+			dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
+			dap.listeners.after.event_terminated["dapui_config"] = function() dapui.close() end
+			dap.listeners.after.event_exited["dapui_config"] = function() dapui.close() end
+
+			-- We need to override nvim-dap's default highlight groups, AFTER requiring nvim-dap for catppuccin.
+			-- vim.api.nvim_set_hl(0, "DapStopped", { fg = colors.green })
+
+			for _, v in ipairs { "Breakpoint", "BreakpointRejected", "BreakpointCondition", "LogPoint", "DapStopped" } do
+				vim.fn.sign_define("Dap" .. v, { text = icons.dap[v], texthl = "Dap" .. v, line = "", numhl = "" })
+			end
+
+			-- Config lang adaptors
+			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
+				local ok, _ = pcall(require, "editting.lang-adapters.dap-" .. dbg)
+				if not ok then
+					vim.notify_once("Failed to load dap-" .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
+				end
+			end
+		end,
 		init = function()
 			k.nvim_register_mapping {
 				["n|<F6>"] = k.callback(function() require("dap").continue() end):with_defaults "debug: Run/Continue",
@@ -540,7 +656,6 @@ return {
 	["nvim-telescope/telescope.nvim"] = {
 		cmd = "Telescope",
 		lazy = true,
-		config = require "editting.nvim-telescope",
 		dependencies = {
 			{ "nvim-tree/nvim-web-devicons" },
 			{ "nvim-lua/plenary.nvim" },
@@ -552,10 +667,97 @@ return {
 			{
 				"ahmedkhalf/project.nvim",
 				event = "BufReadPost",
-				config = require "editting.project",
+				config = function()
+					require("project_nvim").setup {
+						ignore_lsp = { "null-ls", "copilot" },
+						show_hidden = true,
+						silent_chdir = true,
+						scope_chdir = "win",
+					}
+				end,
 			},
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 		},
+		config = function()
+			require("telescope").setup(vim.tbl_deep_extend("keep", require("editor").config.plugins.telescope, {
+				defaults = {
+					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
+					selection_caret = icons.ui_space.ChevronRight,
+					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+					scroll_strategy = "limit",
+					layout_strategy = "horizontal",
+					path_display = { "absolute" },
+					results_title = false,
+					mappings = {
+						i = {
+							["<C-a>"] = { "<esc>0i", type = "command" },
+							["<Esc>"] = require("telescope.actions").close,
+						},
+						n = { ["q"] = require("telescope.actions").close },
+					},
+					layout_config = {
+						horizontal = {
+							preview_width = 0.5,
+							prompt_position = "top",
+						},
+						vertical = {
+							preview_height = 0.5,
+							prompt_position = "top",
+						},
+					},
+					generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
+				},
+				extensions = {
+					undo = { side_by_side = true },
+					fzf = {
+						fuzzy = false,
+						override_generic_sorter = true,
+						override_file_sorter = true,
+						case_mode = "smart_case",
+					},
+					frecency = {
+						show_scores = true,
+						show_unindexed = true,
+						ignore_patterns = { "*.git/*", "*/tmp/*", "*/lazy-lock.json" },
+					},
+					live_grep_args = {
+						auto_quoting = true,
+						mappings = {
+							i = {
+								["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
+								["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt {
+									postfix = " --iglob ",
+								},
+							},
+						},
+					},
+				},
+				pickers = {
+					keymaps = {
+						theme = "dropdown",
+					},
+					live_grep = {
+						on_input_filter_cb = function(prompt)
+							-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
+							return { prompt = prompt:gsub("%s", ".*") }
+						end,
+						attach_mappings = function(_)
+							require("telescope.actions.set").select:enhance {
+								post = function() vim.cmd ":normal! zx" end,
+							}
+							return true
+						end,
+					},
+					diagnostics = {
+						initial_mode = "normal",
+					},
+				},
+			}))
+
+			for _, v in ipairs { "fzf", "projects", "frecency", "live_grep_args", "zoxide", "notify", "undo" } do
+				require("telescope").load_extension(v)
+			end
+		end,
 		init = function()
 			local command_panel = function()
 				require("telescope.builtin").keymaps {
