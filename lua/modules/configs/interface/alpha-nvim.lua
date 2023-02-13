@@ -3,8 +3,8 @@ return function()
 	local dashboard = require "alpha.themes.dashboard"
 
 	local icons = {
-		misc = require("utils.icons").get("misc", true),
-		ui = require("utils.icons").get("ui", true),
+		misc = require("icons").get("misc", true),
+		ui = require("icons").get("ui", true),
 	}
 
 	---@param postfix string postfix to use with leader

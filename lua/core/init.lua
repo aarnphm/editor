@@ -74,7 +74,7 @@ local ok, _ = pcall(require, require("editor").config.colorscheme)
 if not ok then
 	vim.notify(
 		"WARNING: colorscheme " .. require("editor").config.colorscheme .. " not found",
-		vim.log.levels.ERROR,
+		vim.log.levels.WARN,
 		{ title = "editor: configuration" }
 	)
 	vim.cmd.colorscheme "un"

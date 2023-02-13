@@ -1,7 +1,7 @@
 local api = vim.api
 
 -- set better diagnostics icons
-local diagnostics = require("utils.icons").get("diagnostics", true)
+local diagnostics = require("icons").get("diagnostics", true)
 local diagnostic_icons = {
 	Error = diagnostics.ErrorHolo,
 	Warn = diagnostics.WarningHolo,

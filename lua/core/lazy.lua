@@ -1,10 +1,10 @@
 local k = require "keybind"
 local icons = {
-	kind = require("utils.icons").get "kind",
-	documents = require("utils.icons").get "documents",
-	ui = require("utils.icons").get "ui",
-	ui_sep = require("utils.icons").get("ui", true),
-	misc = require("utils.icons").get "misc",
+	kind = require("icons").get "kind",
+	documents = require("icons").get "documents",
+	ui = require("icons").get "ui",
+	ui_sep = require("icons").get("ui", true),
+	misc = require("icons").get "misc",
 }
 
 local modules = {}
@@ -52,7 +52,7 @@ vim.opt.rtp:prepend(lazy_path)
 
 require("lazy").setup(modules, {
 	root = require("editor").global.data_dir .. "lazy", -- directory where plugins will be installed
-	defaults = { lazy = true },
+	defaults = { lazy = false },
 	concurrency = require("editor").global.is_mac and 30 or nil,
 	git = {
 		log = { "-10" }, -- show the last 10 commits

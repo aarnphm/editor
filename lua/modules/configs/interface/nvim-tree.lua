@@ -1,9 +1,9 @@
 return function()
 	local icons = {
-		diagnostics = require("utils.icons").get "diagnostics",
-		documents = require("utils.icons").get "documents",
-		git = require("utils.icons").get "git",
-		ui = require("utils.icons").get "ui",
+		diagnostics = require("icons").get "diagnostics",
+		documents = require("icons").get "documents",
+		git = require("icons").get "git",
+		ui = require("icons").get "ui",
 	}
 
 	require("nvim-tree").setup {

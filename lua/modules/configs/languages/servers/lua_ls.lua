@@ -39,6 +39,7 @@ return {
 				enable = true,
 				globals = { "vim" },
 			},
+			hint = { enable = true },
 			runtime = {
 				version = "LuaJIT",
 				path = vim.split(package.path, ";"),
@@ -50,7 +51,7 @@ return {
 					vim.fn.expand "$VIMRUNTIME/lua",
 					require("neodev.config").types(),
 					vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
-					vim.fn.stdpath "config" .. "/lua/modules/configs",
+					require("editor").global.modules_dir .. "/configs",
 				},
 				checkThirdParty = false,
 				maxPreload = 100000,

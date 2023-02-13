@@ -10,11 +10,11 @@ local cmd = {
 	ipython = nil,
 }
 local icons = {
-	ui = require("utils.icons").get "ui",
-	ui_space = require("utils.icons").get("ui", true),
-	misc = require("utils.icons").get "misc",
-	diagnostics = require("utils.icons").get "diagnostics",
-	dap = require("utils.icons").get "dap",
+	ui = require("icons").get "ui",
+	ui_space = require("icons").get("ui", true),
+	misc = require("icons").get "misc",
+	diagnostics = require("icons").get "diagnostics",
+	dap = require("icons").get "dap",
 }
 
 return {

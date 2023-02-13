@@ -1,9 +1,9 @@
 return function()
 	local icons = {
-		diagnostics = require("utils.icons").get("diagnostics", true),
-		misc = require("utils.icons").get("misc", true),
-		git = require("utils.icons").get "git",
-		ui = require("utils.icons").get("ui", true),
+		diagnostics = require("icons").get("diagnostics", true),
+		misc = require("icons").get("misc", true),
+		git = require("icons").get "git",
+		ui = require("icons").get("ui", true),
 	}
 
 	local escape_status = function()

@@ -1,5 +1,5 @@
 local k = require "keybind"
-local icons = { ui = require("utils.icons").get "ui", diagnostics = require("utils.icons").get "diagnostics" }
+local icons = { ui = require("icons").get "ui", diagnostics = require("icons").get "diagnostics" }
 return {
 	["nathom/filetype.nvim"] = { lazy = false },
 

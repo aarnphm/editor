@@ -1,13 +1,13 @@
 local k = require "keybind"
 local icons = {
-	diagnostics = require("utils.icons").get("diagnostics", true),
-	git = require("utils.icons").get("git", true),
-	misc = require("utils.icons").get("misc", true),
-	ui = require("utils.icons").get("ui", true),
-	kind = require("utils.icons").get("kind", true),
-	dap = require("utils.icons").get("dap", true),
-	cmp = require("utils.icons").get "cmp",
-	type = require("utils.icons").get "type",
+	diagnostics = require("icons").get("diagnostics", true),
+	git = require("icons").get("git", true),
+	misc = require("icons").get("misc", true),
+	ui = require("icons").get("ui", true),
+	kind = require("icons").get("kind", true),
+	dap = require("icons").get("dap", true),
+	cmp = require("icons").get "cmp",
+	type = require("icons").get "type",
 }
 
 return {
@@ -90,16 +90,17 @@ return {
 						name = "rt_lldb",
 					}
 				end
-
-				local codelldb_extension_path = vim.env.HOME .. "/.vscode/extensions/vadimcn.vscode-lldb-1.8.1/"
-				local codelldb_path = codelldb_extension_path .. "adapter/codelldb"
+				local codelldb_extension_path = require("editor").global.mason_dir .. "/packages/codelldb/extension"
+				local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
 				local extension = ".so"
 				if require("editor").global.is_mac then extension = ".dylib" end
-				local liblldb_path = codelldb_extension_path .. "lldb/lib/liblldb" .. extension
+				local liblldb_path = codelldb_extension_path .. "/lldb/lib/liblldb" .. extension
 				return require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path)
 			end
+			local ih = require "inlay-hints"
 			require("rust-tools").setup {
 				on_initialized = function(_)
+					ih.set_all()
 					require("lsp_signature").on_attach {
 						bind = true,
 						use_lspsaga = false,
@@ -112,14 +113,18 @@ return {
 				end,
 				tools = {
 					inlay_hints = {
-						only_current_line = false,
-						show_parameter_hints = true,
+						auto = false,
 						other_hints_prefix = ":: ",
+						only_current_line = true,
+						show_parameter_hints = false,
 					},
 				},
 				dap = { adapter = get_rust_adapters() },
 				server = {
 					standalone = true,
+					server = {
+						on_attach = function(c, b) ih.on_attach(c, b) end,
+					},
 					settings = {
 						["rust-analyzer"] = {
 							cargo = {
@@ -238,6 +243,23 @@ return {
 			{ "williamboman/mason.nvim" },
 			{ "williamboman/mason-lspconfig.nvim" },
 			{
+				"simrat39/inlay-hints.nvim",
+				config = function()
+					require("inlay-hints").setup {
+						-- {dynamic | eol | virtline }
+						parameter = { show = true },
+						renderer = "inlay-hints.render.eol",
+						only_current_line = true,
+						eol = {
+							parameter = {
+								separator = ",",
+								format = function(hints) return string.format(":: (%s)", hints) end,
+							},
+						},
+					}
+				end,
+			},
+			{
 				"jose-elias-alvarez/null-ls.nvim",
 				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
 				requires = { "nvim-lua/plenary.nvim" },
@@ -250,6 +272,10 @@ return {
 						-- a list of all tools you want to ensure are installed upon
 						-- start; they should be the names Mason uses for each tool
 						ensure_installed = {
+							-- NOTE: DAP
+							"codelldb",
+							"delve",
+							"debugpy",
 
 							-- NOTE: Formatter
 							"stylua",
@@ -282,7 +308,11 @@ return {
 				"glepnir/lspsaga.nvim",
 				branch = "main",
 				event = { "BufRead", "BufReadPost" },
-				dependencies = { "nvim-tree/nvim-web-devicons" },
+				requires = {
+					{ "nvim-tree/nvim-web-devicons" },
+					--Please make sure you install markdown and markdown_inline parser
+					{ "nvim-treesitter/nvim-treesitter" },
+				},
 				config = function()
 					require("lspsaga").setup {
 						finder = { keys = { jump_to = "e" } },
@@ -341,17 +371,19 @@ return {
 			local nvim_lsp = require "lspconfig"
 			local mason = require "mason"
 			require("lspconfig.ui.windows").default_options.border = "single"
+
 			-- Configuring native diagnostics
 			vim.diagnostic.config {
+				virtual_text = false,
 				signs = true,
 				update_in_insert = true,
-				underline = true,
-				virtual_text = {
-					source = "true",
-				},
+				underline = false,
+				severity_sort = false,
 				float = {
-					source = "if_many",
-					focusable = true,
+					border = "rounded",
+					source = "always",
+					header = "",
+					prefix = "",
 				},
 			}
 
@@ -478,8 +510,9 @@ return {
 			if ok then capabilities = cmp_nvim_lsp.default_capabilities(capabilities) end
 			capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+			local ih = require "inlay-hints"
 			local options = {
-				on_attach = function(client, _)
+				on_attach = function(client, bufnr)
 					--- NOTE: Avoid LSP foratting, since it will be handled by null-ls
 					client.server_capabilities.documentFormattingProvider = false
 					client.server_capabilities.documentRangeFormattingProvider = false
@@ -538,12 +571,73 @@ return {
 				marksman = lsp_callback "marksman",
 				bufls = lsp_callback "bufls",
 				bashls = lsp_callback "bashls",
-				gopls = lsp_callback "gopls",
 				jsonls = lsp_callback "jsonls",
 				jdtls = lsp_callback "jdtls",
-				lua_ls = lsp_callback "lua_ls",
 				yamlls = lsp_callback "yamlls",
-				tsserver = lsp_callback "tsserver",
+				gopls = function()
+					nvim_lsp.gopls.setup(vim.tbl_deep_extend("keep", require "languages.servers.gopls", {
+						on_attach = function(client, bufnr)
+							options.on_attach(client, bufnr)
+							ih.on_attach(client, bufnr)
+						end,
+						capabilities = options.capabilities,
+						settings = {
+							gopls = {
+								hints = {
+									assignVariableTypes = true,
+									compositeLiteralFields = true,
+									compositeLiteralTypes = true,
+									constantValues = true,
+									functionTypeParameters = true,
+									parameterNames = true,
+									rangeVariableTypes = true,
+								},
+							},
+						},
+					}))
+				end,
+				lua_ls = function()
+					nvim_lsp.lua_ls.setup(vim.tbl_deep_extend("keep", require "languages.servers.lua_ls", {
+						on_attach = function(client, bufnr)
+							options.on_attach(client, bufnr)
+							ih.on_attach(client, bufnr)
+						end,
+						capabilities = options.capabilities,
+					}))
+				end,
+				tsserver = function()
+					nvim_lsp.tsserver.setup(vim.tbl_deep_extend("keep", require "languages.servers.tsserver", {
+						on_attach = function(client, bufnr)
+							options.on_attach(client, bufnr)
+							ih.on_attach(client, bufnr)
+						end,
+						capabilities = options.capabilities,
+						settings = {
+							javascript = {
+								inlayHints = {
+									includeInlayEnumMemberValueHints = true,
+									includeInlayFunctionLikeReturnTypeHints = true,
+									includeInlayFunctionParameterTypeHints = true,
+									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+									includeInlayPropertyDeclarationTypeHints = true,
+									includeInlayVariableTypeHints = true,
+								},
+							},
+							typescript = {
+								inlayHints = {
+									includeInlayEnumMemberValueHints = true,
+									includeInlayFunctionLikeReturnTypeHints = true,
+									includeInlayFunctionParameterTypeHints = true,
+									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+									includeInlayPropertyDeclarationTypeHints = true,
+									includeInlayVariableTypeHints = true,
+								},
+							},
+						},
+					}))
+				end,
 				pyright = lsp_callback "pyright",
 			}
 
@@ -585,10 +679,8 @@ return {
 			{ "onsails/lspkind.nvim" },
 			{ "saadparwaiz1/cmp_luasnip" },
 			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "hrsh7th/cmp-nvim-lua" },
 			{ "hrsh7th/cmp-path" },
 			{ "hrsh7th/cmp-buffer" },
-			{ "hrsh7th/cmp-emoji" },
 			{
 				"windwp/nvim-autopairs",
 				config = function()
@@ -723,8 +815,8 @@ return {
 				},
 				mapping = cmp.mapping.preset.insert {
 					["<CR>"] = cmp.mapping.confirm { behavior = cmp.ConfirmBehavior.Replace, select = true },
-					["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Select },
-					["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Select },
+					["<C-k>"] = cmp.mapping.select_prev_item(),
+					["<C-j>"] = cmp.mapping.select_next_item(),
 					["<Tab>"] = function(fallback)
 						if require("copilot.suggestion").is_visible() then
 							require("copilot.suggestion").accept()
@@ -755,9 +847,7 @@ return {
 					{ name = "path" },
 					{ name = "nvim_lsp", keyword_length = 3 },
 					{ name = "buffer", keyword_length = 3 },
-					{ name = "nvim_lua", keyword_length = 2 },
-					{ name = "luasnip" },
-					{ name = "emoji" },
+					{ name = "luasnip", keyword_length = 2 },
 				},
 			}
 		end,
