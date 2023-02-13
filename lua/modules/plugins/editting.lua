@@ -18,9 +18,13 @@ local icons = {
 }
 
 return {
-	["jghauser/mkdir.nvim"] = { lazy = false },
+	["jghauser/mkdir.nvim"] = {},
 	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
-	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
+	["asiryk/auto-hlsearch.nvim"] = {
+		lazy = true,
+		event = "InsertEnter",
+		config = function() require("auto-hlsearch").setup() end,
+	},
 	["nmac427/guess-indent.nvim"] = {
 		lazy = true,
 		event = "BufEnter",
@@ -48,11 +52,6 @@ return {
 			}
 		end,
 	},
-	["ibhagwan/smartyank.nvim"] = {
-		lazy = true,
-		event = "BufReadPost",
-		config = function() require("smartyank").setup {} end,
-	},
 	["gelguy/wilder.nvim"] = {
 		lazy = true,
 		event = "CmdlineEnter",
@@ -65,7 +64,7 @@ return {
 		config = function() require("nvim-surround").setup() end,
 	},
 	["nvim-pack/nvim-spectre"] = {
-		module = "spectre",
+		lazy = true,
 		build = "./build.sh",
 		config = function()
 			require("spectre").setup {
@@ -162,6 +161,11 @@ return {
 			}
 		end,
 	},
+	["m4xshen/autoclose.nvim"] = {
+		lazy = true,
+		event = "InsertEnter",
+		config = function() require("autoclose").setup() end,
+	},
 	["max397574/better-escape.nvim"] = {
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
@@ -211,27 +215,6 @@ return {
 					enabled = true,
 					backend = "telescope",
 					trim_prompt = true,
-				},
-			}
-		end,
-	},
-	["RRethy/vim-illuminate"] = {
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		config = function()
-			require("illuminate").configure {
-				filetypes_denylist = {
-					"alpha",
-					"dashboard",
-					"DoomInfo",
-					"startuptime",
-					"fugitive",
-					"help",
-					"norg",
-					"NvimTree",
-					"Outline",
-					"lspsagafinder",
-					"toggleterm",
 				},
 			}
 		end,
@@ -392,63 +375,65 @@ return {
 	["phaazon/hop.nvim"] = {
 		lazy = true,
 		branch = "v2",
-		event = "BufRead",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function() require("hop").setup() end,
 		cond = function() return not vim.tbl_contains({ "nofile", "alpha", "gitcommit", "gitrebase" }, vim.bo.filetype) end,
 		init = function()
-			-- set f/F to use hop
-			local hop = require "hop"
-			local d = require("hop.hint").HintDirection
-			vim.api.nvim_set_keymap("", "f", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 {
-						direction = d.AFTER_CURSOR,
-						current_line_only = true,
-					}
-				end,
-				desc = "motion: f 1 char",
-			})
-			vim.api.nvim_set_keymap("", "F", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 {
-						direction = d.BEFORE_CURSOR,
-						current_line_only = true,
-					}
-				end,
-				desc = "motion: F 1 char",
-			})
-			vim.api.nvim_set_keymap("", "t", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 {
-						direction = d.AFTER_CURSOR,
-						current_line_only = true,
-						hint_offset = -1,
-					}
-				end,
-				desc = "motion: t 1 char",
-			})
-			vim.api.nvim_set_keymap("", "T", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 {
-						direction = d.BEFORE_CURSOR,
-						current_line_only = true,
-						hint_offset = 1,
-					}
-				end,
-				desc = "motion: T 1 char",
-			})
+			if not vim.tbl_contains(require("editor").global.exclude_ft, vim.bo.filetype) then
+				-- set f/F to use hop
+				local hop = require "hop"
+				local d = require("hop.hint").HintDirection
+				vim.api.nvim_set_keymap("", "f", "", {
+					noremap = false,
+					callback = function()
+						hop.hint_char1 {
+							direction = d.AFTER_CURSOR,
+							current_line_only = true,
+						}
+					end,
+					desc = "motion: f 1 char",
+				})
+				vim.api.nvim_set_keymap("", "F", "", {
+					noremap = false,
+					callback = function()
+						hop.hint_char1 {
+							direction = d.BEFORE_CURSOR,
+							current_line_only = true,
+						}
+					end,
+					desc = "motion: F 1 char",
+				})
+				vim.api.nvim_set_keymap("", "t", "", {
+					noremap = false,
+					callback = function()
+						hop.hint_char1 {
+							direction = d.AFTER_CURSOR,
+							current_line_only = true,
+							hint_offset = -1,
+						}
+					end,
+					desc = "motion: t 1 char",
+				})
+				vim.api.nvim_set_keymap("", "T", "", {
+					noremap = false,
+					callback = function()
+						hop.hint_char1 {
+							direction = d.BEFORE_CURSOR,
+							current_line_only = true,
+							hint_offset = 1,
+						}
+					end,
+					desc = "motion: T 1 char",
+				})
 
-			k.nvim_register_mapping {
-				["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
-				["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-				["n|<LocalLeader>k"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-				["n|<LocalLeader>c"] = k.cu("HopChar1"):with_noremap():with_desc "jump: Goto one char",
-				["n|<LocalLeader>cc"] = k.cu("HopChar2"):with_noremap():with_desc "jump: Goto two chars",
-			}
+				k.nvim_register_mapping {
+					["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
+					["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
+					["n|<LocalLeader>k"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
+					["n|<LocalLeader>c"] = k.cu("HopChar1"):with_noremap():with_desc "jump: Goto one char",
+					["n|<LocalLeader>cc"] = k.cu("HopChar2"):with_noremap():with_desc "jump: Goto two chars",
+				}
+			end
 		end,
 	},
 	["pwntester/octo.nvim"] = {
@@ -510,7 +495,6 @@ return {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "mrjones2014/nvim-ts-rainbow" },
 			{ "JoosepAlviste/nvim-ts-context-commentstring" },
-			{ "davidsierradz/cmp-conventionalcommits" },
 			{
 				"andymass/vim-matchup",
 				event = "BufReadPost",
@@ -571,7 +555,7 @@ return {
 			require("telescope").setup(vim.tbl_deep_extend("keep", require("editor").config.plugins.telescope, {
 				defaults = {
 					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
-					selection_caret = icons.ui_space.ChevronRight,
+					selection_caret = icons.ui_space.DoubleSeparator,
 					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 					scroll_strategy = "limit",
 					layout_strategy = "horizontal",

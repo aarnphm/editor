@@ -55,6 +55,7 @@ return {
 		lazy = true,
 		ft = "tex",
 		config = function()
+			vim.g.vimtex_view_method = "zathura"
 			if require("editor").global.is_mac then
 				vim.g.vimtex_view_method = "skim"
 				vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
@@ -65,6 +66,7 @@ return {
 				group = vim.api.nvim_create_augroup("vimtext_mac", { clear = true }),
 				pattern = "VimtexEventCompileSuccess",
 				callback = function(_)
+					---@diagnostic disable-next-line: undefined-field
 					local out = vim.b.vimtex.out()
 					local src_file_path = vim.fn.expand "%:p"
 					local cmd = { vim.g.vimtex_view_general_viewer, "-r" }
@@ -77,72 +79,10 @@ return {
 		end,
 	},
 	["p00f/clangd_extensions.nvim"] = { lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-	["simrat39/rust-tools.nvim"] = {
-		lazy = true,
-		ft = "rust",
-		requires = { "nvim-lua/plenary.nvim" },
-		config = function()
-			local get_rust_adapters = function()
-				if require("editor").global.is_windows then
-					return {
-						type = "executable",
-						command = "lldb-vscode",
-						name = "rt_lldb",
-					}
-				end
-				local codelldb_extension_path = require("editor").global.mason_dir .. "/packages/codelldb/extension"
-				local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
-				local extension = ".so"
-				if require("editor").global.is_mac then extension = ".dylib" end
-				local liblldb_path = codelldb_extension_path .. "/lldb/lib/liblldb" .. extension
-				return require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path)
-			end
-			local ih = require "inlay-hints"
-			require("rust-tools").setup {
-				on_initialized = function(_)
-					ih.set_all()
-					require("lsp_signature").on_attach {
-						bind = true,
-						use_lspsaga = false,
-						floating_window = true,
-						fix_pos = true,
-						hint_enable = true,
-						hi_parameter = "Search",
-						handler_opts = { "double" },
-					}
-				end,
-				tools = {
-					inlay_hints = {
-						auto = false,
-						other_hints_prefix = ":: ",
-						only_current_line = true,
-						show_parameter_hints = false,
-					},
-				},
-				dap = { adapter = get_rust_adapters() },
-				server = {
-					standalone = true,
-					server = {
-						on_attach = function(client, bufnr) ih.on_attach(client, bufnr) end,
-					},
-					settings = {
-						["rust-analyzer"] = {
-							cargo = {
-								loadOutDirsFromCheck = true,
-								buildScripts = { enable = true },
-							},
-							inlayHints = { locationLinks = false },
-							checkOnSave = { command = "clippy" },
-							procMacro = { enable = true },
-						},
-					},
-				},
-			}
-		end,
-	},
 	["saecki/crates.nvim"] = {
 		lazy = true,
-		event = { "BufReadPost Cargo.toml" },
+		event = "BufReadPost Cargo.toml",
+		cond = function() return vim.fn.expand "%:t" == "Cargo.toml" end,
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			require("crates").setup {
@@ -208,29 +148,144 @@ return {
 			}
 		end,
 		init = function()
+			if vim.fn.expand "%:t" == "Cargo.toml" then
+				k.nvim_register_mapping {
+					["n|<Leader>ct"] = k.callback(require("crates").toggle)
+						:with_buffer(0)
+						:with_defaults "crates: Toggle",
+					["n|<Leader>cr"] = k.callback(require("crates").reload)
+						:with_buffer(0)
+						:with_defaults "crates: reload",
+					["n|<Leader>cv"] = k.callback(require("crates").show_versions_popup)
+						:with_defaults "crates: show versions popup",
+					["n|<Leader>cf"] = k.callback(require("crates").show_features_popup)
+						:with_defaults "crates: show features popup",
+					["n|<Leader>cd"] = k.callback(require("crates").show_dependencies_popup)
+						:with_defaults "crates: show dependencies popup",
+					["n|<Leader>cu"] = k.callback(require("crates").update_crate):with_defaults "crates: update crate",
+					["v|<Leader>cu"] = k.callback(require("crates").update_crates)
+						:with_defaults "crates: update crates",
+					["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
+						:with_defaults "crates: update all crates",
+					["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate)
+						:with_defaults "crates: upgrade crate",
+					["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates)
+						:with_defaults "crates: upgrade crates",
+					["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
+						:with_defaults "crates: upgrade all crates",
+					["n|<Leader>cH"] = k.callback(require("crates").open_homepage)
+						:with_defaults "crates: show homepage",
+					["n|<Leader>cR"] = k.callback(require("crates").open_repository)
+						:with_defaults "crates: show repository",
+					["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
+						:with_defaults "crates: show documentation",
+					["n|<Leader>cC"] = k.callback(require("crates").open_crates_io)
+						:with_defaults "crates: open crates.io",
+				}
+			end
+		end,
+	},
+
+	["mfussenegger/nvim-dap"] = {
+		lazy = true,
+		cmd = {
+			"DapSetLogLevel",
+			"DapShowLog",
+			"DapContinue",
+			"DapToggleBreakpoint",
+			"DapToggleRepl",
+			"DapStepOver",
+			"DapStepInto",
+			"DapStepOut",
+			"DapTerminate",
+		},
+		dependencies = {
+			{
+				"rcarriga/nvim-dap-ui",
+				config = function()
+					require("dapui").setup {
+						icons = {
+							expanded = icons.ui.ArrowOpen,
+							collapsed = icons.ui.ArrowClosed,
+							current_frame = icons.ui.Indicator,
+						},
+						layouts = {
+							{
+								elements = {
+									-- Provide as ID strings or tables with "id" and "size" keys
+									{
+										id = "scopes",
+										size = 0.25, -- Can be float or integer > 1
+									},
+									{ id = "breakpoints", size = 0.25 },
+									{ id = "stacks", size = 0.25 },
+									{ id = "watches", size = 0.25 },
+								},
+								size = 40,
+								position = "left",
+							},
+							{ elements = { "repl" }, size = 10, position = "bottom" },
+						},
+						controls = {
+							icons = {
+								pause = icons.dap.Pause,
+								play = icons.dap.Play,
+								step_into = icons.dap.StepInto,
+								step_over = icons.dap.StepOver,
+								step_out = icons.dap.StepOut,
+								step_back = icons.dap.StepBack,
+								run_last = icons.dap.RunLast,
+								terminate = icons.dap.Terminate,
+							},
+						},
+						windows = { indent = 1 },
+					}
+				end,
+			},
+		},
+		config = function()
+			local dap = require "dap"
+			local dapui = require "dapui"
+
+			dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
+			dap.listeners.after.event_terminated["dapui_config"] = function() dapui.close() end
+			dap.listeners.after.event_exited["dapui_config"] = function() dapui.close() end
+
+			-- We need to override nvim-dap's default highlight groups, AFTER requiring nvim-dap for catppuccin.
+			-- vim.api.nvim_set_hl(0, "DapStopped", { fg = colors.green })
+
+			for _, v in ipairs { "Breakpoint", "BreakpointRejected", "BreakpointCondition", "LogPoint", "Stopped" } do
+				vim.fn.sign_define("Dap" .. v, { text = icons.dap[v], texthl = "Dap" .. v, line = "", numhl = "" })
+			end
+
+			-- Config lang adaptors
+			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
+				local ok, _ = pcall(require, "languages.adapters." .. dbg)
+				if not ok then
+					vim.notify_once("Failed to load " .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
+				end
+			end
+		end,
+		init = function()
 			k.nvim_register_mapping {
-				["n|<Leader>ct"] = k.callback(require("crates").toggle):with_buffer(0):with_defaults "crates: Toggle",
-				["n|<Leader>cr"] = k.callback(require("crates").reload):with_buffer(0):with_defaults "crates: reload",
-				["n|<Leader>cv"] = k.callback(require("crates").show_versions_popup)
-					:with_defaults "crates: show versions popup",
-				["n|<Leader>cf"] = k.callback(require("crates").show_features_popup)
-					:with_defaults "crates: show features popup",
-				["n|<Leader>cd"] = k.callback(require("crates").show_dependencies_popup)
-					:with_defaults "crates: show dependencies popup",
-				["n|<Leader>cu"] = k.callback(require("crates").update_crate):with_defaults "crates: update crate",
-				["v|<Leader>cu"] = k.callback(require("crates").update_crates):with_defaults "crates: update crates",
-				["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
-					:with_defaults "crates: update all crates",
-				["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate):with_defaults "crates: upgrade crate",
-				["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates):with_defaults "crates: upgrade crates",
-				["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
-					:with_defaults "crates: upgrade all crates",
-				["n|<Leader>cH"] = k.callback(require("crates").open_homepage):with_defaults "crates: show homepage",
-				["n|<Leader>cR"] = k.callback(require("crates").open_repository)
-					:with_defaults "crates: show repository",
-				["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
-					:with_defaults "crates: show documentation",
-				["n|<Leader>cC"] = k.callback(require("crates").open_crates_io):with_defaults "crates: open crates.io",
+				["n|<F6>"] = k.callback(function() require("dap").continue() end):with_defaults "debug: Run/Continue",
+				["n|<F7>"] = k.callback(function()
+					require("dap").terminate()
+					require("dapui").close()
+				end):with_defaults "debug: Stop",
+				["n|<F8>"] = k.callback(function() require("dap").toggle_breakpoint() end)
+					:with_defaults "debug: Toggle breakpoint",
+				["n|<F9>"] = k.callback(function() require("dap").step_into() end):with_defaults "debug: Step into",
+				["n|<F10>"] = k.callback(function() require("dap").step_out() end):with_defaults "debug: Step out",
+				["n|<F11>"] = k.callback(function() require("dap").step_over() end):with_defaults "debug: Step over",
+				["n|<Leader>db"] = k.callback(
+					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
+				):with_defaults "debug: Set breakpoint with condition",
+				["n|<Leader>dc"] = k.callback(function() require("dap").run_to_cursor() end)
+					:with_defaults "debug: Run to cursor",
+				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end):with_defaults "debug: Run last",
+				["n|<Leader>do"] = k.callback(function() require("dap").repl.open() end)
+					:with_defaults "debug: Open REPL",
 			}
 		end,
 	},
@@ -238,13 +293,12 @@ return {
 	-- NOTE: Native LSP configuration
 	["neovim/nvim-lspconfig"] = {
 		lazy = true,
-		event = { "BufAdd", "BufReadPost", "BufNewFile" },
+		event = { "CursorHold", "CursorHoldI" },
 		dependencies = {
-			{ "ray-x/lsp_signature.nvim" },
-			{ "williamboman/mason.nvim" },
-			{ "williamboman/mason-lspconfig.nvim" },
 			{
 				"simrat39/inlay-hints.nvim",
+				lazy = true,
+				event = { "BufReadPost" },
 				config = function()
 					require("inlay-hints").setup {
 						-- {dynamic | eol | virtline }
@@ -260,60 +314,22 @@ return {
 					}
 				end,
 			},
+			{ "williamboman/mason.nvim" },
+			{ "williamboman/mason-lspconfig.nvim", lazy = true, event = { "CursorHold", "CursorHoldI" } },
+			{ "jay-babu/mason-nvim-dap.nvim", lazy = true, event = { "CursorHold", "CursorHoldI" } },
 			{
 				"jose-elias-alvarez/null-ls.nvim",
+				lazy = true,
+				event = { "BufReadPost" },
 				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
-				requires = { "nvim-lua/plenary.nvim" },
-			},
-			{
-				"WhoIsSethDaniel/mason-tool-installer.nvim",
-				config = function()
-					require("mason-tool-installer").setup {
-
-						-- a list of all tools you want to ensure are installed upon
-						-- start; they should be the names Mason uses for each tool
-						ensure_installed = {
-							-- NOTE: DAP
-							"codelldb",
-							"delve",
-							"debugpy",
-
-							-- NOTE: Formatter
-							"stylua",
-							"prettierd",
-							"black",
-							"shfmt",
-							"isort",
-							"buf", -- proto
-							"buildifier", -- bazel
-							"markdownlint", -- style checker for markdownj
-							"cbfmt", -- format codeblocks in markdown
-							"beautysh", -- bash formatter
-							"yamlfmt",
-							"jq",
-							"ruff",
-
-							-- NOTE: Linters
-							"selene",
-							"eslint_d",
-							"shellcheck",
-							"tflint",
-							"yamllint",
-							"vulture",
-							"vint",
-						},
-					}
-				end,
 			},
 			{
 				"glepnir/lspsaga.nvim",
+				lazy = true,
 				branch = "main",
-				event = { "BufRead", "BufReadPost" },
-				requires = {
-					{ "nvim-tree/nvim-web-devicons" },
-					--Please make sure you install markdown and markdown_inline parser
-					{ "nvim-treesitter/nvim-treesitter" },
-				},
+				events = "VeryLazy",
+				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
+				cond = function() return vim.bo.filetype ~= "rust" end,
 				config = function()
 					require("lspsaga").setup {
 						finder = { keys = { jump_to = "e" } },
@@ -345,18 +361,18 @@ return {
 				end,
 				init = function()
 					k.nvim_register_mapping {
+						["n|<LocalLeader>ci"] = k.cr("Lspsaga incoming_calls"):with_defaults "lsp: Show incoming calls",
+						["n|<LocalLeader>co"] = k.cr("Lspsaga outgoing_calls"):with_defaults "lsp: Show outgoing calls",
 						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
 						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev"):with_defaults "lsp: Prev diagnostic",
 						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next"):with_defaults "lsp: Next diagnostic",
-						["n|gs"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
 						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
 						["n|ga"] = k.cr("Lspsaga code_action"):with_defaults "lsp: Code action for cursor",
 						["v|ga"] = k.cu("Lspsaga code_action"):with_defaults "lsp: Code action for range",
 						["n|gd"] = k.cr("Lspsaga peek_definition"):with_defaults "lsp: Preview definition",
 						["n|gD"] = k.cr("Lspsaga goto_definition"):with_defaults "lsp: Goto definition",
 						["n|gh"] = k.cr("Lspsaga lsp_finder"):with_defaults "lsp: Show reference",
-						["n|<LocalLeader>ci"] = k.cr("Lspsaga incoming_calls"):with_defaults "lsp: Show incoming calls",
-						["n|<LocalLeader>co"] = k.cr("Lspsaga outgoing_calls"):with_defaults "lsp: Show outgoing calls",
+						["n|gs"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
 						["n|K"] = k.callback(function()
 							local filetype = vim.bo.filetype
 							if vim.tbl_contains({ "vim", "help" }, filetype) then
@@ -376,11 +392,12 @@ return {
 		config = function()
 			local nvim_lsp = require "lspconfig"
 			local mason = require "mason"
+
 			require("lspconfig.ui.windows").default_options.border = "single"
 
 			-- Configuring native diagnostics
 			vim.diagnostic.config {
-				virtual_text = false,
+				virtual_text = true,
 				signs = true,
 				update_in_insert = true,
 				underline = false,
@@ -427,6 +444,9 @@ return {
 					"yamlls",
 				},
 				automatic_installation = true,
+			}
+			require("mason-nvim-dap").setup {
+				ensure_installed = { "python", "delve", "cppdbg", "codelldb", "bash" },
 			}
 
 			local disabled_workspaces = require("editor").config.disabled_workspaces
@@ -493,14 +513,7 @@ return {
 						vim.api.nvim_create_autocmd("BufWritePre", {
 							group = augroup,
 							buffer = bufnr,
-							callback = function()
-								vim.lsp.buf.format { bufnr = bufnr }
-								vim.notify(
-									string.format("[%s] Format successfully!", client.name),
-									vim.log.levels.INFO,
-									{ title = "LspFormat" }
-								)
-							end,
+							callback = function() vim.lsp.buf.format { bufnr = bufnr } end,
 						})
 					end
 				end,
@@ -518,6 +531,7 @@ return {
 
 			local ih = require "inlay-hints"
 			local options = {
+				---@diagnostic disable-next-line: unused_variable
 				on_attach = function(client, bufnr)
 					--- NOTE: Avoid LSP foratting, since it will be handled by null-ls
 					client.server_capabilities.documentFormattingProvider = false
@@ -525,16 +539,6 @@ return {
 
 					---Disable |lsp-semantic_tokens| (conflicting with TS highlights)
 					client.server_capabilities.semanticTokensProvider = nil
-
-					require("lsp_signature").on_attach {
-						bind = true,
-						use_lspsaga = false,
-						floating_window = true,
-						fix_pos = true,
-						hint_enable = true,
-						hi_parameter = "Search",
-						handler_opts = { border = "rounded" },
-					}
 				end,
 				capabilities = capabilities,
 			}
@@ -569,8 +573,6 @@ return {
 				end,
 
 				-- TODO: support starlark-rust for bazel
-				-- NOTE: Let rust-tools setup rust-analyzer
-				rust_analyzer = function() end,
 				-- NOTE: Let clangd_extensions setup clangd
 				clangd = function() end,
 				html = lsp_callback "html",
@@ -670,6 +672,7 @@ return {
 				"L3MON4D3/LuaSnip",
 				lazy = true,
 				dependencies = { "rafamadriz/friendly-snippets" },
+				build = "make install_jsregexp",
 				config = function()
 					local snippet_path = vim.fn.stdpath "config" .. "/custom-snippets/"
 					if not vim.tbl_contains(vim.opt.rtp:get(), snippet_path) then vim.opt.rtp:append(snippet_path) end
@@ -688,25 +691,6 @@ return {
 			{ "hrsh7th/cmp-path" },
 			{ "hrsh7th/cmp-buffer" },
 			{ "ray-x/cmp-treesitter" },
-			{
-				"windwp/nvim-autopairs",
-				config = function()
-					require("nvim-autopairs").setup {
-						disable_filetype = { "TelescopePrompt", "vim" },
-						check_ts = true,
-						fast_wrap = {
-							map = "<M-e>",
-							chars = { "{", "[", "(", "\"", "'" },
-							pattern = [=[[%'%"%>%]%)%}%,]]=],
-							end_key = "$",
-							keys = "qwertyuiopzxcvbnmasdfghjkl",
-							check_comma = true,
-							highlight = "Search",
-							highlight_grey = "Comment",
-						},
-					}
-				end,
-			},
 			{
 				"zbirenbaum/copilot.lua",
 				lazy = true,
@@ -744,8 +728,7 @@ return {
 		config = function()
 			local lspkind = require "lspkind"
 			local cmp = require "cmp"
-			local cmp_autopairs = require "nvim-autopairs.completion.cmp"
-			local handlers = require "nvim-autopairs.completion.handlers"
+			local compare = require "cmp.config.compare"
 
 			local border = function(hl)
 				return {
@@ -761,17 +744,6 @@ return {
 			end
 
 			vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#57fa85" })
-
-			local compare = require "cmp.config.compare"
-			compare.lsp_scores = function(entry1, entry2)
-				local diff
-				if entry1.completion_item.score and entry2.completion_item.score then
-					diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
-				else
-					diff = entry2.score - entry1.score
-				end
-				return (diff < 0)
-			end
 
 			cmp.setup {
 				preselect = cmp.PreselectMode.None,
@@ -790,8 +762,6 @@ return {
 					comparators = {
 						compare.offset,
 						compare.exact,
-						compare.lsp_scores,
-						require "clangd_extensions.cmp_scores",
 						compare.kind,
 						compare.sort_text,
 						compare.length,
@@ -822,12 +792,14 @@ return {
 					["<Tab>"] = function(fallback)
 						if require("copilot.suggestion").is_visible() then
 							require("copilot.suggestion").accept()
-						elseif cmp.visible() and require("utils").has_words_before() then
+						elseif cmp.visible() then
 							cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
 						elseif require("luasnip").expand_or_jumpable() then
 							vim.fn.feedkeys(k.replace_termcodes "<Plug>luasnip-expand-or-jump", "")
 						elseif require("utils").check_backspace() then
 							vim.fn.feedkeys(k.replace_termcodes "<Tab>", "n")
+						elseif require("utils").has_words_before() then
+							cmp.complete()
 						else
 							fallback()
 						end
@@ -853,27 +825,6 @@ return {
 					{ name = "treesitter" },
 				},
 			}
-
-			cmp.event:on(
-				"confirm_done",
-				cmp_autopairs.on_confirm_done {
-					map_char = { tex = "" },
-					filetypes = {
-						-- "*" is an alias to all filetypes
-						["*"] = {
-							["("] = {
-								kind = {
-									cmp.lsp.CompletionItemKind.Function,
-									cmp.lsp.CompletionItemKind.Method,
-								},
-								handler = handlers["*"],
-							},
-						},
-						-- Disable for tex
-						tex = false,
-					},
-				}
-			)
 		end,
 	},
 }

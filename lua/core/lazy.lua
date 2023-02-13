@@ -52,23 +52,20 @@ vim.opt.rtp:prepend(lazy_path)
 
 require("lazy").setup(modules, {
 	root = require("editor").global.data_dir .. "lazy", -- directory where plugins will be installed
-	defaults = { lazy = false },
+	defaults = { lazy = true },
 	concurrency = require("editor").global.is_mac and 30 or nil,
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 300,
 		url_format = "https://github.com/%s.git",
 	},
-	install = {
-		-- install missing plugins on startup. This doesn't increase startup time.
-		missing = true,
-		colorscheme = { "un" },
-	},
+	install = { colorscheme = { "un" } },
 	checker = {
-		enabled = true, -- automatically check for updates
+		enabled = true,
 		concurrency = require("editor").global.is_mac and 30 or nil,
-		frequency = 3600 * 24, -- check for updates every day
+		frequency = 3600, -- check for updates every day
 	},
+	change_detection = { notify = false },
 	dev = {
 		path = vim.NIL ~= vim.fn.getenv "WORKSPACE" and vim.env.WORKSPACE .. "/neovim-plugins/" or "~/",
 	},
@@ -101,24 +98,8 @@ require("lazy").setup(modules, {
 		},
 	},
 	performance = {
-		cache = {
-			enabled = true,
-			path = vim.fn.stdpath "cache"
-				.. require("editor").global.path_sep
-				.. "lazy"
-				.. require("editor").global.path_sep
-				.. "cache",
-			-- Once one of the following events triggers, caching will be disabled.
-			-- To cache all modules, set this to `{}`, but that is not recommended.
-			--- { "UIEnter", "BufReadPre" } to make sure everything will be loaded accordingly
-			disable_events = {},
-			ttl = 3600 * 24 * 2, -- keep unused modules for up to 2 days
-		},
 		reset_packpath = true, -- reset the package path to improve startup time
 		rtp = {
-			reset = true, -- reset the runtime path to $VIMRUNTIME and the config directory
-			---@type string[]
-			paths = {}, -- add any custom paths here that you want to include in the rtp
 			disabled_plugins = {
 				"gzip",
 				"matchit",
@@ -133,16 +114,3 @@ require("lazy").setup(modules, {
 		},
 	},
 })
-
-k.nvim_register_mapping {
-	["n|<Leader>lh"] = k.cr("Lazy"):with_nowait():with_defaults "package: Show",
-	["n|<Leader>ls"] = k.cr("Lazy sync"):with_nowait():with_defaults "package: Sync",
-	["n|<Leader>lu"] = k.cr("Lazy update"):with_nowait():with_defaults "package: Update",
-	["n|<Leader>li"] = k.cr("Lazy install"):with_nowait():with_defaults "package: Install",
-	["n|<Leader>ll"] = k.cr("Lazy log"):with_nowait():with_defaults "package: Log",
-	["n|<Leader>lc"] = k.cr("Lazy check"):with_nowait():with_defaults "package: Check",
-	["n|<Leader>ld"] = k.cr("Lazy debug"):with_nowait():with_defaults "package: Debug",
-	["n|<Leader>lp"] = k.cr("Lazy profile"):with_nowait():with_defaults "package: Profile",
-	["n|<Leader>lr"] = k.cr("Lazy restore"):with_nowait():with_defaults "package: Restore",
-	["n|<Leader>lx"] = k.cr("Lazy clean"):with_nowait():with_defaults "package: Clean",
-}

@@ -24,7 +24,6 @@ return function()
 			dap = { enabled = true, enable_ui = true },
 			fidget = true,
 			hop = true,
-			illuminate = true,
 			indent_blankline = { enabled = true, colored_indent_levels = false },
 			lsp_saga = true,
 			lsp_trouble = true,

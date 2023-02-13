@@ -1,5 +1,9 @@
 local k = require "keybind"
-local icons = { ui = require("icons").get "ui", diagnostics = require("icons").get "diagnostics" }
+local icons = {
+	ui = require("icons").get "ui",
+	diagnostics = require("icons").get "diagnostics",
+	dap = require("icons").get("dap", true),
+}
 return {
 	["nathom/filetype.nvim"] = { lazy = false },
 
@@ -38,7 +42,7 @@ return {
 	},
 	["lewis6991/gitsigns.nvim"] = {
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = "BufReadPost",
 		config = require "interface.gitsigns",
 	},
 	["goolord/alpha-nvim"] = {
@@ -161,14 +165,13 @@ return {
 	["rcarriga/nvim-notify"] = {
 		lazy = true,
 		event = "VeryLazy",
+		cond = function() return #vim.api.nvim_list_uis() ~= 0 end,
 		config = function()
 			local notify = require "notify"
 
 			notify.setup {
 				stages = "static",
-				---@usage timeout for notifications in ms, default 5000
-				timeout = 3000,
-				-- @usage User render fps value
+				---@usage User render fps value
 				fps = 60,
 				max_height = function() return math.floor(vim.o.lines * 0.75) end,
 				max_width = function() return math.floor(vim.o.columns * 0.75) end,
@@ -189,108 +192,5 @@ return {
 			vim.notify = notify
 		end,
 		cond = function() return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype) end,
-	},
-	["mfussenegger/nvim-dap"] = {
-		lazy = true,
-		cmd = {
-			"DapSetLogLevel",
-			"DapShowLog",
-			"DapContinue",
-			"DapToggleBreakpoint",
-			"DapToggleRepl",
-			"DapStepOver",
-			"DapStepInto",
-			"DapStepOut",
-			"DapTerminate",
-		},
-		dependencies = {
-			{
-				"rcarriga/nvim-dap-ui",
-				config = function()
-					require("dapui").setup {
-						icons = {
-							expanded = icons.ui.ArrowOpen,
-							collapsed = icons.ui.ArrowClosed,
-							current_frame = icons.ui.Indicator,
-						},
-						layouts = {
-							{
-								elements = {
-									-- Provide as ID strings or tables with "id" and "size" keys
-									{
-										id = "scopes",
-										size = 0.25, -- Can be float or integer > 1
-									},
-									{ id = "breakpoints", size = 0.25 },
-									{ id = "stacks", size = 0.25 },
-									{ id = "watches", size = 0.25 },
-								},
-								size = 40,
-								position = "left",
-							},
-							{ elements = { "repl" }, size = 10, position = "bottom" },
-						},
-						controls = {
-							icons = {
-								pause = icons.dap.Pause,
-								play = icons.dap.Play,
-								step_into = icons.dap.StepInto,
-								step_over = icons.dap.StepOver,
-								step_out = icons.dap.StepOut,
-								step_back = icons.dap.StepBack,
-								run_last = icons.dap.RunLast,
-								terminate = icons.dap.Terminate,
-							},
-						},
-						windows = { indent = 1 },
-					}
-				end,
-			},
-		},
-		config = function()
-			local dap = require "dap"
-			local dapui = require "dapui"
-
-			dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
-			dap.listeners.after.event_terminated["dapui_config"] = function() dapui.close() end
-			dap.listeners.after.event_exited["dapui_config"] = function() dapui.close() end
-
-			-- We need to override nvim-dap's default highlight groups, AFTER requiring nvim-dap for catppuccin.
-			-- vim.api.nvim_set_hl(0, "DapStopped", { fg = colors.green })
-
-			for _, v in ipairs { "Breakpoint", "BreakpointRejected", "BreakpointCondition", "LogPoint", "DapStopped" } do
-				vim.fn.sign_define("Dap" .. v, { text = icons.dap[v], texthl = "Dap" .. v, line = "", numhl = "" })
-			end
-
-			-- Config lang adaptors
-			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
-				local ok, _ = pcall(require, "interface.adapt.dap-" .. dbg)
-				if not ok then
-					vim.notify_once("Failed to load dap-" .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
-				end
-			end
-		end,
-		init = function()
-			k.nvim_register_mapping {
-				["n|<F6>"] = k.callback(function() require("dap").continue() end):with_defaults "debug: Run/Continue",
-				["n|<F7>"] = k.callback(function()
-					require("dap").terminate()
-					require("dapui").close()
-				end):with_defaults "debug: Stop",
-				["n|<F8>"] = k.callback(function() require("dap").toggle_breakpoint() end)
-					:with_defaults "debug: Toggle breakpoint",
-				["n|<F9>"] = k.callback(function() require("dap").step_into() end):with_defaults "debug: Step into",
-				["n|<F10>"] = k.callback(function() require("dap").step_out() end):with_defaults "debug: Step out",
-				["n|<F11>"] = k.callback(function() require("dap").step_over() end):with_defaults "debug: Step over",
-				["n|<Leader>db"] = k.callback(
-					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
-				):with_defaults "debug: Set breakpoint with condition",
-				["n|<Leader>dc"] = k.callback(function() require("dap").run_to_cursor() end)
-					:with_defaults "debug: Run to cursor",
-				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end):with_defaults "debug: Run last",
-				["n|<Leader>do"] = k.callback(function() require("dap").repl.open() end)
-					:with_defaults "debug: Open REPL",
-			}
-		end,
 	},
 }

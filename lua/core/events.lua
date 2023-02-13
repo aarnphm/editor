@@ -39,6 +39,29 @@ api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+-- register lazy command keymap
+api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+	group = misc_id,
+	pattern = "*",
+	callback = function(event)
+		if not vim.tbl_contains(require("editor").global.exclude_ft, event.buf) then
+			local k = require "keybind"
+			k.nvim_register_mapping {
+				["n|<Leader>lh"] = k.cr("Lazy"):with_nowait():with_defaults "package: Show",
+				["n|<Leader>ls"] = k.cr("Lazy sync"):with_nowait():with_defaults "package: Sync",
+				["n|<Leader>lu"] = k.cr("Lazy update"):with_nowait():with_defaults "package: Update",
+				["n|<Leader>li"] = k.cr("Lazy install"):with_nowait():with_defaults "package: Install",
+				["n|<Leader>ll"] = k.cr("Lazy log"):with_nowait():with_defaults "package: Log",
+				["n|<Leader>lc"] = k.cr("Lazy check"):with_nowait():with_defaults "package: Check",
+				["n|<Leader>ld"] = k.cr("Lazy debug"):with_nowait():with_defaults "package: Debug",
+				["n|<Leader>lp"] = k.cr("Lazy profile"):with_nowait():with_defaults "package: Profile",
+				["n|<Leader>lr"] = k.cr("Lazy restore"):with_nowait():with_defaults "package: Restore",
+				["n|<Leader>lx"] = k.cr("Lazy clean"):with_nowait():with_defaults "package: Clean",
+			}
+		end
+	end,
+})
+
 -- Makes switching between buffer and termmode feels like normal mode
 api.nvim_create_autocmd("TermOpen", {
 	group = misc_id,
@@ -51,6 +74,16 @@ api.nvim_create_autocmd("TermOpen", {
 		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
+	end,
+})
+
+-- Fix fold issue of files opened by telescope
+vim.api.nvim_create_autocmd("BufRead", {
+	callback = function()
+		vim.api.nvim_create_autocmd("BufWinEnter", {
+			once = true,
+			command = "normal! zx",
+		})
 	end,
 })
 
@@ -215,6 +248,15 @@ vim.api.nvim_create_autocmd("FileType", {
 	callback = function()
 		vim.opt_local.wrap = true
 		vim.opt_local.spell = true
+	end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+	group = ft_id,
+	pattern = { "make" },
+	callback = function()
+		vim.opt_local.expandtab = false
+		vim.opt_local.shiftwidth = 8
+		vim.opt_local.softtabstop = 0
 	end,
 })
 

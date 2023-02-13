@@ -82,21 +82,26 @@ return function()
 			{ callback = function() vim.api.nvim_command "enew" end }
 		),
 	}
-
-	local footer = icons.misc.BentoBox
-		.. "github.com/aarnphm"
-		.. "   v"
-		.. vim.version().major
-		.. "."
-		.. vim.version().minor
-		.. "."
-		.. vim.version().patch
-		.. "   "
-		.. require("lazy").stats().count
-		.. " plugins total"
+	local gen_footer = function()
+		local stats = require("lazy").stats()
+		local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+		return icons.misc.BentoBox
+			.. "github.com/aarnphm"
+			.. "   v"
+			.. vim.version().major
+			.. "."
+			.. vim.version().minor
+			.. "."
+			.. vim.version().patch
+			.. "   "
+			.. stats.count
+			.. " plugins in "
+			.. ms
+			.. "ms"
+	end
 
 	dashboard.section.footer.opts.hl = "Function"
-	dashboard.section.footer.val = footer
+	dashboard.section.footer.val = gen_footer()
 
 	local top_button_pad = 2
 	local footer_button_pad = 1
@@ -119,7 +124,7 @@ return function()
 	vim.api.nvim_create_autocmd("User", {
 		pattern = "LazyVimStarted",
 		callback = function()
-			dashboard.section.footer.val = footer
+			dashboard.section.footer.val = gen_footer()
 			pcall(vim.cmd.AlphaRedraw)
 		end,
 	})

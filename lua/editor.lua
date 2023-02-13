@@ -34,6 +34,7 @@ return {
 		modules_dir = vim_path .. path_sep .. "lua" .. path_sep .. "modules",
 		local_config_path = local_config_path,
 		mason_dir = vim.fn.stdpath "data" .. path_sep .. "mason",
+		exclude_ft = { "terminal", "toggleterm", "prompt", "alpha", "dashboard", "NvimTree", "help", "TelescopePrompt" },
 	},
 	config = (function()
 		if _config then return _config end

@@ -13,14 +13,10 @@ return function()
 
 	local _cache = { context = "", bufnr = -1 }
 	local lspsaga_symbols = function()
-		local exclude = {
-			["terminal"] = true,
-			["toggleterm"] = true,
-			["prompt"] = true,
-			["NvimTree"] = true,
-			["help"] = true,
-		}
-		if vim.api.nvim_win_get_config(0).zindex or exclude[vim.bo.filetype] then
+		if
+			vim.api.nvim_win_get_config(0).zindex
+			or vim.tbl_contains(require("editor").global.exclude_ft, vim.bo.filetype)
+		then
 			return "" -- Excluded filetypes
 		else
 			local currbuf = vim.api.nvim_get_current_buf()
