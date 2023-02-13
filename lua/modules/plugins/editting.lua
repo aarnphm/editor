@@ -18,7 +18,6 @@ local icons = {
 }
 
 return {
-	--- NOTE: add stablize.nvim if you are not using nvim-nightly
 	["jghauser/mkdir.nvim"] = { lazy = false },
 	["dstein64/vim-startuptime"] = { lazy = true, cmd = "StartupTime" },
 	["romainl/vim-cool"] = { lazy = true, event = { "CursorMoved", "InsertEnter" } },
@@ -52,13 +51,7 @@ return {
 	["ibhagwan/smartyank.nvim"] = {
 		lazy = true,
 		event = "BufReadPost",
-		config = function()
-			require("smartyank").setup {
-				highlight = { enabled = false },
-				tmux = { enabled = false },
-				osc52 = { enabled = false },
-			}
-		end,
+		config = function() require("smartyank").setup {} end,
 	},
 	["gelguy/wilder.nvim"] = {
 		lazy = true,
@@ -401,7 +394,7 @@ return {
 		branch = "v2",
 		event = "BufRead",
 		config = function() require("hop").setup() end,
-		cond = function() return not vim.tbl_contains({ "nofile" }, vim.bo.filetype) end,
+		cond = function() return not vim.tbl_contains({ "nofile", "alpha", "gitcommit", "gitrebase" }, vim.bo.filetype) end,
 		init = function()
 			-- set f/F to use hop
 			local hop = require "hop"
@@ -517,7 +510,7 @@ return {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "mrjones2014/nvim-ts-rainbow" },
 			{ "JoosepAlviste/nvim-ts-context-commentstring" },
-			{ "mfussenegger/nvim-treehopper" },
+			{ "davidsierradz/cmp-conventionalcommits" },
 			{
 				"andymass/vim-matchup",
 				event = "BufReadPost",
@@ -548,110 +541,6 @@ return {
 				end,
 			},
 		},
-	},
-	["mfussenegger/nvim-dap"] = {
-		lazy = true,
-		cmd = {
-			"DapSetLogLevel",
-			"DapShowLog",
-			"DapContinue",
-			"DapToggleBreakpoint",
-			"DapToggleRepl",
-			"DapStepOver",
-			"DapStepInto",
-			"DapStepOut",
-			"DapTerminate",
-		},
-		dependencies = {
-			{
-				"rcarriga/nvim-dap-ui",
-				config = function()
-					require("dapui").setup {
-						icons = {
-							expanded = icons.ui.ArrowOpen,
-							collapsed = icons.ui.ArrowClosed,
-							current_frame = icons.ui.Indicator,
-						},
-						layouts = {
-							{
-								elements = {
-									-- Provide as ID strings or tables with "id" and "size" keys
-									{
-										id = "scopes",
-										size = 0.25, -- Can be float or integer > 1
-									},
-									{ id = "breakpoints", size = 0.25 },
-									{ id = "stacks", size = 0.25 },
-									{ id = "watches", size = 0.25 },
-								},
-								size = 40,
-								position = "left",
-							},
-							{ elements = { "repl" }, size = 10, position = "bottom" },
-						},
-						controls = {
-							icons = {
-								pause = icons.dap.Pause,
-								play = icons.dap.Play,
-								step_into = icons.dap.StepInto,
-								step_over = icons.dap.StepOver,
-								step_out = icons.dap.StepOut,
-								step_back = icons.dap.StepBack,
-								run_last = icons.dap.RunLast,
-								terminate = icons.dap.Terminate,
-							},
-						},
-						windows = { indent = 1 },
-					}
-				end,
-			},
-		},
-		config = function()
-			local dap = require "dap"
-			local dapui = require "dapui"
-
-			dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
-			dap.listeners.after.event_terminated["dapui_config"] = function() dapui.close() end
-			dap.listeners.after.event_exited["dapui_config"] = function() dapui.close() end
-
-			-- We need to override nvim-dap's default highlight groups, AFTER requiring nvim-dap for catppuccin.
-			-- vim.api.nvim_set_hl(0, "DapStopped", { fg = colors.green })
-
-			for _, v in ipairs { "Breakpoint", "BreakpointRejected", "BreakpointCondition", "LogPoint", "DapStopped" } do
-				vim.fn.sign_define("Dap" .. v, { text = icons.dap[v], texthl = "Dap" .. v, line = "", numhl = "" })
-			end
-
-			-- Config lang adaptors
-			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
-				local ok, _ = pcall(require, "editting.lang-adapters.dap-" .. dbg)
-				if not ok then
-					vim.notify_once("Failed to load dap-" .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
-				end
-			end
-		end,
-		init = function()
-			k.nvim_register_mapping {
-				["n|<F6>"] = k.callback(function() require("dap").continue() end):with_defaults "debug: Run/Continue",
-				["n|<F7>"] = k.callback(function()
-					require("dap").terminate()
-					require("dapui").close()
-				end):with_defaults "debug: Stop",
-				["n|<F8>"] = k.callback(function() require("dap").toggle_breakpoint() end)
-					:with_defaults "debug: Toggle breakpoint",
-				["n|<F9>"] = k.callback(function() require("dap").step_into() end):with_defaults "debug: Step into",
-				["n|<F10>"] = k.callback(function() require("dap").step_out() end):with_defaults "debug: Step out",
-				["n|<F11>"] = k.callback(function() require("dap").step_over() end):with_defaults "debug: Step over",
-				["n|<Leader>db"] = k.callback(
-					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
-				):with_defaults "debug: Set breakpoint with condition",
-				["n|<Leader>dc"] = k.callback(function() require("dap").run_to_cursor() end)
-					:with_defaults "debug: Run to cursor",
-				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end):with_defaults "debug: Run last",
-				["n|<Leader>do"] = k.callback(function() require("dap").repl.open() end)
-					:with_defaults "debug: Open REPL",
-				["o|m"] = k.callback(function() require("tsht").nodes() end):with_silent(),
-			}
-		end,
 	},
 	["nvim-telescope/telescope.nvim"] = {
 		cmd = "Telescope",
@@ -772,14 +661,15 @@ return {
 
 			k.nvim_register_mapping {
 				["n|<Leader>w"] = k.callback(
-					function() require("telescope").extensions.live_grep_args.live_grep_args {} end
+					function() require("telescope").extensions.live_grep_args.live_grep_args() end
 				)
 					:with_defaults "find: Word in project",
 				["n|<Leader>r"] = k.callback(function() require("telescope").extensions.frecency.frecency() end)
 					:with_defaults "find: File by frecency",
 				["n|<Leader>b"] = k.cu("Telescope buffers"):with_defaults "find: Buffer opened",
-				["n|<Leader>\\"] = k.callback(function() require("telescope").extensions.projects.projects {} end)
-					:with_defaults "find: Project",
+				["n|<Leader>\\"] = k.callback(
+					function() require("telescope").extensions.projects.projects { promp_title = "Projects" } end
+				):with_defaults "find: Project",
 				["n|<Leader>f"] = k.callback(function() require("utils").find_files(false) end)
 					:with_defaults "find: file in project",
 				["n|<Leader>'"] = k.cu("Telescope zoxide list")

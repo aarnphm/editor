@@ -14,16 +14,6 @@ for type, icon in pairs(diagnostic_icons) do
 end
 
 local misc_id = api.nvim_create_augroup("MiscBufs", { clear = true })
--- Fix fold issue of files opened by telescope
-api.nvim_create_autocmd("BufRead", {
-	group = misc_id,
-	callback = function()
-		api.nvim_create_autocmd("BufWinEnter", {
-			once = true,
-			command = "normal! zx",
-		})
-	end,
-})
 
 -- close some filetypes with <q>
 api.nvim_create_autocmd("FileType", {
@@ -75,7 +65,7 @@ api.nvim_create_autocmd("BufEnter", {
 			and api.nvim_buf_get_option(api.nvim_win_get_buf(layout[2]), "filetype") == "NvimTree"
 			and layout[3] == nil
 		then
-			vim.cmd "confirm quit"
+			vim.cmd.confirm { "quit" }
 		end
 	end,
 })
@@ -105,6 +95,7 @@ api.nvim_create_autocmd("BufWritePre", {
 api.nvim_create_autocmd("BufEnter", {
 	group = bufs_id,
 	pattern = "*",
+	-- { cmd = 'write', args = { "myfile.txt" }, bang = true }
 	command = "silent! lcd %:p:h",
 })
 -- auto place to last edit
@@ -220,7 +211,7 @@ api.nvim_create_autocmd("FileType", {
 })
 vim.api.nvim_create_autocmd("FileType", {
 	group = ft_id,
-	pattern = { "gitcommit", "markdown" },
+	pattern = { "markdown" },
 	callback = function()
 		vim.opt_local.wrap = true
 		vim.opt_local.spell = true

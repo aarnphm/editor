@@ -61,13 +61,13 @@ return function()
 			"SPC \\",
 			icons.ui.List .. "Project find",
 			leader,
-			{ callback = function() require("telescope").extensions.projects.projects {} end }
+			{ callback = function() require("telescope").extensions.projects.projects { promp_title = "Projects" } end }
 		),
 		button(
 			"SPC w",
 			icons.misc.WordFind .. "Word find",
 			leader,
-			{ callback = function() require("telescope").extensions.live_grep_args.live_grep_args {} end }
+			{ callback = function() require("telescope").extensions.live_grep_args.live_grep_args() end }
 		),
 		button(
 			"SPC f",

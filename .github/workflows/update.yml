@@ -41,6 +41,7 @@ jobs:
           # setup directory of the config
           cp -r "${GITHUB_WORKSPACE}/lua" "${HOME}/.config/nvim/lua"
           cp -r "${GITHUB_WORKSPACE}/syntax" "${HOME}/.config/nvim/syntax"
+          cp -r "${GITHUB_WORKSPACE}/colors" "${HOME}/.config/nvim/colors"
           cp -r "${GITHUB_WORKSPACE}/ftplugin" "${HOME}/.config/nvim/ftplugin"
           cp -r "${GITHUB_WORKSPACE}/after" "${HOME}/.config/nvim/after"
           cp -r "${GITHUB_WORKSPACE}/custom-snippets" "${HOME}/.config/nvim/custom-snippets"

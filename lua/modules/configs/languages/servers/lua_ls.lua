@@ -26,6 +26,7 @@ require("neodev").setup {
 			"nvim-bufferline.lua",
 			"lsp-setup.nvim",
 			"rust-tools.nvim",
+			"lsp_signature.nvim",
 		},
 	},
 }

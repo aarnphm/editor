@@ -123,7 +123,7 @@ return {
 				server = {
 					standalone = true,
 					server = {
-						on_attach = function(c, b) ih.on_attach(c, b) end,
+						on_attach = function(client, bufnr) ih.on_attach(client, bufnr) end,
 					},
 					settings = {
 						["rust-analyzer"] = {
@@ -204,6 +204,7 @@ return {
 						yanked = " " .. icons.diagnostics.ErrorHolo .. "yanked ",
 					},
 				},
+				null_ls = { enabled = true, name = "crates.nvim" },
 			}
 		end,
 		init = function()
@@ -318,22 +319,15 @@ return {
 						finder = { keys = { jump_to = "e" } },
 						lightbulb = { enable = false },
 						diagnostic = { keys = { exec_action = "<CR>" } },
-						definition = {
-							edit = "<C-c>o",
-							vsplit = "<C-c>v",
-							split = "<C-c>s",
-							tabe = "<C-c>t",
-							quit = "q",
-							close = "<Esc>",
-						},
+						definition = { split = "<C-c>s" },
 						outline = {
-							win_with = "_sagaoutline",
-							auto_preview = false,
+							win_with = "lsagaoutline",
+							win_width = math.floor(vim.o.columns * 0.2),
 							keys = { jump = "<CR>" },
 						},
 						symbol_in_winbar = {
 							enable = false,
-							separator = " " .. icons.ui.DoubleSeparator,
+							separator = " " .. icons.ui.Separator,
 							show_file = false,
 						},
 						ui = {
@@ -346,6 +340,7 @@ return {
 							incoming = icons.ui.Incoming,
 							outgoing = icons.ui.Outgoing,
 						},
+						callhierarchy = { show_detail = true },
 					}
 				end,
 				init = function()
@@ -355,7 +350,6 @@ return {
 						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next"):with_defaults "lsp: Next diagnostic",
 						["n|gs"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
 						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
-						["n|K"] = k.cr("Lspsaga hover_doc"):with_defaults "lsp: Show doc",
 						["n|ga"] = k.cr("Lspsaga code_action"):with_defaults "lsp: Code action for cursor",
 						["v|ga"] = k.cu("Lspsaga code_action"):with_defaults "lsp: Code action for range",
 						["n|gd"] = k.cr("Lspsaga peek_definition"):with_defaults "lsp: Preview definition",
@@ -363,6 +357,18 @@ return {
 						["n|gh"] = k.cr("Lspsaga lsp_finder"):with_defaults "lsp: Show reference",
 						["n|<LocalLeader>ci"] = k.cr("Lspsaga incoming_calls"):with_defaults "lsp: Show incoming calls",
 						["n|<LocalLeader>co"] = k.cr("Lspsaga outgoing_calls"):with_defaults "lsp: Show outgoing calls",
+						["n|K"] = k.callback(function()
+							local filetype = vim.bo.filetype
+							if vim.tbl_contains({ "vim", "help" }, filetype) then
+								vim.cmd("h " .. vim.fn.expand "<cword>")
+							elseif vim.tbl_contains({ "man" }, filetype) then
+								vim.cmd("Man " .. vim.fn.expand "<cword>")
+							elseif vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
+								require("crates").show_popup()
+							else
+								require("lspsaga.hover"):render_hover_doc()
+							end
+						end):with_defaults "lsp: Show doc",
 					}
 				end,
 			},
@@ -681,30 +687,24 @@ return {
 			{ "hrsh7th/cmp-nvim-lsp" },
 			{ "hrsh7th/cmp-path" },
 			{ "hrsh7th/cmp-buffer" },
+			{ "ray-x/cmp-treesitter" },
 			{
 				"windwp/nvim-autopairs",
 				config = function()
-					local cmp = require "cmp"
-					local cmp_autopairs = require "nvim-autopairs.completion.cmp"
-					local handlers = require "nvim-autopairs.completion.handlers"
-					cmp.event:on(
-						"confirm_done",
-						cmp_autopairs.on_confirm_done {
-							map_char = { tex = "" },
-							filetypes = {
-								-- "*" is an alias to all filetypes
-								["*"] = {
-									["("] = {
-										kind = {
-											cmp.lsp.CompletionItemKind.Function,
-											cmp.lsp.CompletionItemKind.Method,
-										},
-										handler = handlers["*"],
-									},
-								},
-							},
-						}
-					)
+					require("nvim-autopairs").setup {
+						disable_filetype = { "TelescopePrompt", "vim" },
+						check_ts = true,
+						fast_wrap = {
+							map = "<M-e>",
+							chars = { "{", "[", "(", "\"", "'" },
+							pattern = [=[[%'%"%>%]%)%}%,]]=],
+							end_key = "$",
+							keys = "qwertyuiopzxcvbnmasdfghjkl",
+							check_comma = true,
+							highlight = "Search",
+							highlight_grey = "Comment",
+						},
+					}
 				end,
 			},
 			{
@@ -744,6 +744,8 @@ return {
 		config = function()
 			local lspkind = require "lspkind"
 			local cmp = require "cmp"
+			local cmp_autopairs = require "nvim-autopairs.completion.cmp"
+			local handlers = require "nvim-autopairs.completion.handlers"
 
 			local border = function(hl)
 				return {
@@ -848,8 +850,30 @@ return {
 					{ name = "nvim_lsp", keyword_length = 3 },
 					{ name = "buffer", keyword_length = 3 },
 					{ name = "luasnip", keyword_length = 2 },
+					{ name = "treesitter" },
 				},
 			}
+
+			cmp.event:on(
+				"confirm_done",
+				cmp_autopairs.on_confirm_done {
+					map_char = { tex = "" },
+					filetypes = {
+						-- "*" is an alias to all filetypes
+						["*"] = {
+							["("] = {
+								kind = {
+									cmp.lsp.CompletionItemKind.Function,
+									cmp.lsp.CompletionItemKind.Method,
+								},
+								handler = handlers["*"],
+							},
+						},
+						-- Disable for tex
+						tex = false,
+					},
+				}
+			)
 		end,
 	},
 }
