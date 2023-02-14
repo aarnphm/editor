@@ -314,7 +314,6 @@ return {
 				end,
 			},
 			{ "williamboman/mason.nvim" },
-			{ "ray-x/lsp_signature.nvim" },
 			{ "williamboman/mason-lspconfig.nvim", lazy = true, event = { "CursorHold", "CursorHoldI" } },
 			{ "jay-babu/mason-nvim-dap.nvim", lazy = true, event = { "CursorHold", "CursorHoldI" } },
 			{
@@ -550,24 +549,6 @@ return {
 				--- NOTE: Avoid LSP foratting, since it will be handled by null-ls
 				client.server_capabilities.documentFormattingProvider = false
 				client.server_capabilities.documentRangeFormattingProvider = false
-
-				require("lsp_signature").on_attach({
-					floating_window_off_x = 5, -- adjust float windows x position.
-					floating_window_off_y = function() -- adjust float windows y position. e.g. set to -2 can make floating window move up 2 lines
-						local pumheight = vim.o.pumheight
-						local winline = vim.fn.winline() -- line number in the window
-						local winheight = vim.fn.winheight(0)
-						-- window top
-						if winline - 1 < pumheight then return pumheight end
-						-- window bottom
-						if winheight - winline < pumheight then return -pumheight end
-						return 0
-					end,
-					toggle_key = "<M-s>",
-					hint_enable = false,
-					hi_parameter = "Search",
-					handler_opts = { border = "rounded" },
-				}, bufnr)
 			end
 			local options = { on_attach = on_attach, capabilities = capabilities }
 
