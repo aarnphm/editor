@@ -14,19 +14,6 @@ return {
 		config = function() require("nvim-surround").setup() end,
 	},
 	{
-		"rafcamlet/nvim-luapad",
-		lazy = true,
-		ft = "lua",
-		cmd = { "Luapad", "LuaRun" },
-		config = function()
-			require("luapad").setup {
-				count_limit = 150000,
-				eval_on_move = true,
-				error_highlight = "WarningMsg",
-			}
-		end,
-	},
-	{
 		"bazelbuild/vim-bazel",
 		lazy = true,
 		dependencies = { "google/vim-maktaba" },
@@ -84,45 +71,53 @@ return {
 			})
 		end,
 	},
-	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
 	-- Setup language servers.
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 	{
 		"neovim/nvim-lspconfig",
 		event = "BufReadPre",
 		dependencies = {
-			{ "folke/neodev.nvim", config = true, ft = "lua" },
+			{ "folke/neodev.nvim" },
+			{
+				"rafcamlet/nvim-luapad",
+				lazy = true,
+				ft = "lua",
+				cmd = { "Luapad", "LuaRun" },
+				config = function()
+					require("luapad").setup {
+						count_limit = 150000,
+						eval_on_move = true,
+						error_highlight = "WarningMsg",
+					}
+				end,
+			},
+			{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
+			{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust" },
 			{ "williamboman/mason.nvim", cmd = "Mason" },
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "jay-babu/mason-nvim-dap.nvim" },
 			{
 				"simrat39/inlay-hints.nvim",
-				config = function()
-					require("inlay-hints").setup {
-						-- {dynamic | eol | virtline }
-						parameter = { show = true },
-						renderer = "inlay-hints.render.eol",
-						only_current_line = true,
-						eol = {
-							parameter = {
-								separator = ",",
-								format = function(hints) return string.format(":: (%s)", hints) end,
-							},
+				opts = {
+					-- {dynamic | eol | virtline }
+					parameter = { show = true },
+					renderer = "inlay-hints.render.eol",
+					only_current_line = true,
+					eol = {
+						parameter = {
+							separator = ",",
+							format = function(hints) return string.format(":: (%s)", hints) end,
 						},
-					}
-				end,
+					},
+				},
 			},
 			{
 				"jose-elias-alvarez/null-ls.nvim",
-				lazy = true,
-				event = "BufReadPost",
 				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
 			},
 			{
 				"glepnir/lspsaga.nvim",
-				lazy = true,
 				branch = "main",
-				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
 				config = function()
 					require("lspsaga").setup {
@@ -136,6 +131,7 @@ return {
 							win_width = math.floor(vim.o.columns * 0.2),
 							keys = { jump = "<CR>" },
 						},
+						code_actions = { extend_gitsigns = false },
 						symbol_in_winbar = {
 							enable = false,
 							separator = " " .. ZoxIcon.UiSpace.Separator,
@@ -341,7 +337,7 @@ return {
 			--- Supports inlay-hints with `ih.on_attach`
 			---@overload fun(lsp_name: string, enable_inlay_hints?: boolean): fun():nil
 			---@overload fun(lsp_name: string): fun():nil
-			local lsp_callback = function(lsp_name, enable_inlay_hints)
+			local lsp_setup = function(lsp_name, enable_inlay_hints)
 				enable_inlay_hints = enable_inlay_hints or false
 				if enable_inlay_hints then
 					options.on_attach = function(client, bufnr)
@@ -396,22 +392,28 @@ return {
 			end
 
 			require("mason-lspconfig").setup_handlers {
-				clangd = lsp_callback "clangd",
-				html = lsp_callback "html",
-				marksman = lsp_callback "marksman",
-				bufls = lsp_callback "bufls",
-				bashls = lsp_callback "bashls",
-				jsonls = lsp_callback "jsonls",
-				jdtls = lsp_callback "jdtls",
-				yamlls = lsp_callback "yamlls",
-				pyright = lsp_callback "pyright",
-				gopls = lsp_callback("gopls", true),
-				lua_ls = lsp_callback("lua_ls", true),
-				tsserver = lsp_callback("tsserver", true),
+				function(client_name)
+					nvim_lsp[client_name].setup {
+						on_attach = on_attach,
+						capabilities = capabilities,
+					}
+				end,
+				rust_analyzer = lsp_setup "rust_analyzer",
+				clangd = lsp_setup "clangd",
+				html = lsp_setup "html",
+				marksman = lsp_setup "marksman",
+				bufls = lsp_setup "bufls",
+				bashls = lsp_setup "bashls",
+				jsonls = lsp_setup "jsonls",
+				jdtls = lsp_setup "jdtls",
+				yamlls = lsp_setup "yamlls",
+				pyright = lsp_setup "pyright",
+				gopls = lsp_setup("gopls", true),
+				lua_ls = lsp_setup("lua_ls", true),
+				tsserver = lsp_setup("tsserver", true),
 			}
 
-			lsp_callback "starlark_rust"
-			lsp_callback "rust_analyzer"
+			lsp_setup "starlark_rust"
 		end,
 	},
 
@@ -442,6 +444,7 @@ return {
 			{ "onsails/lspkind.nvim" },
 			{ "saadparwaiz1/cmp_luasnip" },
 			{ "hrsh7th/cmp-nvim-lsp" },
+			{ "hrsh7th/cmp-nvim-lua" },
 			{ "hrsh7th/cmp-path" },
 			{ "ray-x/cmp-treesitter" },
 			{
@@ -573,8 +576,9 @@ return {
 				-- You should specify your *installed* sources.
 				sources = {
 					{ name = "path" },
-					{ name = "nvim_lsp", keyword_length = 3 },
+					{ name = "nvim-lua" },
 					{ name = "treesitter" },
+					{ name = "nvim_lsp", keyword_length = 3 },
 					{ name = "luasnip", keyword_length = 2 },
 				},
 			}

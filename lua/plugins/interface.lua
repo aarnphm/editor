@@ -1,4 +1,5 @@
 local k = require "zox.keybind"
+
 return {
 	{
 		"j-hui/fidget.nvim",
@@ -9,6 +10,33 @@ return {
 				text = { spinner = "dots" },
 				window = { blend = 0 },
 			}
+		end,
+	},
+	{
+		"rcarriga/nvim-notify",
+		lazy = true,
+		event = "LspAttach",
+		cond = function()
+			if #vim.api.nvim_list_uis() ~= 0 then
+				return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
+			end
+			return false
+		end,
+		config = function()
+			local notify = require "notify"
+			notify.setup {
+				stages = "static",
+				---@usage User render fps value
+				fps = 60,
+				max_height = function() return math.floor(vim.o.lines * 0.55) end,
+				max_width = function() return math.floor(vim.o.columns * 0.55) end,
+				render = "minimal",
+				background_colour = "Normal",
+				---@usage notifications with level lower than this would be ignored. [ERROR > WARN > INFO > DEBUG > TRACE]
+				level = "INFO",
+			}
+
+			vim.notify = notify
 		end,
 	},
 	{
@@ -31,7 +59,6 @@ return {
 						"prompt",
 						"alpha",
 						"dashboard",
-						"NvimTree",
 						"help",
 						"TelescopePrompt",
 					}, vim.bo.filetype)
@@ -245,6 +272,7 @@ return {
 		event = { "BufReadPost", "BufRead" },
 		config = function()
 			require("bufferline").setup {
+				highlights = require "rose-pine.plugins.bufferline",
 				options = {
 					offsets = {
 						{
@@ -292,12 +320,7 @@ return {
 			}
 		end,
 	},
-	{
-		"asiryk/auto-hlsearch.nvim",
-		lazy = true,
-		event = "InsertEnter",
-		config = function() require("auto-hlsearch").setup() end,
-	},
+	{ "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
 	{
 		"zbirenbaum/neodim",
 		lazy = true,
@@ -354,7 +377,6 @@ return {
 					"vista",
 					"help",
 					"todoist",
-					"NvimTree",
 					"peekaboo",
 					"git",
 					"TelescopePrompt",
@@ -526,18 +548,16 @@ return {
 		branch = "canary",
 		lazy = false,
 		priority = 1000,
-		config = function()
-			require("rose-pine").setup {
-				disable_italics = true,
-				disable_float_background = true,
-				highlight_groups = {
-					Comment = { fg = "muted", italic = true },
-					StatusLine = { fg = "iris", bg = "iris", blend = 10 },
-					StatusLineNC = { fg = "subtle", bg = "surface" },
-				},
-			}
-			vim.cmd.colorscheme "rose-pine"
-		end,
+		opts = {
+			disable_italics = true,
+			disable_float_background = true,
+			highlight_groups = {
+				Comment = { fg = "muted", italic = true },
+				StatusLine = { fg = "iris", bg = "iris", blend = 10 },
+				StatusLineNC = { fg = "subtle", bg = "surface" },
+			},
+		},
+		init = function() vim.cmd.colorscheme "rose-pine" end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -581,30 +601,7 @@ return {
 			vim.api.nvim_set_option_value("foldmethod", "expr", {})
 			vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 			require("nvim-treesitter.configs").setup {
-				ensure_installed = {
-					"lua",
-					"python",
-					"c",
-					"cpp",
-					"go",
-					"bash",
-					"markdown",
-					"markdown_inline",
-					"javascript",
-					"typescript",
-					"terraform",
-					"make",
-					"nix",
-					"rust",
-					"query",
-					"regex",
-					"tsx",
-					"vim",
-					"yaml",
-					"llvm",
-					"toml",
-					"proto",
-				},
+				ensure_installed = "all",
 				ignore_install = { "phpdoc", "gitcommit" },
 				indent = { enable = false },
 				highlight = { enable = true },
@@ -795,21 +792,23 @@ return {
 			"NvimTreeFindFileToggle",
 			"NvimTreeRefresh",
 		},
-		init = function()
-			k.nvim_register_mapping {
-				["n|<C-n>"] = k.cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
-			}
-		end,
+		keys = {
+			{
+				"<C-n>",
+				"<cmd>NvimTreeFindFileToggle<cr>",
+				desc = "Toggle file tree",
+			},
+		},
 		opts = {
-			hijack_cursor = true,
-			hijack_unnamed_buffer_when_opening = true,
-			reload_on_bufenter = true,
-			sync_root_with_cwd = true,
 			actions = {
 				open_file = {
 					quit_on_open = true,
 				},
 			},
+			hijack_cursor = true,
+			hijack_unnamed_buffer_when_opening = true,
+			reload_on_bufenter = true,
+			sync_root_with_cwd = true,
 			update_focused_file = { enable = true, update_root = true },
 			git = { ignore = false },
 			filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
