@@ -1,5 +1,525 @@
+local k = require "zox.keybind"
 return {
-	{ "lewis6991/gitsigns.nvim", config = true },
+	{
+		"j-hui/fidget.nvim",
+		lazy = true,
+		event = "LspAttach",
+		config = function()
+			require("fidget").setup {
+				text = { spinner = "dots" },
+				window = { blend = 0 },
+			}
+		end,
+	},
+	{
+		"nvim-lualine/lualine.nvim",
+		lazy = true,
+		event = "LspAttach",
+		config = function()
+			local escape_status = function()
+				local ok, m = pcall(require, "better_escape")
+				return ok and m.waiting and ZoxIcon.MiscSpace.EscapeST or ""
+			end
+
+			local _cache = { context = "", bufnr = -1 }
+			local lspsaga_symbols = function()
+				if
+					vim.api.nvim_win_get_config(0).zindex
+					or vim.tbl_contains({
+						"terminal",
+						"toggleterm",
+						"prompt",
+						"alpha",
+						"dashboard",
+						"NvimTree",
+						"help",
+						"TelescopePrompt",
+					}, vim.bo.filetype)
+				then
+					return "" -- Excluded filetypes
+				else
+					local currbuf = vim.api.nvim_get_current_buf()
+					local ok, lspsaga = pcall(require, "lspsaga.symbolwinbar")
+					if ok and lspsaga:get_winbar() ~= nil then
+						_cache.context = lspsaga:get_winbar()
+						_cache.bufnr = currbuf
+					elseif _cache.bufnr ~= currbuf then
+						_cache.context = "" -- NOTE: Reset [invalid] cache (usually from another buffer)
+					end
+
+					return _cache.context
+				end
+			end
+
+			local diff_source = function()
+				local gitsigns = vim.b.gitsigns_status_dict
+				if gitsigns then
+					return {
+						added = gitsigns.added,
+						modified = gitsigns.changed,
+						removed = gitsigns.removed,
+					}
+				end
+			end
+
+			local get_cwd = function()
+				local cwd = vim.fn.getcwd()
+				if not vim.loop.os_uname().sysname == "Windows_NT" then
+					local home = os.getenv "HOME"
+					if home and cwd:find(home, 1, true) == 1 then
+						cwd = "~" .. cwd:sub(#home + 1)
+					end
+				end
+				return ZoxIcon.UiSpace.RootFolderOpened .. cwd
+			end
+
+			local mini_sections = {
+				lualine_a = { "filetype" },
+				lualine_b = {},
+				lualine_c = {},
+				lualine_x = {},
+				lualine_y = {},
+				lualine_z = {},
+			}
+			local outline = {
+				sections = mini_sections,
+				filetypes = { "lspsagaoutline" },
+			}
+			local diffview = {
+				sections = mini_sections,
+				filetypes = { "DiffviewFiles" },
+			}
+
+			require("lualine").setup {
+				options = {
+					theme = "auto",
+					disabled_filetypes = {
+						statusline = {
+							"alpha",
+							"dashboard",
+							"NvimTree",
+							"prompt",
+							"toggleterm",
+							"terminal",
+							"help",
+							"lspsagaoutine",
+							"_sagaoutline",
+							"DiffviewFiles",
+							"quickfix",
+							"Trouble",
+						},
+					},
+					component_separators = "|",
+					section_separators = { left = "", right = "" },
+					globalstatus = true,
+				},
+				sections = {
+					lualine_a = { "mode" },
+					lualine_b = {},
+					lualine_c = { lspsaga_symbols },
+					lualine_x = { escape_status, get_cwd },
+					lualine_y = {
+						{ "filetype", colored = true, icon_only = true },
+						{ "branch", icons_enabled = true, icon = ZoxIcon.Git.Branch },
+						{ "diff", source = diff_source },
+					},
+					lualine_z = { "progress", "location" },
+				},
+				inactive_sections = {
+					lualine_a = {},
+					lualine_b = {},
+					lualine_c = {},
+					lualine_x = {},
+					lualine_y = {},
+					lualine_z = {},
+				},
+				tabline = {},
+				extensions = {
+					"quickfix",
+					"nvim-tree",
+					"nvim-dap-ui",
+					"toggleterm",
+					"fugitive",
+					outline,
+					diffview,
+				},
+			}
+
+			-- Properly set background color for lspsaga
+			for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind()) do
+				require("zox.utils").extend_hl("LspSagaWinbar" .. hlGroup[1])
+			end
+			require("zox.utils").extend_hl "LspSagaWinbarSep"
+		end,
+	},
+	{
+		"goolord/alpha-nvim",
+		lazy = true,
+		event = "BufWinEnter",
+		cond = function() return #vim.api.nvim_list_uis() > 0 end,
+		config = function()
+			local dashboard = require "alpha.themes.dashboard"
+			dashboard.section.buttons.opts.hl = "String"
+			dashboard.section.buttons.val = {}
+			local gen_footer = function()
+				local stats = require("lazy").stats()
+				local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+				return ZoxIcon.MiscSpace.BentoBox
+					.. "github.com/aarnphm"
+					.. "   v"
+					.. vim.version().major
+					.. "."
+					.. vim.version().minor
+					.. "."
+					.. vim.version().patch
+					.. "   "
+					.. stats.count
+					.. " plugins in "
+					.. ms
+					.. "ms"
+			end
+
+			dashboard.section.footer.opts.hl = "Function"
+			dashboard.section.footer.val = gen_footer()
+
+			local top_button_pad = 2
+			local footer_button_pad = 1
+			local heights = #dashboard.section.header.val
+				+ 2 * #dashboard.section.buttons.val
+				+ top_button_pad
+
+			dashboard.config.layout = {
+				{
+					type = "padding",
+					val = math.max(0, math.ceil((vim.fn.winheight(0) - heights) * 0.25)),
+				},
+				dashboard.section.header,
+				{ type = "padding", val = top_button_pad },
+				dashboard.section.buttons,
+				{ type = "padding", val = footer_button_pad },
+				dashboard.section.footer,
+			}
+
+			require("alpha").setup(dashboard.config)
+
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "LazyVimStarted",
+				callback = function()
+					dashboard.section.footer.val = gen_footer()
+					pcall(vim.cmd.AlphaRedraw)
+				end,
+			})
+		end,
+	},
+	{
+		"nathom/filetype.nvim",
+		event = "BufReadPost",
+		config = function()
+			--- Add custom filet+pe extension
+			require("filetype").setup {
+				overrides = {
+					extension = {
+						conf = "conf",
+						mdx = "markdown",
+						mjml = "html",
+						sh = "bash",
+					},
+					complex = {
+						[".*%.env.*"] = "sh",
+						["ignore$"] = "conf",
+						["yup.lock"] = "yaml",
+						["WORKSPACE"] = "bzl",
+					},
+					shebang = {
+						-- Set the filetype of files with a dash shebang to sh
+						dash = "sh",
+					},
+				},
+			}
+		end,
+	},
+	{
+		"akinsho/nvim-bufferline.lua",
+		lazy = true,
+		branch = "main",
+		event = { "BufReadPost", "BufRead" },
+		config = function()
+			require("bufferline").setup {
+				options = {
+					offsets = {
+						{
+							filetype = "NvimTree",
+							text = "File Explorer",
+							text_align = "center",
+							padding = 1,
+						},
+						{
+							filetype = "undotree",
+							text = "Undo Tree",
+							text_align = "center",
+							highlight = "Directory",
+							separator = true,
+						},
+					},
+				},
+			}
+
+			k.nvim_register_mapping {
+				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
+				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
+				["n|<Leader>."] = k.cr("BufferLineCycleNext")
+					:with_defaults "buffer: Cycle to next buffer",
+				["n|<Leader>,"] = k.cr("BufferLineCyclePrev")
+					:with_defaults "buffer: Cycle to previous buffer",
+				["n|<Leader>1"] = k.cr("BufferLineGoToBuffer 1")
+					:with_defaults "buffer: Goto buffer 1",
+				["n|<Leader>2"] = k.cr("BufferLineGoToBuffer 2")
+					:with_defaults "buffer: Goto buffer 2",
+				["n|<Leader>3"] = k.cr("BufferLineGoToBuffer 3")
+					:with_defaults "buffer: Goto buffer 3",
+				["n|<Leader>4"] = k.cr("BufferLineGoToBuffer 4")
+					:with_defaults "buffer: Goto buffer 4",
+				["n|<Leader>5"] = k.cr("BufferLineGoToBuffer 5")
+					:with_defaults "buffer: Goto buffer 5",
+				["n|<Leader>6"] = k.cr("BufferLineGoToBuffer 6")
+					:with_defaults "buffer: Goto buffer 6",
+				["n|<Leader>7"] = k.cr("BufferLineGoToBuffer 7")
+					:with_defaults "buffer: Goto buffer 7",
+				["n|<Leader>8"] = k.cr("BufferLineGoToBuffer 8")
+					:with_defaults "buffer: Goto buffer 8",
+				["n|<Leader>9"] = k.cr("BufferLineGoToBuffer 9")
+					:with_defaults "buffer: Goto buffer 9",
+			}
+		end,
+	},
+	{
+		"asiryk/auto-hlsearch.nvim",
+		lazy = true,
+		event = "InsertEnter",
+		config = function() require("auto-hlsearch").setup() end,
+	},
+	{
+		"zbirenbaum/neodim",
+		lazy = true,
+		event = "LspAttach",
+		config = function()
+			require("neodim").setup {
+				blend_color = require("zox.utils").hl_to_rgb("Normal", true),
+				update_in_insert = { delay = 100 },
+				hide = {
+					virtual_text = false,
+					signs = false,
+					underline = false,
+				},
+			}
+		end,
+	},
+	{
+		"folke/todo-comments.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		event = "BufRead",
+		config = function()
+			require("todo-comments").setup {}
+
+			k.nvim_register_mapping {
+				["n|<Leader>tqf"] = k.cr("TodoQuickFix")
+					:with_defaults "todo-comments: Open quickfix",
+				["n|]t"] = k.callback(function() require("todo-comments").jump_next() end)
+					:with_defaults "todo-comments: Next",
+				["n|[t"] = k.callback(function() require("todo-comments").jump_prev() end)
+					:with_defaults "todo-comments: Previous",
+				["n|<Leader>tt"] = k.cr("TodoTelescope"):with_defaults "todo-comments: Telescope",
+			}
+		end,
+	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		lazy = true,
+		event = "BufRead",
+		config = function()
+			require("indent_blankline").setup {
+				char = "│",
+				show_first_indent_level = true,
+				filetype_exclude = {
+					"startify",
+					"dashboard",
+					"alpha",
+					"log",
+					"fugitive",
+					"gitcommit",
+					"vimwiki",
+					"markdown",
+					"json",
+					"txt",
+					"vista",
+					"help",
+					"todoist",
+					"NvimTree",
+					"peekaboo",
+					"git",
+					"TelescopePrompt",
+					"undotree",
+					"flutterToolsOutline",
+					"", -- for all buffers without a file type
+				},
+				buftype_exclude = { "terminal", "nofile" },
+				show_trailing_blankline_indent = false,
+				show_current_context = true,
+				context_patterns = {
+					"class",
+					"function",
+					"method",
+					"block",
+					"list_literal",
+					"selector",
+					"^if",
+					"^table",
+					"if_statement",
+					"while",
+					"for",
+					"type",
+					"var",
+					"import",
+				},
+				space_char_blankline = " ",
+			}
+		end,
+	},
+	{
+		"lewis6991/gitsigns.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		config = function()
+			require("gitsigns").setup {
+				numhl = true,
+				---@diagnostic disable-next-line: undefined-global
+				word_diff = false,
+				current_line_blame = false,
+				current_line_blame_opts = { virtual_text_pos = "eol" },
+				diff_opts = { internal = true },
+				on_attach = function(bufnr)
+					k.nvim_register_mapping {
+						["n|]g"] = k.callback(function()
+							if vim.wo.diff then return "]g" end
+							vim.schedule(function() require("gitsigns.actions").next_hunk() end)
+							return "<Ignore>"
+						end)
+							:with_buffer(bufnr)
+							:with_expr()
+							:with_desc "git: Goto next hunk",
+						["n|[g"] = k.callback(function()
+							if vim.wo.diff then return "[g" end
+							vim.schedule(function() require("gitsigns.actions").prev_hunk() end)
+							return "<Ignore>"
+						end)
+							:with_buffer(bufnr)
+							:with_expr()
+							:with_desc "git: Goto prev hunk",
+						["n|<Leader>hs"] = k.callback(
+							function() require("gitsigns.actions").stage_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Stage hunk",
+						["v|<Leader>hs"] = k.callback(
+							function()
+								require("gitsigns.actions").stage_hunk {
+									vim.fn.line ".",
+									vim.fn.line "v",
+								}
+							end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Stage hunk",
+						["n|<Leader>hu"] = k.callback(
+							function() require("gitsigns.actions").undo_stage_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Undo stage hunk",
+						["n|<Leader>hr"] = k.callback(
+							function() require("gitsigns.actions").reset_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Reset hunk",
+						["v|<Leader>hr"] = k.callback(
+							function()
+								require("gitsigns.actions").reset_hunk {
+									vim.fn.line ".",
+									vim.fn.line "v",
+								}
+							end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Reset hunk",
+						["n|<Leader>hR"] = k.callback(
+							function() require("gitsigns.actions").reset_buffer() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Reset buffer",
+						["n|<Leader>hp"] = k.callback(
+							function() require("gitsigns.actions").preview_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Preview hunk",
+						["n|<Leader>hb"] = k.callback(
+							function() require("gitsigns.actions").blame_line { full = true } end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Blame line",
+						["n|<Leader>hbl"] = k.callback(
+							function() require("gitsigns.actions").toggle_current_line_blame() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Toggle current line blame",
+						["n|<Leader>hwd"] = k.callback(
+							function() require("gitsigns.actions").toggle_word_diff() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Toogle word diff",
+						["n|<Leader>hd"] = k.callback(
+							function() require("gitsigns.actions").toggle_deleted() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Toggle deleted diff",
+						-- Text objects
+						["o|ih"] = k.callback(
+							function() require("gitsigns.actions").text_object() end
+						)
+							:with_buffer(bufnr),
+						["x|ih"] = k.callback(
+							function() require("gitsigns.actions").text_object() end
+						)
+							:with_buffer(bufnr),
+					}
+				end,
+			}
+		end,
+	},
+	{
+		"folke/trouble.nvim",
+		lazy = true,
+		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+		config = function()
+			require("trouble").setup {
+				position = "left",
+				mode = "document_diagnostics",
+				auto_close = true,
+			}
+
+			k.nvim_register_mapping {
+				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
+				["n|gR"] = k.cr("TroubleToggle lsp_references")
+					:with_defaults "lsp: Show lsp references",
+				["n|<LocalLeader>td"] = k.cr("TroubleToggle document_diagnostics")
+					:with_defaults "lsp: Show document diagnostics",
+				["n|<LocalLeader>tw"] = k.cr("TroubleToggle workspace_diagnostics")
+					:with_defaults "lsp: Show workspace diagnostics",
+				["n|<LocalLeader>tq"] = k.cr("TroubleToggle quickfix")
+					:with_defaults "lsp: Show quickfix list",
+				["n|<LocalLeader>tl"] = k.cr("TroubleToggle loclist")
+					:with_defaults "lsp: Show loclist",
+			}
+		end,
+	},
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
@@ -23,7 +543,43 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		event = "BufReadPost",
+		dependencies = {
+			{ "nvim-treesitter/nvim-treesitter-textobjects" },
+			{ "romgrk/nvim-treesitter-context" },
+			{ "JoosepAlviste/nvim-ts-context-commentstring" },
+			{
+				"andymass/vim-matchup",
+				event = "BufReadPost",
+				config = function()
+					vim.g.matchup_matchparen_offscreen = { method = "status_manual" }
+				end,
+			},
+			{
+				"NvChad/nvim-colorizer.lua",
+				config = function()
+					require("colorizer").setup {
+						filetypes = { "*", "!lazy" },
+						buftype = { "*", "!prompt", "!nofile" },
+						user_default_options = {
+							RGB = true, -- #RGB hex codes
+							RRGGBB = true, -- #RRGGBB hex codes
+							names = false, -- "Name" codes like Blue
+							RRGGBBAA = true, -- #RRGGBBAA hex codes
+							AARRGGBB = false, -- 0xAARRGGBB hex codes
+							rgb_fn = true, -- CSS rgb() and rgba() functions
+							hsl_fn = true, -- CSS hsl() and hsla() functions
+							css = false, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+							css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+							mode = "background", -- `mode`: foreground, background,  virtualtext
+							virtualtext = "■",
+						},
+					}
+				end,
+			},
+		},
 		config = function()
+			vim.api.nvim_set_option_value("foldmethod", "expr", {})
+			vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
 			require("nvim-treesitter.configs").setup {
 				ensure_installed = {
 					"lua",
@@ -49,63 +605,232 @@ return {
 					"toml",
 					"proto",
 				},
-				ignore_install = { "phpdoc" },
+				ignore_install = { "phpdoc", "gitcommit" },
 				indent = { enable = false },
 				highlight = { enable = true },
+				context_commentstring = { enable = true, enable_autocmd = false },
+				matchup = { enable = true },
+				textobjects = {
+					select = {
+						enable = true,
+						keymaps = {
+							["af"] = "@function.outer",
+							["if"] = "@function.inner",
+							["ac"] = "@class.outer",
+							["ic"] = "@class.inner",
+						},
+					},
+					move = {
+						enable = true,
+						set_jumps = true, -- whether to set jumps in the jumplist
+						goto_next_start = {
+							["]["] = "@function.outer",
+							["]m"] = "@class.outer",
+						},
+						goto_next_end = {
+							["]]"] = "@function.outer",
+							["]M"] = "@class.outer",
+						},
+						goto_previous_start = {
+							["[["] = "@function.outer",
+							["[m"] = "@class.outer",
+						},
+						goto_previous_end = {
+							["[]"] = "@function.outer",
+							["[M"] = "@class.outer",
+						},
+					},
+				},
+			}
+		end,
+	},
+	{
+		"phaazon/hop.nvim",
+		lazy = true,
+		branch = "v2",
+		event = { "CursorHold", "CursorHoldI" },
+		cond = function()
+			return not vim.tbl_contains(
+				{ "nofile", "alpha", "gitcommit", "gitrebase" },
+				vim.bo.filetype
+			)
+		end,
+		config = function()
+			local hop = require "hop"
+
+			hop.setup()
+			-- set f/F to use hop
+			local d = require("hop.hint").HintDirection
+			vim.api.nvim_set_keymap("", "f", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.AFTER_CURSOR,
+						current_line_only = true,
+					}
+				end,
+				desc = "motion: f 1 char",
+			})
+			vim.api.nvim_set_keymap("", "F", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.BEFORE_CURSOR,
+						current_line_only = true,
+					}
+				end,
+				desc = "motion: F 1 char",
+			})
+			vim.api.nvim_set_keymap("", "t", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.AFTER_CURSOR,
+						current_line_only = true,
+						hint_offset = -1,
+					}
+				end,
+				desc = "motion: t 1 char",
+			})
+			vim.api.nvim_set_keymap("", "T", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.BEFORE_CURSOR,
+						current_line_only = true,
+						hint_offset = 1,
+					}
+				end,
+				desc = "motion: T 1 char",
+			})
+
+			k.nvim_register_mapping {
+				["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
+				["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
+				["n|<LocalLeader>k"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
+				["n|<LocalLeader>c"] = k.cu("HopChar1")
+					:with_noremap()
+					:with_desc "jump: Goto one char",
+				["n|<LocalLeader>cc"] = k.cu("HopChar2")
+					:with_noremap()
+					:with_desc "jump: Goto two chars",
 			}
 		end,
 	},
 	{
 		"nvim-telescope/telescope.nvim",
-		dependencies = "nvim-lua/plenary.nvim",
+		dependencies = {
+			{
+				"nvim-tree/nvim-web-devicons",
+				config = function()
+					require("nvim-web-devicons").setup {
+						override = {
+							zsh = {
+								icon = "",
+								color = "#428850",
+								cterm_color = "65",
+								name = "Zsh",
+							},
+						},
+					}
+				end,
+			},
+			{ "nvim-lua/plenary.nvim" },
+			{ "nvim-lua/popup.nvim" },
+		},
 		cmd = "Telescope",
 		keys = {
 			{
 				"<leader>f",
 				"<cmd>Telescope find_files find_command=fd,-t,f,-H,-E,.git,--strip-cwd-prefix theme=dropdown previewer=false<cr>",
-				desc = "Find files",
+				desc = "find: file in project",
 			},
 			{
-				"<leader>/",
+				"<leader>w",
 				"<cmd>Telescope live_grep<cr>",
-				desc = "Find text",
-			},
-			{
-				"<leader>p",
-				"<cmd>Telescope commands theme=dropdown<cr>",
-				desc = "Commands",
+				desc = "find: text",
 			},
 		},
-		config = true,
+		init = function()
+			local command_panel = function()
+				require("telescope.builtin").keymaps {
+					lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+					layout_config = {
+						width = 0.6,
+						height = 0.6,
+						prompt_position = "top",
+					},
+				}
+			end
+
+			k.nvim_register_mapping {
+				["n|<Leader>/"] = k.cu("Telescope grep_string"):with_defaults "find: Current word",
+				["n|<Leader>b"] = k.cu("Telescope buffers"):with_defaults "find: Buffer opened",
+				["n|<Leader>n"] = k.cu("enew"):with_defaults "buffer: New",
+				["n|<C-p>"] = k.callback(command_panel):with_defaults "tools: Show keymap legends",
+			}
+		end,
+		config = function()
+			require("telescope").setup {
+				defaults = {
+					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+					path_display = { "absolute" },
+					mappings = {
+						i = {
+							["<C-a>"] = { "<esc>0i", type = "command" },
+							["<Esc>"] = require("telescope.actions").close,
+						},
+						n = { ["q"] = require("telescope.actions").close },
+					},
+				},
+			}
+		end,
 	},
 	{
-		"kyazdani42/nvim-tree.lua",
-		keys = {
-			{
-				"<C-n>",
-				"<cmd>NvimTreeFindFileToggle<cr>",
-				desc = "Toggle file tree",
-			},
+		"nvim-tree/nvim-tree.lua",
+		cmd = {
+			"NvimTreeToggle",
+			"NvimTreeOpen",
+			"NvimTreeFindFile",
+			"NvimTreeFindFileToggle",
+			"NvimTreeRefresh",
 		},
+		init = function()
+			k.nvim_register_mapping {
+				["n|<C-n>"] = k.cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
+			}
+		end,
 		opts = {
+			hijack_cursor = true,
+			hijack_unnamed_buffer_when_opening = true,
+			reload_on_bufenter = true,
+			sync_root_with_cwd = true,
 			actions = {
 				open_file = {
 					quit_on_open = true,
 				},
 			},
+			update_focused_file = { enable = true, update_root = true },
 			git = { ignore = false },
+			filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 			renderer = {
-				icons = {
-					show = {
-						file = false,
-						folder = false,
-						folder_arrow = false,
-						git = false,
-					},
+				special_files = {
+					"Cargo.toml",
+					"Makefile",
+					"README.md",
+					"readme.md",
+					"CMakeLists.txt",
 				},
+				root_folder_label = ":.:s?.*?/..?",
+				root_folder_modifier = ":e",
+				icons = { symlink_arrow = "  " },
 			},
-			trash = { cmd = "trash" },
+			trash = {
+				cmd = require("zox.utils").get_binary_path "rip",
+				require_confirm = true,
+			},
 			view = {
+				adaptive_size = false,
 				side = "right",
 				mappings = {
 					list = {
@@ -115,5 +840,106 @@ return {
 				},
 			},
 		},
+	},
+	{
+		"nvim-pack/nvim-spectre",
+		lazy = true,
+		build = "./build.sh",
+		config = function()
+			require("spectre").setup {
+				live_update = true,
+				mapping = {
+					["change_replace_sed"] = {
+						map = "<LocalLeader>trs",
+						cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
+						desc = "replace: Using sed",
+					},
+					["change_replace_oxi"] = {
+						map = "<LocalLeader>tro",
+						cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
+						desc = "replace: Using oxi",
+					},
+					["toggle_live_update"] = {
+						map = "<LocalLeader>tu",
+						cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
+						desc = "replace: update live changes",
+					},
+					-- only work if the find_engine following have that option
+					["toggle_ignore_case"] = {
+						map = "<LocalLeader>ti",
+						cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
+						desc = "replace: toggle ignore case",
+					},
+					["toggle_ignore_hidden"] = {
+						map = "<LocalLeader>th",
+						cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
+						desc = "replace: toggle search hidden",
+					},
+				},
+			}
+		end,
+		init = function()
+			k.nvim_register_mapping {
+				["n|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
+					:with_defaults "replace: Open visual replace",
+				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
+					:with_defaults "replace: Open panel",
+				["n|<Leader>sw"] = k.callback(
+					function() require("spectre").open_visual { select_word = true } end
+				):with_defaults "replace: Replace word under cursor",
+				["n|<Leader>sp"] = k.callback(function() require("spectre").open_file_search() end)
+					:with_defaults "replace: Replace word under file search",
+			}
+		end,
+	},
+	{
+		"akinsho/toggleterm.nvim",
+		lazy = true,
+		cmd = {
+			"ToggleTerm",
+			"ToggleTermSetName",
+			"ToggleTermToggleAll",
+			"ToggleTermSendVisualLines",
+			"ToggleTermSendCurrentLine",
+			"ToggleTermSendVisualSelection",
+		},
+		event = { "CursorHold", "CursorHoldI" },
+		config = function()
+			require("toggleterm").setup {
+				-- size can be a number or function which is passed the current terminal
+				size = function(term)
+					if term.direction == "horizontal" then
+						return 15
+					elseif term.direction == "vertical" then
+						return vim.o.columns * 0.40
+					end
+				end,
+				on_open = function()
+					-- Prevent infinite calls from freezing neovim.
+					-- Only set these options specific to this terminal buffer.
+					vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
+					vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
+				end,
+				open_mapping = false,
+				shade_terminals = false,
+				shading_factor = vim.o.background == "dark" and "1" or "3",
+				direction = "horizontal",
+			}
+
+			k.nvim_register_mapping {
+				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
+					:with_defaults "terminal: Toggle horizontal",
+				["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
+					:with_defaults "terminal: Toggle horizontal",
+				["t|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
+					:with_defaults "terminal: Toggle horizontal",
+				["n|<C-t>"] = k.cr([[execute v:count . "ToggleTerm direction=vertical"]])
+					:with_defaults "terminal: Toggle vertical",
+				["i|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
+					:with_defaults "terminal: Toggle vertical",
+				["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
+					:with_defaults "terminal: Toggle vertical",
+			}
+		end,
 	},
 }

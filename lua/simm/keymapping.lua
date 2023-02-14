@@ -1,46 +1,49 @@
-local map = function(mode, lhs, rhs, opts)
-	opts = opts or {}
-	opts.silent = opts.silent == nil and true or opts.silent
-	vim.keymap.set(mode, lhs, rhs, opts)
-end
+local k = require "zox.keybind"
 
+-- map leader to <Space> and localeader to +
 vim.g.mapleader = " "
+vim.g.maplocalleader = "+"
+vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
+vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
 
--- Improved searching.
-map("n", "<esc>", ":noh<cr>", { desc = "Clear search highlights" })
-map("n", "*", "*N", { desc = "Search under cursor" })
-map("v", "*", [[y/\V<c-r>=escape(@",'/\')<cr><cr>N]], { desc = "Search selection" })
-map("n", ";", ":", { noremap = true, desc = "Enter command mode" })
-
--- Move through wrapped lines.
-map({ "n", "v" }, "j", "gj")
-map({ "n", "v" }, "k", "gk")
-
--- Bubble lines.
-map("n", "<c-j>", ":m .+1<cr>==")
-map("n", "<c-k>", ":m .-2<cr>==")
-map("v", "<c-j>", ":m '>+1<cr>gv=gv")
-map("v", "<c-k>", ":m '<-2<cr>gv=gv")
-
--- Keep selection when indenting.
-map("v", "<", "<gv")
-map("v", ">", ">gv")
-
--- Reindent entire file.
-map("n", "=", "mxggVG=`x")
-
--- Substitute current word.
-map("n", "S", ":%s/<c-r><c-w>//g<left><left>", { silent = false })
-
--- Goto helpers.
-map("n", "go", "<c-o>", { desc = "Goto previous position" })
-map("n", "gO", "<c-i>", { desc = "Goto next position" })
-map("n", "gp", "<c-^>", { desc = "Goto previously focused buffer" })
-map({ "n", "v" }, "gm", "%", { desc = "Goto matching pair" })
-
--- Window controls.
-map("n", "<leader>wh", "<c-w>h", { desc = "Focus window to the left" })
-map("n", "<leader>wj", "<c-w>j", { desc = "Focus window below" })
-map("n", "<leader>wk", "<c-w>k", { desc = "Focus window above" })
-map("n", "<leader>wl", "<c-w>l", { desc = "Focus window to the right" })
-map("n", "<leader>wr", "<c-w>r", { desc = "Swap window positions" })
+k.nvim_register_mapping {
+	["n|<S-Tab>"] = k.cr("normal za"):with_defaults "edit: Toggle code fold",
+	-- Insert
+	["i|<C-u>"] = k.cmd("<C-G>u<C-U>"):with_noremap():with_desc "editi: Delete previous block",
+	["i|<C-b>"] = k.cmd("<Left>"):with_noremap():with_desc "editi: Move cursor to left",
+	["i|<C-a>"] = k.cmd("<ESC>^i"):with_noremap():with_desc "editi: Move cursor to line start",
+	-- Visual
+	["v|J"] = k.cmd(":m '>+1<CR>gv=gv"):with_desc "edit: Move this line down",
+	["v|K"] = k.cmd(":m '<-2<CR>gv=gv"):with_desc "edit: Move this line up",
+	["v|<"] = k.cmd("<gv"):with_desc "edit: Decrease indent",
+	["v|>"] = k.cmd(">gv"):with_desc "edit: Increase indent",
+	["n|<C-s>"] = k.cu("write"):with_noremap():with_desc "edit: Save file",
+	["c|W!!"] = k.cmd("execute 'silent! write !sudo tee % >/dev/null' <bar> edit!")
+		:with_desc "editc: Save file using sudo",
+	-- yank to end of line
+	["n|Y"] = k.cmd("y$"):with_desc "edit: Yank text to EOL",
+	["n|D"] = k.cmd("d$"):with_desc "edit: Delete text to EOL",
+	["n|sn"] = k.cmd("nzzzv"):with_noremap():with_desc "edit: Next search result",
+	["n|sN"] = k.cmd("Nzzzv"):with_noremap():with_desc "edit: Prev search result",
+	["n|J"] = k.cmd("mzJ`z"):with_noremap():with_desc "edit: Join next line",
+	["n|<C-h>"] = k.cmd("<C-w>h"):with_noremap():with_desc "window: Focus left",
+	["n|<C-l>"] = k.cmd("<C-w>l"):with_noremap():with_desc "window: Focus right",
+	["n|<C-j>"] = k.cmd("<C-w>j"):with_noremap():with_desc "window: Focus down",
+	["n|<C-k>"] = k.cmd("<C-w>k"):with_noremap():with_desc "window: Focus up",
+	-- remap command key to ;
+	["n|;"] = k.cmd(":"):with_noremap():with_desc "command: Enter command mode",
+	["n|\\"] = k.cmd(":let @/=''<CR>:noh<CR>"):with_noremap():with_desc "edit: clean hightlight",
+	["n|<LocalLeader>]"] = k.cr("vertical resize -10")
+		:with_silent()
+		:with_desc "windows: resize right 10px",
+	["n|<LocalLeader>["] = k.cr("vertical resize +10")
+		:with_silent()
+		:with_desc "windows: resize left 10px",
+	["n|<LocalLeader>-"] = k.cr("resize -5"):with_silent():with_desc "windows: resize down 5px",
+	["n|<LocalLeader>="] = k.cr("resize +5"):with_silent():with_desc "windows: resize up 5px",
+	["n|<LocalLeader>vs"] = k.cu("vsplit"):with_defaults "edit: split window vertically",
+	["n|<LocalLeader>hs"] = k.cu("split"):with_defaults "edit: split window horizontally",
+	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
+		:with_noremap()
+		:with_desc "edit: toggle invisible characters",
+}

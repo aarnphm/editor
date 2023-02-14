@@ -1,5 +1,3 @@
-opinionated and fast neovim config. To run on AWS.
+Fast neovim config with small overhead.
 
-Startup time: 15ms
-
-Supports telescope, treesitter and builtin LSP.
+Startup time: 23ms
