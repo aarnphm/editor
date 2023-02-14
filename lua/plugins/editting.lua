@@ -25,7 +25,7 @@ return {
 	{
 		"nmac427/guess-indent.nvim",
 		lazy = true,
-		event = "BufEnter",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function() require("guess-indent").setup {} end,
 	},
 	{
@@ -46,7 +46,7 @@ return {
 		"ojroques/nvim-bufdel",
 		lazy = true,
 		event = "BufReadPost",
-		init = function()
+		config = function()
 			k.nvim_register_mapping {
 				["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
 			}
@@ -84,8 +84,9 @@ return {
 		"pwntester/octo.nvim",
 		lazy = true,
 		cmd = "Octo",
-		config = function() require("octo").setup { default_remote = { "upstream", "origin" } } end,
-		init = function()
+		event = { "CursorHold", "CursorHoldI" },
+		config = function()
+			require("octo").setup { default_remote = { "upstream", "origin" } }
 			k.nvim_register_mapping {
 				["n|<Leader>o"] = k.args("Octo"):with_defaults "octo: List pull request",
 			}
@@ -94,7 +95,7 @@ return {
 	{
 		"nvim-pack/nvim-spectre",
 		lazy = true,
-		build = "./build.sh",
+		build = "./build.sh nvim_oxi",
 		config = function()
 			require("spectre").setup {
 				live_update = true,
@@ -146,8 +147,10 @@ return {
 	},
 	{
 		"junegunn/vim-easy-align",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
 		cmd = "EasyAlign",
-		init = function()
+		config = function()
 			k.nvim_register_mapping {
 				["n|gea"] = k.callback(function() return k.replace_termcodes "<Plug>(EasyAlign)" end)
 					:with_expr()
@@ -160,8 +163,9 @@ return {
 	},
 	{
 		"tpope/vim-fugitive",
+		lazy = false,
 		command = { "Git", "G", "Ggrep", "GBrowse" },
-		init = function()
+		config = function()
 			k.nvim_register_mapping {
 				["n|<LocalLeader>G"] = k.cr("G"):with_defaults "git: Open git-fugitive",
 				["n|<LocalLeader>gaa"] = k.cr("G add ."):with_defaults "git: Add all files",
@@ -201,6 +205,7 @@ return {
 		"cshuaimin/ssr.nvim",
 		lazy = true,
 		module = "ssr",
+		event = { "CursorHold", "CursorHoldI" },
 		-- Calling setup is optional.
 		config = function()
 			require("ssr").setup {
@@ -216,8 +221,6 @@ return {
 					replace_all = "<leader><cr>",
 				},
 			}
-		end,
-		init = function()
 			k.nvim_register_mapping {
 				["n|<LocalLeader>sr"] = k.callback(function() require("ssr").open() end)
 					:with_defaults "edit: search and replace",
@@ -287,8 +290,7 @@ return {
 				shading_factor = vim.o.background == "dark" and "1" or "3",
 				direction = "horizontal",
 			}
-		end,
-		init = function()
+
 			local program_term = function(name, opts)
 				opts = opts or {}
 				local path = require("utils").get_binary_path(name)
@@ -366,8 +368,7 @@ return {
 				},
 				use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
 			}
-		end,
-		init = function()
+
 			k.nvim_register_mapping {
 				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
 				["n|gR"] = k.cr("TroubleToggle lsp_references"):with_defaults "lsp: Show lsp references",
@@ -385,64 +386,62 @@ return {
 		lazy = true,
 		branch = "v2",
 		event = { "CursorHold", "CursorHoldI" },
-		config = function() require("hop").setup() end,
 		cond = function() return not vim.tbl_contains({ "nofile", "alpha", "gitcommit", "gitrebase" }, vim.bo.filetype) end,
-		init = function()
-			if not vim.tbl_contains(require("editor").global.exclude_ft, vim.bo.filetype) then
-				-- set f/F to use hop
-				local hop = require "hop"
-				local d = require("hop.hint").HintDirection
-				vim.api.nvim_set_keymap("", "f", "", {
-					noremap = false,
-					callback = function()
-						hop.hint_char1 {
-							direction = d.AFTER_CURSOR,
-							current_line_only = true,
-						}
-					end,
-					desc = "motion: f 1 char",
-				})
-				vim.api.nvim_set_keymap("", "F", "", {
-					noremap = false,
-					callback = function()
-						hop.hint_char1 {
-							direction = d.BEFORE_CURSOR,
-							current_line_only = true,
-						}
-					end,
-					desc = "motion: F 1 char",
-				})
-				vim.api.nvim_set_keymap("", "t", "", {
-					noremap = false,
-					callback = function()
-						hop.hint_char1 {
-							direction = d.AFTER_CURSOR,
-							current_line_only = true,
-							hint_offset = -1,
-						}
-					end,
-					desc = "motion: t 1 char",
-				})
-				vim.api.nvim_set_keymap("", "T", "", {
-					noremap = false,
-					callback = function()
-						hop.hint_char1 {
-							direction = d.BEFORE_CURSOR,
-							current_line_only = true,
-							hint_offset = 1,
-						}
-					end,
-					desc = "motion: T 1 char",
-				})
+		config = function()
+			require("hop").setup()
+			-- set f/F to use hop
+			local hop = require "hop"
+			local d = require("hop.hint").HintDirection
+			vim.api.nvim_set_keymap("", "f", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.AFTER_CURSOR,
+						current_line_only = true,
+					}
+				end,
+				desc = "motion: f 1 char",
+			})
+			vim.api.nvim_set_keymap("", "F", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.BEFORE_CURSOR,
+						current_line_only = true,
+					}
+				end,
+				desc = "motion: F 1 char",
+			})
+			vim.api.nvim_set_keymap("", "t", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.AFTER_CURSOR,
+						current_line_only = true,
+						hint_offset = -1,
+					}
+				end,
+				desc = "motion: t 1 char",
+			})
+			vim.api.nvim_set_keymap("", "T", "", {
+				noremap = false,
+				callback = function()
+					hop.hint_char1 {
+						direction = d.BEFORE_CURSOR,
+						current_line_only = true,
+						hint_offset = 1,
+					}
+				end,
+				desc = "motion: T 1 char",
+			})
 
-				k.nvim_register_mapping {
-					["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
-					["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-					["n|<LocalLeader>k"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-					["n|<LocalLeader>c"] = k.cu("HopChar1"):with_noremap():with_desc "jump: Goto one char",
-					["n|<LocalLeader>cc"] = k.cu("HopChar2"):with_noremap():with_desc "jump: Goto two chars",
-				}
-			end
+			k.nvim_register_mapping {
+				["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
+				["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
+				["n|<LocalLeader>k"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
+				["n|<LocalLeader>c"] = k.cu("HopChar1"):with_noremap():with_desc "jump: Goto one char",
+				["n|<LocalLeader>cc"] = k.cu("HopChar2"):with_noremap():with_desc "jump: Goto two chars",
+			}
 		end,
 	},
 	{
@@ -516,8 +515,7 @@ return {
 			require("Comment").setup {
 				pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
 			}
-		end,
-		init = function()
+
 			k.nvim_register_mapping {
 				["n|gcc"] = k.callback(
 					function()

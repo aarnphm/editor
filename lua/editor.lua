@@ -7,6 +7,7 @@ local vim_path = vim.fn.stdpath "config"
 local path_sep = is_windows and "\\" or "/"
 local home = is_windows and os.getenv "USERPROFILE" or os.getenv "HOME"
 local local_config_path = home .. path_sep .. ".editor.lua"
+local config_dir = vim_path .. path_sep .. "lua"
 
 ---@class Editor: table<str, any>
 ---@field debug boolean: Enable debug mode
@@ -29,8 +30,9 @@ return {
 		vim_path = vim_path,
 		path_sep = path_sep,
 		home = home,
+		config_dir = config_dir,
+		zox = config_dir .. path_sep .. "zox",
 		data_dir = vim.fn.stdpath "data",
-		config_dir = vim.fn.stdpath "config" .. path_sep .. "lua",
 		cache_dir = vim.fn.stdpath "cache" .. path_sep,
 		local_config_path = local_config_path,
 		mason_dir = vim.fn.stdpath "data" .. path_sep .. "mason",

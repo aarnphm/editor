@@ -7,7 +7,7 @@ local icons = {
 }
 local e = require "editor"
 
-local lazy_path = e.global.data_dir .. "lazy" .. e.global.path_sep .. "lazy.nvim"
+local lazy_path = e.global.data_dir .. e.global.path_sep .. "lazy" .. e.global.path_sep .. "lazy.nvim"
 
 if not vim.loop.fs_stat(lazy_path) then
 	vim.api.nvim_command(

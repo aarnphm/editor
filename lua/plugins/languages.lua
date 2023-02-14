@@ -1,4 +1,5 @@
 local k = require "keybind"
+local e = require "editor"
 local icons = {
 	diagnostics = require("icons").get("diagnostics", true),
 	git = require("icons").get("git", true),
@@ -9,6 +10,15 @@ local icons = {
 	cmp = require("icons").get "cmp",
 	type = require("icons").get "type",
 }
+
+---@param path string path to given directory containing lua files.
+---@return string[] list of files in given directory
+local available = function(path)
+	return require("utils").map(
+		vim.split(vim.fn.glob(path .. "/*.lua"), "\n"),
+		function(_) return _:sub(#path + 2, -5) end
+	)
+end
 
 return {
 	-- NOTE: Language-specific plugins
@@ -21,7 +31,7 @@ return {
 		dependencies = { "google/vim-maktaba" },
 		cmd = { "Bazel" },
 		ft = "bzl",
-		init = function()
+		config = function()
 			k.nvim_register_mapping {
 				["n|<LocalLeader>bb"] = k.args("Bazel build"):with_defaults "bazel: build",
 				["n|<LocalLeader>bc"] = k.args("Bazel clean"):with_defaults "bazel: clean",
@@ -48,7 +58,7 @@ return {
 		ft = "markdown",
 		run = "cd app && yarn install",
 		build = "cd app && yarn install",
-		init = function()
+		config = function()
 			k.nvim_register_mapping {
 				["n|mpt"] = k.cr("MarkdownPreviewToggle"):with_defaults "markdown: preview",
 			}
@@ -152,43 +162,31 @@ return {
 				},
 				null_ls = { enabled = true, name = "crates.nvim" },
 			}
-		end,
-		init = function()
-			if vim.fn.expand "%:t" == "Cargo.toml" then
-				k.nvim_register_mapping {
-					["n|<Leader>ct"] = k.callback(require("crates").toggle)
-						:with_buffer(0)
-						:with_defaults "crates: Toggle",
-					["n|<Leader>cr"] = k.callback(require("crates").reload)
-						:with_buffer(0)
-						:with_defaults "crates: reload",
-					["n|<Leader>cv"] = k.callback(require("crates").show_versions_popup)
-						:with_defaults "crates: show versions popup",
-					["n|<Leader>cf"] = k.callback(require("crates").show_features_popup)
-						:with_defaults "crates: show features popup",
-					["n|<Leader>cd"] = k.callback(require("crates").show_dependencies_popup)
-						:with_defaults "crates: show dependencies popup",
-					["n|<Leader>cu"] = k.callback(require("crates").update_crate):with_defaults "crates: update crate",
-					["v|<Leader>cu"] = k.callback(require("crates").update_crates)
-						:with_defaults "crates: update crates",
-					["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
-						:with_defaults "crates: update all crates",
-					["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate)
-						:with_defaults "crates: upgrade crate",
-					["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates)
-						:with_defaults "crates: upgrade crates",
-					["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
-						:with_defaults "crates: upgrade all crates",
-					["n|<Leader>cH"] = k.callback(require("crates").open_homepage)
-						:with_defaults "crates: show homepage",
-					["n|<Leader>cR"] = k.callback(require("crates").open_repository)
-						:with_defaults "crates: show repository",
-					["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
-						:with_defaults "crates: show documentation",
-					["n|<Leader>cC"] = k.callback(require("crates").open_crates_io)
-						:with_defaults "crates: open crates.io",
-				}
-			end
+
+			k.nvim_register_mapping {
+				["n|<Leader>ct"] = k.callback(require("crates").toggle):with_buffer(0):with_defaults "crates: Toggle",
+				["n|<Leader>cr"] = k.callback(require("crates").reload):with_buffer(0):with_defaults "crates: reload",
+				["n|<Leader>cv"] = k.callback(require("crates").show_versions_popup)
+					:with_defaults "crates: show versions popup",
+				["n|<Leader>cf"] = k.callback(require("crates").show_features_popup)
+					:with_defaults "crates: show features popup",
+				["n|<Leader>cd"] = k.callback(require("crates").show_dependencies_popup)
+					:with_defaults "crates: show dependencies popup",
+				["n|<Leader>cu"] = k.callback(require("crates").update_crate):with_defaults "crates: update crate",
+				["v|<Leader>cu"] = k.callback(require("crates").update_crates):with_defaults "crates: update crates",
+				["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
+					:with_defaults "crates: update all crates",
+				["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate):with_defaults "crates: upgrade crate",
+				["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates):with_defaults "crates: upgrade crates",
+				["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
+					:with_defaults "crates: upgrade all crates",
+				["n|<Leader>cH"] = k.callback(require("crates").open_homepage):with_defaults "crates: show homepage",
+				["n|<Leader>cR"] = k.callback(require("crates").open_repository)
+					:with_defaults "crates: show repository",
+				["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
+					:with_defaults "crates: show documentation",
+				["n|<Leader>cC"] = k.callback(require("crates").open_crates_io):with_defaults "crates: open crates.io",
+			}
 		end,
 	},
 
@@ -206,9 +204,11 @@ return {
 			"DapStepOut",
 			"DapTerminate",
 		},
+		events = "VeryLazy",
 		dependencies = {
 			{
 				"rcarriga/nvim-dap-ui",
+				events = "VeryLazy",
 				config = function()
 					require("dapui").setup {
 						icons = {
@@ -267,13 +267,10 @@ return {
 
 			-- Config lang adaptors
 			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
-				local ok, _ = pcall(require, string.format("plugins.zox.adapters.%s", dbg))
-				if not ok then
+				if not require("zox").adapters[dbg] then
 					vim.notify_once("Failed to load " .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
 				end
 			end
-		end,
-		init = function()
 			k.nvim_register_mapping {
 				["n|<F6>"] = k.callback(function() require("dap").continue() end):with_defaults "debug: Run/Continue",
 				["n|<F7>"] = k.callback(function()
@@ -306,7 +303,7 @@ return {
 			{
 				"simrat39/inlay-hints.nvim",
 				lazy = true,
-				event = { "BufReadPost" },
+				event = { "CursorHold", "CursorHoldI" },
 				config = function()
 					require("inlay-hints").setup {
 						-- {dynamic | eol | virtline }
@@ -366,8 +363,7 @@ return {
 						},
 						callhierarchy = { show_detail = true },
 					}
-				end,
-				init = function()
+
 					k.nvim_register_mapping {
 						["n|<LocalLeader>ci"] = k.cr("Lspsaga incoming_calls"):with_defaults "lsp: Show incoming calls",
 						["n|<LocalLeader>co"] = k.cr("Lspsaga outgoing_calls"):with_defaults "lsp: Show outgoing calls",
@@ -404,19 +400,7 @@ return {
 			require("lspconfig.ui.windows").default_options.border = "single"
 
 			-- Configuring native diagnostics
-			vim.diagnostic.config {
-				virtual_text = true,
-				signs = true,
-				update_in_insert = true,
-				underline = false,
-				severity_sort = false,
-				float = {
-					border = "rounded",
-					source = "always",
-					header = "",
-					prefix = "",
-				},
-			}
+			vim.diagnostic.config { virtual_text = false }
 
 			mason.setup {
 				ui = {
@@ -477,6 +461,7 @@ return {
 						extra_filetypes = { "jsonc", "astro", "svelte" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
+					f.clang_format,
 					f.black,
 					f.ruff,
 					f.isort,
@@ -495,10 +480,14 @@ return {
 					},
 
 					-- NOTE: diagnostics
+					d.clang_check,
+					d.cppcheck,
 					d.eslint_d,
 					d.ruff,
+					d.checkmake,
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
+					d.golangci_lint,
 					d.markdownlint.with { extra_args = { "--disable MD033" } },
 					d.zsh,
 					d.buf,
@@ -556,8 +545,6 @@ return {
 						return 0
 					end,
 					hint_enable = false,
-					toggle_key = "<Leader>a",
-					select_signature_key = "<LocalLeader>a",
 					hi_parameter = "Search",
 					handler_opts = { border = "rounded" },
 				}, bufnr)
@@ -576,23 +563,32 @@ return {
 						on_attach(client, bufnr)
 					end
 				end
-
 				return function()
-					local healthy, lspconfig = pcall(require, ("plugins.zox.servers.%s"):format(lsp_name))
-					if healthy then
+					if not vim.tbl_contains(available(e.global.zox .. e.global.path_sep .. "servers"), lsp_name) then
+						vim.notify_once(
+							string.format("Failed to find config for '%s' under zox/servers.", lsp_name),
+							vim.log.levels.ERROR,
+							{ title = "zox" }
+						)
+						return
+					end
+					local lspconfig = require("zox").servers[lsp_name]
+					if type(lspconfig) == "table" then
 						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
+					elseif type(lspconfig) == "function" then
+						--- This is the case where the language server has its own setup
+						--- e.g. clangd_extensions, lua_ls, rust_analyzer
+						lspconfig(options)
 					else
-						if require("editor").config.debug then
-							vim.notify(
-								(
-									"LSP config %s does not exists. Using default setup. If "
-									.. "you wish to add configuration, make sure it is available "
-									.. "under modules/languages/servers/%s.lua."
-								):format(lsp_name, lsp_name),
-								vim.log.levels.INFO,
-								{ title = "nvim-lspconfig" }
-							)
-						end
+						vim.notify(
+							(
+								"Failed to setup '%s'. Server defined under "
+								.. "zox/servers must returns either a function(opts) or a table."
+								.. " Got type '%s' instead."
+							):format(lsp_name, type(lspconfig)),
+							vim.log.levels.ERROR,
+							{ title = "nvim-lspconfig" }
+						)
 					end
 				end
 			end
@@ -604,19 +600,8 @@ return {
 						on_attach = options.on_attach,
 					}
 				end,
-
 				-- TODO: support starlark-rust for bazel
-				-- NOTE: Let clangd_extensions setup clangd
-				clangd = function()
-					capabilities.offsetEncoding = { "utf-16", "utf-8" }
-					require("clangd_extensions").setup {
-						server = vim.tbl_deep_extend("keep", require "plugins.zox.servers.clangd", {
-							on_attach = options.on_attach,
-							capabilities = capabilities,
-						}),
-						extensions = { other_hints_prefix = ":: ", show_parameter_hints = false },
-					}
-				end,
+				clangd = lsp_callback "clangd",
 				rust_analyzer = lsp_callback "rust_analyzer",
 				html = lsp_callback "html",
 				marksman = lsp_callback "marksman",

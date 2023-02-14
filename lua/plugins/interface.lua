@@ -79,8 +79,9 @@ return {
 		"folke/todo-comments.nvim",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		event = "BufRead",
-		config = function() require("todo-comments").setup {} end,
-		init = function()
+		config = function()
+			require("todo-comments").setup {}
+
 			k.nvim_register_mapping {
 				["n|<Leader>tqf"] = k.cr("TodoQuickFix"):with_defaults "todo-comments: Open quickfix",
 				["n|]t"] = k.callback(function() require("todo-comments").jump_next() end)
@@ -743,8 +744,7 @@ return {
 					},
 				},
 			}
-		end,
-		init = function()
+
 			k.nvim_register_mapping {
 				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
 				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",

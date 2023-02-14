@@ -151,4 +151,16 @@ M.check_backspace = function()
 	return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
 end
 
+--- Map a function over a table
+---@param tbl table<string, any>
+---@param func fun(v: any): any
+---@return table<string, any> a new table
+M.map = function(tbl, func)
+	local newtbl = {}
+	for i, v in pairs(tbl) do
+		newtbl[i] = func(v)
+	end
+	return newtbl
+end
+
 return M
