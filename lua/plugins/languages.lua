@@ -15,6 +15,15 @@ return {
 	-- NOTE: Language-specific plugins
 	{ "chrisbra/csv.vim", lazy = true, ft = "csv" },
 	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
+	{
+		"rafcamlet/nvim-luapad",
+		lazy = true,
+		ft = "lua",
+		cmd = { "Luapad", "LuaRun" },
+		config = function()
+			require("luapad").setup { count_limit = 150000, eval_on_move = true, error_highlight = "WarningMsg" }
+		end,
+	},
 	{ "Stormherz/tablify", lazy = true, ft = "rst" },
 	{
 		"bazelbuild/vim-bazel",
@@ -334,6 +343,7 @@ return {
 						lightbulb = { enable = false },
 						diagnostic = { keys = { exec_action = "<CR>" } },
 						definition = { split = "<C-c>s" },
+						beacon = { enable = false },
 						outline = {
 							win_with = "lsagaoutline",
 							win_width = math.floor(vim.o.columns * 0.2),
@@ -365,7 +375,7 @@ return {
 					h("SagaNormal", { bg = p.surface })
 					h("SagaExpand", { fg = p.love })
 					h("SagaCollapse", { fg = p.love })
-					h("SagaBeacon", { fg = p.text })
+					h("SagaBeacon", { fg = p.base })
 					h("ActionPreviewTitle", { fg = p.rose, bold = true })
 					h("CodeActionText", { fg = p.foam })
 					h("CodeActionNumber", { fg = p.foam })
@@ -414,6 +424,15 @@ return {
 			},
 		},
 		config = function()
+			-- Configuring native diagnostics
+			vim.diagnostic.config {
+				virtual_text = false,
+				signs = true,
+				underline = true,
+				update_in_insert = true,
+				severity_sort = false,
+			}
+
 			local nvim_lsp = require "lspconfig"
 			local mason = require "mason"
 
@@ -502,7 +521,6 @@ return {
 					d.cppcheck,
 					d.eslint_d,
 					d.ruff,
-					d.checkmake,
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
 					d.golangci_lint,
@@ -644,7 +662,6 @@ return {
 			{ "saadparwaiz1/cmp_luasnip" },
 			{ "hrsh7th/cmp-nvim-lsp" },
 			{ "hrsh7th/cmp-path" },
-			{ "hrsh7th/cmp-buffer" },
 			{ "ray-x/cmp-treesitter" },
 			{
 				"zbirenbaum/copilot.lua",
@@ -775,9 +792,8 @@ return {
 				sources = {
 					{ name = "path" },
 					{ name = "nvim_lsp", keyword_length = 3 },
-					{ name = "buffer", keyword_length = 3 },
-					{ name = "luasnip", keyword_length = 2 },
 					{ name = "treesitter" },
+					{ name = "luasnip", keyword_length = 2 },
 				},
 			}
 		end,

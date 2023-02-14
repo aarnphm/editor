@@ -6,7 +6,6 @@ local is_windows = os_name == "Windows_NT"
 local separator = is_windows and "\\" or "/"
 local home = is_windows and os.getenv "USERPROFILE" or os.getenv "HOME"
 
-local __cached_config = nil
 
 local M = { adapters = {}, servers = {} }
 
@@ -28,7 +27,9 @@ for package, table in pairs(M) do
 	})
 end
 
-local configure = function()
+_G.__cached_config = nil
+
+M.configure = function()
 	if __cached_config then return __cached_config end
 
 	local local_config_path = home .. separator .. ".editor.lua"
@@ -92,14 +93,6 @@ local configure = function()
 	for package, table in pairs(__cached_config) do
 		rawset(M, package, table)
 	end
-end
-
-M.setup = function()
-	configure()
-
-	require "zox.options"
-	require "zox.mappings"
-	require "zox.events"
 end
 
 return setmetatable(M, {

@@ -228,3 +228,9 @@ icons = {
 	Dap = data.dap,
 	DapSpace = setmetatable({}, { __index = function(_, key) return data.dap[key] .. " " end }),
 }
+
+---@class ToogleTermCmd toggleterm command cache object
+---@field lazygit Terminal | nil
+---@field btop Terminal | nil
+---@field ipython Terminal | nil
+__cached_cmd = { lazygit = nil, btop = nil, ipython = nil }

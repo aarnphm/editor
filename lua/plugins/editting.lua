@@ -1,12 +1,3 @@
-local k = require "keybind"
-local zox = require "zox"
-
----@class ToogleTermCmd toggleterm command cache object
----@field lazygit Terminal | nil
----@field btop Terminal | nil
----@field ipython Terminal | nil
-local cmd = { lazygit = nil, btop = nil, ipython = nil }
-
 return {
 	{ "jghauser/mkdir.nvim" },
 	{ "dstein64/vim-startuptime", lazy = true, cmd = "StartupTime" },
@@ -25,7 +16,7 @@ return {
 	{
 		"folke/which-key.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("which-key").setup {
 				plugins = {
@@ -41,6 +32,7 @@ return {
 		lazy = true,
 		event = "BufReadPost",
 		config = function()
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
 			}
@@ -54,7 +46,7 @@ return {
 	},
 	{
 		"stevearc/dressing.nvim",
-		event = "VeryLazy",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("dressing").setup {
 				input = {
@@ -70,8 +62,6 @@ return {
 	},
 	{
 		"kylechui/nvim-surround",
-		lazy = true,
-		event = "InsertEnter",
 		config = function() require("nvim-surround").setup() end,
 	},
 	{
@@ -80,7 +70,10 @@ return {
 		cmd = "Octo",
 		event = { "CursorHold", "CursorHoldI" },
 		config = function()
+			local k = require "keybind"
+
 			require("octo").setup { default_remote = { "upstream", "origin" } }
+
 			k.nvim_register_mapping {
 				["n|<Leader>o"] = k.args("Octo"):with_defaults "octo: List pull request",
 			}
@@ -89,12 +82,12 @@ return {
 	{
 		"nvim-pack/nvim-spectre",
 		lazy = true,
-		build = "./build.sh nvim_oxi",
+		build = "./build.sh",
 		config = function()
 			require("spectre").setup {
 				live_update = true,
 				default = {
-					replace = { cmd = not zox.is_mac and "oxi" or "sed" },
+					replace = { cmd = not require("zox").is_mac and "oxi" or "sed" },
 				},
 				mapping = {
 					["change_replace_sed"] = {
@@ -127,6 +120,7 @@ return {
 			}
 		end,
 		init = function()
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
@@ -145,6 +139,7 @@ return {
 		event = { "CursorHold", "CursorHoldI" },
 		cmd = "EasyAlign",
 		config = function()
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|gea"] = k.callback(function() return k.replace_termcodes "<Plug>(EasyAlign)" end)
 					:with_expr()
@@ -157,9 +152,11 @@ return {
 	},
 	{
 		"tpope/vim-fugitive",
-		lazy = false,
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
 		command = { "Git", "G", "Ggrep", "GBrowse" },
 		config = function()
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<LocalLeader>G"] = k.cr("G"):with_defaults "git: Open git-fugitive",
 				["n|<LocalLeader>gaa"] = k.cr("G add ."):with_defaults "git: Add all files",
@@ -172,9 +169,12 @@ return {
 	{
 		"sindrets/diffview.nvim",
 		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
 		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
 		init = function()
+			local k = require "keybind"
+
 			k.nvim_register_mapping {
 				["n|<LocalLeader>D"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
 				["n|<LocalLeader><LocalLeader>D"] = k.cr("DiffviewClose"):with_defaults "git: Close diff view",
@@ -215,6 +215,7 @@ return {
 					replace_all = "<leader><cr>",
 				},
 			}
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<LocalLeader>sr"] = k.callback(function() require("ssr").open() end)
 					:with_defaults "edit: search and replace",
@@ -250,7 +251,7 @@ return {
 				},
 			}
 		end,
-		cond = zox.load_big_files_faster,
+		cond = require("zox").load_big_files_faster,
 	},
 	{
 		"akinsho/toggleterm.nvim",
@@ -263,7 +264,7 @@ return {
 			"ToggleTermSendCurrentLine",
 			"ToggleTermSendVisualSelection",
 		},
-		event = "BufReadPost",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("toggleterm").setup {
 				-- size can be a number or function which is passed the current terminal
@@ -291,8 +292,8 @@ return {
 				local path = require("utils").get_binary_path(name)
 
 				if path then
-					if not cmd[name] then
-						cmd[name] = require("toggleterm.terminal").Terminal:new(vim.tbl_extend("keep", opts, {
+					if not __cached_cmd[name] then
+						__cached_cmd[name] = require("toggleterm.terminal").Terminal:new(vim.tbl_extend("keep", opts, {
 							cmd = path,
 							hidden = true,
 							direction = "float",
@@ -310,7 +311,7 @@ return {
 							end,
 						}))
 					end
-					cmd[name]:toggle()
+					__cached_cmd[name]:toggle()
 				else
 					vim.notify(
 						string.format("'%s' not found!. Make sure to include it in PATH.", name),
@@ -319,6 +320,8 @@ return {
 					)
 				end
 			end
+
+			local k = require "keybind"
 
 			k.nvim_register_mapping {
 				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
@@ -364,6 +367,7 @@ return {
 				use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
 			}
 
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
 				["n|gR"] = k.cr("TroubleToggle lsp_references"):with_defaults "lsp: Show lsp references",
@@ -430,6 +434,7 @@ return {
 				desc = "motion: T 1 char",
 			})
 
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
 				["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
@@ -511,6 +516,7 @@ return {
 				pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
 			}
 
+			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|gcc"] = k.callback(
 					function()
@@ -541,7 +547,6 @@ return {
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
-		lazy = true,
 		build = function()
 			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
 		end,
@@ -680,7 +685,7 @@ return {
 			},
 		},
 		config = function()
-			require("telescope").setup(vim.tbl_deep_extend("keep", zox.plugins.telescope, {
+			require("telescope").setup(vim.tbl_deep_extend("keep", require("zox").plugins.telescope, {
 				defaults = {
 					prompt_prefix = " " .. icons.UiSpace.Telescope .. " ",
 					selection_caret = icons.UiSpace.DoubleSeparator,
@@ -770,6 +775,8 @@ return {
 					},
 				}
 			end
+
+			local k = require "keybind"
 
 			k.nvim_register_mapping {
 				["n|<Leader>w"] = k.callback(

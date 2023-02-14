@@ -1,33 +1,6 @@
 --- requires some globals
 require "zox.globals"
 
---- Add custom filet+pe extension
-vim.filetype.add {
-	extension = {
-		conf = "conf",
-		mdx = "markdown",
-		mjml = "html",
-		sh = "bash",
-	},
-	pattern = {
-		[".*%.env.*"] = "sh",
-		["ignore$"] = "conf",
-	},
-	filename = {
-		["yup.lock"] = "yaml",
-		["WORKSPACE"] = "bzl",
-	},
-}
-
--- Configuring native diagnostics
-vim.diagnostic.config {
-	virtual_text = true,
-	signs = true,
-	underline = true,
-	update_in_insert = true,
-	severity_sort = false,
-}
-
 -- map leader to <Space> and localeader to +
 vim.g.mapleader = " "
 vim.g.maplocalleader = "+"
@@ -50,16 +23,17 @@ if not vim.g.vscode then
 
 	package.path = package.path .. ";" .. vim.fn.stdpath "config" .. "/lua/zox/?.lua"
 
-	require("zox").setup()
+	require("zox").configure()
+	require "options"
+	require "mappings"
+	require "events"
 
 	require("lazy").setup("plugins", {
 		defaults = { lazy = true },
 		install = { colorscheme = { "un" } },
 		change_detection = { notify = false },
 		checker = { enabled = true, notify = false },
-		dev = {
-			path = vim.NIL ~= vim.fn.getenv "WORKSPACE" and vim.env.WORKSPACE .. "/neovim-plugins/" or "~/",
-		},
+		dev = { path = vim.NIL ~= vim.fn.getenv "WORKSPACE" and vim.env.WORKSPACE .. "/neovim-plugins/" or "~/" },
 		performance = {
 			rtp = {
 				disabled_plugins = {
@@ -72,6 +46,7 @@ if not vim.g.vscode then
 					"tohtml",
 					"tutor",
 					"zipPlugin",
+					"editorconfig",
 				},
 			},
 		},

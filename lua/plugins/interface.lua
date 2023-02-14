@@ -2,7 +2,33 @@ local k = require "keybind"
 local z = require "zox"
 
 return {
-	{ "nathom/filetype.nvim", lazy = false },
+	{
+		"nathom/filetype.nvim",
+		event = "BufReadPost",
+		config = function()
+			--- Add custom filet+pe extension
+			require("filetype").setup {
+				overrides = {
+					extension = {
+						conf = "conf",
+						mdx = "markdown",
+						mjml = "html",
+						sh = "bash",
+					},
+					complex = {
+						[".*%.env.*"] = "sh",
+						["ignore$"] = "conf",
+						["yup.lock"] = "yaml",
+						["WORKSPACE"] = "bzl",
+					},
+					shebang = {
+						-- Set the filetype of files with a dash shebang to sh
+						dash = "sh",
+					},
+				},
+			}
+		end,
+	},
 	{
 		"j-hui/fidget.nvim",
 		lazy = true,
@@ -17,7 +43,7 @@ return {
 	{
 		"rcarriga/nvim-notify",
 		lazy = true,
-		event = "VeryLazy",
+		event = "LspAttach",
 		cond = function()
 			if #vim.api.nvim_list_uis() ~= 0 then
 				return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
@@ -428,7 +454,7 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = "LspAttach",
 		config = function()
 			local escape_status = function()
 				local ok, m = pcall(require, "better_escape")
