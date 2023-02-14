@@ -1,17 +1,11 @@
 local k = require "keybind"
+local zox = require "zox"
 
 ---@class ToogleTermCmd toggleterm command cache object
 ---@field lazygit Terminal | nil
 ---@field btop Terminal | nil
 ---@field ipython Terminal | nil
 local cmd = { lazygit = nil, btop = nil, ipython = nil }
-local icons = {
-	ui = require("icons").get "ui",
-	ui_space = require("icons").get("ui", true),
-	misc = require("icons").get "misc",
-	diagnostics = require("icons").get "diagnostics",
-	dap = require("icons").get "dap",
-}
 
 return {
 	{ "jghauser/mkdir.nvim" },
@@ -37,7 +31,7 @@ return {
 				plugins = {
 					presets = { operators = false, motions = false, text_objects = false, windows = false, nav = false },
 				},
-				icons = { breadcrumb = icons.ui.Separator, separator = icons.misc.Vbar, group = icons.misc.Add },
+				icons = { breadcrumb = icons.Ui.Separator, separator = icons.Misc.Vbar, group = icons.Misc.Add },
 				disable = { filetypes = { "help", "lspsagaoutine", "_sagaoutline" } },
 			}
 		end,
@@ -100,7 +94,7 @@ return {
 			require("spectre").setup {
 				live_update = true,
 				default = {
-					replace = { cmd = not zox.global.is_mac and "oxi" or "sed" },
+					replace = { cmd = not zox.is_mac and "oxi" or "sed" },
 				},
 				mapping = {
 					["change_replace_sed"] = {
@@ -256,7 +250,7 @@ return {
 				},
 			}
 		end,
-		cond = zox.config.load_big_files_faster,
+		cond = zox.load_big_files_faster,
 	},
 	{
 		"akinsho/toggleterm.nvim",
@@ -354,18 +348,18 @@ return {
 			require("trouble").setup {
 				position = "left", -- position of the list can be: bottom, top, left, right
 				mode = "document_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
-				fold_open = icons.ui.ArrowOpen, -- icon used for open folds
-				fold_closed = icons.ui.ArrowClosed, -- icon used for closed folds
+				fold_open = icons.Ui.ArrowOpen, -- icon used for open folds
+				fold_closed = icons.Ui.ArrowClosed, -- icon used for closed folds
 				auto_close = true, -- automatically close the list when you have no diagnostics
 				auto_fold = false, -- automatically fold a file trouble list at creation
 				auto_jump = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
 				signs = {
 					-- icons / text used for a diagnostic
-					error = icons.diagnostics.ErrorHolo,
-					warning = icons.diagnostics.WarningHolo,
-					hint = icons.diagnostics.HintHolo,
-					information = icons.diagnostics.InformationHolo,
-					other = icons.diagnostics.QuestionHolo,
+					error = icons.Diagnostics.ErrorHolo,
+					warning = icons.Diagnostics.WarningHolo,
+					hint = icons.Diagnostics.HintHolo,
+					information = icons.Diagnostics.InformationHolo,
+					other = icons.Diagnostics.QuestionHolo,
 				},
 				use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
 			}
@@ -591,7 +585,7 @@ return {
 
 			require("nvim-treesitter.configs").setup {
 				ensure_installed = "all",
-				ignore_install = { "phpdoc" },
+				ignore_install = { "phpdoc", "gitcommit" },
 				indent = { enable = false },
 				highlight = {
 					enable = true,
@@ -662,9 +656,6 @@ return {
 						override = {
 							zsh = { icon = "", color = "#428850", cterm_color = "65", name = "Zsh" },
 						},
-						-- globally enable default icons (default to false)
-						-- will get overriden by `get_icons` option
-						default = true,
 					}
 				end,
 			},
@@ -689,10 +680,10 @@ return {
 			},
 		},
 		config = function()
-			require("telescope").setup(vim.tbl_deep_extend("keep", zox.config.plugins.telescope, {
+			require("telescope").setup(vim.tbl_deep_extend("keep", zox.plugins.telescope, {
 				defaults = {
-					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
-					selection_caret = icons.ui_space.DoubleSeparator,
+					prompt_prefix = " " .. icons.UiSpace.Telescope .. " ",
+					selection_caret = icons.UiSpace.DoubleSeparator,
 					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 					scroll_strategy = "limit",
 					layout_strategy = "horizontal",

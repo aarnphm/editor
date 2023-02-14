@@ -40,7 +40,7 @@ return function(options)
 				},
 				diagnostics = {
 					enable = true,
-					globals = { "vim", "zox" },
+					globals = { "vim", "icons" },
 				},
 				hint = { enable = true },
 				runtime = {
@@ -51,10 +51,10 @@ return function(options)
 				workspace = {
 					library = {
 						vim.env.VIMRUNTIME,
+						vim.fn.stdpath "config" .. "/lua/zox",
 						vim.fn.expand "$VIMRUNTIME/lua",
 						require("neodev.config").types(),
 						vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
-						zox.global.zox,
 					},
 					checkThirdParty = false,
 					maxPreload = 100000,

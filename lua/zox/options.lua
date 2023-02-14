@@ -6,13 +6,20 @@ if not conda_prefix == nil or conda_prefix == "" then
 elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/python") == 1 then
 	vim.g.python_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
 	vim.g.python3_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
-else
+elseif vim.NIL ~= vim.fn.getenv "PYTHON3_HOST_PROG" then
 	-- get python host prog from env
 	vim.g.python_host_prog = vim.env["PYTHON3_HOST_PROG"]
 	vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
+else
+	vim.notify_once(
+		"Failed to autodetect Python path. "
+			.. "Either set PYTHON3_HOST_PROG or set 'vim.g.python3_host_prog' for plugins to work.",
+		vim.log.levels.WARN,
+		{ title = "zox: configuration" }
+	)
 end
 
-if zox.global.is_mac then
+if vim.loop.os_uname().sysname == "Darwin" then
 	vim.g.clipboard = {
 		name = "macOS-clipboard",
 		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
@@ -103,7 +110,6 @@ vim.o.timeout = true
 vim.o.timeoutlen = 0
 vim.o.ttimeout = true
 vim.o.ttimeoutlen = 0
-vim.o.undodir = zox.global.cache_dir .. "undo/"
 vim.o.undofile = true
 vim.o.undolevels = 9999
 vim.o.updatetime = 200

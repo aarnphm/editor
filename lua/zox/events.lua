@@ -1,12 +1,12 @@
 local api = vim.api
+local zox = require "zox"
 
 -- set better diagnostics icons
-local diagnostics = require("icons").get("diagnostics", true)
 local diagnostic_icons = {
-	Error = diagnostics.ErrorHolo,
-	Warn = diagnostics.WarningHolo,
-	Info = diagnostics.InformationHolo,
-	Hint = diagnostics.HintHolo,
+	Error = icons.DiagnosticsSpace.ErrorHolo,
+	Warn = icons.DiagnosticsSpace.WarningHolo,
+	Info = icons.DiagnosticsSpace.InformationHolo,
+	Hint = icons.DiagnosticsSpace.HintHolo,
 }
 for type, icon in pairs(diagnostic_icons) do
 	local hl = string.format("DiagnosticSign%s", type)
@@ -44,7 +44,7 @@ api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 	group = misc_id,
 	pattern = "*",
 	callback = function(event)
-		if not vim.tbl_contains(zox.global.exclude_ft, event.buf) then
+		if not vim.tbl_contains(zox.exclude_ft, event.buf) then
 			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<Leader>lh"] = k.cr("Lazy"):with_nowait():with_defaults "package: Show",

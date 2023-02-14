@@ -1,14 +1,5 @@
 local k = require "keybind"
-local icons = {
-	ui = require("icons").get "ui",
-	diagnostics = require("icons").get "diagnostics",
-	dap = require("icons").get("dap", true),
-	documents = require("icons").get "documents",
-	git = require("icons").get "git",
-	misc_space = require("icons").get("misc", true),
-	ui_space = require("icons").get("ui", true),
-	diagnostic_space = require("icons").get("diagnostics", true),
-}
+local z = require "zox"
 
 return {
 	{ "nathom/filetype.nvim", lazy = false },
@@ -45,14 +36,14 @@ return {
 				render = "minimal",
 				background_colour = "Normal",
 				---@usage notifications with level lower than this would be ignored. [ERROR > WARN > INFO > DEBUG > TRACE]
-				level = zox.config.debug and "DEBUG" or "INFO",
+				level = z.debug and "DEBUG" or "INFO",
 				---@usage Icons for the different levels
 				icons = {
-					ERROR = icons.diagnostics.Error,
-					WARN = icons.diagnostics.Warning,
-					INFO = icons.diagnostics.Information,
-					DEBUG = icons.ui.Bug,
-					TRACE = icons.ui.Pencil,
+					ERROR = icons.Diagnostics.Error,
+					WARN = icons.Diagnostics.Warning,
+					INFO = icons.Diagnostics.Information,
+					DEBUG = icons.Ui.Bug,
+					TRACE = icons.Ui.Pencil,
 				},
 			}
 
@@ -104,7 +95,7 @@ return {
 		config = function()
 			require("rose-pine").setup {
 				--- @usage 'main' | 'moon'
-				dark_variant = zox.config.plugins["rose-pine"].dark_variant,
+				dark_variant = z.plugins["rose-pine"].dark_variant,
 				disable_background = true,
 				disable_float_background = true,
 				highlight_groups = {
@@ -115,49 +106,6 @@ return {
 			}
 		end,
 	},
-	{
-		"catppuccin/nvim",
-		as = "catppuccin",
-		lazy = false,
-		name = "catppuccin",
-		config = function()
-			require("catppuccin").setup {
-				-- Can be one of: latte, frappe, macchiato, mocha
-				flavour = vim.o.background == "dark" and zox.config.plugins.catppuccin.dark_variant
-					or zox.config.plugins.catppuccin.light_variant,
-				background = {
-					light = zox.config.plugins.catppuccin.light_variant,
-					dark = zox.config.plugins.catppuccin.dark_variant,
-				},
-				term_colors = true,
-				styles = {
-					comments = { "italic" },
-					properties = { "italic" },
-					functions = { "italic", "bold" },
-					keywords = { "italic" },
-					operators = { "bold" },
-					conditionals = { "bold" },
-					loops = { "bold" },
-					booleans = { "bold", "italic" },
-				},
-				integrations = {
-					dap = { enabled = true, enable_ui = true },
-					fidget = true,
-					hop = true,
-					indent_blankline = { enabled = true, colored_indent_levels = false },
-					lsp_saga = true,
-					lsp_trouble = true,
-					markdown = true,
-					mason = true,
-					notify = true,
-					nvimtree = true,
-					treesitter_context = true,
-					which_key = true,
-				},
-			}
-		end,
-	},
-
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
@@ -219,7 +167,7 @@ return {
 			require("gitsigns").setup {
 				numhl = true,
 				---@diagnostic disable-next-line: undefined-global
-				word_diff = zox.config.plugins.gitsigns.word_diff,
+				word_diff = z.plugins.gitsigns.word_diff,
 				current_line_blame = false,
 				current_line_blame_opts = { virtual_text_pos = "eol" },
 				diff_opts = { internal = true },
@@ -378,30 +326,30 @@ return {
 			dashboard.section.buttons.val = {
 				button(
 					"SPC r",
-					icons.misc_space.Rocket .. "File frecency",
+					icons.MiscSpace.Rocket .. "File frecency",
 					leader,
 					{ callback = function() require("telescope").extensions.frecency.frecency() end }
 				),
-				button("SPC \\", icons.ui_space.List .. "Project find", leader, {
+				button("SPC \\", icons.UiSpace.List .. "Project find", leader, {
 					callback = function()
 						require("telescope").extensions.projects.projects { promp_title = "Projects" }
 					end,
 				}),
 				button(
 					"SPC w",
-					icons.misc_space.WordFind .. "Word find",
+					icons.MiscSpace.WordFind .. "Word find",
 					leader,
 					{ callback = function() require("telescope").extensions.live_grep_args.live_grep_args() end }
 				),
 				button(
 					"SPC f",
-					icons.misc_space.FindFile .. "File find",
+					icons.MiscSpace.FindFile .. "File find",
 					leader,
 					{ callback = function() require("utils").find_files(false) end }
 				),
 				button(
 					"SPC n",
-					icons.ui_space.NewFile .. "File new",
+					icons.UiSpace.NewFile .. "File new",
 					leader,
 					{ callback = function() vim.api.nvim_command "enew" end }
 				),
@@ -409,7 +357,7 @@ return {
 			local gen_footer = function()
 				local stats = require("lazy").stats()
 				local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-				return icons.misc_space.BentoBox
+				return icons.MiscSpace.BentoBox
 					.. "github.com/aarnphm"
 					.. "   v"
 					.. vim.version().major
@@ -461,15 +409,12 @@ return {
 		config = function()
 			local escape_status = function()
 				local ok, m = pcall(require, "better_escape")
-				return ok and m.waiting and icons.misc_space.EscapeST or ""
+				return ok and m.waiting and icons.MiscSpace.EscapeST or ""
 			end
 
 			local _cache = { context = "", bufnr = -1 }
 			local lspsaga_symbols = function()
-				if
-					vim.api.nvim_win_get_config(0).zindex
-					or vim.tbl_contains(zox.global.exclude_ft, vim.bo.filetype)
-				then
+				if vim.api.nvim_win_get_config(0).zindex or vim.tbl_contains(z.exclude_ft, vim.bo.filetype) then
 					return "" -- Excluded filetypes
 				else
 					local currbuf = vim.api.nvim_get_current_buf()
@@ -498,11 +443,11 @@ return {
 
 			local get_cwd = function()
 				local cwd = vim.fn.getcwd()
-				if not zox.global.is_windows then
+				if not z.is_windows then
 					local home = os.getenv "HOME"
 					if home and cwd:find(home, 1, true) == 1 then cwd = "~" .. cwd:sub(#home + 1) end
 				end
-				return icons.ui_space.RootFolderOpened .. cwd
+				return icons.UiSpace.RootFolderOpened .. cwd
 			end
 
 			local mini_sections = {
@@ -536,9 +481,9 @@ return {
 
 				if vim.bo.filetype == "python" then
 					local venv = os.getenv "CONDA_DEFAULT_ENV"
-					if venv then return string.format(icons.misc_space.PyEnv .. ":(%s)", env_cleanup(venv)) end
+					if venv then return string.format(icons.MiscSpace.PyEnv .. ":(%s)", env_cleanup(venv)) end
 					venv = os.getenv "VIRTUAL_ENV"
-					if venv then return string.format(icons.misc_space.PyEnv .. ":(%s)", env_cleanup(venv)) end
+					if venv then return string.format(icons.MiscSpace.PyEnv .. ":(%s)", env_cleanup(venv)) end
 				end
 				return ""
 			end
@@ -564,12 +509,12 @@ return {
 					},
 					component_separators = "|",
 					section_separators = { left = "", right = "" },
-					globalstatus = zox.config.plugins.lualine.globalstatus,
+					globalstatus = z.plugins.lualine.globalstatus,
 				},
 				sections = {
 					lualine_a = { { "mode" } },
 					lualine_b = {
-						{ "branch", icons_enabled = true, icon = icons.git.Branch },
+						{ "branch", icons_enabled = true, icon = icons.Git.Branch },
 						{ "diff", source = diff_source },
 					},
 					lualine_c = { lspsaga_symbols },
@@ -579,9 +524,9 @@ return {
 							"diagnostics",
 							sources = { "nvim_diagnostic" },
 							symbols = {
-								error = icons.diagnostic_space.Error,
-								warn = icons.diagnostic_space.Warning,
-								info = icons.diagnostic_space.Information,
+								error = icons.DiagnosticsSpace.Error,
+								warn = icons.DiagnosticsSpace.Warning,
+								info = icons.DiagnosticsSpace.Information,
 							},
 						},
 						{ get_cwd },
@@ -661,33 +606,33 @@ return {
 					icons = {
 						symlink_arrow = "  ",
 						glyphs = {
-							default = icons.documents.Default, --
-							symlink = icons.documents.Symlink, --
-							bookmark = icons.ui.Bookmark,
+							default = icons.Documents.Default, --
+							symlink = icons.Documents.Symlink, --
+							bookmark = icons.Ui.Bookmark,
 							git = {
-								unstaged = icons.git.ModHolo,
-								staged = icons.git.Add, --
-								unmerged = icons.git.Unmerged,
-								renamed = icons.git.Rename, --
-								untracked = icons.git.Untracked, -- "ﲉ"
-								deleted = icons.git.Remove, --
-								ignored = icons.git.Ignore, --◌
+								unstaged = icons.Git.ModHolo,
+								staged = icons.Git.Add, --
+								unmerged = icons.Git.Unmerged,
+								renamed = icons.Git.Rename, --
+								untracked = icons.Git.Untracked, -- "ﲉ"
+								deleted = icons.Git.Remove, --
+								ignored = icons.Git.Ignore, --◌
 							},
 							folder = {
-								arrow_open = icons.ui.ArrowOpen,
-								arrow_closed = icons.ui.ArrowClosed,
-								default = icons.ui.Folder,
-								open = icons.ui.FolderOpen,
-								empty = icons.ui.EmptyFolder,
-								empty_open = icons.ui.EmptyFolderOpen,
-								symlink = icons.ui.SymlinkFolder,
-								symlink_open = icons.ui.FolderOpen,
+								arrow_open = icons.Ui.ArrowOpen,
+								arrow_closed = icons.Ui.ArrowClosed,
+								default = icons.Ui.Folder,
+								open = icons.Ui.FolderOpen,
+								empty = icons.Ui.EmptyFolder,
+								empty_open = icons.Ui.EmptyFolderOpen,
+								symlink = icons.Ui.SymlinkFolder,
+								symlink_open = icons.Ui.FolderOpen,
 							},
 						},
 					},
 				},
 				update_focused_file = { enable = true, update_root = true },
-				system_open = { cmd = zox.global.is_mac and "open" or "xdg-open" },
+				system_open = { cmd = z.is_mac and "open" or "xdg-open" },
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 				actions = {
 					open_file = {
@@ -704,7 +649,7 @@ return {
 					enable = true,
 					show_on_dirs = true,
 					timeout = 500,
-					ignore = zox.config.plugins.nvim_tree.git.ignore,
+					ignore = z.plugins.nvim_tree.git.ignore,
 				},
 				trash = {
 					cmd = require("utils").get_binary_path "rip",
@@ -721,10 +666,10 @@ return {
 		config = function()
 			require("bufferline").setup {
 				options = {
-					modified_icon = icons.ui.Modified,
-					buffer_close_icon = icons.ui.Close,
-					left_trunc_marker = icons.ui.Left,
-					right_trunc_marker = icons.ui.Right,
+					modified_icon = icons.Ui.Modified,
+					buffer_close_icon = icons.Ui.Close,
+					left_trunc_marker = icons.Ui.Left,
+					right_trunc_marker = icons.Ui.Right,
 					diagnostics = "nvim_lsp",
 					separator_style = { "|", "|" },
 					offsets = {

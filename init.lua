@@ -77,6 +77,6 @@ if not vim.g.vscode then
 		},
 	})
 
-	vim.go.background = zox.config.background
-	vim.cmd.colorscheme(zox.config.colorscheme)
+	vim.go.background = require("zox").background
+	vim.cmd.colorscheme(require("zox").colorscheme)
 end

@@ -1,15 +1,6 @@
 local k = require "keybind"
 local z = require "zox"
-local icons = {
-	diagnostics = require("icons").get("diagnostics", true),
-	git = require("icons").get("git", true),
-	misc = require("icons").get("misc", true),
-	ui = require("icons").get("ui", true),
-	kind = require("icons").get("kind", true),
-	dap = require("icons").get("dap", true),
-	cmp = require("icons").get "cmp",
-	type = require("icons").get "type",
-}
+local u = require "utils"
 
 ---@param path string path to given directory containing lua files.
 ---@return string[] list of files in given directory
@@ -70,7 +61,7 @@ return {
 		ft = "tex",
 		config = function()
 			vim.g.vimtex_view_method = "zathura"
-			if zox.global.is_mac then
+			if require("zox").is_mac then
 				vim.g.vimtex_view_method = "skim"
 				vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
 				vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
@@ -93,7 +84,13 @@ return {
 		end,
 	},
 	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-	{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust", dependencies = { "nvim-lua/plenary.nvim" } },
+	{
+		"simrat39/rust-tools.nvim",
+		lazy = true,
+		ft = "rust",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function() require "zox.servers.rust_analyzer" end,
+	},
 	{
 		"saecki/crates.nvim",
 		lazy = true,
@@ -106,13 +103,13 @@ return {
 				thousands_separator = ",",
 				notification_title = "Crates",
 				text = {
-					loading = " " .. icons.misc.Watch .. "Loading",
-					version = " " .. icons.ui.Check .. "%s",
-					prerelease = " " .. icons.diagnostics.WarningHolo .. "%s",
-					yanked = " " .. icons.diagnostics.Error .. "%s",
-					nomatch = " " .. icons.diagnostics.Question .. "No match",
-					upgrade = " " .. icons.diagnostics.HintHolo .. "%s",
-					error = " " .. icons.diagnostics.Error .. "Error fetching crate",
+					loading = " " .. icons.MiscSpace.Watch .. "Loading",
+					version = " " .. icons.UiSpace.Check .. "%s",
+					prerelease = " " .. icons.DiagnosticsSpace.WarningHolo .. "%s",
+					yanked = " " .. icons.DiagnosticsSpace.Error .. "%s",
+					nomatch = " " .. icons.DiagnosticsSpace.Question .. "No match",
+					upgrade = " " .. icons.DiagnosticsSpace.HintHolo .. "%s",
+					error = " " .. icons.DiagnosticsSpace.Error .. "Error fetching crate",
 				},
 				popup = {
 					hide_on_select = true,
@@ -120,44 +117,44 @@ return {
 					border = "rounded",
 					show_version_date = true,
 					text = {
-						title = icons.ui.Package .. "%s",
+						title = icons.UiSpace.Package .. "%s",
 						description = "%s",
-						created_label = icons.misc.Added .. "created" .. "        ",
+						created_label = icons.MiscSpace.Added .. "created" .. "        ",
 						created = "%s",
-						updated_label = icons.misc.ManUp .. "updated" .. "        ",
+						updated_label = icons.MiscSpace.ManUp .. "updated" .. "        ",
 						updated = "%s",
-						downloads_label = icons.ui.CloudDownload .. "downloads      ",
+						downloads_label = icons.UiSpace.CloudDownload .. "downloads      ",
 						downloads = "%s",
-						homepage_label = icons.misc.Campass .. "homepage       ",
+						homepage_label = icons.MiscSpace.Campass .. "homepage       ",
 						homepage = "%s",
-						repository_label = icons.git.Repo .. "repository     ",
+						repository_label = icons.GitSpace.Repo .. "repository     ",
 						repository = "%s",
-						documentation_label = icons.diagnostics.InformationHolo .. "documentation  ",
+						documentation_label = icons.DiagnosticsSpace.InformationHolo .. "documentation  ",
 						documentation = "%s",
-						crates_io_label = icons.ui.Package .. "crates.io      ",
+						crates_io_label = icons.UiSpace.Package .. "crates.io      ",
 						crates_io = "%s",
-						categories_label = icons.kind.Class .. "categories     ",
-						keywords_label = icons.kind.Keyword .. "keywords       ",
+						categories_label = icons.KindSpace.Class .. "categories     ",
+						keywords_label = icons.KindSpace.Keyword .. "keywords       ",
 						version = "  %s",
-						prerelease = icons.diagnostics.WarningHolo .. "%s prerelease",
-						yanked = icons.diagnostics.Error .. "%s yanked",
+						prerelease = icons.DiagnosticsSpace.WarningHolo .. "%s prerelease",
+						yanked = icons.DiagnosticsSpace.Error .. "%s yanked",
 						version_date = "  %s",
 						feature = "  %s",
-						enabled = icons.dap.Play .. "%s",
-						transitive = icons.ui.List .. "%s",
-						normal_dependencies_title = icons.kind.Interface .. "Dependencies",
-						build_dependencies_title = icons.misc.Gavel .. "Build dependencies",
-						dev_dependencies_title = icons.misc.Glass .. "Dev dependencies",
+						enabled = icons.DapSpace.Play .. "%s",
+						transitive = icons.UiSpace.List .. "%s",
+						normal_dependencies_title = icons.KindSpace.Interface .. "Dependencies",
+						build_dependencies_title = icons.MiscSpace.Gavel .. "Build dependencies",
+						dev_dependencies_title = icons.MiscSpace.Glass .. "Dev dependencies",
 						dependency = "  %s",
-						optional = icons.ui.BigUnfilledCircle .. "%s",
+						optional = icons.UiSpace.BigUnfilledCircle .. "%s",
 						dependency_version = "  %s",
-						loading = " " .. icons.misc.Watch,
+						loading = " " .. icons.MiscSpace.Watch,
 					},
 				},
 				src = {
 					text = {
-						prerelease = " " .. icons.diagnostics.WarningHolo .. "pre-release ",
-						yanked = " " .. icons.diagnostics.ErrorHolo .. "yanked ",
+						prerelease = " " .. icons.DiagnosticsSpace.WarningHolo .. "pre-release ",
+						yanked = " " .. icons.DiagnosticsSpace.ErrorHolo .. "yanked ",
 					},
 				},
 				null_ls = { enabled = true, name = "crates.nvim" },
@@ -212,9 +209,9 @@ return {
 				config = function()
 					require("dapui").setup {
 						icons = {
-							expanded = icons.ui.ArrowOpen,
-							collapsed = icons.ui.ArrowClosed,
-							current_frame = icons.ui.Indicator,
+							expanded = icons.UiSpace.ArrowOpen,
+							collapsed = icons.UiSpace.ArrowClosed,
+							current_frame = icons.UiSpace.Indicator,
 						},
 						layouts = {
 							{
@@ -235,14 +232,14 @@ return {
 						},
 						controls = {
 							icons = {
-								pause = icons.dap.Pause,
-								play = icons.dap.Play,
-								step_into = icons.dap.StepInto,
-								step_over = icons.dap.StepOver,
-								step_out = icons.dap.StepOut,
-								step_back = icons.dap.StepBack,
-								run_last = icons.dap.RunLast,
-								terminate = icons.dap.Terminate,
+								pause = icons.DapSpace.Pause,
+								play = icons.DapSpace.Play,
+								step_into = icons.DapSpace.StepInto,
+								step_over = icons.DapSpace.StepOver,
+								step_out = icons.DapSpace.StepOut,
+								step_back = icons.DapSpace.StepBack,
+								run_last = icons.DapSpace.RunLast,
+								terminate = icons.DapSpace.Terminate,
 							},
 						},
 						windows = { indent = 1 },
@@ -258,11 +255,8 @@ return {
 			dap.listeners.after.event_terminated["dapui_config"] = function() dapui.close() end
 			dap.listeners.after.event_exited["dapui_config"] = function() dapui.close() end
 
-			-- We need to override nvim-dap's default highlight groups, AFTER requiring nvim-dap for catppuccin.
-			-- vim.api.nvim_set_hl(0, "DapStopped", { fg = colors.green })
-
 			for _, v in ipairs { "Breakpoint", "BreakpointRejected", "BreakpointCondition", "LogPoint", "Stopped" } do
-				vim.fn.sign_define("Dap" .. v, { text = icons.dap[v], texthl = "Dap" .. v, line = "", numhl = "" })
+				vim.fn.sign_define("Dap" .. v, { text = icons.DapSpace[v], texthl = "Dap" .. v, line = "", numhl = "" })
 			end
 
 			-- Config lang adaptors
@@ -298,7 +292,7 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = { "BufReadPost", "BufAdd", "BufNewFile" },
 		dependencies = {
 			{
 				"simrat39/inlay-hints.nvim",
@@ -326,14 +320,14 @@ return {
 			{
 				"jose-elias-alvarez/null-ls.nvim",
 				lazy = true,
-				event = { "BufReadPost" },
+				event = "BufReadPost",
 				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
 			},
 			{
 				"glepnir/lspsaga.nvim",
 				lazy = true,
 				branch = "main",
-				events = "VeryLazy",
+				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
 				config = function()
 					require("lspsaga").setup {
@@ -348,18 +342,18 @@ return {
 						},
 						symbol_in_winbar = {
 							enable = false,
-							separator = " " .. icons.ui.Separator,
+							separator = " " .. icons.UiSpace.Separator,
 							show_file = false,
 						},
 						ui = {
 							theme = "round",
-							expand = icons.ui.ArrowClosed,
-							collapse = icons.ui.ArrowOpen,
-							preview = icons.ui.Newspaper,
-							code_action = icons.ui.CodeAction,
-							diagnostic = icons.ui.Bug,
-							incoming = icons.ui.Incoming,
-							outgoing = icons.ui.Outgoing,
+							expand = icons.UiSpace.ArrowClosed,
+							collapse = icons.UiSpace.ArrowOpen,
+							preview = icons.UiSpace.Newspaper,
+							code_action = icons.UiSpace.CodeAction,
+							diagnostic = icons.UiSpace.Bug,
+							incoming = icons.UiSpace.Incoming,
+							outgoing = icons.UiSpace.Outgoing,
 						},
 						callhierarchy = { show_detail = true },
 					}
@@ -403,9 +397,9 @@ return {
 				ui = {
 					border = "rounded",
 					icons = {
-						package_pending = icons.ui.ModifiedHolo,
-						package_installed = icons.ui.Check,
-						package_uninstalled = icons.misc.Ghost,
+						package_pending = icons.UiSpace.ModifiedHolo,
+						package_installed = icons.UiSpace.Check,
+						package_uninstalled = icons.MiscSpace.Ghost,
 					},
 				},
 			}
@@ -438,8 +432,9 @@ return {
 				ensure_installed = { "python", "delve", "cppdbg", "codelldb", "bash" },
 			}
 
-			local disabled_workspaces = zox.config.disabled_workspaces
-			local format_on_save = zox.config.format_on_save
+			local zox = require "zox"
+			local disabled_workspaces = zox.disabled_workspaces
+			local format_on_save = zox.format_on_save
 
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
 			local f = require("null-ls").builtins.formatting
@@ -562,7 +557,10 @@ return {
 				end
 				return function()
 					if
-						not vim.tbl_contains(available(zox.global.zox .. zox.global.path_sep .. "servers"), lsp_name)
+						not vim.tbl_contains(
+							available(u.joinPath(vim.fn.stdpath "config", "lua", "zox", "servers")),
+							lsp_name
+						)
 					then
 						vim.notify_once(
 							string.format("Failed to find config for '%s' under zox/servers.", lsp_name),
@@ -609,7 +607,6 @@ return {
 			}
 
 			lsp_callback "starlark_rust"
-			require "zox.servers.rust_analyzer"
 		end,
 	},
 	{
@@ -726,7 +723,7 @@ return {
 						local kind = lspkind.cmp_format {
 							mode = "symbol_text",
 							maxwidth = 50,
-							symbol_map = vim.tbl_deep_extend("force", icons.kind, icons.type, icons.cmp),
+							symbol_map = vim.tbl_deep_extend("force", icons.KindSpace, icons.Type, icons.Cmp),
 						}(entry, vim_item)
 						local strings = vim.split(kind.kind, "%s", { trimempty = true })
 						kind.kind = " " .. strings[1] .. " "

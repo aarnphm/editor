@@ -92,10 +92,11 @@ M.extend_hl = function(name, def)
 end
 
 M.get_binary_path = function(binary)
+	local zox = require "zox"
 	local path = nil
-	if zox.global.is_mac or zox.global.is_linux then
+	if zox.is_mac or zox.is_linux then
 		path = vim.fn.trim(vim.fn.system("which " .. binary))
-	elseif zox.global.is_windows then
+	elseif zox.is_windows then
 		path = vim.fn.trim(vim.fn.system("where " .. binary))
 	end
 	if vim.v.shell_error ~= 0 then path = nil end
@@ -108,6 +109,7 @@ end
 ---@overload fun(opts: table<string, any>): nil
 ---@overload fun(safe_git: boolean): nil
 M.find_files = function(opts, safe_git)
+	local zox = require "zox"
 	safe_git = safe_git or true
 	opts = opts or {}
 
@@ -121,13 +123,13 @@ M.find_files = function(opts, safe_git)
 		opts.find_command = 1 == vim.fn.executable "fd"
 				and { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" }
 			or nil
-		require("telescope.builtin").find_files(vim.tbl_deep_extend("keep", opts, zox.config.plugins.telescope))
+		require("telescope.builtin").find_files(vim.tbl_deep_extend("keep", opts, zox.plugins.telescope))
 	end
 
 	if safe_git then
 		vim.fn.system "git rev-parse --is-inside-work-tree"
 		if vim.v.shell_error == 0 then
-			require("telescope.builtin").git_files(vim.tbl_deep_extend("keep", opts, zox.config.plugins.telescope))
+			require("telescope.builtin").git_files(vim.tbl_deep_extend("keep", opts, zox.plugins.telescope))
 		else
 			find_files()
 		end
@@ -157,6 +159,10 @@ M.map = function(tbl, func)
 		newtbl[i] = func(v)
 	end
 	return newtbl
+end
+
+M.joinPath = function(...)
+	return table.concat(vim.tbl_flatten { ... }, vim.loop.os_uname().sysname == "Windows_NT" and "\\" or "/")
 end
 
 return M
