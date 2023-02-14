@@ -102,6 +102,29 @@ return {
 					Comment = { fg = "muted", italic = true },
 					StatusLine = { fg = "iris", bg = "iris", blend = 10 },
 					StatusLineNC = { fg = "subtle", bg = "surface" },
+					ColorColumn = { bg = "rose" },
+				},
+				groups = {
+					background = "base",
+					panel = "surface",
+					border = "highlight_med",
+					comment = "muted",
+					link = "iris",
+					punctuation = "subtle",
+
+					error = "love",
+					hint = "iris",
+					info = "foam",
+					warn = "gold",
+
+					headings = {
+						h1 = "iris",
+						h2 = "foam",
+						h3 = "rose",
+						h4 = "gold",
+						h5 = "pine",
+						h6 = "foam",
+					},
 				},
 			}
 		end,

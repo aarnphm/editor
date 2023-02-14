@@ -358,6 +358,33 @@ return {
 						callhierarchy = { show_detail = true },
 					}
 
+					local p = require "rose-pine.palette"
+					local h = require("rose-pine.util").highlight
+					h("TitleString", { fg = p.rose, bold = true })
+					h("TitleIcon", { fg = p.rose })
+					h("SagaBorder", { fg = p.border })
+					h("SagaNormal", { bg = p.surface })
+					h("SagaExpand", { fg = p.love })
+					h("SagaCollapse", { fg = p.love })
+					h("SagaBeacon", { fg = p.text })
+					h("ActionPreviewTitle", { fg = p.rose, bold = true })
+					h("CodeActionText", { fg = p.foam })
+					h("CodeActionNumber", { fg = p.foam })
+					h("SagaShadow", { bg = p.overlay })
+					h("OutlineIndent", { fg = p.rose })
+					h("FinderSelection", { fg = p.gold })
+					h("FinderFileName", { fg = p.text })
+					h("FinderIcon", { fg = p.rose })
+					h("FinderType", { fg = p.iris })
+					h("FinderSpinnerTitle", { fg = p.iris, bold = true })
+					h("FinderSpinner", { fg = p.iris, bold = true })
+					h("FinderVirtText", { fg = p.rose })
+					h("RenameNormal", { fg = p.love, bg = p.base })
+					h("DiagnosticPos", { fg = p.subtle })
+					h("DiagnosticWord", { fg = p.highlight_high })
+					h("CallHierarchyIcon", { fg = p.iris })
+					h("CallHierarchyTitle", { fg = p.love })
+
 					k.nvim_register_mapping {
 						["n|<LocalLeader>ci"] = k.cr("Lspsaga incoming_calls"):with_defaults "lsp: Show incoming calls",
 						["n|<LocalLeader>co"] = k.cr("Lspsaga outgoing_calls"):with_defaults "lsp: Show outgoing calls",
@@ -536,6 +563,7 @@ return {
 						if winheight - winline < pumheight then return -pumheight end
 						return 0
 					end,
+					toggle_key = "<M-s>",
 					hint_enable = false,
 					hi_parameter = "Search",
 					handler_opts = { border = "rounded" },

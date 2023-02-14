@@ -82,7 +82,7 @@ local configure = function()
 						"%.mkv",
 						"%.mp4",
 						"%.zip",
-						"/lazy-lock.json",
+						"**/*/lazy-lock.json",
 					},
 				},
 			},
