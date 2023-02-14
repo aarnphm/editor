@@ -93,7 +93,13 @@ return {
 		end,
 	},
 	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-	{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust", dependencies = { "nvim-lua/plenary.nvim" } },
+	{
+		"simrat39/rust-tools.nvim",
+		lazy = true,
+		ft = "rust",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function() require "zox.servers.rust_analyzer" end,
+	},
 	{
 		"saecki/crates.nvim",
 		lazy = true,
@@ -628,7 +634,6 @@ return {
 			}
 
 			lsp_callback "starlark_rust"
-			require "zox.servers.rust_analyzer"
 		end,
 	},
 	{
@@ -786,8 +791,8 @@ return {
 				-- You should specify your *installed* sources.
 				sources = {
 					{ name = "path" },
-					{ name = "treesitter" },
 					{ name = "nvim_lsp", keyword_length = 3 },
+					{ name = "treesitter" },
 					{ name = "luasnip", keyword_length = 2 },
 				},
 			}

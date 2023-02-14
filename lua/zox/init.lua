@@ -6,6 +6,7 @@ local is_windows = os_name == "Windows_NT"
 local separator = is_windows and "\\" or "/"
 local home = is_windows and os.getenv "USERPROFILE" or os.getenv "HOME"
 
+
 local M = { adapters = {}, servers = {} }
 
 for package, table in pairs(M) do

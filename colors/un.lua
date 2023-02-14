@@ -4,7 +4,7 @@ if 1 == vim.fn.exists "syntax_on" then vim.cmd "syntax reset" end
 
 vim.g.colors_name = "un"
 vim.opt.termguicolors = true
-vim.o.background = "dark"
+vim.o.background = "light"
 
 local variant = vim.g.un_variant or "rose_pine"
 

@@ -1,7 +1,12 @@
 return {
 	{ "jghauser/mkdir.nvim" },
 	{ "dstein64/vim-startuptime", lazy = true, cmd = "StartupTime" },
-	{ "romainl/vim-cool", lazy = true, event = { "CursorMoved", "InsertEnter" } },
+	{
+		"asiryk/auto-hlsearch.nvim",
+		lazy = true,
+		event = "InsertEnter",
+		config = function() require("auto-hlsearch").setup() end,
+	},
 	{
 		"nmac427/guess-indent.nvim",
 		lazy = true,
@@ -11,7 +16,7 @@ return {
 	{
 		"folke/which-key.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("which-key").setup {
 				plugins = {
@@ -37,13 +42,42 @@ return {
 		"m4xshen/autoclose.nvim",
 		lazy = true,
 		event = "InsertEnter",
-		config = function() require("autoclose").setup {} end,
+		config = function() require("autoclose").setup() end,
+	},
+	{
+		"stevearc/dressing.nvim",
+		event = { "CursorHold", "CursorHoldI" },
+		config = function()
+			require("dressing").setup {
+				input = {
+					enabled = true,
+				},
+				select = {
+					enabled = true,
+					backend = "telescope",
+					trim_prompt = true,
+				},
+			}
+		end,
 	},
 	{
 		"kylechui/nvim-surround",
+		config = function() require("nvim-surround").setup() end,
+	},
+	{
+		"pwntester/octo.nvim",
 		lazy = true,
-		event = "InsertEnter",
-		config = function() require("nvim-surround").setup {} end,
+		cmd = "Octo",
+		event = { "CursorHold", "CursorHoldI" },
+		config = function()
+			local k = require "keybind"
+
+			require("octo").setup { default_remote = { "upstream", "origin" } }
+
+			k.nvim_register_mapping {
+				["n|<Leader>o"] = k.args("Octo"):with_defaults "octo: List pull request",
+			}
+		end,
 	},
 	{
 		"nvim-pack/nvim-spectre",
@@ -96,6 +130,39 @@ return {
 					:with_defaults "replace: Replace word under cursor",
 				["n|<Leader>sp"] = k.callback(function() require("spectre").open_file_search() end)
 					:with_defaults "replace: Replace word under file search",
+			}
+		end,
+	},
+	{
+		"junegunn/vim-easy-align",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		cmd = "EasyAlign",
+		config = function()
+			local k = require "keybind"
+			k.nvim_register_mapping {
+				["n|gea"] = k.callback(function() return k.replace_termcodes "<Plug>(EasyAlign)" end)
+					:with_expr()
+					:with_desc "edit: Align by char",
+				["x|gea"] = k.callback(function() return k.replace_termcodes "<Plug>(EasyAlign)" end)
+					:with_expr()
+					:with_desc "edit: Align by char",
+			}
+		end,
+	},
+	{
+		"tpope/vim-fugitive",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		command = { "Git", "G", "Ggrep", "GBrowse" },
+		config = function()
+			local k = require "keybind"
+			k.nvim_register_mapping {
+				["n|<LocalLeader>G"] = k.cr("G"):with_defaults "git: Open git-fugitive",
+				["n|<LocalLeader>gaa"] = k.cr("G add ."):with_defaults "git: Add all files",
+				["n|<LocalLeader>gcm"] = k.cr("G commit"):with_defaults "git: Commit",
+				["n|<LocalLeader>gps"] = k.cr("G push"):with_defaults "git: push",
+				["n|<LocalLeader>gpl"] = k.cr("G pull"):with_defaults "git: pull",
 			}
 		end,
 	},
@@ -487,6 +554,7 @@ return {
 		dependencies = {
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "romgrk/nvim-treesitter-context" },
+			{ "mrjones2014/nvim-ts-rainbow" },
 			{ "JoosepAlviste/nvim-ts-context-commentstring" },
 			{
 				"andymass/vim-matchup",
@@ -534,6 +602,7 @@ return {
 					additional_vim_regex_highlighting = false,
 				},
 				-- NOTE: Highlight (extended mode) also non-parentheses delimiters, boolean or table: lang -> boolean
+				rainbow = { enable = true, extended_mode = true },
 				context_commentstring = { enable = true, enable_autocmd = false },
 				matchup = { enable = true },
 				textobjects = {
@@ -575,6 +644,9 @@ return {
 			for _, p in pairs(parsers_config) do
 				p.install_info.url = p.install_info.url:gsub("https://github.com/", "git@github.com:")
 			end
+
+			-- set octo.nvim to use treesitter
+			if vim.api.nvim_get_commands({})["Octo"] then parsers.filetype_to_parsername.octo = "markdown" end
 		end,
 	},
 	{
@@ -594,6 +666,7 @@ return {
 			},
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-lua/popup.nvim" },
+			{ "debugloop/telescope-undo.nvim" },
 			{ "jvgrootveld/telescope-zoxide" },
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
@@ -607,22 +680,6 @@ return {
 						show_hidden = true,
 						silent_chdir = true,
 						scope_chdir = "win",
-					}
-				end,
-			},
-			{
-				"stevearc/dressing.nvim",
-				event = { "CursorHold", "CursorHoldI" },
-				config = function()
-					require("dressing").setup {
-						input = {
-							enabled = true,
-						},
-						select = {
-							enabled = true,
-							backend = "telescope",
-							trim_prompt = true,
-						},
 					}
 				end,
 			},
@@ -657,6 +714,7 @@ return {
 					generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
 				},
 				extensions = {
+					undo = { side_by_side = true },
 					fzf = {
 						fuzzy = false,
 						override_generic_sorter = true,
@@ -702,7 +760,7 @@ return {
 				},
 			}))
 
-			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify", "projects" } do
+			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify", "undo", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,
