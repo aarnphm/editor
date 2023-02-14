@@ -45,7 +45,7 @@ return {
 				render = "minimal",
 				background_colour = "Normal",
 				---@usage notifications with level lower than this would be ignored. [ERROR > WARN > INFO > DEBUG > TRACE]
-				level = require("editor").config.debug and "DEBUG" or "INFO",
+				level = zox.config.debug and "DEBUG" or "INFO",
 				---@usage Icons for the different levels
 				icons = {
 					ERROR = icons.diagnostics.Error,
@@ -104,7 +104,7 @@ return {
 		config = function()
 			require("rose-pine").setup {
 				--- @usage 'main' | 'moon'
-				dark_variant = require("editor").config.plugins["rose-pine"].dark_variant,
+				dark_variant = zox.config.plugins["rose-pine"].dark_variant,
 				disable_background = true,
 				disable_float_background = true,
 				highlight_groups = {
@@ -123,11 +123,11 @@ return {
 		config = function()
 			require("catppuccin").setup {
 				-- Can be one of: latte, frappe, macchiato, mocha
-				flavour = vim.o.background == "dark" and require("editor").config.plugins.catppuccin.dark_variant
-					or require("editor").config.plugins.catppuccin.light_variant,
+				flavour = vim.o.background == "dark" and zox.config.plugins.catppuccin.dark_variant
+					or zox.config.plugins.catppuccin.light_variant,
 				background = {
-					light = require("editor").config.plugins.catppuccin.light_variant,
-					dark = require("editor").config.plugins.catppuccin.dark_variant,
+					light = zox.config.plugins.catppuccin.light_variant,
+					dark = zox.config.plugins.catppuccin.dark_variant,
 				},
 				term_colors = true,
 				styles = {
@@ -219,7 +219,7 @@ return {
 			require("gitsigns").setup {
 				numhl = true,
 				---@diagnostic disable-next-line: undefined-global
-				word_diff = require("editor").config.plugins.gitsigns.word_diff,
+				word_diff = zox.config.plugins.gitsigns.word_diff,
 				current_line_blame = false,
 				current_line_blame_opts = { virtual_text_pos = "eol" },
 				diff_opts = { internal = true },
@@ -468,7 +468,7 @@ return {
 			local lspsaga_symbols = function()
 				if
 					vim.api.nvim_win_get_config(0).zindex
-					or vim.tbl_contains(require("editor").global.exclude_ft, vim.bo.filetype)
+					or vim.tbl_contains(zox.global.exclude_ft, vim.bo.filetype)
 				then
 					return "" -- Excluded filetypes
 				else
@@ -498,7 +498,7 @@ return {
 
 			local get_cwd = function()
 				local cwd = vim.fn.getcwd()
-				if not require("editor").global.is_windows then
+				if not zox.global.is_windows then
 					local home = os.getenv "HOME"
 					if home and cwd:find(home, 1, true) == 1 then cwd = "~" .. cwd:sub(#home + 1) end
 				end
@@ -564,7 +564,7 @@ return {
 					},
 					component_separators = "|",
 					section_separators = { left = "", right = "" },
-					globalstatus = require("editor").config.plugins.lualine.globalstatus,
+					globalstatus = zox.config.plugins.lualine.globalstatus,
 				},
 				sections = {
 					lualine_a = { { "mode" } },
@@ -687,7 +687,7 @@ return {
 					},
 				},
 				update_focused_file = { enable = true, update_root = true },
-				system_open = { cmd = require("editor").global.is_mac and "open" or "xdg-open" },
+				system_open = { cmd = zox.global.is_mac and "open" or "xdg-open" },
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 				actions = {
 					open_file = {
@@ -704,7 +704,7 @@ return {
 					enable = true,
 					show_on_dirs = true,
 					timeout = 500,
-					ignore = require("editor").config.plugins.nvim_tree.git.ignore,
+					ignore = zox.config.plugins.nvim_tree.git.ignore,
 				},
 				trash = {
 					cmd = require("utils").get_binary_path "rip",

@@ -16,7 +16,7 @@ endif
 benchmark-local:
 	@vim-startuptime --vimpath nvim | sort -k 2
 reset:
-	@mv ${HOME}/.local/share/nvim/site/lazy/nvim-treesitter ${HOME}/.local/share/nvim/site
-	@\rm -rf ${HOME}/.local/share/nvim/site/lazy ${HOME}/.cache/nvim ${HOME}/.local/state/nvim
-	@mkdir -p ${HOME}/.local/share/nvim/site/lazy && mv ${HOME}/.local/share/nvim/site/nvim-treesitter ${HOME}/.local/share/nvim/site/lazy
+	@mv ${HOME}/.local/share/nvim/lazy/nvim-treesitter ${HOME}/.local/share/nvim/
+	@\rm -rf ${HOME}/.local/share/nvim/lazy ${HOME}/.cache/nvim ${HOME}/.local/state/nvim
+	@mkdir -p ${HOME}/.local/share/nvim/lazy && mv ${HOME}/.local/share/nvim/nvim-treesitter ${HOME}/.local/share/nvim/lazy
 	@nvim --headless "+Lazy! update" +qa

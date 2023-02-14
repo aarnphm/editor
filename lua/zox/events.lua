@@ -44,7 +44,7 @@ api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 	group = misc_id,
 	pattern = "*",
 	callback = function(event)
-		if not vim.tbl_contains(require("editor").global.exclude_ft, event.buf) then
+		if not vim.tbl_contains(zox.global.exclude_ft, event.buf) then
 			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<Leader>lh"] = k.cr("Lazy"):with_nowait():with_defaults "package: Show",
@@ -248,7 +248,7 @@ api.nvim_create_autocmd("FileType", {
 -- set filetype for bazel files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = ft_id,
-	pattern = { "*.bazel", "WORKSPACE" },
+	pattern = { "*.bazel", "WORKSPACE", "BUILD", "*.bzlmod" },
 	command = "setf bzl",
 })
 -- set filetype for docker files

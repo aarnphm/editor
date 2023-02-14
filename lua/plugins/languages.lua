@@ -1,5 +1,5 @@
 local k = require "keybind"
-local e = require "editor"
+local z = require "zox"
 local icons = {
 	diagnostics = require("icons").get("diagnostics", true),
 	git = require("icons").get("git", true),
@@ -70,7 +70,7 @@ return {
 		ft = "tex",
 		config = function()
 			vim.g.vimtex_view_method = "zathura"
-			if require("editor").global.is_mac then
+			if zox.global.is_mac then
 				vim.g.vimtex_view_method = "skim"
 				vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
 				vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
@@ -267,7 +267,7 @@ return {
 
 			-- Config lang adaptors
 			for _, dbg in ipairs { "lldb", "debugpy", "dlv" } do
-				if not require("zox").adapters[dbg] then
+				if not z.adapters[dbg] then
 					vim.notify_once("Failed to load " .. dbg, vim.log.levels.ERROR, { title = "dap.nvim" })
 				end
 			end
@@ -399,9 +399,6 @@ return {
 
 			require("lspconfig.ui.windows").default_options.border = "single"
 
-			-- Configuring native diagnostics
-			vim.diagnostic.config { virtual_text = false }
-
 			mason.setup {
 				ui = {
 					border = "rounded",
@@ -441,8 +438,8 @@ return {
 				ensure_installed = { "python", "delve", "cppdbg", "codelldb", "bash" },
 			}
 
-			local disabled_workspaces = require("editor").config.disabled_workspaces
-			local format_on_save = require("editor").config.format_on_save
+			local disabled_workspaces = zox.config.disabled_workspaces
+			local format_on_save = zox.config.format_on_save
 
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
 			local f = require("null-ls").builtins.formatting
@@ -564,7 +561,9 @@ return {
 					end
 				end
 				return function()
-					if not vim.tbl_contains(available(e.global.zox .. e.global.path_sep .. "servers"), lsp_name) then
+					if
+						not vim.tbl_contains(available(zox.global.zox .. zox.global.path_sep .. "servers"), lsp_name)
+					then
 						vim.notify_once(
 							string.format("Failed to find config for '%s' under zox/servers.", lsp_name),
 							vim.log.levels.ERROR,
@@ -572,13 +571,13 @@ return {
 						)
 						return
 					end
-					local lspconfig = require("zox").servers[lsp_name]
-					if type(lspconfig) == "table" then
-						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
-					elseif type(lspconfig) == "function" then
+					local lspconfig = z.servers[lsp_name]
+					if type(lspconfig) == "function" then
 						--- This is the case where the language server has its own setup
 						--- e.g. clangd_extensions, lua_ls, rust_analyzer
 						lspconfig(options)
+					elseif type(lspconfig) == "table" then
+						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
 					else
 						vim.notify(
 							(
@@ -589,20 +588,13 @@ return {
 							vim.log.levels.ERROR,
 							{ title = "nvim-lspconfig" }
 						)
+						return
 					end
 				end
 			end
 
 			require("mason-lspconfig").setup_handlers {
-				function(server)
-					nvim_lsp[server].setup {
-						capabilities = options.capabilities,
-						on_attach = options.on_attach,
-					}
-				end,
-				-- TODO: support starlark-rust for bazel
 				clangd = lsp_callback "clangd",
-				rust_analyzer = lsp_callback "rust_analyzer",
 				html = lsp_callback "html",
 				marksman = lsp_callback "marksman",
 				bufls = lsp_callback "bufls",
@@ -615,6 +607,9 @@ return {
 				lua_ls = lsp_callback("lua_ls", true),
 				tsserver = lsp_callback("tsserver", true),
 			}
+
+			lsp_callback "starlark_rust"
+			require "zox.servers.rust_analyzer"
 		end,
 	},
 	{

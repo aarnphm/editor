@@ -93,9 +93,9 @@ end
 
 M.get_binary_path = function(binary)
 	local path = nil
-	if require("editor").global.is_mac or require("editor").global.is_linux then
+	if zox.global.is_mac or zox.global.is_linux then
 		path = vim.fn.trim(vim.fn.system("which " .. binary))
-	elseif require("editor").global.is_windows then
+	elseif zox.global.is_windows then
 		path = vim.fn.trim(vim.fn.system("where " .. binary))
 	end
 	if vim.v.shell_error ~= 0 then path = nil end
@@ -121,17 +121,13 @@ M.find_files = function(opts, safe_git)
 		opts.find_command = 1 == vim.fn.executable "fd"
 				and { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" }
 			or nil
-		require("telescope.builtin").find_files(
-			vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
-		)
+		require("telescope.builtin").find_files(vim.tbl_deep_extend("keep", opts, zox.config.plugins.telescope))
 	end
 
 	if safe_git then
 		vim.fn.system "git rev-parse --is-inside-work-tree"
 		if vim.v.shell_error == 0 then
-			require("telescope.builtin").git_files(
-				vim.tbl_deep_extend("keep", opts, require("editor").config.plugins.telescope)
-			)
+			require("telescope.builtin").git_files(vim.tbl_deep_extend("keep", opts, zox.config.plugins.telescope))
 		else
 			find_files()
 		end

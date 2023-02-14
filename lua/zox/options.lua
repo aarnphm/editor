@@ -12,7 +12,7 @@ else
 	vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
 end
 
-if require("editor").global.is_mac then
+if zox.global.is_mac then
 	vim.g.clipboard = {
 		name = "macOS-clipboard",
 		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
@@ -20,6 +20,10 @@ if require("editor").global.is_mac then
 		cache_enabled = 0,
 	}
 end
+
+-- quick hack for install sqlite with nix
+vim.g.sqlite_clib_path = vim.NIL ~= vim.fn.getenv "SQLITE_PATH" and vim.env["SQLITE_PATH"]
+	or print "SQLITE_PATH is not set. Telescope will not work"
 
 vim.o.autoindent = true
 vim.o.autoread = true
@@ -99,7 +103,7 @@ vim.o.timeout = true
 vim.o.timeoutlen = 0
 vim.o.ttimeout = true
 vim.o.ttimeoutlen = 0
-vim.o.undodir = require("editor").global.cache_dir .. "undo/"
+vim.o.undodir = zox.global.cache_dir .. "undo/"
 vim.o.undofile = true
 vim.o.undolevels = 9999
 vim.o.updatetime = 200

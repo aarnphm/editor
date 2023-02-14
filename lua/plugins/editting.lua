@@ -100,7 +100,7 @@ return {
 			require("spectre").setup {
 				live_update = true,
 				default = {
-					replace = { cmd = not require("editor").global.is_mac and "oxi" or "sed" },
+					replace = { cmd = not zox.global.is_mac and "oxi" or "sed" },
 				},
 				mapping = {
 					["change_replace_sed"] = {
@@ -256,7 +256,7 @@ return {
 				},
 			}
 		end,
-		cond = require("editor").config.load_big_files_faster,
+		cond = zox.config.load_big_files_faster,
 	},
 	{
 		"akinsho/toggleterm.nvim",
@@ -269,6 +269,7 @@ return {
 			"ToggleTermSendCurrentLine",
 			"ToggleTermSendVisualSelection",
 		},
+		event = "BufReadPost",
 		config = function()
 			require("toggleterm").setup {
 				-- size can be a number or function which is passed the current terminal
@@ -688,7 +689,7 @@ return {
 			},
 		},
 		config = function()
-			require("telescope").setup(vim.tbl_deep_extend("keep", require("editor").config.plugins.telescope, {
+			require("telescope").setup(vim.tbl_deep_extend("keep", zox.config.plugins.telescope, {
 				defaults = {
 					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
 					selection_caret = icons.ui_space.DoubleSeparator,

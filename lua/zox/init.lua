@@ -1,12 +1,11 @@
-local e = require "editor"
-local exported = {
+_G.zox = require "config"
+
+local M = {
 	adapters = {},
 	servers = {},
 }
 
-if not vim.tbl_contains(vim.opt.rtp:get(), e.global.zox) then vim.opt.rtp:append(e.global.zox) end
-
-for package, table in pairs(exported) do
+for package, table in pairs(M) do
 	setmetatable(table, {
 		__index = function(t, k)
 			local ok, builtin = pcall(require, string.format("zox.%s.%s", package, k))
@@ -24,7 +23,13 @@ for package, table in pairs(exported) do
 	})
 end
 
-return setmetatable(exported, {
+M.setup = function()
+	require "zox.options"
+	require "zox.mappings"
+	require "zox.events"
+end
+
+return setmetatable(M, {
 	__index = function(t, k)
 		if not rawget(t, k) then
 			vim.notify(

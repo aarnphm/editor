@@ -40,7 +40,7 @@ return function(options)
 				},
 				diagnostics = {
 					enable = true,
-					globals = { "vim" },
+					globals = { "vim", "zox" },
 				},
 				hint = { enable = true },
 				runtime = {
@@ -54,7 +54,7 @@ return function(options)
 						vim.fn.expand "$VIMRUNTIME/lua",
 						require("neodev.config").types(),
 						vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
-						require("editor").global.zox,
+						zox.global.zox,
 					},
 					checkThirdParty = false,
 					maxPreload = 100000,
