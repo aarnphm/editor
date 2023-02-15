@@ -54,7 +54,32 @@ return {
 		event = "BufReadPre",
 		dependencies = {
 			{ "folke/neodev.nvim", lazy = true, ft = "lua" },
-			{ "ii14/neorepl.nvim", lazy = true, ft = "lua" },
+			{
+				"ii14/neorepl.nvim",
+				lazy = true,
+				ft = "lua",
+				keys = {
+					{
+						"<Leader>or",
+						function()
+							-- get current buffer and window
+							local buf = vim.api.nvim_get_current_buf()
+							local win = vim.api.nvim_get_current_win()
+							-- create a new split for the repl
+							vim.cmd "split"
+							-- spawn repl and set the context to our buffer
+							require("neorepl").new {
+								lang = "vim",
+								buffer = buf,
+								window = win,
+							}
+							-- resize repl window and make it fixed height
+							vim.cmd "resize 10 | setl winfixheight"
+						end,
+						desc = "repl: Open lua repl",
+					},
+				},
+			},
 			{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
 			{
 				"simrat39/rust-tools.nvim",

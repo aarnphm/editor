@@ -19,6 +19,7 @@ api.nvim_create_autocmd("FileType", {
 		"spectre_panel",
 		"startuptime",
 		"tsplayground",
+		"neorepl",
 		"PlenaryTestPopup",
 	},
 	callback = function(event)
