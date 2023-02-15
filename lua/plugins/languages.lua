@@ -53,19 +53,151 @@ return {
 		"neovim/nvim-lspconfig",
 		event = "BufReadPre",
 		dependencies = {
-			{ "folke/neodev.nvim" },
-			{
-				"rafcamlet/nvim-luapad",
-				lazy = true,
-				ft = "lua",
-				cmd = { "Luapad", "LuaRun" },
-				count_limit = 150000,
-				eval_on_move = true,
-				error_highlight = "WarningMsg",
-				opts = {},
-			},
+			{ "folke/neodev.nvim", lazy = true, ft = "lua" },
+			{ "ii14/neorepl.nvim", lazy = true, ft = "lua" },
 			{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-			{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust" },
+			{
+				"simrat39/rust-tools.nvim",
+				lazy = true,
+				ft = "rust",
+				dependencies = {
+					{
+						"saecki/crates.nvim",
+						lazy = true,
+						event = "BufReadPost Cargo.toml",
+						cond = function() return vim.fn.expand "%:t" == "Cargo.toml" end,
+						dependencies = { "nvim-lua/plenary.nvim" },
+						config = function()
+							require("crates").setup {
+								avoid_prerelease = false,
+								thousands_separator = ",",
+								notification_title = "Crates",
+								text = {
+									loading = " " .. ZoxIcon.MiscSpace.Watch .. "Loading",
+									version = " " .. ZoxIcon.UiSpace.Check .. "%s",
+									prerelease = " "
+										.. ZoxIcon.DiagnosticsSpace.WarningHolo
+										.. "%s",
+									yanked = " " .. ZoxIcon.DiagnosticsSpace.Error .. "%s",
+									nomatch = " "
+										.. ZoxIcon.DiagnosticsSpace.Question
+										.. "No match",
+									upgrade = " " .. ZoxIcon.DiagnosticsSpace.HintHolo .. "%s",
+									error = " "
+										.. ZoxIcon.DiagnosticsSpace.Error
+										.. "Error fetching crate",
+								},
+								popup = {
+									hide_on_select = true,
+									copy_register = "\"",
+									border = "rounded",
+									show_version_date = true,
+									text = {
+										title = ZoxIcon.UiSpace.Package .. "%s",
+										description = "%s",
+										created_label = ZoxIcon.MiscSpace.Added
+											.. "created"
+											.. "        ",
+										created = "%s",
+										updated_label = ZoxIcon.MiscSpace.ManUp
+											.. "updated"
+											.. "        ",
+										updated = "%s",
+										downloads_label = ZoxIcon.UiSpace.CloudDownload
+											.. "downloads      ",
+										downloads = "%s",
+										homepage_label = ZoxIcon.MiscSpace.Campass
+											.. "homepage       ",
+										homepage = "%s",
+										repository_label = ZoxIcon.GitSpace.Repo
+											.. "repository     ",
+										repository = "%s",
+										documentation_label = ZoxIcon.DiagnosticsSpace.InformationHolo
+											.. "documentation  ",
+										documentation = "%s",
+										crates_io_label = ZoxIcon.UiSpace.Package
+											.. "crates.io      ",
+										crates_io = "%s",
+										categories_label = ZoxIcon.KindSpace.Class
+											.. "categories     ",
+										keywords_label = ZoxIcon.KindSpace.Keyword
+											.. "keywords       ",
+										version = "  %s",
+										prerelease = ZoxIcon.DiagnosticsSpace.WarningHolo
+											.. "%s prerelease",
+										yanked = ZoxIcon.DiagnosticsSpace.Error .. "%s yanked",
+										version_date = "  %s",
+										feature = "  %s",
+										enabled = ZoxIcon.DapSpace.Play .. "%s",
+										transitive = ZoxIcon.UiSpace.List .. "%s",
+										normal_dependencies_title = ZoxIcon.KindSpace.Interface
+											.. "Dependencies",
+										build_dependencies_title = ZoxIcon.MiscSpace.Gavel
+											.. "Build dependencies",
+										dev_dependencies_title = ZoxIcon.MiscSpace.Glass
+											.. "Dev dependencies",
+										dependency = "  %s",
+										optional = ZoxIcon.UiSpace.BigUnfilledCircle .. "%s",
+										dependency_version = "  %s",
+										loading = " " .. ZoxIcon.MiscSpace.Watch,
+									},
+								},
+								src = {
+									text = {
+										prerelease = " "
+											.. ZoxIcon.DiagnosticsSpace.WarningHolo
+											.. "pre-release ",
+										yanked = " "
+											.. ZoxIcon.DiagnosticsSpace.ErrorHolo
+											.. "yanked ",
+									},
+								},
+								null_ls = { enabled = true, name = "crates.nvim" },
+							}
+							k.nvim_register_mapping {
+								["n|<Leader>ct"] = k.callback(require("crates").toggle)
+									:with_buffer(0)
+									:with_defaults "crates: Toggle",
+								["n|<Leader>cr"] = k.callback(require("crates").reload)
+									:with_buffer(0)
+									:with_defaults "crates: reload",
+								["n|<Leader>cv"] = k.callback(
+									require("crates").show_versions_popup
+								)
+									:with_defaults "crates: show versions popup",
+								["n|<Leader>cf"] = k.callback(
+									require("crates").show_features_popup
+								)
+									:with_defaults "crates: show features popup",
+								["n|<Leader>cd"] = k.callback(
+									require("crates").show_dependencies_popup
+								)
+									:with_defaults "crates: show dependencies popup",
+								["n|<Leader>cu"] = k.callback(require("crates").update_crate)
+									:with_defaults "crates: update crate",
+								["v|<Leader>cu"] = k.callback(require("crates").update_crates)
+									:with_defaults "crates: update crates",
+								["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
+									:with_defaults "crates: update all crates",
+								["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate)
+									:with_defaults "crates: upgrade crate",
+								["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates)
+									:with_defaults "crates: upgrade crates",
+								["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
+									:with_defaults "crates: upgrade all crates",
+								["n|<Leader>cH"] = k.callback(require("crates").open_homepage)
+									:with_defaults "crates: show homepage",
+								["n|<Leader>cR"] = k.callback(require("crates").open_repository)
+									:with_defaults "crates: show repository",
+								["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
+									:with_defaults "crates: show documentation",
+								["n|<Leader>cC"] = k.callback(require("crates").open_crates_io)
+									:with_defaults "crates: open crates.io",
+							}
+						end,
+					},
+				},
+			},
 			{ "williamboman/mason.nvim", cmd = "Mason" },
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "jay-babu/mason-nvim-dap.nvim" },
@@ -315,7 +447,13 @@ return {
 				client.server_capabilities.documentFormattingProvider = false
 				client.server_capabilities.documentRangeFormattingProvider = false
 			end
-			local options = { on_attach = on_attach, capabilities = capabilities }
+			local options = {
+				on_attach = on_attach,
+				capabilities = capabilities,
+				flags = {
+					debounce_text_changes = 150,
+				},
+			}
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
 			--- Supports inlay-hints with `ih.on_attach`
@@ -352,16 +490,12 @@ return {
 							lsp_name
 						)
 					then
-						vim.notify_once(
-							string.format(
-								"Failed to find config for '%s' under zox/servers.",
-								lsp_name
-							),
-							vim.log.levels.ERROR,
-							{ title = "zox" }
-						)
+						--- NOTE: default to nvim-lspconfig for servers
+						--- that doesn't include a configuration setup.
+						nvim_lsp[lsp_name].setup(options)
 						return
 					end
+
 					local lspconfig = require("zox").servers[lsp_name]
 					if type(lspconfig) == "function" then
 						--- This is the case where the language server has its own setup
@@ -370,37 +504,30 @@ return {
 					elseif type(lspconfig) == "table" then
 						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
 					else
-						vim.notify(
-							(
-								"Failed to setup '%s'. Server defined under "
-								.. "zox/servers must returns either a function(opts) or a table."
-								.. " Got type '%s' instead."
-							):format(lsp_name, type(lspconfig)),
-							vim.log.levels.ERROR,
-							{ title = "nvim-lspconfig" }
+						error(
+							string.format(
+								"Failed to setup '%s'. Server defined "
+									.. "under zox/servers must returns either a "
+									.. "function(opts) or a table. Got type '%s' instead.",
+								lsp_name,
+								type(lspconfig)
+							),
+							vim.log.levels.ERROR
 						)
-						return
 					end
 				end
 			end
 
 			require("mason-lspconfig").setup_handlers {
 				function(client_name)
-					nvim_lsp[client_name].setup {
-						on_attach = on_attach,
-						capabilities = capabilities,
-					}
+					ok, _ = pcall(lsp_setup(client_name))
+					if not ok then
+						error(
+							string.format("Failed to setup lspconfig for %s", client_name),
+							vim.log.levels.ERROR
+						)
+					end
 				end,
-				rust_analyzer = lsp_setup "rust_analyzer",
-				clangd = lsp_setup "clangd",
-				html = lsp_setup "html",
-				marksman = lsp_setup "marksman",
-				bufls = lsp_setup "bufls",
-				bashls = lsp_setup "bashls",
-				jsonls = lsp_setup "jsonls",
-				jdtls = lsp_setup "jdtls",
-				yamlls = lsp_setup "yamlls",
-				pyright = lsp_setup "pyright",
 				gopls = lsp_setup("gopls", true),
 				lua_ls = lsp_setup("lua_ls", true),
 				tsserver = lsp_setup("tsserver", true),
