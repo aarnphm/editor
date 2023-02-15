@@ -1,23 +1,23 @@
 return {
 	{ "jghauser/mkdir.nvim" },
+	{ "kylechui/nvim-surround", config = true },
+	{ "nmac427/guess-indent.nvim", event = { "CursorHold", "CursorHoldI" }, config = true },
 	{
-		"nmac427/guess-indent.nvim",
+		"max397574/better-escape.nvim",
 		event = { "CursorHold", "CursorHoldI" },
-		config = function() require("guess-indent").setup {} end,
+		opts = { timeout = 200 },
 	},
 	{
 		"stevearc/dressing.nvim",
 		event = "BufReadPost",
-		config = function()
-			require("dressing").setup {
-				input = { enabled = true },
-				select = {
-					enabled = true,
-					backend = "telescope",
-					trim_prompt = true,
-				},
-			}
-		end,
+		opts = {
+			input = { enabled = true },
+			select = {
+				enabled = true,
+				backend = "telescope",
+				trim_prompt = true,
+			},
+		},
 	},
 	{
 		"ojroques/nvim-bufdel",
@@ -28,10 +28,6 @@ return {
 				["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
 			}
 		end,
-	},
-	{
-		"kylechui/nvim-surround",
-		config = function() require("nvim-surround").setup() end,
 	},
 	{
 		"numToStr/Comment.nvim",
@@ -49,11 +45,6 @@ return {
 				pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
 			}
 		end,
-	},
-	{
-		"max397574/better-escape.nvim",
-		event = { "CursorHold", "CursorHoldI" },
-		config = function() require("better_escape").setup { timeout = 200 } end,
 	},
 	{
 		"echasnovski/mini.align",

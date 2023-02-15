@@ -1,45 +1,21 @@
 local k = require "zox.keybind"
----@param path string path to given directory containing lua files.
----@return string[] list of files in given directory
-local available = function(path)
-	return require("zox.utils").map(
-		vim.split(vim.fn.glob(path .. "/*.lua"), "\n"),
-		function(_) return _:sub(#path + 2, -5) end
-	)
-end
 return {
-	{
-		"kylechui/nvim-surround",
-		lazy = false,
-		config = function() require("nvim-surround").setup() end,
-	},
+	{ "kylechui/nvim-surround", lazy = false, config = true },
 	{
 		"bazelbuild/vim-bazel",
 		lazy = true,
 		dependencies = { "google/vim-maktaba" },
-		cmd = { "Bazel" },
+		cmd = "Bazel",
 		ft = "bzl",
-		config = function()
-			k.nvim_register_mapping {
-				["n|<LocalLeader>bb"] = k.args("Bazel build"):with_defaults "bazel: build",
-				["n|<LocalLeader>bc"] = k.args("Bazel clean"):with_defaults "bazel: clean",
-				["n|<LocalLeader>bd"] = k.args("Bazel debug"):with_defaults "bazel: debug",
-				["n|<LocalLeader>br"] = k.args("Bazel run"):with_defaults "bazel: run",
-				["n|<LocalLeader>bt"] = k.args("Bazel test"):with_defaults "bazel: test",
-			}
-		end,
+		keys = {
+			{ "<LocalLeader>bb", "<cmd>Bazel build<Space>", desc = "bazel: build" },
+			{ "<LocalLeader>bc", "<cmd>Bazel clean<Space>", desc = "bazel: clean" },
+			{ "<LocalLeader>br", "<cmd>Bazel run<Space>", desc = "bazel: run" },
+			{ "<LocalLeader>bq", "<cmd>Bazel query<Space>", desc = "bazel: query" },
+			{ "<LocalLeader>bt", "<cmd>Bazel test<Space>", desc = "bazel: test" },
+		},
 	},
-	{
-		"fatih/vim-go",
-		lazy = true,
-		ft = "go",
-		run = ":GoInstallBinaries",
-		config = function()
-			vim.g.go_doc_keywordprg_enabled = 0
-			vim.g.go_def_mapping_enabled = 0
-			vim.g.go_code_completion_enabled = 0
-		end,
-	},
+	{ "fatih/vim-go", lazy = true, ft = "go", run = ":GoInstallBinaries" },
 	{
 		"lervag/vimtex",
 		lazy = true,
@@ -83,13 +59,10 @@ return {
 				lazy = true,
 				ft = "lua",
 				cmd = { "Luapad", "LuaRun" },
-				config = function()
-					require("luapad").setup {
-						count_limit = 150000,
-						eval_on_move = true,
-						error_highlight = "WarningMsg",
-					}
-				end,
+				count_limit = 150000,
+				eval_on_move = true,
+				error_highlight = "WarningMsg",
+				opts = {},
 			},
 			{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
 			{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust" },
@@ -122,7 +95,7 @@ return {
 				config = function()
 					require("lspsaga").setup {
 						finder = { keys = { jump_to = "e" } },
-						lightbulb = { virtual_text = false },
+						lightbulb = { enable = false },
 						diagnostic = { keys = { exec_action = "<CR>" } },
 						definition = { split = "<C-c>s" },
 						beacon = { enable = false },
@@ -356,6 +329,15 @@ return {
 					end
 				end
 				return function()
+					---@param path string path to given directory containing lua files.
+					---@return string[] list of files in given directory
+					local available = function(path)
+						return require("zox.utils").map(
+							vim.split(vim.fn.glob(path .. "/*.lua"), "\n"),
+							function(_) return _:sub(#path + 2, -5) end
+						)
+					end
+
 					if
 						not vim.tbl_contains(
 							available(

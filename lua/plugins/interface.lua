@@ -1,16 +1,15 @@
 local k = require "zox.keybind"
 
 return {
+	{ "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
 	{
 		"j-hui/fidget.nvim",
 		lazy = true,
-		event = "LspAttach",
-		config = function()
-			require("fidget").setup {
-				text = { spinner = "dots" },
-				window = { blend = 0 },
-			}
-		end,
+		event = "BufReadPost",
+		opts = {
+			text = { spinner = "dots" },
+			window = { blend = 0 },
+		},
 	},
 	{
 		"rcarriga/nvim-notify",
@@ -218,7 +217,7 @@ return {
 			dashboard.config.layout = {
 				{
 					type = "padding",
-					val = math.max(0, math.ceil((vim.fn.winheight(0) - heights) * 0.25)),
+					val = math.max(0, math.ceil((vim.fn.winheight(0) - heights) * 0.12)),
 				},
 				dashboard.section.header,
 				{ type = "padding", val = top_button_pad },
@@ -241,29 +240,26 @@ return {
 	{
 		"nathom/filetype.nvim",
 		event = "BufReadPost",
-		config = function()
-			--- Add custom filet+pe extension
-			require("filetype").setup {
-				overrides = {
-					extension = {
-						conf = "conf",
-						mdx = "markdown",
-						mjml = "html",
-						sh = "bash",
-					},
-					complex = {
-						[".*%.env.*"] = "sh",
-						["ignore$"] = "conf",
-						["yup.lock"] = "yaml",
-						["WORKSPACE"] = "bzl",
-					},
-					shebang = {
-						-- Set the filetype of files with a dash shebang to sh
-						dash = "sh",
-					},
+		opts = {
+			overrides = {
+				extension = {
+					conf = "conf",
+					mdx = "markdown",
+					mjml = "html",
+					sh = "bash",
 				},
-			}
-		end,
+				complex = {
+					[".*%.env.*"] = "sh",
+					["ignore$"] = "conf",
+					["yup.lock"] = "yaml",
+					["WORKSPACE"] = "bzl",
+				},
+				shebang = {
+					-- Set the filetype of files with a dash shebang to sh
+					dash = "sh",
+				},
+			},
+		},
 	},
 	{
 		"akinsho/nvim-bufferline.lua",
@@ -272,7 +268,6 @@ return {
 		event = { "BufReadPost", "BufRead" },
 		config = function()
 			require("bufferline").setup {
-				highlights = require "rose-pine.plugins.bufferline",
 				options = {
 					offsets = {
 						{
@@ -320,7 +315,6 @@ return {
 			}
 		end,
 	},
-	{ "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
 	{
 		"zbirenbaum/neodim",
 		lazy = true,
@@ -716,6 +710,7 @@ return {
 	},
 	{
 		"nvim-telescope/telescope.nvim",
+		event = "BufRead",
 		dependencies = {
 			{
 				"nvim-tree/nvim-web-devicons",
@@ -734,6 +729,10 @@ return {
 			},
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-lua/popup.nvim" },
+			{ "jvgrootveld/telescope-zoxide" },
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 		},
 		cmd = "Telescope",
 		keys = {
@@ -743,30 +742,52 @@ return {
 				desc = "find: file in project",
 			},
 			{
+				"<leader>r",
+				"",
+				desc = "find: recent files",
+				callback = function()
+					require("telescope").extensions.frecency.frecency { previewer = false }
+				end,
+			},
+			{
 				"<leader>w",
-				"<cmd>Telescope live_grep<cr>",
+				"",
 				desc = "find: text",
+				callback = function()
+					require("telescope").extensions.live_grep_args.live_grep_args()
+				end,
+			},
+			{
+				"<leader>/",
+				"<cmd>Telescope grep_string<cr>",
+				desc = "find: Current word",
+			},
+			{
+				"<leader>b",
+				"<cmd>Telescope buffers<cr>",
+				desc = "find: Buffer opened",
+			},
+			{
+				"<leader>n",
+				"<C-u>enew<CR>",
+				desc = "buffer: New",
+			},
+			{
+				"<C-p>",
+				"",
+				desc = "tools: Show keymap legends",
+				callback = function()
+					require("telescope.builtin").keymaps {
+						lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+						layout_config = {
+							width = 0.6,
+							height = 0.6,
+							prompt_position = "top",
+						},
+					}
+				end,
 			},
 		},
-		init = function()
-			local command_panel = function()
-				require("telescope.builtin").keymaps {
-					lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-					layout_config = {
-						width = 0.6,
-						height = 0.6,
-						prompt_position = "top",
-					},
-				}
-			end
-
-			k.nvim_register_mapping {
-				["n|<Leader>/"] = k.cu("Telescope grep_string"):with_defaults "find: Current word",
-				["n|<Leader>b"] = k.cu("Telescope buffers"):with_defaults "find: Buffer opened",
-				["n|<Leader>n"] = k.cu("enew"):with_defaults "buffer: New",
-				["n|<C-p>"] = k.callback(command_panel):with_defaults "tools: Show keymap legends",
-			}
-		end,
 		config = function()
 			require("telescope").setup {
 				defaults = {
@@ -779,8 +800,65 @@ return {
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
+					layout_config = {
+						horizontal = {
+							preview_width = 0.5,
+							prompt_position = "top",
+						},
+						vertical = {
+							preview_height = 0.5,
+							prompt_position = "top",
+						},
+					},
+				},
+				extensions = {
+					frecency = {
+						show_scores = true,
+						show_unindexed = true,
+						ignore_patterns = { "*.git/*", "*/tmp/*", "*/lazy-lock.json" },
+					},
+					fzf = {
+						fuzzy = false,
+						override_generic_sorter = true,
+						override_file_sorter = true,
+						case_mode = "smart_case",
+					},
+					live_grep_args = {
+						auto_quoting = false,
+						mappings = {
+							i = {
+								["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
+								["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt {
+									postfix = " --iglob ",
+								},
+							},
+						},
+					},
+				},
+				pickers = {
+					keymaps = {
+						theme = "dropdown",
+					},
+					live_grep = {
+						on_input_filter_cb = function(prompt)
+							-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
+							return { prompt = prompt:gsub("%s", ".*") }
+						end,
+						attach_mappings = function(_)
+							require("telescope.actions.set").select:enhance {
+								post = function() vim.cmd ":normal! zx" end,
+							}
+							return true
+						end,
+					},
+					diagnostics = {
+						initial_mode = "normal",
+					},
 				},
 			}
+			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify" } do
+				require("telescope").load_extension(v)
+			end
 		end,
 	},
 	{
@@ -844,6 +922,7 @@ return {
 		"nvim-pack/nvim-spectre",
 		lazy = true,
 		build = "./build.sh",
+		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("spectre").setup {
 				live_update = true,
@@ -876,8 +955,7 @@ return {
 					},
 				},
 			}
-		end,
-		init = function()
+
 			k.nvim_register_mapping {
 				["n|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
@@ -903,42 +981,62 @@ return {
 			"ToggleTermSendVisualSelection",
 		},
 		event = { "CursorHold", "CursorHoldI" },
-		config = function()
-			require("toggleterm").setup {
-				-- size can be a number or function which is passed the current terminal
-				size = function(term)
-					if term.direction == "horizontal" then
-						return 15
-					elseif term.direction == "vertical" then
-						return vim.o.columns * 0.40
-					end
-				end,
-				on_open = function()
-					-- Prevent infinite calls from freezing neovim.
-					-- Only set these options specific to this terminal buffer.
-					vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
-					vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
-				end,
-				open_mapping = false,
-				shade_terminals = false,
-				shading_factor = vim.o.background == "dark" and "1" or "3",
-				direction = "horizontal",
-			}
-
-			k.nvim_register_mapping {
-				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
-					:with_defaults "terminal: Toggle horizontal",
-				["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
-					:with_defaults "terminal: Toggle horizontal",
-				["t|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
-					:with_defaults "terminal: Toggle horizontal",
-				["n|<C-t>"] = k.cr([[execute v:count . "ToggleTerm direction=vertical"]])
-					:with_defaults "terminal: Toggle vertical",
-				["i|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
-					:with_defaults "terminal: Toggle vertical",
-				["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
-					:with_defaults "terminal: Toggle vertical",
-			}
-		end,
+		keys = {
+			{
+				"<C-\\>",
+				"<cmd>execute v:count . \"ToggleTerm direction=horizontal\"<CR>",
+				mode = "n",
+				desc = "terminal: toggle horizontal",
+			},
+			{
+				"<C-\\>",
+				"<Esc><Cmd>ToggleTerm direction=horizontal<CR>",
+				mode = "i",
+				desc = "terminal: toggle horizontal",
+			},
+			{
+				"<C-\\>",
+				"<Esc><Cmd>ToggleTerm direction=horizontal<CR>",
+				mode = "t",
+				desc = "terminal: toggle horizontal",
+			},
+			{
+				"<C-t>",
+				mode = "n",
+				"<cmd>execute v:count . \"ToggleTerm direction=vertical\"<CR>",
+				desc = "terminal: toggle vertical",
+			},
+			{
+				"<C-t>",
+				"<Esc><Cmd>ToggleTerm direction=vertical<CR>",
+				mode = "i",
+				desc = "terminal: toggle vertical",
+			},
+			{
+				"<C-t>",
+				"<Esc><Cmd>ToggleTerm direction=vertical<CR>",
+				mode = "t",
+				desc = "terminal: toggle vertical",
+			},
+		},
+		opts = {
+			-- size can be a number or function which is passed the current terminal
+			size = function(term)
+				if term.direction == "horizontal" then
+					return 15
+				elseif term.direction == "vertical" then
+					return vim.o.columns * 0.40
+				end
+			end,
+			on_open = function()
+				-- Prevent infinite calls from freezing neovim.
+				-- Only set these options specific to this terminal buffer.
+				vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
+				vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
+			end,
+			open_mapping = false, -- default mapping
+			shade_terminals = false,
+			direction = "vertical",
+		},
 	},
 }
