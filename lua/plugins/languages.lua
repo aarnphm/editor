@@ -91,58 +91,30 @@ return {
 			{
 				"glepnir/lspsaga.nvim",
 				branch = "main",
+				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
-				config = function()
-					require("lspsaga").setup {
-						finder = { keys = { jump_to = "e" } },
-						lightbulb = { enable = false },
-						diagnostic = { keys = { exec_action = "<CR>" } },
-						definition = { split = "<C-c>s" },
-						beacon = { enable = false },
-						outline = {
-							win_with = "lsagaoutline",
-							win_width = math.floor(vim.o.columns * 0.2),
-							keys = { jump = "<CR>" },
-						},
-						code_actions = { extend_gitsigns = false },
-						symbol_in_winbar = {
-							enable = false,
-							separator = " " .. ZoxIcon.UiSpace.Separator,
-							show_file = false,
-						},
-						callhierarchy = { show_detail = true },
-					}
-
-					local p = require "rose-pine.palette"
-					local h = require("rose-pine.util").highlight
-
-					h("TitleString", { fg = p.rose, bold = true })
-					h("TitleIcon", { fg = p.rose })
-					h("SagaBorder", { fg = p.border })
-					h("SagaNormal", { bg = p.surface })
-					h("SagaExpand", { fg = p.love })
-					h("SagaCollapse", { fg = p.love })
-					h("SagaBeacon", { fg = p.base })
-					h("ActionPreviewTitle", { fg = p.rose, bold = true })
-					h("CodeActionText", { fg = p.foam })
-					h("CodeActionNumber", { fg = p.foam })
-					h("SagaShadow", { bg = p.overlay })
-					h("OutlineIndent", { fg = p.rose })
-					h("FinderSelection", { fg = p.gold })
-					h("FinderFileName", { fg = p.text })
-					h("FinderIcon", { fg = p.rose })
-					h("FinderType", { fg = p.iris })
-					h("FinderSpinnerTitle", { fg = p.iris, bold = true })
-					h("FinderSpinner", { fg = p.iris, bold = true })
-					h("FinderVirtText", { fg = p.rose })
-					h("RenameNormal", { fg = p.love, bg = p.base })
-					h("DiagnosticPos", { fg = p.subtle })
-					h("DiagnosticWord", { fg = p.highlight_high })
-					h("CallHierarchyIcon", { fg = p.iris })
-					h("CallHierarchyTitle", { fg = p.love })
-
+				opts = {
+					finder = { keys = { jump_to = "e" } },
+					lightbulb = { enable = false },
+					diagnostic = { keys = { exec_action = "<CR>" } },
+					definition = { split = "<C-c>s" },
+					beacon = { enable = false },
+					outline = {
+						win_with = "lsagaoutline",
+						win_width = math.floor(vim.o.columns * 0.2),
+						keys = { jump = "<CR>" },
+					},
+					code_actions = { extend_gitsigns = false },
+					symbol_in_winbar = {
+						enable = false,
+						separator = " " .. ZoxIcon.UiSpace.Separator,
+						show_file = false,
+					},
+					callhierarchy = { show_detail = true },
+				},
+				keys = function()
 					local filetype = vim.bo.filetype
-					k.nvim_register_mapping {
+					return k.to_lazy_mapping {
 						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
 						["n|g["] = k.callback(
 							function() require("lspsaga.diagnostic"):goto_prev {} end
@@ -184,6 +156,35 @@ return {
 							end
 						end):with_defaults "lsp: Show doc",
 					}
+				end,
+				init = function()
+					local p = require "rose-pine.palette"
+					local h = require("rose-pine.util").highlight
+
+					h("TitleString", { fg = p.rose, bold = true })
+					h("TitleIcon", { fg = p.rose })
+					h("SagaBorder", { fg = p.border })
+					h("SagaNormal", { bg = p.surface })
+					h("SagaExpand", { fg = p.love })
+					h("SagaCollapse", { fg = p.love })
+					h("SagaBeacon", { fg = p.base })
+					h("ActionPreviewTitle", { fg = p.rose, bold = true })
+					h("CodeActionText", { fg = p.foam })
+					h("CodeActionNumber", { fg = p.foam })
+					h("SagaShadow", { bg = p.overlay })
+					h("OutlineIndent", { fg = p.rose })
+					h("FinderSelection", { fg = p.gold })
+					h("FinderFileName", { fg = p.text })
+					h("FinderIcon", { fg = p.rose })
+					h("FinderType", { fg = p.iris })
+					h("FinderSpinnerTitle", { fg = p.iris, bold = true })
+					h("FinderSpinner", { fg = p.iris, bold = true })
+					h("FinderVirtText", { fg = p.rose })
+					h("RenameNormal", { fg = p.love, bg = p.base })
+					h("DiagnosticPos", { fg = p.subtle })
+					h("DiagnosticWord", { fg = p.highlight_high })
+					h("CallHierarchyIcon", { fg = p.iris })
+					h("CallHierarchyTitle", { fg = p.love })
 				end,
 			},
 		},

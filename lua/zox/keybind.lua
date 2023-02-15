@@ -28,6 +28,20 @@ RHS.new = function(self)
 	return instance
 end
 
+---@param self RHS
+---@param key string
+---@param mode? string
+---@return LazyKeys
+RHS.to_lazy_keymap = function(self, key, mode)
+	mode = mode or "n"
+	return {
+		key, -- lhs
+		self.cmd, -- rhs
+		mode = mode,
+		self.options,
+	}
+end
+
 ---@param cmd_string string
 ---@return RHS
 RHS.cr = function(self, cmd_string)
@@ -138,6 +152,22 @@ bind.args = function(cmd_string) return RHS:new():args(cmd_string) end
 ---@param callback function
 ---@return RHS
 bind.callback = function(callback) return RHS:new():callback(callback) end
+
+---@param mapping table<string, RHS>
+-- This functions takes the mapping tables and converts it to LazyKeys[] table.
+-- The mapping table should be in the following format: [mode|keymap] = RHS
+-- For example:
+-- ["n|<Leader>ph"] = k.cr("Lazy"):with_nowait():with_defaults "package: Show",
+---@return LazyKeys[]
+bind.to_lazy_mapping = function(mapping)
+	---@cast LazyKeys[]
+	local res = {}
+	for key, value in pairs(mapping) do
+		local mode, keymap = key:match "([^|]*)|?(.*)"
+		table.insert(res, value:to_lazy_keymap(keymap, mode))
+	end
+	return res
+end
 
 ---@param mapping table<string, RHS>
 -- This functions takes the mapping tables and loads them into the neovim
