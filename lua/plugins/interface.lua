@@ -714,18 +714,16 @@ return {
 		dependencies = {
 			{
 				"nvim-tree/nvim-web-devicons",
-				config = function()
-					require("nvim-web-devicons").setup {
-						override = {
-							zsh = {
-								icon = "",
-								color = "#428850",
-								cterm_color = "65",
-								name = "Zsh",
-							},
+				opts = {
+					override = {
+						zsh = {
+							icon = "",
+							color = "#428850",
+							cterm_color = "65",
+							name = "Zsh",
 						},
-					}
-				end,
+					},
+				},
 			},
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-lua/popup.nvim" },
@@ -733,6 +731,18 @@ return {
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
+			{
+				"ahmedkhalf/project.nvim",
+				event = "BufReadPost",
+				config = function()
+					require("project_nvim").setup {
+						ignore_lsp = { "null-ls", "copilot" },
+						show_hidden = true,
+						silent_chdir = true,
+						scope_chdir = "win",
+					}
+				end,
+			},
 		},
 		cmd = "Telescope",
 		keys = {
@@ -771,6 +781,13 @@ return {
 				"<leader>n",
 				"<C-u>enew<CR>",
 				desc = "buffer: New",
+			},
+			{
+				"<leader>\\",
+				function()
+					require("telescope").extensions.projects.projects { promp_title = "Projects" }
+				end,
+				desc = "find: Projects",
 			},
 			{
 				"<C-p>",
@@ -856,7 +873,7 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify" } do
+			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,
