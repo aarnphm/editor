@@ -551,7 +551,6 @@ return {
 				StatusLineNC = { fg = "subtle", bg = "surface" },
 			},
 		},
-		init = function() vim.cmd.colorscheme "rose-pine" end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -730,6 +729,10 @@ return {
 			{ "jvgrootveld/telescope-zoxide" },
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{
+				"nvim-telescope/telescope-dap.nvim",
+				dependencies = { "mfussenegger/nvim-dap", "nvim-treesitter/nvim-treesitter" },
+			},
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 			{
 				"ahmedkhalf/project.nvim",
@@ -873,7 +876,15 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "fzf", "frecency", "live_grep_args", "zoxide", "notify", "projects" } do
+			for _, v in ipairs {
+				"fzf",
+				"frecency",
+				"live_grep_args",
+				"zoxide",
+				"notify",
+				"projects",
+				"dap",
+			} do
 				require("telescope").load_extension(v)
 			end
 		end,
@@ -1055,5 +1066,136 @@ return {
 			shade_terminals = false,
 			direction = "vertical",
 		},
+	},
+
+	--- NOTE: Dap setup
+	{
+		"rcarriga/nvim-dap-ui",
+		lazy = true,
+		events = "BufReadPost",
+		config = function()
+			require("dapui").setup {
+				icons = {
+					expanded = ZoxIcon.UiSpace.ArrowOpen,
+					collapsed = ZoxIcon.UiSpace.ArrowClosed,
+					current_frame = ZoxIcon.UiSpace.Indicator,
+				},
+				layouts = {
+					{
+						elements = {
+							-- Provide as ID strings or tables with "id" and "size" keys
+							{
+								id = "scopes",
+								size = 0.25, -- Can be float or integer > 1
+							},
+							{ id = "breakpoints", size = 0.25 },
+							{ id = "stacks", size = 0.25 },
+							{ id = "watches", size = 0.25 },
+						},
+						size = 40,
+						position = "left",
+					},
+					{ elements = { "repl" }, size = 10, position = "bottom" },
+				},
+				controls = {
+					icons = {
+						pause = ZoxIcon.DapSpace.Pause,
+						play = ZoxIcon.DapSpace.Play,
+						step_into = ZoxIcon.DapSpace.StepInto,
+						step_over = ZoxIcon.DapSpace.StepOver,
+						step_out = ZoxIcon.DapSpace.StepOut,
+						step_back = ZoxIcon.DapSpace.StepBack,
+						run_last = ZoxIcon.DapSpace.RunLast,
+						terminate = ZoxIcon.DapSpace.Terminate,
+					},
+				},
+				windows = { indent = 1 },
+			}
+		end,
+	},
+	{
+		"mfussenegger/nvim-dap",
+		lazy = true,
+		cmd = {
+			"DapSetLogLevel",
+			"DapShowLog",
+			"DapContinue",
+			"DapToggleBreakpoint",
+			"DapToggleRepl",
+			"DapStepOver",
+			"DapStepInto",
+			"DapStepOut",
+			"DapTerminate",
+		},
+		events = "BufReadPost",
+		dependencies = { "rcarriga/nvim-dap-ui" },
+		keys = function()
+			return k.to_lazy_mapping {
+				["n|<F6>"] = k.callback(function() require("dap").continue() end)
+					:with_defaults "dap: Run/Continue",
+				["n|<F7>"] = k.callback(function()
+					require("dap").terminate()
+					require("dapui").close()
+				end):with_defaults "dap: Stop",
+				["n|<F8>"] = k.callback(function() require("dap").toggle_breakpoint() end)
+					:with_defaults "dap: Toggle breakpoint",
+				["n|<F9>"] = k.callback(function() require("dap").step_into() end)
+					:with_defaults "dap: Step into",
+				["n|<F10>"] = k.callback(function() require("dap").step_out() end)
+					:with_defaults "dap: Step out",
+				["n|<F11>"] = k.callback(function() require("dap").step_over() end)
+					:with_defaults "dap: Step over",
+				["n|<Leader>db"] = k.callback(
+					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
+				):with_defaults "dap: Set breakpoint with condition",
+				["n|<Leader>dc"] = k.callback(function() require("dap").run_to_cursor() end)
+					:with_defaults "dap: Run to cursor",
+				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
+					:with_defaults "dap: Run last",
+				["n|<Leader>do"] = k.callback(function() require("dap").repl.open() end)
+					:with_defaults "dap: Open REPL",
+			}
+		end,
+		config = function()
+			for _, v in ipairs {
+				"Breakpoint",
+				"BreakpointRejected",
+				"BreakpointCondition",
+				"LogPoint",
+				"Stopped",
+			} do
+				vim.fn.sign_define("Dap" .. v, {
+					text = ZoxIcon.DapSpace[v],
+					texthl = "Dap" .. v,
+					line = "",
+					numhl = "",
+				})
+			end
+			-- Config lang adapters
+			require "zox.adapters.dlv"
+			require "zox.adapters.lldb"
+		end,
+	},
+	{
+		"mfussenegger/nvim-dap-python",
+		ft = "python",
+		dependencies = { "mfussenegger/nvim-dap" },
+		config = function()
+			require("dap-python").setup()
+			require("dap-python").test_runner = "pytest"
+		end,
+	},
+	{
+		"theHamsta/nvim-dap-virtual-text",
+		lazy = true,
+		ft = "python",
+		dependencies = { "mfussenegger/nvim-dap" },
+		config = function()
+			require("nvim-dap-virtual-text").setup {
+				enabled = true,
+				enabled_commands = true,
+				all_frames = true,
+			}
+		end,
 	},
 }

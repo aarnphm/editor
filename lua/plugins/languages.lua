@@ -1,6 +1,5 @@
 local k = require "zox.keybind"
 return {
-	{ "kylechui/nvim-surround", lazy = false, config = true },
 	{
 		"bazelbuild/vim-bazel",
 		lazy = true,
@@ -250,36 +249,13 @@ return {
 				branch = "main",
 				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
-				opts = {
-					finder = { keys = { jump_to = "e" } },
-					lightbulb = { enable = false },
-					diagnostic = { keys = { exec_action = "<CR>" } },
-					definition = { split = "<C-c>s" },
-					beacon = { enable = false },
-					outline = {
-						win_with = "lsagaoutline",
-						win_width = math.floor(vim.o.columns * 0.2),
-						keys = { jump = "<CR>" },
-					},
-					code_actions = { extend_gitsigns = false },
-					symbol_in_winbar = {
-						enable = false,
-						separator = " " .. ZoxIcon.UiSpace.Separator,
-						show_file = false,
-					},
-					callhierarchy = { show_detail = true },
-				},
 				keys = function()
 					local filetype = vim.bo.filetype
 					return k.to_lazy_mapping {
 						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
-						["n|g["] = k.callback(
-							function() require("lspsaga.diagnostic"):goto_prev {} end
-						)
+						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
 							:with_defaults "lsp: Prev diagnostic",
-						["n|g]"] = k.callback(
-							function() require("lspsaga.diagnostic"):goto_next {} end
-						)
+						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
 							:with_defaults "lsp: Next diagnostic",
 						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
 						["n|ca"] = k.callback(function()
@@ -314,7 +290,26 @@ return {
 						end):with_defaults "lsp: Show doc",
 					}
 				end,
-				init = function()
+				config = function()
+					require("lspsaga").setup {
+						finder = { keys = { jump_to = "e" } },
+						lightbulb = { enable = false },
+						diagnostic = { keys = { exec_action = "<CR>" } },
+						definition = { split = "<C-c>s" },
+						beacon = { enable = false },
+						outline = {
+							win_with = "lsagaoutline",
+							win_width = math.floor(vim.o.columns * 0.2),
+							keys = { jump = "<CR>" },
+						},
+						code_actions = { extend_gitsigns = false },
+						symbol_in_winbar = {
+							enable = false,
+							separator = " " .. ZoxIcon.UiSpace.Separator,
+							show_file = false,
+						},
+						callhierarchy = { show_detail = true },
+					}
 					local p = require "rose-pine.palette"
 					local h = require("rose-pine.util").highlight
 

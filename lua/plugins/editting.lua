@@ -1,6 +1,6 @@
 return {
 	{ "jghauser/mkdir.nvim" },
-	{ "kylechui/nvim-surround", config = true },
+	{ "kylechui/nvim-surround", event = { "CursorHold", "CursorHoldI" }, config = true },
 	{ "nmac427/guess-indent.nvim", event = { "CursorHold", "CursorHoldI" }, config = true },
 	{
 		"max397574/better-escape.nvim",
@@ -55,6 +55,7 @@ return {
 		"gelguy/wilder.nvim",
 		lazy = true,
 		event = "CmdlineEnter",
+		build = ":UpdateRemotePlugins",
 		dependencies = { "romgrk/fzy-lua-native" },
 		config = function()
 			local wilder = require "wilder"

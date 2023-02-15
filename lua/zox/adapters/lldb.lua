@@ -1,5 +1,5 @@
 local dap = require "dap"
-local utils = require "utils"
+local utils = require "zox.utils"
 
 local find_lldb_path = function()
 	-- currently lock on the version 1.8.1
