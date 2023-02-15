@@ -1,5 +1,5 @@
+vim.o.background = "light"
 vim.cmd.colorscheme "un"
-vim.g.background = "light"
 
 -- custom python provider
 local conda_prefix = os.getenv "CONDA_PREFIX"
