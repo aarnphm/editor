@@ -168,6 +168,7 @@ return {
 					h("CallHierarchyIcon", { fg = p.iris })
 					h("CallHierarchyTitle", { fg = p.love })
 
+					local filetype = vim.bo.filetype
 					k.nvim_register_mapping {
 						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
 						["n|g["] = k.callback(
@@ -179,10 +180,20 @@ return {
 						)
 							:with_defaults "lsp: Next diagnostic",
 						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
-						["n|ca"] = k.cr("Lspsaga code_action")
-							:with_defaults "lsp: Code action for cursor",
-						["v|ca"] = k.cu("Lspsaga code_action")
-							:with_defaults "lsp: Code action for range",
+						["n|ca"] = k.callback(function()
+							if filetype == "rust" then
+								require("rust-tools").code_action_group.code_action_group()
+							else
+								require("lspsaga.codeaction"):code_action()
+							end
+						end):with_defaults "lsp: Code action for cursor",
+						["v|ca"] = k.callback(function()
+							if filetype == "rust" then
+								require("rust-tools").code_action_group.code_action_group()
+							else
+								require("lspsaga.codeaction"):code_action()
+							end
+						end):with_defaults "lsp: Code action for range",
 						["n|gd"] = k.cr("Lspsaga peek_definition")
 							:with_defaults "lsp: Preview definition",
 						["n|gD"] = k.cr("Lspsaga goto_definition")
@@ -191,7 +202,6 @@ return {
 						["n|gs"] = k.callback(vim.lsp.buf.signature_help)
 							:with_defaults "lsp: Signature help",
 						["n|K"] = k.callback(function()
-							local filetype = vim.bo.filetype
 							if vim.tbl_contains({ "vim", "help" }, filetype) then
 								vim.cmd("h " .. vim.fn.expand "<cword>")
 							elseif vim.tbl_contains({ "man" }, filetype) then
