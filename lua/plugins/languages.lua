@@ -95,16 +95,12 @@ return {
 								thousands_separator = ",",
 								notification_title = "Crates",
 								text = {
-									loading = " "
-										.. require("zox").misc_space.Watch
-										.. "Loading",
+									loading = " " .. require("zox").misc_space.Watch .. "Loading",
 									version = " " .. require("zox").ui_space.Check .. "%s",
 									prerelease = " "
 										.. require("zox").diagnostics_space.WarningHolo
 										.. "%s",
-									yanked = " "
-										.. require("zox").diagnostics_space.Error
-										.. "%s",
+									yanked = " " .. require("zox").diagnostics_space.Error .. "%s",
 									nomatch = " "
 										.. require("zox").diagnostics_space.Question
 										.. "No match",
@@ -233,6 +229,26 @@ return {
 			{ "jay-babu/mason-nvim-dap.nvim" },
 			{
 				"simrat39/inlay-hints.nvim",
+				cond = function()
+					return not vim.tbl_contains({
+						"DoomInfo",
+						"DressingSelect",
+						"NvimTree",
+						"Outline",
+						"TelescopePrompt",
+						"Trouble",
+						"alpha",
+						"dashboard",
+						"dirvish",
+						"fugitive",
+						"help",
+						"lsgsagaoutline",
+						"neogitstatus",
+						"norg",
+						"toggleterm",
+					}, vim.bo.filetype)
+				end,
+				lazy = true,
 				opts = {
 					parameter = { show = true },
 					renderer = "inlay-hints.render.eol",
@@ -363,7 +379,6 @@ return {
 					"gopls",
 					"lua_ls",
 					"marksman",
-					"zk",
 					"denols",
 					"html",
 					"jdtls",
@@ -530,7 +545,7 @@ return {
 					if
 						not vim.tbl_contains(
 							available(
-								require("zox.utils").joinpath(
+								require("zox.utils").path.join(
 									vim.fn.stdpath "config",
 									"lua",
 									"zox",

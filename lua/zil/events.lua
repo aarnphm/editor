@@ -13,6 +13,7 @@ api.nvim_create_autocmd("FileType", {
 		"notify",
 		"lspinfo",
 		"terminal",
+		"lazy",
 		"prompt",
 		"toggleterm",
 		"copilot",
@@ -25,6 +26,18 @@ api.nvim_create_autocmd("FileType", {
 	callback = function(event)
 		vim.bo[event.buf].buflisted = false
 		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<CMD>close<CR>", { silent = true })
+	end,
+})
+
+api.nvim_create_autocmd("FileType", {
+	group = misc_id,
+	pattern = { "alpha" },
+	callback = function(event)
+		-- Disable statusline in dashboard
+		vim.opt.showtabline = 0
+		vim.opt.laststatus = 0
+		vim.bo[event.buf].buflisted = false
+		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<CMD>q<CR>", { silent = true })
 	end,
 })
 
@@ -73,6 +86,22 @@ vim.api.nvim_create_autocmd("BufRead", {
 	end,
 })
 
+-- auto close NvimTree
+api.nvim_create_autocmd("BufEnter", {
+	group = api.nvim_create_augroup("NvimTreeClose", { clear = true }),
+	pattern = "NvimTree_*",
+	callback = function()
+		local layout = api.nvim_call_function("winlayout", {})
+		if
+			layout[1] == "leaf"
+			and api.nvim_buf_get_option(api.nvim_win_get_buf(layout[2]), "filetype") == "NvimTree"
+			and layout[3] == nil
+		then
+			vim.cmd.confirm { "quit" }
+		end
+	end,
+})
+
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
 -- Set noundofile for temporary files
 api.nvim_create_autocmd("BufWritePre", {
@@ -81,6 +110,11 @@ api.nvim_create_autocmd("BufWritePre", {
 	command = "setlocal noundofile",
 })
 -- auto change directory
+api.nvim_create_autocmd("BufEnter", {
+	group = bufs_id,
+	pattern = "*",
+	command = "silent! lcd %:p:h",
+})
 -- auto place to last edit
 api.nvim_create_autocmd("BufReadPost", {
 	group = bufs_id,
@@ -95,18 +129,6 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 })
 
 local wins_id = api.nvim_create_augroup("EditorWins", { clear = true })
--- Force write shada on leaving nvim
-api.nvim_create_autocmd("VimLeave", {
-	group = wins_id,
-	pattern = "*",
-	callback = function(_)
-		if vim.fn.has "nvim" == 1 then
-			api.nvim_command [[wshada!]]
-		else
-			api.nvim_command [[wviminfo!]]
-		end
-	end,
-})
 -- Check if we need to reload the file when it changed
 api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 	group = wins_id,

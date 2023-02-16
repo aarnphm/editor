@@ -100,4 +100,50 @@ return {
 		event = { "CursorHold", "CursorHoldI" },
 		config = function() require("mini.surround").setup() end,
 	},
+	{
+		"epwalsh/obsidian.nvim",
+		ft = "markdown",
+		lazy = true,
+		cmd = {
+			"ObsidianBacklinks",
+			"ObsidianFollowLink",
+			"ObsidianSearch",
+			"ObsidianOpen",
+			"ObsidianLink",
+		},
+		config = function()
+			require("obsidian").setup {
+				dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/"
+					or vim.fn.getcwd(),
+				use_advanced_uri = true,
+				completion = { nvim_cmp = true },
+				note_frontmatter_func = function(note)
+					local out = { id = note.id, aliases = note.aliases, tags = note.tags }
+					-- `note.metadata` contains any manually added fields in the frontmatter.
+					-- So here we just make sure those fields are kept in the frontmatter.
+					if
+						note.metadata ~= nil
+						and require("obsidian").util.table_length(note.metadata) > 0
+					then
+						for k, v in pairs(note.metadata) do
+							out[k] = v
+						end
+					end
+					return out
+				end,
+			}
+
+			local k = require "zox.keybind"
+			k.nvim_register_mapping {
+				["n|<Leader>gf"] = k.callback(function()
+					if require("obsidian").utils.cursor_on_markdown_link() then
+						pcall(vim.cmd.ObsidianFollowLink)
+					end
+				end):with_defaults "obsidian: Follow link",
+				["n|<Leader>bl"] = k.cr("ObsidianBacklinks"):with_defaults "obsidian: Backlinks",
+				["n|<Leader>on"] = k.cr("ObsidianNew"):with_defaults "obsidian: New notes",
+				["n|<Leader>oo"] = k.cr("ObsidianOpen"):with_defaults "obsidian: Open",
+			}
+		end,
+	},
 }

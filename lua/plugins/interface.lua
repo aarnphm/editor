@@ -1,10 +1,54 @@
-local k = require "zox.keybind"
-
 return {
+	{
+		"gelguy/wilder.nvim",
+		lazy = true,
+		event = "CmdlineEnter",
+		dependencies = { "romgrk/fzy-lua-native" },
+		config = function()
+			local wilder = require "wilder"
+			wilder.setup { modes = { ":", "/", "?" } }
+			wilder.set_option("use_python_remote_plugin", 0)
+			wilder.set_option("pipeline", {
+				wilder.branch(
+					wilder.cmdline_pipeline {
+						use_python = 0,
+						fuzzy = 1,
+						fuzzy_filter = wilder.lua_fzy_filter(),
+					},
+					wilder.vim_search_pipeline(),
+					{
+						wilder.check(function(_, x) return x == "" end),
+						wilder.history(),
+						wilder.result {
+							draw = {
+								function(_, x) return " " .. x end,
+							},
+						},
+					}
+				),
+			})
+
+			local wildmenu_renderer = wilder.wildmenu_renderer {
+				highlighter = wilder.lua_fzy_highlighter(),
+				apply_incsearch_fix = true,
+				separator = " | ",
+				left = { " ", wilder.wildmenu_spinner(), " " },
+				right = { " ", wilder.wildmenu_index() },
+			}
+			wilder.set_option(
+				"renderer",
+				wilder.renderer_mux {
+					[":"] = wildmenu_renderer,
+					["/"] = wildmenu_renderer,
+					substitute = wildmenu_renderer,
+				}
+			)
+		end,
+	},
 	{
 		"romainl/vim-cool",
 		lazy = true,
-		event = { "CursorMoved", "InsertEnter" },
+		event = { "CursorHold", "CursorHoldI" },
 		cond = function()
 			if #vim.api.nvim_list_uis() ~= 0 then
 				return not vim.tbl_contains(
@@ -56,6 +100,8 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
 		config = true,
 		keys = function()
+			local k = require "zox.keybind"
+
 			return k.to_lazy_mapping {
 				["n|<LocalLeader>D"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
 				["n|<LocalLeader><LocalLeader>D"] = k.cr("DiffviewClose")
@@ -338,6 +384,8 @@ return {
 		branch = "main",
 		event = { "BufReadPost", "BufRead" },
 		keys = function()
+			local k = require "zox.keybind"
+
 			return k.to_lazy_mapping {
 				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
 				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
@@ -406,6 +454,8 @@ return {
 		event = "BufRead",
 		config = function()
 			require("todo-comments").setup {}
+
+			local k = require "zox.keybind"
 
 			k.nvim_register_mapping {
 				["n|<Leader>tqf"] = k.cr("TodoQuickFix")
@@ -481,6 +531,8 @@ return {
 				current_line_blame_opts = { virtual_text_pos = "eol" },
 				diff_opts = { internal = true },
 				on_attach = function(bufnr)
+					local k = require "zox.keybind"
+
 					k.nvim_register_mapping {
 						["n|]g"] = k.callback(function()
 							if vim.wo.diff then return "]g" end
@@ -588,6 +640,8 @@ return {
 				auto_close = true,
 			}
 
+			local k = require "zox.keybind"
+
 			k.nvim_register_mapping {
 				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
 				["n|gR"] = k.cr("TroubleToggle lsp_references")
@@ -623,6 +677,7 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		event = "BufReadPost",
+		lazy = true,
 		dependencies = {
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "romgrk/nvim-treesitter-context" },
@@ -761,6 +816,8 @@ return {
 				desc = "motion: T 1 char",
 			})
 
+			local k = require "zox.keybind"
+
 			k.nvim_register_mapping {
 				["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
 				["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
@@ -776,6 +833,7 @@ return {
 	},
 	{
 		"nvim-telescope/telescope.nvim",
+		lazy = true,
 		event = "BufRead",
 		dependencies = {
 			{
@@ -937,9 +995,8 @@ return {
 					},
 				},
 				pickers = {
-					keymaps = {
-						theme = "dropdown",
-					},
+					keymaps = { theme = "dropdown" },
+					git_files = { theme = "dropdown" },
 					live_grep = {
 						on_input_filter_cb = function(prompt)
 							-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
@@ -972,6 +1029,7 @@ return {
 	},
 	{
 		"nvim-tree/nvim-tree.lua",
+		lazy = true,
 		cmd = {
 			"NvimTreeToggle",
 			"NvimTreeOpen",
@@ -1064,6 +1122,8 @@ return {
 					},
 				},
 			}
+
+			local k = require "zox.keybind"
 
 			k.nvim_register_mapping {
 				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
@@ -1243,7 +1303,7 @@ return {
 
 			local run_dap = function()
 				require("dap.ext.vscode").load_launchjs()
-				require("dap").continue()
+				require("dap").continue {}
 				require("dapui").open()
 			end
 
@@ -1257,6 +1317,7 @@ return {
 				local has_dapui, dapui = pcall(require, "dapui")
 				if has_dapui then dapui.close() end
 			end
+			local k = require "zox.keybind"
 
 			k.nvim_register_mapping {
 				["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",

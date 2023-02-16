@@ -8,6 +8,7 @@ return function(options)
 			types = true,
 			plugins = {
 				"nvim-dap",
+				"obsidian",
 				"nvim-dap-ui",
 				"lualine",
 				"nvim-lspconfig",

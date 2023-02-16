@@ -46,7 +46,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.breakindent = true
 vim.o.breakindentopt = "shift:2,min:20"
 vim.o.clipboard = "unnamedplus"
-vim.o.cmdheight = 1 -- 0, 1,
+vim.o.cmdheight = 0 -- 0, 1,
 vim.o.cmdwinheight = 5
 vim.o.complete = ".,w,b,k"
 vim.o.concealcursor = "niv"
@@ -66,7 +66,7 @@ vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
 vim.o.laststatus = 2
-vim.o.statusline = " %= %l:%c ♥ "
+vim.o.statusline = "%= %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -80,7 +80,6 @@ vim.o.redrawtime = 1500
 vim.o.relativenumber = true
 vim.o.ruler = true
 vim.o.scrolloff = 3
-vim.o.shada = "!,'300,<50,@100,s10,h"
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
 vim.opt.shortmess:append "c"
@@ -96,6 +95,7 @@ vim.o.softtabstop = 4
 vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.startofline = false
+vim.o.swapfile = false
 vim.o.switchbuf = "usetab,uselast"
 vim.o.synmaxcol = 2500
 vim.o.tabstop = 4
@@ -130,19 +130,6 @@ for _, type in pairs(signs) do
 	vim.fn.sign_define(hl, { text = "●", texthl = hl, numhl = hl })
 end
 
--- Disable statusline in dashboard
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "alpha",
-	callback = function(_)
-		vim.opt.showtabline = 0
-		vim.opt.laststatus = 0
-	end,
-})
--- Show diagnostic float on hover.
-vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-	pattern = "*",
-	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
-})
 -- Jump to last position. See :h last-position-jump
 vim.api.nvim_create_autocmd("BufReadPost", {
 	pattern = "*",
