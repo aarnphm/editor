@@ -49,7 +49,6 @@ vim.o.clipboard = "unnamedplus"
 vim.o.cmdheight = 1 -- 0, 1,
 vim.o.cmdwinheight = 5
 vim.o.complete = ".,w,b,k"
-vim.o.completeopt = "menuone,noselect"
 vim.o.concealcursor = "niv"
 vim.o.conceallevel = 0
 vim.o.diffopt = "filler,iwhite,internal,algorithm:patience"
@@ -143,4 +142,12 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 	pattern = "*",
 	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
+})
+-- Jump to last position. See :h last-position-jump
+vim.api.nvim_create_autocmd("BufReadPost", {
+	pattern = "*",
+	callback = function()
+		local line = vim.fn.line "'\""
+		if line >= 1 and line <= vim.fn.line "$" then vim.cmd "normal! g`\"" end
+	end,
 })

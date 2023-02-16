@@ -346,6 +346,8 @@ return {
 					"gopls",
 					"lua_ls",
 					"marksman",
+					"zk",
+					"denols",
 					"html",
 					"jdtls",
 					"jsonls",
@@ -403,6 +405,7 @@ return {
 					f.taplo.with {
 						extra_args = { "fmt", "-o", "indent_string='" .. string.rep(" ", 4) .. "'" },
 					},
+					f.deno_fmt,
 
 					-- NOTE: diagnostics
 					d.clang_check,
@@ -452,13 +455,23 @@ return {
 			capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 			local ih = require "inlay-hints"
-			local on_attach = function(client, _)
-				--- NOTE: Avoid LSP formatting, since it will be handled by null-ls
-				client.server_capabilities.documentFormattingProvider = false
-				client.server_capabilities.documentRangeFormattingProvider = false
+			local on_attach_factory = function(use_server_formatting_provider)
+				return function(client, bufnr)
+					--- NOTE: Avoid LSP formatting, since it will be handled by null-ls
+					if not use_server_formatting_provider then
+						client.server_capabilities.documentFormattingProvider = false
+						client.server_capabilities.documentRangeFormattingProvider = false
+					end
+
+					local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+					-- Enable completion triggered by <c-x><c-o>
+					buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+				end
 			end
+
 			local options = {
-				on_attach = on_attach,
+				on_attach = on_attach_factory(false),
 				capabilities = capabilities,
 				flags = {
 					debounce_text_changes = 150,
@@ -469,15 +482,17 @@ return {
 			--- Supports inlay-hints with `ih.on_attach`
 			---@overload fun(lsp_name: string, enable_inlay_hints?: boolean): fun():nil
 			---@overload fun(lsp_name: string): fun():nil
-			local lsp_setup = function(lsp_name, enable_inlay_hints, enable_on_attach)
-				enable_on_attach = enable_on_attach or true
-				if not enable_on_attach then options.on_attach = nil end
+			local lsp_setup = function(lsp_name, enable_inlay_hints, use_server_formatting_provider)
+				use_server_formatting_provider = use_server_formatting_provider or false
+				if use_server_formatting_provider then
+					options.on_attach = on_attach_factory(true)
+				end
 
 				enable_inlay_hints = enable_inlay_hints or false
 				if enable_inlay_hints then
 					options.on_attach = function(client, bufnr)
 						ih.on_attach(client, bufnr)
-						on_attach(client, bufnr)
+						on_attach_factory(false)(client, bufnr)
 					end
 				end
 
@@ -581,6 +596,7 @@ return {
 			{ "hrsh7th/cmp-nvim-lsp" },
 			{ "hrsh7th/cmp-nvim-lua" },
 			{ "hrsh7th/cmp-path" },
+			{ "hrsh7th/cmp-buffer" },
 			{ "ray-x/cmp-treesitter" },
 			{
 				"zbirenbaum/copilot.lua",
@@ -710,11 +726,12 @@ return {
 				},
 				-- You should specify your *installed* sources.
 				sources = {
+					{ name = "nvim_lsp" },
 					{ name = "path" },
 					{ name = "nvim-lua" },
+					{ name = "luasnip" },
 					{ name = "treesitter" },
-					{ name = "nvim_lsp", keyword_length = 3 },
-					{ name = "luasnip", keyword_length = 2 },
+					{ name = "buffer" },
 				},
 			}
 		end,

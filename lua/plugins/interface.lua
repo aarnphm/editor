@@ -105,7 +105,7 @@ return {
 
 			local get_cwd = function()
 				local cwd = vim.fn.getcwd()
-				if not vim.loop.os_uname().sysname == "Windows_NT" then
+				if vim.loop.os_uname().sysname ~= "Windows_NT" then
 					local home = os.getenv "HOME"
 					if home and cwd:find(home, 1, true) == 1 then
 						cwd = "~" .. cwd:sub(#home + 1)
@@ -834,6 +834,8 @@ return {
 		config = function()
 			require("telescope").setup {
 				defaults = {
+					prompt_prefix = " " .. ZoxIcon.UiSpace.Telescope .. " ",
+					selection_caret = ZoxIcon.UiSpace.DoubleSeparator,
 					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 					path_display = { "absolute" },
 					mappings = {

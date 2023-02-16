@@ -27,7 +27,12 @@ return function(options)
 		},
 		dap = { adapter = get_rust_adapters() },
 		server = {
-			on_attach = options.on_attach,
+			on_attach = function(client, bufnr)
+				vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
+				vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+				vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
+				options.on_attach(client, bufnr)
+			end,
 			capabilities = options.capabilities,
 			standalone = true,
 			settings = {
