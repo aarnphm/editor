@@ -68,7 +68,7 @@ return {
 							vim.cmd "split"
 							-- spawn repl and set the context to our buffer
 							require("neorepl").new {
-								lang = "vim",
+								lang = "lua",
 								buffer = buf,
 								window = win,
 							}
@@ -230,13 +230,10 @@ return {
 				opts = {
 					-- {dynamic | eol | virtline }
 					parameter = { show = true },
-					renderer = "inlay-hints.render.eol",
+					renderer = "inlay-hints.render.virtline",
 					only_current_line = true,
 					eol = {
-						parameter = {
-							separator = ",",
-							format = function(hints) return string.format(":: (%s)", hints) end,
-						},
+						parameter = { separator = "," },
 					},
 				},
 			},
@@ -249,47 +246,6 @@ return {
 				branch = "main",
 				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
-				keys = function()
-					local filetype = vim.bo.filetype
-					return k.to_lazy_mapping {
-						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
-						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
-							:with_defaults "lsp: Prev diagnostic",
-						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
-							:with_defaults "lsp: Next diagnostic",
-						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
-						["n|ca"] = k.callback(function()
-							if filetype == "rust" then
-								require("rust-tools").code_action_group.code_action_group()
-							else
-								require("lspsaga.codeaction"):code_action()
-							end
-						end):with_defaults "lsp: Code action for cursor",
-						["v|ca"] = k.callback(function()
-							if filetype == "rust" then
-								require("rust-tools").code_action_group.code_action_group()
-							else
-								require("lspsaga.codeaction"):code_action()
-							end
-						end):with_defaults "lsp: Code action for range",
-						["n|gd"] = k.cr("Lspsaga peek_definition")
-							:with_defaults "lsp: Preview definition",
-						["n|gD"] = k.cr("Lspsaga goto_definition")
-							:with_defaults "lsp: Goto definition",
-						["n|gh"] = k.cr("Lspsaga lsp_finder"):with_defaults "lsp: Show reference",
-						["n|gs"] = k.callback(vim.lsp.buf.signature_help)
-							:with_defaults "lsp: Signature help",
-						["n|K"] = k.callback(function()
-							if vim.tbl_contains({ "vim", "help" }, filetype) then
-								vim.cmd("h " .. vim.fn.expand "<cword>")
-							elseif vim.tbl_contains({ "man" }, filetype) then
-								vim.cmd("Man " .. vim.fn.expand "<cword>")
-							else
-								require("lspsaga.hover"):render_hover_doc()
-							end
-						end):with_defaults "lsp: Show doc",
-					}
-				end,
 				config = function()
 					require("lspsaga").setup {
 						finder = { keys = { jump_to = "e" } },
@@ -337,6 +293,40 @@ return {
 					h("DiagnosticWord", { fg = p.highlight_high })
 					h("CallHierarchyIcon", { fg = p.iris })
 					h("CallHierarchyTitle", { fg = p.love })
+
+					k.nvim_register_mapping {
+						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
+						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
+							:with_defaults "lsp: Prev diagnostic",
+						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
+							:with_defaults "lsp: Next diagnostic",
+						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
+						["n|ca"] = k.cr("Lspsaga code_action")
+							:with_defaults "lsp: Code action for cursor",
+						["v|ca"] = k.cr("Lspsaga code_action")
+							:with_defaults "lsp: Code action for range",
+						["n|gd"] = k.cr("Lspsaga peek_definition")
+							:with_defaults "lsp: Preview definition",
+						["n|gD"] = k.cr("Lspsaga goto_definition")
+							:with_defaults "lsp: Goto definition",
+						["n|gh"] = k.cr("Lspsaga lsp_finder"):with_defaults "lsp: Show reference",
+						["n|gs"] = k.callback(vim.lsp.buf.signature_help)
+							:with_defaults "lsp: Signature help",
+						["n|K"] = k.callback(function()
+							if vim.tbl_contains({ "vim", "help" }, filetype) then
+								vim.cmd("h " .. vim.fn.expand "<cword>")
+							elseif vim.tbl_contains({ "man" }, filetype) then
+								vim.cmd("Man " .. vim.fn.expand "<cword>")
+							elseif
+								vim.fn.expand "%:t" == "Cargo.toml"
+								and require("crates").popup_available()
+							then
+								require("crates").show_popup()
+							else
+								vim.cmd "Lspsaga hover_doc"
+							end
+						end):with_defaults "lsp: Show doc",
+					}
 				end,
 			},
 		},
@@ -479,7 +469,10 @@ return {
 			--- Supports inlay-hints with `ih.on_attach`
 			---@overload fun(lsp_name: string, enable_inlay_hints?: boolean): fun():nil
 			---@overload fun(lsp_name: string): fun():nil
-			local lsp_setup = function(lsp_name, enable_inlay_hints)
+			local lsp_setup = function(lsp_name, enable_inlay_hints, enable_on_attach)
+				enable_on_attach = enable_on_attach or true
+				if not enable_on_attach then options.on_attach = nil end
+
 				enable_inlay_hints = enable_inlay_hints or false
 				if enable_inlay_hints then
 					options.on_attach = function(client, bufnr)
@@ -487,6 +480,7 @@ return {
 						on_attach(client, bufnr)
 					end
 				end
+
 				return function()
 					---@param path string path to given directory containing lua files.
 					---@return string[] list of files in given directory
@@ -551,6 +545,7 @@ return {
 				gopls = lsp_setup("gopls", true),
 				lua_ls = lsp_setup("lua_ls", true),
 				tsserver = lsp_setup("tsserver", true),
+				marksman = lsp_setup("marksman", false, false),
 			}
 
 			lsp_setup "starlark_rust"

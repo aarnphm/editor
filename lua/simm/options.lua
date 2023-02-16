@@ -1,4 +1,3 @@
-vim.o.background = "light"
 vim.cmd.colorscheme "un"
 
 -- custom python provider

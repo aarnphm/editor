@@ -1,7 +1,22 @@
 local k = require "zox.keybind"
 
 return {
-	{ "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
+	{ "romainl/vim-cool", lazy = true, event = { "CursorMoved", "InsertEnter" } },
+	{
+		"sindrets/diffview.nvim",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
+		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
+		config = true,
+		keys = function()
+			return k.to_lazy_mapping {
+				["n|<LocalLeader>D"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
+				["n|<LocalLeader><LocalLeader>D"] = k.cr("DiffviewClose")
+					:with_defaults "git: Close diff view",
+			}
+		end,
+	},
 	{
 		"j-hui/fidget.nvim",
 		lazy = true,
@@ -133,6 +148,7 @@ return {
 							"DiffviewFiles",
 							"quickfix",
 							"Trouble",
+							"neorepl",
 						},
 					},
 					component_separators = "|",
@@ -141,14 +157,25 @@ return {
 				},
 				sections = {
 					lualine_a = { "mode" },
-					lualine_b = {},
-					lualine_c = { lspsaga_symbols },
-					lualine_x = { escape_status, get_cwd },
-					lualine_y = {
-						{ "filetype", colored = true, icon_only = true },
+					lualine_b = {
 						{ "branch", icons_enabled = true, icon = ZoxIcon.Git.Branch },
 						{ "diff", source = diff_source },
 					},
+					lualine_c = { lspsaga_symbols },
+					lualine_x = {
+						{ escape_status },
+						{
+							"diagnostics",
+							sources = { "nvim_diagnostic" },
+							symbols = {
+								error = ZoxIcon.Diagnostics.Error,
+								warn = ZoxIcon.Diagnostics.Warning,
+								info = ZoxIcon.Diagnostics.Information,
+							},
+						},
+						{ get_cwd },
+					},
+					lualine_y = {},
 					lualine_z = { "progress", "location" },
 				},
 				inactive_sections = {
@@ -266,28 +293,8 @@ return {
 		lazy = true,
 		branch = "main",
 		event = { "BufReadPost", "BufRead" },
-		config = function()
-			require("bufferline").setup {
-				options = {
-					offsets = {
-						{
-							filetype = "NvimTree",
-							text = "File Explorer",
-							text_align = "center",
-							padding = 1,
-						},
-						{
-							filetype = "undotree",
-							text = "Undo Tree",
-							text_align = "center",
-							highlight = "Directory",
-							separator = true,
-						},
-					},
-				},
-			}
-
-			k.nvim_register_mapping {
+		keys = function()
+			return k.to_lazy_mapping {
 				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
 				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
 				["n|<Leader>."] = k.cr("BufferLineCycleNext")
@@ -314,6 +321,25 @@ return {
 					:with_defaults "buffer: Goto buffer 9",
 			}
 		end,
+		opts = {
+			options = {
+				offsets = {
+					{
+						filetype = "NvimTree",
+						text = "File Explorer",
+						text_align = "center",
+						padding = 1,
+					},
+					{
+						filetype = "undotree",
+						text = "Undo Tree",
+						text_align = "center",
+						highlight = "Directory",
+						separator = true,
+					},
+				},
+			},
+		},
 	},
 	{
 		"zbirenbaum/neodim",
@@ -820,6 +846,18 @@ return {
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
+					file_ignore_patterns = {
+						"static_content",
+						"node_modules",
+						".git/",
+						".cache",
+						"%.class",
+						"%.pdf",
+						"%.mkv",
+						"%.mp4",
+						"%.zip",
+						"lazy-lock.json",
+					},
 					layout_config = {
 						horizontal = {
 							preview_width = 0.5,
@@ -1071,47 +1109,46 @@ return {
 	--- NOTE: Dap setup
 	{
 		"rcarriga/nvim-dap-ui",
+		as = "dapui",
 		lazy = true,
-		events = "BufReadPost",
-		config = function()
-			require("dapui").setup {
-				icons = {
-					expanded = ZoxIcon.UiSpace.ArrowOpen,
-					collapsed = ZoxIcon.UiSpace.ArrowClosed,
-					current_frame = ZoxIcon.UiSpace.Indicator,
-				},
-				layouts = {
-					{
-						elements = {
-							-- Provide as ID strings or tables with "id" and "size" keys
-							{
-								id = "scopes",
-								size = 0.25, -- Can be float or integer > 1
-							},
-							{ id = "breakpoints", size = 0.25 },
-							{ id = "stacks", size = 0.25 },
-							{ id = "watches", size = 0.25 },
+		events = "BufRead",
+		opts = {
+			icons = {
+				expanded = ZoxIcon.UiSpace.ArrowOpen,
+				collapsed = ZoxIcon.UiSpace.ArrowClosed,
+				current_frame = ZoxIcon.UiSpace.Indicator,
+			},
+			layouts = {
+				{
+					elements = {
+						-- Provide as ID strings or tables with "id" and "size" keys
+						{
+							id = "scopes",
+							size = 0.25, -- Can be float or integer > 1
 						},
-						size = 40,
-						position = "left",
+						{ id = "breakpoints", size = 0.25 },
+						{ id = "stacks", size = 0.25 },
+						{ id = "watches", size = 0.25 },
 					},
-					{ elements = { "repl" }, size = 10, position = "bottom" },
+					size = 40,
+					position = "left",
 				},
-				controls = {
-					icons = {
-						pause = ZoxIcon.DapSpace.Pause,
-						play = ZoxIcon.DapSpace.Play,
-						step_into = ZoxIcon.DapSpace.StepInto,
-						step_over = ZoxIcon.DapSpace.StepOver,
-						step_out = ZoxIcon.DapSpace.StepOut,
-						step_back = ZoxIcon.DapSpace.StepBack,
-						run_last = ZoxIcon.DapSpace.RunLast,
-						terminate = ZoxIcon.DapSpace.Terminate,
-					},
+				{ elements = { "repl" }, size = 10, position = "bottom" },
+			},
+			controls = {
+				icons = {
+					pause = ZoxIcon.DapSpace.Pause,
+					play = ZoxIcon.DapSpace.Play,
+					step_into = ZoxIcon.DapSpace.StepInto,
+					step_over = ZoxIcon.DapSpace.StepOver,
+					step_out = ZoxIcon.DapSpace.StepOut,
+					step_back = ZoxIcon.DapSpace.StepBack,
+					run_last = ZoxIcon.DapSpace.RunLast,
+					terminate = ZoxIcon.DapSpace.Terminate,
 				},
-				windows = { indent = 1 },
-			}
-		end,
+			},
+			windows = { indent = 1 },
+		},
 	},
 	{
 		"mfussenegger/nvim-dap",
@@ -1127,36 +1164,14 @@ return {
 			"DapStepOut",
 			"DapTerminate",
 		},
-		events = "BufReadPost",
+		events = "BufRead",
 		dependencies = { "rcarriga/nvim-dap-ui" },
-		keys = function()
-			return k.to_lazy_mapping {
-				["n|<F6>"] = k.callback(function() require("dap").continue() end)
-					:with_defaults "dap: Run/Continue",
-				["n|<F7>"] = k.callback(function()
-					require("dap").terminate()
-					require("dapui").close()
-				end):with_defaults "dap: Stop",
-				["n|<F8>"] = k.callback(function() require("dap").toggle_breakpoint() end)
-					:with_defaults "dap: Toggle breakpoint",
-				["n|<F9>"] = k.callback(function() require("dap").step_into() end)
-					:with_defaults "dap: Step into",
-				["n|<F10>"] = k.callback(function() require("dap").step_out() end)
-					:with_defaults "dap: Step out",
-				["n|<F11>"] = k.callback(function() require("dap").step_over() end)
-					:with_defaults "dap: Step over",
-				["n|<Leader>db"] = k.callback(
-					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
-				):with_defaults "dap: Set breakpoint with condition",
-				["n|<Leader>dc"] = k.callback(function() require("dap").run_to_cursor() end)
-					:with_defaults "dap: Run to cursor",
-				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
-					:with_defaults "dap: Run last",
-				["n|<Leader>do"] = k.callback(function() require("dap").repl.open() end)
-					:with_defaults "dap: Open REPL",
-			}
-		end,
 		config = function()
+			local ok
+			ok, _ = pcall(require, "dap")
+			if not ok then return end
+			ok, _ = pcall(require, "dapui")
+			if not ok then return end
 			for _, v in ipairs {
 				"Breakpoint",
 				"BreakpointRejected",
@@ -1172,8 +1187,59 @@ return {
 				})
 			end
 			-- Config lang adapters
-			require "zox.adapters.dlv"
-			require "zox.adapters.lldb"
+			for _, value in ipairs { "dlv", "lldb" } do
+				ok, _ = pcall(require, "zox.adapters." .. value)
+				if not ok then
+					vim.notify_once(
+						"Failed to setup dap for " .. value,
+						vim.log.levels.ERROR,
+						{ title = "dap" }
+					)
+				end
+			end
+
+			local run_dap = function()
+				require("dap.ext.vscode").load_launchjs()
+				require("dap").continue()
+				require("dapui").open()
+			end
+
+			local stop_dap = function()
+				local has_dap, dap = pcall(require, "dap")
+				if has_dap then
+					dap.disconnect()
+					dap.close()
+					dap.repl.close()
+				end
+				local has_dapui, dapui = pcall(require, "dapui")
+				if has_dapui then dapui.close() end
+			end
+
+			k.nvim_register_mapping {
+				["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",
+				["n|<Leader>ds"] = k.callback(stop_dap):with_defaults "dap: Stop",
+				["n|<Leader>db"] = k.callback(function() require("dap").toggle_breakpoint() end)
+					:with_defaults "dap: Toggle breakpoint",
+				["n|<Leader>dbs"] = k.callback(
+					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
+				):with_defaults "dap: Set breakpoint with condition",
+				["n|<Leader>di"] = k.callback(function() require("dap").step_into() end)
+					:with_defaults "dap: Step into",
+				["n|<Leader>do"] = k.callback(function() require("dap").step_out() end)
+					:with_defaults "dap: Step out",
+				["n|<Leader>dn"] = k.callback(function() require("dap").step_over() end)
+					:with_defaults "dap: Step over",
+				["n|<Leader>dc"] = k.callback(function() require("dap").continue {} end)
+					:with_defaults "dap: Continue",
+				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
+					:with_defaults "dap: Run last",
+				["n|<Leader>dR"] = k.callback(function() require("dap").repl.open() end)
+					:with_defaults "dap: Open REPL",
+				["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
+					:with_defaults "dap: toggle UI",
+				["n|<Leader>dC"] = k.callback(function() require("dapui").close() end)
+					:with_defaults "dap: close UI",
+			}
 		end,
 	},
 	{
