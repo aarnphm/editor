@@ -1,7 +1,53 @@
 local k = require "zox.keybind"
 
 return {
-	{ "romainl/vim-cool", lazy = true, event = { "CursorMoved", "InsertEnter" } },
+	{
+		"romainl/vim-cool",
+		lazy = true,
+		event = { "CursorMoved", "InsertEnter" },
+		cond = function()
+			if #vim.api.nvim_list_uis() ~= 0 then
+				return not vim.tbl_contains(
+					{ "gitcommit", "gitrebase", "alpha", "dashboard" },
+					vim.bo.filetype
+				)
+			end
+			return false
+		end,
+	},
+	{
+		"RRethy/vim-illuminate",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		config = function()
+			require("illuminate").configure {
+				providers = {
+					"lsp",
+					"treesitter",
+					"regex",
+				},
+				delay = 100,
+				filetypes_denylist = {
+					"DoomInfo",
+					"DressingSelect",
+					"NvimTree",
+					"Outline",
+					"TelescopePrompt",
+					"Trouble",
+					"alpha",
+					"dashboard",
+					"dirvish",
+					"fugitive",
+					"help",
+					"lsgsagaoutline",
+					"neogitstatus",
+					"norg",
+					"toggleterm",
+				},
+				under_cursor = false,
+			}
+		end,
+	},
 	{
 		"sindrets/diffview.nvim",
 		lazy = true,
@@ -56,11 +102,11 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		lazy = true,
-		event = "LspAttach",
+		event = "BufReadPost",
 		config = function()
 			local escape_status = function()
 				local ok, m = pcall(require, "better_escape")
-				return ok and m.waiting and ZoxIcon.MiscSpace.EscapeST or ""
+				return ok and m.waiting and require("zox").misc_space.EscapeST or ""
 			end
 
 			local _cache = { context = "", bufnr = -1 }
@@ -111,7 +157,7 @@ return {
 						cwd = "~" .. cwd:sub(#home + 1)
 					end
 				end
-				return ZoxIcon.UiSpace.RootFolderOpened .. cwd
+				return require("zox").ui_space.RootFolderOpened .. cwd
 			end
 
 			local mini_sections = {
@@ -155,7 +201,7 @@ return {
 				sections = {
 					lualine_a = { "mode" },
 					lualine_b = {
-						{ "branch", icons_enabled = true, icon = ZoxIcon.Git.Branch },
+						{ "branch", icons_enabled = true, icon = require("zox").git.Branch },
 						{ "diff", source = diff_source },
 					},
 					lualine_c = { lspsaga_symbols },
@@ -165,9 +211,9 @@ return {
 							"diagnostics",
 							sources = { "nvim_diagnostic" },
 							symbols = {
-								error = ZoxIcon.DiagnosticsSpace.Error,
-								warn = ZoxIcon.DiagnosticsSpace.Warning,
-								info = ZoxIcon.DiagnosticsSpace.Information,
+								error = require("zox").diagnostics_space.Error,
+								warn = require("zox").diagnostics_space.Warning,
+								info = require("zox").diagnostics_space.Information,
 							},
 						},
 						{ get_cwd },
@@ -214,7 +260,7 @@ return {
 			local gen_footer = function()
 				local stats = require("lazy").stats()
 				local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-				return ZoxIcon.MiscSpace.BentoBox
+				return require("zox").misc_space.BentoBox
 					.. "github.com/aarnphm"
 					.. "   v"
 					.. vim.version().major
@@ -263,6 +309,7 @@ return {
 	},
 	{
 		"nathom/filetype.nvim",
+		lazy = true,
 		event = "BufReadPost",
 		opts = {
 			overrides = {
@@ -342,20 +389,19 @@ return {
 		"zbirenbaum/neodim",
 		lazy = true,
 		event = "LspAttach",
-		config = function()
-			require("neodim").setup {
-				blend_color = require("zox.utils").hl_to_rgb("Normal", true),
-				update_in_insert = { delay = 100 },
-				hide = {
-					virtual_text = false,
-					signs = false,
-					underline = false,
-				},
-			}
-		end,
+		opts = {
+			blend_color = require("zox.utils").hl_to_rgb("Normal", true),
+			update_in_insert = { delay = 100 },
+			hide = {
+				virtual_text = false,
+				signs = false,
+				underline = false,
+			},
+		},
 	},
 	{
 		"folke/todo-comments.nvim",
+		lazy = true,
 		dependencies = { "nvim-lua/plenary.nvim" },
 		event = "BufRead",
 		config = function()
@@ -376,58 +422,56 @@ return {
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
 		event = "BufRead",
-		config = function()
-			require("indent_blankline").setup {
-				char = "│",
-				show_first_indent_level = true,
-				filetype_exclude = {
-					"startify",
-					"dashboard",
-					"alpha",
-					"log",
-					"fugitive",
-					"gitcommit",
-					"vimwiki",
-					"markdown",
-					"json",
-					"txt",
-					"vista",
-					"help",
-					"todoist",
-					"peekaboo",
-					"git",
-					"TelescopePrompt",
-					"undotree",
-					"flutterToolsOutline",
-					"", -- for all buffers without a file type
-				},
-				buftype_exclude = { "terminal", "nofile" },
-				show_trailing_blankline_indent = false,
-				show_current_context = true,
-				context_patterns = {
-					"class",
-					"function",
-					"method",
-					"block",
-					"list_literal",
-					"selector",
-					"^if",
-					"^table",
-					"if_statement",
-					"while",
-					"for",
-					"type",
-					"var",
-					"import",
-				},
-				space_char_blankline = " ",
-			}
-		end,
+		opts = {
+			char = "│",
+			show_first_indent_level = true,
+			filetype_exclude = {
+				"startify",
+				"dashboard",
+				"alpha",
+				"log",
+				"fugitive",
+				"gitcommit",
+				"vimwiki",
+				"markdown",
+				"json",
+				"txt",
+				"vista",
+				"help",
+				"todoist",
+				"peekaboo",
+				"git",
+				"TelescopePrompt",
+				"undotree",
+				"flutterToolsOutline",
+				"", -- for all buffers without a file type
+			},
+			buftype_exclude = { "terminal", "nofile" },
+			show_trailing_blankline_indent = false,
+			show_current_context = true,
+			context_patterns = {
+				"class",
+				"function",
+				"method",
+				"block",
+				"list_literal",
+				"selector",
+				"^if",
+				"^table",
+				"if_statement",
+				"while",
+				"for",
+				"type",
+				"var",
+				"import",
+			},
+			space_char_blankline = " ",
+		},
 	},
 	{
 		"lewis6991/gitsigns.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = { "CursorHoldI", "CursorHold" },
 		config = function()
 			require("gitsigns").setup {
 				numhl = true,
@@ -800,7 +844,7 @@ return {
 			},
 			{
 				"<leader>b",
-				"<cmd>Telescope buffers<cr>",
+				"<cmd>Telescope buffers previewer=false<cr>",
 				desc = "find: Buffer opened",
 			},
 			{
@@ -834,8 +878,8 @@ return {
 		config = function()
 			require("telescope").setup {
 				defaults = {
-					prompt_prefix = " " .. ZoxIcon.UiSpace.Telescope .. " ",
-					selection_caret = ZoxIcon.UiSpace.DoubleSeparator,
+					prompt_prefix = " " .. require("zox").ui_space.Telescope .. " ",
+					selection_caret = require("zox").ui_space.DoubleSeparator,
 					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 					path_display = { "absolute" },
 					mappings = {
@@ -859,11 +903,11 @@ return {
 					},
 					layout_config = {
 						horizontal = {
-							preview_width = 0.5,
+							preview_width = 0.3,
 							prompt_position = "top",
 						},
 						vertical = {
-							preview_height = 0.5,
+							preview_height = 0.3,
 							prompt_position = "top",
 						},
 					},
@@ -1022,7 +1066,7 @@ return {
 			}
 
 			k.nvim_register_mapping {
-				["n|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
+				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
 				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
 					:with_defaults "replace: Open panel",
@@ -1110,12 +1154,12 @@ return {
 		"rcarriga/nvim-dap-ui",
 		as = "dapui",
 		lazy = true,
-		events = "BufRead",
+		event = { "CursorHold", "CursorHoldI" },
 		opts = {
 			icons = {
-				expanded = ZoxIcon.UiSpace.ArrowOpen,
-				collapsed = ZoxIcon.UiSpace.ArrowClosed,
-				current_frame = ZoxIcon.UiSpace.Indicator,
+				expanded = require("zox").ui_space.ArrowOpen,
+				collapsed = require("zox").ui_space.ArrowClosed,
+				current_frame = require("zox").ui_space.Indicator,
 			},
 			layouts = {
 				{
@@ -1136,14 +1180,14 @@ return {
 			},
 			controls = {
 				icons = {
-					pause = ZoxIcon.DapSpace.Pause,
-					play = ZoxIcon.DapSpace.Play,
-					step_into = ZoxIcon.DapSpace.StepInto,
-					step_over = ZoxIcon.DapSpace.StepOver,
-					step_out = ZoxIcon.DapSpace.StepOut,
-					step_back = ZoxIcon.DapSpace.StepBack,
-					run_last = ZoxIcon.DapSpace.RunLast,
-					terminate = ZoxIcon.DapSpace.Terminate,
+					pause = require("zox").dap_space.Pause,
+					play = require("zox").dap_space.Play,
+					step_into = require("zox").dap_space.StepInto,
+					step_over = require("zox").dap_space.StepOver,
+					step_out = require("zox").dap_space.StepOut,
+					step_back = require("zox").dap_space.StepBack,
+					run_last = require("zox").dap_space.RunLast,
+					terminate = require("zox").dap_space.Terminate,
 				},
 			},
 			windows = { indent = 1 },
@@ -1163,7 +1207,7 @@ return {
 			"DapStepOut",
 			"DapTerminate",
 		},
-		events = "BufRead",
+		event = { "CursorHold", "CursorHoldI" },
 		dependencies = { "rcarriga/nvim-dap-ui" },
 		config = function()
 			local ok
@@ -1179,7 +1223,7 @@ return {
 				"Stopped",
 			} do
 				vim.fn.sign_define("Dap" .. v, {
-					text = ZoxIcon.DapSpace[v],
+					text = require("zox").dap_space[v],
 					texthl = "Dap" .. v,
 					line = "",
 					numhl = "",
@@ -1241,7 +1285,9 @@ return {
 	},
 	{
 		"mfussenegger/nvim-dap-python",
+		lazy = true,
 		ft = "python",
+		event = { "CursorHold", "CursorHoldI" },
 		dependencies = { "mfussenegger/nvim-dap" },
 		config = function()
 			require("dap-python").setup()
@@ -1251,7 +1297,7 @@ return {
 	{
 		"theHamsta/nvim-dap-virtual-text",
 		lazy = true,
-		ft = "python",
+		event = { "CursorHold", "CursorHoldI" },
 		dependencies = { "mfussenegger/nvim-dap" },
 		config = function()
 			require("nvim-dap-virtual-text").setup {

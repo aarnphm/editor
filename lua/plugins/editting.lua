@@ -1,12 +1,6 @@
 return {
 	{ "jghauser/mkdir.nvim" },
 	{
-		"kylechui/nvim-surround",
-		event = { "CursorHold", "CursorHoldI" },
-		config = true,
-		lazy = true,
-	},
-	{
 		"nmac427/guess-indent.nvim",
 		event = { "CursorHold", "CursorHoldI" },
 		config = true,
@@ -35,9 +29,9 @@ return {
 				},
 			},
 			icons = {
-				breadcrumb = ZoxIcon.Ui.Separator,
-				separator = ZoxIcon.Misc.Vbar,
-				group = ZoxIcon.Misc.Add,
+				breadcrumb = require("zox").ui.Separator,
+				separator = require("zox").misc.Vbar,
+				group = require("zox").misc.Add,
 			},
 			key_labels = {
 				["<space>"] = "SPC",
@@ -89,10 +83,6 @@ return {
 			"JoosepAlviste/nvim-ts-context-commentstring",
 		},
 		config = function()
-			require("nvim-treesitter.configs").setup {
-				context_commentstring = { enable = true, enable_autocmd = false },
-			}
-
 			require("Comment").setup {
 				pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
 			}
@@ -103,5 +93,11 @@ return {
 		lazy = true,
 		event = "BufReadPre",
 		config = function() require("mini.align").setup() end,
+	},
+	{
+		"echasnovski/mini.surround",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		config = function() require("mini.surround").setup() end,
 	},
 }

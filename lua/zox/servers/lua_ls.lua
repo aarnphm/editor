@@ -40,7 +40,8 @@ return function(options)
 				},
 				diagnostics = {
 					enable = true,
-					globals = { "vim", "icons" },
+					globals = { "vim" },
+					disable = { "different-requires" },
 				},
 				hint = { enable = true },
 				runtime = {
@@ -61,6 +62,7 @@ return function(options)
 					preloadFileSize = 10000,
 				},
 				telemetry = { enable = false },
+				semantic = { enable = false },
 			},
 		},
 	}))

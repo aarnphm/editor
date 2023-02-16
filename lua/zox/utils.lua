@@ -119,7 +119,7 @@ M.map = function(tbl, func)
 	return newtbl
 end
 
-M.joinPath = function(...)
+M.joinpath = function(...)
 	return table.concat(
 		vim.tbl_flatten { ... },
 		vim.loop.os_uname().sysname == "Windows_NT" and "\\" or "/"

@@ -1,13 +1,4 @@
 ---@class RHS
----@field cmd string
----@field options table
----@field options.noremap boolean
----@field options.silent boolean
----@field options.expr boolean
----@field options.nowait boolean
----@field options.callback function
----@field options.desc string
----@field buffer boolean|number
 local RHS = {}
 
 RHS.new = function(self)
@@ -38,7 +29,12 @@ RHS.to_lazy_keymap = function(self, key, mode)
 		key, -- lhs
 		self.cmd, -- rhs
 		mode = mode,
-		self.options,
+		desc = self.options.desc,
+		remap = not self.options.noremap,
+		expr = self.options.expr,
+		silent = self.options.silent,
+		nowait = self.options.nowait,
+		callback = self.options.callback,
 	}
 end
 
