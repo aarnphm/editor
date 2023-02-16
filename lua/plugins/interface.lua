@@ -144,11 +144,8 @@ return {
 							"terminal",
 							"help",
 							"lspsagaoutine",
-							"_sagaoutline",
 							"DiffviewFiles",
-							"quickfix",
-							"Trouble",
-							"neorepl",
+							"TelescopePrompt",
 						},
 					},
 					component_separators = "|",
@@ -168,9 +165,9 @@ return {
 							"diagnostics",
 							sources = { "nvim_diagnostic" },
 							symbols = {
-								error = ZoxIcon.Diagnostics.Error,
-								warn = ZoxIcon.Diagnostics.Warning,
-								info = ZoxIcon.Diagnostics.Information,
+								error = ZoxIcon.DiagnosticsSpace.Error,
+								warn = ZoxIcon.DiagnosticsSpace.Warning,
+								info = ZoxIcon.DiagnosticsSpace.Information,
 							},
 						},
 						{ get_cwd },
@@ -1237,8 +1234,6 @@ return {
 					:with_defaults "dap: Open REPL",
 				["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
 					:with_defaults "dap: toggle UI",
-				["n|<Leader>dC"] = k.callback(function() require("dapui").close() end)
-					:with_defaults "dap: close UI",
 			}
 		end,
 	},

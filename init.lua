@@ -5,10 +5,10 @@ vim.g.maplocalleader = "+"
 vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
 vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
 
-require "simm.package"
-require "simm.options"
-require "simm.keymapping"
-require "simm.events"
+require "zil.package"
+require "zil.options"
+require "zil.keymapping"
+require "zil.events"
 
 require("lazy").setup("plugins", {
 	install = { colorscheme = { "un" } },

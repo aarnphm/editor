@@ -126,11 +126,6 @@ api.nvim_create_autocmd("FileType", {
 	pattern = "markdown",
 	command = "set wrap",
 })
-api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = "dap-repl",
-	callback = function(_) require("dap.ext.autocompl").attach() end,
-})
 -- Set mapping for switching header and source file
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,

@@ -30,6 +30,8 @@ return {
 					text_objects = false,
 					windows = false,
 					nav = false,
+					z = false,
+					g = false,
 				},
 			},
 			icons = {
@@ -57,6 +59,7 @@ return {
 	},
 	{
 		"stevearc/dressing.nvim",
+		lazy = true,
 		event = "BufReadPost",
 		opts = {
 			input = { enabled = true },
@@ -100,25 +103,5 @@ return {
 		lazy = true,
 		event = "BufReadPre",
 		config = function() require("mini.align").setup() end,
-	},
-	{
-		"gelguy/wilder.nvim",
-		lazy = true,
-		event = "CmdlineEnter",
-		build = ":UpdateRemotePlugins",
-		dependencies = { "romgrk/fzy-lua-native" },
-		config = function()
-			local wilder = require "wilder"
-			wilder.setup { modes = { ":", "/", "?" } }
-			wilder.set_option(
-				"renderer",
-				wilder.wildmenu_renderer {
-					highlighter = wilder.basic_highlighter(),
-					separator = " · ",
-					left = { " ", wilder.wildmenu_spinner(), " " },
-					right = { " ", wilder.wildmenu_index() },
-				}
-			)
-		end,
 	},
 }

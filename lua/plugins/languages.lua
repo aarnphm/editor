@@ -230,7 +230,7 @@ return {
 				opts = {
 					-- {dynamic | eol | virtline }
 					parameter = { show = true },
-					renderer = "inlay-hints.render.virtline",
+					renderer = "inlay-hints.render.eol",
 					only_current_line = true,
 					eol = {
 						parameter = { separator = "," },

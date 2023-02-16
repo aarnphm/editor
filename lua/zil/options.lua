@@ -49,8 +49,10 @@ vim.o.clipboard = "unnamedplus"
 vim.o.cmdheight = 1 -- 0, 1,
 vim.o.cmdwinheight = 5
 vim.o.complete = ".,w,b,k"
+vim.o.completeopt = "menuone,noselect"
 vim.o.concealcursor = "niv"
 vim.o.conceallevel = 0
+vim.o.diffopt = "filler,iwhite,internal,algorithm:patience"
 vim.o.equalalways = false
 vim.o.expandtab = true
 vim.o.fileformats = "unix,mac,dos"
@@ -65,7 +67,7 @@ vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
 vim.o.laststatus = 2
--- vim.o.statusline = " %f %m %= %l:%c ♥ "
+vim.o.statusline = " %= %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -106,6 +108,8 @@ vim.o.viewoptions = "folds,cursor,curdir,slash,unix"
 vim.o.virtualedit = "block"
 vim.o.visualbell = true
 vim.o.whichwrap = "h,l,<,>,[,],~"
+vim.o.wildignore =
+	".git,*.pyc,*.o,*.out,*.jpg,*.jpeg,*.png,*.gif,*.zip,**/tmp/**,*.DS_Store,**/node_modules/**"
 vim.o.wildchar = 9
 vim.o.wildignorecase = true
 vim.o.wildmode = "longest:full,full"
@@ -134,4 +138,9 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt.showtabline = 0
 		vim.opt.laststatus = 0
 	end,
+})
+-- Show diagnostic float on hover.
+vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+	pattern = "*",
+	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
 })
