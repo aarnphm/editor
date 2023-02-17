@@ -1,22 +1,29 @@
 local api = vim.api
 
--- default options
-local misc_id = api.nvim_create_augroup("MiscBufs", { clear = true })
+-- open telescope for no name buffer
+api.nvim_create_autocmd({ "VimEnter" }, {
+	callback = function(event)
+		local real_file = vim.fn.filereadable(event.file) == 1
+		local no_name = event.file == "" and vim.bo[event.buf].buftype == ""
+		if not real_file and not no_name then return end
+		vim.opt.showtabline = 0
+		vim.opt.laststatus = 0
+	end,
+})
+api.nvim_create_autocmd("BufReadPost", {
+	callback = function(_)
+		vim.opt.showtabline = 2
+		vim.opt.laststatus = 3
+	end,
+})
 
 -- close some filetypes with <q>
 api.nvim_create_autocmd("FileType", {
-	group = misc_id,
 	pattern = {
 		"qf",
 		"help",
 		"man",
-		"notify",
-		"lspinfo",
-		"terminal",
-		"lazy",
 		"prompt",
-		"toggleterm",
-		"copilot",
 		"spectre_panel",
 		"startuptime",
 		"tsplayground",
@@ -37,21 +44,9 @@ api.nvim_create_autocmd("BufReadPost", {
 		if line >= 1 and line <= vim.fn.line "$" then vim.cmd "normal! g`\"" end
 	end,
 })
-api.nvim_create_autocmd("FileType", {
-	group = misc_id,
-	pattern = { "alpha" },
-	callback = function(event)
-		-- Disable statusline in dashboard
-		vim.opt.showtabline = 0
-		vim.opt.laststatus = 0
-		vim.bo[event.buf].buflisted = false
-		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<CMD>q<CR>", { silent = true })
-	end,
-})
 
 -- register lazy command keymap
 api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-	group = misc_id,
 	pattern = "*",
 	callback = function(_)
 		local k = require "zox.keybind"
@@ -72,7 +67,6 @@ api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
 
 -- Makes switching between buffer and termmode feels like normal mode
 api.nvim_create_autocmd("TermOpen", {
-	group = misc_id,
 	pattern = "term://*",
 	callback = function()
 		local opts = { noremap = true, silent = true }
@@ -85,30 +79,16 @@ api.nvim_create_autocmd("TermOpen", {
 	end,
 })
 -- Fix fold issue of files opened by telescope
-vim.api.nvim_create_autocmd("BufRead", {
-	callback = function()
-		vim.api.nvim_create_autocmd("BufWinEnter", {
-			once = true,
-			command = "normal! zx",
-		})
-	end,
-})
+-- vim.api.nvim_create_autocmd("BufRead", {
+-- 	callback = function()
+-- 		vim.api.nvim_create_autocmd("BufWinEnter", {
+-- 			once = true,
+-- 			command = "normal! zx",
+-- 		})
+-- 	end,
+-- })
 
--- auto close NvimTree
-api.nvim_create_autocmd("BufEnter", {
-	group = api.nvim_create_augroup("NvimTreeClose", { clear = true }),
-	pattern = "NvimTree_*",
-	callback = function()
-		local layout = api.nvim_call_function("winlayout", {})
-		if
-			layout[1] == "leaf"
-			and api.nvim_buf_get_option(api.nvim_win_get_buf(layout[2]), "filetype") == "NvimTree"
-			and layout[3] == nil
-		then
-			vim.cmd.confirm { "quit" }
-		end
-	end,
-})
+vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
 
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
 -- Set noundofile for temporary files
@@ -117,12 +97,6 @@ api.nvim_create_autocmd("BufWritePre", {
 	pattern = { "/tmp/*", "*.tmp", "*.bak" },
 	command = "setlocal noundofile",
 })
--- auto place to last edit
-api.nvim_create_autocmd("BufReadPost", {
-	group = bufs_id,
-	pattern = "*",
-	command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
-})
 -- set filetype for header files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = bufs_id,
@@ -130,12 +104,16 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	command = "setlocal filetype=c",
 })
 
-local wins_id = api.nvim_create_augroup("EditorWins", { clear = true })
--- Equalize window dimensions when resizing vim window
-api.nvim_create_autocmd("VimResized", {
-	group = wins_id,
-	pattern = "*",
-	command = "tabdo wincmd =",
+api.nvim_create_autocmd({ "BufReadPost" }, {
+	group = bufs_id,
+	pattern = { "*.rust", "*.c", "*.cpp", "*.h", "*.hpp", "*.hxx", "*.hh" },
+	callback = function() require "zox.adapters.lldb" end,
+})
+
+api.nvim_create_autocmd({ "BufReadPost" }, {
+	group = bufs_id,
+	pattern = { "*.go" },
+	callback = function() require "zox.adapters.dlv" end,
 })
 
 local ft_id = api.nvim_create_augroup("EditorFt", { clear = true })
@@ -189,14 +167,6 @@ api.nvim_create_autocmd("FileType", {
 	group = ft_id,
 	pattern = { "lua", "nix" },
 	command = "set noexpandtab shiftwidth=2 tabstop=2",
-})
-vim.api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = { "markdown" },
-	callback = function()
-		vim.opt_local.wrap = true
-		vim.opt_local.spell = true
-	end,
 })
 
 local yank_id = api.nvim_create_augroup("yank", { clear = true })

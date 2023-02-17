@@ -1,5 +1,21 @@
 return {
 	{
+		"rose-pine/neovim",
+		name = "rose-pine",
+		branch = "canary",
+		lazy = false,
+		priority = 1000,
+		opts = {
+			disable_italics = true,
+			disable_float_background = true,
+			highlight_groups = {
+				Comment = { fg = "muted", italic = true },
+				StatusLine = { fg = "iris", bg = "iris", blend = 10 },
+				StatusLineNC = { fg = "subtle", bg = "surface" },
+			},
+		},
+	},
+	{
 		"gelguy/wilder.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
@@ -106,7 +122,7 @@ return {
 	{
 		"j-hui/fidget.nvim",
 		lazy = true,
-		event = "LspAttach",
+		event = "BufReadPost",
 		opts = {
 			text = { spinner = "dots" },
 			window = { blend = 0 },
@@ -115,7 +131,7 @@ return {
 	{
 		"rcarriga/nvim-notify",
 		lazy = true,
-		event = "LspAttach",
+		event = "BufReadPost",
 		cond = function()
 			if #vim.api.nvim_list_uis() ~= 0 then
 				return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
@@ -137,215 +153,6 @@ return {
 			}
 
 			vim.notify = notify
-		end,
-	},
-	{
-		"nvim-lualine/lualine.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		config = function()
-			local escape_status = function()
-				local ok, m = pcall(require, "better_escape")
-				return ok and m.waiting and require("zox").misc_space.EscapeST or ""
-			end
-
-			local _cache = { context = "", bufnr = -1 }
-			local lspsaga_symbols = function()
-				if
-					vim.api.nvim_win_get_config(0).zindex
-					or vim.tbl_contains({
-						"terminal",
-						"toggleterm",
-						"prompt",
-						"alpha",
-						"dashboard",
-						"help",
-						"TelescopePrompt",
-					}, vim.bo.filetype)
-				then
-					return "" -- Excluded filetypes
-				else
-					local currbuf = vim.api.nvim_get_current_buf()
-					local ok, lspsaga = pcall(require, "lspsaga.symbolwinbar")
-					if ok and lspsaga:get_winbar() ~= nil then
-						_cache.context = lspsaga:get_winbar()
-						_cache.bufnr = currbuf
-					elseif _cache.bufnr ~= currbuf then
-						_cache.context = "" -- NOTE: Reset [invalid] cache (usually from another buffer)
-					end
-
-					return _cache.context
-				end
-			end
-
-			local diff_source = function()
-				---@diagnostic disable-next-line: undefined-field
-				local gitsigns = vim.b.gitsigns_status_dict
-				if gitsigns then
-					return {
-						added = gitsigns.added,
-						modified = gitsigns.changed,
-						removed = gitsigns.removed,
-					}
-				end
-			end
-
-			local get_cwd = function()
-				local cwd = vim.fn.getcwd()
-				if vim.loop.os_uname().sysname ~= "Windows_NT" then
-					local home = os.getenv "HOME"
-					if home and cwd:find(home, 1, true) == 1 then
-						cwd = "~" .. cwd:sub(#home + 1)
-					end
-				end
-				return require("zox").ui_space.RootFolderOpened .. cwd
-			end
-
-			local mini_sections = {
-				lualine_a = { "filetype" },
-				lualine_b = {},
-				lualine_c = {},
-				lualine_x = {},
-				lualine_y = {},
-				lualine_z = {},
-			}
-			local outline = {
-				sections = mini_sections,
-				filetypes = { "lspsagaoutline" },
-			}
-			local diffview = {
-				sections = mini_sections,
-				filetypes = { "DiffviewFiles" },
-			}
-
-			require("lualine").setup {
-				options = {
-					theme = "auto",
-					disabled_filetypes = {
-						statusline = {
-							"alpha",
-							"dashboard",
-							"NvimTree",
-							"prompt",
-							"toggleterm",
-							"terminal",
-							"help",
-							"lspsagaoutine",
-							"DiffviewFiles",
-							"TelescopePrompt",
-						},
-					},
-					component_separators = "|",
-					section_separators = { left = "", right = "" },
-					globalstatus = true,
-				},
-				sections = {
-					lualine_a = { "mode" },
-					lualine_b = {
-						{ "branch", icons_enabled = true, icon = require("zox").git.Branch },
-						{ "diff", source = diff_source },
-					},
-					lualine_c = { lspsaga_symbols },
-					lualine_x = {
-						{ escape_status },
-						{
-							"diagnostics",
-							sources = { "nvim_diagnostic" },
-							symbols = {
-								error = require("zox").diagnostics_space.Error,
-								warn = require("zox").diagnostics_space.Warning,
-								info = require("zox").diagnostics_space.Information,
-							},
-						},
-						{ get_cwd },
-					},
-					lualine_y = {},
-					lualine_z = { "progress", "location" },
-				},
-				inactive_sections = {
-					lualine_a = {},
-					lualine_b = {},
-					lualine_c = {},
-					lualine_x = {},
-					lualine_y = {},
-					lualine_z = {},
-				},
-				tabline = {},
-				extensions = {
-					"quickfix",
-					"nvim-tree",
-					"nvim-dap-ui",
-					"toggleterm",
-					"fugitive",
-					outline,
-					diffview,
-				},
-			}
-
-			-- Properly set background color for lspsaga
-			for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind()) do
-				require("zox.utils").extend_hl("LspSagaWinbar" .. hlGroup[1])
-			end
-			require("zox.utils").extend_hl "LspSagaWinbarSep"
-		end,
-	},
-	{
-		"goolord/alpha-nvim",
-		lazy = true,
-		event = "BufWinEnter",
-		cond = function() return #vim.api.nvim_list_uis() > 0 end,
-		config = function()
-			local dashboard = require "alpha.themes.dashboard"
-			dashboard.section.buttons.opts.hl = "String"
-			dashboard.section.buttons.val = {}
-			local gen_footer = function()
-				local stats = require("lazy").stats()
-				local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-				return require("zox").misc_space.BentoBox
-					.. "github.com/aarnphm"
-					.. "   v"
-					.. vim.version().major
-					.. "."
-					.. vim.version().minor
-					.. "."
-					.. vim.version().patch
-					.. "   "
-					.. stats.count
-					.. " plugins in "
-					.. ms
-					.. "ms"
-			end
-
-			dashboard.section.footer.opts.hl = "Function"
-			dashboard.section.footer.val = gen_footer()
-
-			local top_button_pad = 2
-			local footer_button_pad = 1
-			local heights = #dashboard.section.header.val
-				+ 2 * #dashboard.section.buttons.val
-				+ top_button_pad
-
-			dashboard.config.layout = {
-				{
-					type = "padding",
-					val = math.max(0, math.ceil((vim.fn.winheight(0) - heights) * 0.12)),
-				},
-				dashboard.section.header,
-				{ type = "padding", val = top_button_pad },
-				dashboard.section.buttons,
-				{ type = "padding", val = footer_button_pad },
-				dashboard.section.footer,
-			}
-
-			require("alpha").setup(dashboard.config)
-
-			vim.api.nvim_create_autocmd("User", {
-				pattern = "LazyVimStarted",
-				callback = function()
-					dashboard.section.footer.val = gen_footer()
-					pcall(vim.cmd.AlphaRedraw)
-				end,
-			})
 		end,
 	},
 	{
@@ -431,7 +238,7 @@ return {
 	{
 		"zbirenbaum/neodim",
 		lazy = true,
-		event = "LspAttach",
+		event = "BufReadPost",
 		opts = {
 			blend_color = require("zox.utils").hl_to_rgb("Normal", true),
 			update_in_insert = { delay = 100 },
@@ -447,28 +254,39 @@ return {
 		lazy = true,
 		dependencies = { "nvim-lua/plenary.nvim" },
 		event = { "CursorHoldI", "CursorHold" },
-		config = function()
-			require("todo-comments").setup {}
-
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<Leader>tqf"] = k.cr("TodoQuickFix")
-					:with_defaults "todo-comments: Open quickfix",
-				["n|]t"] = k.callback(function() require("todo-comments").jump_next() end)
-					:with_defaults "todo-comments: Next",
-				["n|[t"] = k.callback(function() require("todo-comments").jump_prev() end)
-					:with_defaults "todo-comments: Previous",
-				["n|<Leader>tt"] = k.cr("TodoTelescope"):with_defaults "todo-comments: Telescope",
-			}
-		end,
+		keys = {
+			{
+				"<Leader>tqf",
+				"<cmd>TodoQuickFix<cr>",
+				desc = "todo-comments: Open quickfix",
+				silent = true,
+			},
+			{
+				"<Leader>tt",
+				"<cmd>TodoTelescope<cr>",
+				desc = "todo-comments: Telescope",
+				silent = true,
+			},
+			{
+				"]t",
+				function() require("todo-comments").jump_next() end,
+				desc = "todo-comments: Next",
+				silent = true,
+			},
+			{
+				"[t",
+				function() require("todo-comments").jump_prev() end,
+				desc = "todo-comments: Previous",
+				silent = true,
+			},
+		},
+		config = true,
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
-		event = { "CursorHoldI", "CursorHold" },
+		event = "BufReadPost",
 		opts = {
-			char = "│",
 			show_first_indent_level = true,
 			filetype_exclude = {
 				"startify",
@@ -510,135 +328,124 @@ return {
 				"var",
 				"import",
 			},
-			space_char_blankline = " ",
 		},
 	},
 	{
 		"lewis6991/gitsigns.nvim",
 		lazy = true,
 		event = { "CursorHoldI", "CursorHold" },
-		config = function()
-			require("gitsigns").setup {
-				numhl = true,
-				---@diagnostic disable-next-line: undefined-global
-				word_diff = false,
-				current_line_blame = false,
-				current_line_blame_opts = { virtual_text_pos = "eol" },
-				diff_opts = { internal = true },
-				on_attach = function(bufnr)
-					local k = require "zox.keybind"
+		opts = {
+			numhl = true,
+			---@diagnostic disable-next-line: undefined-global
+			word_diff = false,
+			current_line_blame = false,
+			current_line_blame_opts = { virtual_text_pos = "eol" },
+			diff_opts = { internal = true },
+			on_attach = function(bufnr)
+				local k = require "zox.keybind"
 
-					k.nvim_register_mapping {
-						["n|]g"] = k.callback(function()
-							if vim.wo.diff then return "]g" end
-							vim.schedule(function() require("gitsigns.actions").next_hunk() end)
-							return "<Ignore>"
-						end)
-							:with_buffer(bufnr)
-							:with_expr()
-							:with_desc "git: Goto next hunk",
-						["n|[g"] = k.callback(function()
-							if vim.wo.diff then return "[g" end
-							vim.schedule(function() require("gitsigns.actions").prev_hunk() end)
-							return "<Ignore>"
-						end)
-							:with_buffer(bufnr)
-							:with_expr()
-							:with_desc "git: Goto prev hunk",
-						["n|<Leader>hs"] = k.callback(
-							function() require("gitsigns.actions").stage_hunk() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Stage hunk",
-						["v|<Leader>hs"] = k.callback(
-							function()
-								require("gitsigns.actions").stage_hunk {
-									vim.fn.line ".",
-									vim.fn.line "v",
-								}
-							end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Stage hunk",
-						["n|<Leader>hu"] = k.callback(
-							function() require("gitsigns.actions").undo_stage_hunk() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Undo stage hunk",
-						["n|<Leader>hr"] = k.callback(
-							function() require("gitsigns.actions").reset_hunk() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Reset hunk",
-						["v|<Leader>hr"] = k.callback(
-							function()
-								require("gitsigns.actions").reset_hunk {
-									vim.fn.line ".",
-									vim.fn.line "v",
-								}
-							end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Reset hunk",
-						["n|<Leader>hR"] = k.callback(
-							function() require("gitsigns.actions").reset_buffer() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Reset buffer",
-						["n|<Leader>hp"] = k.callback(
-							function() require("gitsigns.actions").preview_hunk() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Preview hunk",
-						["n|<Leader>hb"] = k.callback(
-							function() require("gitsigns.actions").blame_line { full = true } end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Blame line",
-						["n|<Leader>tbl"] = k.callback(
-							function() require("gitsigns.actions").toggle_current_line_blame() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Toggle current line blame",
-						["n|<Leader>twd"] = k.callback(
-							function() require("gitsigns.actions").toggle_word_diff() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Toogle word diff",
-						["n|<Leader>thd"] = k.callback(
-							function() require("gitsigns.actions").toggle_deleted() end
-						)
-							:with_buffer(bufnr)
-							:with_desc "git: Toggle deleted diff",
-						-- Text objects
-						["o|ih"] = k.callback(
-							function() require("gitsigns.actions").text_object() end
-						)
-							:with_buffer(bufnr),
-						["x|ih"] = k.callback(
-							function() require("gitsigns.actions").text_object() end
-						)
-							:with_buffer(bufnr),
-					}
-				end,
-			}
-		end,
+				local ok, _ = require "gitsigns"
+				if not ok then return end
+
+				k.nvim_register_mapping {
+					["n|]g"] = k.callback(function()
+						if vim.wo.diff then return "]g" end
+						vim.schedule(function() require("gitsigns.actions").next_hunk() end)
+						return "<Ignore>"
+					end)
+						:with_buffer(bufnr)
+						:with_expr()
+						:with_desc "git: Goto next hunk",
+					["n|[g"] = k.callback(function()
+						if vim.wo.diff then return "[g" end
+						vim.schedule(function() require("gitsigns.actions").prev_hunk() end)
+						return "<Ignore>"
+					end)
+						:with_buffer(bufnr)
+						:with_expr()
+						:with_desc "git: Goto prev hunk",
+					["n|<Leader>hs"] = k.callback(
+						function() require("gitsigns.actions").stage_hunk() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Stage hunk",
+					["v|<Leader>hs"] = k.callback(
+						function()
+							require("gitsigns.actions").stage_hunk {
+								vim.fn.line ".",
+								vim.fn.line "v",
+							}
+						end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Stage hunk",
+					["n|<Leader>hu"] = k.callback(
+						function() require("gitsigns.actions").undo_stage_hunk() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Undo stage hunk",
+					["n|<Leader>hr"] = k.callback(
+						function() require("gitsigns.actions").reset_hunk() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Reset hunk",
+					["v|<Leader>hr"] = k.callback(
+						function()
+							require("gitsigns.actions").reset_hunk {
+								vim.fn.line ".",
+								vim.fn.line "v",
+							}
+						end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Reset hunk",
+					["n|<Leader>hR"] = k.callback(
+						function() require("gitsigns.actions").reset_buffer() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Reset buffer",
+					["n|<Leader>hp"] = k.callback(
+						function() require("gitsigns.actions").preview_hunk() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Preview hunk",
+					["n|<Leader>hb"] = k.callback(
+						function() require("gitsigns.actions").blame_line { full = true } end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Blame line",
+					["n|<Leader>tbl"] = k.callback(
+						function() require("gitsigns.actions").toggle_current_line_blame() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Toggle current line blame",
+					["n|<Leader>twd"] = k.callback(
+						function() require("gitsigns.actions").toggle_word_diff() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Toogle word diff",
+					["n|<Leader>thd"] = k.callback(
+						function() require("gitsigns.actions").toggle_deleted() end
+					)
+						:with_buffer(bufnr)
+						:with_desc "git: Toggle deleted diff",
+					-- Text objects
+					["o|ih"] = k.callback(function() require("gitsigns.actions").text_object() end)
+						:with_buffer(bufnr),
+					["x|ih"] = k.callback(function() require("gitsigns.actions").text_object() end)
+						:with_buffer(bufnr),
+				}
+			end,
+		},
 	},
 	{
 		"folke/trouble.nvim",
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
-		event = "LspAttach",
-		config = function()
-			require("trouble").setup {
-				position = "left",
-				mode = "document_diagnostics",
-				auto_close = true,
-			}
-
+		event = "BufReadPost",
+		keys = function()
 			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
+			return k.to_lazy_mapping {
 				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
 				["n|gR"] = k.cr("TroubleToggle lsp_references")
 					:with_defaults "lsp: Show lsp references",
@@ -652,22 +459,7 @@ return {
 					:with_defaults "lsp: Show loclist",
 			}
 		end,
-	},
-	{
-		"rose-pine/neovim",
-		name = "rose-pine",
-		branch = "canary",
-		lazy = false,
-		priority = 1000,
-		opts = {
-			disable_italics = true,
-			disable_float_background = true,
-			highlight_groups = {
-				Comment = { fg = "muted", italic = true },
-				StatusLine = { fg = "iris", bg = "iris", blend = 10 },
-				StatusLineNC = { fg = "subtle", bg = "surface" },
-			},
-		},
+		opts = { position = "left", mode = "document_diagnostics", auto_close = true },
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -675,8 +467,8 @@ return {
 		event = "BufReadPost",
 		lazy = true,
 		dependencies = {
-			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "romgrk/nvim-treesitter-context" },
+			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 			{ "JoosepAlviste/nvim-ts-context-commentstring" },
 			{
 				"andymass/vim-matchup",
@@ -763,29 +555,55 @@ return {
 				vim.bo.filetype
 			)
 		end,
+		keys = {
+			{
+				"<LocalLeader>w",
+				"<cmd><C-u>HopWord<CR>",
+				"jump: Goto word",
+				noremap = true,
+			},
+			{
+				"<LocalLeader>j",
+				"<cmd><C-u>HopLine<CR>",
+				"jump: Goto line",
+				noremap = true,
+			},
+			{
+				"<LocalLeader>k",
+				"<cmd><C-u>HopLine<CR>",
+				"jump: Goto line",
+				noremap = true,
+			},
+			{
+				"<LocalLeader>c",
+				"<cmd><C-u>HopChar1<CR>",
+				"jump: one char",
+				noremap = true,
+			},
+			{
+				"<LocalLeader>cc",
+				"<cmd><C-u>HopChar2<CR>",
+				"jump: one char",
+				noremap = true,
+			},
+		},
 		config = function()
 			local hop = require "hop"
-
 			hop.setup()
+
 			-- set f/F to use hop
 			local d = require("hop.hint").HintDirection
 			vim.api.nvim_set_keymap("", "f", "", {
 				noremap = false,
 				callback = function()
-					hop.hint_char1 {
-						direction = d.AFTER_CURSOR,
-						current_line_only = true,
-					}
+					hop.hint_char1 { direction = d.AFTER_CURSOR, current_line_only = true }
 				end,
 				desc = "motion: f 1 char",
 			})
 			vim.api.nvim_set_keymap("", "F", "", {
 				noremap = false,
 				callback = function()
-					hop.hint_char1 {
-						direction = d.BEFORE_CURSOR,
-						current_line_only = true,
-					}
+					hop.hint_char1 { direction = d.BEFORE_CURSOR, current_line_only = true }
 				end,
 				desc = "motion: F 1 char",
 			})
@@ -811,29 +629,20 @@ return {
 				end,
 				desc = "motion: T 1 char",
 			})
-
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<LocalLeader>w"] = k.cu("HopWord"):with_noremap():with_desc "jump: Goto word",
-				["n|<LocalLeader>j"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-				["n|<LocalLeader>k"] = k.cu("HopLine"):with_noremap():with_desc "jump: Goto line",
-				["n|<LocalLeader>c"] = k.cu("HopChar1")
-					:with_noremap()
-					:with_desc "jump: Goto one char",
-				["n|<LocalLeader>cc"] = k.cu("HopChar2")
-					:with_noremap()
-					:with_desc "jump: Goto two chars",
-			}
 		end,
 	},
 	{
 		"nvim-telescope/telescope.nvim",
 		lazy = true,
 		event = "BufRead",
+		cmd = "Telescope",
 		dependencies = {
+			{ "nvim-lua/plenary.nvim" },
+			{ "nvim-lua/popup.nvim" },
 			{
 				"nvim-tree/nvim-web-devicons",
+				lazy = true,
+				event = "BufReadPost",
 				opts = {
 					override = {
 						zsh = {
@@ -845,30 +654,20 @@ return {
 					},
 				},
 			},
-			{ "nvim-lua/plenary.nvim" },
-			{ "nvim-lua/popup.nvim" },
-			{ "jvgrootveld/telescope-zoxide" },
-			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
-			{
-				"nvim-telescope/telescope-dap.nvim",
-				dependencies = { "mfussenegger/nvim-dap", "nvim-treesitter/nvim-treesitter" },
-			},
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 			{
 				"ahmedkhalf/project.nvim",
+				lazy = true,
 				event = "BufReadPost",
-				config = function()
-					require("project_nvim").setup {
-						ignore_lsp = { "null-ls", "copilot" },
-						show_hidden = true,
-						silent_chdir = true,
-						scope_chdir = "win",
-					}
-				end,
+				opts = {
+					ignore_lsp = { "null-ls", "copilot" },
+					show_hidden = true,
+					silent_chdir = true,
+					scope_chdir = "win",
+				},
 			},
 		},
-		cmd = "Telescope",
 		keys = {
 			{
 				"<leader>f",
@@ -934,8 +733,6 @@ return {
 				defaults = {
 					prompt_prefix = " " .. require("zox").ui_space.Telescope .. " ",
 					selection_caret = require("zox").ui_space.DoubleSeparator,
-					borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
-					path_display = { "absolute" },
 					mappings = {
 						i = {
 							["<C-a>"] = { "<esc>0i", type = "command" },
@@ -943,41 +740,9 @@ return {
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
-					file_ignore_patterns = {
-						"static_content",
-						"node_modules",
-						".git/",
-						".cache",
-						"%.class",
-						"%.pdf",
-						"%.mkv",
-						"%.mp4",
-						"%.zip",
-						"lazy-lock.json",
-					},
-					layout_config = {
-						horizontal = {
-							preview_width = 0.3,
-							prompt_position = "top",
-						},
-						vertical = {
-							preview_height = 0.3,
-							prompt_position = "top",
-						},
-					},
+					layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
 				},
 				extensions = {
-					frecency = {
-						show_scores = true,
-						show_unindexed = true,
-						ignore_patterns = { "*.git/*", "*/tmp/*", "*/lazy-lock.json" },
-					},
-					fzf = {
-						fuzzy = false,
-						override_generic_sorter = true,
-						override_file_sorter = true,
-						case_mode = "smart_case",
-					},
 					live_grep_args = {
 						auto_quoting = false,
 						mappings = {
@@ -1005,20 +770,9 @@ return {
 							return true
 						end,
 					},
-					diagnostics = {
-						initial_mode = "normal",
-					},
 				},
 			}
-			for _, v in ipairs {
-				"fzf",
-				"frecency",
-				"live_grep_args",
-				"zoxide",
-				"notify",
-				"projects",
-				"dap",
-			} do
+			for _, v in ipairs { "frecency", "live_grep_args", "notify", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,
@@ -1041,26 +795,7 @@ return {
 			},
 		},
 		opts = {
-			actions = {
-				open_file = {
-					quit_on_open = true,
-					resize_window = false,
-					window_picker = {
-						exclude = {
-							filetype = {
-								"notify",
-								"qf",
-								"diff",
-								"fugitive",
-								"fugitiveblame",
-								"alpha",
-								"Trouble",
-							},
-							buftype = { "nofile", "terminal", "help" },
-						},
-					},
-				},
-			},
+			actions = { open_file = { quit_on_open = true } },
 			hijack_cursor = true,
 			hijack_unnamed_buffer_when_opening = true,
 			reload_on_bufenter = true,
@@ -1087,22 +822,13 @@ return {
 				cmd = require("zox.utils").get_binary_path "rip",
 				require_confirm = true,
 			},
-			view = {
-				adaptive_size = false,
-				side = "right",
-				mappings = {
-					list = {
-						{ key = "d", action = "trash" },
-						{ key = "D", action = "remove" },
-					},
-				},
-			},
+			view = { adaptive_size = false, side = "right" },
 		},
 	},
 	{
 		"nvim-pack/nvim-spectre",
 		lazy = true,
-		build = "./build.sh",
+		build = "./build.sh nvim_oxi",
 		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("spectre").setup {
@@ -1225,153 +951,141 @@ return {
 
 	--- NOTE: Dap setup
 	{
-		"theHamsta/nvim-dap-virtual-text",
+		"rcarriga/nvim-dap-ui",
+		as = "dapui",
 		lazy = true,
-		name = "nvim-dap-virtual-text",
-		event = { "CursorHold", "CursorHoldI" },
-		dependencies = {
-			{
-				"mfussenegger/nvim-dap",
-				lazy = true,
-				cmd = {
-					"DapSetLogLevel",
-					"DapShowLog",
-					"DapContinue",
-					"DapToggleBreakpoint",
-					"DapToggleRepl",
-					"DapStepOver",
-					"DapStepInto",
-					"DapStepOut",
-					"DapTerminate",
-				},
-				event = { "CursorHold", "CursorHoldI" },
-				dependencies = {
-					{
-						"rcarriga/nvim-dap-ui",
-						as = "dapui",
-						lazy = true,
-						event = { "CursorHold", "CursorHoldI" },
-						opts = {
-							icons = {
-								expanded = require("zox").ui_space.ArrowOpen,
-								collapsed = require("zox").ui_space.ArrowClosed,
-								current_frame = require("zox").ui_space.Indicator,
-							},
-							layouts = {
-								{
-									elements = {
-										-- Provide as ID strings or tables with "id" and "size" keys
-										{
-											id = "scopes",
-											size = 0.25, -- Can be float or integer > 1
-										},
-										{ id = "breakpoints", size = 0.25 },
-										{ id = "stacks", size = 0.25 },
-										{ id = "watches", size = 0.25 },
-									},
-									size = 40,
-									position = "left",
-								},
-								{ elements = { "repl" }, size = 10, position = "bottom" },
-							},
-							controls = {
-								icons = {
-									pause = require("zox").dap_space.Pause,
-									play = require("zox").dap_space.Play,
-									step_into = require("zox").dap_space.StepInto,
-									step_over = require("zox").dap_space.StepOver,
-									step_out = require("zox").dap_space.StepOut,
-									step_back = require("zox").dap_space.StepBack,
-									run_last = require("zox").dap_space.RunLast,
-									terminate = require("zox").dap_space.Terminate,
-								},
-							},
-							windows = { indent = 1 },
-						},
-					},
-				},
-				config = function()
-					local ok
-					ok, _ = pcall(require, "dap")
-					if not ok then return end
-					ok, _ = pcall(require, "dapui")
-					if not ok then return end
-					for _, v in ipairs {
-						"Breakpoint",
-						"BreakpointRejected",
-						"BreakpointCondition",
-						"LogPoint",
-						"Stopped",
-					} do
-						vim.fn.sign_define("Dap" .. v, {
-							text = require("zox").dap_space[v],
-							texthl = "Dap" .. v,
-							line = "",
-							numhl = "",
-						})
-					end
-					-- Config lang adapters
-					for _, value in ipairs { "dlv", "lldb" } do
-						ok, _ = pcall(require, "zox.adapters." .. value)
-						if not ok then
-							vim.notify_once(
-								"Failed to setup dap for " .. value,
-								vim.log.levels.ERROR,
-								{ title = "dap" }
-							)
-						end
-					end
-
-					local run_dap = function()
-						require("dap.ext.vscode").load_launchjs()
-						require("dap").continue {}
-						require("dapui").open()
-					end
-
-					local stop_dap = function()
-						local has_dap, dap = pcall(require, "dap")
-						if has_dap then
-							dap.disconnect()
-							dap.close()
-							dap.repl.close()
-						end
-						local has_dapui, dapui = pcall(require, "dapui")
-						if has_dapui then dapui.close() end
-					end
-					local k = require "zox.keybind"
-
-					k.nvim_register_mapping {
-						["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",
-						["n|<Leader>ds"] = k.callback(stop_dap):with_defaults "dap: Stop",
-						["n|<Leader>db"] = k.callback(
-							function() require("dap").toggle_breakpoint() end
-						)
-							:with_defaults "dap: Toggle breakpoint",
-						["n|<Leader>dbs"] = k.callback(
-							function()
-								require("dap").set_breakpoint(
-									vim.fn.input { prompt = "Breakpoint condition: " }
-								)
-							end
-						):with_defaults "dap: Set breakpoint with condition",
-						["n|<Leader>di"] = k.callback(function() require("dap").step_into() end)
-							:with_defaults "dap: Step into",
-						["n|<Leader>do"] = k.callback(function() require("dap").step_out() end)
-							:with_defaults "dap: Step out",
-						["n|<Leader>dn"] = k.callback(function() require("dap").step_over() end)
-							:with_defaults "dap: Step over",
-						["n|<Leader>dc"] = k.callback(function() require("dap").continue {} end)
-							:with_defaults "dap: Continue",
-						["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
-							:with_defaults "dap: Run last",
-						["n|<Leader>dR"] = k.callback(function() require("dap").repl.open() end)
-							:with_defaults "dap: Open REPL",
-						["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
-							:with_defaults "dap: toggle UI",
-					}
-				end,
+		event = "BufReadPost",
+		opts = {
+			icons = {
+				expanded = require("zox").ui_space.ArrowOpen,
+				collapsed = require("zox").ui_space.ArrowClosed,
+				current_frame = require("zox").ui_space.Indicator,
 			},
+			layouts = {
+				{
+					elements = {
+						-- Provide as ID strings or tables with "id" and "size" keys
+						{
+							id = "scopes",
+							size = 0.25, -- Can be float or integer > 1
+						},
+						{ id = "breakpoints", size = 0.25 },
+						{ id = "stacks", size = 0.25 },
+						{ id = "watches", size = 0.25 },
+					},
+					size = 40,
+					position = "left",
+				},
+				{ elements = { "repl" }, size = 10, position = "bottom" },
+			},
+			controls = {
+				icons = {
+					pause = require("zox").dap_space.Pause,
+					play = require("zox").dap_space.Play,
+					step_into = require("zox").dap_space.StepInto,
+					step_over = require("zox").dap_space.StepOver,
+					step_out = require("zox").dap_space.StepOut,
+					step_back = require("zox").dap_space.StepBack,
+					run_last = require("zox").dap_space.RunLast,
+					terminate = require("zox").dap_space.Terminate,
+				},
+			},
+			windows = { indent = 1 },
 		},
-		opts = { enabled = true, enabled_commands = true, all_frames = true },
+	},
+	{
+		"mfussenegger/nvim-dap",
+		lazy = true,
+		cmd = {
+			"DapSetLogLevel",
+			"DapShowLog",
+			"DapContinue",
+			"DapToggleBreakpoint",
+			"DapToggleRepl",
+			"DapStepOver",
+			"DapStepInto",
+			"DapStepOut",
+			"DapTerminate",
+		},
+		event = "BufReadPost",
+		dependencies = { "rcarriga/nvim-dap-ui" },
+		config = function()
+			local ok
+			ok, _ = pcall(require, "dap")
+			if not ok then return end
+			ok, _ = pcall(require, "dapui")
+			if not ok then return end
+			for _, v in ipairs {
+				"Breakpoint",
+				"BreakpointRejected",
+				"BreakpointCondition",
+				"LogPoint",
+				"Stopped",
+			} do
+				vim.fn.sign_define("Dap" .. v, {
+					text = require("zox").dap_space[v],
+					texthl = "Dap" .. v,
+					line = "",
+					numhl = "",
+				})
+			end
+			-- Config lang adapters
+			for _, value in ipairs { "dlv", "lldb" } do
+				ok, _ = pcall(require, "zox.adapters." .. value)
+				if not ok then
+					vim.notify_once(
+						"Failed to setup dap for " .. value,
+						vim.log.levels.ERROR,
+						{ title = "dap" }
+					)
+				end
+			end
+
+			local run_dap = function()
+				require("dap.ext.vscode").load_launchjs()
+				require("dap").continue {}
+				require("dapui").open()
+			end
+
+			local stop_dap = function()
+				local has_dap, dap = pcall(require, "dap")
+				if has_dap then
+					dap.disconnect()
+					dap.close()
+					dap.repl.close()
+				end
+				local has_dapui, dapui = pcall(require, "dapui")
+				if has_dapui then dapui.close() end
+			end
+			local k = require "zox.keybind"
+
+			k.nvim_register_mapping {
+				["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",
+				["n|<Leader>ds"] = k.callback(stop_dap):with_defaults "dap: Stop",
+				["n|<Leader>db"] = k.callback(function() require("dap").toggle_breakpoint() end)
+					:with_defaults "dap: Toggle breakpoint",
+				["n|<Leader>dbs"] = k.callback(
+					function()
+						require("dap").set_breakpoint(
+							vim.fn.input { prompt = "Breakpoint condition: " }
+						)
+					end
+				):with_defaults "dap: Set breakpoint with condition",
+				["n|<Leader>di"] = k.callback(function() require("dap").step_into() end)
+					:with_defaults "dap: Step into",
+				["n|<Leader>do"] = k.callback(function() require("dap").step_out() end)
+					:with_defaults "dap: Step out",
+				["n|<Leader>dn"] = k.callback(function() require("dap").step_over() end)
+					:with_defaults "dap: Step over",
+				["n|<Leader>dc"] = k.callback(function() require("dap").continue {} end)
+					:with_defaults "dap: Continue",
+				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
+					:with_defaults "dap: Run last",
+				["n|<Leader>dR"] = k.callback(function() require("dap").repl.open() end)
+					:with_defaults "dap: Open REPL",
+				["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
+					:with_defaults "dap: toggle UI",
+			}
+		end,
 	},
 }

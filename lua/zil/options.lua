@@ -65,8 +65,7 @@ vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
-vim.o.laststatus = 2
--- vim.o.statusline = "%= %l:%c ♥ "
+vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -82,11 +81,8 @@ vim.o.ruler = true
 vim.o.scrolloff = 3
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
-vim.opt.shortmess:append "c"
+vim.o.shortmess = "I" -- no intro
 vim.o.showbreak = "↳  "
-vim.o.showcmd = false
-vim.o.showmode = false
-vim.o.showtabline = 2
 vim.o.sidescrolloff = 5
 vim.o.signcolumn = "yes"
 vim.o.smartcase = true
