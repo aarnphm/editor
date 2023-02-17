@@ -24,6 +24,7 @@ api.nvim_create_autocmd("FileType", {
 		"startuptime",
 		"tsplayground",
 		"neorepl",
+		"toggleterm",
 		"PlenaryTestPopup",
 	},
 	callback = function(event)

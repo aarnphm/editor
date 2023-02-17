@@ -16,6 +16,18 @@ return {
 		},
 	},
 	{
+		"pwntester/octo.nvim",
+		lazy = true,
+		cmd = "Octo",
+		event = "BufReadPost",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope.nvim",
+			"nvim-tree/nvim-web-devicons",
+		},
+		config = true,
+	},
+	{
 		"gelguy/wilder.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
@@ -62,49 +74,6 @@ return {
 		end,
 	},
 	{
-		"romainl/vim-cool",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		cond = function()
-			if #vim.api.nvim_list_uis() ~= 0 then
-				return not vim.tbl_contains(
-					{ "gitcommit", "gitrebase", "alpha", "dashboard" },
-					vim.bo.filetype
-				)
-			end
-			return false
-		end,
-	},
-	{
-		"RRethy/vim-illuminate",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		config = function()
-			require("illuminate").configure {
-				delay = 100,
-				providers = { "lsp", "treesitter", "regex" },
-				filetypes_denylist = {
-					"DoomInfo",
-					"DressingSelect",
-					"NvimTree",
-					"Outline",
-					"TelescopePrompt",
-					"Trouble",
-					"alpha",
-					"dashboard",
-					"dirvish",
-					"fugitive",
-					"help",
-					"lsgsagaoutline",
-					"neogitstatus",
-					"norg",
-					"toggleterm",
-				},
-				under_cursor = false,
-			}
-		end,
-	},
-	{
 		"sindrets/diffview.nvim",
 		lazy = true,
 		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
@@ -123,10 +92,7 @@ return {
 		"j-hui/fidget.nvim",
 		lazy = true,
 		event = "BufReadPost",
-		opts = {
-			text = { spinner = "dots" },
-			window = { blend = 0 },
-		},
+		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
 	},
 	{
 		"rcarriga/nvim-notify",
@@ -735,21 +701,12 @@ return {
 		},
 		opts = {
 			actions = { open_file = { quit_on_open = true } },
-			hijack_cursor = true,
-			hijack_unnamed_buffer_when_opening = true,
 			reload_on_bufenter = true,
 			sync_root_with_cwd = true,
 			update_focused_file = { enable = true, update_root = true },
 			git = { ignore = false },
 			filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 			renderer = {
-				special_files = {
-					"Cargo.toml",
-					"Makefile",
-					"README.md",
-					"readme.md",
-					"CMakeLists.txt",
-				},
 				group_empty = true,
 				highlight_opened_files = "none",
 				indent_markers = { enable = true },
@@ -768,43 +725,12 @@ return {
 		"nvim-pack/nvim-spectre",
 		lazy = true,
 		build = "./build.sh nvim_oxi",
+		module = "spectre",
 		event = { "CursorHold", "CursorHoldI" },
-		config = function()
-			require("spectre").setup {
-				live_update = true,
-				mapping = {
-					["change_replace_sed"] = {
-						map = "<LocalLeader>trs",
-						cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
-						desc = "replace: Using sed",
-					},
-					["change_replace_oxi"] = {
-						map = "<LocalLeader>tro",
-						cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
-						desc = "replace: Using oxi",
-					},
-					["toggle_live_update"] = {
-						map = "<LocalLeader>tu",
-						cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
-						desc = "replace: update live changes",
-					},
-					-- only work if the find_engine following have that option
-					["toggle_ignore_case"] = {
-						map = "<LocalLeader>ti",
-						cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
-						desc = "replace: toggle ignore case",
-					},
-					["toggle_ignore_hidden"] = {
-						map = "<LocalLeader>th",
-						cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
-						desc = "replace: toggle search hidden",
-					},
-				},
-			}
-
+		keys = function()
 			local k = require "zox.keybind"
 
-			k.nvim_register_mapping {
+			return k.to_lazy_mapping {
 				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
 				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
@@ -816,6 +742,37 @@ return {
 					:with_defaults "replace: Replace word under file search",
 			}
 		end,
+		opts = {
+			live_update = true,
+			mapping = {
+				["change_replace_sed"] = {
+					map = "<LocalLeader>trs",
+					cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
+					desc = "replace: Using sed",
+				},
+				["change_replace_oxi"] = {
+					map = "<LocalLeader>tro",
+					cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
+					desc = "replace: Using oxi",
+				},
+				["toggle_live_update"] = {
+					map = "<LocalLeader>tu",
+					cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
+					desc = "replace: update live changes",
+				},
+				-- only work if the find_engine following have that option
+				["toggle_ignore_case"] = {
+					map = "<LocalLeader>ti",
+					cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
+					desc = "replace: toggle ignore case",
+				},
+				["toggle_ignore_hidden"] = {
+					map = "<LocalLeader>th",
+					cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
+					desc = "replace: toggle search hidden",
+				},
+			},
+		},
 	},
 	{
 		"akinsho/toggleterm.nvim",
@@ -870,10 +827,11 @@ return {
 		opts = {
 			-- size can be a number or function which is passed the current terminal
 			size = function(term)
+				local factor = 0.3
 				if term.direction == "horizontal" then
-					return 15
+					return vim.o.lines * factor
 				elseif term.direction == "vertical" then
-					return vim.o.columns * 0.40
+					return vim.o.columns * factor
 				end
 			end,
 			on_open = function()
