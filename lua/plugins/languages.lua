@@ -12,7 +12,7 @@ return {
 				ft = "lua",
 				keys = {
 					{
-						"<Leader>or",
+						"<LocalLeader>or",
 						function()
 							-- get current buffer and window
 							local buf = vim.api.nvim_get_current_buf()
@@ -630,6 +630,7 @@ return {
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",
+				lazy = true,
 				dependencies = { "rafamadriz/friendly-snippets" },
 				build = "make install_jsregexp",
 				config = function()
@@ -654,6 +655,7 @@ return {
 			{ "hrsh7th/cmp-path" },
 			{ "hrsh7th/cmp-buffer" },
 			{ "ray-x/cmp-treesitter" },
+			{ "petertriho/cmp-git", dependencies = { "nvim-lua/plenary.nvim" }, config = true },
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
@@ -689,6 +691,7 @@ return {
 			local cmp = require "cmp"
 
 			local cmp_window = require "cmp.utils.window"
+			local k = require "zox.keybind"
 
 			local prev_info = cmp_window.info
 			---@diagnostic disable-next-line: duplicate-set-field
@@ -799,6 +802,7 @@ return {
 					{ name = "luasnip" },
 					{ name = "treesitter" },
 					{ name = "buffer" },
+					{ name = "git" },
 				},
 			}
 		end,

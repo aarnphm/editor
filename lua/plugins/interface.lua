@@ -10,7 +10,7 @@ return {
 			disable_float_background = true,
 			highlight_groups = {
 				Comment = { fg = "muted", italic = true },
-				StatusLine = { fg = "iris", bg = "iris", blend = 10 },
+				StatusLine = { fg = "rose", bg = "iris", blend = 10 },
 				StatusLineNC = { fg = "subtle", bg = "surface" },
 			},
 		},
@@ -26,6 +26,60 @@ return {
 			"nvim-tree/nvim-web-devicons",
 		},
 		config = true,
+		keys = function()
+			local k = require "zox.keybind"
+			return k.to_lazy_mapping {
+				["n|<leader>o"] = k.args("Octo"):with_defaults "octo: open",
+				["n|<leader>oc"] = k.args("Octo comment"):with_defaults "octo: comment",
+				["n|<leader>oi"] = k.args("Octo issue"):with_defaults "octo: issue",
+				["n|<leader>op"] = k.args("Octo pr"):with_defaults "octo: pr",
+				["n|<leader>or"] = k.args("Octo review"):with_defaults "octo: review",
+				["n|<leader>os"] = k.args("Octo status"):with_defaults "octo: status",
+			}
+		end,
+	},
+	{
+		"romainl/vim-cool",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		cond = function()
+			if #vim.api.nvim_list_uis() ~= 0 then
+				return not vim.tbl_contains(
+					{ "gitcommit", "gitrebase", "alpha", "dashboard" },
+					vim.bo.filetype
+				)
+			end
+			return false
+		end,
+	},
+	{
+		"RRethy/vim-illuminate",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		config = function()
+			require("illuminate").configure {
+				delay = 100,
+				providers = { "lsp", "treesitter", "regex" },
+				filetypes_denylist = {
+					"DoomInfo",
+					"DressingSelect",
+					"NvimTree",
+					"Outline",
+					"TelescopePrompt",
+					"Trouble",
+					"alpha",
+					"dashboard",
+					"dirvish",
+					"fugitive",
+					"help",
+					"lsgsagaoutline",
+					"neogitstatus",
+					"norg",
+					"toggleterm",
+				},
+				under_cursor = false,
+			}
+		end,
 	},
 	{
 		"gelguy/wilder.nvim",
@@ -446,6 +500,12 @@ return {
 					},
 				},
 			}
+
+			-- Use treesitter markdown parser for Octo buffer
+			local ok, _ = pcall(require, "octo")
+			if ok then
+				require("nvim-treesitter.parsers").filetype_to_parsername.octo = "markdown"
+			end
 		end,
 	},
 	{

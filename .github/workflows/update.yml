@@ -45,7 +45,6 @@ jobs:
           cp -r "${GITHUB_WORKSPACE}/syntax" "${HOME}/.config/nvim/syntax"
           cp -r "${GITHUB_WORKSPACE}/ftplugin" "${HOME}/.config/nvim/ftplugin"
           cp -r "${GITHUB_WORKSPACE}/after" "${HOME}/.config/nvim/after"
-          cp -r "${GITHUB_WORKSPACE}/custom-snippets" "${HOME}/.config/nvim/custom-snippets"
 
           # Run update
           nvim --headless "+Lazy! update" +qa

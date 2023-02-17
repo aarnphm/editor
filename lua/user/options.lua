@@ -1,10 +1,8 @@
-vim.cmd.colorscheme "un"
-
 -- custom python provider
-local conda_prefix = os.getenv "CONDA_PREFIX"
-if not conda_prefix == nil or conda_prefix == "" then
-	vim.g.python_host_prog = conda_prefix .. "/bin/python"
-	vim.g.python3_host_prog = conda_prefix .. "/bin/python"
+local conda = os.getenv "CONDA_PREFIX"
+if not conda == nil or conda == "" then
+	vim.g.python_host_prog = conda .. "/bin/python"
+	vim.g.python3_host_prog = conda .. "/bin/python"
 elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/python") == 1 then
 	vim.g.python_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
 	vim.g.python3_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
@@ -65,7 +63,7 @@ vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
-vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
+vim.o.statusline = "%f %m %= %=%y %P %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -84,6 +82,8 @@ vim.o.shiftround = true
 vim.o.shiftwidth = 4
 vim.o.shortmess = "I" -- no intro
 vim.o.showbreak = "↳  "
+vim.o.showcmd = false
+vim.o.showmode = true
 vim.o.sidescrolloff = 5
 vim.o.signcolumn = "yes"
 vim.o.smartcase = true

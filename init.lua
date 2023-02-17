@@ -5,13 +5,14 @@ vim.g.maplocalleader = "+"
 vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
 vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
 
-require "zil.package"
-require "zil.options"
-require "zil.keymapping"
-require "zil.events"
+require "user.package"
+require "user.options"
+require "user.keymapping"
+require "user.events"
 
 require("lazy").setup("plugins", {
 	install = { colorscheme = { "un" } },
+	defaults = { lazy = true },
 	change_detection = { notify = false },
 	performance = {
 		rtp = {
@@ -33,5 +34,5 @@ require("lazy").setup("plugins", {
 	},
 })
 
-vim.o.background = "dark"
+vim.o.background = "light"
 vim.cmd.colorscheme "rose-pine"
