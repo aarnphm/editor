@@ -1,1 +1,3 @@
-std = "lua51+vim"
+std = "vim+lua52"
+[lints]
+multiple_statements = "allow"

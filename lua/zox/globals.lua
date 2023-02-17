@@ -1,3 +1,5 @@
+---@diagnostic disable: duplicate-set-field
+--# selene: allow(global_usage)
 local ok, plenary_reload = pcall(require, "plenary.reload")
 local reloader = require
 if ok then reloader = plenary_reload.reload_module end
@@ -10,6 +12,6 @@ end
 _G.RELOAD = function(...) return reloader(...) end
 
 _G.R = function(name)
-	RELOAD(name)
+	_G.RELOAD(name)
 	return require(name)
 end

@@ -1048,6 +1048,21 @@ return {
 			actions = {
 				open_file = {
 					quit_on_open = true,
+					resize_window = false,
+					window_picker = {
+						exclude = {
+							filetype = {
+								"notify",
+								"qf",
+								"diff",
+								"fugitive",
+								"fugitiveblame",
+								"alpha",
+								"Trouble",
+							},
+							buftype = { "nofile", "terminal", "help" },
+						},
+					},
 				},
 			},
 			hijack_cursor = true,
@@ -1065,6 +1080,9 @@ return {
 					"readme.md",
 					"CMakeLists.txt",
 				},
+				group_empty = true,
+				highlight_opened_files = "none",
+				indent_markers = { enable = true },
 				root_folder_label = ":.:s?.*?/..?",
 				root_folder_modifier = ":e",
 				icons = { symlink_arrow = "  " },

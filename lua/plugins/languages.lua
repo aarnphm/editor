@@ -44,7 +44,12 @@ return {
 					{ "<LocalLeader>bt", "<cmd>Bazel test<Space>", desc = "bazel: test" },
 				},
 			},
-			{ "fatih/vim-go", lazy = true, ft = "go", run = ":GoInstallBinaries" },
+			{
+				"fatih/vim-go",
+				lazy = true,
+				ft = "go",
+				run = ":GoInstallBinaries",
+			},
 			{
 				"lervag/vimtex",
 				lazy = true,
@@ -457,7 +462,6 @@ return {
 
 					-- NOTE: code actions
 					ca.gitrebase,
-					ca.gitsigns,
 					ca.shellcheck,
 				},
 				on_attach = function(client, bufnr)
@@ -505,9 +509,7 @@ return {
 			local options = {
 				on_attach = on_attach_factory(false),
 				capabilities = capabilities,
-				flags = {
-					debounce_text_changes = 150,
-				},
+				flags = { debounce_text_changes = 150 },
 			}
 
 			--- A small wrapper to setup lsp with nvim-lspconfig

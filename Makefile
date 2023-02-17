@@ -6,15 +6,6 @@ fmt:
 	@stylua lua
 lint:
 	@selene lua
-ifeq ($(USE_SH),true)
-benchmark:
-	@./fixtures/benchmark.sh && cat ./fixtures/benchmark.txt
-else
-benchmark:
-	@./fixtures/benchmark.pl
-endif
-benchmark-local:
-	@vim-startuptime --vimpath nvim | sort -k 2
 reset:
-	@\rm -rf ${HOME}/.local/share/nvim ${HOME}/.cache/nvim ${HOME}/.local/state/nvim
-	nvim
+	@\rm -rf ${HOME}/.local/share/nvim/lazy ${HOME}/.cache/nvim ${HOME}/.local/state/nvim
+	@nvim --headless "+Lazy! update" +qa
