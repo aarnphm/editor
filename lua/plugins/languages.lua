@@ -36,13 +36,15 @@ return {
 				dependencies = { "google/vim-maktaba" },
 				cmd = "Bazel",
 				ft = "bzl",
-				keys = {
-					{ "<LocalLeader>bb", "<cmd>Bazel build<Space>", desc = "bazel: build" },
-					{ "<LocalLeader>bc", "<cmd>Bazel clean<Space>", desc = "bazel: clean" },
-					{ "<LocalLeader>br", "<cmd>Bazel run<Space>", desc = "bazel: run" },
-					{ "<LocalLeader>bq", "<cmd>Bazel query<Space>", desc = "bazel: query" },
-					{ "<LocalLeader>bt", "<cmd>Bazel test<Space>", desc = "bazel: test" },
-				},
+				config = function()
+					k.nvim_register_mapping {
+						["n|<LocalLeader>bb"] = k.args("Bazel build"):with_defaults "bazel: build",
+						["n|<LocalLeader>bc"] = k.args("Bazel clean"):with_defaults "bazel: clean",
+						["n|<LocalLeader>bd"] = k.args("Bazel debug"):with_defaults "bazel: debug",
+						["n|<LocalLeader>br"] = k.args("Bazel run"):with_defaults "bazel: run",
+						["n|<LocalLeader>bt"] = k.args("Bazel test"):with_defaults "bazel: test",
+					}
+				end,
 			},
 			{
 				"fatih/vim-go",
@@ -280,8 +282,7 @@ return {
 						definition = { split = "<C-c>s" },
 						beacon = { enable = false },
 						outline = {
-							win_with = "lsagaoutline",
-							win_width = math.floor(vim.o.columns * 0.2),
+							win_width = math.floor(vim.o.columns * 0.3),
 							keys = { jump = "<CR>" },
 						},
 						code_actions = { extend_gitsigns = false },
@@ -305,11 +306,24 @@ return {
 						},
 					}
 					k.nvim_register_mapping {
-						["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
-						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
+						["n|go"] = k.callback(function() require("lspsaga.outline"):outline() end)
+							:with_defaults "lsp: Toggle outline",
+						["n|g["] = k.callback(
+							function() require("lspsaga.diagnostic"):goto_prev() end
+						)
 							:with_defaults "lsp: Prev diagnostic",
-						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
+						["n|g]"] = k.callback(
+							function() require("lspsaga.diagnostic"):goto_next() end
+						)
 							:with_defaults "lsp: Next diagnostic",
+						["n|gl"] = k.callback(
+							function() require("lspsaga.diagnostic"):show_diagnostics({}, "line") end
+						):with_defaults "lsp: Show line diagnotics",
+						["n|gC"] = k.callback(
+							function() require("lspsaga.diagnostic"):show_diagnostics({}, "cursor") end
+						):with_defaults "lsp: Show cursor diagnotics",
+						["n|gB"] = k.cr("Lspsaga show_buf_diagnostics")
+							:with_defaults "lsp: Show cursor diagnotics",
 						["n|gr"] = k.cr("Lspsaga rename"):with_defaults "lsp: Rename in file range",
 						["n|ca"] = k.cr("Lspsaga code_action")
 							:with_defaults "lsp: Code action for cursor",

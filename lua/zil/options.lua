@@ -46,7 +46,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.breakindent = true
 vim.o.breakindentopt = "shift:2,min:20"
 vim.o.clipboard = "unnamedplus"
-vim.o.cmdheight = 0 -- 0, 1,
+vim.o.cmdheight = 1 -- 0, 1,
 vim.o.cmdwinheight = 5
 vim.o.complete = ".,w,b,k"
 vim.o.concealcursor = "niv"
@@ -57,7 +57,7 @@ vim.o.expandtab = true
 vim.o.fileformats = "unix,mac,dos"
 vim.o.foldenable = true
 vim.o.foldlevelstart = 99
-vim.o.formatoptions = "1jcroql"
+vim.o.formatoptions = "1jcrql"
 vim.o.grepformat = "%f:%l:%c:%m"
 vim.o.grepprg = "rg --hidden --vimgrep --smart-case --"
 vim.o.helpheight = 12
@@ -119,10 +119,6 @@ vim.o.wrapscan = true
 vim.o.writebackup = false
 
 vim.diagnostic.config { virtual_text = false }
-
-vim.api.nvim_create_autocmd("BufEnter", {
-	command = "setlocal formatoptions-=o",
-})
 
 local signs = { "Error", "Warn", "Hint", "Info" }
 for _, type in pairs(signs) do
