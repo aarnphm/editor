@@ -66,7 +66,7 @@ vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
 vim.o.laststatus = 2
-vim.o.statusline = "%= %l:%c ♥ "
+-- vim.o.statusline = "%= %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -125,12 +125,3 @@ for _, type in pairs(signs) do
 	local hl = string.format("DiagnosticSign%s", type)
 	vim.fn.sign_define(hl, { text = "●", texthl = hl, numhl = hl })
 end
-
--- Jump to last position. See :h last-position-jump
-vim.api.nvim_create_autocmd("BufReadPost", {
-	pattern = "*",
-	callback = function()
-		local line = vim.fn.line "'\""
-		if line >= 1 and line <= vim.fn.line "$" then vim.cmd "normal! g`\"" end
-	end,
-})

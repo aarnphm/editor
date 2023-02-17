@@ -8,16 +8,11 @@ vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
 
 k.nvim_register_mapping {
 	["n|<S-Tab>"] = k.cr("normal za"):with_defaults "edit: Toggle code fold",
-	-- Insert
-	["i|<C-u>"] = k.cmd("<C-G>u<C-U>"):with_noremap():with_desc "editi: Delete previous block",
-	["i|<C-b>"] = k.cmd("<Left>"):with_noremap():with_desc "editi: Move cursor to left",
-	["i|<C-a>"] = k.cmd("<ESC>^i"):with_noremap():with_desc "editi: Move cursor to line start",
 	-- Visual
 	["v|J"] = k.cmd(":m '>+1<CR>gv=gv"):with_desc "edit: Move this line down",
 	["v|K"] = k.cmd(":m '<-2<CR>gv=gv"):with_desc "edit: Move this line up",
 	["v|<"] = k.cmd("<gv"):with_desc "edit: Decrease indent",
 	["v|>"] = k.cmd(">gv"):with_desc "edit: Increase indent",
-	["n|<C-s>"] = k.cu("write"):with_noremap():with_desc "edit: Save file",
 	["c|W!!"] = k.cmd("execute 'silent! write !sudo tee % >/dev/null' <bar> edit!")
 		:with_desc "editc: Save file using sudo",
 	-- yank to end of line

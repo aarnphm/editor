@@ -2,8 +2,8 @@ return {
 	{
 		"gelguy/wilder.nvim",
 		lazy = true,
-		event = "CmdlineEnter",
-		dependencies = { "romgrk/fzy-lua-native" },
+		event = { "CursorHold", "CursorHoldI" },
+		dependencies = { { "romgrk/fzy-lua-native", lazy = true } },
 		config = function()
 			local wilder = require "wilder"
 			wilder.setup { modes = { ":", "/", "?" } }
@@ -65,12 +65,8 @@ return {
 		event = { "CursorHold", "CursorHoldI" },
 		config = function()
 			require("illuminate").configure {
-				providers = {
-					"lsp",
-					"treesitter",
-					"regex",
-				},
 				delay = 100,
+				providers = { "lsp", "treesitter", "regex" },
 				filetypes_denylist = {
 					"DoomInfo",
 					"DressingSelect",
@@ -95,11 +91,9 @@ return {
 	{
 		"sindrets/diffview.nvim",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
 		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
-		config = true,
-		keys = function()
+		config = function()
 			local k = require "zox.keybind"
 
 			return k.to_lazy_mapping {
@@ -112,7 +106,7 @@ return {
 	{
 		"j-hui/fidget.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = "LspAttach",
 		opts = {
 			text = { spinner = "dots" },
 			window = { blend = 0 },
@@ -185,6 +179,7 @@ return {
 			end
 
 			local diff_source = function()
+				---@diagnostic disable-next-line: undefined-field
 				local gitsigns = vim.b.gitsigns_status_dict
 				if gitsigns then
 					return {
@@ -451,7 +446,7 @@ return {
 		"folke/todo-comments.nvim",
 		lazy = true,
 		dependencies = { "nvim-lua/plenary.nvim" },
-		event = "BufRead",
+		event = { "CursorHoldI", "CursorHold" },
 		config = function()
 			require("todo-comments").setup {}
 
@@ -471,7 +466,7 @@ return {
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
-		event = "BufRead",
+		event = { "CursorHoldI", "CursorHold" },
 		opts = {
 			char = "│",
 			show_first_indent_level = true,
@@ -600,17 +595,17 @@ return {
 						)
 							:with_buffer(bufnr)
 							:with_desc "git: Blame line",
-						["n|<Leader>hbl"] = k.callback(
+						["n|<Leader>tbl"] = k.callback(
 							function() require("gitsigns.actions").toggle_current_line_blame() end
 						)
 							:with_buffer(bufnr)
 							:with_desc "git: Toggle current line blame",
-						["n|<Leader>hwd"] = k.callback(
+						["n|<Leader>twd"] = k.callback(
 							function() require("gitsigns.actions").toggle_word_diff() end
 						)
 							:with_buffer(bufnr)
 							:with_desc "git: Toogle word diff",
-						["n|<Leader>hd"] = k.callback(
+						["n|<Leader>thd"] = k.callback(
 							function() require("gitsigns.actions").toggle_deleted() end
 						)
 							:with_buffer(bufnr)
@@ -633,6 +628,7 @@ return {
 		"folke/trouble.nvim",
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+		event = "LspAttach",
 		config = function()
 			require("trouble").setup {
 				position = "left",
@@ -1229,161 +1225,153 @@ return {
 
 	--- NOTE: Dap setup
 	{
-		"rcarriga/nvim-dap-ui",
-		as = "dapui",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		opts = {
-			icons = {
-				expanded = require("zox").ui_space.ArrowOpen,
-				collapsed = require("zox").ui_space.ArrowClosed,
-				current_frame = require("zox").ui_space.Indicator,
-			},
-			layouts = {
-				{
-					elements = {
-						-- Provide as ID strings or tables with "id" and "size" keys
-						{
-							id = "scopes",
-							size = 0.25, -- Can be float or integer > 1
-						},
-						{ id = "breakpoints", size = 0.25 },
-						{ id = "stacks", size = 0.25 },
-						{ id = "watches", size = 0.25 },
-					},
-					size = 40,
-					position = "left",
-				},
-				{ elements = { "repl" }, size = 10, position = "bottom" },
-			},
-			controls = {
-				icons = {
-					pause = require("zox").dap_space.Pause,
-					play = require("zox").dap_space.Play,
-					step_into = require("zox").dap_space.StepInto,
-					step_over = require("zox").dap_space.StepOver,
-					step_out = require("zox").dap_space.StepOut,
-					step_back = require("zox").dap_space.StepBack,
-					run_last = require("zox").dap_space.RunLast,
-					terminate = require("zox").dap_space.Terminate,
-				},
-			},
-			windows = { indent = 1 },
-		},
-	},
-	{
-		"mfussenegger/nvim-dap",
-		lazy = true,
-		cmd = {
-			"DapSetLogLevel",
-			"DapShowLog",
-			"DapContinue",
-			"DapToggleBreakpoint",
-			"DapToggleRepl",
-			"DapStepOver",
-			"DapStepInto",
-			"DapStepOut",
-			"DapTerminate",
-		},
-		event = { "CursorHold", "CursorHoldI" },
-		dependencies = { "rcarriga/nvim-dap-ui" },
-		config = function()
-			local ok
-			ok, _ = pcall(require, "dap")
-			if not ok then return end
-			ok, _ = pcall(require, "dapui")
-			if not ok then return end
-			for _, v in ipairs {
-				"Breakpoint",
-				"BreakpointRejected",
-				"BreakpointCondition",
-				"LogPoint",
-				"Stopped",
-			} do
-				vim.fn.sign_define("Dap" .. v, {
-					text = require("zox").dap_space[v],
-					texthl = "Dap" .. v,
-					line = "",
-					numhl = "",
-				})
-			end
-			-- Config lang adapters
-			for _, value in ipairs { "dlv", "lldb" } do
-				ok, _ = pcall(require, "zox.adapters." .. value)
-				if not ok then
-					vim.notify_once(
-						"Failed to setup dap for " .. value,
-						vim.log.levels.ERROR,
-						{ title = "dap" }
-					)
-				end
-			end
-
-			local run_dap = function()
-				require("dap.ext.vscode").load_launchjs()
-				require("dap").continue {}
-				require("dapui").open()
-			end
-
-			local stop_dap = function()
-				local has_dap, dap = pcall(require, "dap")
-				if has_dap then
-					dap.disconnect()
-					dap.close()
-					dap.repl.close()
-				end
-				local has_dapui, dapui = pcall(require, "dapui")
-				if has_dapui then dapui.close() end
-			end
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",
-				["n|<Leader>ds"] = k.callback(stop_dap):with_defaults "dap: Stop",
-				["n|<Leader>db"] = k.callback(function() require("dap").toggle_breakpoint() end)
-					:with_defaults "dap: Toggle breakpoint",
-				["n|<Leader>dbs"] = k.callback(
-					function() require("dap").set_breakpoint(vim.fn.input "Breakpoint condition: ") end
-				):with_defaults "dap: Set breakpoint with condition",
-				["n|<Leader>di"] = k.callback(function() require("dap").step_into() end)
-					:with_defaults "dap: Step into",
-				["n|<Leader>do"] = k.callback(function() require("dap").step_out() end)
-					:with_defaults "dap: Step out",
-				["n|<Leader>dn"] = k.callback(function() require("dap").step_over() end)
-					:with_defaults "dap: Step over",
-				["n|<Leader>dc"] = k.callback(function() require("dap").continue {} end)
-					:with_defaults "dap: Continue",
-				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
-					:with_defaults "dap: Run last",
-				["n|<Leader>dR"] = k.callback(function() require("dap").repl.open() end)
-					:with_defaults "dap: Open REPL",
-				["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
-					:with_defaults "dap: toggle UI",
-			}
-		end,
-	},
-	{
-		"mfussenegger/nvim-dap-python",
-		lazy = true,
-		ft = "python",
-		event = { "CursorHold", "CursorHoldI" },
-		dependencies = { "mfussenegger/nvim-dap" },
-		config = function()
-			require("dap-python").setup()
-			require("dap-python").test_runner = "pytest"
-		end,
-	},
-	{
 		"theHamsta/nvim-dap-virtual-text",
 		lazy = true,
+		name = "nvim-dap-virtual-text",
 		event = { "CursorHold", "CursorHoldI" },
-		dependencies = { "mfussenegger/nvim-dap" },
-		config = function()
-			require("nvim-dap-virtual-text").setup {
-				enabled = true,
-				enabled_commands = true,
-				all_frames = true,
-			}
-		end,
+		dependencies = {
+			{
+				"mfussenegger/nvim-dap",
+				lazy = true,
+				cmd = {
+					"DapSetLogLevel",
+					"DapShowLog",
+					"DapContinue",
+					"DapToggleBreakpoint",
+					"DapToggleRepl",
+					"DapStepOver",
+					"DapStepInto",
+					"DapStepOut",
+					"DapTerminate",
+				},
+				event = { "CursorHold", "CursorHoldI" },
+				dependencies = {
+					{
+						"rcarriga/nvim-dap-ui",
+						as = "dapui",
+						lazy = true,
+						event = { "CursorHold", "CursorHoldI" },
+						opts = {
+							icons = {
+								expanded = require("zox").ui_space.ArrowOpen,
+								collapsed = require("zox").ui_space.ArrowClosed,
+								current_frame = require("zox").ui_space.Indicator,
+							},
+							layouts = {
+								{
+									elements = {
+										-- Provide as ID strings or tables with "id" and "size" keys
+										{
+											id = "scopes",
+											size = 0.25, -- Can be float or integer > 1
+										},
+										{ id = "breakpoints", size = 0.25 },
+										{ id = "stacks", size = 0.25 },
+										{ id = "watches", size = 0.25 },
+									},
+									size = 40,
+									position = "left",
+								},
+								{ elements = { "repl" }, size = 10, position = "bottom" },
+							},
+							controls = {
+								icons = {
+									pause = require("zox").dap_space.Pause,
+									play = require("zox").dap_space.Play,
+									step_into = require("zox").dap_space.StepInto,
+									step_over = require("zox").dap_space.StepOver,
+									step_out = require("zox").dap_space.StepOut,
+									step_back = require("zox").dap_space.StepBack,
+									run_last = require("zox").dap_space.RunLast,
+									terminate = require("zox").dap_space.Terminate,
+								},
+							},
+							windows = { indent = 1 },
+						},
+					},
+				},
+				config = function()
+					local ok
+					ok, _ = pcall(require, "dap")
+					if not ok then return end
+					ok, _ = pcall(require, "dapui")
+					if not ok then return end
+					for _, v in ipairs {
+						"Breakpoint",
+						"BreakpointRejected",
+						"BreakpointCondition",
+						"LogPoint",
+						"Stopped",
+					} do
+						vim.fn.sign_define("Dap" .. v, {
+							text = require("zox").dap_space[v],
+							texthl = "Dap" .. v,
+							line = "",
+							numhl = "",
+						})
+					end
+					-- Config lang adapters
+					for _, value in ipairs { "dlv", "lldb" } do
+						ok, _ = pcall(require, "zox.adapters." .. value)
+						if not ok then
+							vim.notify_once(
+								"Failed to setup dap for " .. value,
+								vim.log.levels.ERROR,
+								{ title = "dap" }
+							)
+						end
+					end
+
+					local run_dap = function()
+						require("dap.ext.vscode").load_launchjs()
+						require("dap").continue {}
+						require("dapui").open()
+					end
+
+					local stop_dap = function()
+						local has_dap, dap = pcall(require, "dap")
+						if has_dap then
+							dap.disconnect()
+							dap.close()
+							dap.repl.close()
+						end
+						local has_dapui, dapui = pcall(require, "dapui")
+						if has_dapui then dapui.close() end
+					end
+					local k = require "zox.keybind"
+
+					k.nvim_register_mapping {
+						["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",
+						["n|<Leader>ds"] = k.callback(stop_dap):with_defaults "dap: Stop",
+						["n|<Leader>db"] = k.callback(
+							function() require("dap").toggle_breakpoint() end
+						)
+							:with_defaults "dap: Toggle breakpoint",
+						["n|<Leader>dbs"] = k.callback(
+							function()
+								require("dap").set_breakpoint(
+									vim.fn.input { prompt = "Breakpoint condition: " }
+								)
+							end
+						):with_defaults "dap: Set breakpoint with condition",
+						["n|<Leader>di"] = k.callback(function() require("dap").step_into() end)
+							:with_defaults "dap: Step into",
+						["n|<Leader>do"] = k.callback(function() require("dap").step_out() end)
+							:with_defaults "dap: Step out",
+						["n|<Leader>dn"] = k.callback(function() require("dap").step_over() end)
+							:with_defaults "dap: Step over",
+						["n|<Leader>dc"] = k.callback(function() require("dap").continue {} end)
+							:with_defaults "dap: Continue",
+						["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
+							:with_defaults "dap: Run last",
+						["n|<Leader>dR"] = k.callback(function() require("dap").repl.open() end)
+							:with_defaults "dap: Open REPL",
+						["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
+							:with_defaults "dap: toggle UI",
+					}
+				end,
+			},
+		},
+		opts = { enabled = true, enabled_commands = true, all_frames = true },
 	},
 }

@@ -29,6 +29,14 @@ api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+-- Jump to last position. See :h last-position-jump
+api.nvim_create_autocmd("BufReadPost", {
+	pattern = "*",
+	callback = function()
+		local line = vim.fn.line "'\""
+		if line >= 1 and line <= vim.fn.line "$" then vim.cmd "normal! g`\"" end
+	end,
+})
 api.nvim_create_autocmd("FileType", {
 	group = misc_id,
 	pattern = { "alpha" },
@@ -109,12 +117,6 @@ api.nvim_create_autocmd("BufWritePre", {
 	pattern = { "/tmp/*", "*.tmp", "*.bak" },
 	command = "setlocal noundofile",
 })
--- auto change directory
-api.nvim_create_autocmd("BufEnter", {
-	group = bufs_id,
-	pattern = "*",
-	command = "silent! lcd %:p:h",
-})
 -- auto place to last edit
 api.nvim_create_autocmd("BufReadPost", {
 	group = bufs_id,
@@ -129,12 +131,6 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 })
 
 local wins_id = api.nvim_create_augroup("EditorWins", { clear = true })
--- Check if we need to reload the file when it changed
-api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
-	group = wins_id,
-	pattern = "*",
-	command = "checktime",
-})
 -- Equalize window dimensions when resizing vim window
 api.nvim_create_autocmd("VimResized", {
 	group = wins_id,
@@ -143,11 +139,6 @@ api.nvim_create_autocmd("VimResized", {
 })
 
 local ft_id = api.nvim_create_augroup("EditorFt", { clear = true })
-api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = "markdown",
-	command = "set wrap",
-})
 -- Set mapping for switching header and source file
 api.nvim_create_autocmd("FileType", {
 	group = ft_id,
@@ -205,15 +196,6 @@ vim.api.nvim_create_autocmd("FileType", {
 	callback = function()
 		vim.opt_local.wrap = true
 		vim.opt_local.spell = true
-	end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = { "make" },
-	callback = function()
-		vim.opt_local.expandtab = false
-		vim.opt_local.shiftwidth = 8
-		vim.opt_local.softtabstop = 0
 	end,
 })
 
