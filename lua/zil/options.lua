@@ -73,6 +73,7 @@ vim.o.magic = true
 vim.o.mouse = "a"
 vim.o.mousescroll = "ver:3,hor:6"
 vim.o.number = true
+vim.o.showtabline = 0
 vim.o.previewheight = 12
 vim.o.pumheight = 15
 vim.o.redrawtime = 1500
@@ -114,7 +115,7 @@ vim.o.wrap = false
 vim.o.wrapscan = true
 vim.o.writebackup = false
 
-vim.diagnostic.config { virtual_text = false }
+vim.diagnostic.config { virtual_text = false, underline = false }
 
 local signs = { "Error", "Warn", "Hint", "Info" }
 for _, type in pairs(signs) do

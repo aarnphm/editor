@@ -6,15 +6,11 @@ api.nvim_create_autocmd({ "VimEnter" }, {
 		local real_file = vim.fn.filereadable(event.file) == 1
 		local no_name = event.file == "" and vim.bo[event.buf].buftype == ""
 		if not real_file and not no_name then return end
-		vim.opt.showtabline = 0
 		vim.opt.laststatus = 0
 	end,
 })
 api.nvim_create_autocmd("BufReadPost", {
-	callback = function(_)
-		vim.opt.showtabline = 2
-		vim.opt.laststatus = 3
-	end,
+	callback = function() vim.opt.laststatus = 3 end,
 })
 
 -- close some filetypes with <q>
@@ -78,15 +74,16 @@ api.nvim_create_autocmd("TermOpen", {
 		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
 	end,
 })
+
 -- Fix fold issue of files opened by telescope
--- vim.api.nvim_create_autocmd("BufRead", {
--- 	callback = function()
--- 		vim.api.nvim_create_autocmd("BufWinEnter", {
--- 			once = true,
--- 			command = "normal! zx",
--- 		})
--- 	end,
--- })
+vim.api.nvim_create_autocmd("BufRead", {
+	callback = function()
+		vim.api.nvim_create_autocmd("BufWinEnter", {
+			once = true,
+			command = "normal! zx",
+		})
+	end,
+})
 
 vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
 
@@ -102,18 +99,6 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = bufs_id,
 	pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" },
 	command = "setlocal filetype=c",
-})
-
-api.nvim_create_autocmd({ "BufReadPost" }, {
-	group = bufs_id,
-	pattern = { "*.rust", "*.c", "*.cpp", "*.h", "*.hpp", "*.hxx", "*.hh" },
-	callback = function() require "zox.adapters.lldb" end,
-})
-
-api.nvim_create_autocmd({ "BufReadPost" }, {
-	group = bufs_id,
-	pattern = { "*.go" },
-	callback = function() require "zox.adapters.dlv" end,
 })
 
 local ft_id = api.nvim_create_augroup("EditorFt", { clear = true })

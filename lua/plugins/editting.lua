@@ -33,11 +33,6 @@ return {
 				separator = require("zox").misc.Vbar,
 				group = require("zox").misc.Add,
 			},
-			key_labels = {
-				["<space>"] = "SPC",
-				["<cr>"] = "RET",
-				["<tab>"] = "TAB",
-			},
 			hidden = {
 				"<silent>",
 				"<Cmd>",
@@ -48,13 +43,13 @@ return {
 				"^:",
 				"^ ",
 			}, -- hide mapping boilerplate
-			disable = { filetypes = { "help", "lspsagaoutine", "_sagaoutline" } },
 		},
 	},
 	{
 		"stevearc/dressing.nvim",
 		lazy = true,
 		event = "BufReadPost",
+		enabled = true,
 		opts = {
 			input = { enabled = true },
 			select = {
@@ -118,7 +113,7 @@ return {
 				use_advanced_uri = true,
 				completion = { nvim_cmp = true },
 				note_frontmatter_func = function(note)
-					local out = { id = note.id, aliases = note.aliases, tags = note.tags }
+					local out = { id = note.id, tags = note.tags }
 					-- `note.metadata` contains any manually added fields in the frontmatter.
 					-- So here we just make sure those fields are kept in the frontmatter.
 					if

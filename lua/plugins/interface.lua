@@ -112,7 +112,7 @@ return {
 		config = function()
 			local k = require "zox.keybind"
 
-			return k.to_lazy_mapping {
+			k.nvim_register_mapping {
 				["n|<LocalLeader>D"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
 				["n|<LocalLeader><LocalLeader>D"] = k.cr("DiffviewClose")
 					:with_defaults "git: Close diff view",
@@ -181,72 +181,12 @@ return {
 		},
 	},
 	{
-		"akinsho/nvim-bufferline.lua",
-		lazy = true,
-		branch = "main",
-		event = { "BufReadPost", "BufRead" },
-		keys = function()
-			local k = require "zox.keybind"
-
-			return k.to_lazy_mapping {
-				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
-				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
-				["n|<Leader>."] = k.cr("BufferLineCycleNext")
-					:with_defaults "buffer: Cycle to next buffer",
-				["n|<Leader>,"] = k.cr("BufferLineCyclePrev")
-					:with_defaults "buffer: Cycle to previous buffer",
-				["n|<Leader>1"] = k.cr("BufferLineGoToBuffer 1")
-					:with_defaults "buffer: Goto buffer 1",
-				["n|<Leader>2"] = k.cr("BufferLineGoToBuffer 2")
-					:with_defaults "buffer: Goto buffer 2",
-				["n|<Leader>3"] = k.cr("BufferLineGoToBuffer 3")
-					:with_defaults "buffer: Goto buffer 3",
-				["n|<Leader>4"] = k.cr("BufferLineGoToBuffer 4")
-					:with_defaults "buffer: Goto buffer 4",
-				["n|<Leader>5"] = k.cr("BufferLineGoToBuffer 5")
-					:with_defaults "buffer: Goto buffer 5",
-				["n|<Leader>6"] = k.cr("BufferLineGoToBuffer 6")
-					:with_defaults "buffer: Goto buffer 6",
-				["n|<Leader>7"] = k.cr("BufferLineGoToBuffer 7")
-					:with_defaults "buffer: Goto buffer 7",
-				["n|<Leader>8"] = k.cr("BufferLineGoToBuffer 8")
-					:with_defaults "buffer: Goto buffer 8",
-				["n|<Leader>9"] = k.cr("BufferLineGoToBuffer 9")
-					:with_defaults "buffer: Goto buffer 9",
-			}
-		end,
-		opts = {
-			options = {
-				offsets = {
-					{
-						filetype = "NvimTree",
-						text = "File Explorer",
-						text_align = "center",
-						padding = 1,
-					},
-					{
-						filetype = "undotree",
-						text = "Undo Tree",
-						text_align = "center",
-						highlight = "Directory",
-						separator = true,
-					},
-				},
-			},
-		},
-	},
-	{
 		"zbirenbaum/neodim",
 		lazy = true,
 		event = "BufReadPost",
 		opts = {
 			blend_color = require("zox.utils").hl_to_rgb("Normal", true),
 			update_in_insert = { delay = 100 },
-			hide = {
-				virtual_text = false,
-				signs = false,
-				underline = false,
-			},
 		},
 	},
 	{
@@ -479,25 +419,23 @@ return {
 			},
 			{
 				"NvChad/nvim-colorizer.lua",
-				config = function()
-					require("colorizer").setup {
-						filetypes = { "*", "!lazy" },
-						buftype = { "*", "!prompt", "!nofile" },
-						user_default_options = {
-							RGB = true, -- #RGB hex codes
-							RRGGBB = true, -- #RRGGBB hex codes
-							names = false, -- "Name" codes like Blue
-							RRGGBBAA = true, -- #RRGGBBAA hex codes
-							AARRGGBB = false, -- 0xAARRGGBB hex codes
-							rgb_fn = true, -- CSS rgb() and rgba() functions
-							hsl_fn = true, -- CSS hsl() and hsla() functions
-							css = false, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-							css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-							mode = "background", -- `mode`: foreground, background,  virtualtext
-							virtualtext = "■",
-						},
-					}
-				end,
+				opts = {
+					filetypes = { "*", "!lazy" },
+					buftype = { "*", "!prompt", "!nofile" },
+					user_default_options = {
+						RGB = true, -- #RGB hex codes
+						RRGGBB = true, -- #RRGGBB hex codes
+						names = false, -- "Name" codes like Blue
+						RRGGBBAA = true, -- #RRGGBBAA hex codes
+						AARRGGBB = false, -- 0xAARRGGBB hex codes
+						rgb_fn = true, -- CSS rgb() and rgba() functions
+						hsl_fn = true, -- CSS hsl() and hsla() functions
+						css = false, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+						css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+						mode = "background", -- `mode`: foreground, background,  virtualtext
+						virtualtext = "■",
+					},
+				},
 			},
 		},
 		config = function()
@@ -658,6 +596,7 @@ return {
 			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 			{
 				"ahmedkhalf/project.nvim",
+				name = "project_nvim",
 				lazy = true,
 				event = "BufReadPost",
 				opts = {
@@ -947,145 +886,5 @@ return {
 			shade_terminals = false,
 			direction = "vertical",
 		},
-	},
-
-	--- NOTE: Dap setup
-	{
-		"rcarriga/nvim-dap-ui",
-		as = "dapui",
-		lazy = true,
-		event = "BufReadPost",
-		opts = {
-			icons = {
-				expanded = require("zox").ui_space.ArrowOpen,
-				collapsed = require("zox").ui_space.ArrowClosed,
-				current_frame = require("zox").ui_space.Indicator,
-			},
-			layouts = {
-				{
-					elements = {
-						-- Provide as ID strings or tables with "id" and "size" keys
-						{
-							id = "scopes",
-							size = 0.25, -- Can be float or integer > 1
-						},
-						{ id = "breakpoints", size = 0.25 },
-						{ id = "stacks", size = 0.25 },
-						{ id = "watches", size = 0.25 },
-					},
-					size = 40,
-					position = "left",
-				},
-				{ elements = { "repl" }, size = 10, position = "bottom" },
-			},
-			controls = {
-				icons = {
-					pause = require("zox").dap_space.Pause,
-					play = require("zox").dap_space.Play,
-					step_into = require("zox").dap_space.StepInto,
-					step_over = require("zox").dap_space.StepOver,
-					step_out = require("zox").dap_space.StepOut,
-					step_back = require("zox").dap_space.StepBack,
-					run_last = require("zox").dap_space.RunLast,
-					terminate = require("zox").dap_space.Terminate,
-				},
-			},
-			windows = { indent = 1 },
-		},
-	},
-	{
-		"mfussenegger/nvim-dap",
-		lazy = true,
-		cmd = {
-			"DapSetLogLevel",
-			"DapShowLog",
-			"DapContinue",
-			"DapToggleBreakpoint",
-			"DapToggleRepl",
-			"DapStepOver",
-			"DapStepInto",
-			"DapStepOut",
-			"DapTerminate",
-		},
-		event = "BufReadPost",
-		dependencies = { "rcarriga/nvim-dap-ui" },
-		config = function()
-			local ok
-			ok, _ = pcall(require, "dap")
-			if not ok then return end
-			ok, _ = pcall(require, "dapui")
-			if not ok then return end
-			for _, v in ipairs {
-				"Breakpoint",
-				"BreakpointRejected",
-				"BreakpointCondition",
-				"LogPoint",
-				"Stopped",
-			} do
-				vim.fn.sign_define("Dap" .. v, {
-					text = require("zox").dap_space[v],
-					texthl = "Dap" .. v,
-					line = "",
-					numhl = "",
-				})
-			end
-			-- Config lang adapters
-			for _, value in ipairs { "dlv", "lldb" } do
-				ok, _ = pcall(require, "zox.adapters." .. value)
-				if not ok then
-					vim.notify_once(
-						"Failed to setup dap for " .. value,
-						vim.log.levels.ERROR,
-						{ title = "dap" }
-					)
-				end
-			end
-
-			local run_dap = function()
-				require("dap.ext.vscode").load_launchjs()
-				require("dap").continue {}
-				require("dapui").open()
-			end
-
-			local stop_dap = function()
-				local has_dap, dap = pcall(require, "dap")
-				if has_dap then
-					dap.disconnect()
-					dap.close()
-					dap.repl.close()
-				end
-				local has_dapui, dapui = pcall(require, "dapui")
-				if has_dapui then dapui.close() end
-			end
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<Leader>dr"] = k.callback(run_dap):with_defaults "dap: Run/Continue",
-				["n|<Leader>ds"] = k.callback(stop_dap):with_defaults "dap: Stop",
-				["n|<Leader>db"] = k.callback(function() require("dap").toggle_breakpoint() end)
-					:with_defaults "dap: Toggle breakpoint",
-				["n|<Leader>dbs"] = k.callback(
-					function()
-						require("dap").set_breakpoint(
-							vim.fn.input { prompt = "Breakpoint condition: " }
-						)
-					end
-				):with_defaults "dap: Set breakpoint with condition",
-				["n|<Leader>di"] = k.callback(function() require("dap").step_into() end)
-					:with_defaults "dap: Step into",
-				["n|<Leader>do"] = k.callback(function() require("dap").step_out() end)
-					:with_defaults "dap: Step out",
-				["n|<Leader>dn"] = k.callback(function() require("dap").step_over() end)
-					:with_defaults "dap: Step over",
-				["n|<Leader>dc"] = k.callback(function() require("dap").continue {} end)
-					:with_defaults "dap: Continue",
-				["n|<Leader>dl"] = k.callback(function() require("dap").run_last() end)
-					:with_defaults "dap: Run last",
-				["n|<Leader>dR"] = k.callback(function() require("dap").repl.open() end)
-					:with_defaults "dap: Open REPL",
-				["n|<Leader>dt"] = k.callback(function() require("dapui").toggle() end)
-					:with_defaults "dap: toggle UI",
-			}
-		end,
 	},
 }

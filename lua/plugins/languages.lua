@@ -1,4 +1,3 @@
-local k = require "zox.keybind"
 return {
 	-- Setup language servers.
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
@@ -37,6 +36,7 @@ return {
 				cmd = "Bazel",
 				ft = "bzl",
 				config = function()
+					local k = require "zox.keybind"
 					k.nvim_register_mapping {
 						["n|<LocalLeader>bb"] = k.args("Bazel build"):with_defaults "bazel: build",
 						["n|<LocalLeader>bc"] = k.args("Bazel clean"):with_defaults "bazel: clean",
@@ -97,6 +97,7 @@ return {
 						cond = function() return vim.fn.expand "%:t" == "Cargo.toml" end,
 						dependencies = { "nvim-lua/plenary.nvim" },
 						config = function()
+							local k = require "zox.keybind"
 							require("crates").setup {
 								avoid_prerelease = false,
 								thousands_separator = ",",
@@ -275,6 +276,7 @@ return {
 				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
 				config = function()
+					local k = require "zox.keybind"
 					require("lspsaga").setup {
 						finder = { keys = { jump_to = "e" } },
 						lightbulb = { enable = false },
@@ -287,7 +289,8 @@ return {
 						},
 						code_actions = { extend_gitsigns = false },
 						symbol_in_winbar = {
-							enable = false,
+							enable = true,
+							respect_root = true,
 							separator = " " .. require("zox").ui_space.Separator,
 							show_file = false,
 						},
