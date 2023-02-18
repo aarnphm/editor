@@ -1,7 +1,6 @@
 return {
 	{
 		"nathom/filetype.nvim",
-		lazy = true,
 		event = "BufReadPost",
 		opts = {
 			overrides = {
@@ -25,6 +24,7 @@ return {
 	},
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
+		lazy = false,
 		branch = "canary",
 		priority = 1000,
 		opts = {
@@ -37,15 +37,7 @@ return {
 			},
 		},
 	},
-	-- Better quickfix list
-	{ "kevinhwang91/nvim-bqf", lazy = true, ft = "qf", config = true },
-	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
-	{
-		"stevearc/dressing.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		opts = { input = { insert_only = false } },
-	},
+	{ "stevearc/dressing.nvim", opts = { input = { insert_only = false } } },
 	{
 		"folke/noice.nvim",
 		event = "BufReadPost",

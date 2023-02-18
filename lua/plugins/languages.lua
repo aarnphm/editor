@@ -347,8 +347,7 @@ return {
 	-- Setup completions.
 	{
 		"hrsh7th/nvim-cmp",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = "InsertEnter",
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",
@@ -371,34 +370,50 @@ return {
 			{ "hrsh7th/cmp-nvim-lua" },
 			{ "hrsh7th/cmp-path" },
 			{ "hrsh7th/cmp-buffer" },
-			{ "petertriho/cmp-git", dependencies = { "nvim-lua/plenary.nvim" }, config = true },
+			{
+				"petertriho/cmp-git",
+				dependencies = { "nvim-lua/plenary.nvim" },
+				config = true,
+				opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
+			},
+			{
+				"saecki/crates.nvim",
+				event = { "BufRead Cargo.toml" },
+				opts = { popup = { border = "rounded" } },
+			},
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
-				event = { "CursorHold", "CursorHoldI" },
+				event = "InsertEnter",
 				config = function()
-					vim.defer_fn(function()
-						require("copilot").setup {
-							panel = { enabled = false },
-							suggestion = {
-								enabled = true,
-								auto_trigger = true,
-							},
-							filetypes = {
-								help = false,
-								terraform = false,
-								gitcommit = false,
-								gitrebase = false,
-								hgcommit = false,
-								svn = false,
-								cvs = false,
-								["TelescopePrompt"] = false,
-								["dap-repl"] = false,
-								["big_file_disabled_ft"] = false,
-								markdown = true, -- overrides default
-							},
-						}
-					end, 100)
+					vim.defer_fn(
+						function()
+							require("copilot").setup {
+								panel = { enabled = false },
+								suggestion = {
+									enabled = true,
+									auto_trigger = true,
+								},
+								filetypes = {
+									help = false,
+									markdown = true,
+									terraform = false,
+									gitcommit = false,
+									gitrebase = false,
+									hgcommit = false,
+									svn = false,
+									cvs = false,
+									["octo"] = false,
+									["TelescopePrompt"] = false,
+									["dap-repl"] = false,
+									["big_file_disabled_ft"] = false,
+									["neogitCommitMessage"] = false,
+									["gitcommit"] = false,
+								},
+							}
+						end,
+						100
+					)
 				end,
 			},
 		},
@@ -428,8 +443,6 @@ return {
 				end
 				return (diff < 0)
 			end
-
-			vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#57fa85" })
 
 			local has_words_before = function()
 				if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
@@ -514,8 +527,9 @@ return {
 				sources = {
 					{ name = "nvim_lsp" },
 					{ name = "path" },
-					{ name = "nvim-lua" },
 					{ name = "luasnip" },
+					{ name = "nvim-lua" },
+					{ name = "crates" },
 					{ name = "buffer" },
 					{ name = "git" },
 				},
