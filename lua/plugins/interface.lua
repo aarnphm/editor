@@ -14,134 +14,47 @@ return {
 				StatusLineNC = { fg = "subtle", bg = "surface" },
 			},
 		},
+		config = function(_, opts)
+			require("rose-pine").setup(opts)
+			vim.cmd.colorscheme "rose-pine"
+		end,
 	},
+	-- Better quickfix list
+	{ "kevinhwang91/nvim-bqf", ft = "qf", opts = {} },
+	{ url = "https://git.sr.ht/~whynothugo/lsp_lines.nvim", config = true },
 	{
-		"pwntester/octo.nvim",
+		"stevearc/dressing.nvim",
 		lazy = true,
-		cmd = "Octo",
 		event = "BufReadPost",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-telescope/telescope.nvim",
-			"nvim-tree/nvim-web-devicons",
+		enabled = true,
+		opts = {
+			input = { enabled = true, insert_only = false },
+			select = { enabled = true, backend = "nui", trim_prompt = true },
 		},
-		config = true,
-		keys = function()
-			local k = require "zox.keybind"
-			return k.to_lazy_mapping {
-				["n|<leader>o"] = k.args("Octo"):with_defaults "octo: open",
-				["n|<leader>oc"] = k.args("Octo comment"):with_defaults "octo: comment",
-				["n|<leader>oi"] = k.args("Octo issue"):with_defaults "octo: issue",
-				["n|<leader>op"] = k.args("Octo pr"):with_defaults "octo: pr",
-				["n|<leader>or"] = k.args("Octo review"):with_defaults "octo: review",
-				["n|<leader>os"] = k.args("Octo status"):with_defaults "octo: status",
-			}
-		end,
 	},
 	{
-		"romainl/vim-cool",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		cond = function()
-			if #vim.api.nvim_list_uis() ~= 0 then
-				return not vim.tbl_contains(
-					{ "gitcommit", "gitrebase", "alpha", "dashboard" },
-					vim.bo.filetype
-				)
-			end
-			return false
-		end,
-	},
-	{
-		"RRethy/vim-illuminate",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		config = function()
-			require("illuminate").configure {
-				delay = 100,
-				providers = { "lsp", "treesitter", "regex" },
-				filetypes_denylist = {
-					"DoomInfo",
-					"DressingSelect",
-					"NvimTree",
-					"Outline",
-					"TelescopePrompt",
-					"Trouble",
-					"alpha",
-					"dashboard",
-					"dirvish",
-					"fugitive",
-					"help",
-					"lsgsagaoutline",
-					"neogitstatus",
-					"norg",
-					"toggleterm",
+		"folke/noice.nvim",
+		opts = {
+			lsp = {
+				override = {
+					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+					["vim.lsp.util.stylize_markdown"] = true,
+					["cmp.entry.get_documentation"] = true,
 				},
-				under_cursor = false,
-			}
-		end,
+			},
+			presets = {
+				command_palette = true,
+				lsp_doc_border = true,
+			},
+			routes = {
+				{
+					view = "notify",
+					filter = { event = "msg_showmode" },
+				},
+			},
+		},
 	},
-	{
-		"gelguy/wilder.nvim",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		dependencies = { { "romgrk/fzy-lua-native", lazy = true } },
-		config = function()
-			local wilder = require "wilder"
-			wilder.setup { modes = { ":", "/", "?" } }
-			wilder.set_option("use_python_remote_plugin", 0)
-			wilder.set_option("pipeline", {
-				wilder.branch(
-					wilder.cmdline_pipeline {
-						use_python = 0,
-						fuzzy = 1,
-						fuzzy_filter = wilder.lua_fzy_filter(),
-					},
-					wilder.vim_search_pipeline(),
-					{
-						wilder.check(function(_, x) return x == "" end),
-						wilder.history(),
-						wilder.result {
-							draw = {
-								function(_, x) return " " .. x end,
-							},
-						},
-					}
-				),
-			})
-
-			local wildmenu_renderer = wilder.wildmenu_renderer {
-				highlighter = wilder.lua_fzy_highlighter(),
-				apply_incsearch_fix = true,
-				separator = " | ",
-				left = { " ", wilder.wildmenu_spinner(), " " },
-				right = { " ", wilder.wildmenu_index() },
-			}
-			wilder.set_option(
-				"renderer",
-				wilder.renderer_mux {
-					[":"] = wildmenu_renderer,
-					["/"] = wildmenu_renderer,
-					substitute = wildmenu_renderer,
-				}
-			)
-		end,
-	},
-	{
-		"sindrets/diffview.nvim",
-		lazy = true,
-		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
-		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
-		config = function()
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<LocalLeader>D"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
-				["n|<LocalLeader><LocalLeader>D"] = k.cr("DiffviewClose")
-					:with_defaults "git: Close diff view",
-			}
-		end,
-	},
+	{ "MunifTanjim/nui.nvim", lazy = true },
 	{
 		"j-hui/fidget.nvim",
 		lazy = true,
@@ -151,29 +64,16 @@ return {
 	{
 		"rcarriga/nvim-notify",
 		lazy = true,
-		event = "BufReadPost",
-		cond = function()
-			if #vim.api.nvim_list_uis() ~= 0 then
-				return not vim.tbl_contains({ "gitcommit", "gitrebase" }, vim.bo.filetype)
-			end
-			return false
-		end,
-		config = function()
-			local notify = require "notify"
-			notify.setup {
-				stages = "static",
-				---@usage User render fps value
-				fps = 60,
-				max_height = function() return math.floor(vim.o.lines * 0.55) end,
-				max_width = function() return math.floor(vim.o.columns * 0.55) end,
-				render = "minimal",
-				background_colour = "Normal",
-				---@usage notifications with level lower than this would be ignored. [ERROR > WARN > INFO > DEBUG > TRACE]
-				level = "INFO",
-			}
-
-			vim.notify = notify
-		end,
+		opts = {
+			stages = "static",
+			---@usage User render fps value
+			fps = 60,
+			max_height = function() return math.floor(vim.o.lines * 0.55) end,
+			max_width = function() return math.floor(vim.o.columns * 0.55) end,
+			render = "minimal",
+			background_colour = "Normal",
+			level = "INFO",
+		},
 	},
 	{
 		"nathom/filetype.nvim",
@@ -211,36 +111,9 @@ return {
 	},
 	{
 		"folke/todo-comments.nvim",
-		lazy = true,
-		dependencies = { "nvim-lua/plenary.nvim" },
-		event = { "CursorHoldI", "CursorHold" },
-		keys = {
-			{
-				"<Leader>tqf",
-				"<cmd>TodoQuickFix<cr>",
-				desc = "todo-comments: Open quickfix",
-				silent = true,
-			},
-			{
-				"<Leader>tt",
-				"<cmd>TodoTelescope<cr>",
-				desc = "todo-comments: Telescope",
-				silent = true,
-			},
-			{
-				"]t",
-				function() require("todo-comments").jump_next() end,
-				desc = "todo-comments: Next",
-				silent = true,
-			},
-			{
-				"[t",
-				function() require("todo-comments").jump_prev() end,
-				desc = "todo-comments: Previous",
-				silent = true,
-			},
-		},
-		config = true,
+		cmd = { "TodoTrouble", "TodoTelescope" },
+		event = "BufReadPost",
+		opts = {},
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
@@ -429,7 +302,6 @@ return {
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
-			{ "JoosepAlviste/nvim-ts-context-commentstring" },
 			{
 				"andymass/vim-matchup",
 				event = "BufReadPost",
@@ -453,54 +325,68 @@ return {
 						css = false, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
 						css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
 						mode = "background", -- `mode`: foreground, background,  virtualtext
-						virtualtext = "■",
 					},
 				},
 			},
 		},
-		config = function()
-			vim.api.nvim_set_option_value("foldmethod", "expr", {})
-			vim.api.nvim_set_option_value("foldexpr", "nvim_treesitter#foldexpr()", {})
-			require("nvim-treesitter.configs").setup {
-				ensure_installed = "all",
-				ignore_install = { "phpdoc", "gitcommit" },
-				indent = { enable = false },
-				highlight = { enable = true },
-				context_commentstring = { enable = true, enable_autocmd = false },
-				matchup = { enable = true },
-				textobjects = {
-					select = {
-						enable = true,
-						keymaps = {
-							["af"] = "@function.outer",
-							["if"] = "@function.inner",
-							["ac"] = "@class.outer",
-							["ic"] = "@class.inner",
-						},
-					},
-					move = {
-						enable = true,
-						set_jumps = true, -- whether to set jumps in the jumplist
-						goto_next_start = {
-							["]["] = "@function.outer",
-							["]m"] = "@class.outer",
-						},
-						goto_next_end = {
-							["]]"] = "@function.outer",
-							["]M"] = "@class.outer",
-						},
-						goto_previous_start = {
-							["[["] = "@function.outer",
-							["[m"] = "@class.outer",
-						},
-						goto_previous_end = {
-							["[]"] = "@function.outer",
-							["[M"] = "@class.outer",
-						},
+		opts = {
+			ensure_installed = "all",
+			ignore_install = { "phpdoc", "gitcommit" },
+			indent = { enable = false },
+			highlight = { enable = true },
+			context_commentstring = { enable = true, enable_autocmd = false },
+			matchup = { enable = true },
+			textobjects = {
+				select = {
+					enable = true,
+					lookahead = true,
+					keymaps = {
+						["af"] = "@function.outer",
+						["if"] = "@function.inner",
+						["ac"] = "@conditional.outer",
+						["ic"] = "@conditional.inner",
+						["aa"] = "@parameter.outer",
+						["ia"] = "@parameter.inner",
+						["aS"] = "@statement.outer",
+						["aC"] = "@class.outer",
+						["iC"] = "@class.inner",
+						["al"] = "@loop.outer",
+						["il"] = "@loop.inner",
 					},
 				},
-			}
-
+				swap = {
+					enable = true,
+					swap_next = {
+						["<leader>Pa"] = "@parameter.inner",
+					},
+					swap_previous = {
+						["<leader>PA"] = "@parameter.inner",
+					},
+				},
+				move = {
+					enable = true,
+					set_jumps = true,
+					goto_next_start = {
+						["]]"] = "@function.outer",
+						["]c"] = "@class.outer",
+					},
+					goto_next_end = {
+						["]["] = "@function.outer",
+						["]C"] = "@class.outer",
+					},
+					goto_previous_start = {
+						["[["] = "@function.outer",
+						["[c"] = "@class.outer",
+					},
+					goto_previous_end = {
+						["[]"] = "@function.outer",
+						["[C"] = "@class.outer",
+					},
+				},
+			},
+		},
+		config = function(_, opts)
+			require("nvim-treesitter.configs").setup(opts)
 			-- Use treesitter markdown parser for Octo buffer
 			local ok, _ = pcall(require, "octo")
 			if ok then
@@ -836,54 +722,7 @@ return {
 	},
 	{
 		"akinsho/toggleterm.nvim",
-		lazy = true,
-		cmd = {
-			"ToggleTerm",
-			"ToggleTermSetName",
-			"ToggleTermToggleAll",
-			"ToggleTermSendVisualLines",
-			"ToggleTermSendCurrentLine",
-			"ToggleTermSendVisualSelection",
-		},
 		event = { "CursorHold", "CursorHoldI" },
-		keys = {
-			{
-				"<C-\\>",
-				"<cmd>execute v:count . \"ToggleTerm direction=horizontal\"<CR>",
-				mode = "n",
-				desc = "terminal: toggle horizontal",
-			},
-			{
-				"<C-\\>",
-				"<Esc><Cmd>ToggleTerm direction=horizontal<CR>",
-				mode = "i",
-				desc = "terminal: toggle horizontal",
-			},
-			{
-				"<C-\\>",
-				"<Esc><Cmd>ToggleTerm direction=horizontal<CR>",
-				mode = "t",
-				desc = "terminal: toggle horizontal",
-			},
-			{
-				"<C-t>",
-				mode = "n",
-				"<cmd>execute v:count . \"ToggleTerm direction=vertical\"<CR>",
-				desc = "terminal: toggle vertical",
-			},
-			{
-				"<C-t>",
-				"<Esc><Cmd>ToggleTerm direction=vertical<CR>",
-				mode = "i",
-				desc = "terminal: toggle vertical",
-			},
-			{
-				"<C-t>",
-				"<Esc><Cmd>ToggleTerm direction=vertical<CR>",
-				mode = "t",
-				desc = "terminal: toggle vertical",
-			},
-		},
 		opts = {
 			-- size can be a number or function which is passed the current terminal
 			size = function(term)
@@ -894,13 +733,7 @@ return {
 					return vim.o.columns * factor
 				end
 			end,
-			on_open = function()
-				-- Prevent infinite calls from freezing neovim.
-				-- Only set these options specific to this terminal buffer.
-				vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local" })
-				vim.api.nvim_set_option_value("foldexpr", "0", { scope = "local" })
-			end,
-			open_mapping = false, -- default mapping
+			open_mapping = "<C-t>", -- default mapping
 			shade_terminals = false,
 			direction = "vertical",
 		},

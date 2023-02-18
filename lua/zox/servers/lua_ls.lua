@@ -31,6 +31,10 @@ return function(options)
 			},
 		},
 	}
+	-- Make runtime files discoverable to the server
+	local runtime_path = vim.split(package.path, ";")
+	table.insert(runtime_path, "lua/?.lua")
+	table.insert(runtime_path, "lua/?/init.lua")
 
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/lua_ls.lua
 	require("lspconfig").lua_ls.setup(vim.tbl_deep_extend("force", options, {
@@ -47,7 +51,7 @@ return function(options)
 				hint = { enable = true },
 				runtime = {
 					version = "LuaJIT",
-					path = vim.split(package.path, ";"),
+					path = runtime_path,
 					special = { reload = "require" },
 				},
 				workspace = {

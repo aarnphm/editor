@@ -86,6 +86,11 @@ vim.api.nvim_create_autocmd("BufRead", {
 	end,
 })
 
+-- no comments on new line
+vim.api.nvim_create_autocmd({ "BufWinEnter", "BufRead", "BufNewFile" }, {
+	command = "setlocal formatoptions-=cro",
+})
+
 vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
 
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })

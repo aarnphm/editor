@@ -41,6 +41,10 @@ return function(options)
 						loadOutDirsFromCheck = true,
 						buildScripts = { enable = true },
 					},
+					diagnostics = {
+						disabled = { "unresolved-proc-macro" },
+						enableExperimental = true,
+					},
 					checkOnSave = { command = "clippy" },
 					procMacro = { enable = true },
 				},

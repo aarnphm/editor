@@ -1,43 +1,10 @@
--- custom python provider
-local conda = os.getenv "CONDA_PREFIX"
-if not conda == nil or conda == "" then
-	vim.g.python_host_prog = conda .. "/bin/python"
-	vim.g.python3_host_prog = conda .. "/bin/python"
-elseif vim.fn.executable(vim.env.HOME .. "/.pyenv/shims/python") == 1 then
-	vim.g.python_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
-	vim.g.python3_host_prog = vim.env.HOME .. "/.pyenv/shims/python"
-elseif vim.NIL ~= vim.fn.getenv "PYTHON3_HOST_PROG" then
-	-- get python host prog from env
-	vim.g.python_host_prog = vim.env["PYTHON3_HOST_PROG"]
-	vim.g.python3_host_prog = vim.env["PYTHON3_HOST_PROG"]
-else
-	vim.notify_once(
-		"Failed to autodetect Python path. "
-			.. "Either set PYTHON3_HOST_PROG or set 'vim.g.python3_host_prog' for plugins to work.",
-		vim.log.levels.WARN,
-		{ title = "zox: configuration" }
-	)
-end
-
-if vim.loop.os_uname().sysname == "Darwin" then
-	vim.g.clipboard = {
-		name = "macOS-clipboard",
-		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
-		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
-		cache_enabled = 0,
-	}
-end
-
--- quick hack for install sqlite with nix
-vim.g.sqlite_clib_path = vim.NIL ~= vim.fn.getenv "SQLITE_PATH" and vim.env["SQLITE_PATH"]
-	or print "SQLITE_PATH is not set. Telescope will not work"
+vim.cmd.colorscheme "un"
 
 vim.o.autoindent = true
 vim.o.autoread = true
 vim.o.autowrite = true
 vim.o.backspace = "indent,eol,start"
 vim.o.breakat = [[\ \	;:,!?]]
-vim.opt.guicursor = ""
 vim.opt.pumheight = 8
 vim.opt.undofile = true
 vim.opt.signcolumn = "yes"
@@ -49,16 +16,16 @@ vim.o.cmdwinheight = 5
 vim.o.complete = ".,w,b,k"
 vim.o.concealcursor = "niv"
 vim.o.conceallevel = 0
-vim.o.diffopt = "filler,iwhite,internal,algorithm:patience"
-vim.o.equalalways = false
+vim.o.equalalways = true
 vim.o.expandtab = true
 vim.o.fileformats = "unix,mac,dos"
 vim.o.foldenable = true
+-- Better folding using tree-sitter
 vim.o.foldlevelstart = 99
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.formatoptions = "1jcrql"
-vim.o.grepformat = "%f:%l:%c:%m"
 vim.o.grepprg = "rg --hidden --vimgrep --smart-case --"
-vim.o.helpheight = 12
 vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
@@ -72,17 +39,13 @@ vim.o.mouse = "a"
 vim.o.mousescroll = "ver:3,hor:6"
 vim.o.number = true
 vim.o.showtabline = 0
-vim.o.previewheight = 12
-vim.o.pumheight = 15
 vim.o.redrawtime = 1500
 vim.o.relativenumber = true
 vim.o.ruler = true
-vim.o.scrolloff = 3
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
 vim.o.shortmess = "I" -- no intro
 vim.o.showbreak = "↳  "
-vim.o.showcmd = false
 vim.o.showmode = true
 vim.o.sidescrolloff = 5
 vim.o.signcolumn = "yes"
@@ -91,7 +54,6 @@ vim.o.smarttab = true
 vim.o.softtabstop = 4
 vim.o.splitbelow = true
 vim.o.splitright = true
-vim.o.startofline = false
 vim.o.swapfile = false
 vim.o.switchbuf = "usetab,uselast"
 vim.o.synmaxcol = 2500
@@ -102,18 +64,19 @@ vim.o.undolevels = 9999
 vim.o.updatetime = 250
 vim.o.viewoptions = "folds,cursor,curdir,slash,unix"
 vim.o.virtualedit = "block"
-vim.o.visualbell = true
 vim.o.whichwrap = "h,l,<,>,[,],~"
-vim.o.wildignore =
-	".git,*.pyc,*.o,*.out,*.jpg,*.jpeg,*.png,*.gif,*.zip,**/tmp/**,*.DS_Store,**/node_modules/**"
-vim.o.wildchar = 9
-vim.o.wildignorecase = true
-vim.o.wildmode = "longest:full,full"
-vim.o.winminwidth = 10
-vim.o.winwidth = 30
 vim.o.wrap = false
-vim.o.wrapscan = true
 vim.o.writebackup = false
+vim.o.background = "dark"
+
+if vim.loop.os_uname().sysname == "Darwin" then
+	vim.g.clipboard = {
+		name = "macOS-clipboard",
+		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
+		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
+		cache_enabled = 0,
+	}
+end
 
 vim.diagnostic.config { virtual_text = false, underline = false }
 
@@ -122,3 +85,9 @@ for _, type in pairs(signs) do
 	local hl = string.format("DiagnosticSign%s", type)
 	vim.fn.sign_define(hl, { text = "●", texthl = hl, numhl = hl })
 end
+
+-- map leader to <Space> and localeader to +
+vim.g.mapleader = " "
+vim.g.maplocalleader = "+"
+vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
+vim.api.nvim_set_keymap("x", " ", "", { noremap = true })

@@ -1,240 +1,199 @@
 return {
 	-- Setup language servers.
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+	{ "fatih/vim-go", lazy = true, ft = "go", run = ":GoInstallBinaries" },
+	{ "simrat39/rust-tools.nvim", lazy = true, ft = "rust" },
+	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
+	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
+	{
+		"bazelbuild/vim-bazel",
+		lazy = true,
+		dependencies = { "google/vim-maktaba" },
+		cmd = "Bazel",
+		ft = "bzl",
+		config = function()
+			local k = require "zox.keybind"
+			k.nvim_register_mapping {
+				["n|<LocalLeader>bb"] = k.args("Bazel build"):with_defaults "bazel: build",
+				["n|<LocalLeader>bc"] = k.args("Bazel clean"):with_defaults "bazel: clean",
+				["n|<LocalLeader>bd"] = k.args("Bazel debug"):with_defaults "bazel: debug",
+				["n|<LocalLeader>br"] = k.args("Bazel run"):with_defaults "bazel: run",
+				["n|<LocalLeader>bt"] = k.args("Bazel test"):with_defaults "bazel: test",
+			}
+		end,
+	},
+	{
+		"lervag/vimtex",
+		lazy = true,
+		ft = "tex",
+		config = function()
+			vim.g.vimtex_view_method = "zathura"
+			if vim.loop.os_uname().sysname == "Darwin" then
+				vim.g.vimtex_view_method = "skim"
+				vim.g.vimtex_view_general_viewer =
+					"/Applications/Skim.app/Contents/SharedSupport/displayline"
+				vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
+			end
+
+			vim.api.nvim_create_autocmd("User", {
+				group = vim.api.nvim_create_augroup("vimtext_mac", { clear = true }),
+				pattern = "VimtexEventCompileSuccess",
+				callback = function(_)
+					---@diagnostic disable-next-line: undefined-field
+					local out = vim.b.vimtex.out()
+					local src_file_path = vim.fn.expand "%:p"
+					local cmd = { vim.g.vimtex_view_general_viewer, "-r" }
+
+					if vim.fn.empty(vim.fn.system "pgrep Skim") == 0 then
+						table.insert(cmd, "-g")
+					end
+
+					vim.fn.jobstart(vim.list_extend(cmd, { vim.fn.line ".", out, src_file_path }))
+				end,
+			})
+		end,
+	},
+	{
+		"ii14/neorepl.nvim",
+		lazy = true,
+		ft = "lua",
+		keys = {
+			{
+				"<LocalLeader>or",
+				function()
+					-- get current buffer and window
+					local buf = vim.api.nvim_get_current_buf()
+					local win = vim.api.nvim_get_current_win()
+					-- create a new split for the repl
+					vim.cmd "split"
+					-- spawn repl and set the context to our buffer
+					require("neorepl").new { lang = "lua", buffer = buf, window = win }
+					-- resize repl window and make it fixed height
+					vim.cmd "resize 10 | setl winfixheight"
+				end,
+				desc = "repl: Open lua repl",
+			},
+		},
+	},
+	{
+		"saecki/crates.nvim",
+		lazy = true,
+		event = "BufReadPost Cargo.toml",
+		cond = function() return vim.fn.expand "%:t" == "Cargo.toml" end,
+		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function()
+			local k = require "zox.keybind"
+			require("crates").setup {
+				avoid_prerelease = false,
+				thousands_separator = ",",
+				notification_title = "Crates",
+				text = {
+					loading = " " .. require("zox").misc_space.Watch .. "Loading",
+					version = " " .. require("zox").ui_space.Check .. "%s",
+					prerelease = " " .. require("zox").diagnostics_space.WarningHolo .. "%s",
+					yanked = " " .. require("zox").diagnostics_space.Error .. "%s",
+					nomatch = " " .. require("zox").diagnostics_space.Question .. "No match",
+					upgrade = " " .. require("zox").diagnostics_space.HintHolo .. "%s",
+					error = " " .. require("zox").diagnostics_space.Error .. "Error fetching crate",
+				},
+				popup = {
+					hide_on_select = true,
+					copy_register = "\"",
+					border = "rounded",
+					show_version_date = true,
+					text = {
+						title = require("zox").ui_space.Package .. "%s",
+						description = "%s",
+						created_label = require("zox").misc_space.Added .. "created" .. "        ",
+						created = "%s",
+						updated_label = require("zox").misc_space.ManUp .. "updated" .. "        ",
+						updated = "%s",
+						downloads_label = require("zox").ui_space.CloudDownload
+							.. "downloads      ",
+						downloads = "%s",
+						homepage_label = require("zox").misc_space.Campass .. "homepage       ",
+						homepage = "%s",
+						repository_label = require("zox").git_space.Repo .. "repository     ",
+						repository = "%s",
+						documentation_label = require("zox").diagnostics_space.InformationHolo
+							.. "documentation  ",
+						documentation = "%s",
+						crates_io_label = require("zox").ui_space.Package .. "crates.io      ",
+						crates_io = "%s",
+						categories_label = require("zox").kind_space.Class .. "categories     ",
+						keywords_label = require("zox").kind_space.Keyword .. "keywords       ",
+						version = "  %s",
+						prerelease = require("zox").diagnostics_space.WarningHolo
+							.. "%s prerelease",
+						yanked = require("zox").diagnostics_space.Error .. "%s yanked",
+						version_date = "  %s",
+						feature = "  %s",
+						enabled = require("zox").dap_space.Play .. "%s",
+						transitive = require("zox").ui_space.List .. "%s",
+						normal_dependencies_title = require("zox").kind_space.Interface
+							.. "Dependencies",
+						build_dependencies_title = require("zox").misc_space.Gavel
+							.. "Build dependencies",
+						dev_dependencies_title = require("zox").misc_space.Glass
+							.. "Dev dependencies",
+						dependency = "  %s",
+						optional = require("zox").ui_space.BigUnfilledCircle .. "%s",
+						dependency_version = "  %s",
+						loading = " " .. require("zox").misc_space.Watch,
+					},
+				},
+				src = {
+					text = {
+						prerelease = " "
+							.. require("zox").diagnostics_space.WarningHolo
+							.. "pre-release ",
+						yanked = " " .. require("zox").diagnostics_space.ErrorHolo .. "yanked ",
+					},
+				},
+				null_ls = { enabled = true, name = "crates.nvim" },
+			}
+			k.nvim_register_mapping {
+				["n|<Leader>ct"] = k.callback(require("crates").toggle)
+					:with_buffer(0)
+					:with_defaults "crates: Toggle",
+				["n|<Leader>cr"] = k.callback(require("crates").reload)
+					:with_buffer(0)
+					:with_defaults "crates: reload",
+				["n|<Leader>cv"] = k.callback(require("crates").show_versions_popup)
+					:with_defaults "crates: show versions popup",
+				["n|<Leader>cf"] = k.callback(require("crates").show_features_popup)
+					:with_defaults "crates: show features popup",
+				["n|<Leader>cd"] = k.callback(require("crates").show_dependencies_popup)
+					:with_defaults "crates: show dependencies popup",
+				["n|<Leader>cu"] = k.callback(require("crates").update_crate)
+					:with_defaults "crates: update crate",
+				["v|<Leader>cu"] = k.callback(require("crates").update_crates)
+					:with_defaults "crates: update crates",
+				["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
+					:with_defaults "crates: update all crates",
+				["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate)
+					:with_defaults "crates: upgrade crate",
+				["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates)
+					:with_defaults "crates: upgrade crates",
+				["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
+					:with_defaults "crates: upgrade all crates",
+				["n|<Leader>cH"] = k.callback(require("crates").open_homepage)
+					:with_defaults "crates: show homepage",
+				["n|<Leader>cR"] = k.callback(require("crates").open_repository)
+					:with_defaults "crates: show repository",
+				["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
+					:with_defaults "crates: show documentation",
+				["n|<Leader>cC"] = k.callback(require("crates").open_crates_io)
+					:with_defaults "crates: open crates.io",
+			}
+		end,
+	},
 	{
 		"neovim/nvim-lspconfig",
 		event = "BufReadPre",
 		dependencies = {
-			{ "folke/neodev.nvim", lazy = true, ft = "lua" },
-			{
-				"ii14/neorepl.nvim",
-				lazy = true,
-				ft = "lua",
-				keys = {
-					{
-						"<LocalLeader>or",
-						function()
-							-- get current buffer and window
-							local buf = vim.api.nvim_get_current_buf()
-							local win = vim.api.nvim_get_current_win()
-							-- create a new split for the repl
-							vim.cmd "split"
-							-- spawn repl and set the context to our buffer
-							require("neorepl").new { lang = "lua", buffer = buf, window = win }
-							-- resize repl window and make it fixed height
-							vim.cmd "resize 10 | setl winfixheight"
-						end,
-						desc = "repl: Open lua repl",
-					},
-				},
-			},
-			{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-			{
-				"bazelbuild/vim-bazel",
-				lazy = true,
-				dependencies = { "google/vim-maktaba" },
-				cmd = "Bazel",
-				ft = "bzl",
-				config = function()
-					local k = require "zox.keybind"
-					k.nvim_register_mapping {
-						["n|<LocalLeader>bb"] = k.args("Bazel build"):with_defaults "bazel: build",
-						["n|<LocalLeader>bc"] = k.args("Bazel clean"):with_defaults "bazel: clean",
-						["n|<LocalLeader>bd"] = k.args("Bazel debug"):with_defaults "bazel: debug",
-						["n|<LocalLeader>br"] = k.args("Bazel run"):with_defaults "bazel: run",
-						["n|<LocalLeader>bt"] = k.args("Bazel test"):with_defaults "bazel: test",
-					}
-				end,
-			},
-			{
-				"fatih/vim-go",
-				lazy = true,
-				ft = "go",
-				run = ":GoInstallBinaries",
-			},
-			{
-				"lervag/vimtex",
-				lazy = true,
-				ft = "tex",
-				config = function()
-					vim.g.vimtex_view_method = "zathura"
-					if vim.loop.os_uname().sysname == "Darwin" then
-						vim.g.vimtex_view_method = "skim"
-						vim.g.vimtex_view_general_viewer =
-							"/Applications/Skim.app/Contents/SharedSupport/displayline"
-						vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
-					end
-
-					vim.api.nvim_create_autocmd("User", {
-						group = vim.api.nvim_create_augroup("vimtext_mac", { clear = true }),
-						pattern = "VimtexEventCompileSuccess",
-						callback = function(_)
-							---@diagnostic disable-next-line: undefined-field
-							local out = vim.b.vimtex.out()
-							local src_file_path = vim.fn.expand "%:p"
-							local cmd = { vim.g.vimtex_view_general_viewer, "-r" }
-
-							if vim.fn.empty(vim.fn.system "pgrep Skim") == 0 then
-								table.insert(cmd, "-g")
-							end
-
-							vim.fn.jobstart(
-								vim.list_extend(cmd, { vim.fn.line ".", out, src_file_path })
-							)
-						end,
-					})
-				end,
-			},
-			{
-				"simrat39/rust-tools.nvim",
-				lazy = true,
-				ft = "rust",
-				dependencies = {
-					{
-						"saecki/crates.nvim",
-						lazy = true,
-						event = "BufReadPost Cargo.toml",
-						cond = function() return vim.fn.expand "%:t" == "Cargo.toml" end,
-						dependencies = { "nvim-lua/plenary.nvim" },
-						config = function()
-							local k = require "zox.keybind"
-							require("crates").setup {
-								avoid_prerelease = false,
-								thousands_separator = ",",
-								notification_title = "Crates",
-								text = {
-									loading = " " .. require("zox").misc_space.Watch .. "Loading",
-									version = " " .. require("zox").ui_space.Check .. "%s",
-									prerelease = " "
-										.. require("zox").diagnostics_space.WarningHolo
-										.. "%s",
-									yanked = " " .. require("zox").diagnostics_space.Error .. "%s",
-									nomatch = " "
-										.. require("zox").diagnostics_space.Question
-										.. "No match",
-									upgrade = " "
-										.. require("zox").diagnostics_space.HintHolo
-										.. "%s",
-									error = " "
-										.. require("zox").diagnostics_space.Error
-										.. "Error fetching crate",
-								},
-								popup = {
-									hide_on_select = true,
-									copy_register = "\"",
-									border = "rounded",
-									show_version_date = true,
-									text = {
-										title = require("zox").ui_space.Package .. "%s",
-										description = "%s",
-										created_label = require("zox").misc_space.Added
-											.. "created"
-											.. "        ",
-										created = "%s",
-										updated_label = require("zox").misc_space.ManUp
-											.. "updated"
-											.. "        ",
-										updated = "%s",
-										downloads_label = require("zox").ui_space.CloudDownload
-											.. "downloads      ",
-										downloads = "%s",
-										homepage_label = require("zox").misc_space.Campass
-											.. "homepage       ",
-										homepage = "%s",
-										repository_label = require("zox").git_space.Repo
-											.. "repository     ",
-										repository = "%s",
-										documentation_label = require("zox").diagnostics_space.InformationHolo
-											.. "documentation  ",
-										documentation = "%s",
-										crates_io_label = require("zox").ui_space.Package
-											.. "crates.io      ",
-										crates_io = "%s",
-										categories_label = require("zox").kind_space.Class
-											.. "categories     ",
-										keywords_label = require("zox").kind_space.Keyword
-											.. "keywords       ",
-										version = "  %s",
-										prerelease = require("zox").diagnostics_space.WarningHolo
-											.. "%s prerelease",
-										yanked = require("zox").diagnostics_space.Error
-											.. "%s yanked",
-										version_date = "  %s",
-										feature = "  %s",
-										enabled = require("zox").dap_space.Play .. "%s",
-										transitive = require("zox").ui_space.List .. "%s",
-										normal_dependencies_title = require("zox").kind_space.Interface
-											.. "Dependencies",
-										build_dependencies_title = require("zox").misc_space.Gavel
-											.. "Build dependencies",
-										dev_dependencies_title = require("zox").misc_space.Glass
-											.. "Dev dependencies",
-										dependency = "  %s",
-										optional = require("zox").ui_space.BigUnfilledCircle
-											.. "%s",
-										dependency_version = "  %s",
-										loading = " " .. require("zox").misc_space.Watch,
-									},
-								},
-								src = {
-									text = {
-										prerelease = " "
-											.. require("zox").diagnostics_space.WarningHolo
-											.. "pre-release ",
-										yanked = " "
-											.. require("zox").diagnostics_space.ErrorHolo
-											.. "yanked ",
-									},
-								},
-								null_ls = { enabled = true, name = "crates.nvim" },
-							}
-							k.nvim_register_mapping {
-								["n|<Leader>ct"] = k.callback(require("crates").toggle)
-									:with_buffer(0)
-									:with_defaults "crates: Toggle",
-								["n|<Leader>cr"] = k.callback(require("crates").reload)
-									:with_buffer(0)
-									:with_defaults "crates: reload",
-								["n|<Leader>cv"] = k.callback(
-									require("crates").show_versions_popup
-								)
-									:with_defaults "crates: show versions popup",
-								["n|<Leader>cf"] = k.callback(
-									require("crates").show_features_popup
-								)
-									:with_defaults "crates: show features popup",
-								["n|<Leader>cd"] = k.callback(
-									require("crates").show_dependencies_popup
-								)
-									:with_defaults "crates: show dependencies popup",
-								["n|<Leader>cu"] = k.callback(require("crates").update_crate)
-									:with_defaults "crates: update crate",
-								["v|<Leader>cu"] = k.callback(require("crates").update_crates)
-									:with_defaults "crates: update crates",
-								["n|<Leader>ca"] = k.callback(require("crates").update_all_crates)
-									:with_defaults "crates: update all crates",
-								["n|<Leader>cU"] = k.callback(require("crates").upgrade_crate)
-									:with_defaults "crates: upgrade crate",
-								["v|<Leader>cU"] = k.callback(require("crates").upgrade_crates)
-									:with_defaults "crates: upgrade crates",
-								["n|<Leader>cA"] = k.callback(require("crates").upgrade_all_crates)
-									:with_defaults "crates: upgrade all crates",
-								["n|<Leader>cH"] = k.callback(require("crates").open_homepage)
-									:with_defaults "crates: show homepage",
-								["n|<Leader>cR"] = k.callback(require("crates").open_repository)
-									:with_defaults "crates: show repository",
-								["n|<Leader>cD"] = k.callback(require("crates").open_documentation)
-									:with_defaults "crates: show documentation",
-								["n|<Leader>cC"] = k.callback(require("crates").open_crates_io)
-									:with_defaults "crates: open crates.io",
-							}
-						end,
-					},
-				},
-			},
 			{ "williamboman/mason.nvim", cmd = "Mason" },
 			{ "williamboman/mason-lspconfig.nvim" },
-			{ "jay-babu/mason-nvim-dap.nvim" },
 			{
 				"simrat39/inlay-hints.nvim",
 				cond = function()
@@ -261,9 +220,7 @@ return {
 					parameter = { show = true },
 					renderer = "inlay-hints.render.eol",
 					only_current_line = true,
-					eol = {
-						parameter = { separator = "," },
-					},
+					eol = { parameter = { separator = "," } },
 				},
 			},
 			{
@@ -418,9 +375,6 @@ return {
 				},
 				automatic_installation = true,
 			}
-			require("mason-nvim-dap").setup {
-				ensure_installed = { "python", "delve", "codelldb", "bash" },
-			}
 
 			local disabled_workspaces = {}
 			local format_on_save = true
@@ -450,7 +404,6 @@ return {
 					f.markdownlint,
 					f.cbfmt,
 					f.beautysh,
-					f.yamlfmt,
 					f.rustfmt,
 					f.jq,
 					f.buf,
@@ -626,7 +579,7 @@ return {
 	{
 		"hrsh7th/nvim-cmp",
 		lazy = true,
-		event = "BufReadPre",
+		event = { "CursorHold", "CursorHoldI" },
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",
@@ -634,10 +587,6 @@ return {
 				dependencies = { "rafamadriz/friendly-snippets" },
 				build = "make install_jsregexp",
 				config = function()
-					local snippet_path = vim.fn.stdpath "config" .. "/custom-snippets/"
-					if not vim.tbl_contains(vim.opt.rtp:get(), snippet_path) then
-						vim.opt.rtp:append(snippet_path)
-					end
 					require("luasnip").config.set_config {
 						history = true,
 						updateevents = "TextChanged,TextChangedI",
@@ -659,7 +608,7 @@ return {
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
-				event = "InsertEnter",
+				event = { "CursorHold", "CursorHoldI" },
 				config = function()
 					vim.defer_fn(function()
 						require("copilot").setup {
@@ -803,6 +752,13 @@ return {
 					{ name = "treesitter" },
 					{ name = "buffer" },
 					{ name = "git" },
+				},
+				window = {
+					completion = cmp.config.window.bordered(),
+					documentation = cmp.config.window.bordered(),
+				},
+				experimental = {
+					ghost_text = { hl_group = "LspCodeLens" },
 				},
 			}
 		end,

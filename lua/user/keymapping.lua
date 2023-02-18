@@ -25,6 +25,7 @@ k.nvim_register_mapping {
 	["n|<C-l>"] = k.cmd("<C-w>l"):with_noremap():with_desc "window: Focus right",
 	["n|<C-j>"] = k.cmd("<C-w>j"):with_noremap():with_desc "window: Focus down",
 	["n|<C-k>"] = k.cmd("<C-w>k"):with_noremap():with_desc "window: Focus up",
+	["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
 	-- remap command key to ;
 	["n|;"] = k.cmd(":"):with_noremap():with_desc "command: Enter command mode",
 	["n|\\"] = k.cmd(":let @/=''<CR>:noh<CR>"):with_noremap():with_desc "edit: clean hightlight",
