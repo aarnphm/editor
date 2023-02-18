@@ -1,5 +1,11 @@
 local api = vim.api
 
+-- Show diagnostic float on hover.
+vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+	pattern = "*",
+	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
+})
+
 -- open telescope for no name buffer
 api.nvim_create_autocmd({ "VimEnter" }, {
 	callback = function(event)
@@ -10,6 +16,7 @@ api.nvim_create_autocmd({ "VimEnter" }, {
 	end,
 })
 api.nvim_create_autocmd("BufReadPost", {
+	pattern = "*",
 	callback = function() vim.opt.laststatus = 3 end,
 })
 
@@ -25,20 +32,13 @@ api.nvim_create_autocmd("FileType", {
 		"tsplayground",
 		"neorepl",
 		"toggleterm",
+		"health",
 		"PlenaryTestPopup",
+		"",
 	},
 	callback = function(event)
 		vim.bo[event.buf].buflisted = false
 		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<CMD>close<CR>", { silent = true })
-	end,
-})
-
--- Jump to last position. See :h last-position-jump
-api.nvim_create_autocmd("BufReadPost", {
-	pattern = "*",
-	callback = function()
-		local line = vim.fn.line "'\""
-		if line >= 1 and line <= vim.fn.line "$" then vim.cmd "normal! g`\"" end
 	end,
 })
 
@@ -136,12 +136,6 @@ api.nvim_create_autocmd("FileType", {
 		)
 	end,
 })
--- set filetype for bazel files
-api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-	group = ft_id,
-	pattern = { "*.bazel", "WORKSPACE", "BUILD", "*.bzlmod" },
-	command = "setf bzl",
-})
 -- set filetype for docker files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = ft_id,
@@ -152,12 +146,6 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = ft_id,
 	pattern = { "*.{tpl,template,tmpl,j2,jinja}" },
 	command = "setf html",
-})
--- set shiftwidth and tabstop for lua and nix files
-api.nvim_create_autocmd("FileType", {
-	group = ft_id,
-	pattern = { "lua", "nix" },
-	command = "set noexpandtab shiftwidth=2 tabstop=2",
 })
 
 local yank_id = api.nvim_create_augroup("yank", { clear = true })

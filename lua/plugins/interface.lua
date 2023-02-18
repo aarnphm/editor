@@ -1,5 +1,29 @@
 return {
 	{
+		"nathom/filetype.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		opts = {
+			overrides = {
+				extension = {
+					conf = "conf",
+					mdx = "markdown",
+					mjml = "html",
+					sh = "bash",
+				},
+				complex = {
+					[".*%.env.*"] = "sh",
+					["ignore$"] = "conf",
+					["*.rc"] = "conf",
+					["yup.lock"] = "yaml",
+					["WORKSPACE"] = "bzl",
+					["BUILD"] = "bzl",
+				},
+				shebang = { dash = "sh" },
+			},
+		},
+	},
+	{
 		"rose-pine/neovim",
 		name = "rose-pine",
 		branch = "canary",
@@ -20,82 +44,29 @@ return {
 		end,
 	},
 	-- Better quickfix list
-	{ "kevinhwang91/nvim-bqf", ft = "qf", opts = {} },
-	{ url = "https://git.sr.ht/~whynothugo/lsp_lines.nvim", config = true },
+	{ "kevinhwang91/nvim-bqf", lazy = true, ft = "qf", config = true },
+	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
 	{
 		"stevearc/dressing.nvim",
 		lazy = true,
 		event = "BufReadPost",
-		enabled = true,
-		opts = {
-			input = { enabled = true, insert_only = false },
-			select = { enabled = true, backend = "nui", trim_prompt = true },
-		},
+		opts = { input = { insert_only = false } },
 	},
 	{
 		"folke/noice.nvim",
+		event = "BufReadPost",
+		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
 		opts = {
-			lsp = {
-				override = {
-					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true,
-				},
-			},
-			presets = {
-				command_palette = true,
-				lsp_doc_border = true,
-			},
+			presets = { command_palette = true, lsp_doc_border = true },
 			routes = {
+				{ view = "mini", filter = { event = "msg_showmode" } },
 				{
-					view = "notify",
-					filter = { event = "msg_showmode" },
+					filter = { event = "msg_show", kind = "", find = "written" },
+					opts = { skip = true },
 				},
-			},
-		},
-	},
-	{ "MunifTanjim/nui.nvim", lazy = true },
-	{
-		"j-hui/fidget.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
-	},
-	{
-		"rcarriga/nvim-notify",
-		lazy = true,
-		opts = {
-			stages = "static",
-			---@usage User render fps value
-			fps = 60,
-			max_height = function() return math.floor(vim.o.lines * 0.55) end,
-			max_width = function() return math.floor(vim.o.columns * 0.55) end,
-			render = "minimal",
-			background_colour = "Normal",
-			level = "INFO",
-		},
-	},
-	{
-		"nathom/filetype.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		opts = {
-			overrides = {
-				extension = {
-					conf = "conf",
-					mdx = "markdown",
-					mjml = "html",
-					sh = "bash",
-				},
-				complex = {
-					[".*%.env.*"] = "sh",
-					["ignore$"] = "conf",
-					["yup.lock"] = "yaml",
-					["WORKSPACE"] = "bzl",
-				},
-				shebang = {
-					-- Set the filetype of files with a dash shebang to sh
-					dash = "sh",
+				{
+					filter = { event = "msg_show", kind = "search_count" },
+					opts = { skip = true },
 				},
 			},
 		},
@@ -121,46 +92,9 @@ return {
 		event = "BufReadPost",
 		opts = {
 			show_first_indent_level = true,
-			filetype_exclude = {
-				"startify",
-				"dashboard",
-				"alpha",
-				"log",
-				"fugitive",
-				"gitcommit",
-				"vimwiki",
-				"markdown",
-				"json",
-				"txt",
-				"vista",
-				"help",
-				"todoist",
-				"peekaboo",
-				"git",
-				"TelescopePrompt",
-				"undotree",
-				"flutterToolsOutline",
-				"", -- for all buffers without a file type
-			},
 			buftype_exclude = { "terminal", "nofile" },
 			show_trailing_blankline_indent = false,
 			show_current_context = true,
-			context_patterns = {
-				"class",
-				"function",
-				"method",
-				"block",
-				"list_literal",
-				"selector",
-				"^if",
-				"^table",
-				"if_statement",
-				"while",
-				"for",
-				"type",
-				"var",
-				"import",
-			},
 		},
 	},
 	{
@@ -169,7 +103,6 @@ return {
 		event = { "CursorHoldI", "CursorHold" },
 		opts = {
 			numhl = true,
-			---@diagnostic disable-next-line: undefined-global
 			word_diff = false,
 			current_line_blame = false,
 			current_line_blame_opts = { virtual_text_pos = "eol" },
@@ -211,7 +144,7 @@ return {
 						end
 					)
 						:with_buffer(bufnr)
-						:with_desc "git: Stage hunk",
+						:with_desc "git: undo stage hunk",
 					["n|<Leader>hu"] = k.callback(
 						function() require("gitsigns.actions").undo_stage_hunk() end
 					)
@@ -247,21 +180,6 @@ return {
 					)
 						:with_buffer(bufnr)
 						:with_desc "git: Blame line",
-					["n|<Leader>tbl"] = k.callback(
-						function() require("gitsigns.actions").toggle_current_line_blame() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Toggle current line blame",
-					["n|<Leader>twd"] = k.callback(
-						function() require("gitsigns.actions").toggle_word_diff() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Toogle word diff",
-					["n|<Leader>thd"] = k.callback(
-						function() require("gitsigns.actions").toggle_deleted() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Toggle deleted diff",
 					-- Text objects
 					["o|ih"] = k.callback(function() require("gitsigns.actions").text_object() end)
 						:with_buffer(bufnr),
@@ -276,23 +194,11 @@ return {
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
 		event = "BufReadPost",
-		keys = function()
-			local k = require "zox.keybind"
-			return k.to_lazy_mapping {
-				["n|gt"] = k.cr("TroubleToggle"):with_defaults "lsp: Toggle trouble list",
-				["n|gR"] = k.cr("TroubleToggle lsp_references")
-					:with_defaults "lsp: Show lsp references",
-				["n|<LocalLeader>td"] = k.cr("TroubleToggle document_diagnostics")
-					:with_defaults "lsp: Show document diagnostics",
-				["n|<LocalLeader>tw"] = k.cr("TroubleToggle workspace_diagnostics")
-					:with_defaults "lsp: Show workspace diagnostics",
-				["n|<LocalLeader>tq"] = k.cr("TroubleToggle quickfix")
-					:with_defaults "lsp: Show quickfix list",
-				["n|<LocalLeader>tl"] = k.cr("TroubleToggle loclist")
-					:with_defaults "lsp: Show loclist",
-			}
-		end,
-		opts = { position = "left", mode = "document_diagnostics", auto_close = true },
+		keys = {
+			{ "gt", "<cmd>TroubleToggle<cr>", desc = "lsp: Toggle trouble list" },
+			{ "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: Show lsp references" },
+		},
+		config = true,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -329,6 +235,7 @@ return {
 				},
 			},
 		},
+		keys = { { "<LocalLeader>Ts", vim.treesitter.show_tree, desc = "treesitter: show tree" } },
 		opts = {
 			ensure_installed = "all",
 			ignore_install = { "phpdoc", "gitcommit" },
@@ -399,12 +306,7 @@ return {
 		lazy = true,
 		branch = "v2",
 		event = { "CursorHold", "CursorHoldI" },
-		cond = function()
-			return not vim.tbl_contains(
-				{ "nofile", "alpha", "gitcommit", "gitrebase" },
-				vim.bo.filetype
-			)
-		end,
+		config = true,
 		keys = {
 			{
 				"<LocalLeader>w",
@@ -436,50 +338,59 @@ return {
 				"jump: one char",
 				noremap = true,
 			},
-		},
-		config = function()
-			local hop = require "hop"
-			hop.setup()
-
-			-- set f/F to use hop
-			local d = require("hop.hint").HintDirection
-			vim.api.nvim_set_keymap("", "f", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 { direction = d.AFTER_CURSOR, current_line_only = true }
+			{
+				"f",
+				function()
+					local h = require "hop"
+					local d = require("hop.hint").HintDirection
+					h.hint_char1 { direction = d.AFTER_CURSOR, current_line_only = true }
 				end,
+				mode = "",
+				remap = true,
 				desc = "motion: f 1 char",
-			})
-			vim.api.nvim_set_keymap("", "F", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 { direction = d.BEFORE_CURSOR, current_line_only = true }
+			},
+			{
+				"F",
+				function()
+					local h = require "hop"
+					local d = require("hop.hint").HintDirection
+					h.hint_char1 { direction = d.BEFORE_CURSOR, current_line_only = true }
 				end,
+				mode = "",
+				remap = true,
 				desc = "motion: F 1 char",
-			})
-			vim.api.nvim_set_keymap("", "t", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 {
+			},
+			{
+				"t",
+				function()
+					local h = require "hop"
+					local d = require("hop.hint").HintDirection
+					h.hint_char1 {
 						direction = d.AFTER_CURSOR,
 						current_line_only = true,
 						hint_offset = -1,
 					}
 				end,
+				mode = "",
+				remap = true,
 				desc = "motion: t 1 char",
-			})
-			vim.api.nvim_set_keymap("", "T", "", {
-				noremap = false,
-				callback = function()
-					hop.hint_char1 {
+			},
+			{
+				"T",
+				function()
+					local h = require "hop"
+					local d = require("hop.hint").HintDirection
+					h.hint_char1 {
 						direction = d.BEFORE_CURSOR,
 						current_line_only = true,
 						hint_offset = 1,
 					}
 				end,
+				mode = "",
+				remap = true,
 				desc = "motion: T 1 char",
-			})
-		end,
+			},
+		},
 	},
 	{
 		"nvim-telescope/telescope.nvim",
@@ -505,10 +416,8 @@ return {
 				},
 			},
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
-			{ "nvim-telescope/telescope-frecency.nvim", dependencies = { "kkharji/sqlite.lua" } },
 			{
 				"ahmedkhalf/project.nvim",
-				name = "project_nvim",
 				lazy = true,
 				event = "BufReadPost",
 				opts = {
@@ -517,6 +426,7 @@ return {
 					silent_chdir = true,
 					scope_chdir = "win",
 				},
+				config = function(_, opts) require("project_nvim").setup(opts) end,
 			},
 		},
 		keys = {
@@ -527,11 +437,8 @@ return {
 			},
 			{
 				"<leader>r",
-				"",
+				"<cmd>Telescope git_files find_command=fd,-t,f,-H,-E,.git,--strip-cwd-prefix theme=dropdown previewer=false<cr>",
 				desc = "find: recent files",
-				callback = function()
-					require("telescope").extensions.frecency.frecency { previewer = false }
-				end,
 			},
 			{
 				"<leader>w",
@@ -584,6 +491,17 @@ return {
 				defaults = {
 					prompt_prefix = " " .. require("zox").ui_space.Telescope .. " ",
 					selection_caret = require("zox").ui_space.DoubleSeparator,
+					vimgrep_arguments = {
+						"rg",
+						"--color=never",
+						"--no-heading",
+						"--with-filename",
+						"--line-number",
+						"--column",
+						"--smart-case",
+						"--hidden",
+					},
+					file_ignore_patterns = { ".git", "%.egg-info" },
 					mappings = {
 						i = {
 							["<C-a>"] = { "<esc>0i", type = "command" },
@@ -591,7 +509,13 @@ return {
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
-					layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+					layout_config = {
+						width = 0.6,
+						height = 0.6,
+						prompt_position = "top",
+						horizontal = { preview_height = 0.4 },
+						vertical = { preview_height = 0.4 },
+					},
 				},
 				extensions = {
 					live_grep_args = {
@@ -607,8 +531,6 @@ return {
 					},
 				},
 				pickers = {
-					keymaps = { theme = "dropdown" },
-					git_files = { theme = "dropdown" },
 					live_grep = {
 						on_input_filter_cb = function(prompt)
 							-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
@@ -623,7 +545,7 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "frecency", "live_grep_args", "notify", "projects" } do
+			for _, v in ipairs { "live_grep_args", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,
@@ -735,7 +657,6 @@ return {
 			end,
 			open_mapping = "<C-t>", -- default mapping
 			shade_terminals = false,
-			direction = "vertical",
 		},
 	},
 }

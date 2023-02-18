@@ -25,7 +25,7 @@ k.nvim_register_mapping {
 	["n|<C-l>"] = k.cmd("<C-w>l"):with_noremap():with_desc "window: Focus right",
 	["n|<C-j>"] = k.cmd("<C-w>j"):with_noremap():with_desc "window: Focus down",
 	["n|<C-k>"] = k.cmd("<C-w>k"):with_noremap():with_desc "window: Focus up",
-	["n|<C-x>"] = k.cr("BufDel"):with_defaults "bufdel: Delete current buffer",
+	["n|<C-x>"] = k.cr("bdelete"):with_defaults "buffer: Delete current buffer",
 	-- remap command key to ;
 	["n|;"] = k.cmd(":"):with_noremap():with_desc "command: Enter command mode",
 	["n|\\"] = k.cmd(":let @/=''<CR>:noh<CR>"):with_noremap():with_desc "edit: clean hightlight",
@@ -42,4 +42,15 @@ k.nvim_register_mapping {
 	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
+	-- lsp
+	["n|co"] = k.cr("AerialToggle!"):with_defaults "lsp: Toggle outline",
+	["n|ch"] = k.callback(vim.show_pos):with_defaults "lsp: Show hightlight",
+	["n|c["] = k.callback(vim.diagnostic.goto_prev):with_defaults "lsp: Prev diagnostic",
+	["n|c]"] = k.callback(vim.diagnostic.goto_next):with_defaults "lsp: Next diagnostic",
+	["n|cr"] = k.callback(vim.lsp.buf.rename):with_defaults "lsp: Rename in file range",
+	["n|cD"] = k.callback(vim.lsp.buf.type_definition):with_defaults "lsp: Type definition",
+	["n|K"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
+	["n|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for cursor",
+	["v|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for range",
+	["n|ce"] = k.callback(vim.diagnostic.open_float):with_defaults "lsp: Open current diagnostic",
 }

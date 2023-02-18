@@ -1,13 +1,11 @@
 return {
 	{ "jghauser/mkdir.nvim" },
-	{ "ojroques/nvim-bufdel" },
 	{ "lewis6991/impatient.nvim" },
 	{ "tpope/vim-repeat", event = "VeryLazy" },
 	{
 		"nmac427/guess-indent.nvim",
 		event = { "CursorHold", "CursorHoldI" },
 		config = true,
-		lazy = true,
 	},
 	{
 		"max397574/better-escape.nvim",
@@ -59,6 +57,7 @@ return {
 		"numToStr/Comment.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
+		keys = { "gc", "gb" },
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		config = true,
 	},

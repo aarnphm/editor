@@ -22,7 +22,6 @@ vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup("plugins", {
 	install = { colorscheme = { "un" } },
-	defaults = { lazy = true },
 	change_detection = { notify = false },
 	checker = { enable = true },
 	performance = {

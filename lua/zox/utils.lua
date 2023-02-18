@@ -128,31 +128,4 @@ M.path = {
 	end,
 }
 
-M.find_files = function(opts, safe_git)
-	safe_git = safe_git or true
-	opts = vim.tbl_extend("force", {
-		previewer = false,
-		shorten_path = true,
-		layout_strategy = "horizontal",
-		theme = "dropdown",
-	}, opts or {})
-	local find_files = function()
-		opts.find_command = 1 == vim.fn.executable "fd"
-				and { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" }
-			or nil
-		require("telescope.builtin").find_files(opts)
-	end
-
-	if safe_git then
-		vim.fn.system "git rev-parse --is-inside-work-tree"
-		if vim.v.shell_error == 0 then
-			require("telescope.builtin").git_files(opts)
-		else
-			find_files()
-		end
-	else
-		find_files()
-	end
-end
-
 return M
