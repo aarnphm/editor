@@ -2,6 +2,7 @@ return {
 	{ "jghauser/mkdir.nvim" },
 	{ "ojroques/nvim-bufdel", cmd = { "BufDel" } },
 	{ "lewis6991/impatient.nvim" },
+	{ "nacro90/numb.nvim", config = true },
 	{ "tpope/vim-repeat", event = "VeryLazy" },
 	{
 		"nmac427/guess-indent.nvim",
