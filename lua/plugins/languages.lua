@@ -103,7 +103,7 @@ return {
 					},
 					code_actions = { extend_gitsigns = false },
 					symbol_in_winbar = {
-						enable = true,
+						enable = false,
 						respect_root = true,
 						separator = " " .. require("zox").ui_space.Separator,
 						show_file = false,
