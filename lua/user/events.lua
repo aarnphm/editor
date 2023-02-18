@@ -94,12 +94,6 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "BufRead", "BufNewFile" }, {
 vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
 
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
--- Set noundofile for temporary files
-api.nvim_create_autocmd("BufWritePre", {
-	group = bufs_id,
-	pattern = { "/tmp/*", "*.tmp", "*.bak" },
-	command = "setlocal noundofile",
-})
 -- set filetype for header files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = bufs_id,

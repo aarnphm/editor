@@ -1,5 +1,3 @@
-vim.cmd.colorscheme "un"
-
 vim.o.autoindent = true
 vim.o.autoread = true
 vim.o.autowrite = true
@@ -82,8 +80,6 @@ vim.o.winwidth = 30
 vim.o.wrap = false
 vim.o.wrapscan = true
 vim.o.writebackup = false
-
-vim.o.background = "dark"
 
 if vim.loop.os_uname().sysname == "Darwin" then
 	vim.g.clipboard = {

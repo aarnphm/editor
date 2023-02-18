@@ -21,7 +21,7 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup("plugins", {
-	install = { colorscheme = { "un" } },
+	install = { colorscheme = { "rose-pine" } },
 	change_detection = { notify = false },
 	checker = { enable = true },
 	performance = {
@@ -52,3 +52,6 @@ require("lazy").setup("plugins", {
 		},
 	},
 })
+
+vim.o.background = "dark"
+vim.cmd.colorscheme "rose-pine"

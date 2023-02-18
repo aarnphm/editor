@@ -24,10 +24,8 @@ return {
 		},
 	},
 	{
-		"rose-pine/neovim",
-		name = "rose-pine",
+		dir = vim.fn.stdpath "config" .. "/rose-pine",
 		branch = "canary",
-		lazy = false,
 		priority = 1000,
 		opts = {
 			disable_italics = true,
@@ -38,10 +36,6 @@ return {
 				StatusLineNC = { fg = "subtle", bg = "surface" },
 			},
 		},
-		config = function(_, opts)
-			require("rose-pine").setup(opts)
-			vim.cmd.colorscheme "rose-pine"
-		end,
 	},
 	-- Better quickfix list
 	{ "kevinhwang91/nvim-bqf", lazy = true, ft = "qf", config = true },
@@ -57,6 +51,13 @@ return {
 		event = "BufReadPost",
 		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
 		opts = {
+			lsp = {
+				override = {
+					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+					["vim.lsp.util.stylize_markdown"] = true,
+					["cmp.entry.get_documentation"] = true,
+				},
+			},
 			presets = { command_palette = true, lsp_doc_border = true },
 			routes = {
 				{ view = "mini", filter = { event = "msg_showmode" } },
@@ -302,93 +303,17 @@ return {
 		end,
 	},
 	{
-		"phaazon/hop.nvim",
+		"nvim-tree/nvim-web-devicons",
 		lazy = true,
-		branch = "v2",
-		event = { "CursorHold", "CursorHoldI" },
-		config = true,
-		keys = {
-			{
-				"<LocalLeader>w",
-				"<cmd><C-u>HopWord<CR>",
-				"jump: Goto word",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>j",
-				"<cmd><C-u>HopLine<CR>",
-				"jump: Goto line",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>k",
-				"<cmd><C-u>HopLine<CR>",
-				"jump: Goto line",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>c",
-				"<cmd><C-u>HopChar1<CR>",
-				"jump: one char",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>cc",
-				"<cmd><C-u>HopChar2<CR>",
-				"jump: one char",
-				noremap = true,
-			},
-			{
-				"f",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 { direction = d.AFTER_CURSOR, current_line_only = true }
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: f 1 char",
-			},
-			{
-				"F",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 { direction = d.BEFORE_CURSOR, current_line_only = true }
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: F 1 char",
-			},
-			{
-				"t",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 {
-						direction = d.AFTER_CURSOR,
-						current_line_only = true,
-						hint_offset = -1,
-					}
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: t 1 char",
-			},
-			{
-				"T",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 {
-						direction = d.BEFORE_CURSOR,
-						current_line_only = true,
-						hint_offset = 1,
-					}
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: T 1 char",
+		event = "BufReadPost",
+		opts = {
+			override = {
+				zsh = {
+					icon = "",
+					color = "#428850",
+					cterm_color = "65",
+					name = "Zsh",
+				},
 			},
 		},
 	},
@@ -400,22 +325,8 @@ return {
 		dependencies = {
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-lua/popup.nvim" },
-			{
-				"nvim-tree/nvim-web-devicons",
-				lazy = true,
-				event = "BufReadPost",
-				opts = {
-					override = {
-						zsh = {
-							icon = "",
-							color = "#428850",
-							cterm_color = "65",
-							name = "Zsh",
-						},
-					},
-				},
-			},
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{
 				"ahmedkhalf/project.nvim",
 				lazy = true,
@@ -509,13 +420,8 @@ return {
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
-					layout_config = {
-						width = 0.6,
-						height = 0.6,
-						prompt_position = "top",
-						horizontal = { preview_height = 0.4 },
-						vertical = { preview_height = 0.4 },
-					},
+					layout_strategy = "horizontal",
+					layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
 				},
 				extensions = {
 					live_grep_args = {
@@ -531,6 +437,7 @@ return {
 					},
 				},
 				pickers = {
+					find_files = { hidden = true },
 					live_grep = {
 						on_input_filter_cb = function(prompt)
 							-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
@@ -545,7 +452,7 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "live_grep_args", "projects" } do
+			for _, v in ipairs { "live_grep_args", "projects", "fzf" } do
 				require("telescope").load_extension(v)
 			end
 		end,

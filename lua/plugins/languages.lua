@@ -71,7 +71,6 @@ return {
 		dependencies = {
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "williamboman/mason.nvim", cmd = "Mason" },
-			{ "stevearc/aerial.nvim", cmd = "AerialToggle", lazy = true, config = true },
 			{
 				"simrat39/inlay-hints.nvim",
 				lazy = true,
@@ -98,7 +97,8 @@ return {
 					definition = { split = "<C-c>s" },
 					beacon = { enable = false },
 					outline = {
-						win_width = math.floor(vim.o.columns * 0.3),
+						win_width = math.floor(vim.o.columns * 0.2),
+						with_position = "left",
 						keys = { jump = "<CR>" },
 					},
 					code_actions = { extend_gitsigns = false },
