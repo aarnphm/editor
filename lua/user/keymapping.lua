@@ -48,7 +48,7 @@ k.nvim_register_mapping {
 	["n|c["] = k.callback(vim.diagnostic.goto_prev):with_defaults "lsp: Prev diagnostic",
 	["n|c]"] = k.callback(vim.diagnostic.goto_next):with_defaults "lsp: Next diagnostic",
 	["n|cr"] = k.callback(vim.lsp.buf.rename):with_defaults "lsp: Rename in file range",
-	["n|cD"] = k.callback(vim.lsp.buf.type_definition):with_defaults "lsp: Type definition",
+	["n|cd"] = k.callback(vim.lsp.buf.type_definition):with_defaults "lsp: Type definition",
 	["n|K"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
 	["n|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for cursor",
 	["v|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for range",

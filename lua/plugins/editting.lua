@@ -37,6 +37,12 @@ return {
 		config = function() require("mini.surround").setup() end,
 	},
 	{
+		"echasnovski/mini.ai",
+		lazy = true,
+		event = { "CursorHold", "CursorHoldI" },
+		config = function() require("mini.ai").setup() end,
+	},
+	{
 		"folke/which-key.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },

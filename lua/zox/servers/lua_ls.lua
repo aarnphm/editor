@@ -3,18 +3,12 @@ return function(options)
 	-- NOTE: call neodev before setup lua_ls
 	require("neodev").setup {
 		library = {
-			enabled = true,
-			runtime = true,
-			types = true,
 			plugins = {
 				"nvim-lspconfig",
 				"nvim-treesitter",
 				"telescope.nvim",
-				"nvim-cmp",
 				"lazy",
-				"gitsigns.nvim",
 				"lspsaga.nvim",
-				"null-ls.nvim",
 			},
 		},
 	}

@@ -69,16 +69,21 @@ return {
 		end,
 	},
 	{
+		"TimUntersberger/neogit",
+		lazy = true,
+		dependencies = "nvim-lua/plenary.nvim",
+		cmd = "Neogit",
+	},
+	{
 		"sindrets/diffview.nvim",
 		lazy = true,
 		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
-		config = function()
+		keys = function()
 			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<LocalLeader>D"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
-				["n|<LocalLeader><LocalLeader>D"] = k.cr("DiffviewClose")
+			return k.to_lazy_mapping {
+				["n|<LocalLeader>d"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
+				["n|<LocalLeader><LocalLeader>d"] = k.cr("DiffviewClose")
 					:with_defaults "git: Close diff view",
 			}
 		end,

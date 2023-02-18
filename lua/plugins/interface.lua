@@ -46,6 +46,13 @@ return {
 		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
 		opts = {
 			lsp = {
+				progress = {
+					format = {
+						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
+						{ "{data.progress.title} ", hl_group = "NoiceLspProgressTitle" },
+						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
+					},
+				},
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
@@ -196,6 +203,13 @@ return {
 		},
 		config = true,
 	},
+	-- Nice diagnostics in virtual text
+	{
+		url = "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+		enabled = false,
+		event = "BufReadPost",
+		config = true,
+	},
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
@@ -332,6 +346,7 @@ return {
 				},
 				config = function(_, opts) require("project_nvim").setup(opts) end,
 			},
+			{ "folke/noice.nvim" },
 		},
 		keys = {
 			{
@@ -447,7 +462,7 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "live_grep_args", "projects", "fzf" } do
+			for _, v in ipairs { "fzf", "noice", "live_grep_args", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,
@@ -617,11 +632,6 @@ return {
 		lazy = true,
 		event = "BufReadPost",
 		config = function()
-			local escape_status = function()
-				local ok, m = pcall(require, "better_escape")
-				return ok and m.waiting and require("zox").misc_space.EscapeST or ""
-			end
-
 			local _cache = { context = "", bufnr = -1 }
 			local lspsaga_symbols = function()
 				if
@@ -722,7 +732,6 @@ return {
 					},
 					lualine_c = { lspsaga_symbols },
 					lualine_x = {
-						{ escape_status },
 						{
 							"diagnostics",
 							sources = { "nvim_diagnostic" },

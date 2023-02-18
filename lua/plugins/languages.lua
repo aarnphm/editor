@@ -194,10 +194,11 @@ return {
 					d.markdownlint.with { extra_args = { "--disable MD033" } },
 					d.zsh,
 					d.buf,
+					d.protolint,
 					d.pydocstyle,
 					d.buildifier,
 					d.yamllint,
-					d.vulture,
+					d.vulture.with { extra_args = { "--min-confidence 70" } },
 					d.vint,
 
 					-- NOTE: code actions
