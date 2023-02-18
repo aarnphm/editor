@@ -194,6 +194,7 @@ return {
 					d.markdownlint.with { extra_args = { "--disable MD033" } },
 					d.zsh,
 					d.buf,
+					d.pydocstyle,
 					d.buildifier,
 					d.yamllint,
 					d.vulture,
