@@ -315,11 +315,9 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		lazy = true,
-		event = "BufRead",
+		event = "BufReadPost",
 		cmd = "Telescope",
 		dependencies = {
-			{ "nvim-lua/plenary.nvim" },
-			{ "nvim-lua/popup.nvim" },
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{
@@ -407,7 +405,7 @@ return {
 						"--smart-case",
 						"--hidden",
 					},
-					file_ignore_patterns = { ".git", "%.egg-info" },
+					file_ignore_patterns = { ".git" },
 					mappings = {
 						i = {
 							["<C-a>"] = { "<esc>0i", type = "command" },
@@ -415,7 +413,6 @@ return {
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
-					layout_strategy = "horizontal",
 					layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
 				},
 				extensions = {
@@ -426,6 +423,9 @@ return {
 								["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
 								["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt {
 									postfix = " --iglob ",
+								},
+								["<C-j>"] = require("telescope-live-grep-args.actions").quote_prompt {
+									postfix = " -t ",
 								},
 							},
 						},

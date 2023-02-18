@@ -1,4 +1,5 @@
 return {
+	{ "nvim-lua/plenary.nvim" },
 	{ "jghauser/mkdir.nvim" },
 	{ "ojroques/nvim-bufdel", cmd = { "BufDel" } },
 	{ "lewis6991/impatient.nvim" },
