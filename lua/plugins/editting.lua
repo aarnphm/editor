@@ -2,7 +2,6 @@ return {
 	{ "nvim-lua/plenary.nvim" },
 	{ "jghauser/mkdir.nvim" },
 	{ "ojroques/nvim-bufdel", cmd = { "BufDel" } },
-	{ "lewis6991/impatient.nvim" },
 	{ "nacro90/numb.nvim", config = true },
 	{ "tpope/vim-repeat", event = "VeryLazy" },
 	{
@@ -57,11 +56,6 @@ return {
 					z = false,
 					g = false,
 				},
-			},
-			icons = {
-				breadcrumb = require("zox").ui.Separator,
-				separator = require("zox").misc.Vbar,
-				group = require("zox").misc.Add,
 			},
 		},
 	},

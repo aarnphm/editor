@@ -3,7 +3,6 @@ return {
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 	{ "fatih/vim-go", lazy = true, ft = "go", run = ":GoInstallBinaries" },
 	{ "simrat39/rust-tools.nvim", lazy = true, ft = { "rs", "rust" } },
-	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
 	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
 	{
 		"bazelbuild/vim-bazel",
@@ -12,37 +11,7 @@ return {
 		dependencies = { "google/vim-maktaba" },
 		ft = { "bzl", "bazel", "bzlmod" },
 	},
-	{
-		"lervag/vimtex",
-		lazy = true,
-		ft = "tex",
-		config = function()
-			vim.g.vimtex_view_method = "zathura"
-			if vim.loop.os_uname().sysname == "Darwin" then
-				vim.g.vimtex_view_method = "skim"
-				vim.g.vimtex_view_general_viewer =
-					"/Applications/Skim.app/Contents/SharedSupport/displayline"
-				vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
-			end
-
-			vim.api.nvim_create_autocmd("User", {
-				group = vim.api.nvim_create_augroup("vimtext_mac", { clear = true }),
-				pattern = "VimtexEventCompileSuccess",
-				callback = function(_)
-					---@diagnostic disable-next-line: undefined-field
-					local out = vim.b.vimtex.out()
-					local src_file_path = vim.fn.expand "%:p"
-					local cmd = { vim.g.vimtex_view_general_viewer, "-r" }
-
-					if vim.fn.empty(vim.fn.system "pgrep Skim") == 0 then
-						table.insert(cmd, "-g")
-					end
-
-					vim.fn.jobstart(vim.list_extend(cmd, { vim.fn.line ".", out, src_file_path }))
-				end,
-			})
-		end,
-	},
+	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
 	{
 		"ii14/neorepl.nvim",
 		lazy = true,
@@ -65,6 +34,7 @@ return {
 			},
 		},
 	},
+	{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true, event = "BufReadPost" },
 	{
 		"neovim/nvim-lspconfig",
 		event = "BufReadPre",
@@ -97,7 +67,7 @@ return {
 					definition = { split = "<C-c>s" },
 					beacon = { enable = false },
 					outline = {
-						win_width = math.floor(vim.o.columns * 0.2),
+						win_width = math.floor(vim.o.columns * 0.1),
 						with_position = "left",
 						keys = { jump = "<CR>" },
 					},

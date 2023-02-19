@@ -31,13 +31,7 @@ return function(options)
 					special = { reload = "require" },
 				},
 				workspace = {
-					library = {
-						vim.env.VIMRUNTIME,
-						vim.fn.stdpath "config" .. "/lua/zox",
-						vim.fn.expand "$VIMRUNTIME/lua",
-						require("neodev.config").types(),
-						vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
-					},
+					library = { vim.env.VIMRUNTIME, require("neodev.config").types() },
 					checkThirdParty = false,
 					maxPreload = 100000,
 					preloadFileSize = 10000,

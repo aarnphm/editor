@@ -1,5 +1,3 @@
-pcall(require, "impatient")
-
 require "zox.globals"
 
 require "user.options"
@@ -23,6 +21,7 @@ vim.opt.runtimepath:prepend(lazypath)
 require("lazy").setup("plugins", {
 	install = { colorscheme = { "rose-pine" } },
 	change_detection = { notify = false },
+	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 	checker = { enable = true },
 	performance = {
 		rtp = {
@@ -48,6 +47,8 @@ require("lazy").setup("plugins", {
 				"vimballPlugin",
 				"zip",
 				"zipPlugin",
+				"rplugin",
+				"editorconfig",
 			},
 		},
 	},

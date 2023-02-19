@@ -2,7 +2,7 @@ return {
 	{
 		"nathom/filetype.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = { "CursorHoldI", "CursorHold" },
 		opts = {
 			overrides = {
 				extension = {
@@ -23,6 +23,10 @@ return {
 			},
 		},
 	},
+	{ "kevinhwang91/nvim-bqf", lazy = true, ft = "qf", config = true },
+	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
+	{ "asiryk/auto-hlsearch.nvim", branch = "main", event = "BufReadPost", lazy = true },
+	{ "stevearc/dressing.nvim", event = "BufReadPost", opts = { input = { insert_only = false } } },
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
 		lazy = false,
@@ -38,21 +42,14 @@ return {
 			},
 		},
 	},
-	{ "stevearc/dressing.nvim", event = "BufReadPost", opts = { input = { insert_only = false } } },
 	{
 		"folke/noice.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = { "CursorHoldI", "CursorHold" },
 		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
 		opts = {
 			lsp = {
-				progress = {
-					format = {
-						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
-						{ "{data.progress.title} ", hl_group = "NoiceLspProgressTitle" },
-						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
-					},
-				},
+				progress = { format = "lsp_progress" },
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
@@ -86,13 +83,13 @@ return {
 		"folke/todo-comments.nvim",
 		lazy = true,
 		cmd = { "TodoTrouble", "TodoTelescope" },
-		event = "BufReadPost",
-		opts = {},
+		event = { "CursorHoldI", "CursorHold" },
+		config = true,
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = { "CursorHoldI", "CursorHold" },
 		opts = {
 			show_first_indent_level = true,
 			buftype_exclude = { "terminal", "nofile" },
@@ -197,17 +194,6 @@ return {
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
 		event = "BufReadPost",
-		keys = {
-			{ "gt", "<cmd>TroubleToggle<cr>", desc = "lsp: Toggle trouble list" },
-			{ "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: Show lsp references" },
-		},
-		config = true,
-	},
-	-- Nice diagnostics in virtual text
-	{
-		url = "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-		enabled = false,
-		event = "BufReadPost",
 		config = true,
 	},
 	{
@@ -218,32 +204,6 @@ return {
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
-			{
-				"andymass/vim-matchup",
-				event = "BufReadPost",
-				config = function()
-					vim.g.matchup_matchparen_offscreen = { method = "status_manual" }
-				end,
-			},
-			{
-				"NvChad/nvim-colorizer.lua",
-				opts = {
-					filetypes = { "*", "!lazy" },
-					buftype = { "*", "!prompt", "!nofile" },
-					user_default_options = {
-						RGB = true, -- #RGB hex codes
-						RRGGBB = true, -- #RRGGBB hex codes
-						names = false, -- "Name" codes like Blue
-						RRGGBBAA = true, -- #RRGGBBAA hex codes
-						AARRGGBB = false, -- 0xAARRGGBB hex codes
-						rgb_fn = true, -- CSS rgb() and rgba() functions
-						hsl_fn = true, -- CSS hsl() and hsla() functions
-						css = false, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-						css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-						mode = "background", -- `mode`: foreground, background,  virtualtext
-					},
-				},
-			},
 		},
 		keys = { { "<LocalLeader>Ts", vim.treesitter.show_tree, desc = "treesitter: show tree" } },
 		opts = {
@@ -630,7 +590,7 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = { "CursorHoldI", "CursorHold" },
 		config = function()
 			local _cache = { context = "", bufnr = -1 }
 			local lspsaga_symbols = function()
