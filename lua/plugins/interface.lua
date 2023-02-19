@@ -23,10 +23,9 @@ return {
 			},
 		},
 	},
-	{ "kevinhwang91/nvim-bqf", lazy = true, ft = "qf", config = true },
 	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
-	{ "asiryk/auto-hlsearch.nvim", branch = "main", event = "BufReadPost", lazy = true },
-	{ "stevearc/dressing.nvim", event = "BufReadPost", opts = { input = { insert_only = false } } },
+	{ "asiryk/auto-hlsearch.nvim", branch = "main", event = "VeryLazy", lazy = true },
+	{ "stevearc/dressing.nvim", event = "VeryLazy", opts = { input = { insert_only = false } } },
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
 		lazy = false,
@@ -45,11 +44,17 @@ return {
 	{
 		"folke/noice.nvim",
 		lazy = true,
-		event = { "CursorHoldI", "CursorHold" },
+		event = "VeryLazy",
 		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
 		opts = {
 			lsp = {
-				progress = { format = "lsp_progress" },
+				progress = {
+					format = {
+						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
+						-- { "{data.progress.title} ", hl_group = "NoiceLspProgressTitle" },
+						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
+					},
+				},
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
@@ -58,7 +63,6 @@ return {
 			},
 			presets = { command_palette = true, lsp_doc_border = true },
 			routes = {
-				{ view = "mini", filter = { event = "msg_showmode" } },
 				{
 					filter = { event = "msg_show", kind = "", find = "written" },
 					opts = { skip = true },
@@ -73,7 +77,7 @@ return {
 	{
 		"zbirenbaum/neodim",
 		lazy = true,
-		event = "LspAttach",
+		event = "VeryLazy",
 		opts = {
 			blend_color = require("zox.utils").hl_to_rgb("Normal", true),
 			update_in_insert = { delay = 100 },
@@ -196,6 +200,7 @@ return {
 		event = "BufReadPost",
 		config = true,
 	},
+	{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true, event = "BufReadPost" },
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
@@ -590,7 +595,7 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		lazy = true,
-		event = { "CursorHoldI", "CursorHold" },
+		event = "BufReadPost",
 		config = function()
 			local _cache = { context = "", bufnr = -1 }
 			local lspsaga_symbols = function()
@@ -719,10 +724,14 @@ return {
 			}
 
 			-- Properly set background color for lspsaga
-			for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind()) do
-				require("zox.utils").extend_hl("LspSagaWinbar" .. hlGroup[1])
+			local winbar_bg = require("zox.utils").hl_to_rgb(
+				"StatusLine",
+				true,
+				require("rose-pine.palette").base
+			)
+			for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind_group()) do
+				require("zox.utils").extend_hl(hlGroup, { bg = winbar_bg })
 			end
-			require("zox.utils").extend_hl "LspSagaWinbarSep"
 		end,
 	},
 }

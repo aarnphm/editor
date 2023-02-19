@@ -9,6 +9,7 @@ return function(options)
 				"telescope.nvim",
 				"lazy",
 				"lspsaga.nvim",
+				"rose-pine",
 			},
 		},
 	}

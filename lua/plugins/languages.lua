@@ -34,7 +34,6 @@ return {
 			},
 		},
 	},
-	{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true, event = "BufReadPost" },
 	{
 		"neovim/nvim-lspconfig",
 		event = "BufReadPre",
@@ -164,8 +163,6 @@ return {
 					d.markdownlint.with { extra_args = { "--disable MD033" } },
 					d.zsh,
 					d.buf,
-					d.protolint,
-					d.pydocstyle,
 					d.buildifier,
 					d.yamllint,
 					d.vulture.with { extra_args = { "--min-confidence 70" } },
@@ -375,12 +372,11 @@ return {
 									hgcommit = false,
 									svn = false,
 									cvs = false,
-									["octo"] = false,
-									["TelescopePrompt"] = false,
 									["dap-repl"] = false,
-									["big_file_disabled_ft"] = false,
-									["neogitCommitMessage"] = false,
-									["gitcommit"] = false,
+									octo = false,
+									TelescopePrompt = false,
+									big_file_disabled_ft = false,
+									neogitCommitMessage = false,
 								},
 							}
 						end,
@@ -428,7 +424,9 @@ return {
 
 			local check_backspace = function()
 				local col = vim.fn.col "." - 1
-				return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
+				---@diagnostic disable-next-line: param-type-mismatch
+				local current_line = vim.fn.getline "."
+				return col == 0 or current_line:sub(col, col):match "%s"
 			end
 
 			cmp.setup {

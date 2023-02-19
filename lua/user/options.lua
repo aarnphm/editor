@@ -31,7 +31,7 @@ vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
-vim.o.statusline = "%f %m %= %=%y %P %l:%c ♥ "
+-- vim.o.statusline = "%f %m %= %=%y %P %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"

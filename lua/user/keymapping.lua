@@ -43,15 +43,13 @@ k.nvim_register_mapping {
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
 	-- lsp
-	["n|co"] = k.cr("Lspsaga outline"):with_defaults "lsp: Toggle outline",
-	["n|ch"] = k.callback(vim.show_pos):with_defaults "lsp: Show hightlight",
-	["n|c["] = k.callback(vim.diagnostic.goto_prev):with_defaults "lsp: Prev diagnostic",
-	["n|c]"] = k.callback(vim.diagnostic.goto_next):with_defaults "lsp: Next diagnostic",
-	["n|cr"] = k.callback(vim.lsp.buf.rename):with_defaults "lsp: Rename in file range",
-	["n|cd"] = k.cr("Glance definitions"):with_defaults "lsp: Type definition",
 	["n|K"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
+	["n|gh"] = k.callback(vim.show_pos):with_defaults "lsp: Show hightlight",
+	["n|g["] = k.callback(vim.diagnostic.goto_prev):with_defaults "lsp: Prev diagnostic",
+	["n|g]"] = k.callback(vim.diagnostic.goto_next):with_defaults "lsp: Next diagnostic",
+	["n|gr"] = k.callback(vim.lsp.buf.rename):with_defaults "lsp: Rename in file range",
+	["n|gd"] = k.cr("Glance definitions"):with_defaults "lsp: Type definition",
 	["n|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for cursor",
 	["v|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for range",
-	["n|ce"] = k.callback(vim.diagnostic.open_float):with_defaults "lsp: Open current diagnostic",
 	["n|gR"] = k.cr("TroubleToggle lsp_references"):with_defaults "lsp: Show references",
 }

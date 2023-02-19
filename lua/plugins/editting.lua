@@ -2,7 +2,7 @@ return {
 	{ "nvim-lua/plenary.nvim" },
 	{ "jghauser/mkdir.nvim" },
 	{ "ojroques/nvim-bufdel", cmd = { "BufDel" } },
-	{ "nacro90/numb.nvim", config = true },
+	{ "nacro90/numb.nvim", event = "VeryLazy", config = true },
 	{ "tpope/vim-repeat", event = "VeryLazy" },
 	{
 		"nmac427/guess-indent.nvim",
@@ -36,31 +36,23 @@ return {
 		config = function() require("mini.surround").setup() end,
 	},
 	{
-		"echasnovski/mini.ai",
-		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		config = function() require("mini.ai").setup() end,
-	},
-	{
 		"folke/which-key.nvim",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = "VeryLazy",
 		opts = {
+			window = {
+				border = "single",
+			},
 			plugins = {
-				presets = {
-					operators = false,
-					motions = false,
-					text_objects = false,
-					windows = false,
-					nav = false,
-					z = false,
-					g = false,
+				spelling = {
+					enabled = true,
 				},
 			},
 		},
 	},
 	{
 		"windwp/nvim-autopairs",
+		lazy = true,
 		event = "InsertEnter",
 		opts = {
 			check_ts = true,
@@ -81,35 +73,36 @@ return {
 		lazy = true,
 		branch = "v2",
 		event = { "CursorHold", "CursorHoldI" },
+		cmd = { "HopWord", "HopLine", "HopChar1", "HopChar2" },
 		config = true,
 		keys = {
 			{
 				"<LocalLeader>w",
-				"<cmd><C-u>HopWord<CR>",
+				"<cmd>HopWord<CR>",
 				"jump: Goto word",
 				noremap = true,
 			},
 			{
 				"<LocalLeader>j",
-				"<cmd><C-u>HopLine<CR>",
+				"<cmd>HopLine<CR>",
 				"jump: Goto line",
 				noremap = true,
 			},
 			{
 				"<LocalLeader>k",
-				"<cmd><C-u>HopLine<CR>",
+				"<cmd>HopLine<CR>",
 				"jump: Goto line",
 				noremap = true,
 			},
 			{
 				"<LocalLeader>c",
-				"<cmd><C-u>HopChar1<CR>",
+				"<cmd>HopChar1<CR>",
 				"jump: one char",
 				noremap = true,
 			},
 			{
 				"<LocalLeader>cc",
-				"<cmd><C-u>HopChar2<CR>",
+				"<cmd>HopChar2<CR>",
 				"jump: one char",
 				noremap = true,
 			},
