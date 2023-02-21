@@ -1,11 +1,5 @@
 local api = vim.api
 
--- Show diagnostic float on hover.
-vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-	pattern = "*",
-	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
-})
-
 -- open telescope for no name buffer
 api.nvim_create_autocmd({ "VimEnter" }, {
 	callback = function(event)

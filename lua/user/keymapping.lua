@@ -49,7 +49,9 @@ k.nvim_register_mapping {
 	["n|g]"] = k.callback(vim.diagnostic.goto_next):with_defaults "lsp: Next diagnostic",
 	["n|gr"] = k.callback(vim.lsp.buf.rename):with_defaults "lsp: Rename in file range",
 	["n|gd"] = k.cr("Glance definitions"):with_defaults "lsp: Type definition",
+	["n|gD"] = k.cr("Lspsaga goto_definition"):with_defaults "lsp: Type definition",
 	["n|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for cursor",
 	["v|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for range",
+	["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Show outline",
 	["n|gR"] = k.cr("TroubleToggle lsp_references"):with_defaults "lsp: Show references",
 }

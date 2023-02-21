@@ -78,10 +78,7 @@ return {
 		"zbirenbaum/neodim",
 		lazy = true,
 		event = "VeryLazy",
-		opts = {
-			blend_color = require("zox.utils").hl_to_rgb("Normal", true),
-			update_in_insert = { delay = 100 },
-		},
+		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
 	},
 	{
 		"folke/todo-comments.nvim",
@@ -640,6 +637,11 @@ return {
 
 			local get_cwd = function()
 				local cwd = vim.fn.getcwd()
+				local bentoml_git_root = os.getenv "BENTOML_GIT_ROOT"
+				if bentoml_git_root and cwd:find(bentoml_git_root, 1, true) == 1 then
+					return require("zox").misc_space.BentoBox .. cwd:sub(#bentoml_git_root + 2)
+				end
+
 				if vim.loop.os_uname().sysname ~= "Windows_NT" then
 					local home = os.getenv "HOME"
 					if home and cwd:find(home, 1, true) == 1 then

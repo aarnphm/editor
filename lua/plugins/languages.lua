@@ -41,16 +41,6 @@ return {
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "williamboman/mason.nvim", cmd = "Mason" },
 			{
-				"simrat39/inlay-hints.nvim",
-				lazy = true,
-				opts = {
-					parameter = { show = true },
-					renderer = "inlay-hints.render.eol",
-					only_current_line = true,
-					eol = { parameter = { separator = "," } },
-				},
-			},
-			{
 				"jose-elias-alvarez/null-ls.nvim",
 				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
 			},
@@ -66,7 +56,8 @@ return {
 					definition = { split = "<C-c>s" },
 					beacon = { enable = false },
 					outline = {
-						win_width = math.floor(vim.o.columns * 0.1),
+						auto_preview = false,
+						win_width = math.floor(vim.o.columns * 0.2),
 						with_position = "left",
 						keys = { jump = "<CR>" },
 					},
@@ -79,6 +70,17 @@ return {
 					},
 					callhierarchy = { show_detail = true },
 				},
+				config = function(_, opts)
+					require("lspsaga").setup(opts)
+
+					-- Show diagnostic float on hover.
+					vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+						pattern = "*",
+						callback = function()
+							require("lspsaga.diagnostic"):show_diagnostics(nil, "cursor")
+						end,
+					})
+				end,
 			},
 		},
 		config = function()
@@ -156,7 +158,6 @@ return {
 					-- NOTE: diagnostics
 					d.clang_check,
 					d.eslint_d,
-					d.ruff,
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
 					d.golangci_lint,
@@ -198,7 +199,6 @@ return {
 			if ok then capabilities = cmp_nvim_lsp.default_capabilities(capabilities) end
 			capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-			local ih = require "inlay-hints"
 			local on_attach_factory = function(use_server_formatting_provider)
 				return function(client, bufnr)
 					--- NOTE: Avoid LSP formatting, since it will be handled by null-ls
@@ -221,26 +221,11 @@ return {
 			}
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
-			--- Supports inlay-hints with `ih.on_attach`
-			---@overload fun(lsp_name: string, enable_inlay_hints?: boolean): fun():nil
+			---@overload fun(lsp_name: string, use_server_formatting_provider?: boolean): fun():nil
 			---@overload fun(lsp_name: string): fun():nil
-			local mason_handler = function(
-				lsp_name,
-				enable_inlay_hints,
-				use_server_formatting_provider
-			)
+			local mason_handler = function(lsp_name, use_server_formatting_provider)
 				use_server_formatting_provider = use_server_formatting_provider or false
-				if use_server_formatting_provider then
-					options.on_attach = on_attach_factory(true)
-				end
-
-				enable_inlay_hints = enable_inlay_hints or false
-				if enable_inlay_hints then
-					options.on_attach = function(client, bufnr)
-						ih.on_attach(client, bufnr)
-						on_attach_factory(false)(client, bufnr)
-					end
-				end
+				options.on_attach = on_attach_factory(use_server_formatting_provider)
 
 				return function()
 					---@param path string path to given directory containing lua files.
@@ -303,10 +288,6 @@ return {
 						)
 					end
 				end,
-				gopls = mason_handler("gopls", true),
-				lua_ls = mason_handler("lua_ls", true),
-				tsserver = mason_handler("tsserver", true),
-				marksman = mason_handler("marksman", false, false),
 			}
 
 			mason_handler "starlark_rust"
