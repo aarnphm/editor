@@ -57,7 +57,7 @@ return {
 					beacon = { enable = false },
 					outline = {
 						auto_preview = false,
-						win_width = math.floor(vim.o.columns * 0.2),
+						win_width = math.floor(vim.o.columns * 0.24),
 						with_position = "left",
 						keys = { jump = "<CR>" },
 					},
@@ -134,7 +134,7 @@ return {
 					-- NOTE: formatting
 					f.prettierd.with {
 						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
-						extra_filetypes = { "jsonc", "astro", "svelte" },
+						extra_filetypes = { "jsonc", "astro", "svelte", "yaml" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.clang_format,

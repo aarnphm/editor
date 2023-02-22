@@ -24,8 +24,6 @@ return {
 		},
 	},
 	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
-	{ "asiryk/auto-hlsearch.nvim", branch = "main", event = "VeryLazy", lazy = true },
-	{ "stevearc/dressing.nvim", event = "VeryLazy", opts = { input = { insert_only = false } } },
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
 		lazy = false,
@@ -44,14 +42,13 @@ return {
 	{
 		"folke/noice.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = "BufReadPost",
 		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
 		opts = {
 			lsp = {
 				progress = {
 					format = {
 						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
-						-- { "{data.progress.title} ", hl_group = "NoiceLspProgressTitle" },
 						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
 					},
 				},
@@ -264,14 +261,7 @@ return {
 				},
 			},
 		},
-		config = function(_, opts)
-			require("nvim-treesitter.configs").setup(opts)
-			-- Use treesitter markdown parser for Octo buffer
-			local ok, _ = pcall(require, "octo")
-			if ok then
-				require("nvim-treesitter.parsers").filetype_to_parsername.octo = "markdown"
-			end
-		end,
+		config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
 	},
 	{
 		"nvim-tree/nvim-web-devicons",
@@ -295,7 +285,6 @@ return {
 		cmd = "Telescope",
 		dependencies = {
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
-			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			{
 				"ahmedkhalf/project.nvim",
 				lazy = true,
@@ -424,7 +413,7 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "fzf", "noice", "live_grep_args", "projects" } do
+			for _, v in ipairs { "noice", "live_grep_args", "projects" } do
 				require("telescope").load_extension(v)
 			end
 		end,
@@ -537,6 +526,7 @@ return {
 			end,
 			open_mapping = "<C-t>", -- default mapping
 			shade_terminals = false,
+			direction = "vertical",
 		},
 	},
 	--- NOTE: bufferline

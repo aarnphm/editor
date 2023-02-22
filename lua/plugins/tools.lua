@@ -89,8 +89,13 @@ return {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope.nvim",
 			"nvim-tree/nvim-web-devicons",
+			"nvim-treesitter/nvim-treesitter",
 		},
-		config = true,
+		config = function()
+			require("octo").setup()
+			-- Use treesitter markdown parser for Octo buffer
+			require("nvim-treesitter.parsers").filetype_to_parsername.octo = "markdown"
+		end,
 		keys = function()
 			local k = require "zox.keybind"
 			return k.to_lazy_mapping {
