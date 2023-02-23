@@ -2,7 +2,6 @@ return {
 	{ "nvim-lua/plenary.nvim" },
 	{ "jghauser/mkdir.nvim" },
 	{ "ojroques/nvim-bufdel", cmd = { "BufDel" } },
-	{ "nacro90/numb.nvim", event = "VeryLazy", config = true },
 	{ "tpope/vim-repeat", event = "VeryLazy" },
 	{
 		"nmac427/guess-indent.nvim",
@@ -18,15 +17,14 @@ return {
 	{
 		"numToStr/Comment.nvim",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		keys = { "gc", "gb" },
+		event = "BufReadPost",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		config = true,
 	},
 	{
 		"echasnovski/mini.align",
 		lazy = true,
-		event = "BufReadPre",
+		event = "VeryLazy",
 		config = function() require("mini.align").setup() end,
 	},
 	{

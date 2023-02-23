@@ -1,5 +1,60 @@
 return {
 	{
+		"goolord/alpha-nvim",
+		lazy = true,
+		event = "BufWinEnter",
+		cond = function() return #vim.api.nvim_list_uis() > 0 end,
+		config = function()
+			local dashboard = require "alpha.themes.dashboard"
+			dashboard.section.buttons.opts.hl = "String"
+			dashboard.section.buttons.val = {}
+			local gen_footer = function()
+				return require("zox").misc_space.BentoBox
+					.. "github.com/aarnphm"
+					.. "   v"
+					.. vim.version().major
+					.. "."
+					.. vim.version().minor
+					.. "."
+					.. vim.version().patch
+					.. "   "
+					.. require("lazy").stats().count
+					.. " plugins"
+			end
+
+			dashboard.section.footer.opts.hl = "Function"
+			dashboard.section.footer.val = gen_footer()
+
+			local top_button_pad = 2
+			local footer_button_pad = 1
+			local heights = #dashboard.section.header.val
+				+ 2 * #dashboard.section.buttons.val
+				+ top_button_pad
+
+			dashboard.config.layout = {
+				{
+					type = "padding",
+					val = math.max(0, math.ceil((vim.fn.winheight(0) - heights) * 0.12)),
+				},
+				dashboard.section.header,
+				{ type = "padding", val = top_button_pad },
+				dashboard.section.buttons,
+				{ type = "padding", val = footer_button_pad },
+				dashboard.section.footer,
+			}
+
+			require("alpha").setup(dashboard.config)
+
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "LazyVimStarted",
+				callback = function()
+					dashboard.section.footer.val = gen_footer()
+					pcall(vim.cmd.AlphaRedraw)
+				end,
+			})
+		end,
+	},
+	{
 		"nathom/filetype.nvim",
 		lazy = true,
 		event = { "CursorHoldI", "CursorHold" },
@@ -24,6 +79,7 @@ return {
 		},
 	},
 	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
+	{ "stevearc/dressing.nvim", event = "VeryLazy", opts = { input = { insert_only = false } } },
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
 		lazy = false,
@@ -40,54 +96,57 @@ return {
 		},
 	},
 	{
+		"j-hui/fidget.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		opts = {
+			window = { blend = 0 },
+			text = { spinner = "dots_hop" },
+			sources = {
+				["null-ls"] = { ignore = true },
+			},
+		},
+	},
+	{
 		"folke/noice.nvim",
 		lazy = true,
 		event = "BufReadPost",
-		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+		dependencies = {
+			{ "MunifTanjim/nui.nvim", lazy = true },
+			{ "nvim-telescope/telescope.nvim" },
+		},
 		opts = {
-			lsp = {
-				progress = {
-					format = {
-						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
-						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
-					},
-				},
-				override = {
-					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true,
-				},
-			},
-			presets = { command_palette = true, lsp_doc_border = true },
+			lsp = { progress = { enabled = false } },
+			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
 			routes = {
 				{
 					filter = { event = "msg_show", kind = "", find = "written" },
 					opts = { skip = true },
 				},
-				{
-					filter = { event = "msg_show", kind = "search_count" },
-					opts = { skip = true },
-				},
 			},
 		},
+		config = function(_, opts)
+			require("noice").setup(opts)
+			require("telescope").load_extension "noice"
+		end,
 	},
 	{
 		"zbirenbaum/neodim",
 		lazy = true,
-		event = "VeryLazy",
+		event = "BufReadPost",
 		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
 	},
 	{
 		"folke/todo-comments.nvim",
 		lazy = true,
 		cmd = { "TodoTrouble", "TodoTelescope" },
-		event = { "CursorHoldI", "CursorHold" },
+		event = "LspAttach",
 		config = true,
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
-		event = { "CursorHoldI", "CursorHold" },
+		event = "BufReadPost",
 		opts = {
 			show_first_indent_level = true,
 			buftype_exclude = { "terminal", "nofile" },
@@ -283,22 +342,7 @@ return {
 		lazy = true,
 		event = "BufReadPost",
 		cmd = "Telescope",
-		dependencies = {
-			{ "nvim-telescope/telescope-live-grep-args.nvim" },
-			{
-				"ahmedkhalf/project.nvim",
-				lazy = true,
-				event = "BufReadPost",
-				opts = {
-					ignore_lsp = { "null-ls", "copilot" },
-					show_hidden = true,
-					silent_chdir = true,
-					scope_chdir = "win",
-				},
-				config = function(_, opts) require("project_nvim").setup(opts) end,
-			},
-			{ "folke/noice.nvim" },
-		},
+		dependencies = { { "nvim-telescope/telescope-live-grep-args.nvim" } },
 		keys = {
 			{
 				"<leader>f",
@@ -332,13 +376,6 @@ return {
 				"<leader>n",
 				"<C-u>enew<CR>",
 				desc = "buffer: New",
-			},
-			{
-				"<leader>\\",
-				function()
-					require("telescope").extensions.projects.projects { promp_title = "Projects" }
-				end,
-				desc = "find: Projects",
 			},
 			{
 				"<C-p>",
@@ -413,9 +450,7 @@ return {
 					},
 				},
 			}
-			for _, v in ipairs { "noice", "live_grep_args", "projects" } do
-				require("telescope").load_extension(v)
-			end
+			require("telescope").load_extension "live_grep_args"
 		end,
 	},
 	{
@@ -436,10 +471,11 @@ return {
 			},
 		},
 		opts = {
+			disable_netrw = true,
 			actions = { open_file = { quit_on_open = true } },
 			reload_on_bufenter = true,
 			sync_root_with_cwd = true,
-			update_focused_file = { enable = true, update_root = true },
+			update_focused_file = { enable = true, update_root = false },
 			git = { ignore = false },
 			filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 			renderer = {
@@ -448,7 +484,32 @@ return {
 				indent_markers = { enable = true },
 				root_folder_label = ":.:s?.*?/..?",
 				root_folder_modifier = ":e",
-				icons = { symlink_arrow = "  " },
+				icons = {
+					padding = " ",
+					symlink_arrow = "  ",
+					glyphs = {
+						default = require("zox").documents.Default, --
+						symlink = require("zox").documents.Symlink, --
+						bookmark = require("zox").ui.Bookmark,
+						git = {
+							unstaged = require("zox").git.Mod_alt,
+							staged = require("zox").git.Add, --
+							unmerged = require("zox").git.Unmerged,
+							renamed = require("zox").git.Rename, --
+							untracked = require("zox").git.Untracked, -- "ﲉ"
+							deleted = require("zox").git.Remove, --
+							ignored = require("zox").git.Ignore, --◌
+						},
+						folder = {
+							default = require("zox").ui.Folder,
+							open = require("zox").ui.FolderOpen,
+							empty = require("zox").ui.EmptyFolder,
+							empty_open = require("zox").ui.EmptyFolderOpen,
+							symlink = require("zox").ui.SymlinkFolder,
+							symlink_open = require("zox").ui.FolderOpen,
+						},
+					},
+				},
 			},
 			trash = {
 				cmd = require("zox.utils").get_binary_path "rip",
@@ -460,10 +521,40 @@ return {
 	{
 		"nvim-pack/nvim-spectre",
 		lazy = true,
-		build = "./build.sh nvim_oxi",
-		module = "spectre",
-		event = { "CursorHold", "CursorHoldI" },
-		keys = function()
+		event = "BufReadPost",
+		config = function()
+			require("spectre").setup {
+				live_update = true,
+				mapping = {
+					["change_replace_sed"] = {
+						map = "<LocalLeader>trs",
+						cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
+						desc = "replace: Using sed",
+					},
+					["change_replace_oxi"] = {
+						map = "<LocalLeader>tro",
+						cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
+						desc = "replace: Using oxi",
+					},
+					["toggle_live_update"] = {
+						map = "<LocalLeader>tu",
+						cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
+						desc = "replace: update live changes",
+					},
+					-- only work if the find_engine following have that option
+					["toggle_ignore_case"] = {
+						map = "<LocalLeader>ti",
+						cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
+						desc = "replace: toggle ignore case",
+					},
+					["toggle_ignore_hidden"] = {
+						map = "<LocalLeader>th",
+						cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
+						desc = "replace: toggle search hidden",
+					},
+				},
+			}
+
 			local k = require "zox.keybind"
 
 			return k.to_lazy_mapping {
@@ -478,37 +569,6 @@ return {
 					:with_defaults "replace: Replace word under file search",
 			}
 		end,
-		opts = {
-			live_update = true,
-			mapping = {
-				["change_replace_sed"] = {
-					map = "<LocalLeader>trs",
-					cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
-					desc = "replace: Using sed",
-				},
-				["change_replace_oxi"] = {
-					map = "<LocalLeader>tro",
-					cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
-					desc = "replace: Using oxi",
-				},
-				["toggle_live_update"] = {
-					map = "<LocalLeader>tu",
-					cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
-					desc = "replace: update live changes",
-				},
-				-- only work if the find_engine following have that option
-				["toggle_ignore_case"] = {
-					map = "<LocalLeader>ti",
-					cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
-					desc = "replace: toggle ignore case",
-				},
-				["toggle_ignore_hidden"] = {
-					map = "<LocalLeader>th",
-					cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
-					desc = "replace: toggle search hidden",
-				},
-			},
-		},
 	},
 	{
 		"akinsho/toggleterm.nvim",

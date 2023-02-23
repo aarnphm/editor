@@ -87,9 +87,34 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "BufRead", "BufNewFile" }, {
 	command = "setlocal formatoptions-=cro",
 })
 
+-- Check if we need to reload the file when it changed
+api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+	pattern = "*",
+	command = "checktime",
+})
 vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
 
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
+-- source vimrc on save
+api.nvim_create_autocmd("BufWritePost", {
+	group = bufs_id,
+	pattern = "$VIM_PATH/{*.vim,*.yaml,vimrc}",
+	command = "source $MYVIMRC | redraw",
+	nested = true,
+})
+-- Reload Vim script automatically if setlocal autoread
+api.nvim_create_autocmd({ "BufWritePost", "FileWritePost" }, {
+	group = bufs_id,
+	pattern = "*.vim",
+	command = "if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif",
+	nested = true,
+})
+-- Set noundofile for temporary files
+api.nvim_create_autocmd("BufWritePre", {
+	group = bufs_id,
+	pattern = { "/tmp/*", "*.tmp", "*.bak" },
+	command = "setlocal noundofile",
+})
 -- set filetype for header files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 	group = bufs_id,

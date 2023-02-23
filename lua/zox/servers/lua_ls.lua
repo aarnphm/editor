@@ -10,6 +10,7 @@ return function(options)
 				"lazy",
 				"lspsaga.nvim",
 				"rose-pine",
+				"noice.nvim",
 			},
 		},
 	}

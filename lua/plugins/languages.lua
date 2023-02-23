@@ -165,7 +165,6 @@ return {
 					d.zsh,
 					d.buf,
 					d.buildifier,
-					d.yamllint,
 					d.vulture.with { extra_args = { "--min-confidence 70" } },
 					d.vint,
 
@@ -297,6 +296,7 @@ return {
 	-- Setup completions.
 	{
 		"hrsh7th/nvim-cmp",
+		lazy = true,
 		event = "InsertEnter",
 		dependencies = {
 			{
