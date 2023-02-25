@@ -42,6 +42,7 @@ k.nvim_register_mapping {
 	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
+	["n|<Leader>p"] = k.cr("Lazy"):with_nowait():with_desc "package: Show",
 	-- lsp
 	["n|K"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
 	["n|gh"] = k.callback(vim.show_pos):with_defaults "lsp: Show hightlight",
@@ -54,4 +55,45 @@ k.nvim_register_mapping {
 	["v|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for range",
 	["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Show outline",
 	["n|gR"] = k.cr("TroubleToggle lsp_references"):with_defaults "lsp: Show references",
+	-- nvim-tree
+	["n|<C-n>"] = k.cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
+	-- telescope
+	["n|<Leader>f"] = k.callback(
+		function()
+			require("telescope.builtin").find_files {
+				find_command = { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" },
+				theme = "dropdown",
+				previewer = false,
+				hidden = true,
+			}
+		end
+	):with_defaults "find: file in current directory",
+	["n|<Leader>r"] = k.callback(
+		function()
+			require("telescope.builtin").git_files {
+
+				find_command = { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" },
+				theme = "dropdown",
+				previewer = false,
+				hidden = true,
+			}
+		end
+	):with_defaults "find: files in git repository",
+	["n|<Leader>w"] = k.callback(
+		function() require("telescope").extensions.live_grep_args.live_grep_args() end
+	):with_defaults "find: live grep args",
+	["n|<Leader>/"] = k.cr("Telescope grep_string"):with_defaults "find: Current word under cursor.",
+	["n|<Leader>b"] = k.cr("Telescope buffers previewer=false")
+		:with_defaults "find: Current buffers",
+	["n|<Leader>n"] = k.cr("enew"):with_defaults "buffer: new",
+	["n|<C-p>"] = k.callback(function()
+		require("telescope.builtin").keymaps {
+			lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+			layout_config = {
+				width = 0.6,
+				height = 0.6,
+				prompt_position = "top",
+			},
+		}
+	end):with_defaults "tools: Show keymap legends",
 }

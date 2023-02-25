@@ -101,10 +101,7 @@ return {
 		event = "BufReadPost",
 		opts = {
 			window = { blend = 0 },
-			text = { spinner = "dots_hop" },
-			sources = {
-				["null-ls"] = { ignore = true },
-			},
+			text = { spinner = "dots_snake" },
 		},
 	},
 	{
@@ -113,7 +110,6 @@ return {
 		event = "BufReadPost",
 		dependencies = {
 			{ "MunifTanjim/nui.nvim", lazy = true },
-			{ "nvim-telescope/telescope.nvim" },
 		},
 		opts = {
 			lsp = { progress = { enabled = false } },
@@ -125,10 +121,6 @@ return {
 				},
 			},
 		},
-		config = function(_, opts)
-			require("noice").setup(opts)
-			require("telescope").load_extension "noice"
-		end,
 	},
 	{
 		"zbirenbaum/neodim",
@@ -257,142 +249,76 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		event = "BufReadPost",
+		event = "VeryLazy",
 		lazy = true,
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
 		},
-		keys = { { "<LocalLeader>Ts", vim.treesitter.show_tree, desc = "treesitter: show tree" } },
-		opts = {
-			ensure_installed = "all",
-			ignore_install = { "phpdoc", "gitcommit" },
-			indent = { enable = false },
-			highlight = { enable = true },
-			context_commentstring = { enable = true, enable_autocmd = false },
-			matchup = { enable = true },
-			textobjects = {
-				select = {
-					enable = true,
-					lookahead = true,
-					keymaps = {
-						["af"] = "@function.outer",
-						["if"] = "@function.inner",
-						["ac"] = "@conditional.outer",
-						["ic"] = "@conditional.inner",
-						["aa"] = "@parameter.outer",
-						["ia"] = "@parameter.inner",
-						["aS"] = "@statement.outer",
-						["aC"] = "@class.outer",
-						["iC"] = "@class.inner",
-						["al"] = "@loop.outer",
-						["il"] = "@loop.inner",
+		config = function()
+			require("nvim-treesitter.configs").setup {
+				ensure_installed = "all",
+				ignore_install = { "phpdoc", "gitcommit" },
+				indent = { enable = false },
+				highlight = { enable = true },
+				context_commentstring = { enable = true, enable_autocmd = false },
+				matchup = { enable = true },
+				textobjects = {
+					select = {
+						enable = true,
+						lookahead = true,
+						keymaps = {
+							["af"] = "@function.outer",
+							["if"] = "@function.inner",
+							["ac"] = "@conditional.outer",
+							["ic"] = "@conditional.inner",
+							["aa"] = "@parameter.outer",
+							["ia"] = "@parameter.inner",
+							["aS"] = "@statement.outer",
+							["aC"] = "@class.outer",
+							["iC"] = "@class.inner",
+							["al"] = "@loop.outer",
+							["il"] = "@loop.inner",
+						},
+					},
+					swap = {
+						enable = true,
+						swap_next = {
+							["<leader>Pa"] = "@parameter.inner",
+						},
+						swap_previous = {
+							["<leader>PA"] = "@parameter.inner",
+						},
+					},
+					move = {
+						enable = true,
+						set_jumps = true,
+						goto_next_start = {
+							["]]"] = "@function.outer",
+							["]c"] = "@class.outer",
+						},
+						goto_next_end = {
+							["]["] = "@function.outer",
+							["]C"] = "@class.outer",
+						},
+						goto_previous_start = {
+							["[["] = "@function.outer",
+							["[c"] = "@class.outer",
+						},
+						goto_previous_end = {
+							["[]"] = "@function.outer",
+							["[C"] = "@class.outer",
+						},
 					},
 				},
-				swap = {
-					enable = true,
-					swap_next = {
-						["<leader>Pa"] = "@parameter.inner",
-					},
-					swap_previous = {
-						["<leader>PA"] = "@parameter.inner",
-					},
-				},
-				move = {
-					enable = true,
-					set_jumps = true,
-					goto_next_start = {
-						["]]"] = "@function.outer",
-						["]c"] = "@class.outer",
-					},
-					goto_next_end = {
-						["]["] = "@function.outer",
-						["]C"] = "@class.outer",
-					},
-					goto_previous_start = {
-						["[["] = "@function.outer",
-						["[c"] = "@class.outer",
-					},
-					goto_previous_end = {
-						["[]"] = "@function.outer",
-						["[C"] = "@class.outer",
-					},
-				},
-			},
-		},
-		config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
-	},
-	{
-		"nvim-tree/nvim-web-devicons",
-		lazy = true,
-		event = "BufReadPost",
-		opts = {
-			override = {
-				zsh = {
-					icon = "",
-					color = "#428850",
-					cterm_color = "65",
-					name = "Zsh",
-				},
-			},
-		},
+			}
+		end,
 	},
 	{
 		"nvim-telescope/telescope.nvim",
 		lazy = true,
 		event = "BufReadPost",
-		cmd = "Telescope",
-		dependencies = { { "nvim-telescope/telescope-live-grep-args.nvim" } },
-		keys = {
-			{
-				"<leader>f",
-				"<cmd>Telescope find_files find_command=fd,-t,f,-H,-E,.git,--strip-cwd-prefix theme=dropdown previewer=false<cr>",
-				desc = "find: file in project",
-			},
-			{
-				"<leader>r",
-				"<cmd>Telescope git_files find_command=fd,-t,f,-H,-E,.git,--strip-cwd-prefix theme=dropdown previewer=false<cr>",
-				desc = "find: recent files",
-			},
-			{
-				"<leader>w",
-				"",
-				desc = "find: text",
-				callback = function()
-					require("telescope").extensions.live_grep_args.live_grep_args()
-				end,
-			},
-			{
-				"<leader>/",
-				"<cmd>Telescope grep_string<cr>",
-				desc = "find: Current word",
-			},
-			{
-				"<leader>b",
-				"<cmd>Telescope buffers previewer=false<cr>",
-				desc = "find: Buffer opened",
-			},
-			{
-				"<leader>n",
-				"<C-u>enew<CR>",
-				desc = "buffer: New",
-			},
-			{
-				"<C-p>",
-				"",
-				desc = "tools: Show keymap legends",
-				callback = function()
-					require("telescope.builtin").keymaps {
-						lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-						layout_config = {
-							width = 0.6,
-							height = 0.6,
-							prompt_position = "top",
-						},
-					}
-				end,
-			},
-		},
+		dependencies = { "nvim-telescope/telescope-live-grep-args.nvim" },
 		config = function()
 			require("telescope").setup {
 				defaults = {
@@ -455,7 +381,6 @@ return {
 	},
 	{
 		"nvim-tree/nvim-tree.lua",
-		lazy = true,
 		cmd = {
 			"NvimTreeToggle",
 			"NvimTreeOpen",
@@ -463,60 +388,56 @@ return {
 			"NvimTreeFindFileToggle",
 			"NvimTreeRefresh",
 		},
-		keys = {
-			{
-				"<C-n>",
-				"<cmd>NvimTreeFindFileToggle<cr>",
-				desc = "Toggle file tree",
-			},
-		},
-		opts = {
-			disable_netrw = true,
-			actions = { open_file = { quit_on_open = true } },
-			reload_on_bufenter = true,
-			sync_root_with_cwd = true,
-			update_focused_file = { enable = true, update_root = false },
-			git = { ignore = false },
-			filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
-			renderer = {
-				group_empty = true,
-				highlight_opened_files = "none",
-				indent_markers = { enable = true },
-				root_folder_label = ":.:s?.*?/..?",
-				root_folder_modifier = ":e",
-				icons = {
-					padding = " ",
-					symlink_arrow = "  ",
-					glyphs = {
-						default = require("zox").documents.Default, --
-						symlink = require("zox").documents.Symlink, --
-						bookmark = require("zox").ui.Bookmark,
-						git = {
-							unstaged = require("zox").git.Mod_alt,
-							staged = require("zox").git.Add, --
-							unmerged = require("zox").git.Unmerged,
-							renamed = require("zox").git.Rename, --
-							untracked = require("zox").git.Untracked, -- "ﲉ"
-							deleted = require("zox").git.Remove, --
-							ignored = require("zox").git.Ignore, --◌
-						},
-						folder = {
-							default = require("zox").ui.Folder,
-							open = require("zox").ui.FolderOpen,
-							empty = require("zox").ui.EmptyFolder,
-							empty_open = require("zox").ui.EmptyFolderOpen,
-							symlink = require("zox").ui.SymlinkFolder,
-							symlink_open = require("zox").ui.FolderOpen,
+		event = "BufReadPost",
+		config = function()
+			require("nvim-tree").setup {
+				disable_netrw = true,
+				actions = { open_file = { quit_on_open = true } },
+				reload_on_bufenter = true,
+				sync_root_with_cwd = true,
+				update_focused_file = { enable = true, update_root = false },
+				git = { ignore = false },
+				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
+				renderer = {
+					group_empty = true,
+					highlight_opened_files = "none",
+					indent_markers = { enable = true },
+					root_folder_label = ":.:s?.*?/..?",
+					root_folder_modifier = ":e",
+					icons = {
+						padding = " ",
+						symlink_arrow = "  ",
+						glyphs = {
+							default = require("zox").documents.Default, --
+							symlink = require("zox").documents.Symlink, --
+							bookmark = require("zox").ui.Bookmark,
+							git = {
+								unstaged = require("zox").git.Mod_alt,
+								staged = require("zox").git.Add, --
+								unmerged = require("zox").git.Unmerged,
+								renamed = require("zox").git.Rename, --
+								untracked = require("zox").git.Untracked, -- "ﲉ"
+								deleted = require("zox").git.Remove, --
+								ignored = require("zox").git.Ignore, --◌
+							},
+							folder = {
+								default = require("zox").ui.Folder,
+								open = require("zox").ui.FolderOpen,
+								empty = require("zox").ui.EmptyFolder,
+								empty_open = require("zox").ui.EmptyFolderOpen,
+								symlink = require("zox").ui.SymlinkFolder,
+								symlink_open = require("zox").ui.FolderOpen,
+							},
 						},
 					},
 				},
-			},
-			trash = {
-				cmd = require("zox.utils").get_binary_path "rip",
-				require_confirm = true,
-			},
-			view = { adaptive_size = false, side = "right" },
-		},
+				trash = {
+					cmd = require("zox.utils").get_binary_path "rip",
+					require_confirm = true,
+				},
+				view = { adaptive_size = false, side = "left" },
+			}
+		end,
 	},
 	{
 		"nvim-pack/nvim-spectre",
@@ -557,7 +478,7 @@ return {
 
 			local k = require "zox.keybind"
 
-			return k.to_lazy_mapping {
+			k.nvim_register_mapping {
 				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
 				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
@@ -574,31 +495,45 @@ return {
 		"akinsho/toggleterm.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
-		opts = {
-			-- size can be a number or function which is passed the current terminal
-			size = function(term)
-				local factor = 0.3
-				if term.direction == "horizontal" then
-					return vim.o.lines * factor
-				elseif term.direction == "vertical" then
-					return vim.o.columns * factor
-				end
-			end,
-			open_mapping = "<C-t>", -- default mapping
-			shade_terminals = false,
-			direction = "vertical",
-		},
+		config = function()
+			require("toggleterm").setup {
+				-- size can be a number or function which is passed the current terminal
+				size = function(term)
+					local factor = 0.3
+					if term.direction == "horizontal" then
+						return vim.o.lines * factor
+					elseif term.direction == "vertical" then
+						return vim.o.columns * factor
+					end
+				end,
+				open_mapping = "<C-t>", -- default mapping
+				shade_terminals = false,
+				direction = "vertical",
+			}
+		end,
 	},
 	--- NOTE: bufferline
 	{
 		"akinsho/nvim-bufferline.lua",
 		lazy = true,
 		branch = "main",
-		event = { "BufReadPost", "BufRead" },
-		keys = function()
+		event = "BufReadPost",
+		config = function()
+			require("bufferline").setup {
+				options = {
+					offsets = {
+						{
+							filetype = "NvimTree",
+							text = "File Explorer",
+							text_align = "center",
+							padding = 1,
+						},
+					},
+				},
+			}
 			local k = require "zox.keybind"
 
-			return k.to_lazy_mapping {
+			k.nvim_register_mapping {
 				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
 				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
 				["n|<Leader>."] = k.cr("BufferLineCycleNext")
@@ -625,18 +560,6 @@ return {
 					:with_defaults "buffer: Goto buffer 9",
 			}
 		end,
-		opts = {
-			options = {
-				offsets = {
-					{
-						filetype = "NvimTree",
-						text = "File Explorer",
-						text_align = "center",
-						padding = 1,
-					},
-				},
-			},
-		},
 	},
 	--- NOTE: lualine
 	{

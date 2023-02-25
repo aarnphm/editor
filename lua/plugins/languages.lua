@@ -96,7 +96,6 @@ return {
 					"bufls",
 					"clangd",
 					"dockerls",
-					"gopls",
 					"lua_ls",
 					"marksman",
 					"denols",
@@ -153,7 +152,10 @@ return {
 					f.taplo.with {
 						extra_args = { "fmt", "-o", "indent_string='" .. string.rep(" ", 4) .. "'" },
 					},
-					f.deno_fmt,
+					f.deno_fmt.with {
+						extra_args = { "--line-width", "80" },
+					},
+					f.markdown_toc,
 
 					-- NOTE: diagnostics
 					d.clang_check,
