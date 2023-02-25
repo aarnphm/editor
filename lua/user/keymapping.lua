@@ -43,28 +43,16 @@ k.nvim_register_mapping {
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
 	["n|<Leader>p"] = k.cr("Lazy"):with_nowait():with_desc "package: Show",
-	-- lsp
-	["n|K"] = k.callback(vim.lsp.buf.signature_help):with_defaults "lsp: Signature help",
-	["n|gh"] = k.callback(vim.show_pos):with_defaults "lsp: Show hightlight",
-	["n|g["] = k.callback(vim.diagnostic.goto_prev):with_defaults "lsp: Prev diagnostic",
-	["n|g]"] = k.callback(vim.diagnostic.goto_next):with_defaults "lsp: Next diagnostic",
-	["n|gr"] = k.callback(vim.lsp.buf.rename):with_defaults "lsp: Rename in file range",
-	["n|gd"] = k.cr("Glance definitions"):with_defaults "lsp: Type definition",
-	["n|gD"] = k.cr("Lspsaga goto_definition"):with_defaults "lsp: Type definition",
-	["n|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for cursor",
-	["v|ca"] = k.callback(vim.lsp.buf.code_action):with_defaults "lsp: Code action for range",
-	["n|go"] = k.cr("Lspsaga outline"):with_defaults "lsp: Show outline",
-	["n|gR"] = k.cr("TroubleToggle lsp_references"):with_defaults "lsp: Show references",
+	["n|<LocalLeader>ft"] = k.cr("FormatToggle"):with_defaults "lsp: Toggle formatter",
 	-- nvim-tree
 	["n|<C-n>"] = k.cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
 	-- telescope
 	["n|<Leader>f"] = k.callback(
 		function()
 			require("telescope.builtin").find_files {
-				find_command = { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" },
+				find_command = { "fd", "-H", "-tf", "--strip-cwd-prefix" },
 				theme = "dropdown",
 				previewer = false,
-				hidden = true,
 			}
 		end
 	):with_defaults "find: file in current directory",
@@ -72,10 +60,9 @@ k.nvim_register_mapping {
 		function()
 			require("telescope.builtin").git_files {
 
-				find_command = { "fd", "-t", "f", "-H", "-E", ".git", "--strip-cwd-prefix" },
+				find_command = { "fd", "-H", "-tf", "--strip-cwd-prefix" },
 				theme = "dropdown",
 				previewer = false,
-				hidden = true,
 			}
 		end
 	):with_defaults "find: files in git repository",

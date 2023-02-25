@@ -82,7 +82,7 @@ return {
 	{ "stevearc/dressing.nvim", event = "VeryLazy", opts = { input = { insert_only = false } } },
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
-		lazy = false,
+		as = "rose-pine",
 		branch = "canary",
 		priority = 1000,
 		opts = {
@@ -124,7 +124,6 @@ return {
 	},
 	{
 		"zbirenbaum/neodim",
-		lazy = true,
 		event = "BufReadPost",
 		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
 	},
@@ -150,93 +149,95 @@ return {
 		"lewis6991/gitsigns.nvim",
 		lazy = true,
 		event = { "CursorHoldI", "CursorHold" },
-		opts = {
-			numhl = true,
-			word_diff = false,
-			current_line_blame = false,
-			current_line_blame_opts = { virtual_text_pos = "eol" },
-			diff_opts = { internal = true },
-			on_attach = function(bufnr)
-				local k = require "zox.keybind"
+		config = function()
+			require("gitsigns").setup {
+				numhl = true,
+				word_diff = false,
+				current_line_blame = false,
+				diff_opts = { internal = true },
+				on_attach = function(bufnr)
+					local k = require "zox.keybind"
 
-				local ok, _ = require "gitsigns"
-				if not ok then return end
-
-				k.nvim_register_mapping {
-					["n|]g"] = k.callback(function()
-						if vim.wo.diff then return "]g" end
-						vim.schedule(function() require("gitsigns.actions").next_hunk() end)
-						return "<Ignore>"
-					end)
-						:with_buffer(bufnr)
-						:with_expr()
-						:with_desc "git: Goto next hunk",
-					["n|[g"] = k.callback(function()
-						if vim.wo.diff then return "[g" end
-						vim.schedule(function() require("gitsigns.actions").prev_hunk() end)
-						return "<Ignore>"
-					end)
-						:with_buffer(bufnr)
-						:with_expr()
-						:with_desc "git: Goto prev hunk",
-					["n|<Leader>hs"] = k.callback(
-						function() require("gitsigns.actions").stage_hunk() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Stage hunk",
-					["v|<Leader>hs"] = k.callback(
-						function()
-							require("gitsigns.actions").stage_hunk {
-								vim.fn.line ".",
-								vim.fn.line "v",
-							}
-						end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: undo stage hunk",
-					["n|<Leader>hu"] = k.callback(
-						function() require("gitsigns.actions").undo_stage_hunk() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Undo stage hunk",
-					["n|<Leader>hr"] = k.callback(
-						function() require("gitsigns.actions").reset_hunk() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Reset hunk",
-					["v|<Leader>hr"] = k.callback(
-						function()
-							require("gitsigns.actions").reset_hunk {
-								vim.fn.line ".",
-								vim.fn.line "v",
-							}
-						end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Reset hunk",
-					["n|<Leader>hR"] = k.callback(
-						function() require("gitsigns.actions").reset_buffer() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Reset buffer",
-					["n|<Leader>hp"] = k.callback(
-						function() require("gitsigns.actions").preview_hunk() end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Preview hunk",
-					["n|<Leader>hb"] = k.callback(
-						function() require("gitsigns.actions").blame_line { full = true } end
-					)
-						:with_buffer(bufnr)
-						:with_desc "git: Blame line",
-					-- Text objects
-					["o|ih"] = k.callback(function() require("gitsigns.actions").text_object() end)
-						:with_buffer(bufnr),
-					["x|ih"] = k.callback(function() require("gitsigns.actions").text_object() end)
-						:with_buffer(bufnr),
-				}
-			end,
-		},
+					k.nvim_register_mapping {
+						["n|]g"] = k.callback(function()
+							if vim.wo.diff then return "]g" end
+							vim.schedule(function() require("gitsigns.actions").next_hunk() end)
+							return "<Ignore>"
+						end)
+							:with_buffer(bufnr)
+							:with_expr()
+							:with_desc "git: Goto next hunk",
+						["n|[g"] = k.callback(function()
+							if vim.wo.diff then return "[g" end
+							vim.schedule(function() require("gitsigns.actions").prev_hunk() end)
+							return "<Ignore>"
+						end)
+							:with_buffer(bufnr)
+							:with_expr()
+							:with_desc "git: Goto prev hunk",
+						["n|<Leader>hs"] = k.callback(
+							function() require("gitsigns.actions").stage_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Stage hunk",
+						["v|<Leader>hs"] = k.callback(
+							function()
+								require("gitsigns.actions").stage_hunk {
+									vim.fn.line ".",
+									vim.fn.line "v",
+								}
+							end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: undo stage hunk",
+						["n|<Leader>hu"] = k.callback(
+							function() require("gitsigns.actions").undo_stage_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Undo stage hunk",
+						["n|<Leader>hr"] = k.callback(
+							function() require("gitsigns.actions").reset_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Reset hunk",
+						["v|<Leader>hr"] = k.callback(
+							function()
+								require("gitsigns.actions").reset_hunk {
+									vim.fn.line ".",
+									vim.fn.line "v",
+								}
+							end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Reset hunk",
+						["n|<Leader>hR"] = k.callback(
+							function() require("gitsigns.actions").reset_buffer() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Reset buffer",
+						["n|<Leader>hp"] = k.callback(
+							function() require("gitsigns.actions").preview_hunk() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Preview hunk",
+						["n|<Leader>hb"] = k.callback(
+							function() require("gitsigns.actions").blame_line { full = true } end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: Blame line",
+						-- Text objects
+						["o|ih"] = k.callback(
+							function() require("gitsigns.actions").text_object() end
+						)
+							:with_buffer(bufnr),
+						["x|ih"] = k.callback(
+							function() require("gitsigns.actions").text_object() end
+						)
+							:with_buffer(bufnr),
+					}
+				end,
+			}
+		end,
 	},
 	{
 		"folke/trouble.nvim",
@@ -395,7 +396,7 @@ return {
 				actions = { open_file = { quit_on_open = true } },
 				reload_on_bufenter = true,
 				sync_root_with_cwd = true,
-				update_focused_file = { enable = true, update_root = false },
+				update_focused_file = { enable = true, update_root = true },
 				git = { ignore = false },
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 				renderer = {
@@ -404,32 +405,6 @@ return {
 					indent_markers = { enable = true },
 					root_folder_label = ":.:s?.*?/..?",
 					root_folder_modifier = ":e",
-					icons = {
-						padding = " ",
-						symlink_arrow = "  ",
-						glyphs = {
-							default = require("zox").documents.Default, --
-							symlink = require("zox").documents.Symlink, --
-							bookmark = require("zox").ui.Bookmark,
-							git = {
-								unstaged = require("zox").git.Mod_alt,
-								staged = require("zox").git.Add, --
-								unmerged = require("zox").git.Unmerged,
-								renamed = require("zox").git.Rename, --
-								untracked = require("zox").git.Untracked, -- "ﲉ"
-								deleted = require("zox").git.Remove, --
-								ignored = require("zox").git.Ignore, --◌
-							},
-							folder = {
-								default = require("zox").ui.Folder,
-								open = require("zox").ui.FolderOpen,
-								empty = require("zox").ui.EmptyFolder,
-								empty_open = require("zox").ui.EmptyFolderOpen,
-								symlink = require("zox").ui.SymlinkFolder,
-								symlink_open = require("zox").ui.FolderOpen,
-							},
-						},
-					},
 				},
 				trash = {
 					cmd = require("zox.utils").get_binary_path "rip",
@@ -499,20 +474,39 @@ return {
 			require("toggleterm").setup {
 				-- size can be a number or function which is passed the current terminal
 				size = function(term)
-					local factor = 0.3
+					local factor = 0.4
 					if term.direction == "horizontal" then
 						return vim.o.lines * factor
 					elseif term.direction == "vertical" then
 						return vim.o.columns * factor
 					end
 				end,
-				open_mapping = "<C-t>", -- default mapping
+				open_mapping = false, -- default mapping
 				shade_terminals = false,
 				direction = "vertical",
+				shell = vim.o.shell,
+				highlight = require "rose-pine.plugins.toggleterm",
+			}
+
+			local k = require "zox.keybind"
+			k.nvim_register_mapping {
+				["t|<Esc><Esc>"] = k.cmd([[<C-\><C-n>]]):with_silent(), -- switch to normal mode in terminal.
+				["t|jk"] = k.cmd([[<C-\><C-n>]]):with_silent(), -- switch to normal mode in terminal.
+				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
+					:with_defaults "terminal: Toggle horizontal",
+				["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
+					:with_defaults "terminal: Toggle horizontal",
+				["t|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
+					:with_defaults "terminal: Toggle horizontal",
+				["n|<C-t>"] = k.cr([[execute v:count . "ToggleTerm direction=vertical"]])
+					:with_defaults "terminal: Toggle vertical",
+				["i|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
+					:with_defaults "terminal: Toggle vertical",
+				["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
+					:with_defaults "terminal: Toggle vertical",
 			}
 		end,
 	},
-	--- NOTE: bufferline
 	{
 		"akinsho/nvim-bufferline.lua",
 		lazy = true,
@@ -561,7 +555,6 @@ return {
 			}
 		end,
 	},
-	--- NOTE: lualine
 	{
 		"nvim-lualine/lualine.nvim",
 		lazy = true,
@@ -649,11 +642,6 @@ return {
 							"alpha",
 							"dashboard",
 							"NvimTree",
-							"prompt",
-							"toggleterm",
-							"terminal",
-							"help",
-							"lspsagaoutine",
 							"DiffviewFiles",
 							"TelescopePrompt",
 							"nofile",

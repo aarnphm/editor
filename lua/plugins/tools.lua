@@ -94,7 +94,7 @@ return {
 		config = function()
 			require("octo").setup()
 			-- Use treesitter markdown parser for Octo buffer
-			require("nvim-treesitter.parsers").filetype_to_parsername.octo = "markdown"
+			vim.treesitter.language.register("markdown", "octo")
 		end,
 		keys = function()
 			local k = require "zox.keybind"

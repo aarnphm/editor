@@ -3,6 +3,11 @@ return {
 	-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 	{ "fatih/vim-go", lazy = true, ft = "go", run = ":GoInstallBinaries" },
 	{ "simrat39/rust-tools.nvim", lazy = true, ft = { "rs", "rust" } },
+	{
+		"saecki/crates.nvim",
+		event = { "BufRead Cargo.toml" },
+		opts = { popup = { border = "rounded" } },
+	},
 	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
 	{
 		"bazelbuild/vim-bazel",
@@ -39,7 +44,7 @@ return {
 		event = "BufReadPre",
 		dependencies = {
 			{ "williamboman/mason-lspconfig.nvim" },
-			{ "williamboman/mason.nvim", cmd = "Mason" },
+			{ "williamboman/mason.nvim", cmd = "Mason", lazy = true },
 			{
 				"jose-elias-alvarez/null-ls.nvim",
 				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
@@ -49,37 +54,28 @@ return {
 				branch = "main",
 				events = "BufReadPost",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
-				opts = {
-					finder = { keys = { jump_to = "e" } },
-					lightbulb = { enable = false },
-					diagnostic = { keys = { exec_action = "<CR>" } },
-					definition = { split = "<C-c>s" },
-					beacon = { enable = false },
-					outline = {
-						auto_preview = false,
-						win_width = math.floor(vim.o.columns * 0.24),
-						with_position = "left",
-						keys = { jump = "<CR>" },
-					},
-					code_actions = { extend_gitsigns = false },
-					symbol_in_winbar = {
-						enable = false,
-						respect_root = true,
-						separator = " " .. require("zox").ui_space.Separator,
-						show_file = false,
-					},
-					callhierarchy = { show_detail = true },
-				},
-				config = function(_, opts)
-					require("lspsaga").setup(opts)
-
-					-- Show diagnostic float on hover.
-					vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-						pattern = "*",
-						callback = function()
-							require("lspsaga.diagnostic"):show_diagnostics(nil, "cursor")
-						end,
-					})
+				config = function()
+					require("lspsaga").setup {
+						finder = { keys = { jump_to = "e" } },
+						lightbulb = { enable = false },
+						diagnostic = { keys = { exec_action = "<CR>" } },
+						definition = { split = "<C-c>s" },
+						beacon = { enable = false },
+						outline = {
+							auto_preview = false,
+							win_width = math.floor(vim.o.columns * 0.21),
+							with_position = "left",
+							keys = { jump = "<CR>" },
+						},
+						code_actions = { extend_gitsigns = false },
+						symbol_in_winbar = {
+							enable = false,
+							respect_root = true,
+							separator = " " .. require("zox").ui_space.Separator,
+							show_file = false,
+						},
+						callhierarchy = { show_detail = true },
+					}
 				end,
 			},
 		},
@@ -98,13 +94,13 @@ return {
 					"dockerls",
 					"lua_ls",
 					"marksman",
-					"denols",
 					"html",
 					"jdtls",
 					"jsonls",
 					"pyright",
 					"rnix",
 					"ruff_lsp",
+					"svelte",
 					"rust_analyzer",
 					"spectral",
 					"taplo",
@@ -116,15 +112,10 @@ return {
 				automatic_installation = true,
 			}
 
-			local disabled_workspaces = {}
-			local format_on_save = true
-
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
 			local f = require("null-ls").builtins.formatting
 			local d = require("null-ls").builtins.diagnostics
 			local ca = require("null-ls").builtins.code_actions
-
-			local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 			require("null-ls").setup {
 				update_in_insert = false,
@@ -152,10 +143,10 @@ return {
 					f.taplo.with {
 						extra_args = { "fmt", "-o", "indent_string='" .. string.rep(" ", 4) .. "'" },
 					},
+					-- NOTE: Using deno fmt for markdown
 					f.deno_fmt.with {
 						extra_args = { "--line-width", "80" },
 					},
-					f.markdown_toc,
 
 					-- NOTE: diagnostics
 					d.clang_check,
@@ -174,26 +165,14 @@ return {
 					ca.gitrebase,
 					ca.shellcheck,
 				},
-				on_attach = function(client, bufnr)
-					local cwd = vim.fn.getcwd()
-					for i = 1, #disabled_workspaces do
-						if cwd.find(cwd, disabled_workspaces[i]) ~= nil then return end
-					end
-					if client.supports_method "textDocument/formatting" and format_on_save then
-						vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
-						vim.api.nvim_create_autocmd("BufWritePre", {
-							group = augroup,
-							buffer = bufnr,
-							callback = function() vim.lsp.buf.format { bufnr = bufnr } end,
-						})
-					end
-				end,
 			}
 			require("mason-null-ls").setup {
 				ensure_installed = nil,
 				automatic_installation = true,
 				automatic_setup = false,
 			}
+
+			require("zox.formatting").configure_format_on_save()
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
@@ -212,6 +191,44 @@ return {
 
 					-- Enable completion triggered by <c-x><c-o>
 					buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+
+					local k = require "zox.keybind"
+					k.nvim_register_mapping {
+						-- lsp
+						["n|K"] = k.callback(vim.lsp.buf.signature_help)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Signature help",
+						["n|gh"] = k.callback(vim.show_pos)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Show hightlight",
+						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Prev diagnostic",
+						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Next diagnostic",
+						["n|gr"] = k.callback(vim.lsp.buf.rename)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Rename in file range",
+						["n|gd"] = k.cr("Glance definitions")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Peek definition",
+						["n|gD"] = k.cr("Lspsaga goto_definition")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Goto definition",
+						["n|ca"] = k.callback(vim.lsp.buf.code_action)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Code action for cursor",
+						["v|ca"] = k.callback(vim.lsp.buf.code_action)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Code action for range",
+						["n|go"] = k.cr("Lspsaga outline")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Show outline",
+						["n|gR"] = k.cr("TroubleToggle lsp_references")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Show references",
+					}
 				end
 			end
 
@@ -222,74 +239,52 @@ return {
 			}
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
-			---@overload fun(lsp_name: string, use_server_formatting_provider?: boolean): fun():nil
-			---@overload fun(lsp_name: string): fun():nil
-			local mason_handler = function(lsp_name, use_server_formatting_provider)
-				use_server_formatting_provider = use_server_formatting_provider or false
-				options.on_attach = on_attach_factory(use_server_formatting_provider)
-
-				return function()
-					---@param path string path to given directory containing lua files.
-					---@return string[] list of files in given directory
-					local available = function(path)
-						return require("zox.utils").map(
-							vim.split(vim.fn.glob(path .. "/*.lua"), "\n"),
-							function(_) return _:sub(#path + 2, -5) end
-						)
+			--- @param lsp_name string name of given lsp server
+			local mason_handler = function(lsp_name)
+				local check_config = function()
+					local path = require("zox.utils").path.join(
+						vim.fn.stdpath "config",
+						"lua",
+						"zox",
+						"servers"
+					)
+					local servers = {}
+					local available_configs = vim.split(vim.fn.glob(path .. "/*.lua"), "\n")
+					if type(available_configs) == "table" then
+						for _, s in ipairs(available_configs) do
+							servers[#servers + 1] = s:sub(#path + 2, -5)
+						end
 					end
+					return vim.tbl_contains(servers, lsp_name)
+				end
 
-					if
-						not vim.tbl_contains(
-							available(
-								require("zox.utils").path.join(
-									vim.fn.stdpath "config",
-									"lua",
-									"zox",
-									"servers"
-								)
-							),
-							lsp_name
-						)
-					then
-						--- NOTE: default to nvim-lspconfig for servers
-						--- that doesn't include a configuration setup.
-						nvim_lsp[lsp_name].setup(options)
-						return
-					end
+				if not check_config() then
+					nvim_lsp[lsp_name].setup(options)
+					return
+				end
 
-					local lspconfig = require("zox").servers[lsp_name]
-					if type(lspconfig) == "function" then
-						--- This is the case where the language server has its own setup
-						--- e.g. clangd_extensions, lua_ls, rust_analyzer
-						lspconfig(options)
-					elseif type(lspconfig) == "table" then
-						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
-					else
-						error(
-							string.format(
-								"Failed to setup '%s'. Server defined "
-									.. "under zox/servers must return either a "
-									.. "function(opts) or a table. Got type '%s' instead.",
-								lsp_name,
-								type(lspconfig)
-							),
-							vim.log.levels.ERROR
-						)
-					end
+				local lspconfig = require("zox").servers[lsp_name]
+				if type(lspconfig) == "function" then
+					--- This is the case where the language server has its own setup
+					--- e.g. clangd_extensions, lua_ls, rust_analyzer
+					lspconfig(options)
+				elseif type(lspconfig) == "table" then
+					nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
+				else
+					error(
+						string.format(
+							"Failed to setup '%s'. Server defined "
+								.. "under zox/servers must return either a "
+								.. "function(opts) or a table. Got type '%s' instead.",
+							lsp_name,
+							type(lspconfig)
+						),
+						vim.log.levels.ERROR
+					)
 				end
 			end
 
-			require("mason-lspconfig").setup_handlers {
-				function(client_name)
-					ok, _ = pcall(mason_handler(client_name))
-					if not ok then
-						error(
-							string.format("Failed to setup lspconfig for %s", client_name),
-							vim.log.levels.ERROR
-						)
-					end
-				end,
-			}
+			require("mason-lspconfig").setup_handlers { mason_handler }
 
 			mason_handler "starlark_rust"
 		end,
@@ -317,7 +312,6 @@ return {
 			},
 			{ "onsails/lspkind.nvim" },
 			{ "saadparwaiz1/cmp_luasnip" },
-			{ "lukas-reineke/cmp-under-comparator" },
 			{ "hrsh7th/cmp-nvim-lsp" },
 			{ "hrsh7th/cmp-nvim-lua" },
 			{ "hrsh7th/cmp-path" },
@@ -327,11 +321,6 @@ return {
 				dependencies = { "nvim-lua/plenary.nvim" },
 				config = true,
 				opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
-			},
-			{
-				"saecki/crates.nvim",
-				event = { "BufRead Cargo.toml" },
-				opts = { popup = { border = "rounded" } },
 			},
 			{
 				"zbirenbaum/copilot.lua",
@@ -383,18 +372,6 @@ return {
 				return info
 			end
 
-			local compare = require "cmp.config.compare"
-			compare.lsp_scores = function(entry1, entry2)
-				local diff
-				if entry1.completion_item.score and entry2.completion_item.score then
-					diff = (entry2.completion_item.score * entry2.score)
-						- (entry1.completion_item.score * entry1.score)
-				else
-					diff = entry2.score - entry1.score
-				end
-				return (diff < 0)
-			end
-
 			local has_words_before = function()
 				if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
 				local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -409,6 +386,7 @@ return {
 				local col = vim.fn.col "." - 1
 				---@diagnostic disable-next-line: param-type-mismatch
 				local current_line = vim.fn.getline "."
+				---@diagnostic disable-next-line: undefined-field
 				return col == 0 or current_line:sub(col, col):match "%s"
 			end
 
@@ -416,19 +394,6 @@ return {
 				preselect = cmp.PreselectMode.None,
 				snippet = {
 					expand = function(args) require("luasnip").lsp_expand(args.body) end,
-				},
-				sorting = {
-					priority_weight = 2,
-					comparators = {
-						compare.offset,
-						compare.exact,
-						compare.lsp_scores,
-						require("cmp-under-comparator").under,
-						compare.kind,
-						compare.sort_text,
-						compare.length,
-						compare.order,
-					},
 				},
 				formatting = {
 					fields = { "kind", "abbr", "menu" },
