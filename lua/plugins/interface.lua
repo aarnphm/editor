@@ -250,7 +250,7 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		event = "VeryLazy",
+		event = "BufReadPost",
 		lazy = true,
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
@@ -393,9 +393,13 @@ return {
 		config = function()
 			require("nvim-tree").setup {
 				disable_netrw = true,
-				actions = { open_file = { quit_on_open = true } },
+				hijack_cursor = true,
+				sort_by = "extensions",
+				prefer_startup_root = true,
+				respect_buf_cwd = true,
 				reload_on_bufenter = true,
 				sync_root_with_cwd = true,
+				actions = { open_file = { quit_on_open = false } },
 				update_focused_file = { enable = true, update_root = true },
 				git = { ignore = false },
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },

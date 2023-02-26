@@ -1,3 +1,32 @@
+vim.filetype.add {
+	extension = {
+		conf = "conf",
+		mdx = "markdown",
+		mjml = "html",
+		cjs = "javascript",
+	},
+	pattern = {
+		["%.(%a+)"] = function(_, _, ext)
+			if vim.tbl_contains({ "Dockerfile", "dockerfile" }, ext) then
+				return "dockerfile"
+			elseif vim.tbl_contains({ "j2", "jinja", "tpl", "template" }, ext) then
+				return "html"
+			elseif vim.tbl_contains({ "bazel", "bzl" }, ext) then
+				return "bzl"
+			end
+		end,
+		["Dockerfile.(%a+)$"] = function(_, _, ext)
+			if vim.tbl_contains({ "template", "tpl", "tmpl" }, ext) then return "dockerfile" end
+		end,
+		[".*%.env.*"] = "sh",
+		["ignore$"] = "conf",
+	},
+	filename = {
+		["yup.lock"] = "yaml",
+		["WORKSPACE"] = "bzl",
+	},
+}
+
 vim.o.autoindent = true
 vim.o.autoread = true
 vim.o.autowrite = true

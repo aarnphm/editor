@@ -150,7 +150,7 @@ return {
 
 					-- NOTE: diagnostics
 					d.clang_check,
-					d.eslint_d,
+					d.eslint,
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
 					d.golangci_lint,

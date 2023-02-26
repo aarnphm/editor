@@ -36,7 +36,7 @@ return {
 	{
 		"folke/which-key.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = "BufReadPost",
 		opts = {
 			window = {
 				border = "single",
