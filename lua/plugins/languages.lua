@@ -124,7 +124,7 @@ return {
 					-- NOTE: formatting
 					f.prettierd.with {
 						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
-						extra_filetypes = { "jsonc", "astro", "svelte", "yaml" },
+						extra_filetypes = { "jsonc", "astro", "svelte" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.clang_format,
@@ -138,6 +138,9 @@ return {
 					f.rustfmt,
 					f.jq,
 					f.buf,
+					f.eslint.with {
+						extra_filetypes = { "astro", "svelte" },
+					},
 					f.buildifier,
 					-- NOTE: format with 4 spaces
 					f.taplo.with {
@@ -150,7 +153,9 @@ return {
 
 					-- NOTE: diagnostics
 					d.clang_check,
-					d.eslint,
+					d.eslint.with {
+						extra_filetypes = { "astro", "svelte" },
+					},
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
 					d.golangci_lint,
@@ -164,6 +169,9 @@ return {
 					-- NOTE: code actions
 					ca.gitrebase,
 					ca.shellcheck,
+					ca.eslint.with {
+						extra_filetypes = { "astro", "svelte" },
+					},
 				},
 			}
 			require("mason-null-ls").setup {

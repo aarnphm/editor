@@ -50,7 +50,7 @@ k.nvim_register_mapping {
 	["n|<Leader>f"] = k.callback(
 		function()
 			require("telescope.builtin").find_files {
-				find_command = { "fd", "-H", "-tf", "--strip-cwd-prefix" },
+				find_command = { "fd", "-H", "-tf", "-E", "lazy-lock.json", "--strip-cwd-prefix" },
 				theme = "dropdown",
 				previewer = false,
 			}
@@ -60,7 +60,7 @@ k.nvim_register_mapping {
 		function()
 			require("telescope.builtin").git_files {
 
-				find_command = { "fd", "-H", "-tf", "--strip-cwd-prefix" },
+				find_command = { "fd", "-H", "-tf", "-E", "lazy-lock.json", "--strip-cwd-prefix" },
 				theme = "dropdown",
 				previewer = false,
 			}
@@ -83,4 +83,6 @@ k.nvim_register_mapping {
 			},
 		}
 	end):with_defaults "tools: Show keymap legends",
+	["n|<LocalLeader>d"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
+	["n|<LocalLeader><LocalLeader>d"] = k.cr("DiffviewClose"):with_defaults "git: Close diff view",
 }

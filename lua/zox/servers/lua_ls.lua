@@ -4,13 +4,12 @@ return function(options)
 	require("neodev").setup {
 		library = {
 			plugins = {
+				"lazy",
+				"lualine.nvim",
 				"nvim-lspconfig",
 				"nvim-treesitter",
 				"telescope.nvim",
-				"lazy",
 				"lspsaga.nvim",
-				"rose-pine",
-				"noice.nvim",
 			},
 		},
 	}

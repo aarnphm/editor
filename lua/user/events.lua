@@ -1,19 +1,5 @@
 local api = vim.api
 
--- disable laststatus on non-file buffers
-api.nvim_create_autocmd({ "VimEnter" }, {
-	callback = function(event)
-		local real_file = vim.fn.filereadable(event.file) == 1
-		local no_name = event.file == "" and vim.bo[event.buf].buftype == ""
-		if not real_file and not no_name then return end
-		vim.opt.laststatus = 0
-	end,
-})
-api.nvim_create_autocmd("BufReadPost", {
-	pattern = "*",
-	callback = function() vim.opt.laststatus = 3 end,
-})
-
 -- auto close NvimTree
 vim.api.nvim_create_autocmd("BufEnter", {
 	group = vim.api.nvim_create_augroup("NvimTreeClose", { clear = true }),
@@ -89,20 +75,6 @@ api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
 
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
--- source vimrc on save
-api.nvim_create_autocmd("BufWritePost", {
-	group = bufs_id,
-	pattern = "$VIM_PATH/{*.vim,*.yaml,vimrc}",
-	command = "source $MYVIMRC | redraw",
-	nested = true,
-})
--- Reload Vim script automatically if setlocal autoread
-api.nvim_create_autocmd({ "BufWritePost", "FileWritePost" }, {
-	group = bufs_id,
-	pattern = "*.vim",
-	command = "if &l:autoread > 0 | source <afile> | echo 'source ' . bufname('%') | endif",
-	nested = true,
-})
 -- Set noundofile for temporary files
 api.nvim_create_autocmd("BufWritePre", {
 	group = bufs_id,
@@ -144,17 +116,6 @@ api.nvim_create_autocmd("FileType", {
 			{ noremap = true }
 		)
 	end,
-})
--- set filetype for docker files
-api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-	group = ft_id,
-	pattern = { "Dockerfile-*", "Dockerfile.{tpl,template,tmpl}", "*.{Dockerfile,dockerfile}" },
-	command = "setf dockerfile",
-})
-api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-	group = ft_id,
-	pattern = { "*.{tpl,template,tmpl,j2,jinja}" },
-	command = "setf html",
 })
 
 local yank_id = api.nvim_create_augroup("yank", { clear = true })

@@ -6,9 +6,7 @@ return function(options)
 	require("lspconfig").starlark_rust.setup {
 		on_attach = options.on_attach,
 		capabilities = options.capabilities,
-		cmd = vim.NIL ~= vim.env.WORKSPACE
-				and { vim.env.WORKSPACE .. "/starlark_rust/target/debug/starlark", "--lsp" }
-			or { "starlark", "--lsp" },
+		cmd = { "starlark", "--lsp" },
 		filetypes = { "bzl", "WORKSPACE", "star", "BUILD.bazel", "bazel", "bzlmod" },
 		root_dir = function(fname)
 			return u.root_pattern(unpack(root_files))(fname)

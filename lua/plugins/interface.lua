@@ -251,7 +251,6 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		event = "BufReadPost",
-		lazy = true,
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
@@ -319,23 +318,40 @@ return {
 		"nvim-telescope/telescope.nvim",
 		lazy = true,
 		event = "BufReadPost",
-		dependencies = { "nvim-telescope/telescope-live-grep-args.nvim" },
+		dependencies = {
+			{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			{
+				"ahmedkhalf/project.nvim",
+				as = "project_nvim",
+				event = "BufReadPost",
+				config = function()
+					require("project_nvim").setup {
+						manual_mode = false,
+						detection_methods = { "lsp", "pattern" },
+						patterns = {
+							".git",
+							"_darcs",
+							".hg",
+							".bzr",
+							".svn",
+							"Makefile",
+							"package.json",
+						},
+						ignore_lsp = { "null-ls", "copilot", "pyright" },
+						exclude_dirs = {},
+						show_hidden = true,
+						silent_chdir = true,
+						scope_chdir = "wins",
+					}
+				end,
+			},
+		},
 		config = function()
 			require("telescope").setup {
 				defaults = {
 					prompt_prefix = " " .. require("zox").ui_space.Telescope .. " ",
 					selection_caret = require("zox").ui_space.DoubleSeparator,
-					vimgrep_arguments = {
-						"rg",
-						"--color=never",
-						"--no-heading",
-						"--with-filename",
-						"--line-number",
-						"--column",
-						"--smart-case",
-						"--hidden",
-					},
-					file_ignore_patterns = { ".git" },
+					file_ignore_patterns = { ".git/" },
 					mappings = {
 						i = {
 							["<C-a>"] = { "<esc>0i", type = "command" },
@@ -378,6 +394,7 @@ return {
 				},
 			}
 			require("telescope").load_extension "live_grep_args"
+			require("telescope").load_extension "projects"
 		end,
 	},
 	{
@@ -401,6 +418,10 @@ return {
 				sync_root_with_cwd = true,
 				actions = { open_file = { quit_on_open = false } },
 				update_focused_file = { enable = true, update_root = true },
+				icons = {
+					padding = " ",
+					symlink_arrow = "  ",
+				},
 				git = { ignore = false },
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 				renderer = {
@@ -561,7 +582,6 @@ return {
 	},
 	{
 		"nvim-lualine/lualine.nvim",
-		lazy = true,
 		event = "BufReadPost",
 		config = function()
 			local _cache = { context = "", bufnr = -1 }

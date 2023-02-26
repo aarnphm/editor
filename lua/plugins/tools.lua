@@ -116,16 +116,8 @@ return {
 	},
 	{
 		"sindrets/diffview.nvim",
-		lazy = true,
 		cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
 		dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
-		keys = function()
-			local k = require "zox.keybind"
-			return k.to_lazy_mapping {
-				["n|<LocalLeader>d"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
-				["n|<LocalLeader><LocalLeader>d"] = k.cr("DiffviewClose")
-					:with_defaults "git: Close diff view",
-			}
-		end,
+		config = true,
 	},
 }
