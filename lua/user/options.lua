@@ -33,11 +33,11 @@ vim.o.autoread = true
 vim.o.autowrite = true
 vim.o.backspace = "indent,eol,start"
 vim.o.breakat = [[\ \	;:,!?]]
-vim.opt.guicursor = ""
-vim.opt.pumheight = 8
-vim.opt.undofile = true
-vim.opt.signcolumn = "yes"
-vim.opt.breakindent = true
+vim.o.guicursor = ""
+vim.o.pumheight = 8
+vim.o.undofile = true
+vim.o.signcolumn = "yes"
+vim.o.breakindent = true
 vim.o.breakindentopt = "shift:2,min:20"
 vim.o.clipboard = "unnamedplus"
 vim.o.cmdwinheight = 5
@@ -61,8 +61,7 @@ vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
-vim.o.laststatus = 3
-vim.o.statusline = "%f %m %= %=%y %P %l:%c ♥ "
+-- vim.o.statusline = "%f %m %= %=%y %P %l:%c ♥ "
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"

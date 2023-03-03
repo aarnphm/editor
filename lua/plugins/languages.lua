@@ -101,6 +101,7 @@ return {
 					"rnix",
 					"ruff_lsp",
 					"svelte",
+					"cssls",
 					"rust_analyzer",
 					"spectral",
 					"taplo",
@@ -108,6 +109,8 @@ return {
 					"tsserver",
 					"vimls",
 					"yamlls",
+					"denols",
+					"gopls",
 				},
 				automatic_installation = true,
 			}
@@ -125,6 +128,7 @@ return {
 					f.prettierd.with {
 						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
 						extra_filetypes = { "jsonc", "astro", "svelte" },
+						disabled_filetypes = { "markdown" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.clang_format,
@@ -132,12 +136,12 @@ return {
 					f.ruff,
 					f.isort,
 					f.stylua,
-					f.markdownlint,
 					f.cbfmt,
 					f.beautysh,
 					f.rustfmt,
 					f.jq,
 					f.buf,
+					f.stylelint,
 					f.eslint.with {
 						extra_filetypes = { "astro", "svelte" },
 					},
@@ -163,6 +167,7 @@ return {
 					d.zsh,
 					d.buf,
 					d.buildifier,
+					d.stylelint,
 					d.vulture.with { extra_args = { "--min-confidence 70" } },
 					d.vint,
 
@@ -203,7 +208,7 @@ return {
 					local k = require "zox.keybind"
 					k.nvim_register_mapping {
 						-- lsp
-						["n|K"] = k.callback(vim.lsp.buf.signature_help)
+						["n|K"] = k.cr("Lspsaga hover_doc")
 							:with_buffer(bufnr)
 							:with_defaults "lsp: Signature help",
 						["n|gh"] = k.callback(vim.show_pos)
@@ -292,7 +297,30 @@ return {
 				end
 			end
 
-			require("mason-lspconfig").setup_handlers { mason_handler }
+			require("mason-lspconfig").setup_handlers {
+				mason_handler,
+				taplo = function()
+					nvim_lsp["taplo"].setup {
+						on_attach = on_attach_factory(true),
+						capabilities = capabilities,
+						flags = { debounce_text_changes = 150 },
+					}
+				end,
+				spectral = function()
+					nvim_lsp["spectral"].setup {
+						on_attach = on_attach_factory(true),
+						capabilities = capabilities,
+						flags = { debounce_text_changes = 150 },
+					}
+				end,
+				yamlls = function()
+					nvim_lsp["yamlls"].setup {
+						on_attach = on_attach_factory(true),
+						capabilities = capabilities,
+						flags = { debounce_text_changes = 150 },
+					}
+				end,
+			}
 
 			mason_handler "starlark_rust"
 		end,
@@ -302,7 +330,7 @@ return {
 	{
 		"hrsh7th/nvim-cmp",
 		lazy = true,
-		event = "InsertEnter",
+		event = "LspAttach",
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",

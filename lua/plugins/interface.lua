@@ -78,6 +78,24 @@ return {
 			},
 		},
 	},
+	{
+		"NvChad/nvim-colorizer.lua",
+		config = function()
+			require("colorizer").setup {
+				filetypes = { "*" },
+				user_default_options = {
+					names = true, -- "Name" codes like Blue
+					RRGGBBAA = true, -- #RRGGBBAA hex codes
+					rgb_fn = true, -- CSS rgb() and rgba() functions
+					hsl_fn = true, -- CSS hsl() and hsla() functions
+					css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+					css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+					sass = { enable = true, parsers = { "css" } },
+					mode = "background",
+				},
+			}
+		end,
+	},
 	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
 	{ "stevearc/dressing.nvim", event = "VeryLazy", opts = { input = { insert_only = false } } },
 	{
@@ -148,7 +166,7 @@ return {
 	{
 		"lewis6991/gitsigns.nvim",
 		lazy = true,
-		event = { "CursorHoldI", "CursorHold" },
+		event = "VeryLazy",
 		config = function()
 			require("gitsigns").setup {
 				numhl = true,
@@ -418,10 +436,6 @@ return {
 				sync_root_with_cwd = true,
 				actions = { open_file = { quit_on_open = false } },
 				update_focused_file = { enable = true, update_root = true },
-				icons = {
-					padding = " ",
-					symlink_arrow = "  ",
-				},
 				git = { ignore = false },
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 				renderer = {
@@ -430,6 +444,10 @@ return {
 					indent_markers = { enable = true },
 					root_folder_label = ":.:s?.*?/..?",
 					root_folder_modifier = ":e",
+					icons = {
+						padding = " ",
+						symlink_arrow = "  ",
+					},
 				},
 				trash = {
 					cmd = require("zox.utils").get_binary_path "rip",
@@ -515,8 +533,6 @@ return {
 
 			local k = require "zox.keybind"
 			k.nvim_register_mapping {
-				["t|<Esc><Esc>"] = k.cmd([[<C-\><C-n>]]):with_silent(), -- switch to normal mode in terminal.
-				["t|jk"] = k.cmd([[<C-\><C-n>]]):with_silent(), -- switch to normal mode in terminal.
 				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
 					:with_defaults "terminal: Toggle horizontal",
 				["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
@@ -679,7 +695,6 @@ return {
 				sections = {
 					lualine_a = { "mode" },
 					lualine_b = {
-						{ "branch", icons_enabled = true, icon = require("zox").git.Branch },
 						{ "diff", source = diff_source },
 					},
 					lualine_c = { lspsaga_symbols },

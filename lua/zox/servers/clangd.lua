@@ -61,7 +61,7 @@ return function(options)
 				"--all-scopes-completion",
 				"--completion-style=detailed",
 				"--header-insertion-decorators",
-				"--header-insertion=never",
+				"--header-insertion=iwyu",
 			},
 			filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
 			commands = {

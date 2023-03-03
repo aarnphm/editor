@@ -30,7 +30,7 @@ return {
 	{
 		"echasnovski/mini.surround",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = "VeryLazy",
 		config = function() require("mini.surround").setup() end,
 	},
 	{

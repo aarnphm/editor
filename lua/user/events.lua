@@ -1,5 +1,19 @@
 local api = vim.api
 
+-- disable laststatus on non-file buffers
+api.nvim_create_autocmd({ "VimEnter" }, {
+	callback = function(event)
+		local real_file = vim.fn.filereadable(event.file) == 1
+		local no_name = event.file == "" and vim.bo[event.buf].buftype == ""
+		if not real_file and not no_name then return end
+		vim.o.laststatus = 0
+	end,
+})
+api.nvim_create_autocmd({ "BufReadPost" }, {
+	pattern = "*",
+	callback = function() vim.o.laststatus = 3 end,
+})
+
 -- auto close NvimTree
 vim.api.nvim_create_autocmd("BufEnter", {
 	group = vim.api.nvim_create_augroup("NvimTreeClose", { clear = true }),
@@ -49,16 +63,6 @@ api.nvim_create_autocmd("TermOpen", {
 		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
-	end,
-})
-
--- Fix fold issue of files opened by telescope
-vim.api.nvim_create_autocmd("BufRead", {
-	callback = function()
-		vim.api.nvim_create_autocmd("BufWinEnter", {
-			once = true,
-			command = "normal! zx",
-		})
 	end,
 })
 
