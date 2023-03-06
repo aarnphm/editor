@@ -1,16 +1,1 @@
-opinionated, yet fast neovim config.
-
-Current benchmarks on M1 Max, 32GB RAM: 26ms with LunarVim/bigfile.nvim, 15ms without (tested with `vim-startuptime`)
-
-This comes as a full package, and I don't have any intention to make it modular.
-If you want to use something more customizable refer to NvChad (https://github.com/NvChad/NvChad), SpaceVim (https://github.com/SpaceVim/SpaceVim)
-
-Recognitions to glepnir/nvim (https://github.com/glepnir/nvim) and ayamir/nvimdots (https://github.com/ayamir/nvimdots)
-as they were the main inspirations for this config.
-
-This configuration currently builds on top of nvim HEAD
-
-Some env variables that can be set:
-
-- PYTHON3_HOST_PROG - python3 executable
-- SQLITE_PATH - path to sqlite shared library
+This branch is now deprecated, most updates will be done in simple
