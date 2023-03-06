@@ -59,7 +59,7 @@
   "trouble.nvim": { "branch": "main", "commit": "67337644e38144b444d026b0df2dc5fa0038930f" },
   "vim-bazel": { "branch": "master", "commit": "31b0d5e4f51da1aeb56d65bf505a744e6de405de" },
   "vim-cool": { "branch": "master", "commit": "80c19445728d70595c2f72d0436527e28292ebd9" },
-  "vim-fugitive": { "branch": "master", "commit": "fa33145cc12003005b92d7e536025ed5833b9c4f" },
+  "vim-fugitive": { "branch": "master", "commit": "caf1bc99b63a80cc3a35cc9d05320dfa75d7ebfa" },
   "vim-go": { "branch": "master", "commit": "23cc4bca2f586c8c2f7d2cb78bbbfec4b7361763" },
   "vim-maktaba": { "branch": "master", "commit": "5d416e84d024538f5e5cf25c394d081802f0a35e" },
   "vim-repeat": { "branch": "master", "commit": "24afe922e6a05891756ecf331f39a1f6743d3d5a" },
