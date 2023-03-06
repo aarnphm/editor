@@ -45,7 +45,13 @@ return {
 			}
 		end,
 	},
-	{ "shortcuts/no-neck-pain.nvim" },
+	{
+		"folke/zen-mode.nvim",
+		cmd = "ZenMode",
+		events = { "VeryLazy" },
+		config = true,
+		opts = { window = { width = 0.46 } },
+	},
 	{
 		"pwntester/octo.nvim",
 		lazy = true,

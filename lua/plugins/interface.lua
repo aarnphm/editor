@@ -1,62 +1,40 @@
 return {
 	{
-		"goolord/alpha-nvim",
+		"folke/which-key.nvim",
 		lazy = true,
-		event = "BufWinEnter",
-		cond = function() return #vim.api.nvim_list_uis() > 0 end,
-		config = function()
-			local dashboard = require "alpha.themes.dashboard"
-			dashboard.section.buttons.opts.hl = "String"
-			dashboard.section.buttons.val = {}
-			local gen_footer = function()
-				return require("zox").misc_space.BentoBox
-					.. "github.com/aarnphm"
-					.. "   v"
-					.. vim.version().major
-					.. "."
-					.. vim.version().minor
-					.. "."
-					.. vim.version().patch
-					.. "   "
-					.. require("lazy").stats().count
-					.. " plugins"
-			end
-
-			dashboard.section.footer.opts.hl = "Function"
-			dashboard.section.footer.val = gen_footer()
-
-			local top_button_pad = 2
-			local footer_button_pad = 1
-			local heights = #dashboard.section.header.val
-				+ 2 * #dashboard.section.buttons.val
-				+ top_button_pad
-
-			dashboard.config.layout = {
-				{
-					type = "padding",
-					val = math.max(0, math.ceil((vim.fn.winheight(0) - heights) * 0.12)),
+		enabled = true,
+		event = "BufReadPost",
+		opts = {
+			window = {
+				border = "single",
+			},
+			plugins = {
+				spelling = {
+					enabled = true,
 				},
-				dashboard.section.header,
-				{ type = "padding", val = top_button_pad },
-				dashboard.section.buttons,
-				{ type = "padding", val = footer_button_pad },
-				dashboard.section.footer,
-			}
-
-			require("alpha").setup(dashboard.config)
-
-			vim.api.nvim_create_autocmd("User", {
-				pattern = "LazyVimStarted",
-				callback = function()
-					dashboard.section.footer.val = gen_footer()
-					pcall(vim.cmd.AlphaRedraw)
-				end,
-			})
-		end,
+			},
+		},
+	},
+	{
+		"folke/noice.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+		opts = {
+			cmdline = { view = "cmdline" },
+			lsp = { progress = { enabled = false } },
+			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
+			routes = {
+				{
+					-- hide search virtual text
+					filter = { event = "msg_show", kind = "search_count" },
+					opts = { skip = true },
+				},
+			},
+		},
 	},
 	{
 		"nathom/filetype.nvim",
-		lazy = true,
 		event = { "CursorHoldI", "CursorHold" },
 		opts = {
 			overrides = {
@@ -65,6 +43,7 @@ return {
 					mdx = "markdown",
 					mjml = "html",
 					sh = "bash",
+					m = "objc",
 				},
 				complex = {
 					[".*%.env.*"] = "sh",
@@ -84,7 +63,7 @@ return {
 			require("colorizer").setup {
 				filetypes = { "*" },
 				user_default_options = {
-					names = true, -- "Name" codes like Blue
+					names = false, -- "Name" codes like Blue
 					RRGGBBAA = true, -- #RRGGBBAA hex codes
 					rgb_fn = true, -- CSS rgb() and rgba() functions
 					hsl_fn = true, -- CSS hsl() and hsla() functions
@@ -120,24 +99,6 @@ return {
 		opts = {
 			window = { blend = 0 },
 			text = { spinner = "dots_snake" },
-		},
-	},
-	{
-		"folke/noice.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		dependencies = {
-			{ "MunifTanjim/nui.nvim", lazy = true },
-		},
-		opts = {
-			lsp = { progress = { enabled = false } },
-			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
-			routes = {
-				{
-					filter = { event = "msg_show", kind = "", find = "written" },
-					opts = { skip = true },
-				},
-			},
 		},
 	},
 	{
@@ -277,7 +238,7 @@ return {
 			require("nvim-treesitter.configs").setup {
 				ensure_installed = "all",
 				ignore_install = { "phpdoc", "gitcommit" },
-				indent = { enable = false },
+				indent = { enable = true },
 				highlight = { enable = true },
 				context_commentstring = { enable = true, enable_autocmd = false },
 				matchup = { enable = true },
@@ -427,7 +388,6 @@ return {
 		event = "BufReadPost",
 		config = function()
 			require("nvim-tree").setup {
-				disable_netrw = true,
 				hijack_cursor = true,
 				sort_by = "extensions",
 				prefer_startup_root = true,
@@ -440,7 +400,6 @@ return {
 				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
 				renderer = {
 					group_empty = true,
-					highlight_opened_files = "none",
 					indent_markers = { enable = true },
 					root_folder_label = ":.:s?.*?/..?",
 					root_folder_modifier = ":e",
@@ -453,7 +412,7 @@ return {
 					cmd = require("zox.utils").get_binary_path "rip",
 					require_confirm = true,
 				},
-				view = { adaptive_size = false, side = "left" },
+				view = { width = "15%", side = "left" },
 			}
 		end,
 	},
@@ -517,7 +476,7 @@ return {
 			require("toggleterm").setup {
 				-- size can be a number or function which is passed the current terminal
 				size = function(term)
-					local factor = 0.4
+					local factor = 0.3
 					if term.direction == "horizontal" then
 						return vim.o.lines * factor
 					elseif term.direction == "vertical" then
@@ -546,194 +505,6 @@ return {
 				["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
 					:with_defaults "terminal: Toggle vertical",
 			}
-		end,
-	},
-	{
-		"akinsho/nvim-bufferline.lua",
-		lazy = true,
-		branch = "main",
-		event = "BufReadPost",
-		config = function()
-			require("bufferline").setup {
-				options = {
-					offsets = {
-						{
-							filetype = "NvimTree",
-							text = "File Explorer",
-							text_align = "center",
-							padding = 1,
-						},
-					},
-				},
-			}
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<LocalLeader>p"] = k.cr("BufferLinePick"):with_defaults "buffer: Pick",
-				["n|<LocalLeader>c"] = k.cr("BufferLinePickClose"):with_defaults "buffer: Close",
-				["n|<Leader>."] = k.cr("BufferLineCycleNext")
-					:with_defaults "buffer: Cycle to next buffer",
-				["n|<Leader>,"] = k.cr("BufferLineCyclePrev")
-					:with_defaults "buffer: Cycle to previous buffer",
-				["n|<Leader>1"] = k.cr("BufferLineGoToBuffer 1")
-					:with_defaults "buffer: Goto buffer 1",
-				["n|<Leader>2"] = k.cr("BufferLineGoToBuffer 2")
-					:with_defaults "buffer: Goto buffer 2",
-				["n|<Leader>3"] = k.cr("BufferLineGoToBuffer 3")
-					:with_defaults "buffer: Goto buffer 3",
-				["n|<Leader>4"] = k.cr("BufferLineGoToBuffer 4")
-					:with_defaults "buffer: Goto buffer 4",
-				["n|<Leader>5"] = k.cr("BufferLineGoToBuffer 5")
-					:with_defaults "buffer: Goto buffer 5",
-				["n|<Leader>6"] = k.cr("BufferLineGoToBuffer 6")
-					:with_defaults "buffer: Goto buffer 6",
-				["n|<Leader>7"] = k.cr("BufferLineGoToBuffer 7")
-					:with_defaults "buffer: Goto buffer 7",
-				["n|<Leader>8"] = k.cr("BufferLineGoToBuffer 8")
-					:with_defaults "buffer: Goto buffer 8",
-				["n|<Leader>9"] = k.cr("BufferLineGoToBuffer 9")
-					:with_defaults "buffer: Goto buffer 9",
-			}
-		end,
-	},
-	{
-		"nvim-lualine/lualine.nvim",
-		event = "BufReadPost",
-		config = function()
-			local _cache = { context = "", bufnr = -1 }
-			local lspsaga_symbols = function()
-				if
-					vim.api.nvim_win_get_config(0).zindex
-					or vim.tbl_contains({
-						"terminal",
-						"toggleterm",
-						"prompt",
-						"alpha",
-						"dashboard",
-						"help",
-						"TelescopePrompt",
-					}, vim.bo.filetype)
-				then
-					return "" -- Excluded filetypes
-				else
-					local currbuf = vim.api.nvim_get_current_buf()
-					local ok, lspsaga = pcall(require, "lspsaga.symbolwinbar")
-					if ok and lspsaga:get_winbar() ~= nil then
-						_cache.context = lspsaga:get_winbar()
-						_cache.bufnr = currbuf
-					elseif _cache.bufnr ~= currbuf then
-						_cache.context = "" -- NOTE: Reset [invalid] cache (usually from another buffer)
-					end
-
-					return _cache.context
-				end
-			end
-
-			local diff_source = function()
-				---@diagnostic disable-next-line: undefined-field
-				local gitsigns = vim.b.gitsigns_status_dict
-				if gitsigns then
-					return {
-						added = gitsigns.added,
-						modified = gitsigns.changed,
-						removed = gitsigns.removed,
-					}
-				end
-			end
-
-			local get_cwd = function()
-				local cwd = vim.fn.getcwd()
-				local bentoml_git_root = os.getenv "BENTOML_GIT_ROOT"
-				if bentoml_git_root and cwd:find(bentoml_git_root, 1, true) == 1 then
-					return require("zox").misc_space.BentoBox .. cwd:sub(#bentoml_git_root + 2)
-				end
-
-				if vim.loop.os_uname().sysname ~= "Windows_NT" then
-					local home = os.getenv "HOME"
-					if home and cwd:find(home, 1, true) == 1 then
-						cwd = "~" .. cwd:sub(#home + 1)
-					end
-				end
-				return require("zox").ui_space.RootFolderOpened .. cwd
-			end
-
-			local mini_sections = {
-				lualine_a = { "filetype" },
-				lualine_b = {},
-				lualine_c = {},
-				lualine_x = {},
-				lualine_y = {},
-				lualine_z = {},
-			}
-			local outline = {
-				sections = mini_sections,
-				filetypes = { "lspsagaoutline" },
-			}
-			local diffview = {
-				sections = mini_sections,
-				filetypes = { "DiffviewFiles" },
-			}
-
-			require("lualine").setup {
-				options = {
-					theme = "auto",
-					disabled_filetypes = {
-						statusline = {
-							"alpha",
-							"dashboard",
-							"NvimTree",
-							"DiffviewFiles",
-							"TelescopePrompt",
-							"nofile",
-							"",
-						},
-					},
-					component_separators = "|",
-					section_separators = { left = "", right = "" },
-					globalstatus = true,
-				},
-				sections = {
-					lualine_a = { "mode" },
-					lualine_b = {
-						{ "diff", source = diff_source },
-					},
-					lualine_c = { lspsaga_symbols },
-					lualine_x = {
-						{
-							"diagnostics",
-							sources = { "nvim_diagnostic" },
-							symbols = {
-								error = require("zox").diagnostics_space.Error,
-								warn = require("zox").diagnostics_space.Warning,
-								info = require("zox").diagnostics_space.Information,
-							},
-						},
-						{ get_cwd },
-					},
-					lualine_y = {},
-					lualine_z = { "progress", "location" },
-				},
-				inactive_sections = {},
-				tabline = {},
-				extensions = {
-					"quickfix",
-					"nvim-tree",
-					"toggleterm",
-					"fugitive",
-					outline,
-					diffview,
-				},
-			}
-
-			-- Properly set background color for lspsaga
-			local winbar_bg = require("zox.utils").hl_to_rgb(
-				"StatusLine",
-				true,
-				require("rose-pine.palette").base
-			)
-			for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind_group()) do
-				require("zox.utils").extend_hl(hlGroup, { bg = winbar_bg })
-			end
 		end,
 	},
 }

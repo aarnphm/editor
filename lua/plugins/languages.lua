@@ -69,7 +69,8 @@ return {
 						},
 						code_actions = { extend_gitsigns = false },
 						symbol_in_winbar = {
-							enable = false,
+							enable = true,
+							ignore_patterns = { "%w_spec" },
 							respect_root = true,
 							separator = " " .. require("zox").ui_space.Separator,
 							show_file = false,
@@ -131,7 +132,10 @@ return {
 						disabled_filetypes = { "markdown" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.clang_format,
+					f.clang_format.with {
+						extra_args = { "--style", "{BasedOnStyle: LLVM, IndentWidth: 4}" },
+						filetypes = { "c", "cpp", "objc", "objcpp" },
+					},
 					f.black,
 					f.ruff,
 					f.isort,
@@ -184,6 +188,7 @@ return {
 				automatic_installation = true,
 				automatic_setup = false,
 			}
+			-- require("mason-null-ls").setup_handlers()
 
 			require("zox.formatting").configure_format_on_save()
 
@@ -253,7 +258,9 @@ return {
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
 			--- @param lsp_name string name of given lsp server
-			local mason_handler = function(lsp_name)
+			local mason_handler = function(lsp_name, use_server_formatting_provider)
+				use_server_formatting_provider = use_server_formatting_provider or false
+				options.on_attach = on_attach_factory(use_server_formatting_provider)
 				local check_config = function()
 					local path = require("zox.utils").path.join(
 						vim.fn.stdpath "config",
@@ -271,55 +278,44 @@ return {
 					return vim.tbl_contains(servers, lsp_name)
 				end
 
-				if not check_config() then
-					nvim_lsp[lsp_name].setup(options)
-					return
-				end
+				return function()
+					if not check_config() then
+						nvim_lsp[lsp_name].setup(options)
+						return
+					end
 
-				local lspconfig = require("zox").servers[lsp_name]
-				if type(lspconfig) == "function" then
-					--- This is the case where the language server has its own setup
-					--- e.g. clangd_extensions, lua_ls, rust_analyzer
-					lspconfig(options)
-				elseif type(lspconfig) == "table" then
-					nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
-				else
-					error(
-						string.format(
-							"Failed to setup '%s'. Server defined "
-								.. "under zox/servers must return either a "
-								.. "function(opts) or a table. Got type '%s' instead.",
-							lsp_name,
-							type(lspconfig)
-						),
-						vim.log.levels.ERROR
-					)
+					local lspconfig = require("zox").servers[lsp_name]
+					if type(lspconfig) == "function" then
+						--- This is the case where the language server has its own setup
+						--- e.g. clangd_extensions, lua_ls, rust_analyzer
+						lspconfig(options)
+					elseif type(lspconfig) == "table" then
+						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
+					else
+						error(
+							string.format(
+								"Failed to setup '%s'. Server defined "
+									.. "under zox/servers must return either a "
+									.. "function(opts) or a table. Got type '%s' instead.",
+								lsp_name,
+								type(lspconfig)
+							),
+							vim.log.levels.ERROR
+						)
+					end
 				end
 			end
 
 			require("mason-lspconfig").setup_handlers {
-				mason_handler,
-				taplo = function()
-					nvim_lsp["taplo"].setup {
-						on_attach = on_attach_factory(true),
-						capabilities = capabilities,
-						flags = { debounce_text_changes = 150 },
-					}
+				function(lsp_name)
+					ok, _ = pcall(mason_handler(lsp_name))
+					if not ok then
+						error(string.format("Failed to setup '%s'", lsp_name), vim.log.levels.ERROR)
+					end
 				end,
-				spectral = function()
-					nvim_lsp["spectral"].setup {
-						on_attach = on_attach_factory(true),
-						capabilities = capabilities,
-						flags = { debounce_text_changes = 150 },
-					}
-				end,
-				yamlls = function()
-					nvim_lsp["yamlls"].setup {
-						on_attach = on_attach_factory(true),
-						capabilities = capabilities,
-						flags = { debounce_text_changes = 150 },
-					}
-				end,
+				taplo = mason_handler("taplo", true),
+				spectral = mason_handler("spectral", true),
+				yamlls = mason_handler("yamlls", true),
 			}
 
 			mason_handler "starlark_rust"
@@ -330,7 +326,7 @@ return {
 	{
 		"hrsh7th/nvim-cmp",
 		lazy = true,
-		event = "LspAttach",
+		event = "BufReadPost",
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",
@@ -367,16 +363,11 @@ return {
 						function()
 							require("copilot").setup {
 								panel = { enabled = false },
-								suggestion = {
-									enabled = true,
-									auto_trigger = true,
-								},
+								suggestion = { enabled = true, auto_trigger = true },
 								filetypes = {
-									help = false,
 									markdown = true,
+									help = false,
 									terraform = false,
-									gitcommit = false,
-									gitrebase = false,
 									hgcommit = false,
 									svn = false,
 									cvs = false,
@@ -394,12 +385,11 @@ return {
 			},
 		},
 		config = function()
-			local lspkind = require "lspkind"
 			local cmp = require "cmp"
+			local k = require "zox.keybind"
+			local lspkind = require "lspkind"
 
 			local cmp_window = require "cmp.utils.window"
-			local k = require "zox.keybind"
-
 			local prev_info = cmp_window.info
 			---@diagnostic disable-next-line: duplicate-set-field
 			cmp_window.info = function(self)
@@ -491,7 +481,6 @@ return {
 					completion = cmp.config.window.bordered { border = "single" },
 					documentation = cmp.config.window.bordered { border = "single" },
 				},
-				experimental = { ghost_text = { hl_group = "LspCodeLens" } },
 			}
 		end,
 	},

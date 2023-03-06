@@ -1,8 +1,8 @@
 return {
 	{ "nvim-lua/plenary.nvim" },
-	{ "jghauser/mkdir.nvim" },
 	{ "ojroques/nvim-bufdel", cmd = { "BufDel" } },
 	{ "tpope/vim-repeat", event = "VeryLazy" },
+	{ "tpope/vim-fugitive", event = "VeryLazy", cmd = { "Git", "G" } },
 	{
 		"nmac427/guess-indent.nvim",
 		event = { "CursorHold", "CursorHoldI" },
@@ -34,21 +34,6 @@ return {
 		config = function() require("mini.surround").setup() end,
 	},
 	{
-		"folke/which-key.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		opts = {
-			window = {
-				border = "single",
-			},
-			plugins = {
-				spelling = {
-					enabled = true,
-				},
-			},
-		},
-	},
-	{
 		"windwp/nvim-autopairs",
 		lazy = true,
 		event = "InsertEnter",
@@ -72,90 +57,58 @@ return {
 		branch = "v2",
 		event = { "CursorHold", "CursorHoldI" },
 		cmd = { "HopWord", "HopLine", "HopChar1", "HopChar2" },
-		config = true,
-		keys = {
-			{
-				"<LocalLeader>w",
-				"<cmd>HopWord<CR>",
-				"jump: Goto word",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>j",
-				"<cmd>HopLine<CR>",
-				"jump: Goto line",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>k",
-				"<cmd>HopLine<CR>",
-				"jump: Goto line",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>c",
-				"<cmd>HopChar1<CR>",
-				"jump: one char",
-				noremap = true,
-			},
-			{
-				"<LocalLeader>cc",
-				"<cmd>HopChar2<CR>",
-				"jump: one char",
-				noremap = true,
-			},
-			{
-				"f",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 { direction = d.AFTER_CURSOR, current_line_only = true }
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: f 1 char",
-			},
-			{
-				"F",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 { direction = d.BEFORE_CURSOR, current_line_only = true }
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: F 1 char",
-			},
-			{
-				"t",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 {
-						direction = d.AFTER_CURSOR,
-						current_line_only = true,
-						hint_offset = -1,
-					}
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: t 1 char",
-			},
-			{
-				"T",
-				function()
-					local h = require "hop"
-					local d = require("hop.hint").HintDirection
-					h.hint_char1 {
-						direction = d.BEFORE_CURSOR,
-						current_line_only = true,
-						hint_offset = 1,
-					}
-				end,
-				mode = "",
-				remap = true,
-				desc = "motion: T 1 char",
-			},
-		},
+		config = function()
+			local h = require "hop"
+			local hh = require "hop.hint"
+			local k = require "zox.keybind"
+
+			h.setup()
+
+			k.nvim_register_mapping {
+				["n|<LocalLeader>w"] = k.cr("HopWord"):with_defaults "jump: Goto word",
+				["n|<LocalLeader>j"] = k.cr("HopLine"):with_defaults "jump: Goto line",
+				["n|<LocalLeader>k"] = k.cr("HopLine"):with_defaults "jump: Goto line",
+				["n|<LocalLeader>c"] = k.cr("HopChar1"):with_defaults "jump: one char",
+				["n|<LocalLeader>cc"] = k.cr("HopChar2"):with_defaults "jump: two chars",
+				["n|f"] = k.callback(
+					function()
+						h.hint_char1 {
+							direction = hh.HintDirection.AFTER_CURSOR,
+							current_line_only = true,
+						}
+					end
+				):with_defaults "motion: forward inline to char",
+				["n|<LocalLeader>f"] = k.cr("HopChar1AC")
+					:with_defaults "jump: one char after cursor to eol",
+				["n|F"] = k.callback(
+					function()
+						h.hint_char1 {
+							direction = hh.HintDirection.BEFORE_CURSOR,
+							current_line_only = true,
+						}
+					end
+				):with_defaults "motion: backward inline to char",
+				["n|<LocalLeader>F"] = k.cr("HopChar1BC")
+					:with_defaults "jump: one char after cursor to eol",
+				["n|t"] = k.callback(
+					function()
+						h.hint_char1 {
+							direction = hh.HintDirection.AFTER_CURSOR,
+							current_line_only = true,
+							hint_offset = -1,
+						}
+					end
+				):with_defaults "motion: forward inline one char before requested",
+				["n|T"] = k.callback(
+					function()
+						h.hint_char1 {
+							direction = hh.HintDirection.BEFORE_CURSOR,
+							current_line_only = true,
+							hint_offset = -1,
+						}
+					end
+				):with_defaults "motion: backward inline one char before requested",
+			}
+		end,
 	},
 }

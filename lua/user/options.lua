@@ -61,7 +61,9 @@ vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
--- vim.o.statusline = "%f %m %= %=%y %P %l:%c ♥ "
+vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
+vim.o.swapfile = false
+vim.o.backup = false
 vim.o.linebreak = true
 vim.o.list = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -78,7 +80,8 @@ vim.o.scrolloff = 3
 vim.o.shada = "!,'300,<50,@100,s10,h"
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
-vim.opt.shortmess:append "Ic"
+-- vim.o.shortmess:append "Ic"
+vim.o.shortmess = "aoOTIcF"
 vim.o.showbreak = "↳  "
 vim.o.showcmd = false
 vim.o.showmode = false
@@ -94,10 +97,11 @@ vim.o.startofline = false
 vim.o.switchbuf = "usetab,uselast"
 vim.o.synmaxcol = 2500
 vim.o.tabstop = 4
-vim.o.timeoutlen = 200
+vim.o.timeout = true
+vim.o.timeoutlen = 100
 vim.o.undofile = true
 vim.o.undolevels = 9999
-vim.o.updatetime = 250
+vim.o.updatetime = 200
 vim.o.viewoptions = "folds,cursor,curdir,slash,unix"
 vim.o.virtualedit = "block"
 vim.o.visualbell = true
