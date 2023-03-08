@@ -39,9 +39,10 @@ return {
 						pcall(vim.cmd.ObsidianFollowLink)
 					end
 				end):with_defaults "obsidian: Follow link",
-				["n|<Leader>bl"] = k.cr("ObsidianBacklinks"):with_defaults "obsidian: Backlinks",
-				["n|<Leader>on"] = k.cr("ObsidianNew"):with_defaults "obsidian: New notes",
-				["n|<Leader>oo"] = k.cr("ObsidianOpen"):with_defaults "obsidian: Open",
+				["n|<LocalLeader>obl"] = k.cr("ObsidianBacklinks")
+					:with_defaults "obsidian: Backlinks",
+				["n|<LocalLeader>on"] = k.cr("ObsidianNew"):with_defaults "obsidian: New notes",
+				["n|<LocalLeader>oo"] = k.cr("ObsidianOpen"):with_defaults "obsidian: Open",
 			}
 		end,
 	},

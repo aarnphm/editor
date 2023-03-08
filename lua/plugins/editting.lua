@@ -21,6 +21,77 @@ return {
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		config = true,
 	},
+	-- better text-objects
+	{
+		"echasnovski/mini.ai",
+		event = "VeryLazy",
+		dependencies = { "nvim-treesitter-textobjects" },
+		opts = function()
+			local ai = require "mini.ai"
+			return {
+				n_lines = 500,
+				custom_textobjects = {
+					o = ai.gen_spec.treesitter({
+						a = { "@block.outer", "@conditional.outer", "@loop.outer" },
+						i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+					}, {}),
+					f = ai.gen_spec.treesitter(
+						{ a = "@function.outer", i = "@function.inner" },
+						{}
+					),
+					c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
+				},
+			}
+		end,
+		config = function(_, opts)
+			require("mini.ai").setup(opts)
+			if require("zox.utils").has "which-key.nvim" then
+				--- register text-objects with which-key
+				---@type table<string, string|table>
+				local i = {
+					[" "] = "Whitespace",
+					["\""] = "Balanced \"",
+					["'"] = "Balanced '",
+					["`"] = "Balanced `",
+					["("] = "Balanced (",
+					[")"] = "Balanced ) including white-space",
+					[">"] = "Balanced > including white-space",
+					["<lt>"] = "Balanced <",
+					["]"] = "Balanced ] including white-space",
+					["["] = "Balanced [",
+					["}"] = "Balanced } including white-space",
+					["{"] = "Balanced {",
+					["?"] = "User Prompt",
+					_ = "Underscore",
+					a = "Argument",
+					b = "Balanced ), ], }",
+					c = "Class",
+					f = "Function",
+					o = "Block, conditional, loop",
+					q = "Quote `, \", '",
+					t = "Tag",
+				}
+				local a = vim.deepcopy(i)
+				for k, v in pairs(a) do
+					a[k] = v:gsub(" including.*", "")
+				end
+
+				local ic = vim.deepcopy(i)
+				local ac = vim.deepcopy(a)
+				for key, name in pairs { n = "Next", l = "Last" } do
+					i[key] =
+						vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
+					a[key] =
+						vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
+				end
+				require("which-key").register {
+					mode = { "o", "x" },
+					i = i,
+					a = a,
+				}
+			end
+		end,
+	},
 	{
 		"echasnovski/mini.align",
 		lazy = true,
@@ -33,82 +104,39 @@ return {
 		event = "VeryLazy",
 		config = function() require("mini.surround").setup() end,
 	},
+	-- testing out mini.pairs
 	{
-		"windwp/nvim-autopairs",
-		lazy = true,
-		event = "InsertEnter",
-		opts = {
-			check_ts = true,
-			enable_check_bracket_line = false,
-			fast_wrap = {
-				map = "<C-b>",
-				chars = { "{", "[", "(", "\"", "'" },
-				pattern = [=[[%'%"%)%>%]%)%}%,]]=],
-				end_key = "$",
-				keys = "qwertyuiopzxcvbnmasdfghjkl",
-				highlight = "LightspeedShortcut",
-				highlight_grey = "LightspeedGreyWash",
-			},
-		},
+		"echasnovski/mini.pairs",
+		event = "VeryLazy",
+		config = function(_, opts) require("mini.pairs").setup(opts) end,
+	},
+	-- easily jump to any location and enhanced f/t motions for Leap
+	{
+		"ggandor/flit.nvim",
+		keys = function()
+			local ret = {}
+			for _, key in ipairs { "f", "F", "t", "T" } do
+				ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
+			end
+			return ret
+		end,
+		opts = { labeled_modes = "nx" },
 	},
 	{
-		"phaazon/hop.nvim",
-		lazy = true,
-		branch = "v2",
-		event = { "CursorHold", "CursorHoldI" },
-		cmd = { "HopWord", "HopLine", "HopChar1", "HopChar2" },
-		config = function()
-			local h = require "hop"
-			local hh = require "hop.hint"
-			local k = require "zox.keybind"
-
-			h.setup()
-
-			k.nvim_register_mapping {
-				["n|<LocalLeader>w"] = k.cr("HopWord"):with_defaults "jump: Goto word",
-				["n|<LocalLeader>j"] = k.cr("HopLine"):with_defaults "jump: Goto line",
-				["n|<LocalLeader>k"] = k.cr("HopLine"):with_defaults "jump: Goto line",
-				["n|<LocalLeader>c"] = k.cr("HopChar1"):with_defaults "jump: one char",
-				["n|<LocalLeader>cc"] = k.cr("HopChar2"):with_defaults "jump: two chars",
-				["n|f"] = k.callback(
-					function()
-						h.hint_char1 {
-							direction = hh.HintDirection.AFTER_CURSOR,
-							current_line_only = true,
-						}
-					end
-				):with_defaults "motion: forward inline to char",
-				["n|<LocalLeader>f"] = k.cr("HopChar1AC")
-					:with_defaults "jump: one char after cursor to eol",
-				["n|F"] = k.callback(
-					function()
-						h.hint_char1 {
-							direction = hh.HintDirection.BEFORE_CURSOR,
-							current_line_only = true,
-						}
-					end
-				):with_defaults "motion: backward inline to char",
-				["n|<LocalLeader>F"] = k.cr("HopChar1BC")
-					:with_defaults "jump: one char after cursor to eol",
-				["n|t"] = k.callback(
-					function()
-						h.hint_char1 {
-							direction = hh.HintDirection.AFTER_CURSOR,
-							current_line_only = true,
-							hint_offset = -1,
-						}
-					end
-				):with_defaults "motion: forward inline one char before requested",
-				["n|T"] = k.callback(
-					function()
-						h.hint_char1 {
-							direction = hh.HintDirection.BEFORE_CURSOR,
-							current_line_only = true,
-							hint_offset = -1,
-						}
-					end
-				):with_defaults "motion: backward inline one char before requested",
-			}
+		"ggandor/leap.nvim",
+		keys = {
+			{ "s", mode = { "n", "x", "o" }, desc = "Leap forward to" },
+			{ "S", mode = { "n", "x", "o" }, desc = "Leap backward to" },
+			{ "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
+		},
+		config = function(_, opts)
+			local leap = require "leap"
+			for k, v in pairs(opts) do
+				leap.opts[k] = v
+			end
+			leap.add_default_mappings(true)
+			vim.keymap.del({ "x", "o" }, "x")
+			vim.keymap.del({ "x", "o" }, "X")
 		end,
 	},
 }

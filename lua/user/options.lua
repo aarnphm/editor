@@ -61,6 +61,7 @@ vim.o.ignorecase = true
 vim.o.incsearch = true
 vim.o.infercase = true
 vim.o.jumpoptions = "stack"
+vim.o.laststatus = 2 -- status line to be buffer local
 vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
 vim.o.swapfile = false
 vim.o.backup = false
@@ -80,7 +81,6 @@ vim.o.scrolloff = 3
 vim.o.shada = "!,'300,<50,@100,s10,h"
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
--- vim.o.shortmess:append "Ic"
 vim.o.shortmess = "aoOTIcF"
 vim.o.showbreak = "↳  "
 vim.o.showcmd = false
@@ -101,7 +101,7 @@ vim.o.timeout = true
 vim.o.timeoutlen = 100
 vim.o.undofile = true
 vim.o.undolevels = 9999
-vim.o.updatetime = 200
+vim.o.updatetime = 50
 vim.o.viewoptions = "folds,cursor,curdir,slash,unix"
 vim.o.virtualedit = "block"
 vim.o.visualbell = true
@@ -124,7 +124,21 @@ if vim.loop.os_uname().sysname == "Darwin" then
 	}
 end
 
-vim.diagnostic.config { virtual_text = false, underline = false }
+vim.diagnostic.config {
+	virtual_text = false,
+	signs = true,
+	update_in_insert = false,
+	underline = false,
+	severity_sort = true,
+	float = {
+		focusable = false,
+		style = "minimal",
+		border = "rounded",
+		source = "always",
+		header = "",
+		prefix = "",
+	},
+}
 
 local signs = { "Error", "Warn", "Hint", "Info" }
 for _, type in pairs(signs) do

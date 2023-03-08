@@ -2,17 +2,10 @@ return {
 	{
 		"folke/which-key.nvim",
 		lazy = true,
-		enabled = true,
 		event = "BufReadPost",
 		opts = {
-			window = {
-				border = "single",
-			},
-			plugins = {
-				spelling = {
-					enabled = true,
-				},
-			},
+			window = { border = "single" },
+			plugins = { spelling = { enabled = true } },
 		},
 	},
 	{
@@ -23,6 +16,7 @@ return {
 		opts = {
 			cmdline = { view = "cmdline" },
 			lsp = { progress = { enabled = false } },
+			popupmenu = { enabled = true, backend = "cmp" },
 			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
 			routes = {
 				{
@@ -44,6 +38,7 @@ return {
 					mjml = "html",
 					sh = "bash",
 					m = "objc",
+					BUILD = "bzl",
 				},
 				complex = {
 					[".*%.env.*"] = "sh",
@@ -102,11 +97,6 @@ return {
 		},
 	},
 	{
-		"zbirenbaum/neodim",
-		event = "BufReadPost",
-		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
-	},
-	{
 		"folke/todo-comments.nvim",
 		lazy = true,
 		cmd = { "TodoTrouble", "TodoTelescope" },
@@ -116,13 +106,40 @@ return {
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
-		event = "BufReadPost",
+		event = { "BufReadPost", "BufNewFile" },
 		opts = {
 			show_first_indent_level = true,
 			buftype_exclude = { "terminal", "nofile" },
+			filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
 			show_trailing_blankline_indent = false,
-			show_current_context = true,
+			show_current_context = false,
 		},
+	},
+	-- active indent guide and indent text objects
+	{
+		"echasnovski/mini.indentscope",
+		event = { "BufReadPre", "BufNewFile" },
+		opts = {
+			symbol = "│",
+			options = { try_as_border = true },
+		},
+		init = function()
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = {
+					"help",
+					"alpha",
+					"dashboard",
+					"neo-tree",
+					"Trouble",
+					"lazy",
+					"mason",
+					"TelescopePrompt",
+					"NvimTree",
+				},
+				callback = function() vim.b.miniindentscope_disable = true end,
+			})
+		end,
+		config = function(_, opts) require("mini.indentscope").setup(opts) end,
 	},
 	{
 		"lewis6991/gitsigns.nvim",
@@ -225,11 +242,11 @@ return {
 		event = "BufReadPost",
 		config = true,
 	},
-	{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true, event = "BufReadPost" },
+	{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		event = "BufReadPost",
+		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
 			{ "nvim-treesitter/nvim-treesitter-textobjects" },
@@ -238,56 +255,17 @@ return {
 			require("nvim-treesitter.configs").setup {
 				ensure_installed = "all",
 				ignore_install = { "phpdoc", "gitcommit" },
-				indent = { enable = true },
+				indent = { enable = true, disable = { "python" } },
 				highlight = { enable = true },
 				context_commentstring = { enable = true, enable_autocmd = false },
 				matchup = { enable = true },
-				textobjects = {
-					select = {
-						enable = true,
-						lookahead = true,
-						keymaps = {
-							["af"] = "@function.outer",
-							["if"] = "@function.inner",
-							["ac"] = "@conditional.outer",
-							["ic"] = "@conditional.inner",
-							["aa"] = "@parameter.outer",
-							["ia"] = "@parameter.inner",
-							["aS"] = "@statement.outer",
-							["aC"] = "@class.outer",
-							["iC"] = "@class.inner",
-							["al"] = "@loop.outer",
-							["il"] = "@loop.inner",
-						},
-					},
-					swap = {
-						enable = true,
-						swap_next = {
-							["<leader>Pa"] = "@parameter.inner",
-						},
-						swap_previous = {
-							["<leader>PA"] = "@parameter.inner",
-						},
-					},
-					move = {
-						enable = true,
-						set_jumps = true,
-						goto_next_start = {
-							["]]"] = "@function.outer",
-							["]c"] = "@class.outer",
-						},
-						goto_next_end = {
-							["]["] = "@function.outer",
-							["]C"] = "@class.outer",
-						},
-						goto_previous_start = {
-							["[["] = "@function.outer",
-							["[c"] = "@class.outer",
-						},
-						goto_previous_end = {
-							["[]"] = "@function.outer",
-							["[C"] = "@class.outer",
-						},
+				incremental_selection = {
+					enable = true,
+					keymaps = {
+						init_selection = "<C-space>",
+						node_incremental = "<C-space>",
+						scope_incremental = "<nop>",
+						node_decremental = "<bs>",
 					},
 				},
 			}
@@ -412,7 +390,7 @@ return {
 					cmd = require("zox.utils").get_binary_path "rip",
 					require_confirm = true,
 				},
-				view = { width = "15%", side = "left" },
+				view = { width = "12%", side = "right" },
 			}
 		end,
 	},

@@ -133,7 +133,7 @@ return {
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.clang_format.with {
-						extra_args = { "--style", "{BasedOnStyle: LLVM, IndentWidth: 4}" },
+						extra_args = { "-style={BasedOnStyle: LLVM, IndentWidth: 4}" },
 						filetypes = { "c", "cpp", "objc", "objcpp" },
 					},
 					f.black,
@@ -183,142 +183,107 @@ return {
 					},
 				},
 			}
-			require("mason-null-ls").setup {
-				ensure_installed = nil,
-				automatic_installation = true,
-				automatic_setup = false,
-			}
-			-- require("mason-null-ls").setup_handlers()
-
-			require("zox.formatting").configure_format_on_save()
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 			if ok then capabilities = cmp_nvim_lsp.default_capabilities(capabilities) end
 			capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-			local on_attach_factory = function(use_server_formatting_provider)
-				return function(client, bufnr)
-					--- NOTE: Avoid LSP formatting, since it will be handled by null-ls
-					if not use_server_formatting_provider then
-						client.server_capabilities.documentFormattingProvider = false
-						client.server_capabilities.documentRangeFormattingProvider = false
-					end
+			local on_attach = function(client, bufnr)
+				local buf_set_option = function(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
-					local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+				require("zox.formatting").on_attach(client, bufnr)
 
-					-- Enable completion triggered by <c-x><c-o>
-					buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+				-- Enable completion triggered by <c-x><c-o>
+				buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
-					local k = require "zox.keybind"
-					k.nvim_register_mapping {
-						-- lsp
-						["n|K"] = k.cr("Lspsaga hover_doc")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Signature help",
-						["n|gh"] = k.callback(vim.show_pos)
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Show hightlight",
-						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Prev diagnostic",
-						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Next diagnostic",
-						["n|gr"] = k.callback(vim.lsp.buf.rename)
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Rename in file range",
-						["n|gd"] = k.cr("Glance definitions")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Peek definition",
-						["n|gD"] = k.cr("Lspsaga goto_definition")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Goto definition",
-						["n|ca"] = k.callback(vim.lsp.buf.code_action)
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Code action for cursor",
-						["v|ca"] = k.callback(vim.lsp.buf.code_action)
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Code action for range",
-						["n|go"] = k.cr("Lspsaga outline")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Show outline",
-						["n|gR"] = k.cr("TroubleToggle lsp_references")
-							:with_buffer(bufnr)
-							:with_defaults "lsp: Show references",
-					}
-				end
+				local k = require "zox.keybind"
+				k.nvim_register_mapping {
+					-- lsp
+					["n|K"] = k.cr("Lspsaga hover_doc")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Signature help",
+					["n|gh"] = k.callback(vim.show_pos)
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Show hightlight",
+					["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Prev diagnostic",
+					["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Next diagnostic",
+					["n|gr"] = k.callback(vim.lsp.buf.rename)
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Rename in file range",
+					["n|gd"] = k.cr("Glance definitions")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Peek definition",
+					["n|gD"] = k.cr("Lspsaga goto_definition")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Goto definition",
+					["n|ca"] = k.callback(vim.lsp.buf.code_action)
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Code action for cursor",
+					["v|ca"] = k.callback(vim.lsp.buf.code_action)
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Code action for range",
+					["n|go"] = k.cr("Lspsaga outline")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Show outline",
+					["n|gR"] = k.cr("TroubleToggle lsp_references")
+						:with_buffer(bufnr)
+						:with_defaults "lsp: Show references",
+				}
 			end
 
 			local options = {
-				on_attach = on_attach_factory(false),
+				on_attach = on_attach,
 				capabilities = capabilities,
 				flags = { debounce_text_changes = 150 },
 			}
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
 			--- @param lsp_name string name of given lsp server
-			local mason_handler = function(lsp_name, use_server_formatting_provider)
-				use_server_formatting_provider = use_server_formatting_provider or false
-				options.on_attach = on_attach_factory(use_server_formatting_provider)
-				local check_config = function()
-					local path = require("zox.utils").path.join(
-						vim.fn.stdpath "config",
-						"lua",
-						"zox",
-						"servers"
-					)
-					local servers = {}
-					local available_configs = vim.split(vim.fn.glob(path .. "/*.lua"), "\n")
-					if type(available_configs) == "table" then
-						for _, s in ipairs(available_configs) do
-							servers[#servers + 1] = s:sub(#path + 2, -5)
-						end
-					end
-					return vim.tbl_contains(servers, lsp_name)
+			local mason_handler = function(lsp_name)
+				local success, handler = pcall(require, "zox.servers." .. lsp_name)
+
+				if not success then
+					nvim_lsp[lsp_name].setup(options)
+					return
 				end
 
-				return function()
-					if not check_config() then
-						nvim_lsp[lsp_name].setup(options)
-						return
-					end
-
-					local lspconfig = require("zox").servers[lsp_name]
-					if type(lspconfig) == "function" then
-						--- This is the case where the language server has its own setup
-						--- e.g. clangd_extensions, lua_ls, rust_analyzer
-						lspconfig(options)
-					elseif type(lspconfig) == "table" then
-						nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, lspconfig))
-					else
-						error(
-							string.format(
-								"Failed to setup '%s'. Server defined "
-									.. "under zox/servers must return either a "
-									.. "function(opts) or a table. Got type '%s' instead.",
-								lsp_name,
-								type(lspconfig)
-							),
-							vim.log.levels.ERROR
-						)
-					end
+				if type(handler) == "function" then
+					--- This is the case where the language server has its own setup
+					--- e.g. clangd_extensions, lua_ls, rust_analyzer
+					handler(options)
+				elseif type(handler) == "table" then
+					nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, handler))
+				else
+					error(
+						string.format(
+							"Failed to setup '%s'. Server defined "
+								.. "under zox/servers must return either a "
+								.. "function(opts) or a table. Got type '%s' instead.",
+							lsp_name,
+							type(handler)
+						),
+						vim.log.levels.ERROR
+					)
 				end
 			end
 
-			require("mason-lspconfig").setup_handlers {
-				function(lsp_name)
-					ok, _ = pcall(mason_handler(lsp_name))
-					if not ok then
-						error(string.format("Failed to setup '%s'", lsp_name), vim.log.levels.ERROR)
-					end
-				end,
-				taplo = mason_handler("taplo", true),
-				spectral = mason_handler("spectral", true),
-				yamlls = mason_handler("yamlls", true),
-			}
+			require("mason-lspconfig").setup_handlers { mason_handler }
 
 			mason_handler "starlark_rust"
+
+			require("mason-null-ls").setup {
+				ensure_installed = nil,
+				automatic_installation = true,
+				automatic_setup = true,
+			}
+			require("mason-null-ls").setup_handlers()
+
+			require("zox.formatting").configure_format_on_save()
 		end,
 	},
 
