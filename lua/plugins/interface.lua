@@ -244,6 +244,11 @@ return {
 	},
 	{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
 	{
+		"zbirenbaum/neodim",
+		event = "BufReadPost",
+		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
+	},
+	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
@@ -253,7 +258,21 @@ return {
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup {
-				ensure_installed = "all",
+				ensure_installed = {
+					"python",
+					"rust",
+					"lua",
+					"c",
+					"go",
+					"cpp",
+					"yaml",
+					"json",
+					"toml",
+					"bash",
+					"css",
+					"vim",
+					"regex",
+				},
 				ignore_install = { "phpdoc", "gitcommit" },
 				indent = { enable = true, disable = { "python" } },
 				highlight = { enable = true },

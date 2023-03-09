@@ -1,12 +1,6 @@
 -- plugins that are disabled for now for simplicity, but can be enabled anytime
 return {
 	{
-		"zbirenbaum/neodim",
-		enabled = false,
-		event = "BufReadPost",
-		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
-	},
-	{
 		"windwp/nvim-autopairs",
 		lazy = true,
 		enabled = false,

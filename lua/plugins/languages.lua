@@ -158,6 +158,7 @@ return {
 					f.deno_fmt.with {
 						extra_args = { "--line-width", "80" },
 					},
+					f.yamlfmt,
 
 					-- NOTE: diagnostics
 					d.clang_check,
@@ -282,8 +283,6 @@ return {
 				automatic_setup = true,
 			}
 			require("mason-null-ls").setup_handlers()
-
-			require("zox.formatting").configure_format_on_save()
 		end,
 	},
 
