@@ -9,25 +9,6 @@ return {
 		},
 	},
 	{
-		"folke/noice.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
-		opts = {
-			cmdline = { view = "cmdline" },
-			lsp = { progress = { enabled = false } },
-			popupmenu = { enabled = true, backend = "cmp" },
-			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
-			routes = {
-				{
-					-- hide search virtual text
-					filter = { event = "msg_show", kind = "search_count" },
-					opts = { skip = true },
-				},
-			},
-		},
-	},
-	{
 		"nathom/filetype.nvim",
 		event = { "CursorHoldI", "CursorHold" },
 		opts = {
@@ -221,6 +202,16 @@ return {
 						)
 							:with_buffer(bufnr)
 							:with_desc "git: Blame line",
+						["n|<Leader>tlb"] = k.callback(
+							function() require("gitsigns.actions").toggle_current_line_blame() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: toggle current line blame",
+						["n|<Leader>twd"] = k.callback(
+							function() require("gitsigns.actions").toggle_word_diff() end
+						)
+							:with_buffer(bufnr)
+							:with_desc "git: toggle word diff",
 						-- Text objects
 						["o|ih"] = k.callback(
 							function() require("gitsigns.actions").text_object() end

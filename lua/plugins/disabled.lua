@@ -1,9 +1,36 @@
 -- plugins that are disabled for now for simplicity, but can be enabled anytime
-return {
+
+--@param plugins LazyPlugins[]
+local disable_plugins = function(plugins)
+	for _, plugin in ipairs(plugins) do
+		plugin.enabled = false
+	end
+	return plugins
+end
+
+return disable_plugins {
+	{
+		"folke/noice.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+		opts = {
+			cmdline = { view = "cmdline" },
+			lsp = { progress = { enabled = false } },
+			popupmenu = { enabled = true, backend = "nui" },
+			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
+			routes = {
+				{
+					-- hide search virtual text
+					filter = { event = "msg_show", kind = "search_count" },
+					opts = { skip = true },
+				},
+			},
+		},
+	},
 	{
 		"windwp/nvim-autopairs",
 		lazy = true,
-		enabled = false,
 		event = "InsertEnter",
 		opts = {
 			check_ts = true,
@@ -23,7 +50,6 @@ return {
 		"phaazon/hop.nvim",
 		lazy = true,
 		branch = "v2",
-		enabled = false,
 		event = { "CursorHold", "CursorHoldI" },
 		cmd = { "HopWord", "HopLine", "HopChar1", "HopChar2" },
 		config = function()
@@ -83,7 +109,6 @@ return {
 	{
 		"goolord/alpha-nvim",
 		lazy = true,
-		enabled = false,
 		event = "BufWinEnter",
 		cond = function() return #vim.api.nvim_list_uis() > 0 end,
 		config = function()
@@ -139,7 +164,6 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		event = "BufReadPost",
-		enabled = false,
 		config = function()
 			local _cache = { context = "", bufnr = -1 }
 			local lspsaga_symbols = function()
@@ -280,7 +304,6 @@ return {
 	{
 		"akinsho/nvim-bufferline.lua",
 		lazy = true,
-		enabled = false,
 		branch = "main",
 		event = "BufReadPost",
 		config = function()

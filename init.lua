@@ -53,5 +53,5 @@ require("lazy").setup("plugins", {
 	},
 })
 
-vim.o.background = "dark"
+vim.o.background = "light"
 vim.cmd.colorscheme "rose-pine"

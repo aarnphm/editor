@@ -9,6 +9,7 @@ return function(options)
 				"nvim-lspconfig",
 				"nvim-treesitter",
 				"telescope.nvim",
+				"gitsigns.nvim",
 				"lspsaga.nvim",
 			},
 		},
