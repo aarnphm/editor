@@ -125,21 +125,7 @@ if vim.loop.os_uname().sysname == "Darwin" then
 	}
 end
 
-vim.diagnostic.config {
-	virtual_text = false,
-	signs = true,
-	update_in_insert = false,
-	underline = false,
-	severity_sort = true,
-	float = {
-		focusable = false,
-		style = "minimal",
-		border = "rounded",
-		source = "always",
-		header = "",
-		prefix = "",
-	},
-}
+vim.diagnostic.config { virtual_text = false }
 
 local signs = { "Error", "Warn", "Hint", "Info" }
 for _, type in pairs(signs) do

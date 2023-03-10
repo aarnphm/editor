@@ -40,15 +40,79 @@ return {
 		},
 	},
 	{
+		"jose-elias-alvarez/null-ls.nvim",
+		event = "BufReadPre",
+		dependencies = { "nvim-lua/plenary.nvim", "jayp0521/mason-null-ls.nvim" },
+		keys = {
+			{ "<Leader><Leader>", vim.lsp.buf.format, desc = "lsp: manual format" },
+		},
+		config = function()
+			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
+			local f = require("null-ls").builtins.formatting
+			local d = require("null-ls").builtins.diagnostics
+			local ca = require("null-ls").builtins.code_actions
+			local c = require("null-ls").builtins.completion
+
+			require("mason-null-ls").setup { automatic_setup = true }
+			require("null-ls").setup {
+				sources = {
+					c.spell,
+
+					-- NOTE: formatting
+					f.prettierd.with {
+						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
+						extra_filetypes = { "jsonc", "astro", "svelte" },
+						disabled_filetypes = { "markdown" },
+					},
+					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
+					f.black,
+					f.ruff,
+					f.isort,
+					f.stylua,
+					f.cbfmt,
+					f.beautysh,
+					f.rustfmt,
+					f.jq,
+					f.buf,
+					f.stylelint,
+					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
+					f.buildifier,
+					f.taplo,
+					-- NOTE: Using deno fmt for markdown
+					f.deno_fmt.with { extra_args = { "--line-width", "80" } },
+					f.yamlfmt,
+
+					-- NOTE: diagnostics
+					d.clang_check,
+					d.eslint.with { extra_filetypes = { "astro", "svelte" } },
+					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
+					d.selene,
+					d.golangci_lint,
+					d.markdownlint.with { extra_args = { "--disable MD033" } },
+					d.zsh,
+					d.buf,
+					d.buildifier,
+					d.stylelint,
+					d.vulture.with { extra_args = { "--min-confidence 70" } },
+					d.vint,
+
+					-- NOTE: code actions
+					ca.gitrebase,
+					ca.shellcheck,
+					ca.eslint.with {
+						extra_filetypes = { "astro", "svelte" },
+					},
+				},
+			}
+			require("mason-null-ls").setup_handlers {}
+		end,
+	},
+	{
 		"neovim/nvim-lspconfig",
 		event = "BufReadPre",
 		dependencies = {
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "williamboman/mason.nvim", cmd = "Mason", lazy = true },
-			{
-				"jose-elias-alvarez/null-ls.nvim",
-				dependencies = { "nvim-lua/plenary.nvim", "jay-babu/mason-null-ls.nvim" },
-			},
 			{
 				"glepnir/lspsaga.nvim",
 				branch = "main",
@@ -116,73 +180,13 @@ return {
 				automatic_installation = true,
 			}
 
-			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
-			local f = require("null-ls").builtins.formatting
-			local d = require("null-ls").builtins.diagnostics
-			local ca = require("null-ls").builtins.code_actions
-
-			require("null-ls").setup {
-				diagnostics_format = "[#{c}] #{m} (#{s})",
-				sources = {
-					-- NOTE: formatting
-					f.prettierd.with {
-						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
-						extra_filetypes = { "jsonc", "astro", "svelte" },
-						disabled_filetypes = { "markdown" },
-					},
-					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.black,
-					f.ruff,
-					f.isort,
-					f.stylua,
-					f.cbfmt,
-					f.beautysh,
-					f.rustfmt,
-					f.jq,
-					f.buf,
-					f.stylelint,
-					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
-					f.buildifier,
-					f.taplo,
-					-- NOTE: Using deno fmt for markdown
-					f.deno_fmt.with { extra_args = { "--line-width", "80" } },
-					f.yamlfmt,
-
-					-- NOTE: diagnostics
-					d.clang_check,
-					d.eslint.with { extra_filetypes = { "astro", "svelte" } },
-					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
-					d.selene,
-					d.golangci_lint,
-					d.markdownlint.with { extra_args = { "--disable MD033" } },
-					d.zsh,
-					d.buf,
-					d.buildifier,
-					d.stylelint,
-					d.vulture.with { extra_args = { "--min-confidence 70" } },
-					d.vint,
-
-					-- NOTE: code actions
-					ca.gitrebase,
-					ca.shellcheck,
-					ca.eslint.with {
-						extra_filetypes = { "astro", "svelte" },
-					},
-				},
-			}
-
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 			if ok then capabilities = cmp_nvim_lsp.default_capabilities(capabilities) end
-			capabilities.textDocument.completion.completionItem.snippetSupport = true
+			capabilities.offsetEncoding = { "utf-16" }
 
 			local on_attach = function(client, bufnr)
-				local buf_set_option = function(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
 				require("zox.formatting").on_attach(client, bufnr)
-
-				-- Enable completion triggered by <c-x><c-o>
-				buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
 				local k = require "zox.keybind"
 				k.nvim_register_mapping {
@@ -190,9 +194,6 @@ return {
 					["n|K"] = k.cr("Lspsaga hover_doc")
 						:with_buffer(bufnr)
 						:with_defaults "lsp: Signature help",
-					["n|sP"] = k.callback(vim.show_pos)
-						:with_buffer(bufnr)
-						:with_defaults "text-object: show current position",
 					["n|gh"] = k.callback(vim.show_pos)
 						:with_buffer(bufnr)
 						:with_defaults "lsp: Show hightlight",
@@ -229,7 +230,6 @@ return {
 			local options = {
 				on_attach = on_attach,
 				capabilities = capabilities,
-				flags = { debounce_text_changes = 150 },
 			}
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
@@ -265,13 +265,6 @@ return {
 			require("mason-lspconfig").setup_handlers { mason_handler }
 
 			mason_handler "starlark_rust"
-
-			require("mason-null-ls").setup {
-				ensure_installed = nil,
-				automatic_installation = true,
-				automatic_setup = true,
-			}
-			require("mason-null-ls").setup_handlers()
 		end,
 	},
 

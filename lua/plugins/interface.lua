@@ -323,6 +323,7 @@ return {
 					"vim",
 					"regex",
 					"markdown",
+					"markdown_inline",
 				},
 				ignore_install = { "phpdoc", "gitcommit" },
 				indent = { enable = true, disable = { "python" } },
