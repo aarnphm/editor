@@ -68,25 +68,6 @@ return disable_plugins {
 		end,
 	},
 	{
-		"folke/noice.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
-		opts = {
-			cmdline = { view = "cmdline" },
-			lsp = { progress = { enabled = false } },
-			popupmenu = { enabled = true, backend = "nui" },
-			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
-			routes = {
-				{
-					-- hide search virtual text
-					filter = { event = "msg_show", kind = "search_count" },
-					opts = { skip = true },
-				},
-			},
-		},
-	},
-	{
 		"windwp/nvim-autopairs",
 		lazy = true,
 		event = "InsertEnter",

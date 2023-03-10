@@ -6,6 +6,7 @@ return function(options)
 			plugins = {
 				"lazy",
 				"lualine.nvim",
+				"null-ls.nvim",
 				"nvim-lspconfig",
 				"nvim-treesitter",
 				"telescope.nvim",

@@ -17,6 +17,12 @@ M.toggle = function()
 	end
 end
 
+local server_formatting_blocklist = {
+	lua_ls = true,
+	tsserver = true,
+	clangd = true,
+}
+
 M.format = function(opts)
 	local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
 	local ft = vim.bo[bufnr].filetype

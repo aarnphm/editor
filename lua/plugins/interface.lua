@@ -258,12 +258,53 @@ return {
 		opts = { blend_color = require("zox.utils").hl_to_rgb("Normal", true) },
 	},
 	{
+		"folke/noice.nvim",
+		event = "VeryLazy",
+		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+		opts = {
+			cmdline = { view = "cmdline" },
+			popupmenu = { enabled = true, backend = "cmp" },
+			lsp = {
+				progress = { enabled = false },
+				override = {
+					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+					["vim.lsp.util.stylize_markdown"] = true,
+				},
+			},
+			presets = {
+				command_palette = true,
+				lsp_doc_border = true,
+				bottom_search = true,
+				long_message_to_split = true,
+			},
+		},
+	},
+	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
 			{ "romgrk/nvim-treesitter-context" },
-			{ "nvim-treesitter/nvim-treesitter-textobjects" },
+			{
+				"nvim-treesitter/nvim-treesitter-textobjects",
+				init = function()
+					-- PERF: no need to load the plugin, if we only need its queries for mini.ai
+					local plugin = require("lazy.core.config").spec.plugins["nvim-treesitter"]
+					local opts = require("lazy.core.plugin").values(plugin, "opts", false)
+					local enabled = false
+					if opts.textobjects then
+						for _, mod in ipairs { "move", "select", "swap", "lsp_interop" } do
+							if opts.textobjects[mod] and opts.textobjects[mod].enable then
+								enabled = true
+								break
+							end
+						end
+					end
+					if not enabled then
+						require("lazy.core.loader").disable_rtp_plugin "nvim-treesitter-textobjects"
+					end
+				end,
+			},
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup {

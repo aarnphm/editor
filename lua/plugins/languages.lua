@@ -131,7 +131,6 @@ return {
 						disabled_filetypes = { "markdown" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.clang_format,
 					f.black,
 					f.ruff,
 					f.isort,
@@ -169,7 +168,6 @@ return {
 					ca.eslint.with {
 						extra_filetypes = { "astro", "svelte" },
 					},
-					ca.refactoring,
 				},
 			}
 
@@ -192,6 +190,9 @@ return {
 					["n|K"] = k.cr("Lspsaga hover_doc")
 						:with_buffer(bufnr)
 						:with_defaults "lsp: Signature help",
+					["n|sP"] = k.callback(vim.show_pos)
+						:with_buffer(bufnr)
+						:with_defaults "text-object: show current position",
 					["n|gh"] = k.callback(vim.show_pos)
 						:with_buffer(bufnr)
 						:with_defaults "lsp: Show hightlight",
