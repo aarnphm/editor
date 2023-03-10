@@ -24,8 +24,11 @@ require("lazy").setup({
 	{
 		"echasnovski/mini.bufremove",
 		keys = {
-            -- stylua: ignore
-            { "<C-x>", function() require("mini.bufremove").delete(0, false) end, desc = "buf: delete" },
+			{
+				"<C-x>",
+				function() require("mini.bufremove").delete(0, false) end,
+				desc = "buf: delete",
+			},
 			{
 				"<leader>bD",
 				function() require("mini.bufremove").delete(0, true) end,
@@ -45,6 +48,11 @@ require("lazy").setup({
 			},
 			{ "<Leader>p", function() vim.cmd [[ Git push ]] end, desc = "git: push" },
 		},
+	},
+	{
+		"nmac427/guess-indent.nvim",
+		event = { "CursorHold", "CursorHoldI" },
+		config = true,
 	},
 	{
 		"max397574/better-escape.nvim",
@@ -111,8 +119,8 @@ require("lazy").setup({
 					t = "Tag",
 				}
 				local a = vim.deepcopy(i)
-				for k, v in pairs(a) do
-					a[k] = v:gsub(" including.*", "")
+				for key, val in pairs(a) do
+					a[key] = val:gsub(" including.*", "")
 				end
 
 				local ic = vim.deepcopy(i)
@@ -123,11 +131,7 @@ require("lazy").setup({
 					a[key] =
 						vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
 				end
-				require("which-key").register {
-					mode = { "o", "x" },
-					i = i,
-					a = a,
-				}
+				require("which-key").register { mode = { "o", "x" }, i = i, a = a }
 			end
 		end,
 	},
@@ -207,8 +211,8 @@ require("lazy").setup({
 		},
 		config = function(_, opts)
 			local leap = require "leap"
-			for k, v in pairs(opts) do
-				leap.opts[k] = v
+			for key, val in pairs(opts) do
+				leap.opts[key] = val
 			end
 			leap.add_default_mappings(true)
 			vim.keymap.del({ "x", "o" }, "x")
@@ -391,6 +395,18 @@ require("lazy").setup({
 		cmd = { "TodoTrouble", "TodoTelescope" },
 		event = "LspAttach",
 		config = true,
+	},
+	{
+		"folke/noice.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+		opts = {
+			cmdline = { view = "cmdline" },
+			lsp = { progress = { enabled = false } },
+			popupmenu = { enabled = true, backend = "cmp" },
+			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
+		},
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -797,498 +813,483 @@ require("lazy").setup({
 		},
 		config = function()
 			local lspconfig = require "lspconfig"
-			local mason = require "mason"
-
 			require("lspconfig.ui.windows").default_options.border = "single"
-
-			mason.setup {}
-			require("mason-lspconfig").setup {
-				ensure_installed = {
-					"bashls",
-					"bufls",
-					"clangd",
-					"dockerls",
-					"lua_ls",
-					"marksman",
-					"html",
-					"jdtls",
-					"jsonls",
-					"pyright",
-					"rnix",
-					"ruff_lsp",
-					"svelte",
-					"cssls",
-					"rust_analyzer",
-					"spectral",
-					"taplo",
-					"tflint",
-					"tsserver",
-					"vimls",
-					"yamlls",
-					"denols",
-					"gopls",
-				},
-				automatic_installation = true,
-			}
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 			if ok then capabilities = cmp_nvim_lsp.default_capabilities(capabilities) end
 			capabilities.offsetEncoding = { "utf-16" }
 
-			local on_attach = function(client, bufnr)
-				require("user.format").on_attach(client, bufnr)
+			local options = {
+				on_attach = function(client, bufnr)
+					require("user.format").on_attach(client, bufnr)
+					k.nvim_register_mapping {
+						-- lsp
+						["n|K"] = k.cr("Lspsaga hover_doc")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Signature help",
+						["n|gh"] = k.callback(vim.show_pos)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Show hightlight",
+						["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Prev diagnostic",
+						["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Next diagnostic",
+						["n|gr"] = k.callback(vim.lsp.buf.rename)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Rename in file range",
+						["n|gd"] = k.cr("Glance definitions")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Peek definition",
+						["n|gD"] = k.cr("Lspsaga goto_definition")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Goto definition",
+						["n|ca"] = k.callback(vim.lsp.buf.code_action)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Code action for cursor",
+						["v|ca"] = k.callback(vim.lsp.buf.code_action)
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Code action for range",
+						["n|go"] = k.cr("Lspsaga outline")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Show outline",
+						["n|gR"] = k.cr("TroubleToggle lsp_references")
+							:with_buffer(bufnr)
+							:with_defaults "lsp: Show references",
+					}
+				end,
+				capabilities = capabilities,
+			}
 
-				k.nvim_register_mapping {
-					-- lsp
-					["n|K"] = k.cr("Lspsaga hover_doc")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Signature help",
-					["n|gh"] = k.callback(vim.show_pos)
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Show hightlight",
-					["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Prev diagnostic",
-					["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Next diagnostic",
-					["n|gr"] = k.callback(vim.lsp.buf.rename)
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Rename in file range",
-					["n|gd"] = k.cr("Glance definitions")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Peek definition",
-					["n|gD"] = k.cr("Lspsaga goto_definition")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Goto definition",
-					["n|ca"] = k.callback(vim.lsp.buf.code_action)
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Code action for cursor",
-					["v|ca"] = k.callback(vim.lsp.buf.code_action)
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Code action for range",
-					["n|go"] = k.cr("Lspsaga outline")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Show outline",
-					["n|gR"] = k.cr("TroubleToggle lsp_references")
-						:with_buffer(bufnr)
-						:with_defaults "lsp: Show references",
-				}
-			end
+			-- NOTE: call neodev before setup lua_ls
+			require("neodev").setup {
+				library = {
+					plugins = {
+						"lazy",
+						"lualine.nvim",
+						"null-ls.nvim",
+						"nvim-lspconfig",
+						"nvim-treesitter",
+						"telescope.nvim",
+						"gitsigns.nvim",
+						"lspsaga.nvim",
+					},
+				},
+			}
 
-			local options = { on_attach = on_attach, capabilities = capabilities }
+			require("mason").setup {}
+			require("mason-lspconfig").setup_handlers {
+				function(lsp_name)
+					local servers = {
+						bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
+						clangd = function()
+							options.capabilities.offsetEncoding = { "utf-16", "utf-8" }
 
-			--- A small wrapper to setup lsp with nvim-lspconfig
-			--- @param lsp_name string name of given lsp server
-			local mason_handler = function(lsp_name)
-				local servers = {
-					bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
-					clangd = function(o)
-						o.capabilities.offsetEncoding = { "utf-16", "utf-8" }
-
-						local switch_source_header_splitcmd = function(bufnr, splitcmd)
-							bufnr = lspconfig.util.validate_bufnr(bufnr)
-							local clangd_client =
-								lspconfig.util.get_active_client_by_name(bufnr, "clangd")
-							local params = { uri = vim.uri_from_bufnr(bufnr) }
-							if clangd_client then
-								clangd_client.request(
-									"textDocument/switchSourceHeader",
-									params,
-									function(err, result)
-										if err then error(tostring(err)) end
-										if not result then
-											vim.notify(
-												"Corresponding file can’t be determined",
-												vim.log.levels.ERROR,
-												{ title = "LSP Error!" }
+							local switch_source_header_splitcmd = function(bufnr, splitcmd)
+								bufnr = lspconfig.util.validate_bufnr(bufnr)
+								local clangd_client =
+									lspconfig.util.get_active_client_by_name(bufnr, "clangd")
+								local params = { uri = vim.uri_from_bufnr(bufnr) }
+								if clangd_client then
+									clangd_client.request(
+										"textDocument/switchSourceHeader",
+										params,
+										function(err, result)
+											if err then error(tostring(err)) end
+											if not result then
+												vim.notify(
+													"Corresponding file can’t be determined",
+													vim.log.levels.ERROR,
+													{ title = "LSP Error!" }
+												)
+												return
+											end
+											vim.api.nvim_command(
+												splitcmd .. " " .. vim.uri_to_fname(result)
 											)
-											return
 										end
-										vim.api.nvim_command(
-											splitcmd .. " " .. vim.uri_to_fname(result)
-										)
-									end
-								)
-							else
-								vim.notify(
-									"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
-									vim.log.levels.ERROR,
-									{ title = "LSP Error!" }
-								)
-							end
-						end
-
-						local get_binary_path_list = function(binaries)
-							local get_binary_path = function(binary)
-								local path = nil
-								if vim.loop.os_uname().sysname == "Windows_NT" then
-									path = vim.fn.trim(vim.fn.system("where " .. binary))
+									)
 								else
-									path = vim.fn.trim(vim.fn.system("which " .. binary))
+									vim.notify(
+										"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
+										vim.log.levels.ERROR,
+										{ title = "LSP Error!" }
+									)
 								end
-								if vim.v.shell_error ~= 0 then path = nil end
-								return path
 							end
 
-							local path_list = {}
-							for _, binary in ipairs(binaries) do
-								local path = get_binary_path(binary)
-								if path then table.insert(path_list, path) end
+							local get_binary_path_list = function(binaries)
+								local get_binary_path = function(binary)
+									local path = nil
+									if vim.loop.os_uname().sysname == "Windows_NT" then
+										path = vim.fn.trim(vim.fn.system("where " .. binary))
+									else
+										path = vim.fn.trim(vim.fn.system("which " .. binary))
+									end
+									if vim.v.shell_error ~= 0 then path = nil end
+									return path
+								end
+
+								local path_list = {}
+								for _, binary in ipairs(binaries) do
+									local path = get_binary_path(binary)
+									if path then table.insert(path_list, path) end
+								end
+								return table.concat(path_list, ",")
 							end
-							return table.concat(path_list, ",")
-						end
 
-						require("clangd_extensions").setup {
-							-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
-							server = {
-								on_attach = o.on_attach,
-								capabilities = o.capabilities,
-								single_file_support = true,
-								cmd = {
-									"clangd",
-									"--background-index",
-									"--pch-storage=memory",
-									-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-									"--query-driver="
-										.. get_binary_path_list { "clang++", "clang", "gcc", "g++" },
-									"--clang-tidy",
-									"--all-scopes-completion",
-									"--completion-style=detailed",
-									"--header-insertion-decorators",
-									"--header-insertion=never",
-								},
-								filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-								commands = {
-									ClangdSwitchSourceHeader = {
-										function() switch_source_header_splitcmd(0, "edit") end,
-										description = "cpp: Open source/header in current buffer",
+							require("clangd_extensions").setup {
+								-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
+								server = {
+									on_attach = options.on_attach,
+									capabilities = options.capabilities,
+									single_file_support = true,
+									cmd = {
+										"clangd",
+										"--background-index",
+										"--pch-storage=memory",
+										-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
+										"--query-driver="
+											.. get_binary_path_list {
+												"clang++",
+												"clang",
+												"gcc",
+												"g++",
+											},
+										"--clang-tidy",
+										"--all-scopes-completion",
+										"--completion-style=detailed",
+										"--header-insertion-decorators",
+										"--header-insertion=never",
 									},
-									ClangdSwitchSourceHeaderVSplit = {
-										function() switch_source_header_splitcmd(0, "vsplit") end,
-										description = "cpp: Open source/header in a new vsplit",
-									},
-									ClangdSwitchSourceHeaderSplit = {
-										function() switch_source_header_splitcmd(0, "split") end,
-										description = "cpp: Open source/header in a new split",
-									},
-								},
-							},
-						}
-					end,
-					gopls = {
-						flags = { debounce_text_changes = 500 },
-						cmd = { "gopls", "-remote=auto" },
-						settings = {
-							gopls = {
-								usePlaceholders = true,
-								analyses = {
-									nilness = true,
-									shadow = true,
-									unusedparams = true,
-									unusewrites = true,
-								},
-								hints = {
-									assignVariableTypes = true,
-									compositeLiteralFields = true,
-									compositeLiteralTypes = true,
-									constantValues = true,
-									functionTypeParameters = true,
-									parameterNames = true,
-									rangeVariableTypes = true,
-								},
-							},
-						},
-					},
-					html = {
-						cmd = { "html-languageserver", "--stdio" },
-						filetypes = { "html" },
-						init_options = {
-							configurationSection = { "html", "css", "javascript" },
-							embeddedLanguages = { css = true, javascript = true },
-						},
-						settings = {},
-						single_file_support = true,
-						flags = { debounce_text_changes = 500 },
-					},
-					jdtls = {
-						flags = { debounce_text_changes = 500 },
-						settings = {
-							root_dir = {
-								-- Single-module projects
-								{
-									"build.xml", -- Ant
-									"pom.xml", -- Maven
-									"settings.gradle", -- Gradle
-									"settings.gradle.kts", -- Gradle
-								},
-								-- Multi-module projects
-								{ "build.gradle", "build.gradle.kts" },
-								{ "$BENTOML_GIT_ROOT/grpc-client/java" },
-								{ "$BENTOML_GIT_ROOT/grpc-client/kotlin" },
-							} or vim.fn.getcwd(),
-						},
-					},
-					jsonls = {
-						flags = { debounce_text_changes = 500 },
-						settings = {
-							json = {
-								-- Schemas https://www.schemastore.org
-								schemas = {
-									{
-										fileMatch = { "package.json" },
-										url = "https://json.schemastore.org/package.json",
-									},
-									{
-										fileMatch = { "tsconfig*.json" },
-										url = "https://json.schemastore.org/tsconfig.json",
-									},
-									{
-										fileMatch = {
-											".prettierrc",
-											".prettierrc.json",
-											"prettier.config.json",
+									filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+									commands = {
+										ClangdSwitchSourceHeader = {
+											function() switch_source_header_splitcmd(0, "edit") end,
+											description = "cpp: Open source/header in current buffer",
 										},
-										url = "https://json.schemastore.org/prettierrc.json",
-									},
-									{
-										fileMatch = { ".eslintrc", ".eslintrc.json" },
-										url = "https://json.schemastore.org/eslintrc.json",
-									},
-									{
-										fileMatch = {
-											".babelrc",
-											".babelrc.json",
-											"babel.config.json",
+										ClangdSwitchSourceHeaderVSplit = {
+											function() switch_source_header_splitcmd(0, "vsplit") end,
+											description = "cpp: Open source/header in a new vsplit",
 										},
-										url = "https://json.schemastore.org/babelrc.json",
-									},
-									{
-										fileMatch = { "lerna.json" },
-										url = "https://json.schemastore.org/lerna.json",
-									},
-									{
-										fileMatch = {
-											".stylelintrc",
-											".stylelintrc.json",
-											"stylelint.config.json",
+										ClangdSwitchSourceHeaderSplit = {
+											function() switch_source_header_splitcmd(0, "split") end,
+											description = "cpp: Open source/header in a new split",
 										},
-										url = "http://json.schemastore.org/stylelintrc.json",
-									},
-									{
-										fileMatch = { "/.github/workflows/*" },
-										url = "https://json.schemastore.org/github-workflow.json",
 									},
 								},
-							},
-						},
-					},
-					lua_ls = function(o)
-						-- NOTE: call neodev before setup lua_ls
-						require("neodev").setup {
-							library = {
-								plugins = {
-									"lazy",
-									"lualine.nvim",
-									"null-ls.nvim",
-									"nvim-lspconfig",
-									"nvim-treesitter",
-									"telescope.nvim",
-									"gitsigns.nvim",
-									"lspsaga.nvim",
-								},
-							},
-						}
-
-						-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/lua_ls.lua
-						lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", o, {
-							settings = {
-								Lua = {
-									completion = {
-										callSnippet = "Replace",
-									},
-									diagnostics = {
-										enable = true,
-										globals = { "vim" },
-										disable = { "different-requires" },
-									},
-									hint = { enable = true },
-									runtime = {
-										version = "LuaJIT",
-										special = { reload = "require" },
-									},
-									workspace = {
-										library = {
-											vim.env.VIMRUNTIME,
-											require("neodev.config").types(),
-										},
-										checkThirdParty = false,
-										maxPreload = 100000,
-										preloadFileSize = 10000,
-									},
-									telemetry = { enable = false },
-									semantic = { enable = false },
-								},
-							},
-						}))
-					end,
-					pyright = {
-						flags = { debounce_text_changes = 500 },
-						root_dir = function(fname)
-							return lspconfig.util.root_pattern(
-								"WORKSPACE",
-								".git",
-								"Pipfile",
-								"pyrightconfig.json",
-								"setup.py",
-								"setup.cfg",
-								"pyproject.toml",
-								"requirements.txt"
-							)(fname) or lspconfig.util.path.dirname(fname)
+							}
 						end,
-						settings = {
-							python = {
-								analysis = {
-									autoSearchPaths = true,
-									useLibraryCodeForTypes = true,
+						gopls = {
+							flags = { debounce_text_changes = 500 },
+							cmd = { "gopls", "-remote=auto" },
+							settings = {
+								gopls = {
+									usePlaceholders = true,
+									analyses = {
+										nilness = true,
+										shadow = true,
+										unusedparams = true,
+										unusewrites = true,
+									},
+									hints = {
+										assignVariableTypes = true,
+										compositeLiteralFields = true,
+										compositeLiteralTypes = true,
+										constantValues = true,
+										functionTypeParameters = true,
+										parameterNames = true,
+										rangeVariableTypes = true,
+									},
 								},
 							},
 						},
-					},
-					rust_analyzer = function(o)
-						local get_rust_adapters = function()
-							if vim.loop.os_uname().sysname == "Windows_NT" then
-								return {
-									type = "executable",
-									command = "lldb-vscode",
-									name = "rt_lldb",
-								}
-							end
-							local codelldb_extension_path = vim.fn.stdpath "data"
-								.. "/mason/packages/codelldb/extension"
-							local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
-							local extension = ".so"
-							if vim.loop.os_uname().sysname == "Darin" then extension = ".dylib" end
-							local liblldb_path = codelldb_extension_path
-								.. "/lldb/lib/liblldb"
-								.. extension
-							return require("rust-tools.dap").get_codelldb_adapter(
-								codelldb_path,
-								liblldb_path
-							)
-						end
-
-						require("rust-tools").setup {
-							tools = {
-								inlay_hints = {
-									auto = true,
-									other_hints_prefix = ":: ",
-									only_current_line = true,
-									show_parameter_hints = false,
+						html = {
+							cmd = { "html-languageserver", "--stdio" },
+							filetypes = { "html" },
+							init_options = {
+								configurationSection = { "html", "css", "javascript" },
+								embeddedLanguages = { css = true, javascript = true },
+							},
+							settings = {},
+							single_file_support = true,
+							flags = { debounce_text_changes = 500 },
+						},
+						jdtls = {
+							flags = { debounce_text_changes = 500 },
+							settings = {
+								root_dir = {
+									-- Single-module projects
+									{
+										"build.xml", -- Ant
+										"pom.xml", -- Maven
+										"settings.gradle", -- Gradle
+										"settings.gradle.kts", -- Gradle
+									},
+									-- Multi-module projects
+									{ "build.gradle", "build.gradle.kts" },
+									{ "$BENTOML_GIT_ROOT/grpc-client/java" },
+									{ "$BENTOML_GIT_ROOT/grpc-client/kotlin" },
+								} or vim.fn.getcwd(),
+							},
+						},
+						jsonls = {
+							flags = { debounce_text_changes = 500 },
+							settings = {
+								json = {
+									-- Schemas https://www.schemastore.org
+									schemas = {
+										{
+											fileMatch = { "package.json" },
+											url = "https://json.schemastore.org/package.json",
+										},
+										{
+											fileMatch = { "tsconfig*.json" },
+											url = "https://json.schemastore.org/tsconfig.json",
+										},
+										{
+											fileMatch = {
+												".prettierrc",
+												".prettierrc.json",
+												"prettier.config.json",
+											},
+											url = "https://json.schemastore.org/prettierrc.json",
+										},
+										{
+											fileMatch = { ".eslintrc", ".eslintrc.json" },
+											url = "https://json.schemastore.org/eslintrc.json",
+										},
+										{
+											fileMatch = {
+												".babelrc",
+												".babelrc.json",
+												"babel.config.json",
+											},
+											url = "https://json.schemastore.org/babelrc.json",
+										},
+										{
+											fileMatch = { "lerna.json" },
+											url = "https://json.schemastore.org/lerna.json",
+										},
+										{
+											fileMatch = {
+												".stylelintrc",
+												".stylelintrc.json",
+												"stylelint.config.json",
+											},
+											url = "http://json.schemastore.org/stylelintrc.json",
+										},
+										{
+											fileMatch = { "/.github/workflows/*" },
+											url = "https://json.schemastore.org/github-workflow.json",
+										},
+									},
 								},
 							},
-							dap = { adapter = get_rust_adapters() },
-							server = {
-								on_attach = function(client, bufnr)
-									vim.api.nvim_buf_set_option(
-										bufnr,
-										"formatexpr",
-										"v:lua.vim.lsp.formatexpr()"
-									)
-									vim.api.nvim_buf_set_option(
-										bufnr,
-										"omnifunc",
-										"v:lua.vim.lsp.omnifunc"
-									)
-									vim.api.nvim_buf_set_option(
-										bufnr,
-										"tagfunc",
-										"v:lua.vim.lsp.tagfunc"
-									)
-									o.on_attach(client, bufnr)
-								end,
-								capabilities = o.capabilities,
-								standalone = true,
+						},
+						lua_ls = function()
+							-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/lua_ls.lua
+							lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", options, {
 								settings = {
-									["rust-analyzer"] = {
-										cargo = {
-											loadOutDirsFromCheck = true,
-											buildScripts = { enable = true },
+									Lua = {
+										completion = {
+											callSnippet = "Replace",
 										},
 										diagnostics = {
-											disabled = { "unresolved-proc-macro" },
-											enableExperimental = true,
+											enable = true,
+											globals = { "vim" },
+											disable = { "different-requires" },
 										},
-										checkOnSave = { command = "clippy" },
-										procMacro = { enable = true },
+										hint = { enable = true },
+										runtime = {
+											version = "LuaJIT",
+											special = { reload = "require" },
+										},
+										workspace = {
+											library = {
+												vim.env.VIMRUNTIME,
+												require("neodev.config").types(),
+											},
+											checkThirdParty = false,
+											maxPreload = 100000,
+											preloadFileSize = 10000,
+										},
+										telemetry = { enable = false },
+										semantic = { enable = false },
+									},
+								},
+							}))
+						end,
+						pyright = {
+							flags = { debounce_text_changes = 500 },
+							root_dir = function(fname)
+								return lspconfig.util.root_pattern(
+									"WORKSPACE",
+									".git",
+									"Pipfile",
+									"pyrightconfig.json",
+									"setup.py",
+									"setup.cfg",
+									"pyproject.toml",
+									"requirements.txt"
+								)(fname) or lspconfig.util.path.dirname(fname)
+							end,
+							settings = {
+								python = {
+									analysis = {
+										autoSearchPaths = true,
+										useLibraryCodeForTypes = true,
 									},
 								},
 							},
-						}
-					end,
-					tsserver = {
-						root_dir = lspconfig.util.root_pattern(
-							"tsconfig.json",
-							"package.json",
-							".git"
-						),
-						settings = {
-							javascript = {
-								inlayHints = {
-									includeInlayEnumMemberValueHints = true,
-									includeInlayFunctionLikeReturnTypeHints = true,
-									includeInlayFunctionParameterTypeHints = true,
-									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-									includeInlayPropertyDeclarationTypeHints = true,
-									includeInlayVariableTypeHints = true,
+						},
+						rust_analyzer = function()
+							local get_rust_adapters = function()
+								if vim.loop.os_uname().sysname == "Windows_NT" then
+									return {
+										type = "executable",
+										command = "lldb-vscode",
+										name = "rt_lldb",
+									}
+								end
+								local codelldb_extension_path = vim.fn.stdpath "data"
+									.. "/mason/packages/codelldb/extension"
+								local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
+								local extension = ".so"
+								if vim.loop.os_uname().sysname == "Darin" then
+									extension = ".dylib"
+								end
+								local liblldb_path = codelldb_extension_path
+									.. "/lldb/lib/liblldb"
+									.. extension
+								return require("rust-tools.dap").get_codelldb_adapter(
+									codelldb_path,
+									liblldb_path
+								)
+							end
+
+							require("rust-tools").setup {
+								tools = {
+									inlay_hints = {
+										auto = true,
+										other_hints_prefix = ":: ",
+										only_current_line = true,
+										show_parameter_hints = false,
+									},
 								},
-							},
-							typescript = {
-								inlayHints = {
-									includeInlayEnumMemberValueHints = true,
-									includeInlayFunctionLikeReturnTypeHints = true,
-									includeInlayFunctionParameterTypeHints = true,
-									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
-									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-									includeInlayPropertyDeclarationTypeHints = true,
-									includeInlayVariableTypeHints = true,
+								dap = { adapter = get_rust_adapters() },
+								server = {
+									on_attach = function(client, bufnr)
+										vim.api.nvim_buf_set_option(
+											bufnr,
+											"formatexpr",
+											"v:lua.vim.lsp.formatexpr()"
+										)
+										vim.api.nvim_buf_set_option(
+											bufnr,
+											"omnifunc",
+											"v:lua.vim.lsp.omnifunc"
+										)
+										vim.api.nvim_buf_set_option(
+											bufnr,
+											"tagfunc",
+											"v:lua.vim.lsp.tagfunc"
+										)
+										options.on_attach(client, bufnr)
+									end,
+									capabilities = options.capabilities,
+									standalone = true,
+									settings = {
+										["rust-analyzer"] = {
+											cargo = {
+												loadOutDirsFromCheck = true,
+												buildScripts = { enable = true },
+											},
+											diagnostics = {
+												disabled = { "unresolved-proc-macro" },
+												enableExperimental = true,
+											},
+											checkOnSave = { command = "clippy" },
+											procMacro = { enable = true },
+										},
+									},
+								},
+							}
+						end,
+						tsserver = {
+							root_dir = lspconfig.util.root_pattern(
+								"tsconfig.json",
+								"package.json",
+								".git"
+							),
+							settings = {
+								javascript = {
+									inlayHints = {
+										includeInlayEnumMemberValueHints = true,
+										includeInlayFunctionLikeReturnTypeHints = true,
+										includeInlayFunctionParameterTypeHints = true,
+										includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+										includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+										includeInlayPropertyDeclarationTypeHints = true,
+										includeInlayVariableTypeHints = true,
+									},
+								},
+								typescript = {
+									inlayHints = {
+										includeInlayEnumMemberValueHints = true,
+										includeInlayFunctionLikeReturnTypeHints = true,
+										includeInlayFunctionParameterTypeHints = true,
+										includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+										includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+										includeInlayPropertyDeclarationTypeHints = true,
+										includeInlayVariableTypeHints = true,
+									},
 								},
 							},
 						},
-					},
-					yamlls = {
-						settings = {
-							yaml = {
-								schemaStore = {
-									enable = true,
-								},
-								schemas = {
-									["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+						yamlls = {
+							settings = {
+								yaml = {
+									schemaStore = {
+										enable = true,
+									},
+									schemas = {
+										["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+									},
 								},
 							},
 						},
-					},
-				}
+						bashls = {},
+						dockerls = {},
+						marksman = {},
+						rnix = {},
+						ruff_lsp = {},
+						svelte = {},
+						cssls = {},
+						spectral = {},
+						taplo = {},
+						denols = {},
+					}
 
-				if not vim.tbl_contains(servers, lsp_name) then
-					lspconfig[lsp_name].setup(options)
-					return
-				end
+					if not vim.tbl_contains(servers, lsp_name) then
+						lspconfig[lsp_name].setup(options)
+						return
+					end
 
-				local handler = servers[lsp_name]
+					local handler = servers[lsp_name]
 
-				if type(handler) == "function" then
-					--- This is the case where the language server has its own setup
-					--- e.g. clangd_extensions, lua_ls, rust_analyzer
-					handler(options)
-				elseif type(handler) == "table" then
-					lspconfig[lsp_name].setup(vim.tbl_extend("force", options, handler))
-				end
-			end
-
-			require("mason-lspconfig").setup_handlers { mason_handler }
+					if type(handler) == "function" then
+						--- This is the case where the language server has its own setup
+						--- e.g. clangd_extensions, lua_ls, rust_analyzer
+						local run_ok, _ = pcall(handler)
+						if not run_ok then lspconfig[lsp_name].setup(options) end
+					elseif type(handler) == "table" then
+						lspconfig[lsp_name].setup(vim.tbl_extend("force", options, handler))
+					end
+				end,
+			}
 
 			-- starlark_rust
 			lspconfig.starlark_rust.setup {
@@ -1546,6 +1547,7 @@ require("lazy").setup({
 				"vimball",
 				"vimballPlugin",
 				"zip",
+				"rplugin",
 				"zipPlugin",
 				"editorconfig",
 			},
