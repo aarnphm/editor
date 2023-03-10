@@ -416,17 +416,10 @@ return {
 				function()
 					require("neo-tree.command").execute {
 						toggle = true,
-						dir = require("zox.utils").get_root(),
+						dir = vim.loop.cwd(),
 					}
 				end,
 				desc = "explorer: root dir",
-			},
-			{
-				"<LocalLeader>fE",
-				function()
-					require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() }
-				end,
-				desc = "explorer: current dir",
 			},
 		},
 		deactivate = function() vim.cmd [[Neotree close]] end,
