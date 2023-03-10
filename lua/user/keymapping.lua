@@ -1,11 +1,4 @@
-local vim = vim
-local k = require "zox.keybind"
-
--- map leader to <Space> and localeader to +
-vim.g.mapleader = " "
-vim.g.maplocalleader = "+"
-vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
-vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
+local k = require "keybind"
 
 k.nvim_register_mapping {
 	["n|<S-Tab>"] = k.cr("normal za"):with_defaults "edit: Toggle code fold",
@@ -36,17 +29,6 @@ k.nvim_register_mapping {
 	["n|<Leader>Q"] = k.cr("cclose"):with_defaults "quickfix: Close quickfix",
 	["n|<Leader>l"] = k.cr("lopen"):with_defaults "quickfix: Open location list",
 	["n|<Leader>L"] = k.cr("lclose"):with_defaults "quickfix: Close location list",
-	-- Gigachad fugitive
-	["n|<LocalLeader>P"] = k.callback(function() vim.cmd [[ Git pull --rebase ]] end)
-		:with_buffer(vim.api.nvim_get_current_buf())
-		:with_noremap()
-		:with_desc "git: Pull rebase always",
-	["n|<LocalLeader>p"] = k.callback(function() vim.cmd [[ Git push ]] end)
-		:with_buffer(vim.api.nvim_get_current_buf())
-		:with_noremap()
-		:with_desc "git: push",
-	-- Zen mode
-	["n|zm"] = k.cr("ZenMode"):with_defaults "zen: Toggle zen mode",
 	-- remap command key to ;
 	["n|;"] = k.cmd(":"):with_noremap():with_desc "command: Enter command mode",
 	["n|\\"] = k.cmd(":let @/=''<CR>:noh<CR>"):with_noremap():with_desc "edit: clean hightlight",
@@ -63,8 +45,7 @@ k.nvim_register_mapping {
 	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
-	["n|<Leader>p"] = k.cr("Lazy"):with_nowait():with_desc "package: Show",
-	["n|<LocalLeader>ft"] = k.callback(require("zox.formatting").toggle)
+	["n|<LocalLeader>ft"] = k.callback(require("user.format").toggle)
 		:with_defaults "lsp: Toggle formatter",
 	-- telescope
 	["n|<Leader>f"] = k.callback(
@@ -86,7 +67,7 @@ k.nvim_register_mapping {
 			}
 		end
 	):with_defaults "find: files in git repository",
-	["n|<Leader>?"] = k.callback(function() require("telescope.builtin").live_grep {} end)
+	["n|<Leader>'"] = k.callback(function() require("telescope.builtin").live_grep {} end)
 		:with_defaults "find: words",
 	["n|<Leader>w"] = k.callback(
 		function() require("telescope").extensions.live_grep_args.live_grep_args() end
@@ -105,6 +86,4 @@ k.nvim_register_mapping {
 			},
 		}
 	end):with_defaults "tools: Show keymap legends",
-	["n|<LocalLeader>d"] = k.cr("DiffviewOpen"):with_defaults "git: Show diff view",
-	["n|<LocalLeader><LocalLeader>d"] = k.cr("DiffviewClose"):with_defaults "git: Close diff view",
 }

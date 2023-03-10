@@ -38,7 +38,7 @@ api.nvim_create_autocmd("TermOpen", {
 
 -- no comments on new line
 vim.api.nvim_create_autocmd({ "BufWinEnter", "BufRead", "BufNewFile" }, {
-	command = "setlocal formatoptions-=c",
+	command = "setlocal formatoptions-=cro",
 })
 
 -- Check if we need to reload the file when it changed

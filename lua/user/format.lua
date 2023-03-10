@@ -17,11 +17,12 @@ M.toggle = function()
 	end
 end
 
-local server_formatting_blocklist = {
-	lua_ls = true,
-	tsserver = true,
-	clangd = true,
-}
+---@param name string
+local get_opts = function(name)
+	local plugin = require("lazy.core.config").plugins[name]
+	if not plugin then return {} end
+	return require("lazy.core.plugin").values(plugin, "opts", false)
+end
 
 M.format = function(opts)
 	local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
@@ -37,7 +38,7 @@ M.format = function(opts)
 			if have_nls then return client.name == "null-ls" end
 			return client.name ~= "null-ls"
 		end,
-	}, require("zox.utils").opts("nvim-lspconfig").format or {}))
+	}, get_opts("nvim-lspconfig").format or {}))
 end
 
 M.on_attach = function(client, bufnr)

@@ -1,3 +1,14 @@
+local get_binary_path = function(binary)
+	local path = nil
+	if vim.loop.os_uname().sysname == "Windows_NT" then
+		path = vim.fn.trim(vim.fn.system("where " .. binary))
+	else
+		path = vim.fn.trim(vim.fn.system("which " .. binary))
+	end
+	if vim.v.shell_error ~= 0 then path = nil end
+	return path
+end
+
 local switch_source_header_splitcmd = function(bufnr, splitcmd)
 	local ok, lspconfig = pcall(require, "lspconfig")
 	if not ok then
@@ -36,7 +47,7 @@ end
 local get_binary_path_list = function(binaries)
 	local path_list = {}
 	for _, binary in ipairs(binaries) do
-		local path = require("zox.utils").get_binary_path(binary)
+		local path = get_binary_path(binary)
 		if path then table.insert(path_list, path) end
 	end
 	return table.concat(path_list, ",")
