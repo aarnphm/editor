@@ -1,9 +1,8 @@
 require "user.globals"
 require "user.options"
-require "user.keymapping"
 require "user.events"
 
-local icons = require "icons"
+local k = require "keybind"
 
 -- Bootstrap lazy.nvim plugin manager.
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -22,12 +21,16 @@ vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup({
 	{ "nvim-lua/plenary.nvim" },
-	-- NOTE: interface
 	{
 		"echasnovski/mini.bufremove",
 		keys = {
             -- stylua: ignore
             { "<C-x>", function() require("mini.bufremove").delete(0, false) end, desc = "buf: delete" },
+			{
+				"<leader>bD",
+				function() require("mini.bufremove").delete(0, true) end,
+				desc = "buf: force delete",
+			},
 		},
 	},
 	{
@@ -78,7 +81,55 @@ require("lazy").setup({
 				},
 			}
 		end,
-		config = function(_, opts) require("mini.ai").setup(opts) end,
+		config = function(_, opts)
+			require("mini.ai").setup(opts)
+
+			if _G.HAS "which-key.nvim" then
+				--- register text-objects with which-key
+				---@type table<string, string|table>
+				local i = {
+					[" "] = "Whitespace",
+					["\""] = "Balanced \"",
+					["'"] = "Balanced '",
+					["`"] = "Balanced `",
+					["("] = "Balanced (",
+					[")"] = "Balanced ) including white-space",
+					[">"] = "Balanced > including white-space",
+					["<lt>"] = "Balanced <",
+					["]"] = "Balanced ] including white-space",
+					["["] = "Balanced [",
+					["}"] = "Balanced } including white-space",
+					["{"] = "Balanced {",
+					["?"] = "User Prompt",
+					_ = "Underscore",
+					a = "Argument",
+					b = "Balanced ), ], }",
+					c = "Class",
+					f = "Function",
+					o = "Block, conditional, loop",
+					q = "Quote `, \", '",
+					t = "Tag",
+				}
+				local a = vim.deepcopy(i)
+				for k, v in pairs(a) do
+					a[k] = v:gsub(" including.*", "")
+				end
+
+				local ic = vim.deepcopy(i)
+				local ac = vim.deepcopy(a)
+				for key, name in pairs { n = "Next", l = "Last" } do
+					i[key] =
+						vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
+					a[key] =
+						vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
+				end
+				require("which-key").register {
+					mode = { "o", "x" },
+					i = i,
+					a = a,
+				}
+			end
+		end,
 	},
 	{
 		"echasnovski/mini.align",
@@ -229,8 +280,6 @@ require("lazy").setup({
 				current_line_blame = true,
 				diff_opts = { internal = true },
 				on_attach = function(bufnr)
-					local k = require "keybind"
-
 					k.nvim_register_mapping {
 						["n|]g"] = k.callback(function()
 							if vim.wo.diff then return "]g" end
@@ -317,11 +366,30 @@ require("lazy").setup({
 			}
 		end,
 	},
+	-- folke is neovim's tpope
+	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
+	{
+		"folke/trouble.nvim",
+		lazy = true,
+		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+		event = "BufReadPost",
+		config = true,
+	},
+	{ "folke/zen-mode.nvim" },
+	{
+		"folke/which-key.nvim",
+		lazy = true,
+		event = "BufReadPost",
+		opts = {
+			window = { border = "single" },
+			plugins = { spelling = { enabled = true } },
+		},
+	},
 	{
 		"folke/todo-comments.nvim",
 		lazy = true,
 		cmd = { "TodoTrouble", "TodoTelescope" },
-		event = "VeryLazy",
+		event = "LspAttach",
 		config = true,
 	},
 	{
@@ -389,14 +457,12 @@ require("lazy").setup({
 	},
 	{
 		"nvim-telescope/telescope.nvim",
-		lazy = true,
 		event = "BufReadPost",
 		dependencies = {
 			{ "nvim-telescope/telescope-live-grep-args.nvim" },
 			{
 				"ahmedkhalf/project.nvim",
 				as = "project_nvim",
-				event = "BufReadPost",
 				config = function()
 					require("project_nvim").setup {
 						manual_mode = false,
@@ -413,8 +479,8 @@ require("lazy").setup({
 		config = function()
 			require("telescope").setup {
 				defaults = {
-					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
-					selection_caret = icons.ui_space.DoubleSeparator,
+					prompt_prefix = " " .. " " .. " ",
+					selection_caret = " ",
 					file_ignore_patterns = { ".git/" },
 					mappings = {
 						i = {
@@ -503,6 +569,7 @@ require("lazy").setup({
 		init = function()
 			vim.g.neo_tree_remove_legacy_commands = 1
 			if vim.fn.argc() == 1 then
+				---@diagnostic disable-next-line: param-type-mismatch
 				local stat = vim.loop.fs_stat(vim.fn.argv(0))
 				if stat and stat.type == "directory" then require "neo-tree" end
 			end
@@ -565,11 +632,8 @@ require("lazy").setup({
 					},
 				},
 			}
-
-			local k = require "keybind"
-
 			k.nvim_register_mapping {
-				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
+				["v|<LocalLeader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
 				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
 					:with_defaults "replace: Open panel",
@@ -602,8 +666,6 @@ require("lazy").setup({
 				shell = vim.o.shell,
 				highlight = require "rose-pine.plugins.toggleterm",
 			}
-
-			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
 					:with_defaults "terminal: Toggle horizontal",
@@ -628,7 +690,6 @@ require("lazy").setup({
 		opts = { popup = { border = "rounded" } },
 	},
 	{ "p00f/clangd_extensions.nvim", lazy = true, ft = { "c", "cpp", "hpp", "h" } },
-	{ "folke/neodev.nvim", lazy = true, ft = "lua" },
 	{
 		"jose-elias-alvarez/null-ls.nvim",
 		event = "BufReadPre",
@@ -665,8 +726,9 @@ require("lazy").setup({
 					},
 					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
 					f.buildifier,
-					f.taplo,
-					-- NOTE: Using deno fmt for markdown
+					f.taplo.with {
+						extra_args = { "fmt", "-o", "indent_string='" .. string.rep(" ", 4) .. "'" },
+					},
 					f.deno_fmt.with { extra_args = { "--line-width", "80" } },
 					f.yamlfmt,
 
@@ -701,18 +763,11 @@ require("lazy").setup({
 		dependencies = {
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "williamboman/mason.nvim", cmd = "Mason", lazy = true },
-			{
-				"folke/trouble.nvim",
-				lazy = true,
-				cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
-				event = "BufReadPost",
-				config = true,
-			},
 			{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
 			{
 				"glepnir/lspsaga.nvim",
 				branch = "main",
-				events = "BufReadPost",
+				events = "LspAttach",
 				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
 				config = function()
 					require("lspsaga").setup {
@@ -732,7 +787,7 @@ require("lazy").setup({
 							enable = false,
 							ignore_patterns = { "%w_spec" },
 							respect_root = true,
-							separator = " " .. icons.ui_space.Separator,
+							separator = "  ",
 							show_file = false,
 						},
 						callhierarchy = { show_detail = true },
@@ -741,7 +796,7 @@ require("lazy").setup({
 			},
 		},
 		config = function()
-			local nvim_lsp = require "lspconfig"
+			local lspconfig = require "lspconfig"
 			local mason = require "mason"
 
 			require("lspconfig.ui.windows").default_options.border = "single"
@@ -784,7 +839,6 @@ require("lazy").setup({
 			local on_attach = function(client, bufnr)
 				require("user.format").on_attach(client, bufnr)
 
-				local k = require "keybind"
 				k.nvim_register_mapping {
 					-- lsp
 					["n|K"] = k.cr("Lspsaga hover_doc")
@@ -823,47 +877,439 @@ require("lazy").setup({
 				}
 			end
 
-			local options = {
-				on_attach = on_attach,
-				capabilities = capabilities,
-			}
+			local options = { on_attach = on_attach, capabilities = capabilities }
 
 			--- A small wrapper to setup lsp with nvim-lspconfig
 			--- @param lsp_name string name of given lsp server
 			local mason_handler = function(lsp_name)
-				local success, handler = pcall(require, "lsp." .. lsp_name)
+				local servers = {
+					bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
+					clangd = function(o)
+						o.capabilities.offsetEncoding = { "utf-16", "utf-8" }
 
-				if not success then
-					nvim_lsp[lsp_name].setup(options)
+						local switch_source_header_splitcmd = function(bufnr, splitcmd)
+							bufnr = lspconfig.util.validate_bufnr(bufnr)
+							local clangd_client =
+								lspconfig.util.get_active_client_by_name(bufnr, "clangd")
+							local params = { uri = vim.uri_from_bufnr(bufnr) }
+							if clangd_client then
+								clangd_client.request(
+									"textDocument/switchSourceHeader",
+									params,
+									function(err, result)
+										if err then error(tostring(err)) end
+										if not result then
+											vim.notify(
+												"Corresponding file can’t be determined",
+												vim.log.levels.ERROR,
+												{ title = "LSP Error!" }
+											)
+											return
+										end
+										vim.api.nvim_command(
+											splitcmd .. " " .. vim.uri_to_fname(result)
+										)
+									end
+								)
+							else
+								vim.notify(
+									"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
+									vim.log.levels.ERROR,
+									{ title = "LSP Error!" }
+								)
+							end
+						end
+
+						local get_binary_path_list = function(binaries)
+							local get_binary_path = function(binary)
+								local path = nil
+								if vim.loop.os_uname().sysname == "Windows_NT" then
+									path = vim.fn.trim(vim.fn.system("where " .. binary))
+								else
+									path = vim.fn.trim(vim.fn.system("which " .. binary))
+								end
+								if vim.v.shell_error ~= 0 then path = nil end
+								return path
+							end
+
+							local path_list = {}
+							for _, binary in ipairs(binaries) do
+								local path = get_binary_path(binary)
+								if path then table.insert(path_list, path) end
+							end
+							return table.concat(path_list, ",")
+						end
+
+						require("clangd_extensions").setup {
+							-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
+							server = {
+								on_attach = o.on_attach,
+								capabilities = o.capabilities,
+								single_file_support = true,
+								cmd = {
+									"clangd",
+									"--background-index",
+									"--pch-storage=memory",
+									-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
+									"--query-driver="
+										.. get_binary_path_list { "clang++", "clang", "gcc", "g++" },
+									"--clang-tidy",
+									"--all-scopes-completion",
+									"--completion-style=detailed",
+									"--header-insertion-decorators",
+									"--header-insertion=never",
+								},
+								filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+								commands = {
+									ClangdSwitchSourceHeader = {
+										function() switch_source_header_splitcmd(0, "edit") end,
+										description = "cpp: Open source/header in current buffer",
+									},
+									ClangdSwitchSourceHeaderVSplit = {
+										function() switch_source_header_splitcmd(0, "vsplit") end,
+										description = "cpp: Open source/header in a new vsplit",
+									},
+									ClangdSwitchSourceHeaderSplit = {
+										function() switch_source_header_splitcmd(0, "split") end,
+										description = "cpp: Open source/header in a new split",
+									},
+								},
+							},
+						}
+					end,
+					gopls = {
+						flags = { debounce_text_changes = 500 },
+						cmd = { "gopls", "-remote=auto" },
+						settings = {
+							gopls = {
+								usePlaceholders = true,
+								analyses = {
+									nilness = true,
+									shadow = true,
+									unusedparams = true,
+									unusewrites = true,
+								},
+								hints = {
+									assignVariableTypes = true,
+									compositeLiteralFields = true,
+									compositeLiteralTypes = true,
+									constantValues = true,
+									functionTypeParameters = true,
+									parameterNames = true,
+									rangeVariableTypes = true,
+								},
+							},
+						},
+					},
+					html = {
+						cmd = { "html-languageserver", "--stdio" },
+						filetypes = { "html" },
+						init_options = {
+							configurationSection = { "html", "css", "javascript" },
+							embeddedLanguages = { css = true, javascript = true },
+						},
+						settings = {},
+						single_file_support = true,
+						flags = { debounce_text_changes = 500 },
+					},
+					jdtls = {
+						flags = { debounce_text_changes = 500 },
+						settings = {
+							root_dir = {
+								-- Single-module projects
+								{
+									"build.xml", -- Ant
+									"pom.xml", -- Maven
+									"settings.gradle", -- Gradle
+									"settings.gradle.kts", -- Gradle
+								},
+								-- Multi-module projects
+								{ "build.gradle", "build.gradle.kts" },
+								{ "$BENTOML_GIT_ROOT/grpc-client/java" },
+								{ "$BENTOML_GIT_ROOT/grpc-client/kotlin" },
+							} or vim.fn.getcwd(),
+						},
+					},
+					jsonls = {
+						flags = { debounce_text_changes = 500 },
+						settings = {
+							json = {
+								-- Schemas https://www.schemastore.org
+								schemas = {
+									{
+										fileMatch = { "package.json" },
+										url = "https://json.schemastore.org/package.json",
+									},
+									{
+										fileMatch = { "tsconfig*.json" },
+										url = "https://json.schemastore.org/tsconfig.json",
+									},
+									{
+										fileMatch = {
+											".prettierrc",
+											".prettierrc.json",
+											"prettier.config.json",
+										},
+										url = "https://json.schemastore.org/prettierrc.json",
+									},
+									{
+										fileMatch = { ".eslintrc", ".eslintrc.json" },
+										url = "https://json.schemastore.org/eslintrc.json",
+									},
+									{
+										fileMatch = {
+											".babelrc",
+											".babelrc.json",
+											"babel.config.json",
+										},
+										url = "https://json.schemastore.org/babelrc.json",
+									},
+									{
+										fileMatch = { "lerna.json" },
+										url = "https://json.schemastore.org/lerna.json",
+									},
+									{
+										fileMatch = {
+											".stylelintrc",
+											".stylelintrc.json",
+											"stylelint.config.json",
+										},
+										url = "http://json.schemastore.org/stylelintrc.json",
+									},
+									{
+										fileMatch = { "/.github/workflows/*" },
+										url = "https://json.schemastore.org/github-workflow.json",
+									},
+								},
+							},
+						},
+					},
+					lua_ls = function(o)
+						-- NOTE: call neodev before setup lua_ls
+						require("neodev").setup {
+							library = {
+								plugins = {
+									"lazy",
+									"lualine.nvim",
+									"null-ls.nvim",
+									"nvim-lspconfig",
+									"nvim-treesitter",
+									"telescope.nvim",
+									"gitsigns.nvim",
+									"lspsaga.nvim",
+								},
+							},
+						}
+
+						-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/lua_ls.lua
+						lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", o, {
+							settings = {
+								Lua = {
+									completion = {
+										callSnippet = "Replace",
+									},
+									diagnostics = {
+										enable = true,
+										globals = { "vim" },
+										disable = { "different-requires" },
+									},
+									hint = { enable = true },
+									runtime = {
+										version = "LuaJIT",
+										special = { reload = "require" },
+									},
+									workspace = {
+										library = {
+											vim.env.VIMRUNTIME,
+											require("neodev.config").types(),
+										},
+										checkThirdParty = false,
+										maxPreload = 100000,
+										preloadFileSize = 10000,
+									},
+									telemetry = { enable = false },
+									semantic = { enable = false },
+								},
+							},
+						}))
+					end,
+					pyright = {
+						flags = { debounce_text_changes = 500 },
+						root_dir = function(fname)
+							return lspconfig.util.root_pattern(
+								"WORKSPACE",
+								".git",
+								"Pipfile",
+								"pyrightconfig.json",
+								"setup.py",
+								"setup.cfg",
+								"pyproject.toml",
+								"requirements.txt"
+							)(fname) or lspconfig.util.path.dirname(fname)
+						end,
+						settings = {
+							python = {
+								analysis = {
+									autoSearchPaths = true,
+									useLibraryCodeForTypes = true,
+								},
+							},
+						},
+					},
+					rust_analyzer = function(o)
+						local get_rust_adapters = function()
+							if vim.loop.os_uname().sysname == "Windows_NT" then
+								return {
+									type = "executable",
+									command = "lldb-vscode",
+									name = "rt_lldb",
+								}
+							end
+							local codelldb_extension_path = vim.fn.stdpath "data"
+								.. "/mason/packages/codelldb/extension"
+							local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
+							local extension = ".so"
+							if vim.loop.os_uname().sysname == "Darin" then extension = ".dylib" end
+							local liblldb_path = codelldb_extension_path
+								.. "/lldb/lib/liblldb"
+								.. extension
+							return require("rust-tools.dap").get_codelldb_adapter(
+								codelldb_path,
+								liblldb_path
+							)
+						end
+
+						require("rust-tools").setup {
+							tools = {
+								inlay_hints = {
+									auto = true,
+									other_hints_prefix = ":: ",
+									only_current_line = true,
+									show_parameter_hints = false,
+								},
+							},
+							dap = { adapter = get_rust_adapters() },
+							server = {
+								on_attach = function(client, bufnr)
+									vim.api.nvim_buf_set_option(
+										bufnr,
+										"formatexpr",
+										"v:lua.vim.lsp.formatexpr()"
+									)
+									vim.api.nvim_buf_set_option(
+										bufnr,
+										"omnifunc",
+										"v:lua.vim.lsp.omnifunc"
+									)
+									vim.api.nvim_buf_set_option(
+										bufnr,
+										"tagfunc",
+										"v:lua.vim.lsp.tagfunc"
+									)
+									o.on_attach(client, bufnr)
+								end,
+								capabilities = o.capabilities,
+								standalone = true,
+								settings = {
+									["rust-analyzer"] = {
+										cargo = {
+											loadOutDirsFromCheck = true,
+											buildScripts = { enable = true },
+										},
+										diagnostics = {
+											disabled = { "unresolved-proc-macro" },
+											enableExperimental = true,
+										},
+										checkOnSave = { command = "clippy" },
+										procMacro = { enable = true },
+									},
+								},
+							},
+						}
+					end,
+					tsserver = {
+						root_dir = lspconfig.util.root_pattern(
+							"tsconfig.json",
+							"package.json",
+							".git"
+						),
+						settings = {
+							javascript = {
+								inlayHints = {
+									includeInlayEnumMemberValueHints = true,
+									includeInlayFunctionLikeReturnTypeHints = true,
+									includeInlayFunctionParameterTypeHints = true,
+									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+									includeInlayPropertyDeclarationTypeHints = true,
+									includeInlayVariableTypeHints = true,
+								},
+							},
+							typescript = {
+								inlayHints = {
+									includeInlayEnumMemberValueHints = true,
+									includeInlayFunctionLikeReturnTypeHints = true,
+									includeInlayFunctionParameterTypeHints = true,
+									includeInlayParameterNameHints = "all", -- 'none' | 'literals' | 'all';
+									includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+									includeInlayPropertyDeclarationTypeHints = true,
+									includeInlayVariableTypeHints = true,
+								},
+							},
+						},
+					},
+					yamlls = {
+						settings = {
+							yaml = {
+								schemaStore = {
+									enable = true,
+								},
+								schemas = {
+									["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+								},
+							},
+						},
+					},
+				}
+
+				if not vim.tbl_contains(servers, lsp_name) then
+					lspconfig[lsp_name].setup(options)
 					return
 				end
+
+				local handler = servers[lsp_name]
 
 				if type(handler) == "function" then
 					--- This is the case where the language server has its own setup
 					--- e.g. clangd_extensions, lua_ls, rust_analyzer
 					handler(options)
 				elseif type(handler) == "table" then
-					nvim_lsp[lsp_name].setup(vim.tbl_extend("force", options, handler))
-				else
-					error(
-						string.format(
-							"Failed to setup '%s'. Server defined "
-								.. "under lsp/ must return either a "
-								.. "function(opts) or a table. Got type '%s' instead.",
-							lsp_name,
-							type(handler)
-						),
-						vim.log.levels.ERROR
-					)
+					lspconfig[lsp_name].setup(vim.tbl_extend("force", options, handler))
 				end
 			end
 
 			require("mason-lspconfig").setup_handlers { mason_handler }
 
-			mason_handler "starlark_rust"
+			-- starlark_rust
+			lspconfig.starlark_rust.setup {
+				on_attach = options.on_attach,
+				capabilities = options.capabilities,
+				cmd = { "starlark", "--lsp" },
+				filetypes = { "bzl", "WORKSPACE", "star", "BUILD.bazel", "bazel", "bzlmod" },
+				root_dir = function(fname)
+					return lspconfig.util.root_pattern(unpack {
+						"WORKSPACE",
+						"WORKSPACE.bzlmod",
+						"WORKSPACE.bazel",
+						"MODULE.bazel",
+						"MODULE",
+					})(fname) or lspconfig.util.find_git_ancestor(fname) or lspconfig.util.path.dirname(
+						fname
+					)
+				end,
+			}
 		end,
 	},
-
 	-- Setup completions.
 	{
 		"hrsh7th/nvim-cmp",
@@ -928,7 +1374,6 @@ require("lazy").setup({
 		},
 		config = function()
 			local cmp = require "cmp"
-			local k = require "keybind"
 			local lspkind = require "lspkind"
 
 			local cmp_window = require "cmp.utils.window"
@@ -1060,7 +1505,6 @@ require("lazy").setup({
 				end,
 			}
 
-			local k = require "keybind"
 			k.nvim_register_mapping {
 				["n|<Leader>gf"] = k.callback(function()
 					if require("obsidian").utils.cursor_on_markdown_link() then

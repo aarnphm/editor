@@ -15,3 +15,5 @@ _G.R = function(name)
 	_G.RELOAD(name)
 	return require(name)
 end
+
+_G.HAS = function(plugin) return require("lazy.core.config").plugins[plugin] ~= nil end
