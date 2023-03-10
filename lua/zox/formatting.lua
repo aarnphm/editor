@@ -1,86 +1,19 @@
 local M = {}
 
 local disabled_ft = { "gitcommit", "gitconfig", "gitignore" }
-local format_on_save = true
+M.autoformat = true
 
-vim.api.nvim_create_user_command("FormatToggle", function() M.toggle_format_on_save() end, {})
-
-local block_list = {}
-vim.api.nvim_create_user_command("FormatterToggle", function(opts)
-	if block_list[opts.args] == nil then
-		vim.notify(
-			string.format(
-				"[LSP]Formatter for [%s] has been recorded in list and disabled.",
-				opts.args
-			),
-			vim.log.levels.WARN,
-			{ title = "LSP Formatter Warning!" }
-		)
-		block_list[opts.args] = true
+M.toggle = function()
+	if vim.b.autoformat == false then
+		vim.b.autoformat = nil
+		M.autoformat = true
 	else
-		block_list[opts.args] = not block_list[opts.args]
-		vim.notify(
-			string.format(
-				"[LSP] Formatter for [%s] has been %s.",
-				opts.args,
-				not block_list[opts.args] and "enabled" or "disabled"
-			),
-			not block_list[opts.args] and vim.log.levels.INFO or vim.log.levels.WARN,
-			{
-				title = string.format(
-					"LSP Formatter %s",
-					not block_list[opts.args] and "Info" or "Warning"
-				),
-			}
-		)
+		M.autoformat = not M.autoformat
 	end
-end, { nargs = 1, complete = "filetype" })
-
-M.enable_format_on_save = function(is_configured)
-	local opts = { pattern = "*", timeout = 1000 }
-	vim.api.nvim_create_augroup("format_on_save", {})
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		group = "format_on_save",
-		pattern = opts.pattern,
-		callback = function() M.format { timeout_ms = opts.timeout } end,
-	})
-	if not is_configured then
-		vim.notify(
-			"Successfully enabled format-on-save",
-			vim.log.levels.INFO,
-			{ title = "Settings modification success!" }
-		)
-	end
-end
-
-M.configure_format_on_save = function()
-	if format_on_save then
-		M.enable_format_on_save(true)
+	if M.autoformat then
+		vim.notify("Enabled format on save", vim.log.levels.INFO, { title = "Format" })
 	else
-		M.disable_format_on_save()
-	end
-end
-
-M.disable_format_on_save = function()
-	pcall(vim.api.nvim_del_augroup_by_name, "format_on_save")
-	if format_on_save then
-		vim.notify(
-			"Disabled format-on-save",
-			vim.log.levels.INFO,
-			{ title = "Settings modification success!" }
-		)
-	end
-end
-
-M.toggle_format_on_save = function()
-	local status = pcall(vim.api.nvim_get_autocmds, {
-		group = "format_on_save",
-		event = "BufWritePre",
-	})
-	if not status then
-		M.enable_format_on_save(false)
-	else
-		M.disable_format_on_save()
+		vim.notify("Disabled format on save", vim.log.levels.WARN, { title = "Format" })
 	end
 end
 
@@ -115,7 +48,7 @@ M.on_attach = function(client, bufnr)
 			group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, {}),
 			buffer = bufnr,
 			callback = function()
-				if format_on_save then M.format {} end
+				if M.autoformat then M.format {} end
 			end,
 		})
 	end

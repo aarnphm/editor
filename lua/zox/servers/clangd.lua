@@ -79,6 +79,5 @@ return function(options)
 				},
 			},
 		},
-		extensions = { other_hints_prefix = ":: ", show_parameter_hints = false },
 	}
 end

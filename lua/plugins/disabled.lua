@@ -10,6 +10,64 @@ end
 
 return disable_plugins {
 	{
+		"NvChad/nvim-colorizer.lua",
+		config = function()
+			require("colorizer").setup {
+				filetypes = { "*" },
+				user_default_options = {
+					names = false, -- "Name" codes like Blue
+					RRGGBBAA = true, -- #RRGGBBAA hex codes
+					rgb_fn = true, -- CSS rgb() and rgba() functions
+					hsl_fn = true, -- CSS hsl() and hsla() functions
+					css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+					css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+					sass = { enable = true, parsers = { "css" } },
+					mode = "background",
+				},
+			}
+		end,
+	},
+	{
+		"nvim-tree/nvim-tree.lua",
+		cmd = {
+			"NvimTreeToggle",
+			"NvimTreeOpen",
+			"NvimTreeFindFile",
+			"NvimTreeFindFileToggle",
+			"NvimTreeRefresh",
+		},
+		event = "BufReadPost",
+		config = function()
+			require("nvim-tree").setup {
+				hijack_cursor = true,
+				sort_by = "extensions",
+				prefer_startup_root = true,
+				respect_buf_cwd = true,
+				reload_on_bufenter = true,
+				sync_root_with_cwd = true,
+				actions = { open_file = { quit_on_open = false } },
+				update_focused_file = { enable = true, update_root = true },
+				git = { ignore = false },
+				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
+				renderer = {
+					group_empty = true,
+					indent_markers = { enable = true },
+					root_folder_label = ":.:s?.*?/..?",
+					root_folder_modifier = ":e",
+					icons = {
+						padding = " ",
+						symlink_arrow = "  ",
+					},
+				},
+				trash = {
+					cmd = require("zox.utils").get_binary_path "rip",
+					require_confirm = true,
+				},
+				view = { width = "12%", side = "right" },
+			}
+		end,
+	},
+	{
 		"folke/noice.nvim",
 		lazy = true,
 		event = "BufReadPost",
@@ -299,56 +357,6 @@ return disable_plugins {
 			for _, hlGroup in pairs(require("lspsaga.lspkind").get_kind_group()) do
 				require("zox.utils").extend_hl(hlGroup, { bg = winbar_bg })
 			end
-		end,
-	},
-	{
-		"akinsho/nvim-bufferline.lua",
-		lazy = true,
-		branch = "main",
-		event = "BufReadPost",
-		config = function()
-			require("bufferline").setup {
-				options = {
-					offsets = {
-						{
-							filetype = "NvimTree",
-							text = "File Explorer",
-							text_align = "center",
-							padding = 1,
-						},
-					},
-				},
-			}
-			local k = require "zox.keybind"
-
-			k.nvim_register_mapping {
-				["n|<LocalLeader><LocalLeader>p"] = k.cr("BufferLinePick")
-					:with_defaults "buffer: Pick",
-				["n|<LocalLeader><LocalLeader>c"] = k.cr("BufferLinePickClose")
-					:with_defaults "buffer: Close",
-				["n|<Leader>."] = k.cr("BufferLineCycleNext")
-					:with_defaults "buffer: Cycle to next buffer",
-				["n|<Leader>,"] = k.cr("BufferLineCyclePrev")
-					:with_defaults "buffer: Cycle to previous buffer",
-				["n|<Leader>1"] = k.cr("BufferLineGoToBuffer 1")
-					:with_defaults "buffer: Goto buffer 1",
-				["n|<Leader>2"] = k.cr("BufferLineGoToBuffer 2")
-					:with_defaults "buffer: Goto buffer 2",
-				["n|<Leader>3"] = k.cr("BufferLineGoToBuffer 3")
-					:with_defaults "buffer: Goto buffer 3",
-				["n|<Leader>4"] = k.cr("BufferLineGoToBuffer 4")
-					:with_defaults "buffer: Goto buffer 4",
-				["n|<Leader>5"] = k.cr("BufferLineGoToBuffer 5")
-					:with_defaults "buffer: Goto buffer 5",
-				["n|<Leader>6"] = k.cr("BufferLineGoToBuffer 6")
-					:with_defaults "buffer: Goto buffer 6",
-				["n|<Leader>7"] = k.cr("BufferLineGoToBuffer 7")
-					:with_defaults "buffer: Goto buffer 7",
-				["n|<Leader>8"] = k.cr("BufferLineGoToBuffer 8")
-					:with_defaults "buffer: Goto buffer 8",
-				["n|<Leader>9"] = k.cr("BufferLineGoToBuffer 9")
-					:with_defaults "buffer: Goto buffer 9",
-			}
 		end,
 	},
 }

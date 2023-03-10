@@ -28,6 +28,7 @@ k.nvim_register_mapping {
 	["n|<C-j>"] = k.cmd("<C-w>j"):with_noremap():with_desc "window: Focus down",
 	["n|<C-k>"] = k.cmd("<C-w>k"):with_noremap():with_desc "window: Focus up",
 	["n|<C-x>"] = k.cr("BufDel"):with_defaults "buffer: Delete current buffer",
+	["n|<leader>qq"] = k.cr("wqa"):with_defaults "editor: write quit all",
 	["n|<Leader>."] = k.cr("bnext"):with_defaults "buffer: next",
 	["n|<Leader>,"] = k.cr("bprevious"):with_defaults "buffer: previous",
 	-- quickfix
@@ -63,9 +64,8 @@ k.nvim_register_mapping {
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
 	["n|<Leader>p"] = k.cr("Lazy"):with_nowait():with_desc "package: Show",
-	["n|<LocalLeader>ft"] = k.cr("FormatToggle"):with_defaults "lsp: Toggle formatter",
-	-- nvim-tree
-	["n|<C-n>"] = k.cr("NvimTreeToggle"):with_defaults "file-explorer: Toggle",
+	["n|<LocalLeader>ft"] = k.callback(require("zox.formatting").toggle)
+		:with_defaults "lsp: Toggle formatter",
 	-- telescope
 	["n|<Leader>f"] = k.callback(
 		function()

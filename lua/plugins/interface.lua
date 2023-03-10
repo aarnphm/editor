@@ -9,6 +9,27 @@ return {
 		},
 	},
 	{
+		"akinsho/nvim-bufferline.lua",
+		lazy = true,
+		branch = "main",
+		event = "VeryLazy",
+		config = function()
+			require("bufferline").setup {
+				options = {
+					always_show_bufferline = false,
+					offsets = {
+						{
+							filetype = "neo-tree",
+							text = "Neo-tree",
+							highlight = "File explorer",
+							text_align = "left",
+						},
+					},
+				},
+			}
+		end,
+	},
+	{
 		"nathom/filetype.nvim",
 		event = { "CursorHoldI", "CursorHold" },
 		opts = {
@@ -33,26 +54,23 @@ return {
 			},
 		},
 	},
+	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
 	{
-		"NvChad/nvim-colorizer.lua",
-		config = function()
-			require("colorizer").setup {
-				filetypes = { "*" },
-				user_default_options = {
-					names = false, -- "Name" codes like Blue
-					RRGGBBAA = true, -- #RRGGBBAA hex codes
-					rgb_fn = true, -- CSS rgb() and rgba() functions
-					hsl_fn = true, -- CSS hsl() and hsla() functions
-					css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-					css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-					sass = { enable = true, parsers = { "css" } },
-					mode = "background",
-				},
-			}
+		"stevearc/dressing.nvim",
+		event = "VeryLazy",
+		init = function()
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.select = function(...)
+				require("lazy").load { plugins = { "dressing.nvim" } }
+				return vim.ui.select(...)
+			end
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.input = function(...)
+				require("lazy").load { plugins = { "dressing.nvim" } }
+				return vim.ui.input(...)
+			end
 		end,
 	},
-	{ "romainl/vim-cool", lazy = true, event = { "CursorHoldI", "CursorHold" } },
-	{ "stevearc/dressing.nvim", event = "VeryLazy", opts = { input = { insert_only = false } } },
 	{
 		dir = vim.fn.stdpath "config" .. "/rose-pine",
 		as = "rose-pine",
@@ -263,6 +281,7 @@ return {
 					"css",
 					"vim",
 					"regex",
+					"markdown",
 				},
 				ignore_install = { "phpdoc", "gitcommit" },
 				indent = { enable = true, disable = { "python" } },
@@ -365,44 +384,80 @@ return {
 		end,
 	},
 	{
-		"nvim-tree/nvim-tree.lua",
-		cmd = {
-			"NvimTreeToggle",
-			"NvimTreeOpen",
-			"NvimTreeFindFile",
-			"NvimTreeFindFileToggle",
-			"NvimTreeRefresh",
+		"nvim-neo-tree/neo-tree.nvim",
+		cmd = "Neotree",
+		dependencies = {
+			{ "MunifTanjim/nui.nvim", lazy = true },
+			{ "nvim-lua/plenary.nvim" },
+			{
+				"s1n7ax/nvim-window-picker",
+				config = function()
+					require("window-picker").setup {
+						autoselect_one = true,
+						include_current = false,
+						filter_rules = {
+							-- filter using buffer options
+							bo = {
+								-- if the file type is one of following, the window will be ignored
+								filetype = { "neo-tree", "neo-tree-popup", "notify" },
+
+								-- if the buffer type is one of following, the window will be ignored
+								buftype = { "terminal", "quickfix" },
+							},
+						},
+						other_win_hl_color = "#e35e4f",
+					}
+				end,
+			},
 		},
-		event = "BufReadPost",
-		config = function()
-			require("nvim-tree").setup {
-				hijack_cursor = true,
-				sort_by = "extensions",
-				prefer_startup_root = true,
-				respect_buf_cwd = true,
-				reload_on_bufenter = true,
-				sync_root_with_cwd = true,
-				actions = { open_file = { quit_on_open = false } },
-				update_focused_file = { enable = true, update_root = true },
-				git = { ignore = false },
-				filters = { custom = { "^.git$", ".DS_Store", "__pycache__", "lazy-lock.json" } },
-				renderer = {
-					group_empty = true,
-					indent_markers = { enable = true },
-					root_folder_label = ":.:s?.*?/..?",
-					root_folder_modifier = ":e",
-					icons = {
-						padding = " ",
-						symlink_arrow = "  ",
-					},
-				},
-				trash = {
-					cmd = require("zox.utils").get_binary_path "rip",
-					require_confirm = true,
-				},
-				view = { width = "12%", side = "right" },
-			}
+		keys = {
+			{
+				"<C-n>",
+				function()
+					require("neo-tree.command").execute {
+						toggle = true,
+						dir = require("zox.utils").get_root(),
+					}
+				end,
+				desc = "explorer: root dir",
+			},
+			{
+				"<LocalLeader>fE",
+				function()
+					require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() }
+				end,
+				desc = "explorer: current dir",
+			},
+		},
+		deactivate = function() vim.cmd [[Neotree close]] end,
+		init = function()
+			vim.g.neo_tree_remove_legacy_commands = 1
+			if vim.fn.argc() == 1 then
+				local stat = vim.loop.fs_stat(vim.fn.argv(0))
+				if stat and stat.type == "directory" then require "neo-tree" end
+			end
 		end,
+		opts = {
+			filesystem = {
+				bind_to_cwd = false,
+				follow_current_file = true,
+			},
+			window = {
+				mappings = {
+					["<space>"] = "none",
+					["s"] = "split_with_window_picker",
+					["v"] = "vsplit_with_window_picker",
+				},
+			},
+			default_component_configs = {
+				indent = {
+					with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
+					expander_collapsed = "",
+					expander_expanded = "",
+					expander_highlight = "NeoTreeExpander",
+				},
+			},
+		},
 	},
 	{
 		"nvim-pack/nvim-spectre",

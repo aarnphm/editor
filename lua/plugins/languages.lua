@@ -69,7 +69,7 @@ return {
 						},
 						code_actions = { extend_gitsigns = false },
 						symbol_in_winbar = {
-							enable = true,
+							enable = false,
 							ignore_patterns = { "%w_spec" },
 							respect_root = true,
 							separator = " " .. require("zox").ui_space.Separator,
@@ -122,7 +122,6 @@ return {
 			local ca = require("null-ls").builtins.code_actions
 
 			require("null-ls").setup {
-				update_in_insert = false,
 				diagnostics_format = "[#{c}] #{m} (#{s})",
 				sources = {
 					-- NOTE: formatting
@@ -132,10 +131,7 @@ return {
 						disabled_filetypes = { "markdown" },
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.clang_format.with {
-						extra_args = { "-style={BasedOnStyle: LLVM, IndentWidth: 4}" },
-						filetypes = { "c", "cpp", "objc", "objcpp" },
-					},
+					f.clang_format,
 					f.black,
 					f.ruff,
 					f.isort,
@@ -146,25 +142,16 @@ return {
 					f.jq,
 					f.buf,
 					f.stylelint,
-					f.eslint.with {
-						extra_filetypes = { "astro", "svelte" },
-					},
+					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
 					f.buildifier,
-					-- NOTE: format with 4 spaces
-					f.taplo.with {
-						extra_args = { "fmt", "-o", "indent_string='" .. string.rep(" ", 4) .. "'" },
-					},
+					f.taplo,
 					-- NOTE: Using deno fmt for markdown
-					f.deno_fmt.with {
-						extra_args = { "--line-width", "80" },
-					},
+					f.deno_fmt.with { extra_args = { "--line-width", "80" } },
 					f.yamlfmt,
 
 					-- NOTE: diagnostics
 					d.clang_check,
-					d.eslint.with {
-						extra_filetypes = { "astro", "svelte" },
-					},
+					d.eslint.with { extra_filetypes = { "astro", "svelte" } },
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
 					d.golangci_lint,
@@ -182,6 +169,7 @@ return {
 					ca.eslint.with {
 						extra_filetypes = { "astro", "svelte" },
 					},
+					ca.refactoring,
 				},
 			}
 
