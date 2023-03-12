@@ -1,5 +1,6 @@
 local k = require "keybind"
 
+-- default vim options
 vim.o.autowrite = true
 vim.o.breakat = [[\ \	;:,!?]]
 vim.o.guicursor = ""
@@ -31,6 +32,8 @@ vim.o.relativenumber = true
 vim.o.shiftround = true
 vim.o.shiftwidth = 4
 vim.o.shortmess = "aoOTIcF"
+vim.o.showmode = false
+vim.o.showcmd = false
 vim.o.showbreak = "↳  "
 vim.o.sidescrolloff = 5
 vim.o.signcolumn = "yes"
@@ -39,7 +42,8 @@ vim.o.softtabstop = 4
 vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.tabstop = 4
-vim.o.timeoutlen = 100
+vim.o.timeout = true
+vim.o.timeoutlen = 200
 vim.o.undofile = true
 vim.o.undolevels = 9999
 vim.o.updatetime = 50
@@ -62,19 +66,23 @@ if vim.loop.os_uname().sysname == "Darwin" then
 	}
 end
 
-vim.diagnostic.config { virtual_text = false }
-
-local signs = { "Error", "Warn", "Hint", "Info" }
-for _, type in pairs(signs) do
+for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 	local hl = string.format("DiagnosticSign%s", type)
 	vim.fn.sign_define(hl, { text = "●", texthl = hl, numhl = hl })
 end
 
+vim.diagnostic.config {
+	-- NOTE: on a sunny day where I feel like enable virtual text use { spacing = 4, prefix = "●" }
+	virtual_text = false,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+}
+
 -- map leader to <Space> and localeader to +
 vim.g.mapleader = " "
 vim.g.maplocalleader = "+"
-vim.api.nvim_set_keymap("n", " ", "", { noremap = true })
-vim.api.nvim_set_keymap("x", " ", "", { noremap = true })
+vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
 k.nvim_register_mapping {
 	["n|<S-Tab>"] = k.cr("normal za"):with_defaults "edit: Toggle code fold",
@@ -121,8 +129,7 @@ k.nvim_register_mapping {
 	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
-	["n|<LocalLeader>ft"] = k.callback(require("user.format").toggle)
-		:with_defaults "lsp: Toggle formatter",
+	["n|<LocalLeader>ft"] = k.callback(require("lsp").toggle):with_defaults "lsp: Toggle formatter",
 	-- telescope
 	["n|<Leader>f"] = k.callback(
 		function()
@@ -163,7 +170,7 @@ k.nvim_register_mapping {
 		function() require("telescope").extensions.live_grep_args.live_grep_args() end
 	):with_defaults "find: live grep args",
 	["n|<Leader>/"] = k.cr("Telescope grep_string"):with_defaults "find: Current word under cursor.",
-	["n|<Leader>b"] = k.cr("Telescope buffers previewer=false")
+	["n|<Leader>b"] = k.cr("Telescope buffers show_all_buffers=true previewer=false")
 		:with_defaults "find: Current buffers",
 	["n|<Leader>n"] = k.cr("enew"):with_defaults "buffer: new",
 	["n|<C-p>"] = k.callback(function()

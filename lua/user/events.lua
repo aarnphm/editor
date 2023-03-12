@@ -1,7 +1,8 @@
 local api = vim.api
+local autocmd = vim.api.nvim_create_autocmd
 
 -- close some filetypes with <q>
-api.nvim_create_autocmd("FileType", {
+autocmd("FileType", {
 	pattern = {
 		"qf",
 		"help",
@@ -25,7 +26,7 @@ api.nvim_create_autocmd("FileType", {
 })
 
 -- Makes switching between buffer and termmode feels like normal mode
-api.nvim_create_autocmd("TermOpen", {
+autocmd("TermOpen", {
 	pattern = "term://*",
 	callback = function()
 		local opts = { noremap = true, silent = true }
@@ -37,26 +38,26 @@ api.nvim_create_autocmd("TermOpen", {
 })
 
 -- no comments on new line
-vim.api.nvim_create_autocmd({ "BufWinEnter", "BufRead", "BufNewFile" }, {
+autocmd({ "BufWinEnter", "BufRead", "BufNewFile" }, {
 	command = "setlocal formatoptions-=cro",
 })
 
 -- Check if we need to reload the file when it changed
-api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 	pattern = "*",
 	command = "checktime",
 })
-vim.api.nvim_create_autocmd("VimResized", { command = "tabdo wincmd =" })
+autocmd("VimResized", { command = "tabdo wincmd =" })
 
 local bufs_id = api.nvim_create_augroup("EditorBufs", { clear = true })
 -- Set noundofile for temporary files
-api.nvim_create_autocmd("BufWritePre", {
+autocmd("BufWritePre", {
 	group = bufs_id,
 	pattern = { "/tmp/*", "*.tmp", "*.bak" },
 	command = "setlocal noundofile",
 })
 -- set filetype for header files
-api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+autocmd({ "BufNewFile", "BufRead" }, {
 	group = bufs_id,
 	pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" },
 	command = "setlocal filetype=c",
@@ -64,7 +65,7 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 
 local ft_id = api.nvim_create_augroup("EditorFt", { clear = true })
 -- Set mapping for switching header and source file
-api.nvim_create_autocmd("FileType", {
+autocmd("FileType", {
 	group = ft_id,
 	pattern = "c,cpp",
 	callback = function(event)
@@ -94,8 +95,8 @@ api.nvim_create_autocmd("FileType", {
 
 local yank_id = api.nvim_create_augroup("yank", { clear = true })
 -- Highlight on yank
-api.nvim_create_autocmd("TextYankPost", {
+autocmd("TextYankPost", {
 	group = yank_id,
 	pattern = "*",
-	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 300 } end,
+	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 40 } end,
 })
