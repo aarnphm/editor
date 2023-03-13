@@ -3,6 +3,7 @@ require "user.options"
 require "user.events"
 
 local k = require "keybind"
+local icons = require "user.icons"
 
 -- Bootstrap lazy.nvim plugin manager.
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -36,6 +37,40 @@ require("lazy").setup({
 			},
 			{ "<Leader>P", function() vim.cmd [[ Git push ]] end, desc = "git: push" },
 		},
+	},
+	-- NOTE: nice git integration and UI
+	{
+		"lewis6991/gitsigns.nvim",
+		lazy = true,
+		event = "VeryLazy",
+		config = function()
+			require("gitsigns").setup {
+				numhl = true,
+				word_diff = false,
+				current_line_blame = false,
+				diff_opts = { internal = true },
+				on_attach = function(bufnr)
+					local gs = package.loaded.gitsigns
+					local map = function(mode, l, r, desc)
+						vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
+					end
+                    -- stylua: ignore start
+					map("n", "]h", gs.next_hunk, "git: next hunk")
+					map("n", "[h", gs.prev_hunk, "git: prev hunk")
+					map("n", "<leader>hu", gs.undo_stage_hunk, "git: undo stage hunk")
+					map("n", "<leader>hR", gs.reset_buffer, "git: reset buffer")
+					map("n", "<leader>hS", gs.stage_buffer, "git: stage buffer")
+					map("n", "<leader>hp", gs.preview_hunk, "git: preview hunk")
+                    map("n", "<leader>hd", gs.diffthis, "git: diff this")
+                    map("n", "<leader>hD", function() gs.diffthis("~") end, "git: diff this ~")
+                    map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "git: blame Line")
+					map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
+					map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
+                    map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+					-- stylua: ignore end
+				end,
+			}
+		end,
 	},
 	-- NOTE: exit fast af
 	{
@@ -110,6 +145,7 @@ require("lazy").setup({
 			}
 		end,
 	},
+	-- NOTE: comments, you say what?
 	{
 		"numToStr/Comment.nvim",
 		lazy = true,
@@ -244,6 +280,7 @@ require("lazy").setup({
 		end,
 		config = function(_, opts) require("mini.indentscope").setup(opts) end,
 	},
+	-- NOTE: cuz sometimes `set list` is not enough and you need some indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = true,
@@ -256,7 +293,7 @@ require("lazy").setup({
 			show_current_context = false,
 		},
 	},
-	-- easily jump to any location and enhanced f/t motions for Leap
+	-- NOTE: easily jump to any location and enhanced f/t motions for Leap
 	{
 		"ggandor/flit.nvim",
 		---@return LazyKeys[]
@@ -286,6 +323,7 @@ require("lazy").setup({
 			vim.keymap.del({ "x", "o" }, "X")
 		end,
 	},
+	-- NOTE: better UI components
 	{
 		"stevearc/dressing.nvim",
 		event = "VeryLazy",
@@ -302,6 +340,7 @@ require("lazy").setup({
 			end
 		end,
 	},
+	-- NOTE: cozy colorscheme
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
@@ -320,67 +359,14 @@ require("lazy").setup({
 			},
 		},
 	},
-	{
-		"lewis6991/gitsigns.nvim",
-		lazy = true,
-		event = "VeryLazy",
-		config = function()
-			require("gitsigns").setup {
-				numhl = true,
-				word_diff = false,
-				current_line_blame = false,
-				diff_opts = { internal = true },
-				on_attach = function(bufnr)
-					local gs = package.loaded.gitsigns
-					local map = function(mode, l, r, desc)
-						vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
-					end
-                    -- stylua: ignore start
-					map("n", "]h", gs.next_hunk, "git: next hunk")
-					map("n", "[h", gs.prev_hunk, "git: prev hunk")
-					map("n", "<leader>hu", gs.undo_stage_hunk, "git: undo stage hunk")
-					map("n", "<leader>hR", gs.reset_buffer, "git: reset buffer")
-					map("n", "<leader>hS", gs.stage_buffer, "git: stage buffer")
-					map("n", "<leader>hp", gs.preview_hunk, "git: preview hunk")
-                    map("n", "<leader>hd", gs.diffthis, "git: diff this")
-                    map("n", "<leader>hD", function() gs.diffthis("~") end, "git: diff this ~")
-                    map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "git: blame Line")
-					map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
-					map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
-                    map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
-					-- stylua: ignore end
-				end,
-			}
-		end,
-	},
-	{
-		"ii14/neorepl.nvim",
-		lazy = true,
-		ft = "lua",
-		keys = {
-			{
-				"<LocalLeader>or",
-				function()
-					-- get current buffer and window
-					local buf = vim.api.nvim_get_current_buf()
-					local win = vim.api.nvim_get_current_win()
-					-- create a new split for the repl
-					vim.cmd "split"
-					-- spawn repl and set the context to our buffer
-					require("neorepl").new { lang = "lua", buffer = buf, window = win }
-					-- resize repl window and make it fixed height
-					vim.cmd "resize 10 | setl winfixheight"
-				end,
-				desc = "repl: Open lua repl",
-			},
-		},
-	},
-	-- folke is neovim's tpope
+	-- NOTE: folke is neovim's tpope
+	{ "folke/zen-mode.nvim", event = "BufReadPost" },
 	{
 		"folke/trouble.nvim",
 		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
 		opts = { use_diagnostic_signs = true },
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 		keys = {
 			{
 				"[q",
@@ -406,7 +392,6 @@ require("lazy").setup({
 			},
 		},
 	},
-	{ "folke/zen-mode.nvim" },
 	{
 		"folke/which-key.nvim",
 		lazy = true,
@@ -443,6 +428,7 @@ require("lazy").setup({
 			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
 		},
 	},
+	-- NOTE: fuzzy finder ftw
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "BufReadPost",
@@ -450,8 +436,8 @@ require("lazy").setup({
 		config = function()
 			require("telescope").setup {
 				defaults = {
-					prompt_prefix = " " .. " " .. " ",
-					selection_caret = " ",
+					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
+					selection_caret = icons.ui_space.DoubleSeparator,
 					file_ignore_patterns = { ".git/" },
 					mappings = {
 						i = {
@@ -497,6 +483,7 @@ require("lazy").setup({
 			require("telescope").load_extension "live_grep_args"
 		end,
 	},
+	-- NOTE: better nvim-tree.lua
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		cmd = "Neotree",
@@ -566,6 +553,29 @@ require("lazy").setup({
 			},
 		},
 	},
+	-- NOTE: Chad colorizer
+	{
+		"NvChad/nvim-colorizer.lua",
+		lazy = true,
+		enabled = false,
+		event = "BufReadPost",
+		config = function()
+			require("colorizer").setup {
+				filetypes = { "*" },
+				user_default_options = {
+					names = false, -- "Name" codes like Blue
+					RRGGBBAA = true, -- #RRGGBBAA hex codes
+					rgb_fn = true, -- CSS rgb() and rgba() functions
+					hsl_fn = true, -- CSS hsl() and hsla() functions
+					css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+					css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+					sass = { enable = true, parsers = { "css" } },
+					mode = "background",
+				},
+			}
+		end,
+	},
+	-- NOTE: spectre for magic search and replace
 	{
 		"nvim-pack/nvim-spectre",
 		lazy = true,
@@ -603,7 +613,7 @@ require("lazy").setup({
 				},
 			}
 			k.nvim_register_mapping {
-				["v|<LocalLeader>sv"] = k.callback(function() require("spectre").open_visual() end)
+				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
 					:with_defaults "replace: Open visual replace",
 				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
 					:with_defaults "replace: Open panel",
@@ -615,6 +625,7 @@ require("lazy").setup({
 			}
 		end,
 	},
+	-- NOTE: terminal-in-terminal PacMan
 	{
 		"akinsho/toggleterm.nvim",
 		lazy = true,
@@ -652,6 +663,7 @@ require("lazy").setup({
 			}
 		end,
 	},
+	-- NOTE: all specific language plugins
 	{
 		"fatih/vim-go",
 		lazy = true,
@@ -659,10 +671,12 @@ require("lazy").setup({
 		run = ":GoInstallBinaries",
 		dependencies = { { "junegunn/fzf", lazy = true, build = ":call fzf#install()" } },
 	},
+	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
 	{
 		"simrat39/rust-tools.nvim",
 		lazy = true,
 		ft = "rust",
+		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local ok, cmp = pcall(require, "cmp_nvim_lsp")
@@ -723,11 +737,11 @@ require("lazy").setup({
 			}
 		end,
 	},
-	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
 	{
 		"p00f/clangd_extensions.nvim",
 		lazy = true,
 		ft = { "c", "cpp", "hpp", "h" },
+		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
 			local lspconfig = require "lspconfig"
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -831,13 +845,11 @@ require("lazy").setup({
 		end,
 	},
 	{ "b0o/SchemaStore.nvim", lazy = true, ft = { "json", "yaml", "yml" } },
+	-- NOTE: format for days
 	{
 		"jose-elias-alvarez/null-ls.nvim",
 		event = "BufReadPre",
 		dependencies = { "nvim-lua/plenary.nvim", "jayp0521/mason-null-ls.nvim" },
-		keys = {
-			{ "<Leader><Leader>", vim.lsp.buf.format, desc = "lsp: manual format" },
-		},
 		config = function()
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
 			local f = require("null-ls").builtins.formatting
@@ -907,7 +919,30 @@ require("lazy").setup({
 			require("mason-null-ls").setup_handlers {}
 		end,
 	},
-	-- lspconfig
+	-- NOTE: lua related
+	{
+		"ii14/neorepl.nvim",
+		lazy = true,
+		ft = "lua",
+		keys = {
+			{
+				"<LocalLeader>or",
+				function()
+					-- get current buffer and window
+					local buf = vim.api.nvim_get_current_buf()
+					local win = vim.api.nvim_get_current_win()
+					-- create a new split for the repl
+					vim.cmd "split"
+					-- spawn repl and set the context to our buffer
+					require("neorepl").new { lang = "lua", buffer = buf, window = win }
+					-- resize repl window and make it fixed height
+					vim.cmd "resize 10 | setl winfixheight"
+				end,
+				desc = "repl: Open lua repl",
+			},
+		},
+	},
+	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
@@ -921,36 +956,6 @@ require("lazy").setup({
 			},
 			{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
 			{ "folke/neodev.nvim", config = true, ft = "lua" },
-			{
-				"glepnir/lspsaga.nvim",
-				branch = "main",
-				events = "LspAttach",
-				dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
-				config = function()
-					require("lspsaga").setup {
-						finder = { keys = { jump_to = "e" } },
-						lightbulb = { enable = false },
-						diagnostic = { keys = { exec_action = "<CR>" } },
-						definition = { split = "<C-c>s" },
-						beacon = { enable = false },
-						outline = {
-							auto_preview = false,
-							win_width = math.floor(vim.o.columns * 0.21),
-							with_position = "left",
-							keys = { jump = "<CR>" },
-						},
-						code_actions = { extend_gitsigns = false },
-						symbol_in_winbar = {
-							enable = false,
-							ignore_patterns = { "%w_spec" },
-							respect_root = true,
-							separator = "  ",
-							show_file = false,
-						},
-						callhierarchy = { show_detail = true },
-					}
-				end,
-			},
 		},
 		---@class LspOptions
 		opts = {
@@ -1115,6 +1120,7 @@ require("lazy").setup({
 			local mason_handler = function(server)
 				local server_opts = vim.tbl_deep_extend("force", {
 					capabilities = vim.deepcopy(capabilities),
+					flags = { debounce_text_changes = 150 },
 				}, servers[server] or {})
 
 				if setup[server] then
@@ -1132,15 +1138,18 @@ require("lazy").setup({
 			for server, server_opts in pairs(servers) do
 				if server_opts then
 					server_opts = server_opts == true and {} or server_opts
+					-- XXX: servers that are isolated should be setup manually.
 					if server_opts.isolated then
-						-- servers that are isolated should be setup manually.
 						ensure_installed[#ensure_installed + 1] = server
-					end
-					-- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-					if server_opts.mason == false or not vim.tbl_contains(available, server) then
-						mason_handler(server)
 					else
-						ensure_installed[#ensure_installed + 1] = server
+						-- XXX: run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+						if
+							server_opts.mason == false or not vim.tbl_contains(available, server)
+						then
+							mason_handler(server)
+						else
+							ensure_installed[#ensure_installed + 1] = server
+						end
 					end
 				end
 			end
@@ -1150,7 +1159,7 @@ require("lazy").setup({
 			mason_lspconfig.setup_handlers { mason_handler }
 		end,
 	},
-	-- Setup completions.
+	-- NOTE: Setup completions.
 	{
 		"hrsh7th/nvim-cmp",
 		lazy = true,
@@ -1311,7 +1320,7 @@ require("lazy").setup({
 			}
 		end,
 	},
-	-- NOTE: tools
+	-- NOTE: obsidian integration with garden
 	{
 		"epwalsh/obsidian.nvim",
 		ft = "markdown",
@@ -1363,6 +1372,29 @@ require("lazy").setup({
 	change_detection = { notify = false },
 	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 	checker = { enable = true },
+	ui = {
+		icons = {
+			cmd = icons.misc.Code,
+			config = icons.ui.Gear,
+			event = icons.kind.Event,
+			ft = icons.documents.Files,
+			init = icons.misc.ManUp,
+			import = icons.documents.Import,
+			keys = icons.ui.Keyboard,
+			loaded = icons.ui.Check,
+			not_loaded = icons.misc.Ghost,
+			plugin = icons.ui.Package,
+			runtime = icons.misc.Vim,
+			source = icons.kind.StaticMethod,
+			start = icons.ui.Play,
+			list = {
+				icons.ui_space.BigCircle,
+				icons.ui_space.BigUnfilledCircle,
+				icons.ui_space.Square,
+				icons.ui_space.ChevronRight,
+			},
+		},
+	},
 	performance = {
 		rtp = {
 			disabled_plugins = {

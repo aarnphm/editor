@@ -130,6 +130,7 @@ k.nvim_register_mapping {
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",
 	["n|<LocalLeader>ft"] = k.callback(require("lsp").toggle):with_defaults "lsp: Toggle formatter",
+	["n|<LocalLeader>p"] = k.cr("Lazy"):with_defaults "package: show manager",
 	-- telescope
 	["n|<Leader>f"] = k.callback(
 		function()

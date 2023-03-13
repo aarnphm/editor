@@ -36,6 +36,58 @@ M.format = function(opts)
 	}, require("user.utils").opts("nvim-lspconfig").format or {}))
 end
 
+M._keys = nil
+
+M.diagnostic_goto = function(next, severity)
+	local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+	severity = severity and vim.diagnostic.severity[severity] or nil
+	return function() go { severity = severity } end
+end
+
+M.setup_keymaps = function()
+	if not M._keys then
+  ---@class PluginLspKeys
+    -- stylua: ignore
+    M._keys =  {
+      { "<leader>cd", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
+      { "<leader>ci", "<cmd>LspInfo<cr>", desc = "lsp: info" },
+      { "gh", vim.show_pos, desc = "lsp: Show current position" },
+      { "gr", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: References" },
+      { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
+      { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
+      { "gI", "<cmd>Telescope lsp_implementations<cr>", desc = "lsp: Goto implementation" },
+      { "gt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "lsp: Goto type definition" },
+      { "K", vim.lsp.buf.hover, desc = "lsp: Hover doc" },
+      { "gK", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
+      { "]d", M.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
+      { "[d", M.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
+      { "]e", M.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
+      { "[e", M.diagnostic_goto(false, "ERROR"), desc = "lsp: Prev error" },
+      { "]w", M.diagnostic_goto(true, "WARN"), desc = "lsp: Next warning" },
+      { "[w", M.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
+      { "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: Code action", mode = { "n", "v" }, has = "codeAction" },
+      { "<leader><leader>", M.format, desc = "lsp: Format document", has = "documentFormatting" },
+      { "<leader><leader>", M.format, desc = "lsp: Format range", mode = "v", has = "documentRangeFormatting" },
+    }
+		if require("user.utils").has "inc-rename.nvim" then
+			M._keys[#M._keys + 1] = {
+				"<leader>gr",
+				function()
+					require "inc_rename"
+					return ":IncRename " .. vim.fn.expand "<cword>"
+				end,
+				expr = true,
+				desc = "lsp: rename",
+				has = "rename",
+			}
+		else
+            -- stylua: ignore
+			M._keys[#M._keys + 1] = { "<leader>gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" }
+		end
+	end
+	return M._keys
+end
+
 M.on_attach = function(client, bufnr)
 	-- don't format when client is disabled
 	if
@@ -50,41 +102,33 @@ M.on_attach = function(client, bufnr)
 			group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, {}),
 			buffer = bufnr,
 			callback = function()
-				if M.autoformat then M.format {} end
+				if M.autoformat then M.format { bufnr = bufnr } end
 			end,
 		})
 	end
 
-	k.nvim_register_mapping {
-		-- lsp
-		["n|K"] = k.cr("Lspsaga hover_doc"):with_buffer(bufnr):with_defaults "lsp: Signature help",
-		["n|gh"] = k.callback(vim.show_pos):with_buffer(bufnr):with_defaults "lsp: Show hightlight",
-		["n|g["] = k.cr("Lspsaga diagnostic_jump_prev")
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Prev diagnostic",
-		["n|g]"] = k.cr("Lspsaga diagnostic_jump_next")
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Next diagnostic",
-		["n|gr"] = k.callback(vim.lsp.buf.rename)
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Rename in file range",
-		["n|gd"] = k.cr("Glance definitions")
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Peek definition",
-		["n|gD"] = k.cr("Lspsaga goto_definition")
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Goto definition",
-		["n|ca"] = k.callback(vim.lsp.buf.code_action)
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Code action for cursor",
-		["v|ca"] = k.callback(vim.lsp.buf.code_action)
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Code action for range",
-		["n|go"] = k.cr("Lspsaga outline"):with_buffer(bufnr):with_defaults "lsp: Show outline",
-		["n|gR"] = k.cr("TroubleToggle lsp_references")
-			:with_buffer(bufnr)
-			:with_defaults "lsp: Show references",
-	}
+	local LazyKeys = require "lazy.core.handler.keys"
+	local keymaps = {} ---@type table<string,LazyKeys|{has?:string}>
+
+	for _, value in ipairs(M.setup_keymaps()) do
+		local keys = LazyKeys.parse(value)
+		if keys[2] == vim.NIL or keys[2] == false then
+			keymaps[keys.id] = nil
+		else
+			keymaps[keys.id] = keys
+		end
+	end
+
+	for _, keys in pairs(keymaps) do
+		if not keys.has or client.server_capabilities[keys.has .. "Provider"] then
+			local opts = LazyKeys.opts(keys)
+			---@diagnostic disable-next-line: no-unknown
+			opts.has = nil
+			opts.silent = opts.silent ~= false
+			opts.buffer = bufnr
+			vim.keymap.set(keys.mode or "n", keys[1], keys[2], opts)
+		end
+	end
 end
 
 return M
