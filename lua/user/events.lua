@@ -27,6 +27,15 @@ autocmd("FileType", {
 	end,
 })
 
+-- Disable statusline for some filetypes
+autocmd("FileType", {
+	pattern = { "qf", "prompt", "Scratch", "spectre_panel", "neorepl", "health" },
+    -- stylua: ignore
+	callback = function()
+        vim.o.statusline = ''
+    end,
+})
+
 -- Makes switching between buffer and termmode feels like normal mode
 autocmd("TermOpen", {
 	pattern = "term://*",

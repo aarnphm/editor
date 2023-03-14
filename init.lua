@@ -5,10 +5,9 @@ require "user.events"
 local k = require "keybind"
 local icons = require "user.icons"
 
--- XXX: whether to make completion fancy or dead simple
+-- NOTE: whether to make completion fancy or simple border
 local simple = true
 
--- Bootstrap lazy.nvim plugin manager.
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system {
@@ -284,9 +283,9 @@ require("lazy").setup({
 	{
 		"ggandor/leap.nvim",
 		keys = {
-			{ "s", mode = { "n", "x", "o" }, desc = "Leap forward to" },
-			{ "S", mode = { "n", "x", "o" }, desc = "Leap backward to" },
-			{ "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
+			{ "s", mode = { "n", "x", "o" }, desc = "motion: Leap forward to" },
+			{ "S", mode = { "n", "x", "o" }, desc = "motion: Leap backward to" },
+			{ "gs", mode = { "n", "x", "o" }, desc = "motion: Leap from windows" },
 		},
 		config = function(_, opts)
 			local leap = require "leap"
@@ -362,10 +361,18 @@ require("lazy").setup({
 			{
 				"[q",
 				function()
-					if require("trouble").is_open() then
-						require("trouble").previous { skip_groups = true, jump = true }
+					if #vim.fn.getqflist() > 0 then
+						if require("trouble").is_open() then
+							require("trouble").previous { skip_groups = true, jump = true }
+						else
+							vim.cmd.cprev()
+						end
 					else
-						vim.cmd.cprev()
+						vim.notify(
+							"No items in quickfix",
+							vim.log.levels.INFO,
+							{ title = "Trouble" }
+						)
 					end
 				end,
 				desc = "qf: Previous item",
@@ -373,10 +380,18 @@ require("lazy").setup({
 			{
 				"]q",
 				function()
-					if require("trouble").is_open() then
-						require("trouble").next { skip_groups = true, jump = true }
+					if #vim.fn.getqflist() > 0 then
+						if require("trouble").is_open() then
+							require("trouble").next { skip_groups = true, jump = true }
+						else
+							vim.cmd.cnext()
+						end
 					else
-						vim.cmd.cnext()
+						vim.notify(
+							"No items in quickfix",
+							vim.log.levels.INFO,
+							{ title = "Trouble" }
+						)
 					end
 				end,
 				desc = "qf: Next item",
@@ -515,13 +530,42 @@ require("lazy").setup({
 			end
 		end,
 		opts = {
+			enable_diagnostics = false, -- default is set to true here.
 			filesystem = {
 				bind_to_cwd = false,
 				follow_current_file = true,
 			},
+			event_handlers = {
+				{
+					event = "neo_tree_window_after_open",
+					handler = function(args)
+						if args.position == "left" or args.position == "right" then
+							vim.cmd "wincmd ="
+						end
+					end,
+				},
+				{
+					event = "neo_tree_window_after_close",
+					handler = function(args)
+						if args.position == "left" or args.position == "right" then
+							vim.cmd "wincmd ="
+						end
+					end,
+				},
+				-- disable last status on neo-tree
+				{
+					event = "neo_tree_buffer_enter",
+					handler = function() vim.opt_local.laststatus = 0 end,
+				},
+				{
+					event = "neo_tree_buffer_leave",
+					handler = function() vim.opt_local.laststatus = 2 end,
+				},
+			},
+			always_show = { ".github" },
 			window = {
 				mappings = {
-					["<space>"] = "none",
+					["<space>"] = "none", -- disable space since it is leader
 					["s"] = "split_with_window_picker",
 					["v"] = "vsplit_with_window_picker",
 				},
@@ -623,6 +667,11 @@ require("lazy").setup({
 				elseif term.direction == "vertical" then
 					return vim.o.columns * factor
 				end
+			end,
+			on_open = function(term)
+				vim.cmd "startinsert!"
+				vim.opt_local.statusline =
+					'%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
 			end,
 			open_mapping = false, -- default mapping
 			shade_terminals = false,
