@@ -133,7 +133,7 @@ require("lazy").setup({
 				"yaml",
 			},
 			ignore_install = { "phpdoc", "gitcommit" },
-			indent = { enable = true, disable = { "python" } },
+			indent = { enable = true },
 			highlight = { enable = true },
 			context_commentstring = { enable = true, enable_autocmd = false },
 			incremental_selection = {
@@ -270,15 +270,15 @@ require("lazy").setup({
 	-- NOTE: easily jump to any location and enhanced f/t motions for Leap
 	{
 		"ggandor/flit.nvim",
-		---@return LazyKeys[]
+		opts = { labeled_modes = "nx" },
 		keys = function()
+			---@type table<string, LazyKeys[]>
 			local ret = {}
 			for _, key in ipairs { "f", "F", "t", "T" } do
 				ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
 			end
 			return ret
 		end,
-		opts = { labeled_modes = "nx" },
 	},
 	{
 		"ggandor/leap.nvim",
@@ -302,7 +302,7 @@ require("lazy").setup({
 		"j-hui/fidget.nvim",
 		lazy = true,
 		event = "LspAttach",
-		opts = { text = { spinner = "bouncing_bar" } },
+		opts = { text = { spinner = "dots" } },
 	},
 	{
 		"stevearc/dressing.nvim",
@@ -490,6 +490,7 @@ require("lazy").setup({
 			{ "nvim-lua/plenary.nvim" },
 			{
 				"s1n7ax/nvim-window-picker",
+				lazy = true,
 				config = function()
 					require("window-picker").setup {
 						autoselect_one = true,
@@ -668,7 +669,7 @@ require("lazy").setup({
 					return vim.o.columns * factor
 				end
 			end,
-			on_open = function(term)
+			on_open = function(_)
 				vim.cmd "startinsert!"
 				vim.opt_local.statusline =
 					'%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
@@ -901,7 +902,7 @@ require("lazy").setup({
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"jayp0521/mason-null-ls.nvim",
-			"williamboman/mason.nvim",
+			"mason.nvim",
 		},
 		opts = function()
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
@@ -976,8 +977,12 @@ require("lazy").setup({
 			}
 		end,
 		config = function(_, opts)
-			require("mason-null-ls").setup { automatic_setup = true }
 			require("null-ls").setup(opts)
+			require("mason-null-ls").setup {
+				ensure_installed = nil,
+				automatic_installation = true,
+				automatic_setup = false,
+			}
 			require("mason-null-ls").setup_handlers {}
 		end,
 	},
@@ -1010,7 +1015,7 @@ require("lazy").setup({
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"williamboman/mason-lspconfig.nvim",
-			"williamboman/mason.nvim",
+			"mason.nvim",
 			{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
 			{
 				"lewis6991/hover.nvim",
@@ -1104,13 +1109,11 @@ require("lazy").setup({
 				yamlls = {
 					-- lazy-load schemastore when needed
 					on_new_config = function(config)
-						config.settings.yaml.schemas = config.settings.yaml.schemas or {}
-						vim.list_extend(
-							config.settings.yaml.schemas,
-							require("schemastore").yaml.schemas()
-						)
+						if require("user.utils").has "SchemaStore" then
+							config.settings.yaml.schemas = require("schemastore").yaml.schemas()
+						end
 					end,
-					settings = { yaml = { format = { enable = true } } },
+					settings = { yaml = { hover = true, validate = true, completion = true } },
 				},
 				pyright = {
 					flags = { debounce_text_changes = 500 },
@@ -1242,18 +1245,33 @@ require("lazy").setup({
 					end
 				end
 			end
-
-			require("mason").setup {}
 			mason_lspconfig.setup { ensure_installed = ensure_installed }
 			mason_lspconfig.setup_handlers { mason_handler }
+		end,
+	},
+	{
+		"williamboman/mason.nvim",
+		cmd = "Mason",
+		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+		opts = {
+			ensure_installed = { "lua-language-server", "pyright" },
+		},
+		---@param opts MasonSettings | {ensure_installed: string[]}
+		config = function(_, opts)
+			require("mason").setup(opts)
+			local mr = require "mason-registry"
+			for _, tool in ipairs(opts.ensure_installed) do
+				local p = mr.get_package(tool)
+				if not p:is_installed() then p:install() end
+			end
 		end,
 	},
 	-- NOTE: Setup completions.
 	{
 		"petertriho/cmp-git",
+		lazy = true,
 		dependencies = { "nvim-lua/plenary.nvim" },
 		ft = { "gitcommit", "octo", "neogitCommitMessage" },
-		dependencies = { "hrsh7th/nvim-cmp" },
 		opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
 		config = true,
 	},
@@ -1286,7 +1304,6 @@ require("lazy").setup({
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
-				build = ":Copilot auth",
 				event = "InsertEnter",
 				config = function()
 					vim.defer_fn(
