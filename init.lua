@@ -5,6 +5,9 @@ require "user.events"
 local k = require "keybind"
 local icons = require "user.icons"
 
+-- XXX: whether to make completion fancy or dead simple
+local simple = true
+
 -- Bootstrap lazy.nvim plugin manager.
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -24,6 +27,12 @@ require("lazy").setup({
 	{ "nvim-lua/plenary.nvim" },
 	-- NOTE: cuz it is cool
 	{ "romainl/vim-cool", event = { "CursorHold", "CursorHoldI" }, lazy = true },
+	{
+		"mtth/scratch.vim",
+		lazy = true,
+		cmd = "Scratch",
+		keys = { { "<Space><Space>s", "<cmd>Scratch<cr>", desc = "buffer: open scratch" } },
+	},
 	-- NOTE: Gigachad Git
 	{
 		"tpope/vim-fugitive",
@@ -334,6 +343,12 @@ require("lazy").setup({
 	},
 	-- NOTE: better UI components
 	{
+		"j-hui/fidget.nvim",
+		lazy = true,
+		event = "LspAttach",
+		opts = { text = { spinner = "bouncing_bar" } },
+	},
+	{
 		"stevearc/dressing.nvim",
 		event = "VeryLazy",
 		init = function()
@@ -434,17 +449,6 @@ require("lazy").setup({
 				function() require("todo-comments").jump_prev() end,
 				desc = "todo: Previous comment",
 			},
-		},
-	},
-	{
-		"folke/noice.nvim",
-		lazy = true,
-		event = "BufReadPost",
-		dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
-		opts = {
-			cmdline = { view = "cmdline" },
-			popupmenu = { enabled = true, backend = "cmp" },
-			presets = { command_palette = true, lsp_doc_border = true, bottom_search = true },
 		},
 	},
 	-- NOTE: fuzzy finder ftw
@@ -632,8 +636,8 @@ require("lazy").setup({
 				},
 			}
 			k.nvim_register_mapping {
-				["v|<Leader>sv"] = k.callback(function() require("spectre").open_visual() end)
-					:with_defaults "replace: Open visual replace",
+				["v|<Leader>so"] = k.callback(function() require("spectre").open_visual() end)
+					:with_defaults "replace: Open panel",
 				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
 					:with_defaults "replace: Open panel",
 				["n|<Leader>sw"] = k.callback(
@@ -644,11 +648,11 @@ require("lazy").setup({
 			}
 		end,
 	},
-	-- NOTE: terminal-in-terminal PacMan
+	-- NOTE: terminal-in-terminal PacMan (also we only really need this with LspAttach)
 	{
 		"akinsho/toggleterm.nvim",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = "LspAttach",
 		config = function()
 			require("toggleterm").setup {
 				-- size can be a number or function which is passed the current terminal
@@ -807,9 +811,7 @@ require("lazy").setup({
 				bufnr = lspconfig.util.validate_bufnr(bufnr)
 				local params = { uri = vim.uri_from_bufnr(bufnr) }
 
-                        -- stylua: ignore start
-						local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
-				-- stylua: ignore end
+				local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
 
 				if clangd_client then
 					clangd_client.request(
@@ -897,7 +899,7 @@ require("lazy").setup({
 			}
 		end,
 	},
-	{ "b0o/SchemaStore.nvim", lazy = true, ft = { "json", "yaml", "yml" } },
+	{ "b0o/SchemaStore.nvim", version = false, lazy = true, ft = { "json", "yaml", "yml" } },
 	-- NOTE: format for days
 	{
 		"jose-elias-alvarez/null-ls.nvim",
@@ -1114,11 +1116,7 @@ require("lazy").setup({
 							require("schemastore").yaml.schemas()
 						)
 					end,
-					settings = {
-						yaml = {
-							format = { enable = true },
-						},
-					},
+					settings = { yaml = { format = { enable = true } } },
 				},
 				pyright = {
 					flags = { debounce_text_changes = 500 },
@@ -1258,9 +1256,18 @@ require("lazy").setup({
 	},
 	-- NOTE: Setup completions.
 	{
+		"petertriho/cmp-git",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		ft = { "gitcommit", "octo", "neogitCommitMessage" },
+		dependencies = { "hrsh7th/nvim-cmp" },
+		opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
+		config = true,
+	},
+	{
 		"hrsh7th/nvim-cmp",
 		lazy = true,
-		event = "BufReadPost",
+		version = false,
+		event = "InsertEnter",
 		dependencies = {
 			{
 				"L3MON4D3/LuaSnip",
@@ -1282,12 +1289,6 @@ require("lazy").setup({
 			{ "hrsh7th/cmp-nvim-lua" },
 			{ "hrsh7th/cmp-path" },
 			{ "hrsh7th/cmp-buffer" },
-			{
-				"petertriho/cmp-git",
-				dependencies = { "nvim-lua/plenary.nvim" },
-				config = true,
-				opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
-			},
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
@@ -1323,13 +1324,15 @@ require("lazy").setup({
 			local cmp = require "cmp"
 			local lspkind = require "lspkind"
 
-			local cmp_window = require "cmp.utils.window"
-			local prev_info = cmp_window.info
-			---@diagnostic disable-next-line: duplicate-set-field
-			cmp_window.info = function(self)
-				local info = prev_info(self)
-				info.scrollable = false
-				return info
+			if not simple then
+				local cmp_window = require "cmp.utils.window"
+				local prev_info = cmp_window.info
+				---@diagnostic disable-next-line: duplicate-set-field
+				cmp_window.info = function(self)
+					local info = prev_info(self)
+					info.scrollable = false
+					return info
+				end
 			end
 
 			local has_words_before = function()
@@ -1350,7 +1353,7 @@ require("lazy").setup({
 				return col == 0 or current_line:sub(col, col):match "%s"
 			end
 
-			cmp.setup {
+			local opts = {
 				preselect = cmp.PreselectMode.None,
 				snippet = {
 					expand = function(args) require("luasnip").lsp_expand(args.body) end,
@@ -1407,15 +1410,26 @@ require("lazy").setup({
 					{ name = "path" },
 					{ name = "luasnip" },
 					{ name = "nvim-lua" },
-					{ name = "crates" },
 					{ name = "buffer" },
-					{ name = "git" },
-				},
-				window = {
-					completion = cmp.config.window.bordered { border = "single" },
-					documentation = cmp.config.window.bordered { border = "single" },
 				},
 			}
+
+			if require("user.utils").has "cmp-git" then
+				table.insert(opts.sources, { name = "git" })
+			end
+
+			if vim.fn.expand "%" == "Cargo.toml" then
+				table.insert(opts.sources, { name = "crates" })
+			end
+
+			if not simple then
+				opts.windows = {
+					completion = cmp.config.window.bordered { border = "single" },
+					documentation = cmp.config.window.bordered { border = "single" },
+				}
+			end
+
+			cmp.setup(opts)
 		end,
 	},
 	-- NOTE: obsidian integration with garden

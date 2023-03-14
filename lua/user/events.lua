@@ -18,6 +18,7 @@ autocmd("FileType", {
 		"health",
 		"PlenaryTestPopup",
 		"nofile",
+		"Scratch",
 		"",
 	},
 	callback = function(event)
