@@ -80,10 +80,10 @@ vim.diagnostic.config {
 }
 
 -- NOTE: diagnostic on hover
--- vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
--- 	pattern = "*",
--- 	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
--- })
+vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+	pattern = "*",
+	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
+})
 
 -- map leader to <Space> and localeader to +
 vim.g.mapleader = " "
@@ -188,4 +188,15 @@ k.nvim_register_mapping {
 			},
 		}
 	end):with_defaults "tools: Show keymap legends",
+	-- NOTE: toggleterm
+	["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
+		:with_defaults "terminal: Toggle horizontal",
+	["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
+		:with_defaults "terminal: Toggle horizontal",
+	["t|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults "terminal: Toggle horizontal",
+	["n|<C-t>"] = k.cr([[execute v:count . "ToggleTerm direction=vertical"]])
+		:with_defaults "terminal: Toggle vertical",
+	["i|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
+		:with_defaults "terminal: Toggle vertical",
+	["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults "terminal: Toggle vertical",
 }

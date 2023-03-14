@@ -26,7 +26,7 @@ vim.opt.runtimepath:prepend(lazypath)
 require("lazy").setup({
 	{ "nvim-lua/plenary.nvim" },
 	-- NOTE: cuz it is cool
-	{ "romainl/vim-cool", event = { "CursorHold", "CursorHoldI" }, lazy = true },
+	{ "romainl/vim-cool", event = "InsertEnter", lazy = true },
 	{
 		"mtth/scratch.vim",
 		lazy = true,
@@ -36,7 +36,7 @@ require("lazy").setup({
 	-- NOTE: Gigachad Git
 	{
 		"tpope/vim-fugitive",
-		event = "VeryLazy",
+		lazy = true,
 		cmd = { "Git", "G" },
 		keys = {
 			{
@@ -85,7 +85,7 @@ require("lazy").setup({
 	{
 		"max397574/better-escape.nvim",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
+		event = "InsertEnter",
 		opts = { timeout = 500, clear_empty_lines = true, keys = "<Esc>" },
 	},
 	-- NOTE: treesitter-based dependencies
@@ -208,63 +208,19 @@ require("lazy").setup({
 				},
 			}
 		end,
-		config = function(_, opts)
-			require("mini.ai").setup(opts)
-
-			if require("user.utils").has "which-key.nvim" then
-				--- register text-objects with which-key
-				---@type table<string, string|table>
-				local i = {
-					[" "] = "Whitespace",
-					['"'] = 'Balanced "',
-					["'"] = "Balanced '",
-					["`"] = "Balanced `",
-					["("] = "Balanced (",
-					[")"] = "Balanced ) including white-space",
-					[">"] = "Balanced > including white-space",
-					["<lt>"] = "Balanced <",
-					["]"] = "Balanced ] including white-space",
-					["["] = "Balanced [",
-					["}"] = "Balanced } including white-space",
-					["{"] = "Balanced {",
-					["?"] = "User Prompt",
-					_ = "Underscore",
-					a = "Argument",
-					b = "Balanced ), ], }",
-					c = "Class",
-					f = "Function",
-					o = "Block, conditional, loop",
-					q = "Quote `, \", '",
-					t = "Tag",
-				}
-				local a = vim.deepcopy(i)
-				for key, val in pairs(a) do
-					a[key] = val:gsub(" including.*", "")
-				end
-
-				local ic = vim.deepcopy(i)
-				local ac = vim.deepcopy(a)
-				for key, name in pairs { n = "Next", l = "Last" } do
-					i[key] =
-						vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
-					a[key] =
-						vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
-				end
-				require("which-key").register { mode = { "o", "x" }, i = i, a = a }
-			end
-		end,
+		config = function(_, opts) require("mini.ai").setup(opts) end,
 	},
 	{
 		"echasnovski/mini.align",
 		lazy = true,
 		event = "VeryLazy",
-		config = function() require("mini.align").setup() end,
+		config = function(_, opts) require("mini.align").setup(opts) end,
 	},
 	{
 		"echasnovski/mini.surround",
 		lazy = true,
 		event = "VeryLazy",
-		config = function() require("mini.surround").setup() end,
+		config = function(_, opts) require("mini.surround").setup(opts) end,
 	},
 	{
 		"echasnovski/mini.pairs",
@@ -275,6 +231,7 @@ require("lazy").setup({
 	{
 		-- active indent guide and indent text objects
 		"echasnovski/mini.indentscope",
+		lazy = true,
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
 			symbol = "│",
@@ -429,8 +386,11 @@ require("lazy").setup({
 	{
 		"folke/which-key.nvim",
 		lazy = true,
-		event = { "CursorHold", "CursorHoldI" },
-		opts = { window = { border = "single" } },
+		event = "LspAttach",
+		config = function(_, opts)
+			if not simple then opts.window = { border = "single" } end
+			require("which-key").setup(opts)
+		end,
 	},
 	{
 		"folke/todo-comments.nvim",
@@ -652,39 +612,24 @@ require("lazy").setup({
 	{
 		"akinsho/toggleterm.nvim",
 		lazy = true,
-		event = "LspAttach",
-		config = function()
-			require("toggleterm").setup {
-				-- size can be a number or function which is passed the current terminal
-				size = function(term)
-					local factor = 0.3
-					if term.direction == "horizontal" then
-						return vim.o.lines * factor
-					elseif term.direction == "vertical" then
-						return vim.o.columns * factor
-					end
-				end,
-				open_mapping = false, -- default mapping
-				shade_terminals = false,
-				direction = "vertical",
-				shell = vim.o.shell,
-				highlight = require "rose-pine.plugins.toggleterm",
-			}
-			k.nvim_register_mapping {
-				["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
-					:with_defaults "terminal: Toggle horizontal",
-				["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
-					:with_defaults "terminal: Toggle horizontal",
-				["t|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
-					:with_defaults "terminal: Toggle horizontal",
-				["n|<C-t>"] = k.cr([[execute v:count . "ToggleTerm direction=vertical"]])
-					:with_defaults "terminal: Toggle vertical",
-				["i|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
-					:with_defaults "terminal: Toggle vertical",
-				["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>")
-					:with_defaults "terminal: Toggle vertical",
-			}
-		end,
+		cmd = { "ToggleTerm" },
+		module = true,
+		opts = {
+			-- size can be a number or function which is passed the current terminal
+			size = function(term)
+				local factor = 0.3
+				if term.direction == "horizontal" then
+					return vim.o.lines * factor
+				elseif term.direction == "vertical" then
+					return vim.o.columns * factor
+				end
+			end,
+			open_mapping = false, -- default mapping
+			shade_terminals = false,
+			direction = "vertical",
+			shell = vim.o.shell,
+		},
+		config = true,
 	},
 	-- NOTE: all specific language plugins
 	{
