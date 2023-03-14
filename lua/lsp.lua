@@ -1,7 +1,5 @@
 local M = {}
 
-local k = require "keybind"
-
 local disabled_ft = { "gitcommit", "gitconfig", "gitignore" }
 M.autoformat = true
 
@@ -20,6 +18,8 @@ M.toggle = function()
 end
 
 M.format = function(opts)
+	-- NOTE: here so that we can call M.format in vim.keymap.set
+	opts = opts or {}
 	local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
 	local ft = vim.bo[bufnr].filetype
 
@@ -36,13 +36,13 @@ M.format = function(opts)
 	}, require("user.utils").opts("nvim-lspconfig").format or {}))
 end
 
-M._keys = nil
-
 M.diagnostic_goto = function(next, severity)
-	local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+	local goto_impl = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
 	severity = severity and vim.diagnostic.severity[severity] or nil
-	return function() go { severity = severity } end
+	return function() goto_impl { severity = severity } end
 end
+
+M._keys = nil
 
 M.setup_keymaps = function()
 	if not M._keys then
@@ -52,13 +52,11 @@ M.setup_keymaps = function()
       { "<leader>cd", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
       { "<leader>ci", "<cmd>LspInfo<cr>", desc = "lsp: info" },
       { "gh", vim.show_pos, desc = "lsp: Show current position" },
-      { "gr", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: References" },
+      { "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: References" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
-      { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
+      { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration", has = "declaration" },
       { "gI", "<cmd>Telescope lsp_implementations<cr>", desc = "lsp: Goto implementation" },
       { "gt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "lsp: Goto type definition" },
-      { "K", vim.lsp.buf.hover, desc = "lsp: Hover doc" },
-      { "gK", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
       { "]d", M.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
       { "[d", M.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
       { "]e", M.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
@@ -71,7 +69,7 @@ M.setup_keymaps = function()
     }
 		if require("user.utils").has "inc-rename.nvim" then
 			M._keys[#M._keys + 1] = {
-				"<leader>gr",
+				"gr",
 				function()
 					require "inc_rename"
 					return ":IncRename " .. vim.fn.expand "<cword>"
@@ -82,7 +80,26 @@ M.setup_keymaps = function()
 			}
 		else
             -- stylua: ignore
-			M._keys[#M._keys + 1] = { "<leader>gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" }
+			M._keys[#M._keys + 1] = { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" }
+		end
+
+		-- use hover.nvim if available
+		if require("user.utils").has "hover.nvim" then
+			M._keys[#M._keys + 1] = { "K", require("hover").hover, desc = "lsp: Hover doc" }
+			M._keys[#M._keys + 1] = {
+				"gK",
+				require("hover").hover_select,
+				desc = "lsp: Signature help",
+				has = "signatureHelp",
+			}
+		else
+			M._keys[#M._keys + 1] = { "K", vim.lsp.buf.hover, desc = "lsp: Hover doc" }
+			M._keys[#M._keys + 1] = {
+				"gK",
+				vim.lsp.buf.signature_help,
+				desc = "lsp: Signature help",
+				has = "signatureHelp",
+			}
 		end
 	end
 	return M._keys

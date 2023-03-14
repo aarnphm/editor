@@ -42,7 +42,7 @@ require("lazy").setup({
 	{
 		"lewis6991/gitsigns.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = "LspAttach", -- we probably only need to use gitsigns with LspAttach
 		config = function()
 			require("gitsigns").setup {
 				numhl = true,
@@ -77,7 +77,7 @@ require("lazy").setup({
 		"max397574/better-escape.nvim",
 		lazy = true,
 		event = { "CursorHold", "CursorHoldI" },
-		opts = { timeout = 200, clear_empty_lines = true },
+		opts = { timeout = 500, clear_empty_lines = true, keys = "<Esc>" },
 	},
 	-- NOTE: treesitter-based dependencies
 	{
@@ -107,42 +107,48 @@ require("lazy").setup({
 			},
 		},
 		keys = { { "<bs>", desc = "Decrement selection", mode = "x" } },
-		config = function()
-			require("nvim-treesitter.configs").setup {
-				ensure_installed = {
-					"python",
-					"rust",
-					"lua",
-					"c",
-					"cpp",
-					"go",
-					"json",
-					"json5",
-					"jsonc",
-					"toml",
-					"bash",
-					"css",
-					"vim",
-					"regex",
-					"markdown",
-					"markdown_inline",
-					"vim",
-					"yaml",
+		opts = {
+			ensure_installed = {
+				"python",
+				"rust",
+				"lua",
+				"c",
+				"cpp",
+				"toml",
+				"bash",
+				"css",
+				"vim",
+				"regex",
+				"markdown",
+				"markdown_inline",
+				"vim",
+				"yaml",
+			},
+			ignore_install = { "phpdoc", "gitcommit" },
+			indent = { enable = true, disable = { "python" } },
+			highlight = { enable = true },
+			context_commentstring = { enable = true, enable_autocmd = false },
+			incremental_selection = {
+				enable = true,
+				keymaps = {
+					init_selection = "<C-a>",
+					node_incremental = "<C-a>",
+					scope_incremental = "<nop>",
+					node_decremental = "<bs>",
 				},
-				ignore_install = { "phpdoc", "gitcommit" },
-				indent = { enable = true, disable = { "python" } },
-				highlight = { enable = true },
-				context_commentstring = { enable = true, enable_autocmd = false },
-				incremental_selection = {
-					enable = true,
-					keymaps = {
-						init_selection = "<C-a>",
-						node_incremental = "<C-a>",
-						scope_incremental = "<nop>",
-						node_decremental = "<bs>",
-					},
-				},
-			}
+			},
+		},
+		config = function(_, opts)
+			if require("user.utils").has "typescript.nvim" then
+				vim.list_extend(opts.ensure_installed, { "typescript", "tsx" })
+			end
+			if require("user.utils").has "vim-go" then
+				vim.list_extend(opts.ensure_installed, { "go" })
+			end
+			if require("user.utils").has "SchemaStore.nvim" then
+				vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" })
+			end
+			require("nvim-treesitter.configs").setup(opts)
 		end,
 	},
 	-- NOTE: comments, you say what?
@@ -156,6 +162,7 @@ require("lazy").setup({
 	-- NOTE: mini libraries of deps because it is light and easy to use.
 	{
 		"echasnovski/mini.bufremove",
+		lazy = true,
 		keys = {
 			{
 				"<C-x>",
@@ -172,6 +179,7 @@ require("lazy").setup({
 	{
 		-- better text-objects
 		"echasnovski/mini.ai",
+		lazy = true,
 		event = "VeryLazy",
 		dependencies = { "nvim-treesitter-textobjects" },
 		opts = function()
@@ -252,6 +260,7 @@ require("lazy").setup({
 	{
 		"echasnovski/mini.pairs",
 		event = "VeryLazy",
+		lazy = true,
 		config = function(_, opts) require("mini.pairs").setup(opts) end,
 	},
 	{
@@ -340,6 +349,16 @@ require("lazy").setup({
 			end
 		end,
 	},
+	{
+		"kevinhwang91/nvim-bqf",
+		ft = "qf",
+		lazy = true,
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			{ "junegunn/fzf", lazy = true, build = ":call fzf#install()" },
+		},
+		config = true,
+	},
 	-- NOTE: cozy colorscheme
 	{
 		"rose-pine/neovim",
@@ -395,7 +414,7 @@ require("lazy").setup({
 	{
 		"folke/which-key.nvim",
 		lazy = true,
-		event = "VeryLazy",
+		event = { "CursorHold", "CursorHoldI" },
 		opts = { window = { border = "single" } },
 	},
 	{
@@ -671,6 +690,40 @@ require("lazy").setup({
 		run = ":GoInstallBinaries",
 		dependencies = { { "junegunn/fzf", lazy = true, build = ":call fzf#install()" } },
 	},
+	{
+		"jose-elias-alvarez/typescript.nvim",
+		lazy = true,
+		ft = { "typescript", "tsx" },
+		dependencies = { "neovim/nvim-lspconfig" },
+		config = function()
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local ok, cmp = pcall(require, "cmp_nvim_lsp")
+			if ok then capabilities = cmp.default_capabilities(capabilities) end
+
+			require("user.utils").on_attach(function(client, buffer)
+				if client.name == "tsserver" then
+					vim.keymap.set(
+						"n",
+						"<leader>co",
+						"<cmd>TypescriptOrganizeImports<CR>",
+						{ buffer = buffer, desc = "lsp: organize imports" }
+					)
+					vim.keymap.set(
+						"n",
+						"<leader>cR",
+						"<cmd>TypescriptRenameFile<CR>",
+						{ desc = "lsp: rename file", buffer = buffer }
+					)
+				end
+			end)
+			require("typescript").setup {
+				server = {
+					capabilities = capabilities,
+					completions = { completeFunctionCalls = true },
+				},
+			}
+		end,
+	},
 	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
 	{
 		"simrat39/rust-tools.nvim",
@@ -849,16 +902,25 @@ require("lazy").setup({
 	{
 		"jose-elias-alvarez/null-ls.nvim",
 		event = "BufReadPre",
-		dependencies = { "nvim-lua/plenary.nvim", "jayp0521/mason-null-ls.nvim" },
-		config = function()
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"jayp0521/mason-null-ls.nvim",
+			"williamboman/mason.nvim",
+		},
+		opts = function()
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
 			local f = require("null-ls").builtins.formatting
 			local d = require("null-ls").builtins.diagnostics
 			local ca = require("null-ls").builtins.code_actions
-
-			require("mason-null-ls").setup { automatic_setup = true }
-			require("null-ls").setup {
+			return {
 				debug = true,
+				-- NOTE: add neoconf.json to root pattern
+				root_dir = require("null-ls.utils").root_pattern(
+					".null-ls-root",
+					".neoconf.json",
+					"Makefile",
+					".git"
+				),
 				sources = {
 					-- NOTE: formatting
 					f.prettierd.with {
@@ -916,6 +978,10 @@ require("lazy").setup({
 					},
 				},
 			}
+		end,
+		config = function(_, opts)
+			require("mason-null-ls").setup { automatic_setup = true }
+			require("null-ls").setup(opts)
 			require("mason-null-ls").setup_handlers {}
 		end,
 	},
@@ -950,6 +1016,23 @@ require("lazy").setup({
 			"williamboman/mason-lspconfig.nvim",
 			"williamboman/mason.nvim",
 			{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
+			{
+				"lewis6991/hover.nvim",
+				lazy = true,
+				config = function()
+					require("hover").setup {
+						init = function()
+							require "hover.providers.lsp"
+							require "hover.providers.gh"
+							require "hover.providers.gh_user"
+						end,
+						-- Whether the contents of a currently open hover window should be moved
+						-- to a :h preview-window when pressing the hover keymap.
+						preview_window = false,
+						title = true,
+					}
+				end,
+			},
 			{
 				"hrsh7th/cmp-nvim-lsp",
 				cond = function() return require("user.utils").has "nvim-cmp" end,
@@ -1039,6 +1122,18 @@ require("lazy").setup({
 				},
 				pyright = {
 					flags = { debounce_text_changes = 500 },
+					root_dir = function(fname)
+						return require("lspconfig.util").root_pattern(
+							"WORKSPACE",
+							".git",
+							"Pipfile",
+							"pyrightconfig.json",
+							"setup.py",
+							"setup.cfg",
+							"pyproject.toml",
+							"requirements.txt"
+						)(fname) or require("lspconfig.util").path.dirname(fname)
+					end,
 					settings = {
 						python = {
 							analysis = {
@@ -1048,8 +1143,6 @@ require("lazy").setup({
 						},
 					},
 				},
-				starlark_rust = { mason = false },
-				tsserver = { settings = { completions = { completeFunctionCalls = true } } },
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -1075,8 +1168,12 @@ require("lazy").setup({
 				spectral = {},
 				taplo = {},
 				denols = {},
+				-- NOTE: isolated servers will have their own plugins for setup
 				clangd = { isolated = true },
 				rust_analyzer = { isolated = true },
+				tsserver = { isolated = true },
+				-- NOTE: servers that mason is currently not supported but nvim-lspconfig is.
+				starlark_rust = { mason = false },
 			},
 			---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
 			setup = {
@@ -1113,9 +1210,9 @@ require("lazy").setup({
 
 			require("user.utils").on_attach(require("lsp").on_attach)
 
-            -- stylua: ignore start
-			local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-			-- stylua: ignore end
+			local capabilities = require("cmp_nvim_lsp").default_capabilities(
+				vim.lsp.protocol.make_client_capabilities()
+			)
 
 			local mason_handler = function(server)
 				local server_opts = vim.tbl_deep_extend("force", {
@@ -1194,6 +1291,7 @@ require("lazy").setup({
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
+				build = ":Copilot auth",
 				event = "InsertEnter",
 				config = function()
 					vim.defer_fn(
@@ -1297,7 +1395,7 @@ require("lazy").setup({
 							cmp.select_prev_item()
 						elseif require("luasnip").jumpable(-1) then
 							vim.fn.feedkeys(k.replace_termcodes "<Plug>luasnip-jump-prev", "")
-						elseif require("utils").has_words_before() then
+						elseif has_words_before() then
 							cmp.complete()
 						else
 							fallback()

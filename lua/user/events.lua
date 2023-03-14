@@ -7,6 +7,7 @@ autocmd("FileType", {
 		"qf",
 		"help",
 		"man",
+		"nowrite", -- fugitive
 		"prompt",
 		"spectre_panel",
 		"startuptime",
@@ -21,7 +22,7 @@ autocmd("FileType", {
 	},
 	callback = function(event)
 		vim.bo[event.buf].buflisted = false
-		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<CMD>close<CR>", { silent = true })
+		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
 	end,
 })
 

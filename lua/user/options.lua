@@ -36,7 +36,7 @@ vim.o.showmode = false
 vim.o.showcmd = false
 vim.o.showbreak = "↳  "
 vim.o.sidescrolloff = 5
-vim.o.signcolumn = "yes"
+vim.o.signcolumn = "yes:1"
 vim.o.smartcase = true
 vim.o.softtabstop = 4
 vim.o.splitbelow = true
@@ -46,7 +46,7 @@ vim.o.timeout = true
 vim.o.timeoutlen = 200
 vim.o.undofile = true
 vim.o.undolevels = 9999
-vim.o.updatetime = 50
+vim.o.updatetime = 250
 vim.o.viewoptions = "folds,cursor,curdir,slash,unix"
 vim.o.virtualedit = "block"
 vim.o.whichwrap = "h,l,<,>,[,],~"
@@ -74,10 +74,16 @@ end
 vim.diagnostic.config {
 	-- NOTE: on a sunny day where I feel like enable virtual text use { spacing = 4, prefix = "●" }
 	virtual_text = false,
-	underline = true,
+	underline = false,
 	update_in_insert = false,
 	severity_sort = true,
 }
+
+-- NOTE: diagnostic on hover
+-- vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+-- 	pattern = "*",
+-- 	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
+-- })
 
 -- map leader to <Space> and localeader to +
 vim.g.mapleader = " "
@@ -96,15 +102,15 @@ k.nvim_register_mapping {
 	-- yank to end of line
 	["n|Y"] = k.cmd("y$"):with_desc "edit: Yank text to EOL",
 	["n|D"] = k.cmd("d$"):with_desc "edit: Delete text to EOL",
-	["n|sn"] = k.cmd("nzzzv"):with_noremap():with_desc "edit: Next search result",
-	["n|sN"] = k.cmd("Nzzzv"):with_noremap():with_desc "edit: Prev search result",
 	["n|J"] = k.cmd("mzJ`z"):with_noremap():with_desc "edit: Join next line",
 	-- window movement
 	["n|<C-h>"] = k.cmd("<C-w>h"):with_noremap():with_desc "window: Focus left",
 	["n|<C-l>"] = k.cmd("<C-w>l"):with_noremap():with_desc "window: Focus right",
 	["n|<C-j>"] = k.cmd("<C-w>j"):with_noremap():with_desc "window: Focus down",
 	["n|<C-k>"] = k.cmd("<C-w>k"):with_noremap():with_desc "window: Focus up",
-	["n|<C-x>"] = k.cr("BufDel"):with_defaults "buffer: Delete current buffer",
+	["n|<LocalLeader>sw"] = k.cmd("<C-w>r"):with_noremap():with_desc "window: swap position",
+	["n|<LocalLeader>vs"] = k.cmd("<C-w>v"):with_defaults "edit: split window vertically",
+	["n|<LocalLeader>hs"] = k.cmd("<C-w>s"):with_defaults "edit: split window horizontally",
 	["n|<leader>qq"] = k.cr("wqa"):with_defaults "editor: write quit all",
 	["n|<Leader>."] = k.cr("bnext"):with_defaults "buffer: next",
 	["n|<Leader>,"] = k.cr("bprevious"):with_defaults "buffer: previous",
@@ -124,8 +130,6 @@ k.nvim_register_mapping {
 		:with_desc "windows: resize left 10px",
 	["n|<LocalLeader>-"] = k.cr("resize -5"):with_silent():with_desc "windows: resize down 5px",
 	["n|<LocalLeader>="] = k.cr("resize +5"):with_silent():with_desc "windows: resize up 5px",
-	["n|<LocalLeader>vs"] = k.cu("vsplit"):with_defaults "edit: split window vertically",
-	["n|<LocalLeader>hs"] = k.cu("split"):with_defaults "edit: split window horizontally",
 	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
 		:with_noremap()
 		:with_desc "edit: toggle invisible characters",

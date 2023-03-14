@@ -192,7 +192,26 @@ local data = {
 	},
 }
 
-local icons = {}
+local icons = {
+	kind = {},
+	kind_space = {},
+	type = {},
+	type_space = {},
+	documents = {},
+	documents_space = {},
+	git = {},
+	git_space = {},
+	ui = {},
+	ui_space = {},
+	diagnostics = {},
+	diagnostics_space = {},
+	misc = {},
+	misc_space = {},
+	cmp = {},
+	cmp_space = {},
+	dap = {},
+	dap_space = {},
+}
 
 for key, table in pairs(data) do
 	icons[key] = setmetatable({}, {
