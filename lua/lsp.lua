@@ -147,6 +147,14 @@ M.on_attach = function(client, bufnr)
 			vim.keymap.set(keys.mode or "n", keys[1], keys[2], opts)
 		end
 	end
+
+	-- Create a command `:Format` local to the LSP buffer
+	vim.api.nvim_buf_create_user_command(
+		bufnr,
+		"Format",
+		function(_) vim.lsp.buf.format() end,
+		{ desc = "format: current buffer using lsp" }
+	)
 end
 
 return M

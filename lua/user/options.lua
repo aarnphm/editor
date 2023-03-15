@@ -1,61 +1,82 @@
+-- stylua: ignore
 local k = require "keybind"
 
--- default vim options
-vim.o.autowrite = true
-vim.o.breakat = [[\ \	;:,!?]]
-vim.o.guicursor = ""
-vim.o.undofile = true
-vim.o.breakindent = true
-vim.o.breakindentopt = "shift:2,min:20"
-vim.o.clipboard = "unnamedplus"
-vim.o.complete = ".,w,b,k"
-vim.o.completeopt = "menuone,noselect"
-vim.o.expandtab = true
-vim.o.formatoptions = "1jcroql"
-vim.o.grepformat = "%f:%l:%c:%m"
-vim.o.grepprg = "rg --hidden --vimgrep --smart-case --"
+-- Some defaults and don't question it
+vim.o.wrap           = false                 -- egh i don't like wrap
+vim.o.writebackup    = false                 -- whos needs backup btw (i do sometimes)
+vim.o.autowrite      = true                  -- sometimes I forget to save
+vim.o.guicursor      = ""                    -- no gui cursor
+vim.o.undofile       = true                  -- set undofile to infinite undo
+vim.o.breakindent    = true                  -- enable break indent
+vim.o.breakindentopt = "shift:2,min:20"      -- wrap two spaces, with min of 20 text width
+vim.o.clipboard      = "unnamedplus"         -- sync system clipboard
+vim.o.pumheight      = 12                    -- larger completion windows
+vim.o.completeopt    = "menuone,noselect"    -- better completion menu
+vim.o.expandtab      = true                  -- convert spaces to tabs
+vim.o.mouse          = "a"                   -- ugh who needs mouse (accept on SSH maybe)
+vim.o.number         = true                  -- number is good for nav
+vim.o.relativenumber = true                  -- relativenumber is useful, grow up
+vim.o.swapfile       = false                 -- I don't like swap files personally, found undofile to be better
+vim.o.undofile       = true                  -- better than swapfile
+vim.o.undolevels     = 9999                  -- infinite undo
+vim.o.shortmess      = "aoOTIcF"             -- insanely complex shortmess, but its cleannn
+
+-- I refuse to have a complex statusline, but lualine is cool tho
+vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
+
+-- NOTE: "1jcroql"
+vim.opt.formatoptions = vim.opt.formatoptions
+	- "a" -- Auto formatting is BAD.
+	- "t" -- Don't auto format my code. I got linters for that.
+	+ "c" -- In general, I like it when comments respect textwidth
+	+ "q" -- Allow formatting comments w/ gq
+	- "o" -- O and o, don't continue comments
+	+ "r" -- But do continue when pressing enter.
+	+ "n" -- Indent past the formatlistpat, not underneath it.
+	+ "j" -- Auto-remove comments if possible.
+	- "2" -- I'm not in gradeschool anymore
+
+
 -- Better folding using tree-sitter
 vim.o.foldlevelstart = 99
-vim.o.foldmethod = "expr"
-vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+vim.o.foldmethod     = "expr"
+vim.o.foldexpr       = "nvim_treesitter#foldexpr()"
+
+-- searching and grep stuff
+vim.o.smartcase  = true
 vim.o.ignorecase = true
-vim.o.infercase = true
+vim.o.infercase  = true
+vim.o.grepprg    = "rg --hidden --vimgrep --smart-case --"  -- also its 2023 use rg
+
 vim.o.jumpoptions = "stack"
-vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
-vim.o.swapfile = false
 vim.o.linebreak = true
 vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
-vim.o.mouse = "a"
-vim.o.number = true
-vim.o.pumheight = 15
-vim.o.relativenumber = true
-vim.o.shiftround = true
-vim.o.shiftwidth = 4
-vim.o.shortmess = "aoOTIcF"
-vim.o.showmode = false
-vim.o.showcmd = false
-vim.o.showbreak = "↳  "
-vim.o.sidescrolloff = 5
-vim.o.signcolumn = "yes:1"
-vim.o.smartcase = true
+
+-- Spaces and tabs config
+vim.o.tabstop     = 4
 vim.o.softtabstop = 4
-vim.o.splitbelow = true
-vim.o.splitright = true
-vim.o.tabstop = 4
-vim.o.timeout = true
-vim.o.timeoutlen = 200
-vim.o.undofile = true
-vim.o.undolevels = 9999
-vim.o.updatetime = 250
-vim.o.viewoptions = "folds,cursor,curdir,slash,unix"
-vim.o.virtualedit = "block"
-vim.o.whichwrap = "h,l,<,>,[,],~"
-vim.o.wildchar = 9
+vim.o.shiftwidth  = 4
+vim.o.shiftround  = true
+
+-- UI config
+vim.o.showbreak     = "↳  "
+vim.o.sidescrolloff = 5
+vim.o.signcolumn    = "yes:1"
+vim.o.splitbelow    = true
+vim.o.splitright    = true
+vim.o.timeout       = true
+vim.o.timeoutlen    = 200
+vim.o.updatetime    = 250
+vim.o.virtualedit   = "block"
+vim.o.whichwrap     = "h,l,<,>,[,],~"
+
+-- last but def not least, wildmenu
+vim.o.wildchar       = 9
 vim.o.wildignorecase = true
-vim.o.wildmode = "longest:full,full"
-vim.o.winminwidth = 10
-vim.o.wrap = false
-vim.o.writebackup = false
+vim.o.wildmode       = "longest:full,full"
+vim.opt.wildignore   = "__pycache__"
+vim.opt.wildignore:append { "*.o", "*~", "*.pyc", "*pycache*" }
+vim.opt.wildignore:append { "Cargo.lock", "lazy-lock.json" }
 
 if vim.loop.os_uname().sysname == "Darwin" then
 	vim.g.clipboard = {
@@ -72,7 +93,6 @@ for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 end
 
 vim.diagnostic.config {
-	-- NOTE: on a sunny day where I feel like enable virtual text use { spacing = 4, prefix = "●" }
 	virtual_text = false,
 	underline = false,
 	update_in_insert = false,
@@ -90,6 +110,8 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "+"
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
+-- TODO: migrate these to vim.keymap.set.
+-- imo it is a lot more readable and this DSL is simply using the same API.
 k.nvim_register_mapping {
 	["n|<S-Tab>"] = k.cr("normal za"):with_defaults "edit: Toggle code fold",
 	-- Visual

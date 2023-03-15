@@ -23,9 +23,10 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup({
-	{ "nvim-lua/plenary.nvim" },
+	"nvim-lua/plenary.nvim",
+	"tpope/vim-sleuth",
 	-- NOTE: cuz it is cool
-	{ "romainl/vim-cool", event = "InsertEnter", lazy = true },
+	{ "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" }, lazy = true },
 	{
 		"mtth/scratch.vim",
 		lazy = true,
@@ -90,7 +91,9 @@ require("lazy").setup({
 	-- NOTE: treesitter-based dependencies
 	{
 		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
+		build = function()
+			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
+		end,
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
 			{
@@ -159,6 +162,7 @@ require("lazy").setup({
 			require("nvim-treesitter.configs").setup(opts)
 		end,
 	},
+	{ "m-demare/hlargs.nvim", lazy = true, config = true },
 	-- NOTE: comments, you say what?
 	{
 		"numToStr/Comment.nvim",
@@ -248,6 +252,7 @@ require("lazy").setup({
 					"mason",
 					"TelescopePrompt",
 					"NvimTree",
+					"scratch",
 				},
 				callback = function() vim.b.miniindentscope_disable = true end,
 			})
@@ -350,7 +355,8 @@ require("lazy").setup({
 		},
 	},
 	-- NOTE: folke is neovim's tpope
-	{ "folke/zen-mode.nvim", event = "BufReadPost" },
+	{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode", lazy = true },
+	{ "folke/paint.nvim", event = "BufReadPost", lazy = true, config = true },
 	{
 		"folke/trouble.nvim",
 		lazy = true,
@@ -950,7 +956,15 @@ require("lazy").setup({
 							string.format("indent_string=%s", string.rep(" ", 4)),
 						},
 					},
-					f.deno_fmt.with { extra_args = { "--line-width", "80" } },
+					f.deno_fmt.with {
+						extra_args = { "--line-width", "80" },
+						disabled_filetypes = {
+							"javascript",
+							"javascriptreact",
+							"typescript",
+							"typescriptreact",
+						},
+					},
 					f.yamlfmt,
 
 					-- NOTE: diagnostics
@@ -1266,6 +1280,110 @@ require("lazy").setup({
 			end
 		end,
 	},
+	-- NOTE: lets do some dap
+	{
+		"mfussenegger/nvim-dap",
+		lazy = true,
+		dependencies = {
+			-- Creates a beautiful debugger UI
+			"rcarriga/nvim-dap-ui",
+			-- Installs the debug adapters for you
+			"williamboman/mason.nvim",
+			"jay-babu/mason-nvim-dap.nvim",
+			-- Add your own debuggers here
+			"leoluz/nvim-dap-go",
+		},
+		config = function()
+			local dap = require "dap"
+			local dapui = require "dapui"
+
+			require("mason-nvim-dap").setup {
+				automatic_setup = true,
+				ensure_installed = { "delve", "codelldb" },
+			}
+
+			-- You can provide additional configuration to the handlers,
+			-- see mason-nvim-dap README for more information
+			require("mason-nvim-dap").setup_handlers()
+
+			-- Basic debugging keymaps, feel free to change to your liking!
+			vim.keymap.set("n", "<F5>", dap.continue)
+			vim.keymap.set("n", "<F1>", dap.step_into)
+			vim.keymap.set("n", "<F2>", dap.step_over)
+			vim.keymap.set("n", "<F3>", dap.step_out)
+			vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint)
+			vim.keymap.set(
+				"n",
+				"<leader>B",
+				function() dap.set_breakpoint(vim.fn.input "Breakpoint condition: ") end
+			)
+
+			-- Dap UI setup
+			-- For more information, see |:help nvim-dap-ui|
+			dapui.setup {
+				-- Set icons to characters that are more likely to work in every terminal.
+				--    Feel free to remove or use ones that you like more! :)
+				--    Don't feel like these are good choices.
+				icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+				controls = {
+					icons = {
+						pause = "⏸",
+						play = "▶",
+						step_into = "⏎",
+						step_over = "⏭",
+						step_out = "⏮",
+						step_back = "b",
+						run_last = "▶▶",
+						terminate = "⏹",
+					},
+				},
+			}
+
+			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+			dap.listeners.before.event_exited["dapui_config"] = dapui.close
+
+			-- Install golang specific config
+			require("dap-go").setup()
+
+			dap.adapters.lldb = {
+				type = "executable",
+				command = "/usr/bin/lldb-vscode",
+				name = "lldb",
+			}
+			dap.configurations.cpp = {
+				{
+					name = "Launch",
+					type = "lldb",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopOnEntry = false,
+					args = function()
+						local input = vim.fn.input "Input args: "
+						return vim.fn.split(input, " ", true)
+					end,
+
+					-- if you change `runInTerminal` to true, you might need to change the yama/ptrace_scope setting:
+					--
+					--    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+					--
+					-- Otherwise you might get the following error:
+					--
+					--    Error on launch: Failed to attach to the target process
+					--
+					-- But you should be aware of the implications:
+					-- https://www.kernel.org/doc/html/latest/admin-guide/LSM/Yama.html
+					runInTerminal = false,
+				},
+			}
+
+			dap.configurations.c = dap.configurations.cpp
+			dap.configurations.rust = dap.configurations.cpp
+		end,
+	},
 	-- NOTE: Setup completions.
 	{
 		"petertriho/cmp-git",
@@ -1504,6 +1622,7 @@ require("lazy").setup({
 			init = icons.misc.ManUp,
 			import = icons.documents.Import,
 			keys = icons.ui.Keyboard,
+			lazy = icons.misc.BentoBox,
 			loaded = icons.ui.Check,
 			not_loaded = icons.misc.Ghost,
 			plugin = icons.ui.Package,

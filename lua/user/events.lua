@@ -18,22 +18,13 @@ autocmd("FileType", {
 		"health",
 		"PlenaryTestPopup",
 		"nofile",
-		"Scratch",
+		"scratch",
 		"",
 	},
 	callback = function(event)
 		vim.bo[event.buf].buflisted = false
 		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
 	end,
-})
-
--- Disable statusline for some filetypes
-autocmd("FileType", {
-	pattern = { "qf", "prompt", "Scratch", "spectre_panel", "neorepl", "health" },
-    -- stylua: ignore
-	callback = function()
-        vim.o.statusline = ''
-    end,
 })
 
 -- Makes switching between buffer and termmode feels like normal mode
