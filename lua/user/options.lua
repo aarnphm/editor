@@ -1,6 +1,14 @@
 local api     = vim.api
 local autocmd = vim.api.nvim_create_autocmd
 
+local M = {
+    -- Whether to make completion fancy or simple border
+    simple = true,
+    -- Whether to show the diagnostic popup
+    show_float_diagnostic = false,
+    window = { resize = 10 }
+}
+
 -- Some defaults and don't question it
 vim.o.wrap           = false                 -- egh i don't like wrap
 vim.o.writebackup    = false                 -- whos needs backup btw (i do sometimes)
@@ -60,6 +68,7 @@ vim.o.shiftwidth  = 4
 vim.o.shiftround  = true
 
 -- UI config
+vim.o.showcmd       = false
 vim.o.showbreak     = "↳  "
 vim.o.sidescrolloff = 5
 vim.o.signcolumn    = "yes:1"
@@ -112,63 +121,58 @@ local map = function(mode, lhs, rhs, opts)
     vim.keymap.set(mode, lhs, rhs, opts)
 end
 
-map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
-map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
-map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })
-map("v", "<", "<gv", { desc = "edit: Decrease indent" })
-map("v", ">", ">gv", { desc = "edit: Increase indent" })
-map("c", "W!!", "execute 'silent! write !sudo tee % >/dev/null' <bar> edit!", { desc = "edit: Save file using sudo" })
-map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
-map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
-map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
-map("n", "<C-h>", "<C-w>h", { desc = "window: Focus left" })
-map("n", "<C-l>", "<C-w>l", { desc = "window: Focus right" })
-map("n", "<C-j>", "<C-w>j", { desc = "window: Focus down" })
-map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up" })
-map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
-map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
-map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
-map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
-map("n", "<leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
-map("n", "<Leader>.", "<cmd>bnext<cr>", { desc = "buffer: next" })
-map("n", "<Leader>,", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
-map("n", "<Leader>q", "<cmd>copen<cr>", { desc = "quickfix: Open quickfix" })
-map("n", "<Leader>l", "<cmd>lopen<cr>", { desc = "quickfix: Open location list" })
-map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
-map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
-map("n", "\\", ":let @/=''<CR>:noh<CR>", { silent = true, desc = "command: Search command history" })
-map("n", "<LocalLeader>l", "<cmd>set list! list?<cr>", { silent = false, desc = "misc: toggle invisible characters" })
-
-local resize_value = 10
-map("n", "<LocalLeader>]", string.format("<cmd>vertical resize -%s<cr>", resize_value), { noremap = false, desc = "windows: resize right 10px" })
-map("n", "<LocalLeader>[", string.format("<cmd>vertical resize +%s<cr>", resize_value), { noremap = false, desc = "windows: resize left 10px" })
-map("n", "<LocalLeader>-", string.format("<cmd>resize -%s<cr>", resize_value), { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", resize_value), { noremap = false, desc = "windows: resize up 10px" })
-
--- toggle format
-map("n", "<LocalLeader>ft", require('lsp').toggle, { desc = "lsp: Toggle formatter" })
-map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
-
--- terminal-in-terminal bullcrap
-map("n", "<C-\\>", "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>", { desc = "terminal: Toggle horizontal" })
-map("i", "<C-\\>", "<Esc><cmd>ToggleTerm direction=horizontal<cr>", { desc = "terminal: Toggle horizontal" })
-map("t", "<C-\\>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle horizontal" })
-map("n", "<C-t>", "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>", { desc = "terminal: Toggle vertical" })
-map("i", "<C-t>", "<Esc><cmd>ToggleTerm direction=vertical<cr>", { desc = "terminal: Toggle vertical" })
-map("t", "<C-t>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle vertical" })
-
--- NOTE: some events
+-- NOTE: normal mode
+map("n", "<S-Tab>",         "<cmd>normal za<cr>",                                                                 { desc = "edit: Toggle code fold"                            })
+map("n", "Y",               "y$",                                                                                 { desc = "edit: Yank text to EOL"                            })
+map("n", "D",               "d$",                                                                                 { desc = "edit: Delete text to EOL"                          })
+map("n", "J",               "mzJ`z",                                                                              { desc = "edit: Join next line"                              })
+map("n", "<C-h>",           "<C-w>h",                                                                             { desc = "window: Focus left"                                })
+map("n", "<C-l>",           "<C-w>l",                                                                             { desc = "window: Focus right"                               })
+map("n", "<C-j>",           "<C-w>j",                                                                             { desc = "window: Focus down"                                })
+map("n", "<C-k>",           "<C-w>k",                                                                             { desc = "window: Focus up"                                  })
+map("n", "<LocalLeader>sw", "<C-w>r",                                                                             { desc = "window: swap position"                             })
+map("n", "<LocalLeader>vs", "<C-w>v",                                                                             { desc = "edit: split window vertically"                     })
+map("n", "<LocalLeader>hs", "<C-w>s",                                                                             { desc = "edit: split window horizontally"                   })
+map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>",                                                                     { desc = "misc: change directory to current file buffer"     })
+map("n", "<leader>qq",      "<cmd>wqa<cr>",                                                                       { desc = "editor: write quit all"                            })
+map("n", "<Leader>.",       "<cmd>bnext<cr>",                                                                     { desc = "buffer: next"                                      })
+map("n", "<Leader>,",       "<cmd>bprevious<cr>",                                                                 { desc = "buffer: previous"                                  })
+map("n", "<Leader>q",       "<cmd>copen<cr>",                                                                     { desc = "quickfix: Open quickfix"                           })
+map("n", "<Leader>l",       "<cmd>lopen<cr>",                                                                     { desc = "quickfix: Open location list"                      })
+map("n", "<Leader>n",       "<cmd>enew<cr>",                                                                      { desc = "buffer: new"                                       })
+map("n", "\\",              ":let @/=''<CR>:noh<CR>",                                                             { silent = true, desc = "command: Search command history"    })
+map("n", ";",               ":",                                                                                  { silent = false, desc = "command: Enter command mode"       })
+map("n", "<LocalLeader>l",  "<cmd>set list! list?<cr>",                                                           { silent = false, desc = "misc: toggle invisible characters" })
+map("n", "<LocalLeader>]",  string.format("<cmd>vertical resize -%s<cr>", M.window.resize),                       { noremap = false, desc = "windows: resize right 10px"       })
+map("n", "<LocalLeader>[",  string.format("<cmd>vertical resize +%s<cr>", M.window.resize),                       { noremap = false, desc = "windows: resize left 10px"        })
+map("n", "<LocalLeader>-",  string.format("<cmd>resize -%s<cr>",          M.window.resize),                       { noremap = false, desc = "windows: resize down 10px"        })
+map("n", "<LocalLeader>+",  string.format("<cmd>resize +%s<cr>",          M.window.resize),                       { noremap = false, desc = "windows: resize up 10px"          })
+map("n", "<LocalLeader>ft", require('lsp').toggle,                                                                { desc = "lsp: Toggle formatter"                             })
+map("n", "<LocalLeader>p",  "<cmd>Lazy<cr>",                                                                      { desc = "package: show manager"                             })
+map("v", "J",               ":m '>+1<CR>gv=gv",                                                                   { desc = "edit: Move this line down"                         })
+map("v", "K",               ":m '<-2<CR>gv=gv",                                                                   { desc = "edit: Move this line up"                           })
+map("v", "<",               "<gv",                                                                                { desc = "edit: Decrease indent"                             })
+map("v", ">",               ">gv",                                                                                { desc = "edit: Increase indent"                             })
+map("c", "W!!",             "execute 'silent! write !sudo tee % >/dev/null' <bar> edit!",                         { desc = "edit: Save file using sudo"                        })
+map("n", "<C-\\>",          "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>",                       { desc = "terminal: Toggle horizontal"                       })
+map("i", "<C-\\>",          "<Esc><cmd>ToggleTerm direction=horizontal<cr>",                                      { desc = "terminal: Toggle horizontal"                       })
+map("t", "<C-\\>",          "<Esc><cmd>ToggleTerm<cr>",                                                           { desc = "terminal: Toggle horizontal"                       })
+map("n", "<C-t>",           "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>",                         { desc = "terminal: Toggle vertical"                         })
+map("i", "<C-t>",           "<Esc><cmd>ToggleTerm direction=vertical<cr>",                                        { desc = "terminal: Toggle vertical"                         })
+map("t", "<C-t>",           "<Esc><cmd>ToggleTerm<cr>",                                                           { desc = "terminal: Toggle vertical"                         })
 
 local augroup = function(name)
     return api.nvim_create_augroup("simple_"..name, {clear = true})
 end
 
--- diagnostic on hover
-autocmd({ "CursorHold", "CursorHoldI" }, {
-    group = augroup("diagnostic"),
-	pattern = "*",
-	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
-})
+if M.show_float_diagnostic then
+    -- diagnostic on hover
+    autocmd({ "CursorHold", "CursorHoldI" }, {
+        group = augroup("diagnostic"),
+        pattern = "*",
+        callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
+    })
+end
 
 -- close some filetypes with <q>
 autocmd("FileType", {
@@ -266,3 +270,5 @@ autocmd("TextYankPost", {
 	pattern = "*",
 	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 40 } end,
 })
+
+return M

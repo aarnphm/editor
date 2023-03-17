@@ -31,7 +31,7 @@ local getlocals = function(l)
 	end
 end
 
-_G.dumpsig = function(f)
+_G.GS = function(f)
 	assert(type(f) == "function", "bad argument #1 to 'dumpsig' (function expected)")
 	local p = {}
 	pcall(function()

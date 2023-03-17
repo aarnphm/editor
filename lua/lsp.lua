@@ -47,27 +47,40 @@ M._keys = nil
 
 M.setup_keymaps = function()
 	if not M._keys then
-  ---@class PluginLspKeys
-    -- stylua: ignore
-    M._keys =  {
-      { "<leader>cd", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
-      { "<leader>ci", "<cmd>LspInfo<cr>", desc = "lsp: info" },
-      { "gh", vim.show_pos, desc = "lsp: Show current position" },
-      { "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: References" },
-      { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
-      { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration", has = "declaration" },
-      { "gI", "<cmd>Telescope lsp_implementations<cr>", desc = "lsp: Goto implementation" },
-      { "gt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "lsp: Goto type definition" },
-      { "]d", M.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
-      { "[d", M.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
-      { "]e", M.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
-      { "[e", M.diagnostic_goto(false, "ERROR"), desc = "lsp: Prev error" },
-      { "]w", M.diagnostic_goto(true, "WARN"), desc = "lsp: Next warning" },
-      { "[w", M.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
-      { "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: Code action", mode = { "n", "v" }, has = "codeAction" },
-      { "<leader><leader>", M.format, desc = "lsp: Format document", has = "documentFormatting" },
-      { "<leader><leader>", M.format, desc = "lsp: Format range", mode = "v", has = "documentRangeFormatting" },
-    }
+		---@class PluginLspKeys
+        -- stylua: ignore
+		M._keys = {
+			{ "<leader>cd", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
+			{ "<leader>ci", "<cmd>LspInfo<cr>", desc = "lsp: info" },
+			{ "go", "<cmd>SymbolsOutline<cr>", desc = "lsp: outline" },
+			{ "gh", vim.show_pos, desc = "lsp: current position" },
+			{ "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: references" },
+			{ "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
+			{ "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration", has = "declaration" },
+			{ "gI", "<cmd>Telescope lsp_implementations<cr>", desc = "lsp: Goto implementation" },
+			{ "gt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "lsp: Goto type definition" },
+			{ "]d", M.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
+			{ "[d", M.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
+			{ "]e", M.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
+			{ "[e", M.diagnostic_goto(false, "ERROR"), desc = "lsp: Prev error" },
+			{ "]w", M.diagnostic_goto(true, "WARN"), desc = "lsp: Next warning" },
+			{ "[w", M.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
+			{ "<leader><leader>", M.format, desc = "lsp: Format document", has = "documentFormatting" },
+			{ "<leader><leader>", M.format, desc = "lsp: Format range", mode = "v", has = "documentRangeFormatting" },
+			{ "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: Code action", mode = { "n", "v" }, has = "codeAction" },
+			{ "<leader>cA",
+				function()
+					vim.lsp.buf.code_action {
+						context = {
+							only = { "source" },
+							diagnostics = {},
+						},
+					}
+				end,
+				desc = "lsp: see source action",
+				has = "codeAction",
+			},
+		}
 		if require("user.utils").has "inc-rename.nvim" then
 			M._keys[#M._keys + 1] = {
 				"gr",
@@ -94,11 +107,11 @@ M.setup_keymaps = function()
 				has = "signatureHelp",
 			}
 		else
-			M._keys[#M._keys + 1] = { "K", vim.lsp.buf.hover, desc = "lsp: Hover doc" }
+			M._keys[#M._keys + 1] = { "K", vim.lsp.buf.hover, desc = "lsp: hover doc" }
 			M._keys[#M._keys + 1] = {
 				"gK",
 				vim.lsp.buf.signature_help,
-				desc = "lsp: Signature help",
+				desc = "lsp: signature help",
 				has = "signatureHelp",
 			}
 		end
@@ -156,8 +169,8 @@ M.on_attach = function(client, bufnr)
 	vim.api.nvim_buf_create_user_command(
 		bufnr,
 		"Format",
-		function(_) vim.lsp.buf.format() end,
-		{ desc = "format: current buffer using lsp" }
+		function(_) M.format { bufnr = bufnr } end,
+		{ desc = "format: current buffer (alt for <Leader><Leader>)" }
 	)
 end
 

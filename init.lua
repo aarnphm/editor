@@ -1,10 +1,7 @@
 require "user.globals"
-require "user.options"
 
+local M = require "user.options"
 local icons = require "user.icons"
-
--- NOTE: whether to make completion fancy or simple border
-local simple = true
 
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -44,7 +41,7 @@ require("lazy").setup({
 		name = "rose-pine",
 		opts = {
 			disable_italics = true,
-			dark_variant = "main",
+			dark_variant = "moon",
 			highlight_groups = {
 				Comment = { fg = "muted", italic = true },
 				StatusLine = { fg = "rose", bg = "iris", blend = 10 },
@@ -57,6 +54,7 @@ require("lazy").setup({
 			},
 		},
 	},
+	-- NOTE: scratch buffer
 	{
 		"mtth/scratch.vim",
 		cmd = "Scratch",
@@ -278,6 +276,7 @@ require("lazy").setup({
 					"TelescopePrompt",
 					"NvimTree",
 					"scratch",
+					"nofile",
 				},
 				callback = function() vim.b.miniindentscope_disable = true end,
 			})
@@ -389,8 +388,9 @@ require("lazy").setup({
 	{
 		"folke/which-key.nvim",
 		event = "BufReadPost",
+		opts = { plugins = { presets = { operators = false } } },
 		config = function(_, opts)
-			if not simple then opts.window = { border = "single" } end
+			if not M.simple then opts.window = { border = "single" } end
 			require("which-key").setup(opts)
 		end,
 	},
@@ -1119,6 +1119,12 @@ require("lazy").setup({
 			symbols = { separator = icons.ui_space.Separator },
 		},
 	},
+	{
+		"simrat39/symbols-outline.nvim",
+		cmd = "SymbolsOutline",
+		config = true,
+		opts = { auto_close = true },
+	},
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
@@ -1127,24 +1133,6 @@ require("lazy").setup({
 			"williamboman/mason-lspconfig.nvim",
 			"mason.nvim",
 			{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
-			{
-				"lewis6991/hover.nvim",
-				enabled = false,
-				lazy = true,
-				config = function()
-					require("hover").setup {
-						init = function()
-							require "hover.providers.lsp"
-							require "hover.providers.gh"
-							require "hover.providers.gh_user"
-						end,
-						-- Whether the contents of a currently open hover window should be moved
-						-- to a :h preview-window when pressing the hover keymap.
-						preview_window = false,
-						title = true,
-					}
-				end,
-			},
 			{
 				"hrsh7th/cmp-nvim-lsp",
 				cond = function() return require("user.utils").has "nvim-cmp" end,
@@ -1334,8 +1322,8 @@ require("lazy").setup({
 				lspconfig[server].setup(server_opts)
 			end
 
-			local mason_lspconfig = require "mason-lspconfig"
-			local available = mason_lspconfig.get_available_servers()
+			local have_mason, mason_lspconfig = pcall(require, "mason-lspconfig")
+			local available = have_mason and mason_lspconfig.get_available_servers() or {}
 
 			local ensure_installed = {} ---@type string[]
 			for server, server_opts in pairs(servers) do
@@ -1356,8 +1344,12 @@ require("lazy").setup({
 					end
 				end
 			end
-			mason_lspconfig.setup { ensure_installed = ensure_installed }
-			mason_lspconfig.setup_handlers { mason_handler }
+
+			-- check if mason is available, then call setup
+			if have_mason then
+				mason_lspconfig.setup { ensure_installed = ensure_installed }
+				mason_lspconfig.setup_handlers { mason_handler }
+			end
 		end,
 	},
 	{
@@ -1547,7 +1539,7 @@ require("lazy").setup({
 			local cmp = require "cmp"
 			local lspkind = require "lspkind"
 
-			if not simple then
+			if not M.simple then
 				local cmp_window = require "cmp.utils.window"
 				local prev_info = cmp_window.info
 				---@diagnostic disable-next-line: duplicate-set-field
@@ -1651,8 +1643,8 @@ require("lazy").setup({
 				table.insert(opts.sources, { name = "crates" })
 			end
 
-			if not simple then
-				opts.windows = {
+			if not M.simple then
+				opts.window = {
 					completion = cmp.config.window.bordered { border = "single" },
 					documentation = cmp.config.window.bordered { border = "single" },
 				}
