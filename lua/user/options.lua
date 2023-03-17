@@ -6,7 +6,10 @@ local M = {
     -- Whether to make completion fancy or simple border
     simple = true,
     -- Whether to show the diagnostic popup
-    show_float_diagnostic = false,
+	diagnostic = {
+		use_virtual_text = true,
+		show_float       = false,
+	},
 	-- Windows opts
     window = { resize = 10 }
 }
@@ -105,7 +108,7 @@ for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 end
 
 vim.diagnostic.config {
-	virtual_text     = false,
+	virtual_text     = M.diagnostic.use_virtual_text,
 	underline        = false,
 	update_in_insert = false,
 	severity_sort    = true,
@@ -167,7 +170,7 @@ local augroup = function(name)
     return api.nvim_create_augroup("simple_"..name, {clear = true})
 end
 
-if M.show_float_diagnostic then
+if M.diagnostic.show_float then
     -- diagnostic on hover
     autocmd({ "CursorHold", "CursorHoldI" }, {
         group = augroup("diagnostic"),

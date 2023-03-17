@@ -58,6 +58,7 @@ require("lazy").setup({
 	-- NOTE: cozy colorscheme
 	{
 		"rose-pine/neovim",
+		lazy = false,
 		name = "rose-pine",
 		opts = {
 			disable_italics = true,
@@ -74,6 +75,7 @@ require("lazy").setup({
 			},
 		},
 	},
+	{ "nyoom-engineering/oxocarbon.nvim", lazy = false },
 	-- NOTE: hidden tech the harpoon
 	{
 		"theprimeagen/harpoon",
@@ -1813,6 +1815,8 @@ require("lazy").setup({
 	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 	checker = { enable = true },
 	ui = {
+		size = { width = 0.88, height = 0.8 },
+		wrap = true, -- wrap the lines in the ui
 		icons = {
 			cmd = icons.misc.Code,
 			config = icons.ui.Gear,
@@ -1869,4 +1873,4 @@ require("lazy").setup({
 })
 
 vim.o.background = "dark"
-vim.cmd.colorscheme "rose-pine"
+vim.cmd.colorscheme "oxocarbon"
