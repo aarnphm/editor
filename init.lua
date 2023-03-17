@@ -837,7 +837,7 @@ require("lazy").setup({
 					.. "/mason/packages/codelldb/extension"
 				local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
 				local extension = ".so"
-				if vim.loop.os_uname().sysname == "Darin" then extension = ".dylib" end
+				if vim.loop.os_uname().sysname == "Darwin" then extension = ".dylib" end
 				local liblldb_path = codelldb_extension_path .. "/lldb/lib/liblldb" .. extension
 				return require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path)
 			end
