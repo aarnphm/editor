@@ -7,6 +7,7 @@ local M = {
     simple = true,
     -- Whether to show the diagnostic popup
     show_float_diagnostic = false,
+	-- Windows opts
     window = { resize = 10 }
 }
 
@@ -19,7 +20,7 @@ vim.o.undofile       = true                  -- set undofile to infinite undo
 vim.o.breakindent    = true                  -- enable break indent
 vim.o.breakindentopt = "shift:2,min:20"      -- wrap two spaces, with min of 20 text width
 vim.o.clipboard      = "unnamedplus"         -- sync system clipboard
-vim.o.pumheight      = 12                    -- larger completion windows
+vim.o.pumheight      = 15                    -- larger completion windows
 vim.o.completeopt    = "menuone,noselect"    -- better completion menu
 vim.o.expandtab      = true                  -- convert spaces to tabs
 vim.o.mouse          = "a"                   -- ugh who needs mouse (accept on SSH maybe)
@@ -31,8 +32,8 @@ vim.o.undolevels     = 9999                  -- infinite undo
 vim.o.shortmess      = "aoOTIcF"             -- insanely complex shortmess, but its cleannn
 
 -- I refuse to have a complex statusline, but lualine is cool tho
-vim.o.laststatus = 0
-vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
+vim.o.laststatus = 2
+vim.o.statusline = "%= %=%m %y %l:%c ♥ "
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions

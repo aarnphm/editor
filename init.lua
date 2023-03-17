@@ -26,13 +26,32 @@ require("lazy").setup({
 	{
 		"stevearc/dressing.nvim",
 		opts = {
-			input = { enabled = true },
+			input = {
+				enabled = true,
+				override = function(conf)
+					conf.col = -1
+					conf.row = 0
+					return conf
+				end,
+			},
 			select = {
 				enabled = true,
 				backend = "telescope",
 				trim_prompt = true,
 			},
 		},
+		init = function()
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.select = function(...)
+				require("lazy").load { plugins = { "dressing.nvim" } }
+				return vim.ui.select(...)
+			end
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.input = function(...)
+				require("lazy").load { plugins = { "dressing.nvim" } }
+				return vim.ui.input(...)
+			end
+		end,
 		config = true,
 	},
 	{ "nmac427/guess-indent.nvim", event = "InsertEnter", config = true },
@@ -54,6 +73,24 @@ require("lazy").setup({
 				TelescopeSelectionCaret = { fg = "rose" },
 			},
 		},
+	},
+	-- NOTE: hidden tech the harpoon
+	{
+		"theprimeagen/harpoon",
+		event = "BufReadPost",
+		config = function()
+			local mark = require "harpoon.mark"
+			local ui = require "harpoon.ui"
+			require("harpoon").setup {}
+
+			vim.keymap.set("n", "<leader>a", mark.add_file)
+			vim.keymap.set("n", "<leader>e", ui.toggle_quick_menu)
+
+			-- vim.keymap.set("n", "<C-h>", function() ui.nav_file(1) end)
+			-- vim.keymap.set("n", "<C-i>", function() ui.nav_file(2) end)
+			-- vim.keymap.set("n", "<C-n>", function() ui.nav_file(3) end)
+			-- vim.keymap.set("n", "<C-s>", function() ui.nav_file(4) end)
+		end,
 	},
 	-- NOTE: scratch buffer
 	{
@@ -77,12 +114,13 @@ require("lazy").setup({
 	-- NOTE: nice git integration and UI
 	{
 		"lewis6991/satellite.nvim",
-		config = function() require("satellite").setup() end,
+		event = "BufReadPost",
+		config = true,
 		cmd = { "SatelliteDisable", "SatelliteEnable", "SatelliteRefresh" },
 	},
 	{
 		"lewis6991/gitsigns.nvim",
-		event = "BufReadPost", -- we probably only need to use gitsigns with LspAttach
+		event = "BufReadPost",
 		config = function()
 			require("gitsigns").setup {
 				numhl = true,
@@ -298,6 +336,7 @@ require("lazy").setup({
 	{
 		"ggandor/flit.nvim",
 		opts = { labeled_modes = "nx" },
+		---@diagnostic disable-next-line: assign-type-mismatch
 		keys = function()
 			---@type table<string, LazyKeys[]>
 			local ret = {}
@@ -325,7 +364,6 @@ require("lazy").setup({
 		end,
 	},
 	-- NOTE: better UI components
-	{ "j-hui/fidget.nvim", event = "LspAttach", opts = { text = { spinner = "dots" } } },
 	{
 		"kevinhwang91/nvim-bqf",
 		ft = "qf",
@@ -336,6 +374,17 @@ require("lazy").setup({
 		config = true,
 	},
 	-- NOTE: folke is neovim's tpope
+	{
+		"folke/noice.nvim",
+		event = "BufReadPost",
+		dependencies = { "MunifTanjim/nui.nvim" },
+		opts = {
+			lsp = { progress = { enabled = true } },
+			cmdline = { enabled = true, view = "cmdline" },
+			popupmenu = { enabled = false },
+			presets = { command_palette = true, bottom_search = true },
+		},
+	},
 	{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode" },
 	{ "folke/paint.nvim", event = "BufReadPost", config = true },
 	{
@@ -750,7 +799,8 @@ require("lazy").setup({
 	-- NOTE: terminal-in-terminal PacMan (also we only really need this with LspAttach)
 	{
 		"akinsho/toggleterm.nvim",
-		cmd = { "ToggleTerm" },
+		cmd = "ToggleTerm",
+		---@diagnostic disable-next-line: assign-type-mismatch
 		module = true,
 		opts = {
 			-- size can be a number or function which is passed the current terminal
@@ -1118,6 +1168,12 @@ require("lazy").setup({
 		config = true,
 		opts = { auto_close = true },
 	},
+	{
+		"smjonas/inc-rename.nvim",
+		cmd = "IncRename",
+		config = true,
+		opts = { input_buffer_type = "dressing" },
+	},
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
@@ -1475,6 +1531,7 @@ require("lazy").setup({
 					type = "lldb",
 					request = "launch",
 					program = function()
+						---@diagnostic disable-next-line: redundant-parameter
 						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
 					end,
 					cwd = "${workspaceFolder}",
@@ -1522,6 +1579,7 @@ require("lazy").setup({
 			"hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-buffer",
+			"ray-x/cmp-treesitter",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1543,6 +1601,7 @@ require("lazy").setup({
 					vim.defer_fn(
 						function()
 							require("copilot").setup {
+								cmp = { enabled = true, method = "getCompletionsCycling" },
 								panel = { enabled = false },
 								suggestion = { enabled = true, auto_trigger = true },
 								filetypes = {
@@ -1662,6 +1721,7 @@ require("lazy").setup({
 					{ name = "luasnip" },
 					{ name = "nvim-lua" },
 					{ name = "buffer" },
+					{ name = "treesitter" },
 				},
 			}
 
