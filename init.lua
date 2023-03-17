@@ -1,8 +1,6 @@
 require "user.globals"
 require "user.options"
-require "user.events"
 
-local k = require "keybind"
 local icons = require "user.icons"
 
 -- NOTE: whether to make completion fancy or simple border
@@ -26,15 +24,47 @@ require("lazy").setup({
 	"lewis6991/impatient.nvim",
 	"nvim-lua/plenary.nvim",
 	{
+		"stevearc/dressing.nvim",
+		init = function()
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.select = function(...)
+				require("lazy").load { plugins = { "dressing.nvim" } }
+				return vim.ui.select(...)
+			end
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.ui.input = function(...)
+				require("lazy").load { plugins = { "dressing.nvim" } }
+				return vim.ui.input(...)
+			end
+		end,
+	},
+	-- NOTE: cozy colorscheme
+	{
+		"rose-pine/neovim",
+		name = "rose-pine",
+		opts = {
+			disable_italics = true,
+			dark_variant = "main",
+			highlight_groups = {
+				Comment = { fg = "muted", italic = true },
+				StatusLine = { fg = "rose", bg = "iris", blend = 10 },
+				StatusLineNC = { fg = "subtle", bg = "surface" },
+				TelescopeBorder = { fg = "highlight_high" },
+				TelescopeNormal = { fg = "subtle" },
+				TelescopePromptNormal = { fg = "text" },
+				TelescopeSelection = { fg = "text" },
+				TelescopeSelectionCaret = { fg = "rose" },
+			},
+		},
+	},
+	{
 		"mtth/scratch.vim",
-		lazy = true,
 		cmd = "Scratch",
 		keys = { { "<Space><Space>s", "<cmd>Scratch<cr>", desc = "buffer: open scratch" } },
 	},
 	-- NOTE: Gigachad Git
 	{
 		"tpope/vim-fugitive",
-		lazy = true,
 		cmd = { "Git", "G" },
 		keys = {
 			{
@@ -46,11 +76,14 @@ require("lazy").setup({
 		},
 	},
 	-- NOTE: nice git integration and UI
-	{ "lewis6991/satellite.nvim", config = true, lazy = true },
+	{
+		"lewis6991/satellite.nvim",
+		config = function() require("satellite").setup() end,
+		cmd = { "SatelliteDisable", "SatelliteEnable", "SatelliteRefresh" },
+	},
 	{
 		"lewis6991/gitsigns.nvim",
-		lazy = true,
-		event = "LspAttach", -- we probably only need to use gitsigns with LspAttach
+		event = "BufReadPost", -- we probably only need to use gitsigns with LspAttach
 		config = function()
 			require("gitsigns").setup {
 				numhl = true,
@@ -83,7 +116,6 @@ require("lazy").setup({
 	-- NOTE: exit fast af
 	{
 		"max397574/better-escape.nvim",
-		lazy = true,
 		event = "InsertEnter",
 		opts = { timeout = 500, clear_empty_lines = true, keys = "<Esc>" },
 	},
@@ -173,7 +205,6 @@ require("lazy").setup({
 	-- NOTE: mini libraries of deps because it is light and easy to use.
 	{
 		"echasnovski/mini.bufremove",
-		lazy = true,
 		keys = {
 			{
 				"<C-x>",
@@ -190,8 +221,7 @@ require("lazy").setup({
 	{
 		-- better text-objects
 		"echasnovski/mini.ai",
-		lazy = true,
-		event = "VeryLazy",
+		event = "InsertEnter",
 		dependencies = { "nvim-treesitter-textobjects" },
 		opts = function()
 			local ai = require "mini.ai"
@@ -214,26 +244,22 @@ require("lazy").setup({
 	},
 	{
 		"echasnovski/mini.align",
-		lazy = true,
-		event = "VeryLazy",
+		event = "InsertEnter",
 		config = function(_, opts) require("mini.align").setup(opts) end,
 	},
 	{
 		"echasnovski/mini.surround",
-		lazy = true,
-		event = "VeryLazy",
+		event = "InsertEnter",
 		config = function(_, opts) require("mini.surround").setup(opts) end,
 	},
 	{
 		"echasnovski/mini.pairs",
-		event = "VeryLazy",
-		lazy = true,
+		event = "InsertEnter",
 		config = function(_, opts) require("mini.pairs").setup(opts) end,
 	},
 	{
 		-- active indent guide and indent text objects
 		"echasnovski/mini.indentscope",
-		lazy = true,
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
 			symbol = "│",
@@ -261,7 +287,6 @@ require("lazy").setup({
 	-- NOTE: cuz sometimes `set list` is not enough and you need some indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
-		lazy = true,
 		event = { "BufReadPost", "BufNewFile" },
 		opts = {
 			show_first_indent_level = true,
@@ -302,63 +327,21 @@ require("lazy").setup({
 		end,
 	},
 	-- NOTE: better UI components
-	{
-		"j-hui/fidget.nvim",
-		lazy = true,
-		event = "LspAttach",
-		opts = { text = { spinner = "dots" } },
-	},
-	{
-		"stevearc/dressing.nvim",
-		event = "VeryLazy",
-		init = function()
-			---@diagnostic disable-next-line: duplicate-set-field
-			vim.ui.select = function(...)
-				require("lazy").load { plugins = { "dressing.nvim" } }
-				return vim.ui.select(...)
-			end
-			---@diagnostic disable-next-line: duplicate-set-field
-			vim.ui.input = function(...)
-				require("lazy").load { plugins = { "dressing.nvim" } }
-				return vim.ui.input(...)
-			end
-		end,
-	},
+	{ "j-hui/fidget.nvim", event = "LspAttach", opts = { text = { spinner = "dots" } } },
 	{
 		"kevinhwang91/nvim-bqf",
 		ft = "qf",
-		lazy = true,
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
 			{ "junegunn/fzf", lazy = true, build = ":call fzf#install()" },
 		},
 		config = true,
 	},
-	-- NOTE: cozy colorscheme
-	{
-		"rose-pine/neovim",
-		name = "rose-pine",
-		opts = {
-			disable_italics = true,
-			dark_variant = "main",
-			highlight_groups = {
-				Comment = { fg = "muted", italic = true },
-				StatusLine = { fg = "rose", bg = "iris", blend = 10 },
-				StatusLineNC = { fg = "subtle", bg = "surface" },
-				TelescopeBorder = { fg = "highlight_high" },
-				TelescopeNormal = { fg = "subtle" },
-				TelescopePromptNormal = { fg = "text" },
-				TelescopeSelection = { fg = "text" },
-				TelescopeSelectionCaret = { fg = "rose", bg = "rose" },
-			},
-		},
-	},
 	-- NOTE: folke is neovim's tpope
-	{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode", lazy = true },
-	{ "folke/paint.nvim", event = "BufReadPost", lazy = true, config = true },
+	{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode" },
+	{ "folke/paint.nvim", event = "BufReadPost", config = true },
 	{
 		"folke/trouble.nvim",
-		lazy = true,
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
 		opts = { use_diagnostic_signs = true },
 		dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -405,8 +388,7 @@ require("lazy").setup({
 	},
 	{
 		"folke/which-key.nvim",
-		lazy = true,
-		event = "LspAttach",
+		event = "BufReadPost",
 		config = function(_, opts)
 			if not simple then opts.window = { border = "single" } end
 			require("which-key").setup(opts)
@@ -414,7 +396,6 @@ require("lazy").setup({
 	},
 	{
 		"folke/todo-comments.nvim",
-		lazy = true,
 		cmd = { "TodoTrouble", "TodoTelescope" },
 		event = { "BufReadPost", "BufNewFile" },
 		config = true,
@@ -438,6 +419,92 @@ require("lazy").setup({
 		dependencies = {
 			"nvim-telescope/telescope-live-grep-args.nvim",
 			{ "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
+		},
+		keys = {
+			{
+				"<Leader>f",
+				function()
+					require("telescope.builtin").find_files {
+						find_command = {
+							"fd",
+							"-H",
+							"-tf",
+							"-E",
+							"lazy-lock.json",
+							"--strip-cwd-prefix",
+						},
+						theme = "dropdown",
+						previewer = false,
+					}
+				end,
+				desc = "telescope: Find files in current directory",
+				noremap = true,
+				silent = true,
+			},
+			{
+				"<Leader>r",
+				function()
+					require("telescope.builtin").git_files {
+						find_command = {
+							"fd",
+							"-H",
+							"-tf",
+							"-E",
+							"lazy-lock.json",
+							"--strip-cwd-prefix",
+						},
+						theme = "dropdown",
+						previewer = false,
+					}
+				end,
+				desc = "telescope: Find files in git repository",
+				noremap = true,
+				silent = true,
+			},
+			{
+				"<Leader>'",
+				function() require("telescope.builtin").live_grep {} end,
+				desc = "telescope: Live grep",
+				noremap = true,
+				silent = true,
+			},
+			{
+				"<Leader>w",
+				function() require("telescope").extensions.live_grep_args.live_grep_args() end,
+				desc = "telescope: Live grep args",
+				noremap = true,
+				silent = true,
+			},
+			{
+				"<Leader>/",
+				"<cmd>Telescope grep_string<cr>",
+				desc = "telescope: Grep string under cursor",
+				noremap = true,
+				silent = true,
+			},
+			{
+				"<Leader>b",
+				"<cmd>Telescope buffers show_all_buffers=true previewer=false<cr>",
+				desc = "telescope: Manage buffers",
+				noremap = true,
+				silent = true,
+			},
+			{
+				"<C-p>",
+				function()
+					require("telescope.builtin").keymaps {
+						lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+						layout_config = {
+							width = 0.6,
+							height = 0.6,
+							prompt_position = "top",
+						},
+					}
+				end,
+				desc = "telescope: Keymaps",
+				noremap = true,
+				silent = true,
+			},
 		},
 		config = function()
 			require("telescope").setup {
@@ -507,7 +574,7 @@ require("lazy").setup({
 		cmd = "Neotree",
 		dependencies = {
 			{ "MunifTanjim/nui.nvim", lazy = true },
-			{ "nvim-lua/plenary.nvim" },
+			"nvim-lua/plenary.nvim",
 			{
 				"s1n7ax/nvim-window-picker",
 				lazy = true,
@@ -553,7 +620,7 @@ require("lazy").setup({
 		opts = {
 			enable_diagnostics = false, -- default is set to true here.
 			filesystem = {
-				bind_to_cwd = false,
+				bind_to_cwd = true,
 				follow_current_file = true,
 			},
 			event_handlers = {
@@ -574,14 +641,15 @@ require("lazy").setup({
 					end,
 				},
 				-- disable last status on neo-tree
-				{
-					event = "neo_tree_buffer_enter",
-					handler = function() vim.opt_local.laststatus = 0 end,
-				},
-				{
-					event = "neo_tree_buffer_leave",
-					handler = function() vim.opt_local.laststatus = 2 end,
-				},
+				-- If I use laststatus, then uncomment this
+				-- {
+				-- 	event = "neo_tree_buffer_enter",
+				-- 	handler = function() vim.opt_local.laststatus = 0 end,
+				-- },
+				-- {
+				-- 	event = "neo_tree_buffer_leave",
+				-- 	handler = function() vim.opt_local.laststatus = 2 end,
+				-- },
 			},
 			always_show = { ".github" },
 			window = {
@@ -604,9 +672,7 @@ require("lazy").setup({
 	-- NOTE: Chad colorizer
 	{
 		"NvChad/nvim-colorizer.lua",
-		lazy = true,
-		enabled = false,
-		event = "BufReadPost",
+		event = "LspAttach",
 		config = function()
 			require("colorizer").setup {
 				filetypes = { "*" },
@@ -626,57 +692,65 @@ require("lazy").setup({
 	-- NOTE: spectre for magic search and replace
 	{
 		"nvim-pack/nvim-spectre",
-		lazy = true,
 		event = "BufReadPost",
-		config = function()
-			require("spectre").setup {
-				live_update = true,
-				mapping = {
-					["change_replace_sed"] = {
-						map = "<LocalLeader>trs",
-						cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
-						desc = "replace: Using sed",
-					},
-					["change_replace_oxi"] = {
-						map = "<LocalLeader>tro",
-						cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
-						desc = "replace: Using oxi",
-					},
-					["toggle_live_update"] = {
-						map = "<LocalLeader>tu",
-						cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
-						desc = "replace: update live changes",
-					},
-					-- only work if the find_engine following have that option
-					["toggle_ignore_case"] = {
-						map = "<LocalLeader>ti",
-						cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
-						desc = "replace: toggle ignore case",
-					},
-					["toggle_ignore_hidden"] = {
-						map = "<LocalLeader>th",
-						cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
-						desc = "replace: toggle search hidden",
-					},
+		keys = {
+			{
+				"<Leader>so",
+				function() require("spectre").open() end,
+				desc = "replace: Open panel",
+			},
+			{
+				"<Leader>so",
+				function() require("spectre").open_visual() end,
+				desc = "replace: Open panel",
+				mode = "v",
+			},
+			{
+				"<Leader>sw",
+				function() require("spectre").open_visual { select_word = true } end,
+				desc = "replace: Replace word under cursor",
+			},
+			{
+				"<Leader>sp",
+				function() require("spectre").open_file_search() end,
+				desc = "replace: Replace word under file search",
+			},
+		},
+		opts = {
+			live_update = true,
+			mapping = {
+				["change_replace_sed"] = {
+					map = "<LocalLeader>trs",
+					cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
+					desc = "replace: Using sed",
 				},
-			}
-			k.nvim_register_mapping {
-				["v|<Leader>so"] = k.callback(function() require("spectre").open_visual() end)
-					:with_defaults "replace: Open panel",
-				["n|<Leader>so"] = k.callback(function() require("spectre").open() end)
-					:with_defaults "replace: Open panel",
-				["n|<Leader>sw"] = k.callback(
-					function() require("spectre").open_visual { select_word = true } end
-				):with_defaults "replace: Replace word under cursor",
-				["n|<Leader>sp"] = k.callback(function() require("spectre").open_file_search() end)
-					:with_defaults "replace: Replace word under file search",
-			}
-		end,
+				["change_replace_oxi"] = {
+					map = "<LocalLeader>tro",
+					cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
+					desc = "replace: Using oxi",
+				},
+				["toggle_live_update"] = {
+					map = "<LocalLeader>tu",
+					cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
+					desc = "replace: update live changes",
+				},
+				-- only work if the find_engine following have that option
+				["toggle_ignore_case"] = {
+					map = "<LocalLeader>ti",
+					cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
+					desc = "replace: toggle ignore case",
+				},
+				["toggle_ignore_hidden"] = {
+					map = "<LocalLeader>th",
+					cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
+					desc = "replace: toggle search hidden",
+				},
+			},
+		},
 	},
 	-- NOTE: terminal-in-terminal PacMan (also we only really need this with LspAttach)
 	{
 		"akinsho/toggleterm.nvim",
-		lazy = true,
 		cmd = { "ToggleTerm" },
 		module = true,
 		opts = {
@@ -704,14 +778,12 @@ require("lazy").setup({
 	-- NOTE: all specific language plugins
 	{
 		"fatih/vim-go",
-		lazy = true,
 		ft = "go",
 		run = ":GoInstallBinaries",
 		dependencies = { { "junegunn/fzf", lazy = true, build = ":call fzf#install()" } },
 	},
 	{
 		"jose-elias-alvarez/typescript.nvim",
-		lazy = true,
 		ft = { "typescript", "tsx" },
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
@@ -746,7 +818,6 @@ require("lazy").setup({
 	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
 	{
 		"simrat39/rust-tools.nvim",
-		lazy = true,
 		ft = "rust",
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
@@ -811,7 +882,6 @@ require("lazy").setup({
 	},
 	{
 		"p00f/clangd_extensions.nvim",
-		lazy = true,
 		ft = { "c", "cpp", "hpp", "h" },
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
@@ -914,7 +984,8 @@ require("lazy").setup({
 			}
 		end,
 	},
-	{ "b0o/SchemaStore.nvim", version = false, lazy = true, ft = { "json", "yaml", "yml" } },
+	---@diagnostic disable-next-line: assign-type-mismatch
+	{ "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
 	-- NOTE: format for days
 	{
 		"jose-elias-alvarez/null-ls.nvim",
@@ -1016,7 +1087,6 @@ require("lazy").setup({
 	-- NOTE: lua related
 	{
 		"ii14/neorepl.nvim",
-		lazy = true,
 		ft = "lua",
 		keys = {
 			{
@@ -1036,15 +1106,18 @@ require("lazy").setup({
 			},
 		},
 	},
+	-- NOTE: nice winbar
 	{
 		"utilyre/barbecue.nvim",
 		name = "barbecue",
+		event = "LspAttach",
 		version = "*",
-		dependencies = {
-			"SmiteshP/nvim-navic",
-			"nvim-tree/nvim-web-devicons", -- optional dependency
+		dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
+		opts = {
+			attach_navic = false, -- handled via on_attach hooks
+			exclude_filetypes = { "toggleterm", "Scratch" },
+			symbols = { separator = icons.ui_space.Separator },
 		},
-		opts = { attach_navic = false },
 	},
 	-- NOTE: lspconfig
 	{
@@ -1307,7 +1380,6 @@ require("lazy").setup({
 	-- NOTE: lets do some dap
 	{
 		"mfussenegger/nvim-dap",
-		lazy = true,
 		dependencies = {
 			-- Creates a beautiful debugger UI
 			"rcarriga/nvim-dap-ui",
@@ -1411,7 +1483,6 @@ require("lazy").setup({
 	-- NOTE: Setup completions.
 	{
 		"petertriho/cmp-git",
-		lazy = true,
 		dependencies = { "nvim-lua/plenary.nvim" },
 		ft = { "gitcommit", "octo", "neogitCommitMessage" },
 		opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
@@ -1419,7 +1490,7 @@ require("lazy").setup({
 	},
 	{
 		"hrsh7th/nvim-cmp",
-		lazy = true,
+		---@diagnostic disable-next-line: assign-type-mismatch
 		version = false,
 		event = "InsertEnter",
 		dependencies = {
@@ -1431,7 +1502,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-buffer",
 			{
 				"L3MON4D3/LuaSnip",
-				lazy = true,
 				dependencies = { "rafamadriz/friendly-snippets" },
 				config = function()
 					require("luasnip").config.set_config {
@@ -1506,6 +1576,12 @@ require("lazy").setup({
 				return col == 0 or current_line:sub(col, col):match "%s"
 			end
 
+			---@param str string
+			---@return string
+			local replace_termcodes = function(str)
+				return vim.api.nvim_replace_termcodes(str, true, true, true)
+			end
+
 			local opts = {
 				preselect = cmp.PreselectMode.None,
 				snippet = {
@@ -1537,9 +1613,9 @@ require("lazy").setup({
 						elseif cmp.visible() then
 							cmp.select_next_item()
 						elseif require("luasnip").expand_or_jumpable() then
-							vim.fn.feedkeys(k.replace_termcodes "<Plug>luasnip-expand-or-jump", "")
+							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
 						elseif check_backspace() then
-							vim.fn.feedkeys(k.replace_termcodes "<Tab>", "n")
+							vim.fn.feedkeys(replace_termcodes "<Tab>", "n")
 						elseif has_words_before() then
 							cmp.complete()
 						else
@@ -1550,7 +1626,7 @@ require("lazy").setup({
 						if cmp.visible() then
 							cmp.select_prev_item()
 						elseif require("luasnip").jumpable(-1) then
-							vim.fn.feedkeys(k.replace_termcodes "<Plug>luasnip-jump-prev", "")
+							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
 						elseif has_words_before() then
 							cmp.complete()
 						else
@@ -1589,7 +1665,6 @@ require("lazy").setup({
 	{
 		"epwalsh/obsidian.nvim",
 		ft = "markdown",
-		lazy = true,
 		cmd = {
 			"ObsidianBacklinks",
 			"ObsidianFollowLink",
@@ -1597,43 +1672,60 @@ require("lazy").setup({
 			"ObsidianOpen",
 			"ObsidianLink",
 		},
-		config = function()
-			require("obsidian").setup {
-				dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/"
-					or vim.fn.getcwd(),
-				use_advanced_uri = true,
-				completion = { nvim_cmp = true },
-				note_frontmatter_func = function(note)
-					local out = { id = note.id, tags = note.tags }
-					-- `note.metadata` contains any manually added fields in the frontmatter.
-					-- So here we just make sure those fields are kept in the frontmatter.
-					if
-						note.metadata ~= nil
-						and require("obsidian").util.table_length(note.metadata) > 0
-					then
-						for key, value in pairs(note.metadata) do
-							out[key] = value
-						end
-					end
-					return out
-				end,
-			}
-
-			k.nvim_register_mapping {
-				["n|<Leader>gf"] = k.callback(function()
+		keys = {
+			{
+				"<Leader>gf",
+				function()
 					if require("obsidian").utils.cursor_on_markdown_link() then
 						pcall(vim.cmd.ObsidianFollowLink)
 					end
-				end):with_defaults "obsidian: Follow link",
-				["n|<LocalLeader>obl"] = k.cr("ObsidianBacklinks")
-					:with_defaults "obsidian: Backlinks",
-				["n|<LocalLeader>on"] = k.cr("ObsidianNew"):with_defaults "obsidian: New notes",
-				["n|<LocalLeader>oo"] = k.cr("ObsidianOpen"):with_defaults "obsidian: Open",
-			}
+				end,
+				desc = "obsidian: follow link",
+			},
+			{
+				"<LocalLeader>obl",
+				"<cmd>ObsidianBacklinks<cr>",
+				desc = "obsidian: go backlinks",
+			},
+			{
+				"<LocalLeader>on",
+				"<cmd>ObsidianNew<cr>",
+				desc = "obsidian: new notes",
+			},
+			{
+				"<LocalLeader>op",
+				"<cmd>ObsidianOpen<cr>",
+				desc = "obsidian: open",
+			},
+		},
+		opts = {
+			dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/"
+				or vim.fn.getcwd(),
+			use_advanced_uri = true,
+			completion = { nvim_cmp = true },
+		},
+		config = function(_, opts)
+			opts.note_frontmatter_func = function(note)
+				local out = { id = note.id, tags = note.tags }
+				-- `note.metadata` contains any manually added fields in the frontmatter.
+				-- So here we just make sure those fields are kept in the frontmatter.
+				if
+					note.metadata ~= nil
+					and require("obsidian").util.table_length(note.metadata) > 0
+				then
+					for key, value in pairs(note.metadata) do
+						out[key] = value
+					end
+				end
+				return out
+			end
+
+			require("obsidian").setup(opts)
 		end,
 	},
 }, {
 	install = { colorscheme = { "rose-pine" } },
+	defaults = { lazy = true },
 	change_detection = { notify = false },
 	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 	checker = { enable = true },

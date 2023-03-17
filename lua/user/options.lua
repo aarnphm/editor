@@ -1,5 +1,5 @@
--- stylua: ignore
-local k = require "keybind"
+local api     = vim.api
+local autocmd = vim.api.nvim_create_autocmd
 
 -- Some defaults and don't question it
 vim.o.wrap           = false                 -- egh i don't like wrap
@@ -22,6 +22,7 @@ vim.o.undolevels     = 9999                  -- infinite undo
 vim.o.shortmess      = "aoOTIcF"             -- insanely complex shortmess, but its cleannn
 
 -- I refuse to have a complex statusline, but lualine is cool tho
+vim.o.laststatus = 0
 vim.o.statusline = "%f %m %= %=%y %l:%c ♥ "
 
 -- NOTE: "1jcroql"
@@ -48,9 +49,9 @@ vim.o.ignorecase = true
 vim.o.infercase  = true
 vim.o.grepprg    = "rg --hidden --vimgrep --smart-case --"  -- also its 2023 use rg
 
+vim.o.linebreak   = true
 vim.o.jumpoptions = "stack"
-vim.o.linebreak = true
-vim.o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
+vim.o.listchars   = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 
 -- Spaces and tabs config
 vim.o.tabstop     = 4
@@ -66,7 +67,7 @@ vim.o.splitbelow    = true
 vim.o.splitright    = true
 vim.o.timeout       = true
 vim.o.timeoutlen    = 200
-vim.o.updatetime    = 250
+vim.o.updatetime    = 200
 vim.o.virtualedit   = "block"
 vim.o.whichwrap     = "h,l,<,>,[,],~"
 
@@ -80,9 +81,9 @@ vim.opt.wildignore:append { "Cargo.lock", "lazy-lock.json" }
 
 if vim.loop.os_uname().sysname == "Darwin" then
 	vim.g.clipboard = {
-		name = "macOS-clipboard",
-		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
-		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
+		name          = "macOS-clipboard",
+		copy          = { ["+"] = "pbcopy",  ["*"] = "pbcopy"  },
+		paste         = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
 		cache_enabled = 0,
 	}
 end
@@ -93,133 +94,175 @@ for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 end
 
 vim.diagnostic.config {
-	virtual_text = false,
-	underline = false,
+	virtual_text     = false,
+	underline        = false,
 	update_in_insert = false,
-	severity_sort = true,
+	severity_sort    = true,
 }
 
--- NOTE: diagnostic on hover
-vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+-- map leader to <Space> and localeader to +
+vim.g.mapleader      = " "
+vim.g.maplocalleader = "+"
+
+vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
+
+-- NOTE: Keymaps that are useful, use it and never come back.
+local map = function(mode, lhs, rhs, opts)
+    opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+    vim.keymap.set(mode, lhs, rhs, opts)
+end
+
+map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })
+map("v", "<", "<gv", { desc = "edit: Decrease indent" })
+map("v", ">", ">gv", { desc = "edit: Increase indent" })
+map("c", "W!!", "execute 'silent! write !sudo tee % >/dev/null' <bar> edit!", { desc = "edit: Save file using sudo" })
+map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
+map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
+map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
+map("n", "<C-h>", "<C-w>h", { desc = "window: Focus left" })
+map("n", "<C-l>", "<C-w>l", { desc = "window: Focus right" })
+map("n", "<C-j>", "<C-w>j", { desc = "window: Focus down" })
+map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up" })
+map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
+map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
+map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
+map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
+map("n", "<leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
+map("n", "<Leader>.", "<cmd>bnext<cr>", { desc = "buffer: next" })
+map("n", "<Leader>,", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
+map("n", "<Leader>q", "<cmd>copen<cr>", { desc = "quickfix: Open quickfix" })
+map("n", "<Leader>l", "<cmd>lopen<cr>", { desc = "quickfix: Open location list" })
+map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
+map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
+map("n", "\\", ":let @/=''<CR>:noh<CR>", { silent = true, desc = "command: Search command history" })
+map("n", "<LocalLeader>l", "<cmd>set list! list?<cr>", { silent = false, desc = "misc: toggle invisible characters" })
+
+local resize_value = 10
+map("n", "<LocalLeader>]", string.format("<cmd>vertical resize -%s<cr>", resize_value), { noremap = false, desc = "windows: resize right 10px" })
+map("n", "<LocalLeader>[", string.format("<cmd>vertical resize +%s<cr>", resize_value), { noremap = false, desc = "windows: resize left 10px" })
+map("n", "<LocalLeader>-", string.format("<cmd>resize -%s<cr>", resize_value), { noremap = false, desc = "windows: resize down 10px" })
+map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", resize_value), { noremap = false, desc = "windows: resize up 10px" })
+
+-- toggle format
+map("n", "<LocalLeader>ft", require('lsp').toggle, { desc = "lsp: Toggle formatter" })
+map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
+
+-- terminal-in-terminal bullcrap
+map("n", "<C-\\>", "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>", { desc = "terminal: Toggle horizontal" })
+map("i", "<C-\\>", "<Esc><cmd>ToggleTerm direction=horizontal<cr>", { desc = "terminal: Toggle horizontal" })
+map("t", "<C-\\>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle horizontal" })
+map("n", "<C-t>", "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>", { desc = "terminal: Toggle vertical" })
+map("i", "<C-t>", "<Esc><cmd>ToggleTerm direction=vertical<cr>", { desc = "terminal: Toggle vertical" })
+map("t", "<C-t>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle vertical" })
+
+-- NOTE: some events
+
+local augroup = function(name)
+    return api.nvim_create_augroup("simple_"..name, {clear = true})
+end
+
+-- diagnostic on hover
+autocmd({ "CursorHold", "CursorHoldI" }, {
+    group = augroup("diagnostic"),
 	pattern = "*",
 	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
 })
 
--- map leader to <Space> and localeader to +
-vim.g.mapleader = " "
-vim.g.maplocalleader = "+"
-vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
+-- close some filetypes with <q>
+autocmd("FileType", {
+    group = augroup("filetype"),
+	pattern = {
+		"qf",
+		"help",
+		"man",
+		"nowrite", -- fugitive
+		"prompt",
+		"spectre_panel",
+		"startuptime",
+		"tsplayground",
+		"neorepl",
+		"alpha",
+		"toggleterm",
+		"health",
+		"PlenaryTestPopup",
+		"nofile",
+		"scratch",
+		"",
+	},
+	callback = function(event)
+		vim.bo[event.buf].buflisted = false
+		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
+	end,
+})
 
--- TODO: migrate these to vim.keymap.set.
--- imo it is a lot more readable and this DSL is simply using the same API.
-k.nvim_register_mapping {
-	["n|<S-Tab>"] = k.cr("normal za"):with_defaults "edit: Toggle code fold",
-	-- Visual
-	["v|J"] = k.cmd(":m '>+1<CR>gv=gv"):with_desc "edit: Move this line down",
-	["v|K"] = k.cmd(":m '<-2<CR>gv=gv"):with_desc "edit: Move this line up",
-	["v|<"] = k.cmd("<gv"):with_desc "edit: Decrease indent",
-	["v|>"] = k.cmd(">gv"):with_desc "edit: Increase indent",
-	["c|W!!"] = k.cmd("execute 'silent! write !sudo tee % >/dev/null' <bar> edit!")
-		:with_desc "editc: Save file using sudo",
-	-- yank to end of line
-	["n|Y"] = k.cmd("y$"):with_desc "edit: Yank text to EOL",
-	["n|D"] = k.cmd("d$"):with_desc "edit: Delete text to EOL",
-	["n|J"] = k.cmd("mzJ`z"):with_noremap():with_desc "edit: Join next line",
-	-- window movement
-	["n|<C-h>"] = k.cmd("<C-w>h"):with_noremap():with_desc "window: Focus left",
-	["n|<C-l>"] = k.cmd("<C-w>l"):with_noremap():with_desc "window: Focus right",
-	["n|<C-j>"] = k.cmd("<C-w>j"):with_noremap():with_desc "window: Focus down",
-	["n|<C-k>"] = k.cmd("<C-w>k"):with_noremap():with_desc "window: Focus up",
-	["n|<LocalLeader>sw"] = k.cmd("<C-w>r"):with_noremap():with_desc "window: swap position",
-	["n|<LocalLeader>vs"] = k.cmd("<C-w>v"):with_defaults "edit: split window vertically",
-	["n|<LocalLeader>hs"] = k.cmd("<C-w>s"):with_defaults "edit: split window horizontally",
-	["n|<LocalLeader>cd"] = k.cmd("lcd %:p:h"):with_defaults "misc: change directory to current file buffer",
-	["n|<leader>qq"] = k.cr("wqa"):with_defaults "editor: write quit all",
-	["n|<Leader>."] = k.cr("bnext"):with_defaults "buffer: next",
-	["n|<Leader>,"] = k.cr("bprevious"):with_defaults "buffer: previous",
-	-- quickfix
-	["n|<Leader>q"] = k.cr("copen"):with_defaults "quickfix: Open quickfix",
-	["n|<Leader>Q"] = k.cr("cclose"):with_defaults "quickfix: Close quickfix",
-	["n|<Leader>l"] = k.cr("lopen"):with_defaults "quickfix: Open location list",
-	["n|<Leader>L"] = k.cr("lclose"):with_defaults "quickfix: Close location list",
-	-- remap command key to ;
-	["n|;"] = k.cmd(":"):with_noremap():with_desc "command: Enter command mode",
-	["n|\\"] = k.cmd(":let @/=''<CR>:noh<CR>"):with_noremap():with_desc "edit: clean hightlight",
-	["n|<LocalLeader>]"] = k.cr("vertical resize -10")
-		:with_silent()
-		:with_desc "windows: resize right 10px",
-	["n|<LocalLeader>["] = k.cr("vertical resize +10")
-		:with_silent()
-		:with_desc "windows: resize left 10px",
-	["n|<LocalLeader>-"] = k.cr("resize -5"):with_silent():with_desc "windows: resize down 5px",
-	["n|<LocalLeader>="] = k.cr("resize +5"):with_silent():with_desc "windows: resize up 5px",
-	["n|<LocalLeader>l"] = k.cmd(":set list! list?<CR>")
-		:with_noremap()
-		:with_desc "edit: toggle invisible characters",
-	["n|<LocalLeader>ft"] = k.callback(require("lsp").toggle):with_defaults "lsp: Toggle formatter",
-	["n|<LocalLeader>p"] = k.cr("Lazy"):with_defaults "package: show manager",
-	-- telescope
-	["n|<Leader>f"] = k.callback(
-		function()
-			require("telescope.builtin").find_files {
-				find_command = {
-					"fd",
-					"-H",
-					"-tf",
-					"-E",
-					"lazy-lock.json",
-					"--strip-cwd-prefix",
-				},
-				theme = "dropdown",
-				previewer = false,
-			}
-		end
-	):with_defaults "find: file in current directory",
-	["n|<Leader>r"] = k.callback(
-		function()
-			require("telescope.builtin").git_files {
+-- Makes switching between buffer and termmode feels like normal mode
+autocmd("TermOpen", {
+    group = augroup("term"),
+	pattern = "term://*",
+	callback = function()
+		local opts = { noremap = true, silent = true }
+		api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
+	end,
+})
 
-				find_command = {
-					"fd",
-					"-H",
-					"-tf",
-					"-E",
-					"lazy-lock.json",
-					"--strip-cwd-prefix",
-				},
-				theme = "dropdown",
-				previewer = false,
-			}
-		end
-	):with_defaults "find: files in git repository",
-	["n|<Leader>'"] = k.callback(function() require("telescope.builtin").live_grep {} end)
-		:with_defaults "find: words",
-	["n|<Leader>w"] = k.callback(
-		function() require("telescope").extensions.live_grep_args.live_grep_args() end
-	):with_defaults "find: live grep args",
-	["n|<Leader>/"] = k.cr("Telescope grep_string"):with_defaults "find: Current word under cursor.",
-	["n|<Leader>b"] = k.cr("Telescope buffers show_all_buffers=true previewer=false")
-		:with_defaults "find: Current buffers",
-	["n|<Leader>n"] = k.cr("enew"):with_defaults "buffer: new",
-	["n|<C-p>"] = k.callback(function()
-		require("telescope.builtin").keymaps {
-			lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-			layout_config = {
-				width = 0.6,
-				height = 0.6,
-				prompt_position = "top",
-			},
-		}
-	end):with_defaults "tools: Show keymap legends",
-	-- NOTE: toggleterm
-	["n|<C-\\>"] = k.cr([[execute v:count . "ToggleTerm direction=horizontal"]])
-		:with_defaults "terminal: Toggle horizontal",
-	["i|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=horizontal<CR>")
-		:with_defaults "terminal: Toggle horizontal",
-	["t|<C-\\>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults "terminal: Toggle horizontal",
-	["n|<C-t>"] = k.cr([[execute v:count . "ToggleTerm direction=vertical"]])
-		:with_defaults "terminal: Toggle vertical",
-	["i|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm direction=vertical<CR>")
-		:with_defaults "terminal: Toggle vertical",
-	["t|<C-t>"] = k.cmd("<Esc><Cmd>ToggleTerm<CR>"):with_defaults "terminal: Toggle vertical",
-}
+-- Check if we need to reload the file when it changed
+autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+    group = augroup("checktime"),
+	pattern = "*",
+	command = "checktime",
+})
+autocmd("VimResized", { group = augroup("resized"), command = "tabdo wincmd =" })
+
+-- Set noundofile for temporary files
+autocmd("BufWritePre", {
+	group = augroup("tempfile"),
+	pattern = { "/tmp/*", "*.tmp", "*.bak" },
+	command = "setlocal noundofile",
+})
+-- set filetype for header files
+autocmd({ "BufNewFile", "BufRead" }, {
+	group = augroup("cpp_headers"),
+	pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" },
+	command = "setlocal filetype=c",
+})
+
+-- Set mapping for switching header and source file
+autocmd("FileType", {
+	group = augroup("cpp"),
+	pattern = "c,cpp",
+	callback = function(event)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>h",
+			":ClangdSwitchSourceHeaderVSplit<CR>",
+			{ noremap = true }
+		)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>v",
+			":ClangdSwitchSourceHeaderSplit<CR>",
+			{ noremap = true }
+		)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>oh",
+			":ClangdSwitchSourceHeader<CR>",
+			{ noremap = true }
+		)
+	end,
+})
+
+-- Highlight on yank
+autocmd("TextYankPost", {
+	group = augroup("highlight_yank"),
+	pattern = "*",
+	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 40 } end,
+})
