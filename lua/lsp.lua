@@ -125,6 +125,10 @@ M.on_attach = function(client, bufnr)
 		})
 	end
 
+	if client.server_capabilities["documentSymbolProvider"] then
+		require("nvim-navic").attach(client, bufnr)
+	end
+
 	local LazyKeys = require "lazy.core.handler.keys"
 	local keymaps = {} ---@type table<string,LazyKeys|{has?:string}>
 

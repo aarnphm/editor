@@ -23,10 +23,8 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup({
+	"lewis6991/impatient.nvim",
 	"nvim-lua/plenary.nvim",
-	"tpope/vim-sleuth",
-	-- NOTE: cuz it is cool
-	{ "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" }, lazy = true },
 	{
 		"mtth/scratch.vim",
 		lazy = true,
@@ -48,6 +46,7 @@ require("lazy").setup({
 		},
 	},
 	-- NOTE: nice git integration and UI
+	{ "lewis6991/satellite.nvim", config = true, lazy = true },
 	{
 		"lewis6991/gitsigns.nvim",
 		lazy = true,
@@ -436,13 +435,21 @@ require("lazy").setup({
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "BufReadPost",
-		dependencies = { "nvim-telescope/telescope-live-grep-args.nvim" },
+		dependencies = {
+			"nvim-telescope/telescope-live-grep-args.nvim",
+			{ "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
+		},
 		config = function()
 			require("telescope").setup {
 				defaults = {
 					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
 					selection_caret = icons.ui_space.DoubleSeparator,
-					file_ignore_patterns = { ".git/" },
+					file_ignore_patterns = {
+						".git/",
+						"node_modules/",
+						"static_content/",
+						"lazy-lock.json",
+					},
 					mappings = {
 						i = {
 							["<C-a>"] = { "<esc>0i", type = "command" },
@@ -468,6 +475,12 @@ require("lazy").setup({
 						},
 					},
 				},
+				fzf = {
+					fuzzy = true, -- false will only do exact matching
+					override_generic_sorter = true, -- override the generic sorter
+					override_file_sorter = true, -- override the file sorter
+					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+				},
 				pickers = {
 					find_files = { hidden = true },
 					live_grep = {
@@ -485,6 +498,7 @@ require("lazy").setup({
 				},
 			}
 			require("telescope").load_extension "live_grep_args"
+			require("telescope").load_extension "fzf"
 		end,
 	},
 	-- NOTE: better nvim-tree.lua
@@ -978,7 +992,6 @@ require("lazy").setup({
 					d.buf,
 					d.buildifier,
 					d.stylelint,
-					d.vulture.with { extra_args = { "--min-confidence 70" } },
 					d.vint,
 
 					-- NOTE: code actions
@@ -1023,6 +1036,16 @@ require("lazy").setup({
 			},
 		},
 	},
+	{
+		"utilyre/barbecue.nvim",
+		name = "barbecue",
+		version = "*",
+		dependencies = {
+			"SmiteshP/nvim-navic",
+			"nvim-tree/nvim-web-devicons", -- optional dependency
+		},
+		opts = { attach_navic = false },
+	},
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
@@ -1033,6 +1056,7 @@ require("lazy").setup({
 			{ "dnlhc/glance.nvim", cmd = "Glance", lazy = true, config = true },
 			{
 				"lewis6991/hover.nvim",
+				enabled = false,
 				lazy = true,
 				config = function()
 					require("hover").setup {
@@ -1399,6 +1423,12 @@ require("lazy").setup({
 		version = false,
 		event = "InsertEnter",
 		dependencies = {
+			"onsails/lspkind.nvim",
+			"saadparwaiz1/cmp_luasnip",
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-nvim-lua",
+			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-buffer",
 			{
 				"L3MON4D3/LuaSnip",
 				lazy = true,
@@ -1413,12 +1443,6 @@ require("lazy").setup({
 					require("luasnip.loaders.from_vscode").lazy_load()
 				end,
 			},
-			{ "onsails/lspkind.nvim" },
-			{ "saadparwaiz1/cmp_luasnip" },
-			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "hrsh7th/cmp-nvim-lua" },
-			{ "hrsh7th/cmp-path" },
-			{ "hrsh7th/cmp-buffer" },
 			{
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",

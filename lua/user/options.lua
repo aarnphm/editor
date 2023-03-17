@@ -133,6 +133,7 @@ k.nvim_register_mapping {
 	["n|<LocalLeader>sw"] = k.cmd("<C-w>r"):with_noremap():with_desc "window: swap position",
 	["n|<LocalLeader>vs"] = k.cmd("<C-w>v"):with_defaults "edit: split window vertically",
 	["n|<LocalLeader>hs"] = k.cmd("<C-w>s"):with_defaults "edit: split window horizontally",
+	["n|<LocalLeader>cd"] = k.cmd("lcd %:p:h"):with_defaults "misc: change directory to current file buffer",
 	["n|<leader>qq"] = k.cr("wqa"):with_defaults "editor: write quit all",
 	["n|<Leader>."] = k.cr("bnext"):with_defaults "buffer: next",
 	["n|<Leader>,"] = k.cr("bprevious"):with_defaults "buffer: previous",
