@@ -28,10 +28,10 @@ require("lazy").setup({
 		opts = {
 			input = {
 				enabled = true,
-				override = function(conf)
-					conf.col = -1
-					conf.row = 0
-					return conf
+				override = function(config)
+					config.col = -1
+					config.row = 0
+					return config
 				end,
 			},
 			select = {
@@ -1856,6 +1856,7 @@ require("lazy").setup({
 				"compiler",
 				"bugreport",
 				"ftplugin",
+				"editorconfig",
 			},
 		},
 	},

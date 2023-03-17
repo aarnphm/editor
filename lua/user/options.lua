@@ -8,7 +8,7 @@ local M = {
     -- Whether to show the diagnostic popup
 	diagnostic = {
 		use_virtual_text = false,
-		show_float       = true,
+		show_float       = false,
 	},
 	-- Windows opts
     window = { resize = 10 },
