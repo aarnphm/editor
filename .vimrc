@@ -13,7 +13,6 @@ endif
 " auto source vimrc
 augroup vimrc
   autocmd!
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
   autocmd! BufWritePost $MYVIMRC source $MYVIMRC | echom "Reloaded $MYVIMRC"
 augroup END
 
@@ -55,7 +54,7 @@ Plug 'lervag/vimtex'
 
 call plug#end()
 
-let mapleader='<Space>'
+let mapleader=' '
 let maplocalleader='+'
 let g:is_gui=has('gui_running')
 let g:is_termguicolors = has('termguicolors') && !g:is_gui && $COLORTERM isnot# 'xterm-256color'
@@ -288,7 +287,8 @@ nnoremap <leader>l :set list! list?<CR>
 nnoremap <leader>t :%s/\s\+$//e<CR>
 " Remove the Windows ^M - when the encodings gets messed up
 " for somereason bufread doesn't catch  it first
-nnoremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm nnoremap <leader>w :set wrap! wrap?<CR>
+nnoremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+nnoremap <leader>w :set wrap! wrap?<CR>
 " When you press <leader>r you can search and replace the selected text
 nnoremap <leader>ml :call AppendModeLine()<CR>
 " Visual mode pressing * or # searches for the current selection
@@ -537,12 +537,12 @@ let g:fzf_colors =
 " When set, CTRL-N and CTRL-P will be bound to 'next-history' and
 " 'previous-history' instead of 'down' and 'up'.
 let g:fzf_history_dir = '~/.local/share/fzf-history'
-nnoremap <C-f> :Files <CR>
-nnoremap <C-g> :Lines <CR>
-nnoremap <C-b> :Buffers <CR>
+nnoremap <silent><nowait> <C-f> :Files <CR>
+nnoremap <silent><nowait> <C-g> :Lines <CR>
+nnoremap <silent><nowait> <C-b> :Buffers <CR>
 nnoremap <F7> :Snippets <CR>
 nnoremap <F8> :Colors <CR>
-nnoremap <silent><nowait> <LocalLeader>km :Maps <CR>
+nnoremap <silent><nowait> <C-p> :Maps <CR>
 
 let g:coc_global_extensions = ['coc-texlab', 'coc-lua', 'coc-json', 'coc-pyright', 'coc-java', 'coc-tsserver']
 if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
