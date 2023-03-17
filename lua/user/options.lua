@@ -96,6 +96,11 @@ vim.opt.wildignore   = "__pycache__"
 vim.opt.wildignore:append { "*.o", "*~", "*.pyc", "*pycache*" }
 vim.opt.wildignore:append { "Cargo.lock", "lazy-lock.json" }
 
+-- disable some default providers
+for _, provider in ipairs { "node", "perl", "python3", "ruby" } do
+  vim.g["loaded_" .. provider .. "_provider"] = 0
+end
+
 if vim.loop.os_uname().sysname == "Darwin" then
 	vim.g.clipboard = {
 		name          = "macOS-clipboard",
@@ -298,5 +303,32 @@ autocmd("TextYankPost", {
 	pattern = "*",
 	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
 })
+
+M._capabilities = nil
+
+M.gen_capabilities = function()
+	if not M._capabilities then
+		local capabilities = vim.lsp.protocol.make_client_capabilities()
+		local ok, cmp = pcall(require, "cmp_nvim_lsp")
+		if ok then capabilities = cmp.default_capabilities(capabilities) end
+
+		-- NOTE: some custom completion options
+		capabilities.textDocument.completion.completionItem = {
+			documentationFormat = { "markdown", "plaintext" },
+			snippetSupport = true,
+			preselectSupport = true,
+			insertReplaceSupport = true,
+			labelDetailsSupport = true,
+			deprecatedSupport = true,
+			commitCharactersSupport = true,
+			tagSupport = { valueSet = { 1 } },
+			resolveSupport = {
+				properties = { "documentation", "detail", "additionalTextEdits" },
+			},
+		}
+		M._capabilities = capabilities
+	end
+	return M._capabilities
+end
 
 return M

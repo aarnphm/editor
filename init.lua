@@ -831,10 +831,6 @@ require("lazy").setup({
 		ft = { "typescript", "tsx" },
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			local ok, cmp = pcall(require, "cmp_nvim_lsp")
-			if ok then capabilities = cmp.default_capabilities(capabilities) end
-
 			require("user.utils").on_attach(function(client, buffer)
 				if client.name == "tsserver" then
 					vim.keymap.set(
@@ -853,7 +849,7 @@ require("lazy").setup({
 			end)
 			require("typescript").setup {
 				server = {
-					capabilities = capabilities,
+					capabilities = M.gen_capabilities(),
 					completions = { completeFunctionCalls = true },
 				},
 			}
@@ -865,10 +861,6 @@ require("lazy").setup({
 		ft = "rust",
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			local ok, cmp = pcall(require, "cmp_nvim_lsp")
-			if ok then capabilities = cmp.default_capabilities(capabilities) end
-
 			local get_rust_adapters = function()
 				if vim.loop.os_uname().sysname == "Windows_NT" then
 					return {
@@ -904,7 +896,7 @@ require("lazy").setup({
 						vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
 						-- stylua: ignore end
 					end,
-					capabilities = capabilities,
+					capabilities = M.gen_capabilities(),
 					standalone = true,
 					settings = {
 						["rust-analyzer"] = {
@@ -930,9 +922,7 @@ require("lazy").setup({
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
 			local lspconfig = require "lspconfig"
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			local ok, cmp = pcall(require, "cmp_nvim_lsp")
-			if ok then capabilities = cmp.default_capabilities(capabilities) end
+			local capabilities = M.gen_capabilities()
 
 			capabilities.offsetEncoding = { "utf-16", "utf-8" }
 
@@ -1354,13 +1344,9 @@ require("lazy").setup({
 
 			require("user.utils").on_attach(require("lsp").on_attach)
 
-			local capabilities = require("cmp_nvim_lsp").default_capabilities(
-				vim.lsp.protocol.make_client_capabilities()
-			)
-
 			local mason_handler = function(server)
 				local server_opts = vim.tbl_deep_extend("force", {
-					capabilities = vim.deepcopy(capabilities),
+					capabilities = M.gen_capabilities(),
 					flags = { debounce_text_changes = 150 },
 				}, servers[server] or {})
 
@@ -1864,8 +1850,12 @@ require("lazy").setup({
 				"zip",
 				"rplugin",
 				"zipPlugin",
-				"editorconfig",
-				"spellfile",
+				"syntax",
+				"synmenu",
+				"optwin",
+				"compiler",
+				"bugreport",
+				"ftplugin",
 			},
 		},
 	},
