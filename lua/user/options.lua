@@ -1,6 +1,7 @@
 local api     = vim.api
 local autocmd = vim.api.nvim_create_autocmd
 
+-- simple configuration
 local M = {
     -- Whether to make completion fancy or simple border
     simple = true,
@@ -174,6 +175,13 @@ if M.show_float_diagnostic then
     })
 end
 
+-- auto place to last edit
+autocmd("BufReadPost", {
+	group = augroup("last_edit"),
+	pattern = "*",
+	command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
+})
+
 -- close some filetypes with <q>
 autocmd("FileType", {
     group = augroup("filetype"),
@@ -211,6 +219,19 @@ autocmd("TermOpen", {
 		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
+	end,
+})
+
+-- Force write shada on leaving nvim
+autocmd("VimLeave", {
+	group = augroup("write_shada"),
+	pattern = "*",
+	callback = function(_)
+		if vim.fn.has "nvim" == 1 then
+			api.nvim_command [[wshada!]]
+		else
+			api.nvim_command [[wviminfo!]]
+		end
 	end,
 })
 
@@ -268,7 +289,7 @@ autocmd("FileType", {
 autocmd("TextYankPost", {
 	group = augroup("highlight_yank"),
 	pattern = "*",
-	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 40 } end,
+	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
 })
 
 return M

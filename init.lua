@@ -18,23 +18,24 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup({
+	-- NOTE: utilities
 	"lewis6991/impatient.nvim",
 	"nvim-lua/plenary.nvim",
+	"jghauser/mkdir.nvim",
+	{ "dstein64/vim-startuptime", cmd = "StartupTime" },
 	{
 		"stevearc/dressing.nvim",
-		init = function()
-			---@diagnostic disable-next-line: duplicate-set-field
-			vim.ui.select = function(...)
-				require("lazy").load { plugins = { "dressing.nvim" } }
-				return vim.ui.select(...)
-			end
-			---@diagnostic disable-next-line: duplicate-set-field
-			vim.ui.input = function(...)
-				require("lazy").load { plugins = { "dressing.nvim" } }
-				return vim.ui.input(...)
-			end
-		end,
+		opts = {
+			input = { enabled = true },
+			select = {
+				enabled = true,
+				backend = "telescope",
+				trim_prompt = true,
+			},
+		},
+		config = true,
 	},
+	{ "nmac427/guess-indent.nvim", event = "InsertEnter", config = true },
 	-- NOTE: cozy colorscheme
 	{
 		"rose-pine/neovim",
@@ -163,6 +164,7 @@ require("lazy").setup({
 				"markdown_inline",
 				"vim",
 				"yaml",
+				"go",
 			},
 			ignore_install = { "phpdoc", "gitcommit" },
 			indent = { enable = true },
@@ -181,9 +183,6 @@ require("lazy").setup({
 		config = function(_, opts)
 			if require("user.utils").has "typescript.nvim" then
 				vim.list_extend(opts.ensure_installed, { "typescript", "tsx" })
-			end
-			if require("user.utils").has "vim-go" then
-				vim.list_extend(opts.ensure_installed, { "go" })
 			end
 			if require("user.utils").has "SchemaStore.nvim" then
 				vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" })
@@ -776,12 +775,6 @@ require("lazy").setup({
 		config = true,
 	},
 	-- NOTE: all specific language plugins
-	{
-		"fatih/vim-go",
-		ft = "go",
-		run = ":GoInstallBinaries",
-		dependencies = { { "junegunn/fzf", lazy = true, build = ":call fzf#install()" } },
-	},
 	{
 		"jose-elias-alvarez/typescript.nvim",
 		ft = { "typescript", "tsx" },
@@ -1394,42 +1387,79 @@ require("lazy").setup({
 			-- see mason-nvim-dap README for more information
 			require("mason-nvim-dap").setup_handlers()
 
-			-- Basic debugging keymaps, feel free to change to your liking!
-			vim.keymap.set("n", "<F5>", dap.continue)
-			vim.keymap.set("n", "<F1>", dap.step_into)
-			vim.keymap.set("n", "<F2>", dap.step_over)
-			vim.keymap.set("n", "<F3>", dap.step_out)
-			vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint)
-			vim.keymap.set(
-				"n",
-				"<leader>B",
-				function() dap.set_breakpoint(vim.fn.input "Breakpoint condition: ") end
-			)
-
 			-- Dap UI setup
 			-- For more information, see |:help nvim-dap-ui|
 			dapui.setup {
-				-- Set icons to characters that are more likely to work in every terminal.
-				--    Feel free to remove or use ones that you like more! :)
-				--    Don't feel like these are good choices.
-				icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+				icons = {
+					expanded = icons.ui_space.ArrowOpen,
+					collapsed = icons.ui_space.ArrowClosed,
+					current_frame = icons.ui_space.Indicator,
+				},
+				layouts = {
+					{
+						elements = {
+							-- Provide as ID strings or tables with "id" and "size" keys
+							{
+								id = "scopes",
+								size = 0.25, -- Can be float or integer > 1
+							},
+							{ id = "breakpoints", size = 0.25 },
+							{ id = "stacks", size = 0.25 },
+							{ id = "watches", size = 0.25 },
+						},
+						size = 40,
+						position = "left",
+					},
+					{ elements = { "repl" }, size = 10, position = "bottom" },
+				},
 				controls = {
 					icons = {
-						pause = "⏸",
-						play = "▶",
-						step_into = "⏎",
-						step_over = "⏭",
-						step_out = "⏮",
-						step_back = "b",
-						run_last = "▶▶",
-						terminate = "⏹",
+						pause = icons.dap_space.Pause,
+						play = icons.dap_space.Play,
+						step_into = icons.dap_space.StepInto,
+						step_over = icons.dap_space.StepOver,
+						step_out = icons.dap_space.StepOut,
+						step_back = icons.dap_space.StepBack,
+						run_last = icons.dap_space.RunLast,
+						terminate = icons.dap_space.Terminate,
 					},
 				},
+				windows = { indent = 1 },
 			}
 
 			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
 			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
 			dap.listeners.before.event_exited["dapui_config"] = dapui.close
+
+			for _, v in ipairs {
+				"Breakpoint",
+				"BreakpointRejected",
+				"BreakpointCondition",
+				"LogPoint",
+				"Stopped",
+			} do
+				vim.fn.sign_define(
+					"Dap" .. v,
+					{ text = icons.dap_space[v], texthl = "Dap" .. v, line = "", numhl = "" }
+				)
+			end
+
+			-- Basic debugging keymaps, feel free to change to your liking!
+			vim.keymap.set("n", "<F6>", dap.continue, { desc = "dap: continue" })
+			vim.keymap.set("n", "<F7>", function()
+				dap.terminate()
+				dapui.close()
+			end, { desc = "dap: stop" })
+			vim.keymap.set("n", "<F8>", dap.toggle_breakpoint, { desc = "dap: toggle breakpoint" })
+			vim.keymap.set("n", "<F9>", dap.step_into, { desc = "dap: step into" })
+			vim.keymap.set("n", "<F10>", dap.step_out, { desc = "dap: step out" })
+			vim.keymap.set("n", "<F10>", dap.step_over, { desc = "dap: step over" })
+			vim.keymap.set(
+				"n",
+				"<leader>db",
+				function() dap.set_breakpoint(vim.fn.input "Breakpoint condition: ") end,
+				{ desc = "dap: set breakpoint condition" }
+			)
 
 			-- Install golang specific config
 			require("dap-go").setup()
