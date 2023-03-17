@@ -52,7 +52,7 @@ M.setup_keymaps = function()
 		M._keys = {
 			{ "<leader>cd", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
 			{ "<leader>ci", "<cmd>LspInfo<cr>", desc = "lsp: info" },
-			{ "go", "<cmd>SymbolsOutline<cr>", desc = "lsp: outline" },
+			{ "go", "<cmd>AerialToggle!<cr>", desc = "lsp: outline" },
 			{ "gh", vim.show_pos, desc = "lsp: current position" },
 			{ "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: references" },
 			{ "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },

@@ -58,7 +58,6 @@ require("lazy").setup({
 	-- NOTE: cozy colorscheme
 	{
 		"rose-pine/neovim",
-		lazy = false,
 		name = "rose-pine",
 		opts = {
 			disable_italics = true,
@@ -75,7 +74,7 @@ require("lazy").setup({
 			},
 		},
 	},
-	{ "nyoom-engineering/oxocarbon.nvim", lazy = false },
+	{ "nyoom-engineering/oxocarbon.nvim" },
 	-- NOTE: hidden tech the harpoon
 	{
 		"theprimeagen/harpoon",
@@ -1165,10 +1164,10 @@ require("lazy").setup({
 		},
 	},
 	{
-		"simrat39/symbols-outline.nvim",
-		cmd = "SymbolsOutline",
+		"stevearc/aerial.nvim",
+		cmd = "AerialToggle",
 		config = true,
-		opts = { auto_close = true },
+		opts = { close_automatic_events = { "unsupported" } },
 	},
 	{
 		"smjonas/inc-rename.nvim",
@@ -1809,7 +1808,7 @@ require("lazy").setup({
 		end,
 	},
 }, {
-	install = { colorscheme = { "rose-pine" } },
+	install = { colorscheme = { M.colorscheme } },
 	defaults = { lazy = true },
 	change_detection = { notify = false },
 	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
@@ -1872,5 +1871,5 @@ require("lazy").setup({
 	},
 })
 
-vim.o.background = "dark"
-vim.cmd.colorscheme "oxocarbon"
+vim.o.background = M.background
+vim.cmd.colorscheme(M.colorscheme)

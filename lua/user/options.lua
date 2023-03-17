@@ -7,11 +7,14 @@ local M = {
     simple = true,
     -- Whether to show the diagnostic popup
 	diagnostic = {
-		use_virtual_text = true,
-		show_float       = false,
+		use_virtual_text = false,
+		show_float       = true,
 	},
 	-- Windows opts
-    window = { resize = 10 }
+    window = { resize = 10 },
+	-- colorscheme go brr
+	colorscheme = "oxocarbon",
+	background  = "dark",
 }
 
 -- Some defaults and don't question it
