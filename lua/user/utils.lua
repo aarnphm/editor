@@ -1,38 +1,5 @@
 local M = {}
 
-local cached_autocmds = {}
-
-M.toggle_autocmds = function(name)
-	local has, commands = pcall(vim.api.nvim_get_autocmds, { name = name })
-	if has and type(commands) == "table" then
-		cached_autocmds[name] = commands
-		vim.api.nvim_del_augroup_by_name(name)
-		vim.notify("Disabled autocmds: " .. name, vim.log.levels.INFO)
-	else
-		commands = cached_autocmds[name] or commands
-		vim.api.nvim_create_augroup(name, { clear = true })
-		for _, command in pairs(commands) do
-			local opts = {}
-			opts.desc = command.desc or ""
-			opts.group = command.group_name or name
-
-			if command.pattern ~= nil then
-				opts.pattern = command.pattern
-			elseif command.buffer ~= nil then
-				opts.buffer = command.buffer
-			end
-			if command.callback ~= nil then
-				opts.callback = command.callback
-			elseif command.command ~= nil then
-				opts.command = command.command
-			end
-
-			vim.api.nvim_create_autocmd(command.event, opts)
-		end
-		vim.notify("Enabled autocmds: " .. name, vim.log.levels.INFO)
-	end
-end
-
 ---@param on_attach fun(client, buffer)
 M.on_attach = function(on_attach)
 	vim.api.nvim_create_autocmd("LspAttach", {

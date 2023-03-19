@@ -64,7 +64,7 @@ require("lazy").setup({
 		name = "rose-pine",
 		opts = {
 			disable_italics = true,
-			dark_variant = "moon",
+			dark_variant = "main",
 			highlight_groups = {
 				Comment = { fg = "muted", italic = true },
 				StatusLine = { fg = "rose", bg = "iris", blend = 10 },
@@ -73,7 +73,7 @@ require("lazy").setup({
 				TelescopeNormal = { fg = "subtle" },
 				TelescopePromptNormal = { fg = "text" },
 				TelescopeSelection = { fg = "text" },
-				TelescopeSelectionCaret = { fg = "rose" },
+				TelescopeSelectionCaret = { fg = "iris" },
 			},
 		},
 	},

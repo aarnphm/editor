@@ -58,16 +58,11 @@ _G.GS = function(f)
 end
 
 -- default augroup
-local augroup = function(name) return api.nvim_create_augroup("simple_" .. name, { clear = true }) end
+local augroup_name = function(name) return "simple_" .. name end
+local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
 
 _G.simple_augroup = augroup
-
--- diagnostic on hover
-autocmd({ "CursorHold", "CursorHoldI" }, {
-	group = augroup "diagnostic_show_float",
-	pattern = "*",
-	callback = function() vim.diagnostic.open_float(nil, { focus = false }) end,
-})
+_G.simple_augroup_name = augroup_name
 
 -- auto place to last edit
 autocmd("BufReadPost", {

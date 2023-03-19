@@ -35,7 +35,6 @@ M.format = function(opts)
 			if have_nls then return client.name == "null-ls" end
 			return client.name ~= "null-ls"
 		end,
-		async = true,
 	}, require("user.utils").opts("nvim-lspconfig").format or {}))
 end
 
