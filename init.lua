@@ -1,9 +1,12 @@
 require "user.globals"
 
-local M = require "user.options"
-local icons = require "user.icons"
-
+-- stylua: ignore start
+local M        = require "user.options"
+local icons    = require "user.icons"
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
+-- stylua: ignore end
+
+-- bootstrap logics
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system {
 		"git",
@@ -115,6 +118,7 @@ require("lazy").setup({
 	-- NOTE: nice git integration and UI
 	{
 		"lewis6991/satellite.nvim",
+		enabled = false,
 		event = "BufReadPost",
 		config = true,
 		cmd = { "SatelliteDisable", "SatelliteEnable", "SatelliteRefresh" },
@@ -377,13 +381,32 @@ require("lazy").setup({
 	-- NOTE: folke is neovim's tpope
 	{
 		"folke/noice.nvim",
-		event = "BufReadPost",
+		lazy = false,
+		event = "WinEnter", -- NOTE: if want better startuptime, then move this to BufReadPost and lazy = true
 		dependencies = { "MunifTanjim/nui.nvim" },
 		opts = {
-			lsp = { progress = { enabled = true } },
+			lsp = {
+				progress = {
+					enabled = true,
+					format = {
+						"({data.progress.percentage}%) ",
+						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
+						{ "{data.progress.title} ", hl_group = "NoiceLspProgressTitle" },
+						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
+					},
+				},
+				override = {
+					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+					["vim.lsp.util.stylize_markdown"] = true,
+					["cmp.entry.get_documentation"] = true,
+				},
+			},
 			cmdline = { enabled = true, view = "cmdline" },
 			popupmenu = { enabled = false },
-			presets = { command_palette = true, bottom_search = true },
+			presets = { command_palette = true, bottom_search = true, inc_rename = true },
+			routes = {
+				{ view = "notify", filter = { event = "msg_showmode" } },
+			},
 		},
 	},
 	{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode" },
@@ -849,7 +872,7 @@ require("lazy").setup({
 			end)
 			require("typescript").setup {
 				server = {
-					capabilities = M.gen_capabilities(),
+					capabilities = require("lsp").gen_capabilities(),
 					completions = { completeFunctionCalls = true },
 				},
 			}
@@ -896,7 +919,7 @@ require("lazy").setup({
 						vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
 						-- stylua: ignore end
 					end,
-					capabilities = M.gen_capabilities(),
+					capabilities = require("lsp").gen_capabilities(),
 					standalone = true,
 					settings = {
 						["rust-analyzer"] = {
@@ -922,7 +945,7 @@ require("lazy").setup({
 		dependencies = { "neovim/nvim-lspconfig" },
 		config = function()
 			local lspconfig = require "lspconfig"
-			local capabilities = M.gen_capabilities()
+			local capabilities = require("lsp").gen_capabilities()
 
 			capabilities.offsetEncoding = { "utf-16", "utf-8" }
 
@@ -1159,12 +1182,7 @@ require("lazy").setup({
 		config = true,
 		opts = { close_automatic_events = { "unsupported" } },
 	},
-	{
-		"smjonas/inc-rename.nvim",
-		cmd = "IncRename",
-		config = true,
-		opts = { input_buffer_type = "dressing" },
-	},
+	{ "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
@@ -1346,7 +1364,7 @@ require("lazy").setup({
 
 			local mason_handler = function(server)
 				local server_opts = vim.tbl_deep_extend("force", {
-					capabilities = M.gen_capabilities(),
+					capabilities = require("lsp").gen_capabilities(),
 					flags = { debounce_text_changes = 150 },
 				}, servers[server] or {})
 

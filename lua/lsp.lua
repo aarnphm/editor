@@ -1,7 +1,5 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
-local util = require "vim.lsp.util"
-local clients = {}
 local M = {}
 local disabled_ft = { "gitcommit", "gitconfig", "gitignore" }
 
@@ -54,8 +52,8 @@ M.setup_keymaps = function()
 		---@class PluginLspKeys
         -- stylua: ignore
 		M._keys = {
-			{ "<leader>cd", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
-			{ "<leader>ci", "<cmd>LspInfo<cr>", desc = "lsp: info" },
+			{ "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
+			{ "<leader>i", "<cmd>LspInfo<cr>", desc = "lsp: info" },
 			{ "go", "<cmd>AerialToggle!<cr>", desc = "lsp: outline" },
 			{ "gh", vim.show_pos, desc = "lsp: current position" },
 			{ "gR", "<cmd>TroubleToggle lsp_references<cr>", desc = "lsp: references" },
@@ -95,6 +93,7 @@ M.setup_keymaps = function()
 				expr = true,
 				desc = "lsp: rename",
 				has = "rename",
+				silent = true,
 			}
 		else
             -- stylua: ignore
@@ -123,38 +122,6 @@ M.setup_keymaps = function()
 	return M._keys
 end
 
--- thx to https://gitlab.com/ranjithshegde/dotbare/-/blob/master/.config/nvim/lua/lsp/init.lua
-M.signature_window = function(_, result, ctx, config)
-	local bufnr, winner = vim.lsp.handlers.signature_help(_, result, ctx, config)
-	local current_cursor_line = vim.api.nvim_win_get_cursor(0)[1]
-
-	if winner then
-		if current_cursor_line > 3 then
-			vim.api.nvim_win_set_config(winner, {
-				anchor = "SW",
-				relative = "cursor",
-				row = 0,
-				col = -1,
-			})
-		end
-	end
-
-	if bufnr and winner then return bufnr, winner end
-end
-
--- thx to https://github.com/seblj/dotfiles/blob/0542cae6cd9a2a8cbddbb733f4f65155e6d20edf/nvim/lua/config/lspconfig/init.lua
-local check_trigger_char = function(line_to_cursor, triggers)
-	if not triggers then return false end
-
-	for _, trigger_char in ipairs(triggers) do
-		local current_char = line_to_cursor:sub(#line_to_cursor, #line_to_cursor)
-		local prev_char = line_to_cursor:sub(#line_to_cursor - 1, #line_to_cursor - 1)
-		if current_char == trigger_char then return true end
-		if current_char == " " and prev_char == trigger_char then return true end
-	end
-	return false
-end
-
 M.on_attach = function(client, bufnr)
 	-- NOTE: setup format
 	if
@@ -177,46 +144,6 @@ M.on_attach = function(client, bufnr)
 	if client.server_capabilities["documentSymbolProvider"] then
 		require("nvim-navic").attach(client, bufnr)
 	end
-
-	-- NOTE: setup signatures
-	local group = augroup("LspSignature", { clear = false })
-	vim.api.nvim_clear_autocmds { group = group, pattern = "<buffer>" }
-
-	autocmd("TextChangedI", {
-		group = group,
-		pattern = "<buffer>",
-		callback = function()
-			-- Guard against spamming of method not supported after
-			-- stopping a language serer with LspStop
-			local active_clients = vim.lsp.get_active_clients()
-			if #active_clients < 1 then return end
-
-			local triggered = false
-
-			for _, client_ in pairs(clients) do
-				local triggers = client_.server_capabilities.signatureHelpProvider.triggerCharacters
-
-				local pos = vim.api.nvim_win_get_cursor(0)
-				local line = vim.api.nvim_get_current_line()
-				local line_to_cursor = line:sub(1, pos[2])
-
-				if not triggered then triggered = check_trigger_char(line_to_cursor, triggers) end
-			end
-
-			if triggered then
-				local params = util.make_position_params()
-				vim.lsp.buf_request(
-					0,
-					"textDocument/signatureHelp",
-					params,
-					vim.lsp.with(M.signature_window, {
-						border = "none",
-						focusable = false,
-					})
-				)
-			end
-		end,
-	})
 
 	-- NOTE: setup keymaps
 	local LazyKeys = require "lazy.core.handler.keys"
@@ -249,6 +176,33 @@ M.on_attach = function(client, bufnr)
 		function(_) M.format { bufnr = bufnr } end,
 		{ desc = "format: current buffer (alt for <Leader><Leader>)" }
 	)
+end
+
+M._capabilities = nil
+
+M.gen_capabilities = function()
+	if not M._capabilities then
+		local capabilities = vim.lsp.protocol.make_client_capabilities()
+		local ok, cmp = pcall(require, "cmp_nvim_lsp")
+		if ok then capabilities = cmp.default_capabilities(capabilities) end
+
+		-- NOTE: some custom completion options
+		capabilities.textDocument.completion.completionItem = {
+			documentationFormat = { "markdown", "plaintext" },
+			snippetSupport = true,
+			preselectSupport = true,
+			insertReplaceSupport = true,
+			labelDetailsSupport = true,
+			deprecatedSupport = true,
+			commitCharactersSupport = true,
+			tagSupport = { valueSet = { 1 } },
+			resolveSupport = {
+				properties = { "documentation", "detail", "additionalTextEdits" },
+			},
+		}
+		M._capabilities = capabilities
+	end
+	return M._capabilities
 end
 
 return M
