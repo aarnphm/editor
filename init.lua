@@ -60,6 +60,7 @@ require("lazy").setup({
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
+		lazy = false,
 		opts = {
 			disable_italics = true,
 			dark_variant = "main",
@@ -75,7 +76,7 @@ require("lazy").setup({
 			},
 		},
 	},
-	{ "nyoom-engineering/oxocarbon.nvim" },
+	{ "nyoom-engineering/oxocarbon.nvim", lazy = false },
 	-- NOTE: hidden tech the harpoon
 	{
 		"theprimeagen/harpoon",
@@ -202,7 +203,6 @@ require("lazy").setup({
 				"regex",
 				"markdown",
 				"markdown_inline",
-				"vim",
 				"yaml",
 				"go",
 			},
@@ -380,13 +380,7 @@ require("lazy").setup({
 	{
 		"j-hui/fidget.nvim",
 		event = "LspAttach",
-		opts = {
-			text = { spinner = "dots" },
-			window = { blend = 0 },
-			sources = {
-				["null-ls"] = { ignore = true },
-			},
-		},
+		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
 	},
 	{ "vigoux/notifier.nvim", event = "InsertEnter", config = true },
 	-- NOTE: folke is neovim's tpope
@@ -465,7 +459,7 @@ require("lazy").setup({
 			"nvim-telescope/telescope-live-grep-args.nvim",
 			{
 				"nvim-telescope/telescope-fzf-native.nvim",
-				run = "make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim",
+				build = "make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim",
 			},
 		},
 		keys = {
