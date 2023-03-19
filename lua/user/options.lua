@@ -66,6 +66,7 @@ vim.o.shiftwidth  = 4
 vim.o.shiftround  = true
 
 -- UI config
+vim.o.cmdheight     = 0  -- disable cmd height
 vim.o.showcmd       = false
 vim.o.showmode      = false
 vim.o.showbreak     = "↳  "

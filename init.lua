@@ -32,9 +32,7 @@ require("lazy").setup({
 			input = {
 				enabled = true,
 				override = function(config)
-					config.col = -1
-					config.row = 0
-					return config
+					return vim.tbl_deep_extend("force", config, { col = -1, row = 0 })
 				end,
 			},
 			select = {
@@ -89,11 +87,10 @@ require("lazy").setup({
 
 			vim.keymap.set("n", "<leader>a", mark.add_file)
 			vim.keymap.set("n", "<leader>e", ui.toggle_quick_menu)
-
-			-- vim.keymap.set("n", "<C-h>", function() ui.nav_file(1) end)
-			-- vim.keymap.set("n", "<C-i>", function() ui.nav_file(2) end)
-			-- vim.keymap.set("n", "<C-n>", function() ui.nav_file(3) end)
-			-- vim.keymap.set("n", "<C-s>", function() ui.nav_file(4) end)
+			vim.keymap.set("n", "<LocalLeader><LocalLeader>h", function() ui.nav_file(1) end)
+			vim.keymap.set("n", "<LocalLeader><LocalLeader>i", function() ui.nav_file(2) end)
+			vim.keymap.set("n", "<LocalLeader><LocalLeader>n", function() ui.nav_file(3) end)
+			vim.keymap.set("n", "<LocalLeader><LocalLeader>s", function() ui.nav_file(4) end)
 		end,
 	},
 	-- NOTE: scratch buffer
@@ -159,7 +156,7 @@ require("lazy").setup({
 	{
 		"max397574/better-escape.nvim",
 		event = "InsertEnter",
-		opts = { timeout = 500, clear_empty_lines = true, keys = "<Esc>" },
+		opts = { timeout = 200, clear_empty_lines = true, keys = "<Esc>" },
 	},
 	-- NOTE: treesitter-based dependencies
 	{
@@ -319,6 +316,8 @@ require("lazy").setup({
 					"NvimTree",
 					"scratch",
 					"nofile",
+					"toggleterm",
+					"terminal",
 				},
 				callback = function() vim.b.miniindentscope_disable = true end,
 			})
@@ -378,37 +377,19 @@ require("lazy").setup({
 		},
 		config = true,
 	},
-	-- NOTE: folke is neovim's tpope
 	{
-		"folke/noice.nvim",
-		lazy = false,
-		event = "WinEnter", -- NOTE: if want better startuptime, then move this to BufReadPost and lazy = true
-		dependencies = { "MunifTanjim/nui.nvim" },
+		"j-hui/fidget.nvim",
+		event = "LspAttach",
 		opts = {
-			lsp = {
-				progress = {
-					enabled = true,
-					format = {
-						"({data.progress.percentage}%) ",
-						{ "{spinner} ", hl_group = "NoiceLspProgressSpinner" },
-						{ "{data.progress.title} ", hl_group = "NoiceLspProgressTitle" },
-						{ "{data.progress.client} ", hl_group = "NoiceLspProgressClient" },
-					},
-				},
-				override = {
-					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true,
-				},
-			},
-			cmdline = { enabled = true, view = "cmdline" },
-			popupmenu = { enabled = false },
-			presets = { command_palette = true, bottom_search = true, inc_rename = true },
-			routes = {
-				{ view = "notify", filter = { event = "msg_showmode" } },
+			text = { spinner = "dots" },
+			window = { blend = 0 },
+			sources = {
+				["null-ls"] = { ignore = true },
 			},
 		},
 	},
+	{ "vigoux/notifier.nvim", event = "InsertEnter", config = true },
+	-- NOTE: folke is neovim's tpope
 	{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode" },
 	{ "folke/paint.nvim", event = "BufReadPost", config = true },
 	{
@@ -427,11 +408,7 @@ require("lazy").setup({
 							vim.cmd.cprev()
 						end
 					else
-						vim.notify(
-							"No items in quickfix",
-							vim.log.levels.INFO,
-							{ title = "Trouble" }
-						)
+						vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
 					end
 				end,
 				desc = "qf: Previous item",
@@ -446,11 +423,7 @@ require("lazy").setup({
 							vim.cmd.cnext()
 						end
 					else
-						vim.notify(
-							"No items in quickfix",
-							vim.log.levels.INFO,
-							{ title = "Trouble" }
-						)
+						vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
 					end
 				end,
 				desc = "qf: Next item",
@@ -490,7 +463,10 @@ require("lazy").setup({
 		event = "BufReadPost",
 		dependencies = {
 			"nvim-telescope/telescope-live-grep-args.nvim",
-			{ "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				run = "make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim",
+			},
 		},
 		keys = {
 			{
@@ -1172,7 +1148,7 @@ require("lazy").setup({
 		dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
 		opts = {
 			attach_navic = false, -- handled via on_attach hooks
-			exclude_filetypes = { "toggleterm", "Scratch" },
+			exclude_filetypes = { "toggleterm", "Scratch", "Trouble" },
 			symbols = { separator = icons.ui_space.Separator },
 		},
 	},
@@ -1410,9 +1386,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = {
-			ensure_installed = { "lua-language-server", "pyright" },
-		},
+		opts = { ensure_installed = { "lua-language-server", "pyright" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
