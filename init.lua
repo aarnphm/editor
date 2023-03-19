@@ -1136,13 +1136,20 @@ require("lazy").setup({
 	-- NOTE: nice winbar
 	{
 		"utilyre/barbecue.nvim",
-		name = "barbecue",
 		event = "LspAttach",
 		version = "*",
 		dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
 		opts = {
 			attach_navic = false, -- handled via on_attach hooks
-			exclude_filetypes = { "toggleterm", "Scratch", "Trouble" },
+			exclude_filetypes = {
+				"toggleterm",
+				"Scratch",
+				"Trouble",
+				"gitrebase",
+				"gitcommit",
+				"gitconfig",
+				"gitignore",
+			},
 			symbols = { separator = icons.ui_space.Separator },
 		},
 	},
