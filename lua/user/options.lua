@@ -5,34 +5,32 @@ local autocmd = vim.api.nvim_create_autocmd
 local M = {
 	window      = { resize = 10                                  },                                      -- Windows opts
 	diagnostic  = { show_float = false, use_virtual_text = false },                                      -- Whether to show the diagnostic popup
-	simple      = vim.NIL ~= vim.env.SIMPLE_UI          and vim.env.SIMPLE_UI		   or false,		 -- Whether to make completion fancy or simple border
+	ui          = vim.NIL ~= vim.env.SIMPLE_UI          and vim.env.SIMPLE_UI		   or false,		 -- Whether to make completion fancy or simple border
 	colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "oxocarbon",   -- colorscheme go brr
 	background  = vim.NIL ~= vim.env.SIMPLE_BACKGROUND  and vim.env.SIMPLE_BACKGROUND  or "dark",		 -- dark or light go brr
 }
 
 -- Some defaults and don't question it
-vim.o.wrap           = false              -- egh i don't like wrap
-vim.o.writebackup    = false              -- whos needs backup btw (i do sometimes)
-vim.o.autowrite      = true               -- sometimes I forget to save
-vim.o.guicursor      = ""                 -- no gui cursor
-vim.o.undofile       = true               -- set undofile to infinite undo
-vim.o.breakindent    = true               -- enable break indent
-vim.o.breakindentopt = "shift:2,min:20"   -- wrap two spaces, with min of 20 text width
-vim.o.clipboard      = "unnamedplus"      -- sync system clipboard
-vim.o.pumheight      = 8                  -- larger completion windows
-vim.o.completeopt    = "menuone,noselect" -- better completion menu
-vim.o.expandtab      = true               -- convert spaces to tabs
-vim.o.mouse          = "a"                -- ugh who needs mouse (accept on SSH maybe)
-vim.o.number         = true               -- number is good for nav
-vim.o.relativenumber = true               -- relativenumber is useful, grow up
-vim.o.swapfile       = false              -- I don't like swap files personally, found undofile to be better
-vim.o.undofile       = true               -- better than swapfile
-vim.o.undolevels     = 9999               -- infinite undo
-vim.o.shortmess      = "aoOTIcF"          -- insanely complex shortmess, but its cleannn
-
--- I refuse to have a complex statusline, but lualine is cool tho
-vim.o.laststatus = 2
-vim.o.statusline = "%= %=%m %y %l:%c ♥ "
+vim.o.wrap           = false                  -- egh i don't like wrap
+vim.o.writebackup    = false                  -- whos needs backup btw (i do sometimes)
+vim.o.autowrite      = true                   -- sometimes I forget to save
+vim.o.guicursor      = ""                     -- no gui cursor
+vim.o.undofile       = true                   -- set undofile to infinite undo
+vim.o.breakindent    = true                   -- enable break indent
+vim.o.breakindentopt = "shift:2,min:20"       -- wrap two spaces, with min of 20 text width
+vim.o.clipboard      = "unnamedplus"          -- sync system clipboard
+vim.o.pumheight      = 8                      -- larger completion windows
+vim.o.completeopt    = "menuone,noselect"     -- better completion menu
+vim.o.expandtab      = true                   -- convert spaces to tabs
+vim.o.mouse          = "a"                    -- ugh who needs mouse (accept on SSH maybe)
+vim.o.number         = true                   -- number is good for nav
+vim.o.relativenumber = true                   -- relativenumber is useful, grow up
+vim.o.swapfile       = false                  -- I don't like swap files personally, found undofile to be better
+vim.o.undofile       = true                   -- better than swapfile
+vim.o.undolevels     = 9999                   -- infinite undo
+vim.o.shortmess      = "aoOTIcF"              -- insanely complex shortmess, but its cleannn
+vim.o.laststatus     = 2                      -- show statusline on buffer
+vim.o.statusline     = "%= %= %m %y %l:%c ♥ " -- I refuse to have a complex statusline, but lualine is cool tho
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions
@@ -53,11 +51,10 @@ vim.o.foldmethod     = "expr"
 vim.o.foldexpr       = "nvim_treesitter#foldexpr()"
 
 -- searching and grep stuff
-vim.o.smartcase  = true
-vim.o.ignorecase = true
-vim.o.infercase  = true
-vim.o.grepprg    = "rg --hidden --vimgrep --smart-case --"  -- also its 2023 use rg
-
+vim.o.smartcase   = true
+vim.o.ignorecase  = true
+vim.o.infercase   = true
+vim.o.grepprg     = "rg --hidden --vimgrep --smart-case --"  -- also its 2023 use rg
 vim.o.linebreak   = true
 vim.o.jumpoptions = "stack"
 vim.o.listchars   = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -70,6 +67,7 @@ vim.o.shiftround  = true
 
 -- UI config
 vim.o.showcmd       = false
+vim.o.showmode      = false
 vim.o.showbreak     = "↳  "
 vim.o.sidescrolloff = 5
 vim.o.signcolumn    = "yes:1"

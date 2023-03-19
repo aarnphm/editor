@@ -462,7 +462,7 @@ require("lazy").setup({
 		event = "BufReadPost",
 		opts = { plugins = { presets = { operators = false } } },
 		config = function(_, opts)
-			if not M.simple then opts.window = { border = "single" } end
+			if M.ui then opts.window = { border = "single" } end
 			require("which-key").setup(opts)
 		end,
 	},
@@ -1602,38 +1602,46 @@ require("lazy").setup({
 				"zbirenbaum/copilot.lua",
 				cmd = "Copilot",
 				event = "InsertEnter",
-				config = function()
-					vim.defer_fn(
-						function()
-							require("copilot").setup {
-								cmp = { enabled = true, method = "getCompletionsCycling" },
-								panel = { enabled = false },
-								suggestion = { enabled = true, auto_trigger = true },
-								filetypes = {
-									markdown = true,
-									help = false,
-									terraform = false,
-									hgcommit = false,
-									svn = false,
-									cvs = false,
-									["dap-repl"] = false,
-									octo = false,
-									TelescopePrompt = false,
-									big_file_disabled_ft = false,
-									neogitCommitMessage = false,
-								},
-							}
-						end,
-						100
-					)
+				opts = {
+					cmp = { enabled = true, method = "getCompletionsCycling" },
+					panel = { enabled = false },
+					suggestion = { enabled = true, auto_trigger = true },
+					filetypes = {
+						markdown = true,
+						help = false,
+						terraform = false,
+						hgcommit = false,
+						svn = false,
+						cvs = false,
+						["dap-repl"] = false,
+						octo = false,
+						TelescopePrompt = false,
+						big_file_disabled_ft = false,
+						neogitCommitMessage = false,
+					},
+				},
+				config = function(_, opts)
+					vim.defer_fn(function() require("copilot").setup(opts) end, 100)
 				end,
 			},
 		},
 		config = function()
 			local cmp = require "cmp"
 			local lspkind = require "lspkind"
+			local compare = require "cmp.config.compare"
 
-			if not M.simple then
+			compare.lsp_scores = function(entry1, entry2)
+				local diff
+				if entry1.completion_item.score and entry2.completion_item.score then
+					diff = (entry2.completion_item.score * entry2.score)
+						- (entry1.completion_item.score * entry1.score)
+				else
+					diff = entry2.score - entry1.score
+				end
+				return (diff < 0)
+			end
+
+			if M.ui then
 				local cmp_window = require "cmp.utils.window"
 				local prev_info = cmp_window.info
 				---@diagnostic disable-next-line: duplicate-set-field
@@ -1672,6 +1680,18 @@ require("lazy").setup({
 				preselect = cmp.PreselectMode.None,
 				snippet = {
 					expand = function(args) require("luasnip").lsp_expand(args.body) end,
+				},
+				sorting = {
+					priority_weight = 2,
+					comparators = {
+						compare.offset,
+						compare.exact,
+						compare.lsp_scores,
+						compare.kind,
+						compare.sort_text,
+						compare.length,
+						compare.order,
+					},
 				},
 				formatting = {
 					fields = { "kind", "abbr", "menu" },
@@ -1738,7 +1758,7 @@ require("lazy").setup({
 				table.insert(opts.sources, { name = "crates" })
 			end
 
-			if not M.simple then
+			if M.ui then
 				opts.window = {
 					completion = cmp.config.window.bordered { border = "single" },
 					documentation = cmp.config.window.bordered { border = "single" },
