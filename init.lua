@@ -386,6 +386,20 @@ if not vim.g.vscode then
 		{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode" },
 		{ "folke/paint.nvim", event = "BufReadPost", config = true },
 		{
+			"folke/noice.nvim",
+			event = "BufReadPost",
+			dependencies = { "MunifTanjim/nui.nvim" },
+			opts = {
+				lsp = { progress = { enabled = false } },
+				cmdline = { enabled = true, view = "cmdline" },
+				messages = { view = "mini", view_error = "mini", view_warn = "mini" },
+				popupmenu = { enabled = true },
+				hover = { enabled = false },
+				signature = { enabled = false },
+				presets = { bottom_search = true, command_palette = true, inc_rename = true },
+			},
+		},
+		{
 			"folke/trouble.nvim",
 			cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
 			opts = { use_diagnostic_signs = true },
