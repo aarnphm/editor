@@ -44,9 +44,6 @@ vim.opt.formatoptions = vim.opt.formatoptions
 	+ "j" -- Auto-remove comments if possible.
 	- "2" -- I'm not in gradeschool anymore
 
--- diffopt is cool
-vim.opt.diffopt = "internal,filler,closeoff,algorithm:patience,linematch:60"
-
 -- Better folding using tree-sitter
 vim.o.foldlevelstart = 99
 vim.o.foldmethod     = "expr"
