@@ -1,12 +1,8 @@
---# selene: allow(global_usage)
 require "user.globals"
 
--- stylua: ignore start
-local M        = require "user.options"
-local icons    = require "user.icons"
+local M = require "user.options"
+local icons = require "user.icons"
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-local autocmd  = vim.api.nvim_create_autocmd
--- stylua: ignore end
 
 -- bootstrap logics
 if not vim.loop.fs_stat(lazypath) then
@@ -1162,23 +1158,8 @@ if not vim.g.vscode then
 					"gitignore",
 				},
 				symbols = { separator = icons.ui_space.Separator },
-				create_autocmd = false,
 				show_modified = true,
 			},
-			init = function()
-				autocmd({
-					"BufWinEnter",
-					"CursorHold",
-					"InsertLeave",
-					-- include these if you have set `show_modified` to `true`
-					"BufWritePost",
-					"TextChanged",
-					"TextChangedI",
-				}, {
-					group = _G.simple_augroup "barbecue",
-					callback = function(_) require("barbecue.ui").update() end,
-				})
-			end,
 		},
 		{
 			"stevearc/aerial.nvim",
@@ -1868,8 +1849,7 @@ if not vim.g.vscode then
 		concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 		checker = { enable = true },
 		ui = {
-			size = { width = 0.88, height = 0.8 },
-			wrap = true, -- wrap the lines in the ui
+			border = not M.ui and "single" or "none",
 			icons = {
 				cmd = icons.misc.Code,
 				config = icons.ui.Gear,

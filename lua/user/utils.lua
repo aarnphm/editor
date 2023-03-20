@@ -58,4 +58,63 @@ M.get_root = function()
 	return root
 end
 
+-- statusline and simple
+local fmt = string.format
+
+-- NOTE: git
+local concat_hunks = function(hunks)
+	return vim.tbl_isempty(hunks) and ""
+		or table.concat({
+			fmt("+%d", hunks[1]),
+			fmt("~%d", hunks[2]),
+			fmt("-%d", hunks[3]),
+		}, " ")
+end
+
+local get_hunks = function()
+	local hunks = {}
+	if vim.g.loaded_gitgutter then
+		hunks = vim.fn.GitGutterGetHunkSummary()
+	elseif vim.b.gitsigns_status_dict then
+		hunks = {
+			vim.b.gitsigns_status_dict.added,
+			vim.b.gitsigns_status_dict.changed,
+			vim.b.gitsigns_status_dict.removed,
+		}
+	end
+	return concat_hunks(hunks)
+end
+
+local get_branch = function()
+	local branch = ""
+	if vim.g.loaded_fugitive then
+		branch = vim.fn.FugitiveHead()
+	elseif vim.g.loaded_gitbranch then
+		branch = vim.fn["gitbranch#name"]()
+	elseif vim.b.gitsigns_head ~= nil then
+		branch = vim.b.gitsigns_head
+	end
+	return branch ~= "" and fmt("(b: %s)", branch) or ""
+end
+
+-- NOTE: diagnostic
+local get_diagnostic = function()
+	local buf = vim.api.nvim_get_current_buf()
+	return fmt(
+		"[W:%d | E:%d]",
+		#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
+		#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
+	)
+end
+
+M.statusline = {
+	git = function()
+		local hunks, branch = get_hunks(), get_branch()
+		if hunks == concat_hunks { 0, 0, 0 } and branch == "" then hunks = "" end
+		if hunks ~= "" and branch ~= "" then branch = branch .. " " end
+		return table.concat { branch, hunks }
+	end,
+	diagnostic = function() return get_diagnostic() end,
+}
+
 return M

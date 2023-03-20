@@ -30,7 +30,10 @@ vim.o.undofile       = true                     -- better than swapfile
 vim.o.undolevels     = 9999                     -- infinite undo
 vim.o.shortmess      = "aoOTIcF"                -- insanely complex shortmess, but its cleannn
 vim.o.laststatus     = 2                        -- show statusline on buffer
-vim.o.statusline     = "%= %= %m %y %l:%c ♥ "   -- I refuse to have a complex statusline, but lualine is cool tho
+
+-- I refuse to have a complex statusline, but lualine is cool tho PepeLaugh
+-- [hunk] [branch] --------- [diagnostic] [modified] [filetype] [line:col] [heart]
+vim.o.statusline = "%{%luaeval('require(\"user.utils\").statusline.git()')%} %= %= %{%luaeval('require(\"user.utils\").statusline.diagnostic()')%} %m %y %l:%c ♥ "
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions
@@ -149,7 +152,7 @@ map("n", "<LocalLeader>]",  string.format("<cmd>vertical resize -%s<cr>", M.wind
 map("n", "<LocalLeader>[",  string.format("<cmd>vertical resize +%s<cr>", M.window.resize), { noremap = false, desc = "windows: resize left 10px"        })
 map("n", "<LocalLeader>-",  string.format("<cmd>resize -%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize down 10px"        })
 map("n", "<LocalLeader>+",  string.format("<cmd>resize +%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize up 10px"          })
-map("n", "<LocalLeader>ft", require('lsp').toggle,                                          { desc = "lsp: Toggle formatter"                             })
+map("n", "<LocalLeader>f",  require('lsp').toggle,                                          { desc = "lsp: Toggle formatter"                             })
 map("n", "<LocalLeader>p",  "<cmd>Lazy<cr>",                                                { desc = "package: show manager"                             })
 map("n", "<C-\\>",          "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>", { desc = "terminal: Toggle horizontal"                       })
 map("i", "<C-\\>",          "<Esc><cmd>ToggleTerm direction=horizontal<cr>",                { desc = "terminal: Toggle horizontal"                       })
