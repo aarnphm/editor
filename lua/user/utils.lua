@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-field
+--# selene: allow(global_usage)
 local M = {}
 
 ---@param on_attach fun(client, buffer)
@@ -41,6 +43,7 @@ M.get_root = function()
 				or {}
 			for _, p in ipairs(paths) do
 				local r = vim.loop.fs_realpath(p)
+				---@diagnostic disable-next-line: param-type-mismatch
 				if path:find(r, 1, true) then roots[#roots + 1] = r end
 			end
 		end
@@ -97,24 +100,36 @@ local get_branch = function()
 	return branch ~= "" and fmt("(b: %s)", branch) or ""
 end
 
--- NOTE: diagnostic
-local get_diagnostic = function()
-	local buf = vim.api.nvim_get_current_buf()
-	return fmt(
-		"[W:%d | E:%d]",
-		#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
-		#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
-	)
-end
-
+-- I refuse to have a complex statusline, *proceeds to have a complex statusline* PepeLaugh (lualine is cool though.)
+-- [hunk] [branch] [modified]  --------- [diagnostic] [filetype] [line:col] [heart]
 M.statusline = {
 	git = function()
 		local hunks, branch = get_hunks(), get_branch()
 		if hunks == concat_hunks { 0, 0, 0 } and branch == "" then hunks = "" end
 		if hunks ~= "" and branch ~= "" then branch = branch .. " " end
-		return table.concat { branch, hunks }
+		return fmt("%s", table.concat { branch, hunks })
 	end,
-	diagnostic = function() return get_diagnostic() end,
+	diagnostic = function() -- NOTE: diagnostic
+		local buf = vim.api.nvim_get_current_buf()
+		return fmt(
+			"[W:%d | E:%d]",
+			#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
+			#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
+		)
+	end,
+	build = function()
+		local spacer = "%="
+		return table.concat({
+			"%{%luaeval('require(\"user.utils\").statusline.git()')%}",
+			"%m",
+			spacer,
+			spacer,
+			"%{%luaeval('require(\"user.utils\").statusline.diagnostic()')%}",
+			"%y",
+			"%l:%c",
+			_G.icons.misc_space.Love,
+		}, " ")
+	end,
 }
 
 return M

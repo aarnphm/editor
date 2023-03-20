@@ -11,29 +11,26 @@ local M = {
 }
 
 -- Some defaults and don't question it
-vim.o.wrap           = false                    -- egh i don't like wrap
-vim.o.writebackup    = false                    -- whos needs backup btw (i do sometimes)
-vim.o.autowrite      = true                     -- sometimes I forget to save
-vim.o.guicursor      = ""                       -- no gui cursor
-vim.o.undofile       = true                     -- set undofile to infinite undo
-vim.o.breakindent    = true                     -- enable break indent
-vim.o.breakindentopt = "shift:2,min:20"         -- wrap two spaces, with min of 20 text width
-vim.o.clipboard      = "unnamedplus"            -- sync system clipboard
-vim.o.pumheight      = 8                        -- larger completion windows
-vim.o.completeopt    = "menuone,noselect,menu"  -- better completion menu
-vim.o.expandtab      = true                     -- convert spaces to tabs
-vim.o.mouse          = "a"                      -- ugh who needs mouse (accept on SSH maybe)
-vim.o.number         = true                     -- number is good for nav
-vim.o.relativenumber = true                     -- relativenumber is useful, grow up
-vim.o.swapfile       = false                    -- I don't like swap files personally, found undofile to be better
-vim.o.undofile       = true                     -- better than swapfile
-vim.o.undolevels     = 9999                     -- infinite undo
-vim.o.shortmess      = "aoOTIcF"                -- insanely complex shortmess, but its cleannn
-vim.o.laststatus     = 2                        -- show statusline on buffer
-
--- I refuse to have a complex statusline, but lualine is cool tho PepeLaugh
--- [hunk] [branch] --------- [diagnostic] [modified] [filetype] [line:col] [heart]
-vim.o.statusline = "%{%luaeval('require(\"user.utils\").statusline.git()')%} %= %= %{%luaeval('require(\"user.utils\").statusline.diagnostic()')%} %m %y %l:%c ♥ "
+vim.o.wrap           = false                                    -- egh i don't like wrap
+vim.o.writebackup    = false                                    -- whos needs backup btw (i do sometimes)
+vim.o.autowrite      = true                                     -- sometimes I forget to save
+vim.o.guicursor      = ""                                       -- no gui cursor
+vim.o.undofile       = true                                     -- set undofile to infinite undo
+vim.o.breakindent    = true                                     -- enable break indent
+vim.o.breakindentopt = "shift:2,min:20"                         -- wrap two spaces, with min of 20 text width
+vim.o.clipboard      = "unnamedplus"                            -- sync system clipboard
+vim.o.pumheight      = 8                                        -- larger completion windows
+vim.o.completeopt    = "menuone,noselect,menu"                  -- better completion menu
+vim.o.expandtab      = true                                     -- convert spaces to tabs
+vim.o.mouse          = "a"                                      -- ugh who needs mouse (accept on SSH maybe)
+vim.o.number         = true                                     -- number is good for nav
+vim.o.relativenumber = true                                     -- relativenumber is useful, grow up
+vim.o.swapfile       = false                                    -- I don't like swap files personally, found undofile to be better
+vim.o.undofile       = true                                     -- better than swapfile
+vim.o.undolevels     = 9999                                     -- infinite undo
+vim.o.shortmess      = "aoOTIcF"                                -- insanely complex shortmess, but its cleannn
+vim.o.laststatus     = 2                                        -- show statusline on buffer
+vim.o.statusline     = require("user.utils").statusline.build() -- statusline PepeLaugh
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions
@@ -72,8 +69,9 @@ vim.o.shiftround  = true
 
 -- UI config
 vim.o.cmdheight     = 1
+vim.o.showtabline   = 0
 vim.o.showcmd       = false
-vim.o.showmode      = false
+vim.o.showmode      = true
 vim.o.showbreak     = "↳  "
 vim.o.sidescrolloff = 5
 vim.o.signcolumn    = "yes:1"
@@ -168,21 +166,14 @@ for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 end
 
 vim.diagnostic.config {
-	virtual_text = false,
-	underline = false,
-	update_in_insert = false,
-	severity_sort = true,
-	float = {
-		border = not M.ui and "simple" or "none",
-		format = function(diagnostic)
-			return string.format(
-				"%s (%s) [%s]",
-				diagnostic.message,
-				diagnostic.source,
-				diagnostic.code or diagnostic.user_data.lsp.code
-			)
-		end,
-	},
+    severity_sort    = true,
+    underline        = false,
+    update_in_insert = false,
+	virtual_text     = M.diagnostic.use_virtual_text and { prefix = "", spacing = 4 } or false,
+	float            = not M.ui and {
+		border = "simple",
+		format = function(diagnostic) return string.format("%s (%s) [%s]", diagnostic.message, diagnostic.source, diagnostic.code or diagnostic.user_data.lsp.code) end,
+	} or false,
 }
 
 

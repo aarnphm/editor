@@ -1,3 +1,20 @@
-Fast neovim config with small overhead.
+Fast. Minimalist. Choose 2
+
+Using sfc (single file config) and lazy.nvim to load plugins on demand. IMO this is easier to manage as I don't have a lot of custom config for most of the plugins I use.
+
+Plugins ecosystem:
+
+- rose-pine for soho vibes
+- mini.nvim plugins ecosystem (mini.ai, mini.bufremove, mini.align, mini.surround, mini.pairs, mini.indentscope)
+- treesitter (nvim-treesitter, nvim-treesitter-textobjects)
+- Fuzzy find efficiency with telescope (telescope.nvim, telescope-fzy-native.nvim, telescope-live-grep-args.nvim)
+- LSP integration (nvim-cmp, nvim-lspconfig, nvim-cmp-lua, nvim-cmp-path, nvim-cmp-buffer, nvim-cmp-lsp, copilot.lua, mason, null-ls and language-specific plugins)
+- DAP integration (nvim-dap, nvim-dap-ui)
+- folke's plugins (trouble.nvim, which-key.nvim, todo-comments.nvim)
+- vim-motion with leap.nvim and flit.nvim
+
+and more...
 
 Startup time: 12ms (with vim-startuptime and lazy.nvim)
+
+If you wish to try out something more structural, try out https://github.com/ayamir/nvimdots 

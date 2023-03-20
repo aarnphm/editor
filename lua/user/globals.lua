@@ -1,8 +1,7 @@
 ---@diagnostic disable: duplicate-set-field
 --# selene: allow(global_usage,incorrect_standard_library_use)
-local api = vim.api
-local autocmd = vim.api.nvim_create_autocmd
 
+-- NOTE: globals: START
 local ok, plenary_reload = pcall(require, "plenary.reload")
 local reloader = require
 if ok then reloader = plenary_reload.reload_module end
@@ -56,8 +55,11 @@ _G.GS = function(f)
 	end)
 	return "function(" .. table.concat(p, ",") .. ")"
 end
+-- NOTE: globals: END
 
--- default augroup
+-- NOTE: events: START
+local api = vim.api
+local autocmd = vim.api.nvim_create_autocmd
 local augroup_name = function(name) return "simple_" .. name end
 local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
 
@@ -180,3 +182,272 @@ autocmd("TextYankPost", {
 	pattern = "*",
 	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
 })
+
+-- disable statusline for some filetypes
+local disable_filetype = {
+	"qf",
+	"help",
+	"man",
+	"nowrite", -- fugitive
+	"prompt",
+	"spectre_panel",
+	"startuptime",
+	"tsplayground",
+	"neorepl",
+	"alpha",
+	"toggleterm",
+	"health",
+	"PlenaryTestPopup",
+	"neo-tree",
+	"nofile",
+	"scratch",
+	"",
+}
+autocmd({ "WinEnter, BufEnter" }, {
+	group = augroup "disable_statusline_enter",
+	pattern = disable_filetype,
+	callback = function()
+		vim.opt.laststatus = 0
+		vim.opt.statusline = ""
+	end,
+})
+autocmd({ "WinLeave, BufLeave" }, {
+	group = augroup "disable_statusline_leave",
+	pattern = disable_filetype,
+	callback = function()
+		vim.opt.laststatus = 2
+		vim.opt.statusline = require("user.utils").statusline.build()
+	end,
+})
+
+-- NOTE: events: END
+
+-- NOTE: icons: START
+local data = {
+	kind = {
+		Class = "ﴯ",
+		Color = "",
+		Constant = "",
+		Constructor = "",
+		Enum = "",
+		EnumMember = "",
+		Event = "",
+		Field = "",
+		File = "",
+		Folder = "",
+		Function = "",
+		Interface = "",
+		Keyword = "",
+		Method = "",
+		Module = "",
+		Namespace = "",
+		Number = "",
+		Operator = "",
+		Package = "",
+		Property = "ﰠ",
+		Reference = "",
+		Snippet = "",
+		Struct = "",
+		Text = "",
+		TypeParameter = "",
+		Unit = "",
+		Value = "",
+		Variable = "",
+		-- ccls-specific icons.
+		TypeAlias = "",
+		Parameter = "",
+		StaticMethod = "",
+		Macro = "",
+	},
+	type = {
+		Array = "",
+		Boolean = "",
+		Null = "ﳠ",
+		Number = "",
+		Object = "",
+		String = "",
+	},
+	documents = {
+		Default = "",
+		File = "",
+		Files = "",
+		FileTree = "פּ",
+		Import = "",
+		Symlink = "",
+	},
+	git = {
+		Add = "",
+		Branch = "",
+		Diff = "",
+		Git = "",
+		Ignore = "",
+		Mod = "M",
+		ModHolo = "",
+		Remove = "",
+		Rename = "",
+		Repo = "",
+		Unmerged = "שׂ",
+		Untracked = "ﲉ",
+		Unstaged = "",
+		Staged = "",
+		Conflict = "",
+	},
+	ui = {
+		ArrowClosed = "",
+		ArrowOpen = "",
+		BigCircle = "",
+		BigUnfilledCircle = "",
+		BookMark = "",
+		Bug = "",
+		Calendar = "",
+		Check = "",
+		ChevronRight = "",
+		Circle = "",
+		Close = "",
+		CloseHolo = "",
+		CloudDownload = "",
+		Comment = "",
+		CodeAction = "",
+		Dashboard = "",
+		Emoji = "",
+		EmptyFolder = "",
+		EmptyFolderOpen = "",
+		File = "",
+		Fire = "",
+		Folder = "",
+		FolderOpen = "",
+		Gear = "",
+		History = "",
+		Incoming = "",
+		Indicator = "",
+		Keyboard = "",
+		Left = "",
+		List = "",
+		Square = "",
+		SymlinkFolder = "",
+		Lock = "",
+		Modified = "✥",
+		ModifiedHolo = "",
+		NewFile = "",
+		Newspaper = "",
+		Note = "",
+		Outgoing = "",
+		Package = "",
+		Pencil = "",
+		Perf = "",
+		Play = "",
+		Project = "",
+		Right = "",
+		RootFolderOpened = "",
+		Search = "",
+		Separator = "",
+		DoubleSeparator = "",
+		SignIn = "",
+		SignOut = "",
+		Sort = "",
+		Spell = "暈",
+		Symlink = "",
+		Table = "",
+		Telescope = "",
+	},
+	diagnostics = {
+		Error = "",
+		Warning = "",
+		Information = "",
+		Question = "",
+		Hint = "",
+		-- Holo version
+		ErrorHolo = "",
+		WarningHolo = "",
+		InformationHolo = "",
+		QuestionHolo = "",
+		HintHolo = "",
+	},
+	misc = {
+		Campass = "",
+		Code = "",
+		EscapeST = "✺",
+		Gavel = "",
+		Glass = "",
+		PyEnv = "",
+		Squirrel = "",
+		Tag = "",
+		Tree = "",
+		Watch = "",
+		Lego = "",
+		Vbar = "│",
+		Add = "+",
+		Added = "",
+		Ghost = "",
+		ManUp = "",
+		Vim = "",
+		SimpleVim = "",
+		SingleWheel = "",
+		MultipleWheels = "",
+		FindFile = "",
+		WordFind = "",
+		Rocket = "",
+		BentoBox = "🍱",
+		Love = "♥",
+	},
+	cmp = {
+		Copilot = "",
+		CopilotHolo = "",
+		nvim_lsp = "",
+		nvim_lua = "",
+		path = "",
+		buffer = "",
+		spell = "暈",
+		luasnip = "",
+		treesitter = "",
+	},
+	dap = {
+		Breakpoint = "",
+		BreakpointCondition = "ﳁ",
+		BreakpointRejected = "",
+		LogPoint = "",
+		Pause = "",
+		Play = "",
+		RunLast = "↻",
+		StepBack = "",
+		StepInto = "",
+		StepOut = "",
+		StepOver = "",
+		Stopped = "",
+		Terminate = "ﱢ",
+	},
+}
+
+local icons = {
+	kind = {},
+	kind_space = {},
+	type = {},
+	type_space = {},
+	documents = {},
+	documents_space = {},
+	git = {},
+	git_space = {},
+	ui = {},
+	ui_space = {},
+	diagnostics = {},
+	diagnostics_space = {},
+	misc = {},
+	misc_space = {},
+	cmp = {},
+	cmp_space = {},
+	dap = {},
+	dap_space = {},
+}
+
+for key, table in pairs(data) do
+	icons[key] = setmetatable({}, {
+		__index = function(_, k) return table[k] end,
+	})
+	icons[key .. "_space"] = setmetatable({}, {
+		__index = function(_, k) return table[k] .. " " end,
+	})
+end
+
+_G.icons = icons
+
+-- NOTE: icons: END

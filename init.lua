@@ -1,10 +1,12 @@
+--# selene: allow(global_usage)
 require "user.globals"
 
-local M = require "user.options"
-local icons = require "user.icons"
-local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
+local icons = _G.icons
+local utils = require "user.utils"
+local user = require "user.options"
 
 -- bootstrap logics
+local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system {
 		"git",
@@ -15,9 +17,9 @@ if not vim.loop.fs_stat(lazypath) then
 		lazypath,
 	}
 end
-
 vim.opt.runtimepath:prepend(lazypath)
 
+-- NOTE: compatible block with vscode
 if not vim.g.vscode then
 	require("lazy").setup({
 		-- NOTE: utilities
@@ -112,13 +114,6 @@ if not vim.g.vscode then
 			},
 		},
 		-- NOTE: nice git integration and UI
-		{
-			"lewis6991/satellite.nvim",
-			enabled = false,
-			event = "BufReadPost",
-			config = true,
-			cmd = { "SatelliteDisable", "SatelliteEnable", "SatelliteRefresh" },
-		},
 		{
 			"lewis6991/gitsigns.nvim",
 			event = "BufReadPost",
@@ -219,10 +214,10 @@ if not vim.g.vscode then
 				},
 			},
 			config = function(_, opts)
-				if require("user.utils").has "typescript.nvim" then
+				if utils.has "typescript.nvim" then
 					vim.list_extend(opts.ensure_installed, { "typescript", "tsx" })
 				end
-				if require("user.utils").has "SchemaStore.nvim" then
+				if utils.has "SchemaStore.nvim" then
 					vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" })
 				end
 				require("nvim-treesitter.configs").setup(opts)
@@ -433,7 +428,7 @@ if not vim.g.vscode then
 			event = "BufReadPost",
 			opts = { plugins = { presets = { operators = false } } },
 			config = function(_, opts)
-				if not M.ui then opts.window = { border = "single" } end
+				if not user.ui then opts.window = { border = "single" } end
 				require("which-key").setup(opts)
 			end,
 		},
@@ -828,7 +823,7 @@ if not vim.g.vscode then
 			ft = { "typescript", "tsx" },
 			dependencies = { "neovim/nvim-lspconfig" },
 			config = function()
-				require("user.utils").on_attach(function(client, buffer)
+				utils.on_attach(function(client, buffer)
 					if client.name == "tsserver" then
 						vim.keymap.set(
 							"n",
@@ -1061,10 +1056,7 @@ if not vim.g.vscode then
 						f.buf,
 						f.clang_format.with {
 							extra_args = {
-								string.format(
-									"--style=file:%s/.clang-format",
-									require("user.utils").get_root()
-								),
+								string.format("--style=file:%s/.clang-format", utils.get_root()),
 							},
 						},
 						f.eslint.with { extra_filetypes = { "astro", "svelte" } },
@@ -1181,12 +1173,12 @@ if not vim.g.vscode then
 					lazy = true,
 					config = true,
 					opts = {
-						border = { enable = not M.ui },
+						border = { enable = not user.ui },
 					},
 				},
 				{
 					"hrsh7th/cmp-nvim-lsp",
-					cond = function() return require("user.utils").has "nvim-cmp" end,
+					cond = function() return utils.has "nvim-cmp" end,
 				},
 				{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
 				{ "folke/neodev.nvim", config = true, ft = "lua" },
@@ -1259,7 +1251,7 @@ if not vim.g.vscode then
 					yamlls = {
 						-- lazy-load schemastore when needed
 						on_new_config = function(config)
-							if require("user.utils").has "SchemaStore" then
+							if utils.has "SchemaStore" then
 								config.settings.yaml.schemas = require("schemastore").yaml.schemas()
 							end
 						end,
@@ -1360,7 +1352,7 @@ if not vim.g.vscode then
 
 				require("lspconfig.ui.windows").default_options.border = "single"
 
-				require("user.utils").on_attach(require("lsp").on_attach)
+				utils.on_attach(require("lsp").on_attach)
 
 				local mason_handler = function(server)
 					local server_opts = vim.tbl_deep_extend("force", {
@@ -1540,7 +1532,6 @@ if not vim.g.vscode then
 						type = "lldb",
 						request = "launch",
 						program = function()
-							---@diagnostic disable-next-line: redundant-parameter
 							return vim.fn.input(
 								"Path to executable: ",
 								vim.fn.getcwd() .. "/",
@@ -1649,7 +1640,7 @@ if not vim.g.vscode then
 					return (diff < 0)
 				end
 
-				if not M.ui then
+				if not user.ui then
 					local cmp_window = require "cmp.utils.window"
 					local prev_info = cmp_window.info
 					---@diagnostic disable-next-line: duplicate-set-field
@@ -1761,15 +1752,13 @@ if not vim.g.vscode then
 					},
 				}
 
-				if require("user.utils").has "cmp-git" then
-					table.insert(opts.sources, { name = "git" })
-				end
+				if utils.has "cmp-git" then table.insert(opts.sources, { name = "git" }) end
 
 				if vim.fn.expand "%" == "Cargo.toml" then
 					table.insert(opts.sources, { name = "crates" })
 				end
 
-				if not M.ui then
+				if not user.ui then
 					opts.window = {
 						completion = cmp.config.window.bordered { border = "single" },
 						documentation = cmp.config.window.bordered { border = "single" },
@@ -1843,13 +1832,13 @@ if not vim.g.vscode then
 			end,
 		},
 	}, {
-		install = { colorscheme = { M.colorscheme } },
+		install = { colorscheme = { user.colorscheme } },
 		defaults = { lazy = true },
 		change_detection = { notify = false },
 		concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 		checker = { enable = true },
 		ui = {
-			border = not M.ui and "single" or "none",
+			border = not user.ui and "single" or "none",
 			icons = {
 				cmd = icons.misc.Code,
 				config = icons.ui.Gear,
@@ -1910,6 +1899,6 @@ if not vim.g.vscode then
 		},
 	})
 
-	vim.o.background = M.background
-	vim.cmd.colorscheme(M.colorscheme)
+	vim.o.background = user.background
+	vim.cmd.colorscheme(user.colorscheme)
 end

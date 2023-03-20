@@ -2,7 +2,13 @@
   "neodev": {
     "library": {
       "enabled": true,
-      "plugins": ["nvim-lspconfig", "lazy.nvim", "nvim-cmp", "mason.nvim"]
+      "plugins": [
+        "nvim-lspconfig",
+        "lazy.nvim",
+        "nvim-cmp",
+        "mason.nvim",
+        "plenary.nvim"
+      ]
     }
   },
   "neoconf": {
