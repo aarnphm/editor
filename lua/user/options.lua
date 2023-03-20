@@ -11,26 +11,26 @@ local M = {
 }
 
 -- Some defaults and don't question it
-vim.o.wrap           = false                  -- egh i don't like wrap
-vim.o.writebackup    = false                  -- whos needs backup btw (i do sometimes)
-vim.o.autowrite      = true                   -- sometimes I forget to save
-vim.o.guicursor      = ""                     -- no gui cursor
-vim.o.undofile       = true                   -- set undofile to infinite undo
-vim.o.breakindent    = true                   -- enable break indent
-vim.o.breakindentopt = "shift:2,min:20"       -- wrap two spaces, with min of 20 text width
-vim.o.clipboard      = "unnamedplus"          -- sync system clipboard
-vim.o.pumheight      = 8                      -- larger completion windows
-vim.o.completeopt    = "menuone,noselect"     -- better completion menu
-vim.o.expandtab      = true                   -- convert spaces to tabs
-vim.o.mouse          = "a"                    -- ugh who needs mouse (accept on SSH maybe)
-vim.o.number         = true                   -- number is good for nav
-vim.o.relativenumber = true                   -- relativenumber is useful, grow up
-vim.o.swapfile       = false                  -- I don't like swap files personally, found undofile to be better
-vim.o.undofile       = true                   -- better than swapfile
-vim.o.undolevels     = 9999                   -- infinite undo
-vim.o.shortmess      = "aoOTIcF"              -- insanely complex shortmess, but its cleannn
-vim.o.laststatus     = 2                      -- show statusline on buffer
-vim.o.statusline     = "%= %= %m %y %l:%c ♥ " -- I refuse to have a complex statusline, but lualine is cool tho
+vim.o.wrap           = false                    -- egh i don't like wrap
+vim.o.writebackup    = false                    -- whos needs backup btw (i do sometimes)
+vim.o.autowrite      = true                     -- sometimes I forget to save
+vim.o.guicursor      = ""                       -- no gui cursor
+vim.o.undofile       = true                     -- set undofile to infinite undo
+vim.o.breakindent    = true                     -- enable break indent
+vim.o.breakindentopt = "shift:2,min:20"         -- wrap two spaces, with min of 20 text width
+vim.o.clipboard      = "unnamedplus"            -- sync system clipboard
+vim.o.pumheight      = 8                        -- larger completion windows
+vim.o.completeopt    = "menuone,noselect,menu"  -- better completion menu
+vim.o.expandtab      = true                     -- convert spaces to tabs
+vim.o.mouse          = "a"                      -- ugh who needs mouse (accept on SSH maybe)
+vim.o.number         = true                     -- number is good for nav
+vim.o.relativenumber = true                     -- relativenumber is useful, grow up
+vim.o.swapfile       = false                    -- I don't like swap files personally, found undofile to be better
+vim.o.undofile       = true                     -- better than swapfile
+vim.o.undolevels     = 9999                     -- infinite undo
+vim.o.shortmess      = "aoOTIcF"                -- insanely complex shortmess, but its cleannn
+vim.o.laststatus     = 2                        -- show statusline on buffer
+vim.o.statusline     = "%= %= %m %y %l:%c ♥ "   -- I refuse to have a complex statusline, but lualine is cool tho
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions
@@ -44,6 +44,8 @@ vim.opt.formatoptions = vim.opt.formatoptions
 	+ "j" -- Auto-remove comments if possible.
 	- "2" -- I'm not in gradeschool anymore
 
+-- diffopt is cool
+vim.opt.diffopt = "internal,filler,closeoff,algorithm:patience,linematch:60"
 
 -- Better folding using tree-sitter
 vim.o.foldlevelstart = 99
@@ -117,8 +119,9 @@ map("n", "<S-Tab>",         "<cmd>normal za<cr>",                               
 map("n", "Y",               "y$",                                                           { desc = "edit: Yank text to EOL"                            })
 map("n", "D",               "d$",                                                           { desc = "edit: Delete text to EOL"                          })
 map("n", "J",               "mzJ`z",                                                        { desc = "edit: Join next line"                              })
-map("n", "\\",              ":let @/=''<CR>:noh<CR>",                                       { silent = true, desc = "command: Search command history"    })
+map("n", "\\",              ":let @/=''<CR>:noh<CR>",                                       { silent = true, desc = "window: Clean highlight"            })
 map("n", ";",               ":",                                                            { silent = false, desc = "command: Enter command mode"       })
+map("n", ";;",               ";",                                                           { silent = false, desc = "normal: Enter Ex mode"             })
 map("v", "J",               ":m '>+1<CR>gv=gv",                                             { desc = "edit: Move this line down"                         })
 map("v", "K",               ":m '<-2<CR>gv=gv",                                             { desc = "edit: Move this line up"                           })
 map("v", "<",               "<gv",                                                          { desc = "edit: Decrease indent"                             })
@@ -162,11 +165,23 @@ for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 end
 
 vim.diagnostic.config {
-	virtual_text     = false,
-	underline        = false,
+	virtual_text = false,
+	underline = false,
 	update_in_insert = false,
-	severity_sort    = true,
+	severity_sort = true,
+	float = {
+		border = not M.ui and "simple" or "none",
+		format = function(diagnostic)
+			return string.format(
+				"%s (%s) [%s]",
+				diagnostic.message,
+				diagnostic.source,
+				diagnostic.code or diagnostic.user_data.lsp.code
+			)
+		end,
+	},
 }
+
 
 M.toggle_float_diagnostic = function ()
 	M.diagnostic.show_float = not M.diagnostic.show_float

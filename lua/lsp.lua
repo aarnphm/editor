@@ -121,6 +121,8 @@ M.setup_keymaps = function()
 	return M._keys
 end
 
+M.ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI or false
+
 M.on_attach = function(client, bufnr)
 	-- NOTE: setup format
 	if
@@ -138,6 +140,15 @@ M.on_attach = function(client, bufnr)
 				if M.autoformat then M.format { bufnr = bufnr } end
 			end,
 		})
+	end
+
+	if not M.ui and client.supports_method "textDocument/hover" then
+		vim.lsp.handlers["textDocument/hover"] =
+			vim.lsp.with(vim.lsp.handlers.hover, { border = "single" })
+	end
+	if not M.ui and client.supports_method "textDocument/signatureHelp" then
+		vim.lsp.handlers["textDocument/signatureHelp"] =
+			vim.lsp.with(vim.lsp.handlers.signature_help, { border = "single" })
 	end
 
 	if client.server_capabilities["documentSymbolProvider"] then
