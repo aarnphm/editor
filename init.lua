@@ -1165,9 +1165,6 @@ if not vim.g.vscode then
 				},
 				symbols = { separator = icons.ui_space.Separator },
 				show_modified = true,
-				--- NOTE: disable show filename
-				show_basename = false,
-				show_dirname = false,
 			},
 		},
 		{

@@ -120,7 +120,7 @@ M.statusline = {
 	build = function()
 		local spacer = "%="
 		return table.concat({
-			"%f | %{%luaeval('require(\"user.utils\").statusline.git()')%}",
+			"%{%luaeval('require(\"user.utils\").statusline.git()')%}",
 			"%m",
 			spacer,
 			spacer,
