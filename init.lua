@@ -387,7 +387,7 @@ if not vim.g.vscode then
 		{ "folke/paint.nvim", event = "BufReadPost", config = true },
 		{
 			"folke/noice.nvim",
-			event = "BufReadPost",
+			event = { "BufWinEnter", "BufNewFile", "WinEnter" },
 			dependencies = { "MunifTanjim/nui.nvim" },
 			opts = {
 				lsp = { progress = { enabled = false } },
@@ -1165,6 +1165,9 @@ if not vim.g.vscode then
 				},
 				symbols = { separator = icons.ui_space.Separator },
 				show_modified = true,
+				--- NOTE: disable show filename
+				show_basename = false,
+				show_dirname = false,
 			},
 		},
 		{
