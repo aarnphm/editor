@@ -111,11 +111,13 @@ M.statusline = {
 	end,
 	diagnostic = function() -- NOTE: diagnostic
 		local buf = vim.api.nvim_get_current_buf()
-		return fmt(
-			"[W:%d | E:%d]",
-			#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
-			#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
-		)
+		return vim.diagnostic.get(buf)
+				and fmt(
+					"[W:%d | E:%d]",
+					#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
+					#vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
+				)
+			or ""
 	end,
 	build = function()
 		local spacer = "%="
