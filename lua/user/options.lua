@@ -167,10 +167,14 @@ vim.diagnostic.config {
     underline        = false,
     update_in_insert = false,
 	virtual_text     = M.diagnostic.use_virtual_text and { prefix = "", spacing = 4 } or false,
-	float            = not M.ui and {
-		border = "simple",
-		format = function(diagnostic) return string.format("%s (%s) [%s]", diagnostic.message, diagnostic.source, diagnostic.code or diagnostic.user_data.lsp.code) end,
-	} or false,
+    float = {
+        close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+        focusable = false,
+        focus = false,
+		format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
+        source = "if_many",
+        border = not M.ui and "single" or "none",
+    },
 }
 
 

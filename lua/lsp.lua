@@ -81,6 +81,12 @@ M.setup_keymaps = function()
 				desc = "lsp: see source action",
 				has = "codeAction",
 			},
+            -- document symbols
+            {"ds", vim.lsp.buf.document_symbol, desc = "lsp: document symbols", has = "documentSymbol" },
+            {"<localleader>ws", vim.lsp.buf.workspace_symbol, desc = "lsp: workspace symbols", has = "workspaceSymbol" },
+            -- incoming call hierarchy
+            {"<leader>ci", vim.lsp.buf.incoming_calls, desc = "lsp: incoming calls", has = "callHierarchy" },
+            {"<leader>co", vim.lsp.buf.outgoing_calls, desc = "lsp: incoming calls", has = "callHierarchy" },
 		}
 		if require("user.utils").has "inc-rename.nvim" then
 			M._keys[#M._keys + 1] = {

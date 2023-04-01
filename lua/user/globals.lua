@@ -104,7 +104,7 @@ autocmd("FileType", {
 autocmd("TermOpen", {
 	group = augroup "term",
 	pattern = "term://*",
-	callback = function()
+	callback = function(_)
 		local opts = { noremap = true, silent = true }
 		api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
 		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
