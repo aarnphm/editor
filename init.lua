@@ -36,11 +36,7 @@ if not vim.g.vscode then
 						return vim.tbl_deep_extend("force", config, { col = -1, row = 0 })
 					end,
 				},
-				select = {
-					enabled = true,
-					backend = "telescope",
-					trim_prompt = true,
-				},
+				select = { enabled = true, backend = "telescope", trim_prompt = true },
 			},
 			init = function()
 				---@diagnostic disable-next-line: duplicate-set-field
@@ -383,7 +379,16 @@ if not vim.g.vscode then
 			opts = { notify = { clear_time = 1000 } },
 		},
 		-- NOTE: folke is neovim's tpope
-		{ "folke/zen-mode.nvim", event = "BufReadPost", cmd = "ZenMode" },
+		{
+			"folke/zen-mode.nvim",
+			event = "BufReadPost",
+			cmd = "ZenMode",
+			opts = {
+				window = {
+					width = function() return vim.o.columns * 0.73 end,
+				},
+			},
+		},
 		{ "folke/paint.nvim", event = "BufReadPost", config = true },
 		{
 			"folke/noice.nvim",
@@ -442,7 +447,7 @@ if not vim.g.vscode then
 			event = "BufReadPost",
 			opts = { plugins = { presets = { operators = false } } },
 			config = function(_, opts)
-				if not user.ui then opts.window = { border = "single" } end
+				if user.ui then opts.window = { border = "single" } end
 				require("which-key").setup(opts)
 			end,
 		},
@@ -1187,7 +1192,7 @@ if not vim.g.vscode then
 					lazy = true,
 					config = true,
 					opts = {
-						border = { enable = not user.ui },
+						border = { enable = user.ui },
 					},
 				},
 				{
@@ -1654,7 +1659,7 @@ if not vim.g.vscode then
 					return (diff < 0)
 				end
 
-				if not user.ui then
+				if user.ui then
 					local cmp_window = require "cmp.utils.window"
 					local prev_info = cmp_window.info
 					---@diagnostic disable-next-line: duplicate-set-field
@@ -1772,7 +1777,7 @@ if not vim.g.vscode then
 					table.insert(opts.sources, { name = "crates" })
 				end
 
-				if not user.ui then
+				if user.ui then
 					opts.window = {
 						completion = cmp.config.window.bordered { border = "single" },
 						documentation = cmp.config.window.bordered { border = "single" },
@@ -1852,7 +1857,7 @@ if not vim.g.vscode then
 		concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 		checker = { enable = true },
 		ui = {
-			border = not user.ui and "single" or "none",
+			border = user.ui and "single" or "none",
 			icons = {
 				cmd = icons.misc.Code,
 				config = icons.ui.Gear,

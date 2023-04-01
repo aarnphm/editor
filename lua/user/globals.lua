@@ -33,7 +33,7 @@ local getlocals = function(l)
 	end
 end
 
-_G.GS = function(f)
+_G.S = function(f)
 	assert(type(f) == "function", "bad argument #1 to 'dumpsig' (function expected)")
 	local p = {}
 	pcall(function()
@@ -207,16 +207,16 @@ autocmd({ "WinEnter, BufEnter" }, {
 	group = augroup "disable_statusline_enter",
 	pattern = disable_filetype,
 	callback = function()
-		vim.opt.laststatus = 0
-		vim.opt.statusline = ""
+		vim.o.laststatus = 0
+		vim.o.statusline = ""
 	end,
 })
 autocmd({ "WinLeave, BufLeave" }, {
 	group = augroup "disable_statusline_leave",
-	pattern = disable_filetype,
+	pattern = "*",
 	callback = function()
-		vim.opt.laststatus = 2
-		vim.opt.statusline = require("user.utils").statusline.build()
+		vim.o.laststatus = 2
+		vim.o.statusline = require("user.utils").statusline.build()
 	end,
 })
 

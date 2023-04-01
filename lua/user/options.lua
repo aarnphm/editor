@@ -3,14 +3,41 @@ local autocmd = vim.api.nvim_create_autocmd
 
 -- simple configuration
 local M = {
-	window      = { resize = 10                                  },                                      -- Windows opts
-	diagnostic  = { show_float = false, use_virtual_text = false },                                      -- Whether to show the diagnostic popup
-	ui          = vim.NIL ~= vim.env.SIMPLE_UI          and vim.env.SIMPLE_UI		   or false,		 -- Whether to make completion fancy or simple border
-	colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "oxocarbon",   -- colorscheme go brr
-	background  = vim.NIL ~= vim.env.SIMPLE_BACKGROUND  and vim.env.SIMPLE_BACKGROUND  or "dark",		 -- dark or light go brr
+	-- NOTE: Windows opts
+	window = { resize = 10 },
+	-- NOTE: Whether to show the diagnostic popup
+	diagnostic = { show_float = false, use_virtual_text = false },
+	-- NOTE: Whether to make completion fancy or simple border
+	ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false,
+	-- NOTE: colorscheme go brr
+	colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME
+		or "oxocarbon",
+	-- NOTE: dark or light go brr
+	background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark",
 }
 
+-- disable some default providers
+for _, provider in ipairs { "node", "perl", "python3", "ruby" } do
+	vim.g["loaded_" .. provider .. "_provider"] = 0
+end
+
+if vim.loop.os_uname().sysname == "Darwin" then
+	vim.g.clipboard = {
+		name = "macOS-clipboard",
+		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
+		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
+		cache_enabled = 0,
+	}
+end
+
+-- NOTE: Keymaps that are useful, use it and never come back.
+local map = function(mode, lhs, rhs, opts)
+	opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+	vim.keymap.set(mode, lhs, rhs, opts)
+end
+
 -- Some defaults and don't question it
+-- stylua: ignore start
 vim.o.wrap           = false                                    -- egh i don't like wrap
 vim.o.writebackup    = false                                    -- whos needs backup btw (i do sometimes)
 vim.o.autowrite      = true                                     -- sometimes I forget to save
@@ -86,31 +113,11 @@ vim.o.wildignorecase = true
 vim.o.wildmode       = "longest:full,full"
 vim.opt.wildignore   = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
 
--- disable some default providers
-for _, provider in ipairs { "node", "perl", "python3", "ruby" } do
-  vim.g["loaded_" .. provider .. "_provider"] = 0
-end
-
-if vim.loop.os_uname().sysname == "Darwin" then
-	vim.g.clipboard = {
-		name          = "macOS-clipboard",
-		copy          = { ["+"] = "pbcopy",  ["*"] = "pbcopy"  },
-		paste         = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
-		cache_enabled = 0,
-	}
-end
-
 -- map leader to <Space> and localeader to +
 vim.g.mapleader      = " "
 vim.g.maplocalleader = "+"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
-
--- NOTE: Keymaps that are useful, use it and never come back.
-local map = function(mode, lhs, rhs, opts)
-    opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
-    vim.keymap.set(mode, lhs, rhs, opts)
-end
 
 -- NOTE: normal mode
 map("n", "<S-Tab>",         "<cmd>normal za<cr>",                                           { desc = "edit: Toggle code fold"                            })
@@ -128,10 +135,10 @@ map("c", "W!!",             "execute 'silent! write !sudo tee % >/dev/null' <bar
 map("n", "<C-h>",           "<C-w>h",                                                       { desc = "window: Focus left"                                })
 map("n", "<C-l>",           "<C-w>l",                                                       { desc = "window: Focus right"                               })
 map("n", "<C-j>",           "<C-w>j",                                                       { desc = "window: Focus down"                                })
+map("n", "<C-k>",           "<C-w>k",                                                       { desc = "window: Focus up"                                  })
 map("n", "<LocalLeader>|",  "<C-w>|",                                                       { desc = "window: Maxout width"                              })
 map("n", "<LocalLeader>-",  "<C-w>_",                                                       { desc = "window: Maxout width"                              })
 map("n", "<LocalLeader>=",  "<C-w>=",                                                       { desc = "window: Equal size"                                })
-map("n", "<C-k>",           "<C-w>k",                                                       { desc = "window: Focus up"                                  })
 map("n", "<Leader>qq",      "<cmd>wqa<cr>",                                                 { desc = "editor: write quit all"                            })
 map("n", "<Leader>.",       "<cmd>bnext<cr>",                                               { desc = "buffer: next"                                      })
 map("n", "<Leader>,",       "<cmd>bprevious<cr>",                                           { desc = "buffer: previous"                                  })
@@ -155,6 +162,7 @@ map("t", "<C-\\>",          "<Esc><cmd>ToggleTerm<cr>",                         
 map("n", "<C-t>",           "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>",   { desc = "terminal: Toggle vertical"                         })
 map("i", "<C-t>",           "<Esc><cmd>ToggleTerm direction=vertical<cr>",                  { desc = "terminal: Toggle vertical"                         })
 map("t", "<C-t>",           "<Esc><cmd>ToggleTerm<cr>",                                     { desc = "terminal: Toggle vertical"                         })
+-- stylua: ignore end
 
 -- NOTE: diagnostic config
 for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
@@ -163,22 +171,23 @@ for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
 end
 
 vim.diagnostic.config {
-    severity_sort    = true,
-    underline        = false,
-    update_in_insert = false,
-	virtual_text     = M.diagnostic.use_virtual_text and { prefix = "", spacing = 4 } or false,
-    float = {
-        close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-        focusable = false,
-        focus = false,
-		format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-        source = "if_many",
-        border = not M.ui and "single" or "none",
-    },
+	severity_sort = true,
+	underline = false,
+	update_in_insert = false,
+	virtual_text = M.diagnostic.use_virtual_text and { prefix = "", spacing = 4 } or false,
+	float = {
+		close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+		focusable = false,
+		focus = false,
+		format = function(diagnostic)
+			return string.format("%s (%s)", diagnostic.message, diagnostic.source)
+		end,
+		source = "if_many",
+		border = not M.ui and "single" or "none",
+	},
 }
 
-
-M.toggle_float_diagnostic = function ()
+M.toggle_float_diagnostic = function()
 	M.diagnostic.show_float = not M.diagnostic.show_float
 	if M.diagnostic.show_float then
 		vim.notify("diagnostic: Enable showing float on hover", vim.log.levels.INFO)

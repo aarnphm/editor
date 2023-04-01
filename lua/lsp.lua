@@ -127,7 +127,7 @@ M.setup_keymaps = function()
 	return M._keys
 end
 
-M.ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI or false
+M.ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false
 
 M.on_attach = function(client, bufnr)
 	-- NOTE: setup format
