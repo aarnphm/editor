@@ -156,6 +156,7 @@ if not vim.g.vscode then
 			end,
 			event = { "BufReadPost", "BufNewFile" },
 			dependencies = {
+				"windwp/nvim-ts-autotag",
 				{
 					"nvim-treesitter/nvim-treesitter-textobjects",
 					init = function()
@@ -199,6 +200,7 @@ if not vim.g.vscode then
 				indent = { enable = true },
 				highlight = { enable = true },
 				context_commentstring = { enable = true, enable_autocmd = false },
+				autotag = { enable = true },
 				incremental_selection = {
 					enable = true,
 					keymaps = {
