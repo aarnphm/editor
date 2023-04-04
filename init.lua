@@ -397,7 +397,7 @@ if not vim.g.vscode then
 			event = { "BufWinEnter", "BufNewFile", "WinEnter" },
 			dependencies = { "MunifTanjim/nui.nvim" },
 			opts = {
-				lsp = { progress = { enabled = false } },
+				lsp = { progress = { enabled = false }, signature = { enabled = false } },
 				cmdline = { enabled = true, view = "cmdline" },
 				messages = { view = "mini", view_error = "mini", view_warn = "mini" },
 				popupmenu = { enabled = true },
