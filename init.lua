@@ -402,12 +402,10 @@ if not vim.g.vscode then
 					signature = { enabled = false },
 					hover = { enabled = false },
 				},
-				cmdline = { enabled = true, view = "cmdline" },
 				messages = { view = "mini", view_error = "mini", view_warn = "mini" },
-				popupmenu = { enabled = true },
 				hover = { enabled = false },
 				signature = { enabled = false },
-				presets = { bottom_search = true, command_palette = true, inc_rename = true },
+				presets = { bottom_search = false, command_palette = true, inc_rename = true },
 			},
 		},
 		{
@@ -708,14 +706,14 @@ if not vim.g.vscode then
 					},
 					-- disable last status on neo-tree
 					-- If I use laststatus, then uncomment this
-					-- {
-					-- 	event = "neo_tree_buffer_enter",
-					-- 	handler = function() vim.opt_local.laststatus = 0 end,
-					-- },
-					-- {
-					-- 	event = "neo_tree_buffer_leave",
-					-- 	handler = function() vim.opt_local.laststatus = 2 end,
-					-- },
+					{
+						event = "neo_tree_buffer_enter",
+						handler = function() vim.opt_local.laststatus = 0 end,
+					},
+					{
+						event = "neo_tree_buffer_leave",
+						handler = function() vim.opt_local.laststatus = 2 end,
+					},
 				},
 				always_show = { ".github" },
 				window = {
@@ -1043,7 +1041,7 @@ if not vim.g.vscode then
 		-- NOTE: format for days
 		{
 			"jose-elias-alvarez/null-ls.nvim",
-			event = "BufReadPre",
+			event = { "BufReadPre", "BufNewFile" },
 			dependencies = {
 				"nvim-lua/plenary.nvim",
 				"jayp0521/mason-null-ls.nvim",
@@ -1130,9 +1128,8 @@ if not vim.g.vscode then
 				require("mason-null-ls").setup {
 					ensure_installed = nil,
 					automatic_installation = true,
-					automatic_setup = false,
+					handlers = {},
 				}
-				require("mason-null-ls").setup_handlers {}
 			end,
 		},
 		-- NOTE: lua related
@@ -1329,7 +1326,6 @@ if not vim.g.vscode then
 					cssls = {},
 					spectral = {},
 					taplo = {},
-					denols = {},
 					-- NOTE: isolated servers will have their own plugins for setup
 					clangd = { isolated = true },
 					rust_analyzer = { isolated = true },
@@ -1400,11 +1396,11 @@ if not vim.g.vscode then
 				for server, server_opts in pairs(servers) do
 					if server_opts then
 						server_opts = server_opts == true and {} or server_opts
-						-- XXX: servers that are isolated should be setup manually.
+						-- NOTE: servers that are isolated should be setup manually.
 						if server_opts.isolated then
 							ensure_installed[#ensure_installed + 1] = server
 						else
-							-- XXX: run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+							-- NOTE: run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
 							if
 								server_opts.mason == false
 								or not vim.tbl_contains(available, server)
@@ -1837,7 +1833,7 @@ if not vim.g.vscode then
 			config = function(_, opts)
 			-- stylua: ignore
 			-- NOTE: this is for my garden, you can remove this
-			opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/content/" or vim.fn.getcwd()
+			opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
 				opts.note_frontmatter_func = function(note)
 					local out = { id = note.id, tags = note.tags }
 					-- `note.metadata` contains any manually added fields in the frontmatter.
