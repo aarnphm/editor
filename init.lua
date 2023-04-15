@@ -28,6 +28,7 @@ require("lazy").setup({
 	"lewis6991/impatient.nvim",
 	"nvim-lua/plenary.nvim",
 	"jghauser/mkdir.nvim",
+	"nvim-tree/nvim-web-devicons",
 	{ "dstein64/vim-startuptime", cmd = "StartupTime" },
 	{
 		"stevearc/dressing.nvim",
@@ -398,7 +399,6 @@ require("lazy").setup({
 	{
 		"folke/noice.nvim",
 		event = { "BufWinEnter", "BufNewFile", "WinEnter" },
-		dependencies = { "MunifTanjim/nui.nvim" },
 		opts = {
 			lsp = {
 				progress = { enabled = false },
@@ -1687,7 +1687,7 @@ require("lazy").setup({
 				formatting = {
 					format = lspkind.cmp_format {
 						-- show only symbol annotations
-						mode = "symbol_text",
+						mode = "symbol",
 						-- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 						maxwidth = 50,
 					},

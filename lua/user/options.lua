@@ -6,7 +6,7 @@ local M = {
 	-- NOTE: Windows opts
 	window = { resize = 10, border = "single" },
 	-- NOTE: Whether to show the diagnostic popup
-	diagnostic = { show_float = false, use_virtual_text = false },
+	diagnostic = { show_float = false, use_virtual_text = true },
 	-- NOTE: Whether to make completion fancy or simple border
 	ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false,
 	-- NOTE: colorscheme go brr
@@ -169,9 +169,9 @@ map("t", "<C-t>",           "<Esc><cmd>ToggleTerm<cr>",                         
 -- stylua: ignore end
 
 -- NOTE: diagnostic config
-for _, type in pairs { "Error", "Warn", "Hint", "Info" } do
-	local hl = string.format("DiagnosticSign%s", type)
-	vim.fn.sign_define(hl, { text = "●", texthl = hl, numhl = hl })
+for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
+	local hl = string.format("DiagnosticSign%s", type[1])
+	vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
 end
 
 vim.diagnostic.config {
@@ -187,7 +187,7 @@ vim.diagnostic.config {
 			return string.format("%s (%s)", diagnostic.message, diagnostic.source)
 		end,
 		source = "if_many",
-		border = not M.ui and "single" or "none",
+		border = M.ui and M.window.border or "none",
 	},
 }
 
@@ -200,7 +200,19 @@ M.toggle_float_diagnostic = function()
 	end
 end
 
+M.toggle_virtual_text = function()
+	M.diagnostic.use_virtual_text = not M.diagnostic.use_virtual_text
+	vim.diagnostic.config { virtual_text = M.diagnostic.use_virtual_text and true or false }
+
+	if M.diagnostic.use_virtual_text then
+		vim.notify("diagnostic: Enable showing virtual text", vim.log.levels.INFO)
+	else
+		vim.notify("diagnostic: Disable showing virtual text", vim.log.levels.INFO)
+	end
+end
+
 map("n", "<LocalLeader>d", M.toggle_float_diagnostic, { desc = "diagnostic: Toggle float" })
+map("n", "<LocalLeader>t", M.toggle_virtual_text, { desc = "diagnostic: Toggle virtual text" })
 
 -- diagnostic on hover
 autocmd({ "CursorHold", "CursorHoldI" }, {
