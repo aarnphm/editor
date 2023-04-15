@@ -27,7 +27,6 @@ require("lazy").setup({
 	-- NOTE: utilities
 	"lewis6991/impatient.nvim",
 	"nvim-lua/plenary.nvim",
-	"jghauser/mkdir.nvim",
 	"nvim-tree/nvim-web-devicons",
 	{ "dstein64/vim-startuptime", cmd = "StartupTime" },
 	{
@@ -377,42 +376,7 @@ require("lazy").setup({
 		event = "LspAttach",
 		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
 	},
-	{
-		"vigoux/notifier.nvim",
-		enabled = false,
-		event = "InsertEnter",
-		config = true,
-		opts = { notify = { clear_time = 1000 } },
-	},
 	-- NOTE: folke is neovim's tpope
-	{
-		"folke/zen-mode.nvim",
-		event = "BufReadPost",
-		cmd = "ZenMode",
-		opts = {
-			window = {
-				width = function() return vim.o.columns * 0.73 end,
-			},
-		},
-	},
-	{ "folke/paint.nvim", event = "BufReadPost", config = true },
-	{
-		"folke/noice.nvim",
-		event = { "BufWinEnter", "BufNewFile", "WinEnter" },
-		opts = {
-			lsp = {
-				progress = { enabled = false },
-				signature = { enabled = false },
-				hover = { enabled = false },
-			},
-			cmdline = { view = "cmdline" },
-			messages = { view = "mini", view_error = "mini", view_warn = "mini" },
-			hover = { enabled = false },
-			signature = { enabled = false },
-			popupmenu = { backend = "cmp" },
-			presets = { bottom_search = true, command_palette = false, inc_rename = true },
-		},
-	},
 	{
 		"folke/trouble.nvim",
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -845,201 +809,6 @@ require("lazy").setup({
 		},
 		config = true,
 	},
-	-- NOTE: all specific language plugins
-	{
-		"jose-elias-alvarez/typescript.nvim",
-		ft = { "typescript", "tsx" },
-		dependencies = { "neovim/nvim-lspconfig" },
-		config = function()
-			utils.on_attach(function(client, buffer)
-				if client.name == "tsserver" then
-					vim.keymap.set(
-						"n",
-						"<leader>co",
-						"<cmd>TypescriptOrganizeImports<CR>",
-						{ buffer = buffer, desc = "lsp: organize imports" }
-					)
-					vim.keymap.set(
-						"n",
-						"<leader>cR",
-						"<cmd>TypescriptRenameFile<CR>",
-						{ desc = "lsp: rename file", buffer = buffer }
-					)
-				end
-			end)
-			require("typescript").setup {
-				server = {
-					capabilities = require("lsp").gen_capabilities(),
-					completions = { completeFunctionCalls = true },
-				},
-			}
-		end,
-	},
-	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
-	{
-		"simrat39/rust-tools.nvim",
-		ft = "rust",
-		dependencies = { "neovim/nvim-lspconfig" },
-		config = function()
-			local get_rust_adapters = function()
-				if vim.loop.os_uname().sysname == "Windows_NT" then
-					return {
-						type = "executable",
-						command = "lldb-vscode",
-						name = "rt_lldb",
-					}
-				end
-				local codelldb_extension_path = vim.fn.stdpath "data"
-					.. "/mason/packages/codelldb/extension"
-				local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
-				local extension = ".so"
-				if vim.loop.os_uname().sysname == "Darwin" then extension = ".dylib" end
-				local liblldb_path = codelldb_extension_path .. "/lldb/lib/liblldb" .. extension
-				return require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path)
-			end
-
-			require("rust-tools").setup {
-				tools = {
-					inlay_hints = {
-						auto = true,
-						other_hints_prefix = ":: ",
-						only_current_line = true,
-						show_parameter_hints = false,
-					},
-				},
-				dap = { adapter = get_rust_adapters() },
-				server = {
-					on_attach = function(_, bufnr)
-                        -- stylua: ignore start
-						vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
-						vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-						vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
-						-- stylua: ignore end
-					end,
-					capabilities = require("lsp").gen_capabilities(),
-					standalone = true,
-					settings = {
-						["rust-analyzer"] = {
-							cargo = {
-								loadOutDirsFromCheck = true,
-								buildScripts = { enable = true },
-							},
-							diagnostics = {
-								disabled = { "unresolved-proc-macro" },
-								enableExperimental = true,
-							},
-							checkOnSave = { command = "clippy" },
-							procMacro = { enable = true },
-						},
-					},
-				},
-			}
-		end,
-	},
-	{
-		"p00f/clangd_extensions.nvim",
-		ft = { "c", "cpp", "hpp", "h" },
-		dependencies = { "neovim/nvim-lspconfig" },
-		config = function()
-			local lspconfig = require "lspconfig"
-			local capabilities = require("lsp").gen_capabilities()
-
-			capabilities.offsetEncoding = { "utf-16", "utf-8" }
-
-			local switch_source_header_splitcmd = function(bufnr, splitcmd)
-				bufnr = lspconfig.util.validate_bufnr(bufnr)
-				local params = { uri = vim.uri_from_bufnr(bufnr) }
-
-				local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
-
-				if clangd_client then
-					clangd_client.request(
-						"textDocument/switchSourceHeader",
-						params,
-						function(err, result)
-							if err then error(tostring(err)) end
-							if not result then
-								error(
-									"Corresponding file can’t be determined",
-									vim.log.levels.ERROR
-								)
-								return
-							end
-							vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
-						end
-					)
-				else
-					error(
-						"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
-						vim.log.levels.ERROR
-					)
-				end
-			end
-
-			local get_binary_path_list = function(binaries)
-				local get_binary_path = function(binary)
-					local path = nil
-					if vim.loop.os_uname().sysname == "Windows_NT" then
-						path = vim.fn.trim(vim.fn.system("where " .. binary))
-					else
-						path = vim.fn.trim(vim.fn.system("which " .. binary))
-					end
-					if vim.v.shell_error ~= 0 then path = nil end
-					return path
-				end
-
-				local path_list = {}
-				for _, binary in ipairs(binaries) do
-					local path = get_binary_path(binary)
-					if path then table.insert(path_list, path) end
-				end
-				return table.concat(path_list, ",")
-			end
-
-			require("clangd_extensions").setup {
-				-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
-				server = {
-					capabilities = capabilities,
-					single_file_support = true,
-					cmd = {
-						"clangd",
-						"--background-index",
-						"--pch-storage=memory",
-						-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-						"--query-driver="
-							.. get_binary_path_list {
-								"clang++",
-								"clang",
-								"gcc",
-								"g++",
-							},
-						"--clang-tidy",
-						"--all-scopes-completion",
-						"--completion-style=detailed",
-						"--header-insertion-decorators",
-						"--header-insertion=never",
-					},
-					filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-					commands = {
-						ClangdSwitchSourceHeader = {
-							function() switch_source_header_splitcmd(0, "edit") end,
-							description = "cpp: Open source/header in current buffer",
-						},
-						ClangdSwitchSourceHeaderVSplit = {
-							function() switch_source_header_splitcmd(0, "vsplit") end,
-							description = "cpp: Open source/header in a new vsplit",
-						},
-						ClangdSwitchSourceHeaderSplit = {
-							function() switch_source_header_splitcmd(0, "split") end,
-							description = "cpp: Open source/header in a new split",
-						},
-					},
-				},
-			}
-		end,
-	},
-	---@diagnostic disable-next-line: assign-type-mismatch
-	{ "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
 	-- NOTE: format for days
 	{
 		"jose-elias-alvarez/null-ls.nvim",
@@ -1053,7 +822,6 @@ require("lazy").setup({
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
 			local f = require("null-ls").builtins.formatting
 			local d = require("null-ls").builtins.diagnostics
-			local ca = require("null-ls").builtins.code_actions
 			return {
 				debug = true,
 				-- NOTE: add neoconf.json to root pattern
@@ -1064,64 +832,16 @@ require("lazy").setup({
 					".git"
 				),
 				sources = {
-					-- NOTE: formatting
-					f.prettierd.with {
-						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
-						extra_filetypes = { "jsonc", "astro", "svelte" },
-						disabled_filetypes = { "markdown" },
-					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.black,
 					f.ruff,
 					f.isort,
 					f.stylua,
-					f.beautysh,
-					f.rustfmt,
 					f.jq,
-					f.buf,
-					f.clang_format.with {
-						extra_args = {
-							string.format("--style=file:%s/.clang-format", utils.get_root()),
-						},
-					},
-					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
-					f.buildifier,
-					f.taplo.with {
-						extra_args = {
-							"-o",
-							string.format("indent_string=%s", string.rep(" ", 4)),
-						},
-					},
-					f.deno_fmt.with {
-						extra_args = { "--line-width", "80" },
-						disabled_filetypes = {
-							"javascript",
-							"javascriptreact",
-							"typescript",
-							"typescriptreact",
-						},
-					},
-					f.yamlfmt,
 
 					-- NOTE: diagnostics
-					d.clang_check,
-					d.eslint.with { extra_filetypes = { "astro", "svelte" } },
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
-					d.golangci_lint,
-					d.markdownlint.with { extra_args = { "--disable MD033" } },
-					d.zsh,
-					d.buf,
-					d.buildifier,
-					d.stylelint,
-					d.vint,
-
-					-- NOTE: code actions
-					ca.gitrebase,
-					ca.shellcheck,
-					ca.eslint.with {
-						extra_filetypes = { "astro", "svelte" },
-					},
 				},
 			}
 		end,
@@ -1129,7 +849,7 @@ require("lazy").setup({
 			require("null-ls").setup(opts)
 			require("mason-null-ls").setup {
 				ensure_installed = nil,
-				automatic_installation = true,
+				automatic_installation = false,
 				handlers = {},
 			}
 		end,
@@ -1211,76 +931,6 @@ require("lazy").setup({
 		opts = {
 			---@type lspconfig.options
 			servers = {
-				bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
-				gopls = {
-					flags = { debounce_text_changes = 500 },
-					cmd = { "gopls", "-remote=auto" },
-					settings = {
-						gopls = {
-							usePlaceholders = true,
-							analyses = {
-								nilness = true,
-								shadow = true,
-								unusedparams = true,
-								unusewrites = true,
-							},
-						},
-					},
-				},
-				html = {
-					cmd = { "html-languageserver", "--stdio" },
-					filetypes = { "html" },
-					init_options = {
-						configurationSection = { "html", "css", "javascript" },
-						embeddedLanguages = { css = true, javascript = true },
-					},
-					settings = {},
-					single_file_support = true,
-					flags = { debounce_text_changes = 500 },
-				},
-				jdtls = {
-					flags = { debounce_text_changes = 500 },
-					settings = {
-						root_dir = {
-							-- Single-module projects
-							{
-								"build.xml", -- Ant
-								"pom.xml", -- Maven
-								"settings.gradle", -- Gradle
-								"settings.gradle.kts", -- Gradle
-							},
-							-- Multi-module projects
-							{ "build.gradle", "build.gradle.kts" },
-							{ "$BENTOML_GIT_ROOT/grpc-client/java" },
-							{ "$BENTOML_GIT_ROOT/grpc-client/kotlin" },
-						} or vim.fn.getcwd(),
-					},
-				},
-				jsonls = {
-					-- lazy-load schemastore when needed
-					on_new_config = function(config)
-						config.settings.json.schemas = config.settings.json.schemas or {}
-						vim.list_extend(
-							config.settings.json.schemas,
-							require("schemastore").json.schemas()
-						)
-					end,
-					settings = {
-						json = {
-							format = { enable = true },
-							validate = { enable = true },
-						},
-					},
-				},
-				yamlls = {
-					-- lazy-load schemastore when needed
-					on_new_config = function(config)
-						if utils.has "SchemaStore" then
-							config.settings.yaml.schemas = require("schemastore").yaml.schemas()
-						end
-					end,
-					settings = { yaml = { hover = true, validate = true, completion = true } },
-				},
 				pyright = {
 					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
@@ -1319,51 +969,10 @@ require("lazy").setup({
 						},
 					},
 				},
-				bashls = {},
-				dockerls = {},
-				marksman = {},
-				rnix = {},
 				ruff_lsp = {},
-				svelte = {},
-				cssls = {},
-				spectral = {},
-				taplo = {},
-				-- NOTE: isolated servers will have their own plugins for setup
-				clangd = { isolated = true },
-				rust_analyzer = { isolated = true },
-				tsserver = { isolated = true },
-				-- NOTE: servers that mason is currently not supported but nvim-lspconfig is.
-				starlark_rust = { mason = false },
 			},
 			---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
-			setup = {
-				starlark_rust = function(lspconfig, options)
-					lspconfig.starlark_rust.setup {
-						capabilities = options.capabilities,
-						cmd = { "starlark", "--lsp" },
-						filetypes = {
-							"bzl",
-							"WORKSPACE",
-							"star",
-							"BUILD.bazel",
-							"bazel",
-							"bzlmod",
-						},
-						root_dir = function(fname)
-							return require("lspconfig").util.root_pattern(unpack {
-								"WORKSPACE",
-								"WORKSPACE.bzlmod",
-								"WORKSPACE.bazel",
-								"MODULE.bazel",
-								"MODULE",
-							})(fname) or require("lspconfig").util.find_git_ancestor(fname) or require(
-								"lspconfig"
-							).util.path.dirname(fname)
-						end,
-					}
-					return true
-				end,
-			},
+			setup = {},
 		},
 		---@param opts LspOptions
 		config = function(_, opts)
@@ -1435,146 +1044,6 @@ require("lazy").setup({
 				local p = mr.get_package(tool)
 				if not p:is_installed() then p:install() end
 			end
-		end,
-	},
-	-- NOTE: lets do some dap
-	{
-		"mfussenegger/nvim-dap",
-		dependencies = {
-			-- Creates a beautiful debugger UI
-			"rcarriga/nvim-dap-ui",
-			-- Installs the debug adapters for you
-			"williamboman/mason.nvim",
-			"jay-babu/mason-nvim-dap.nvim",
-			-- Add your own debuggers here
-			"leoluz/nvim-dap-go",
-		},
-		config = function()
-			local dap = require "dap"
-			local dapui = require "dapui"
-
-			require("mason-nvim-dap").setup {
-				automatic_setup = true,
-				ensure_installed = { "delve", "codelldb" },
-			}
-
-			-- You can provide additional configuration to the handlers,
-			-- see mason-nvim-dap README for more information
-			require("mason-nvim-dap").setup_handlers()
-
-			-- Dap UI setup
-			-- For more information, see |:help nvim-dap-ui|
-			dapui.setup {
-				icons = {
-					expanded = icons.ui_space.ArrowOpen,
-					collapsed = icons.ui_space.ArrowClosed,
-					current_frame = icons.ui_space.Indicator,
-				},
-				layouts = {
-					{
-						elements = {
-							-- Provide as ID strings or tables with "id" and "size" keys
-							{
-								id = "scopes",
-								size = 0.25, -- Can be float or integer > 1
-							},
-							{ id = "breakpoints", size = 0.25 },
-							{ id = "stacks", size = 0.25 },
-							{ id = "watches", size = 0.25 },
-						},
-						size = 40,
-						position = "left",
-					},
-					{ elements = { "repl" }, size = 10, position = "bottom" },
-				},
-				controls = {
-					icons = {
-						pause = icons.dap_space.Pause,
-						play = icons.dap_space.Play,
-						step_into = icons.dap_space.StepInto,
-						step_over = icons.dap_space.StepOver,
-						step_out = icons.dap_space.StepOut,
-						step_back = icons.dap_space.StepBack,
-						run_last = icons.dap_space.RunLast,
-						terminate = icons.dap_space.Terminate,
-					},
-				},
-				windows = { indent = 1 },
-			}
-
-			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
-			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-			dap.listeners.before.event_exited["dapui_config"] = dapui.close
-
-			for _, v in ipairs {
-				"Breakpoint",
-				"BreakpointRejected",
-				"BreakpointCondition",
-				"LogPoint",
-				"Stopped",
-			} do
-				vim.fn.sign_define(
-					"Dap" .. v,
-					{ text = icons.dap_space[v], texthl = "Dap" .. v, line = "", numhl = "" }
-				)
-			end
-
-			-- Basic debugging keymaps, feel free to change to your liking!
-			vim.keymap.set("n", "<F6>", dap.continue, { desc = "dap: continue" })
-			vim.keymap.set("n", "<F7>", function()
-				dap.terminate()
-				dapui.close()
-			end, { desc = "dap: stop" })
-			vim.keymap.set("n", "<F8>", dap.toggle_breakpoint, { desc = "dap: toggle breakpoint" })
-			vim.keymap.set("n", "<F9>", dap.step_into, { desc = "dap: step into" })
-			vim.keymap.set("n", "<F10>", dap.step_out, { desc = "dap: step out" })
-			vim.keymap.set("n", "<F10>", dap.step_over, { desc = "dap: step over" })
-			vim.keymap.set(
-				"n",
-				"<leader>db",
-				function() dap.set_breakpoint(vim.fn.input "Breakpoint condition: ") end,
-				{ desc = "dap: set breakpoint condition" }
-			)
-
-			-- Install golang specific config
-			require("dap-go").setup()
-
-			dap.adapters.lldb = {
-				type = "executable",
-				command = "/usr/bin/lldb-vscode",
-				name = "lldb",
-			}
-			dap.configurations.cpp = {
-				{
-					name = "Launch",
-					type = "lldb",
-					request = "launch",
-					program = function()
-						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-					end,
-					cwd = "${workspaceFolder}",
-					stopOnEntry = false,
-					args = function()
-						local input = vim.fn.input "Input args: "
-						return vim.fn.split(input, " ", true)
-					end,
-
-					-- if you change `runInTerminal` to true, you might need to change the yama/ptrace_scope setting:
-					--
-					--    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
-					--
-					-- Otherwise you might get the following error:
-					--
-					--    Error on launch: Failed to attach to the target process
-					--
-					-- But you should be aware of the implications:
-					-- https://www.kernel.org/doc/html/latest/admin-guide/LSM/Yama.html
-					runInTerminal = false,
-				},
-			}
-
-			dap.configurations.c = dap.configurations.cpp
-			dap.configurations.rust = dap.configurations.cpp
 		end,
 	},
 	-- NOTE: Setup completions.
@@ -1777,69 +1246,6 @@ require("lazy").setup({
 					return not disabled[cmd] or cmp.close()
 				end,
 			})
-		end,
-	},
-	-- NOTE: obsidian integration with garden
-	{
-		"epwalsh/obsidian.nvim",
-		ft = "markdown",
-		cmd = {
-			"ObsidianBacklinks",
-			"ObsidianFollowLink",
-			"ObsidianSearch",
-			"ObsidianOpen",
-			"ObsidianLink",
-		},
-		keys = {
-			{
-				"<Leader>gf",
-				function()
-					if require("obsidian").utils.cursor_on_markdown_link() then
-						pcall(vim.cmd.ObsidianFollowLink)
-					end
-				end,
-				desc = "obsidian: follow link",
-			},
-			{
-				"<LocalLeader>obl",
-				"<cmd>ObsidianBacklinks<cr>",
-				desc = "obsidian: go backlinks",
-			},
-			{
-				"<LocalLeader>on",
-				"<cmd>ObsidianNew<cr>",
-				desc = "obsidian: new notes",
-			},
-			{
-				"<LocalLeader>op",
-				"<cmd>ObsidianOpen<cr>",
-				desc = "obsidian: open",
-			},
-		},
-		opts = {
-			use_advanced_uri = true,
-			completion = { nvim_cmp = true },
-		},
-		config = function(_, opts)
-			-- stylua: ignore
-			-- NOTE: this is for my garden, you can remove this
-			opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
-			opts.note_frontmatter_func = function(note)
-				local out = { id = note.id, tags = note.tags }
-				-- `note.metadata` contains any manually added fields in the frontmatter.
-				-- So here we just make sure those fields are kept in the frontmatter.
-				if
-					note.metadata ~= nil
-					and require("obsidian").util.table_length(note.metadata) > 0
-				then
-					for key, value in pairs(note.metadata) do
-						out[key] = value
-					end
-				end
-				return out
-			end
-
-			require("obsidian").setup(opts)
 		end,
 	},
 }, {
