@@ -1054,7 +1054,7 @@ require("lazy").setup({
 			local f = require("null-ls").builtins.formatting
 			local d = require("null-ls").builtins.diagnostics
 			local ca = require("null-ls").builtins.code_actions
-			return {
+			local options = {
 				debug = true,
 				-- NOTE: add neoconf.json to root pattern
 				root_dir = require("null-ls.utils").root_pattern(
@@ -1084,7 +1084,6 @@ require("lazy").setup({
 							string.format("--style=file:%s/.clang-format", utils.get_root()),
 						},
 					},
-					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
 					f.buildifier,
 					f.taplo.with {
 						extra_args = {
@@ -1105,7 +1104,6 @@ require("lazy").setup({
 
 					-- NOTE: diagnostics
 					d.clang_check,
-					d.eslint.with { extra_filetypes = { "astro", "svelte" } },
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
 					d.golangci_lint,
@@ -1119,11 +1117,18 @@ require("lazy").setup({
 					-- NOTE: code actions
 					ca.gitrebase,
 					ca.shellcheck,
-					ca.eslint.with {
-						extra_filetypes = { "astro", "svelte" },
-					},
 				},
 			}
+
+			if vim.fn.executable "eslint" == 1 then
+				vim.list_extend(options.sources, {
+					f.eslint.with { extra_filetypes = { "astro", "svelte" } },
+					d.eslint.with { extra_filetypes = { "astro", "svelte" } },
+					ca.eslint.with { extra_filetypes = { "astro", "svelte" } },
+				})
+			end
+
+			return options
 		end,
 		config = function(_, opts)
 			require("null-ls").setup(opts)
