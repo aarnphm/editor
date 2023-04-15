@@ -4,7 +4,7 @@ local autocmd = vim.api.nvim_create_autocmd
 -- simple configuration
 local M = {
 	-- NOTE: Windows opts
-	window = { resize = 10 },
+	window = { resize = 10, border = "single" },
 	-- NOTE: Whether to show the diagnostic popup
 	diagnostic = { show_float = false, use_virtual_text = false },
 	-- NOTE: Whether to make completion fancy or simple border
@@ -49,7 +49,6 @@ vim.o.breakindent    = true                                     -- enable break 
 vim.o.breakindentopt = "shift:2,min:20"                         -- wrap two spaces, with min of 20 text width
 vim.o.clipboard      = "unnamedplus"                            -- sync system clipboard
 vim.o.pumheight      = 8                                        -- larger completion windows
-vim.o.completeopt    = "menuone,noselect,menu"                  -- better completion menu
 vim.o.expandtab      = true                                     -- convert spaces to tabs
 vim.o.mouse          = "a"                                      -- ugh who needs mouse (accept on SSH maybe)
 vim.o.number         = true                                     -- number is good for nav
@@ -72,6 +71,9 @@ vim.opt.formatoptions = vim.opt.formatoptions
 	+ "n" -- Indent past the formatlistpat, not underneath it.
 	+ "j" -- Auto-remove comments if possible.
 	- "2" -- I'm not in gradeschool anymore
+
+-- better completion menu
+vim.opt.completeopt = { "menuone", "noselect" }
 
 -- Better folding using tree-sitter
 vim.o.foldlevelstart = 99
