@@ -11,7 +11,7 @@ local M = {
 	ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false,
 	-- NOTE: colorscheme go brr
 	colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME
-		or "oxocarbon",
+		or "rose-pine",
 	-- NOTE: dark or light go brr
 	background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark",
 }
