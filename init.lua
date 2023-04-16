@@ -292,7 +292,7 @@ require("lazy").setup({
 		-- active indent guide and indent text objects
 		"echasnovski/mini.indentscope",
 		event = { "BufReadPre", "BufNewFile" },
-		enabled = false,
+		enabled = user.ui,
 		opts = {
 			symbol = "│",
 			options = { try_as_border = true },
@@ -379,7 +379,7 @@ require("lazy").setup({
 	},
 	{
 		"vigoux/notifier.nvim",
-		enabled = false,
+		enabled = function() return not utils.has "noice.nvim" end,
 		event = "InsertEnter",
 		config = true,
 		opts = { notify = { clear_time = 1000 } },
@@ -657,7 +657,7 @@ require("lazy").setup({
 								-- if the file type is one of following, the window will be ignored
 								filetype = { "neo-tree", "neo-tree-popup", "notify" },
 								-- if the buffer type is one of following, the window will be ignored
-								buftype = { "terminal", "quickfix" },
+								buftype = { "terminal", "quickfix", "Scratch" },
 							},
 						},
 						other_win_hl_color = "#e35e4f",
@@ -1692,7 +1692,7 @@ require("lazy").setup({
 				formatting = {
 					format = lspkind.cmp_format {
 						-- show only symbol annotations
-						mode = "symbol",
+						mode = "symbol_text",
 						-- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 						maxwidth = 50,
 					},
@@ -1737,19 +1737,26 @@ require("lazy").setup({
 					{ name = "luasnip" },
 					{ name = "nvim-lua" },
 					{ name = "buffer" },
+					{ name = "treesitter" },
+					{ name = "cmdline" },
 				},
 			}
 
-			if utils.has "cmp-treesitter" then
-				table.insert(opts.sources, { name = "treesitter" })
+			if utils.has "cmp-git" then
+				-- Set configuration for specific filetype.
+				cmp.setup.filetype("gitcommit", {
+					sources = cmp.config.sources({
+						{ name = "cmp_git" },
+					}, { { name = "buffer" } }),
+				})
 			end
-			if utils.has "cmp-cmdline" then table.insert(opts.sources, { name = "cmdline" }) end
-			if utils.has "cmp-git" then table.insert(opts.sources, { name = "git" }) end
 
 			-- special cases with crates.nvim
-			if vim.fn.expand "%" == "Cargo.toml" then
-				table.insert(opts.sources, { name = "crates" })
-			end
+			vim.api.nvim_create_autocmd({ "BufRead" }, {
+				group = _G.simple_augroup "cmp_source_cargo",
+				pattern = "Cargo.toml",
+				callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
+			})
 
 			if user.ui then
 				opts.window = {

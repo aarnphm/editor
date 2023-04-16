@@ -212,9 +212,7 @@ M.gen_capabilities = function()
 			deprecatedSupport = true,
 			commitCharactersSupport = true,
 			tagSupport = { valueSet = { 1 } },
-			resolveSupport = {
-				properties = { "documentation", "detail", "additionalTextEdits" },
-			},
+			resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
 		}
 		M._capabilities = capabilities
 	end

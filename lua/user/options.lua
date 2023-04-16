@@ -130,7 +130,7 @@ map("n", "D",               "d$",                                               
 map("n", "J",               "mzJ`z",                                                        { desc = "edit: Join next line"                              })
 map("n", "\\",              ":let @/=''<CR>:noh<CR>",                                       { silent = true, desc = "window: Clean highlight"            })
 map("n", ";",               ":",                                                            { silent = false, desc = "command: Enter command mode"       })
-map("n", ";;",               ";",                                                           { silent = false, desc = "normal: Enter Ex mode"             })
+map("n", ";;",              ";",                                                            { silent = false, desc = "normal: Enter Ex mode"             })
 map("v", "J",               ":m '>+1<CR>gv=gv",                                             { desc = "edit: Move this line down"                         })
 map("v", "K",               ":m '<-2<CR>gv=gv",                                             { desc = "edit: Move this line up"                           })
 map("v", "<",               "<gv",                                                          { desc = "edit: Decrease indent"                             })
@@ -171,7 +171,7 @@ map("t", "<C-t>",           "<Esc><cmd>ToggleTerm<cr>",                         
 -- NOTE: diagnostic config
 for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
 	local hl = string.format("DiagnosticSign%s", type[1])
-	vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
+	vim.fn.sign_define(hl, { text = "" .. type[2], texthl = hl, numhl = hl })
 end
 
 vim.diagnostic.config {
