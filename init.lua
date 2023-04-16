@@ -377,13 +377,6 @@ require("lazy").setup({
 		event = "LspAttach",
 		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
 	},
-	{
-		"vigoux/notifier.nvim",
-		enabled = function() return not utils.has "noice.nvim" end,
-		event = "InsertEnter",
-		config = true,
-		opts = { notify = { clear_time = 1000 } },
-	},
 	-- NOTE: folke is neovim's tpope
 	{
 		"folke/zen-mode.nvim",
