@@ -1596,6 +1596,8 @@ require("lazy").setup({
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-cmdline",
+			"hrsh7th/cmp-emoji",
+			"lukas-reineke/cmp-under-comparator",
 			"ray-x/cmp-treesitter",
 			{
 				"L3MON4D3/LuaSnip",
@@ -1671,6 +1673,18 @@ require("lazy").setup({
 				return col == 0 or current_line:sub(col, col):match "%s"
 			end
 
+			local compare = require "cmp.config.compare"
+			compare.lsp_scores = function(entry1, entry2)
+				local diff
+				if entry1.completion_item.score and entry2.completion_item.score then
+					diff = (entry2.completion_item.score * entry2.score)
+						- (entry1.completion_item.score * entry1.score)
+				else
+					diff = entry2.score - entry1.score
+				end
+				return (diff < 0)
+			end
+
 			---@param str string
 			---@return string
 			local replace_termcodes = function(str)
@@ -1730,8 +1744,9 @@ require("lazy").setup({
 					{ name = "luasnip" },
 					{ name = "nvim-lua" },
 					{ name = "buffer" },
-					{ name = "treesitter" },
 					{ name = "cmdline" },
+					{ name = "emoji" },
+					{ name = "treesitter" },
 				},
 			}
 
@@ -1758,6 +1773,19 @@ require("lazy").setup({
 				}
 			end
 
+			opts.sorting = {
+				priority_weight = 2,
+				comparators = {
+					compare.offset,
+					compare.exact,
+					compare.lsp_scores,
+					require("cmp-under-comparator").under,
+					compare.kind,
+					compare.sort_text,
+					compare.length,
+					compare.order,
+				},
+			}
 			cmp.setup(opts)
 
 			cmp.setup.cmdline("/", {
