@@ -6,7 +6,7 @@ local M = {
 	-- NOTE: Windows opts
 	window = { resize = 10, border = "single" },
 	-- NOTE: Whether to show the diagnostic popup
-	diagnostic = { show_float = false, use_virtual_text = true },
+	diagnostic = { show_float = false, use_virtual_text = false },
 	-- NOTE: Whether to make completion fancy or simple border
 	ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false,
 	-- NOTE: colorscheme go brr
