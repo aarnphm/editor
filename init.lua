@@ -1598,7 +1598,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-cmdline",
 			"hrsh7th/cmp-emoji",
 			"lukas-reineke/cmp-under-comparator",
-			"ray-x/cmp-treesitter",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1746,7 +1745,6 @@ require("lazy").setup({
 					{ name = "buffer" },
 					{ name = "cmdline" },
 					{ name = "emoji" },
-					{ name = "treesitter" },
 				},
 			}
 
