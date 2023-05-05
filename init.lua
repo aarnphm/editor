@@ -1608,7 +1608,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-cmdline",
 			"hrsh7th/cmp-emoji",
 			"lukas-reineke/cmp-under-comparator",
-			"ray-x/cmp-treesitter",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1770,17 +1769,6 @@ require("lazy").setup({
 					{ name = "buffer" },
 					{ name = "cmdline" },
 					{ name = "emoji" },
-					{
-						name = "treesitter",
-						entry_filter = function(entry)
-							local ignore_list = {
-								"Error",
-								"Comment",
-							}
-							local kind = entry:get_completion_item().cmp.kind_text
-							return not vim.tbl_contains(ignore_list, kind)
-						end,
-					},
 				},
 			}
 
