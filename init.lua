@@ -326,7 +326,15 @@ require("lazy").setup({
 		opts = {
 			show_first_indent_level = false,
 			buftype_exclude = { "terminal", "nofile" },
-			filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+			filetype_exclude = {
+				"help",
+				"alpha",
+				"dashboard",
+				"neo-tree",
+				"Trouble",
+				"lazy",
+				"Mason",
+			},
 			show_trailing_blankline_indent = false,
 			show_current_context = false,
 		},
@@ -864,6 +872,7 @@ require("lazy").setup({
 				server = {
 					capabilities = require("lsp").gen_capabilities(),
 					completions = { completeFunctionCalls = true },
+					single_file_support = false,
 				},
 			}
 		end,
@@ -1326,6 +1335,7 @@ require("lazy").setup({
 				cssls = {},
 				spectral = {},
 				taplo = {},
+				denols = {},
 				-- NOTE: isolated servers will have their own plugins for setup
 				clangd = { isolated = true },
 				rust_analyzer = { isolated = true },
@@ -1598,6 +1608,7 @@ require("lazy").setup({
 			"hrsh7th/cmp-cmdline",
 			"hrsh7th/cmp-emoji",
 			"lukas-reineke/cmp-under-comparator",
+			"ray-x/cmp-treesitter",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1695,7 +1706,21 @@ require("lazy").setup({
 				snippet = {
 					expand = function(args) require("luasnip").lsp_expand(args.body) end,
 				},
+				sorting = {
+					priority_weight = 2,
+					comparators = {
+						compare.offset,
+						compare.exact,
+						compare.lsp_scores,
+						require("cmp-under-comparator").under,
+						compare.kind,
+						compare.sort_text,
+						compare.length,
+						compare.order,
+					},
+				},
 				formatting = {
+					fields = { "menu", "abbr", "kind" },
 					format = lspkind.cmp_format {
 						-- show only symbol annotations
 						mode = "symbol_text",
@@ -1745,6 +1770,17 @@ require("lazy").setup({
 					{ name = "buffer" },
 					{ name = "cmdline" },
 					{ name = "emoji" },
+					{
+						name = "treesitter",
+						entry_filter = function(entry)
+							local ignore_list = {
+								"Error",
+								"Comment",
+							}
+							local kind = entry:get_completion_item().cmp.kind_text
+							return not vim.tbl_contains(ignore_list, kind)
+						end,
+					},
 				},
 			}
 
@@ -1771,19 +1807,6 @@ require("lazy").setup({
 				}
 			end
 
-			opts.sorting = {
-				priority_weight = 2,
-				comparators = {
-					compare.offset,
-					compare.exact,
-					compare.lsp_scores,
-					require("cmp-under-comparator").under,
-					compare.kind,
-					compare.sort_text,
-					compare.length,
-					compare.order,
-				},
-			}
 			cmp.setup(opts)
 
 			cmp.setup.cmdline("/", {

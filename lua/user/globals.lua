@@ -240,6 +240,7 @@ local data = {
 		Keyword = "",
 		Method = "",
 		Module = "",
+		Undefined = "",
 		Namespace = "",
 		Number = "",
 		Operator = "",
@@ -392,6 +393,13 @@ local data = {
 	},
 	cmp = {
 		Copilot = "",
+		-- Add source-specific icons here
+		tmux = "",
+		undefined = "",
+		copilot = "",
+		copilot_alt = "",
+		latex_symbols = "",
+		luasnip = "",
 		CopilotHolo = "",
 		nvim_lsp = "",
 		nvim_lua = "",
