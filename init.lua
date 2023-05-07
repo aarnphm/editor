@@ -180,6 +180,22 @@ require("lazy").setup({
 					end
 				end,
 			},
+			{
+				"nvim-treesitter/nvim-treesitter-context",
+				config = {
+					enable = true,
+					max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
+					min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+					line_numbers = true,
+					multiline_threshold = 20, -- Maximum number of lines to collapse for a single context line
+					trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+					mode = "topline", -- Line used to calculate context. Choices: 'cursor', 'topline'
+					-- Separator between context and content. Should be a single character string, like '-'.
+					-- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+					separator = nil,
+					zindex = 20,
+				},
+			},
 		},
 		keys = { { "<bs>", desc = "Decrement selection", mode = "x" } },
 		opts = {
@@ -1651,7 +1667,32 @@ require("lazy").setup({
 		},
 		config = function()
 			local cmp = require "cmp"
-			local lspkind = require "lspkind"
+			local cmp_format = function(opts)
+				opts = opts or {}
+				return function(entry, vim_item)
+					if opts.before then vim_item = opts.before(entry, vim_item) end
+
+					local item = icons.kind[vim_item.kind]
+						or icons.type[vim_item.kind]
+						or icons.cmp[vim_item.kind]
+						or icons.kind.Undefined
+
+					vim_item.kind = string.format("  %s  %s", item, vim_item.kind)
+
+					if opts.maxwidth ~= nil then
+						if opts.ellipsis_char == nil then
+							vim_item.abbr = string.sub(vim_item.abbr, 1, opts.maxwidth)
+						else
+							local label = vim_item.abbr
+							local truncated_label = vim.fn.strcharpart(label, 0, opts.maxwidth)
+							if truncated_label ~= label then
+								vim_item.abbr = truncated_label .. opts.ellipsis_char
+							end
+						end
+					end
+					return vim_item
+				end
+			end
 
 			if user.ui then
 				local cmp_window = require "cmp.utils.window"
@@ -1719,13 +1760,10 @@ require("lazy").setup({
 					},
 				},
 				formatting = {
-					fields = { "menu", "abbr", "kind" },
-					format = lspkind.cmp_format {
-						-- show only symbol annotations
-						mode = "symbol_text",
-						-- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-						maxwidth = 50,
-					},
+					fields = { "abbr", "kind" },
+					format = function(entry, vim_item)
+						return cmp_format { maxwidth = 40 }(entry, vim_item)
+					end,
 				},
 				mapping = cmp.mapping.preset.insert {
 					["<CR>"] = cmp.mapping.confirm {
@@ -1790,8 +1828,15 @@ require("lazy").setup({
 
 			if user.ui then
 				opts.window = {
-					completion = cmp.config.window.bordered { border = user.window.border },
-					documentation = cmp.config.window.bordered { border = user.window.border },
+					completion = cmp.config.window.bordered {
+						border = user.window.border,
+						winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:PmenuSel",
+						scrollbar = false,
+					},
+					documentation = cmp.config.window.bordered {
+						border = user.window.border,
+						winhighlight = "Normal:CmpDoc",
+					},
 				}
 			end
 
