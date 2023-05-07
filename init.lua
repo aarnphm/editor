@@ -308,7 +308,7 @@ require("lazy").setup({
 		-- active indent guide and indent text objects
 		"echasnovski/mini.indentscope",
 		event = { "BufReadPre", "BufNewFile" },
-		enabled = user.ui,
+		cond = user.ui,
 		opts = {
 			symbol = "│",
 			options = { try_as_border = true },
@@ -416,6 +416,7 @@ require("lazy").setup({
 	{
 		"folke/noice.nvim",
 		event = { "BufWinEnter", "BufNewFile", "WinEnter" },
+		cond = user.ui,
 		opts = {
 			lsp = {
 				progress = { enabled = false },
