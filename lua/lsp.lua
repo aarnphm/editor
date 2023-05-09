@@ -158,6 +158,16 @@ M.on_attach = function(client, bufnr)
 			vim.lsp.with(vim.lsp.handlers.signature_help, { border = "single" })
 	end
 
+	if client.supports_method "textDocument/publishDiagnostics" then
+		vim.lsp.handlers["textDocument/publishDiagnostics"] =
+			vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+				signs = true,
+				underline = true,
+				virtual_text = require("user.options").diagnostic.use_virtual_text,
+				update_in_insert = true,
+			})
+	end
+
 	if client.server_capabilities["documentSymbolProvider"] then
 		require("nvim-navic").attach(client, bufnr)
 	end

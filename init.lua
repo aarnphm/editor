@@ -182,7 +182,8 @@ require("lazy").setup({
 			},
 			{
 				"nvim-treesitter/nvim-treesitter-context",
-				config = {
+				config = true,
+				opts = {
 					enable = true,
 					max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
 					min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
@@ -1306,7 +1307,6 @@ require("lazy").setup({
 					settings = { yaml = { hover = true, validate = true, completion = true } },
 				},
 				pyright = {
-					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
 						return require("lspconfig.util").root_pattern(
 							"WORKSPACE",
@@ -1322,11 +1322,11 @@ require("lazy").setup({
 					settings = {
 						python = {
 							analysis = {
-								autoSearchPaths = true,
-								useLibraryCodeForTypes = true,
+								autoSearchPaths = false,
 							},
 						},
 					},
+					single_file_support = false,
 				},
 				lua_ls = {
 					settings = {
@@ -1706,16 +1706,6 @@ require("lazy").setup({
 				end
 			end
 
-			local has_words_before = function()
-				if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
-				local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-				return col ~= 0
-					and vim.api
-							.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]
-							:match "^%s*$"
-						== nil
-			end
-
 			local check_backspace = function()
 				local col = vim.fn.col "." - 1
 				---@diagnostic disable-next-line: param-type-mismatch
@@ -1782,8 +1772,6 @@ require("lazy").setup({
 							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
 						elseif check_backspace() then
 							vim.fn.feedkeys(replace_termcodes "<Tab>", "n")
-						elseif has_words_before() then
-							cmp.complete()
 						else
 							fallback()
 						end
@@ -1793,8 +1781,6 @@ require("lazy").setup({
 							cmp.select_prev_item()
 						elseif require("luasnip").jumpable(-1) then
 							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
-						elseif has_words_before() then
-							cmp.complete()
 						else
 							fallback()
 						end
@@ -1802,12 +1788,12 @@ require("lazy").setup({
 				},
 				sources = {
 					{ name = "nvim_lsp" },
-					{ name = "path" },
-					{ name = "luasnip" },
 					{ name = "nvim-lua" },
+					{ name = "luasnip" },
+					{ name = "path" },
 					{ name = "buffer" },
-					{ name = "cmdline" },
 					{ name = "emoji" },
+					{ name = "cmdline" },
 				},
 			}
 
@@ -1843,28 +1829,30 @@ require("lazy").setup({
 
 			cmp.setup(opts)
 
-			cmp.setup.cmdline("/", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = { { name = "buffer" } },
-			})
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({ { name = "path" } }, {
-					{
-						name = "cmdline",
-						option = { ignore_cmds = { "Man", "!" } },
-					},
-				}),
-				enabled = function()
-					-- Set of commands where cmp will be disabled
-					local disabled = { IncRename = true }
-					-- Get first word of cmdline
-					local cmd = vim.fn.getcmdline():match "%S+"
-					-- Return true if cmd isn't disabled
-					-- else call/return cmp.close(), which returns false
-					return not disabled[cmd] or cmp.close()
-				end,
-			})
+			if user.ui then
+				cmp.setup.cmdline("/", {
+					mapping = cmp.mapping.preset.cmdline(),
+					sources = { { name = "buffer" } },
+				})
+				cmp.setup.cmdline(":", {
+					mapping = cmp.mapping.preset.cmdline(),
+					sources = cmp.config.sources({ { name = "path" } }, {
+						{
+							name = "cmdline",
+							option = { ignore_cmds = { "Man", "!" } },
+						},
+					}),
+					enabled = function()
+						-- Set of commands where cmp will be disabled
+						local disabled = { IncRename = true }
+						-- Get first word of cmdline
+						local cmd = vim.fn.getcmdline():match "%S+"
+						-- Return true if cmd isn't disabled
+						-- else call/return cmp.close(), which returns false
+						return not disabled[cmd] or cmp.close()
+					end,
+				})
+			end
 		end,
 	},
 	-- NOTE: obsidian integration with garden
