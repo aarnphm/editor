@@ -1319,14 +1319,6 @@ require("lazy").setup({
 							"requirements.txt"
 						)(fname) or require("lspconfig.util").path.dirname(fname)
 					end,
-					settings = {
-						python = {
-							analysis = {
-								autoSearchPaths = false,
-							},
-						},
-					},
-					single_file_support = false,
 				},
 				lua_ls = {
 					settings = {
@@ -1616,7 +1608,6 @@ require("lazy").setup({
 		version = false,
 		event = "InsertEnter",
 		dependencies = {
-			"onsails/lspkind.nvim",
 			"saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-nvim-lua",
@@ -1624,7 +1615,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-cmdline",
 			"hrsh7th/cmp-emoji",
-			"lukas-reineke/cmp-under-comparator",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1743,7 +1733,6 @@ require("lazy").setup({
 						compare.offset,
 						compare.exact,
 						compare.lsp_scores,
-						require("cmp-under-comparator").under,
 						compare.kind,
 						compare.sort_text,
 						compare.length,
@@ -1751,7 +1740,7 @@ require("lazy").setup({
 					},
 				},
 				formatting = {
-					fields = { "abbr", "kind" },
+					fields = { "menu", "abbr", "kind" },
 					format = function(entry, vim_item)
 						return cmp_format { maxwidth = 40 }(entry, vim_item)
 					end,
