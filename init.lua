@@ -180,23 +180,6 @@ require("lazy").setup({
 					end
 				end,
 			},
-			{
-				"nvim-treesitter/nvim-treesitter-context",
-				config = true,
-				opts = {
-					enable = true,
-					max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
-					min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
-					line_numbers = true,
-					multiline_threshold = 20, -- Maximum number of lines to collapse for a single context line
-					trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-					mode = "topline", -- Line used to calculate context. Choices: 'cursor', 'topline'
-					-- Separator between context and content. Should be a single character string, like '-'.
-					-- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
-					separator = nil,
-					zindex = 20,
-				},
-			},
 		},
 		keys = { { "<bs>", desc = "Decrement selection", mode = "x" } },
 		opts = {
@@ -1306,20 +1289,6 @@ require("lazy").setup({
 					end,
 					settings = { yaml = { hover = true, validate = true, completion = true } },
 				},
-				pyright = {
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
-				},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -1345,6 +1314,22 @@ require("lazy").setup({
 				spectral = {},
 				taplo = {},
 				denols = {},
+				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
+				-- pylsp = {},
+				pyright = {
+					root_dir = function(fname)
+						return require("lspconfig.util").root_pattern(
+							"WORKSPACE",
+							".git",
+							"Pipfile",
+							"pyrightconfig.json",
+							"setup.py",
+							"setup.cfg",
+							"pyproject.toml",
+							"requirements.txt"
+						)(fname) or require("lspconfig.util").path.dirname(fname)
+					end,
+				},
 				-- NOTE: isolated servers will have their own plugins for setup
 				clangd = { isolated = true },
 				rust_analyzer = { isolated = true },
@@ -1443,7 +1428,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright" } },
+		opts = { ensure_installed = { "lua-language-server", "pyright" } }, -- "python-lsp-server",
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
