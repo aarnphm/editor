@@ -1329,6 +1329,14 @@ require("lazy").setup({
 							"requirements.txt"
 						)(fname) or require("lspconfig.util").path.dirname(fname)
 					end,
+					settings = {
+						python = {
+							analysis = {
+								typeCheckingMode = "strict",
+								autoSearchPaths = true,
+							},
+						},
+					},
 				},
 				-- NOTE: isolated servers will have their own plugins for setup
 				clangd = { isolated = true },
@@ -1581,13 +1589,6 @@ require("lazy").setup({
 	},
 	-- NOTE: Setup completions.
 	{
-		"petertriho/cmp-git",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		ft = { "gitcommit", "octo", "neogitCommitMessage" },
-		opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
-		config = true,
-	},
-	{
 		"hrsh7th/nvim-cmp",
 		---@diagnostic disable-next-line: assign-type-mismatch
 		version = false,
@@ -1595,24 +1596,17 @@ require("lazy").setup({
 		dependencies = {
 			"saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-cmdline",
 			"hrsh7th/cmp-emoji",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
-				config = function()
-					require("luasnip").config.set_config {
-						history = true,
-						update_events = "TextChanged,TextChangedI",
-						delete_check_events = "TextChanged,InsertLeave",
-					}
-					require("luasnip.loaders.from_lua").lazy_load()
-					require("luasnip.loaders.from_vscode").lazy_load()
-					require("luasnip.loaders.from_snipmate").lazy_load()
-				end,
+				build = (not jit.os:find "Windows")
+						and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+					or nil,
+				config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
+				opts = { history = true, delete_check_events = "TextChanged" },
 			},
 			{
 				"zbirenbaum/copilot.lua",
@@ -1643,6 +1637,7 @@ require("lazy").setup({
 		},
 		config = function()
 			local cmp = require "cmp"
+
 			local cmp_format = function(opts)
 				opts = opts or {}
 				return function(entry, vim_item)
@@ -1689,18 +1684,6 @@ require("lazy").setup({
 				return col == 0 or current_line:sub(col, col):match "%s"
 			end
 
-			local compare = require "cmp.config.compare"
-			compare.lsp_scores = function(entry1, entry2)
-				local diff
-				if entry1.completion_item.score and entry2.completion_item.score then
-					diff = (entry2.completion_item.score * entry2.score)
-						- (entry1.completion_item.score * entry1.score)
-				else
-					diff = entry2.score - entry1.score
-				end
-				return (diff < 0)
-			end
-
 			---@param str string
 			---@return string
 			local replace_termcodes = function(str)
@@ -1709,26 +1692,22 @@ require("lazy").setup({
 
 			local opts = {
 				preselect = cmp.PreselectMode.None,
+				completion = {
+					completeopt = "menu,menuone,noinsert",
+				},
 				snippet = {
 					expand = function(args) require("luasnip").lsp_expand(args.body) end,
-				},
-				sorting = {
-					priority_weight = 2,
-					comparators = {
-						compare.offset,
-						compare.exact,
-						compare.lsp_scores,
-						compare.kind,
-						compare.sort_text,
-						compare.length,
-						compare.order,
-					},
 				},
 				formatting = {
 					fields = { "menu", "abbr", "kind" },
 					format = function(entry, vim_item)
 						return cmp_format { maxwidth = 40 }(entry, vim_item)
 					end,
+				},
+				experimental = {
+					ghost_text = {
+						hl_group = "LspCodeLens",
+					},
 				},
 				mapping = cmp.mapping.preset.insert {
 					["<CR>"] = cmp.mapping.confirm {
@@ -1762,23 +1741,12 @@ require("lazy").setup({
 				},
 				sources = {
 					{ name = "nvim_lsp" },
-					{ name = "nvim-lua" },
+					{ name = "buffer" },
 					{ name = "luasnip" },
 					{ name = "path" },
-					{ name = "buffer" },
 					{ name = "emoji" },
-					{ name = "cmdline" },
 				},
 			}
-
-			if utils.has "cmp-git" then
-				-- Set configuration for specific filetype.
-				cmp.setup.filetype("gitcommit", {
-					sources = cmp.config.sources({
-						{ name = "cmp_git" },
-					}, { { name = "buffer" } }),
-				})
-			end
 
 			-- special cases with crates.nvim
 			vim.api.nvim_create_autocmd({ "BufRead" }, {
@@ -1802,31 +1770,6 @@ require("lazy").setup({
 			end
 
 			cmp.setup(opts)
-
-			if user.ui then
-				cmp.setup.cmdline("/", {
-					mapping = cmp.mapping.preset.cmdline(),
-					sources = { { name = "buffer" } },
-				})
-				cmp.setup.cmdline(":", {
-					mapping = cmp.mapping.preset.cmdline(),
-					sources = cmp.config.sources({ { name = "path" } }, {
-						{
-							name = "cmdline",
-							option = { ignore_cmds = { "Man", "!" } },
-						},
-					}),
-					enabled = function()
-						-- Set of commands where cmp will be disabled
-						local disabled = { IncRename = true }
-						-- Get first word of cmdline
-						local cmd = vim.fn.getcmdline():match "%S+"
-						-- Return true if cmd isn't disabled
-						-- else call/return cmp.close(), which returns false
-						return not disabled[cmd] or cmp.close()
-					end,
-				})
-			end
 		end,
 	},
 	-- NOTE: obsidian integration with garden
