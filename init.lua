@@ -1063,11 +1063,9 @@ require("lazy").setup({
 			"onsails/lspkind.nvim",
 			"saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-cmdline",
-			"ray-x/cmp-treesitter",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1199,14 +1197,10 @@ require("lazy").setup({
 					{ name = "nvim_lsp" },
 					{ name = "path" },
 					{ name = "luasnip" },
-					{ name = "nvim-lua" },
 					{ name = "buffer" },
 				},
 			}
 
-			if utils.has "cmp-treesitter" then
-				table.insert(opts.sources, { name = "treesitter" })
-			end
 			if utils.has "cmp-cmdline" then table.insert(opts.sources, { name = "cmdline" }) end
 			if utils.has "cmp-git" then table.insert(opts.sources, { name = "git" }) end
 
