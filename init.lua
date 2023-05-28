@@ -52,6 +52,7 @@ require("lazy").setup({
 			end
 		end,
 		config = true,
+		enabled = false,
 	},
 	-- NOTE: cozy colorscheme
 	{
@@ -72,30 +73,6 @@ require("lazy").setup({
 				TelescopeSelectionCaret = { fg = "iris" },
 			},
 		},
-	},
-	{ "nyoom-engineering/oxocarbon.nvim", lazy = false },
-	-- NOTE: hidden tech the harpoon
-	{
-		"theprimeagen/harpoon",
-		event = "BufReadPost",
-		config = function()
-			local mark = require "harpoon.mark"
-			local ui = require "harpoon.ui"
-			require("harpoon").setup {}
-
-			vim.keymap.set("n", "<leader>a", mark.add_file)
-			vim.keymap.set("n", "<leader>e", ui.toggle_quick_menu)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>h", function() ui.nav_file(1) end)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>i", function() ui.nav_file(2) end)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>n", function() ui.nav_file(3) end)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>s", function() ui.nav_file(4) end)
-		end,
-	},
-	-- NOTE: scratch buffer
-	{
-		"mtth/scratch.vim",
-		cmd = "Scratch",
-		keys = { { "<Space><Space>s", "<cmd>Scratch<cr>", desc = "buffer: open scratch" } },
 	},
 	-- NOTE: Gigachad Git
 	{
@@ -179,15 +156,7 @@ require("lazy").setup({
 				},
 			},
 		},
-		config = function(_, opts)
-			if utils.has "typescript.nvim" then
-				vim.list_extend(opts.ensure_installed, { "typescript", "tsx" })
-			end
-			if utils.has "SchemaStore.nvim" then
-				vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" })
-			end
-			require("nvim-treesitter.configs").setup(opts)
-		end,
+		config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
 	},
 	-- NOTE: comments, you say what?
 	{
@@ -372,33 +341,6 @@ require("lazy").setup({
 					end
 				end,
 				desc = "qf: Next item",
-			},
-		},
-	},
-	{
-		"folke/which-key.nvim",
-		event = "BufReadPost",
-		opts = { plugins = { presets = { operators = false } } },
-		config = function(_, opts)
-			if user.ui then opts.window = { border = user.window.border } end
-			require("which-key").setup(opts)
-		end,
-	},
-	{
-		"folke/todo-comments.nvim",
-		cmd = { "TodoTrouble", "TodoTelescope" },
-		event = { "BufReadPost", "BufNewFile" },
-		config = true,
-		keys = {
-			{
-				"]t",
-				function() require("todo-comments").jump_next() end,
-				desc = "todo: Next comment",
-			},
-			{
-				"[t",
-				function() require("todo-comments").jump_prev() end,
-				desc = "todo: Previous comment",
 			},
 		},
 	},
@@ -662,26 +604,6 @@ require("lazy").setup({
 			},
 		},
 	},
-	-- NOTE: Chad colorizer
-	{
-		"NvChad/nvim-colorizer.lua",
-		event = "LspAttach",
-		config = function()
-			require("colorizer").setup {
-				filetypes = { "*" },
-				user_default_options = {
-					names = false, -- "Name" codes like Blue
-					RRGGBBAA = true, -- #RRGGBBAA hex codes
-					rgb_fn = true, -- CSS rgb() and rgba() functions
-					hsl_fn = true, -- CSS hsl() and hsla() functions
-					css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-					css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-					sass = { enable = true, parsers = { "css" } },
-					mode = "background",
-				},
-			}
-		end,
-	},
 	-- NOTE: spectre for magic search and replace
 	{
 		"nvim-pack/nvim-spectre",
@@ -835,12 +757,6 @@ require("lazy").setup({
 			show_modified = true,
 		},
 	},
-	{
-		"stevearc/aerial.nvim",
-		cmd = "AerialToggle",
-		config = true,
-		opts = { close_automatic_events = { "unsupported" } },
-	},
 	{ "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
 	-- NOTE: lspconfig
 	{
@@ -986,13 +902,6 @@ require("lazy").setup({
 	},
 	-- NOTE: Setup completions.
 	{
-		"petertriho/cmp-git",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		ft = { "gitcommit", "octo", "neogitCommitMessage" },
-		opts = { filetypes = { "gitcommit", "octo", "neogitCommitMessage" } },
-		config = true,
-	},
-	{
 
 		"hrsh7th/nvim-cmp",
 		---@diagnostic disable-next-line: assign-type-mismatch
@@ -1003,7 +912,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-emoji",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
@@ -1093,9 +1001,7 @@ require("lazy").setup({
 					["<C-k>"] = cmp.mapping.select_prev_item(),
 					["<C-j>"] = cmp.mapping.select_next_item(),
 					["<Tab>"] = function(fallback)
-						if require("copilot.suggestion").is_visible() then
-							require("copilot.suggestion").accept()
-						elseif cmp.visible() then
+						if cmp.visible() then
 							cmp.select_next_item()
 						elseif require("luasnip").expand_or_jumpable() then
 							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
@@ -1120,16 +1026,8 @@ require("lazy").setup({
 					{ name = "buffer" },
 					{ name = "luasnip" },
 					{ name = "path" },
-					{ name = "emoji" },
 				},
 			}
-
-			-- special cases with crates.nvim
-			vim.api.nvim_create_autocmd({ "BufRead" }, {
-				group = _G.simple_augroup "cmp_source_cargo",
-				pattern = "Cargo.toml",
-				callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
-			})
 
 			if user.ui then
 				opts.window = {
@@ -1183,17 +1081,6 @@ require("lazy").setup({
 		rtp = {
 			disabled_plugins = {
 				"2html_plugin",
-				"getscript",
-				"getscriptPlugin",
-				"gzip",
-				"logipat",
-				"netrw",
-				"netrwPlugin",
-				"netrwSettings",
-				"netrwFileHandlers",
-				"matchit",
-				"matchparen",
-				"tar",
 				"tarPlugin",
 				"rrhelper",
 				"spellfile_plugin",
@@ -1208,7 +1095,6 @@ require("lazy").setup({
 				"compiler",
 				"bugreport",
 				"ftplugin",
-				"editorconfig",
 			},
 		},
 	},
