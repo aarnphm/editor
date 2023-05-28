@@ -1055,30 +1055,25 @@ require("lazy").setup({
 		config = true,
 	},
 	{
+
 		"hrsh7th/nvim-cmp",
 		---@diagnostic disable-next-line: assign-type-mismatch
 		version = false,
 		event = "InsertEnter",
 		dependencies = {
-			"onsails/lspkind.nvim",
 			"saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-cmdline",
+			"hrsh7th/cmp-emoji",
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
-				config = function()
-					require("luasnip").config.set_config {
-						history = true,
-						update_events = "TextChanged,TextChangedI",
-						delete_check_events = "TextChanged,InsertLeave",
-					}
-					require("luasnip.loaders.from_lua").lazy_load()
-					require("luasnip.loaders.from_vscode").lazy_load()
-					require("luasnip.loaders.from_snipmate").lazy_load()
-				end,
+				build = (not jit.os:find "Windows")
+						and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+					or nil,
+				config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
+				opts = { history = true, delete_check_events = "TextChanged" },
 			},
 			{
 				"zbirenbaum/copilot.lua",
@@ -1109,7 +1104,33 @@ require("lazy").setup({
 		},
 		config = function()
 			local cmp = require "cmp"
-			local lspkind = require "lspkind"
+
+			local cmp_format = function(opts)
+				opts = opts or {}
+				return function(entry, vim_item)
+					if opts.before then vim_item = opts.before(entry, vim_item) end
+
+					local item = icons.kind[vim_item.kind]
+						or icons.type[vim_item.kind]
+						or icons.cmp[vim_item.kind]
+						or icons.kind.Undefined
+
+					vim_item.kind = string.format("  %s  %s", item, vim_item.kind)
+
+					if opts.maxwidth ~= nil then
+						if opts.ellipsis_char == nil then
+							vim_item.abbr = string.sub(vim_item.abbr, 1, opts.maxwidth)
+						else
+							local label = vim_item.abbr
+							local truncated_label = vim.fn.strcharpart(label, 0, opts.maxwidth)
+							if truncated_label ~= label then
+								vim_item.abbr = truncated_label .. opts.ellipsis_char
+							end
+						end
+					end
+					return vim_item
+				end
+			end
 
 			if user.ui then
 				local cmp_window = require "cmp.utils.window"
@@ -1120,16 +1141,6 @@ require("lazy").setup({
 					info.scrollable = false
 					return info
 				end
-			end
-
-			local has_words_before = function()
-				if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
-				local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-				return col ~= 0
-					and vim.api
-							.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]
-							:match "^%s*$"
-						== nil
 			end
 
 			local check_backspace = function()
@@ -1148,15 +1159,21 @@ require("lazy").setup({
 
 			local opts = {
 				preselect = cmp.PreselectMode.None,
+				completion = {
+					completeopt = "menu,menuone,noinsert",
+				},
 				snippet = {
 					expand = function(args) require("luasnip").lsp_expand(args.body) end,
 				},
 				formatting = {
-					format = lspkind.cmp_format {
-						-- show only symbol annotations
-						mode = "symbol",
-						-- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-						maxwidth = 50,
+					fields = { "menu", "abbr", "kind" },
+					format = function(entry, vim_item)
+						return cmp_format { maxwidth = 40 }(entry, vim_item)
+					end,
+				},
+				experimental = {
+					ghost_text = {
+						hl_group = "LspCodeLens",
 					},
 				},
 				mapping = cmp.mapping.preset.insert {
@@ -1175,8 +1192,6 @@ require("lazy").setup({
 							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
 						elseif check_backspace() then
 							vim.fn.feedkeys(replace_termcodes "<Tab>", "n")
-						elseif has_words_before() then
-							cmp.complete()
 						else
 							fallback()
 						end
@@ -1186,8 +1201,6 @@ require("lazy").setup({
 							cmp.select_prev_item()
 						elseif require("luasnip").jumpable(-1) then
 							vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
-						elseif has_words_before() then
-							cmp.complete()
 						else
 							fallback()
 						end
@@ -1195,51 +1208,35 @@ require("lazy").setup({
 				},
 				sources = {
 					{ name = "nvim_lsp" },
-					{ name = "path" },
-					{ name = "luasnip" },
 					{ name = "buffer" },
+					{ name = "luasnip" },
+					{ name = "path" },
+					{ name = "emoji" },
 				},
 			}
 
-			if utils.has "cmp-cmdline" then table.insert(opts.sources, { name = "cmdline" }) end
-			if utils.has "cmp-git" then table.insert(opts.sources, { name = "git" }) end
-
 			-- special cases with crates.nvim
-			if vim.fn.expand "%" == "Cargo.toml" then
-				table.insert(opts.sources, { name = "crates" })
-			end
+			vim.api.nvim_create_autocmd({ "BufRead" }, {
+				group = _G.simple_augroup "cmp_source_cargo",
+				pattern = "Cargo.toml",
+				callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
+			})
 
 			if user.ui then
 				opts.window = {
-					completion = cmp.config.window.bordered { border = user.window.border },
-					documentation = cmp.config.window.bordered { border = user.window.border },
+					completion = cmp.config.window.bordered {
+						border = user.window.border,
+						winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:PmenuSel",
+						scrollbar = false,
+					},
+					documentation = cmp.config.window.bordered {
+						border = user.window.border,
+						winhighlight = "Normal:CmpDoc",
+					},
 				}
 			end
 
 			cmp.setup(opts)
-
-			cmp.setup.cmdline("/", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = { { name = "buffer" } },
-			})
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({ { name = "path" } }, {
-					{
-						name = "cmdline",
-						option = { ignore_cmds = { "Man", "!" } },
-					},
-				}),
-				enabled = function()
-					-- Set of commands where cmp will be disabled
-					local disabled = { IncRename = true }
-					-- Get first word of cmdline
-					local cmd = vim.fn.getcmdline():match "%S+"
-					-- Return true if cmd isn't disabled
-					-- else call/return cmp.close(), which returns false
-					return not disabled[cmd] or cmp.close()
-				end,
-			})
 		end,
 	},
 }, {
