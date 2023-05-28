@@ -28,7 +28,6 @@ require("lazy").setup({
 	"lewis6991/impatient.nvim",
 	"nvim-lua/plenary.nvim",
 	"nvim-tree/nvim-web-devicons",
-	{ "dstein64/vim-startuptime", cmd = "StartupTime" },
 	{
 		"stevearc/dressing.nvim",
 		opts = {
@@ -112,38 +111,6 @@ require("lazy").setup({
 		},
 	},
 	-- NOTE: nice git integration and UI
-	{
-		"lewis6991/gitsigns.nvim",
-		event = "BufReadPost",
-		config = function()
-			require("gitsigns").setup {
-				numhl = true,
-				word_diff = false,
-				current_line_blame = false,
-				diff_opts = { internal = true },
-				on_attach = function(bufnr)
-					local gs = package.loaded.gitsigns
-					local map = function(mode, l, r, desc)
-						vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
-					end
-                    -- stylua: ignore start
-					map("n", "]h", gs.next_hunk, "git: next hunk")
-					map("n", "[h", gs.prev_hunk, "git: prev hunk")
-					map("n", "<leader>hu", gs.undo_stage_hunk, "git: undo stage hunk")
-					map("n", "<leader>hR", gs.reset_buffer, "git: reset buffer")
-					map("n", "<leader>hS", gs.stage_buffer, "git: stage buffer")
-					map("n", "<leader>hp", gs.preview_hunk, "git: preview hunk")
-                    map("n", "<leader>hd", gs.diffthis, "git: diff this")
-                    map("n", "<leader>hD", function() gs.diffthis("~") end, "git: diff this ~")
-                    map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "git: blame Line")
-					map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
-					map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
-                    map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
-					-- stylua: ignore end
-				end,
-			}
-		end,
-	},
 	-- NOTE: exit fast af
 	{
 		"max397574/better-escape.nvim",
@@ -158,7 +125,6 @@ require("lazy").setup({
 		end,
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
-			"windwp/nvim-ts-autotag",
 			{
 				"nvim-treesitter/nvim-treesitter-textobjects",
 				init = function()
@@ -223,7 +189,6 @@ require("lazy").setup({
 			require("nvim-treesitter.configs").setup(opts)
 		end,
 	},
-	{ "m-demare/hlargs.nvim", lazy = true, config = true },
 	-- NOTE: comments, you say what?
 	{
 		"numToStr/Comment.nvim",
@@ -370,11 +335,6 @@ require("lazy").setup({
 			{ "junegunn/fzf", lazy = true, build = ":call fzf#install()" },
 		},
 		config = true,
-	},
-	{
-		"j-hui/fidget.nvim",
-		event = "LspAttach",
-		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
 	},
 	-- NOTE: folke is neovim's tpope
 	{
@@ -854,28 +814,6 @@ require("lazy").setup({
 			}
 		end,
 	},
-	-- NOTE: lua related
-	{
-		"ii14/neorepl.nvim",
-		ft = "lua",
-		keys = {
-			{
-				"<LocalLeader>or",
-				function()
-					-- get current buffer and window
-					local buf = vim.api.nvim_get_current_buf()
-					local win = vim.api.nvim_get_current_win()
-					-- create a new split for the repl
-					vim.cmd "split"
-					-- spawn repl and set the context to our buffer
-					require("neorepl").new { lang = "lua", buffer = buf, window = win }
-					-- resize repl window and make it fixed height
-					vim.cmd "resize 10 | setl winfixheight"
-				end,
-				desc = "repl: Open lua repl",
-			},
-		},
-	},
 	-- NOTE: nice winbar
 	{
 		"utilyre/barbecue.nvim",
@@ -1069,37 +1007,8 @@ require("lazy").setup({
 			{
 				"L3MON4D3/LuaSnip",
 				dependencies = { "rafamadriz/friendly-snippets" },
-				build = (not jit.os:find "Windows")
-						and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-					or nil,
 				config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
 				opts = { history = true, delete_check_events = "TextChanged" },
-			},
-			{
-				"zbirenbaum/copilot.lua",
-				cmd = "Copilot",
-				event = "InsertEnter",
-				opts = {
-					cmp = { enabled = true, method = "getCompletionsCycling" },
-					panel = { enabled = false },
-					suggestion = { enabled = true, auto_trigger = true },
-					filetypes = {
-						markdown = true,
-						help = false,
-						terraform = false,
-						hgcommit = false,
-						svn = false,
-						cvs = false,
-						["dap-repl"] = false,
-						octo = false,
-						TelescopePrompt = false,
-						big_file_disabled_ft = false,
-						neogitCommitMessage = false,
-					},
-				},
-				config = function(_, opts)
-					vim.defer_fn(function() require("copilot").setup(opts) end, 100)
-				end,
 			},
 		},
 		config = function()
@@ -1286,8 +1195,6 @@ require("lazy").setup({
 				"matchparen",
 				"tar",
 				"tarPlugin",
-				"tohtml",
-				"tutor",
 				"rrhelper",
 				"spellfile_plugin",
 				"vimball",
