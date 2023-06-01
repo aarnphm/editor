@@ -76,23 +76,6 @@ require("lazy").setup({
 		},
 	},
 	{ "nyoom-engineering/oxocarbon.nvim", lazy = false },
-	-- NOTE: hidden tech the harpoon
-	{
-		"theprimeagen/harpoon",
-		event = "BufReadPost",
-		config = function()
-			local mark = require "harpoon.mark"
-			local ui = require "harpoon.ui"
-			require("harpoon").setup {}
-
-			vim.keymap.set("n", "<leader>a", mark.add_file)
-			vim.keymap.set("n", "<leader>e", ui.toggle_quick_menu)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>h", function() ui.nav_file(1) end)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>i", function() ui.nav_file(2) end)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>n", function() ui.nav_file(3) end)
-			vim.keymap.set("n", "<LocalLeader><LocalLeader>s", function() ui.nav_file(4) end)
-		end,
-	},
 	-- NOTE: scratch buffer
 	{
 		"mtth/scratch.vim",
@@ -1317,18 +1300,6 @@ require("lazy").setup({
 				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
 				-- pylsp = {},
 				pyright = {
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
 					settings = {
 						python = {
 							analysis = {
