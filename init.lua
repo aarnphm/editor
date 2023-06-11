@@ -711,7 +711,8 @@ require("lazy").setup({
 					".null-ls-root",
 					".neoconf.json",
 					"Makefile",
-					".git"
+					".git",
+					"pyproject.toml"
 				),
 				sources = {
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
