@@ -672,7 +672,7 @@ require("lazy").setup({
 		opts = {
 			-- size can be a number or function which is passed the current terminal
 			size = function(term)
-				local factor = 0.3
+				local factor = 0.45
 				if term.direction == "horizontal" then
 					return vim.o.lines * factor
 				elseif term.direction == "vertical" then
