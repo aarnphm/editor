@@ -1300,11 +1300,24 @@ require("lazy").setup({
 				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
 				-- pylsp = {},
 				pyright = {
+					flags = { debounce_text_changes = 500 },
+					root_dir = function(fname)
+						return require("lspconfig.util").root_pattern(
+							"WORKSPACE",
+							".git",
+							"Pipfile",
+							"pyrightconfig.json",
+							"setup.py",
+							"setup.cfg",
+							"pyproject.toml",
+							"requirements.txt"
+						)(fname) or require("lspconfig.util").path.dirname(fname)
+					end,
 					settings = {
 						python = {
 							analysis = {
-								typeCheckingMode = "strict",
 								autoSearchPaths = true,
+								useLibraryCodeForTypes = true,
 							},
 						},
 					},
