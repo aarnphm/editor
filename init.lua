@@ -363,11 +363,6 @@ require("lazy").setup({
 		},
 		config = true,
 	},
-	{
-		"j-hui/fidget.nvim",
-		event = "LspAttach",
-		opts = { text = { spinner = "dots" }, window = { blend = 0 } },
-	},
 	-- NOTE: folke is neovim's tpope
 	{
 		"folke/zen-mode.nvim",
@@ -386,7 +381,7 @@ require("lazy").setup({
 		cond = user.ui,
 		opts = {
 			lsp = {
-				progress = { enabled = false },
+				progress = { enabled = user.ui },
 				signature = { enabled = false },
 				hover = { enabled = false },
 			},
@@ -1058,7 +1053,11 @@ require("lazy").setup({
 					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.black,
-					f.ruff,
+					f.ruff.with {
+						extra_args = {
+							string.format("--config%s/pyproject.toml", utils.get_root()),
+						},
+					},
 					f.isort,
 					f.stylua,
 					f.beautysh,
@@ -1099,6 +1098,7 @@ require("lazy").setup({
 					d.buildifier,
 					d.stylelint,
 					d.vint,
+					d.ruff,
 
 					-- NOTE: code actions
 					ca.gitrebase,
@@ -1291,7 +1291,21 @@ require("lazy").setup({
 				dockerls = {},
 				marksman = {},
 				rnix = {},
-				ruff_lsp = {},
+				ruff_lsp = {
+					root_dir = function(fname)
+						return require("lspconfig.util").root_pattern(
+							"WORKSPACE",
+							".git",
+							"Pipfile",
+							"pyrightconfig.json",
+							"setup.py",
+							"setup.cfg",
+							"pyproject.toml",
+							"requirements.txt"
+						)(fname) or require("lspconfig.util").path.dirname(fname)
+					end,
+					settings = {},
+				},
 				svelte = {},
 				cssls = {},
 				spectral = {},
@@ -1300,7 +1314,6 @@ require("lazy").setup({
 				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
 				-- pylsp = {},
 				pyright = {
-					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
 						return require("lspconfig.util").root_pattern(
 							"WORKSPACE",
@@ -1316,7 +1329,9 @@ require("lazy").setup({
 					settings = {
 						python = {
 							analysis = {
+								autoImportCompletions = true,
 								autoSearchPaths = true,
+								diagnosticMode = "openFilesOnly", -- workspace
 								useLibraryCodeForTypes = true,
 							},
 						},
@@ -1674,6 +1689,7 @@ require("lazy").setup({
 				return vim.api.nvim_replace_termcodes(str, true, true, true)
 			end
 
+			vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 			local opts = {
 				preselect = cmp.PreselectMode.None,
 				completion = {
@@ -1690,7 +1706,7 @@ require("lazy").setup({
 				},
 				experimental = {
 					ghost_text = {
-						hl_group = "LspCodeLens",
+						hl_group = "CmpGhostText",
 					},
 				},
 				mapping = cmp.mapping.preset.insert {
