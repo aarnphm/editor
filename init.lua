@@ -1060,10 +1060,9 @@ require("lazy").setup({
 					f.black,
 					f.ruff.with {
 						extra_args = {
-							string.format("--config%s/pyproject.toml", utils.get_root()),
+							string.format("--config %s/pyproject.toml", utils.get_root()),
 						},
 					},
-					f.isort,
 					f.stylua,
 					f.beautysh,
 					f.rustfmt,
@@ -1103,7 +1102,6 @@ require("lazy").setup({
 					d.buildifier,
 					d.stylelint,
 					d.vint,
-					d.ruff,
 
 					-- NOTE: code actions
 					ca.gitrebase,
@@ -1319,18 +1317,6 @@ require("lazy").setup({
 				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
 				-- pylsp = {},
 				pyright = {
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
 					settings = {
 						python = {
 							analysis = {
