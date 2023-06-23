@@ -718,7 +718,6 @@ require("lazy").setup({
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.black,
 					f.ruff,
-					f.isort,
 					f.stylua,
 					f.jq,
 
