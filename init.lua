@@ -717,7 +717,11 @@ require("lazy").setup({
 				sources = {
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
 					f.black,
-					f.ruff,
+					f.ruff.with {
+						extra_args = {
+							string.format("--config %s/pyproject.toml", utils.get_root()),
+						},
+					},
 					f.stylua,
 					f.jq,
 
