@@ -364,16 +364,6 @@ require("lazy").setup({
 		config = true,
 	},
 	-- NOTE: folke is neovim's tpope
-	{
-		"folke/zen-mode.nvim",
-		event = "BufReadPost",
-		cmd = "ZenMode",
-		opts = {
-			window = {
-				width = function() return vim.o.columns * 0.73 end,
-			},
-		},
-	},
 	{ "folke/paint.nvim", event = "BufReadPost", config = true },
 	{
 		"folke/noice.nvim",
@@ -573,7 +563,7 @@ require("lazy").setup({
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
-					layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+					layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
 				},
 				extensions = {
 					live_grep_args = {
@@ -1322,7 +1312,7 @@ require("lazy").setup({
 							analysis = {
 								autoImportCompletions = true,
 								autoSearchPaths = true,
-								diagnosticMode = "openFilesOnly", -- workspace
+								diagnosticMode = "workspace", -- workspace
 								useLibraryCodeForTypes = true,
 							},
 						},
