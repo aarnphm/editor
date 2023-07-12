@@ -459,7 +459,7 @@ require("lazy").setup({
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
-					layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+					layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
 				},
 				extensions = {
 					live_grep_args = {
