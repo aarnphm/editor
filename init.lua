@@ -585,14 +585,24 @@ require("lazy").setup({
 			end
 		end,
 		opts = {
+			close_if_last_window = true,
 			enable_diagnostics = false, -- default is set to true here.
 			filesystem = {
 				bind_to_cwd = true,
+				use_libuv_file_watcher = true, -- use system level watcher for file change
 				follow_current_file = { enabled = true },
 				filtered_items = {
 					visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
 					hide_dotfiles = false,
 					hide_gitignored = true,
+					hide_by_name = {
+						"node_modules",
+						"pdm.lock",
+					},
+					hide_by_pattern = { -- uses glob style patterns
+						"*.meta",
+						"*/src/*/tsconfig.json",
+					},
 				},
 			},
 			event_handlers = {
