@@ -588,7 +588,12 @@ require("lazy").setup({
 			enable_diagnostics = false, -- default is set to true here.
 			filesystem = {
 				bind_to_cwd = true,
-				follow_current_file = true,
+				follow_current_file = { enabled = true },
+				filtered_items = {
+					visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
+					hide_dotfiles = false,
+					hide_gitignored = true,
+				},
 			},
 			event_handlers = {
 				{
