@@ -132,7 +132,7 @@ require("lazy").setup({
 		build = function()
 			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
 		end,
-		event = { "BufReadPost", "BufNewFile" },
+		event = "BufReadPost",
 		dependencies = {
 			{
 				"nvim-treesitter/nvim-treesitter-textobjects",
@@ -289,9 +289,20 @@ require("lazy").setup({
 		"lukas-reineke/indent-blankline.nvim",
 		event = { "BufReadPost", "BufNewFile" },
 		opts = {
+			context_char = "┃",
 			show_first_indent_level = false,
 			buftype_exclude = { "terminal", "nofile" },
-			filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+			filetype_exclude = {
+				"help",
+				"alpha",
+				"dashboard",
+				"neo-tree",
+				"TelescopePrompt",
+				"undotree",
+				"Trouble",
+				"lazy",
+				"Mason",
+			},
 			show_trailing_blankline_indent = false,
 			show_current_context = false,
 		},
@@ -382,6 +393,7 @@ require("lazy").setup({
 		event = "BufReadPost",
 		dependencies = {
 			"nvim-telescope/telescope-live-grep-args.nvim",
+			"jvgrootveld/telescope-zoxide",
 			{
 				"nvim-telescope/telescope-fzf-native.nvim",
 				build = "make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim",
@@ -476,6 +488,14 @@ require("lazy").setup({
 		config = function()
 			require("telescope").setup {
 				defaults = {
+					vimgrep_arguments = {
+						"rg",
+						"--no-heading",
+						"--with-filename",
+						"--line-number",
+						"--column",
+						"--smart-case",
+					},
 					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
 					selection_caret = icons.ui_space.DoubleSeparator,
 					file_ignore_patterns = {
@@ -483,6 +503,7 @@ require("lazy").setup({
 						"node_modules/",
 						"static_content/",
 						"lazy-lock.json",
+						"pdm.lock",
 					},
 					mappings = {
 						i = {
@@ -492,6 +513,15 @@ require("lazy").setup({
 						n = { ["q"] = require("telescope.actions").close },
 					},
 					layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
+					selection_strategy = "reset",
+					sorting_strategy = "ascending",
+					color_devicons = true,
+					file_previewer = require("telescope.previewers").vim_buffer_cat.new,
+					grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
+					qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
+					file_sorter = require("telescope.sorters").get_fuzzy_file,
+					generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
+					buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
 				},
 				extensions = {
 					live_grep_args = {
@@ -510,7 +540,7 @@ require("lazy").setup({
 					},
 				},
 				fzf = {
-					fuzzy = true, -- false will only do exact matching
+					fuzzy = false, -- false will only do exact matching
 					override_generic_sorter = true, -- override the generic sorter
 					override_file_sorter = true, -- override the file sorter
 					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
@@ -533,6 +563,7 @@ require("lazy").setup({
 			}
 			require("telescope").load_extension "live_grep_args"
 			require("telescope").load_extension "fzf"
+			require("telescope").load_extension "zoxide"
 		end,
 	},
 	-- NOTE: better nvim-tree.lua
@@ -731,6 +762,11 @@ require("lazy").setup({
 				vim.opt_local.statusline =
 					'%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
 			end,
+			highlights = {
+				Normal = { link = "Normal" },
+				NormalFloat = { link = "NormalFloat" },
+				FloatBorder = { link = "FloatBorder" },
+			},
 			open_mapping = false, -- default mapping
 			shade_terminals = false,
 			direction = "vertical",
@@ -808,11 +844,30 @@ require("lazy").setup({
 			show_modified = true,
 		},
 	},
+	-- NOTE: scrollview
+	{
+		"dstein64/nvim-scrollview",
+		event = { "BufReadPost", "BufAdd", "BufNewFile" },
+		config = function()
+			require("scrollview").setup {
+				scrollview_mode = "virtual",
+				excluded_filetypes = { "NvimTree", "terminal", "nofile" },
+				winblend = 0,
+				signs_on_startup = { "folds", "marks", "search", "spell" },
+			}
+		end,
+	},
+	{
+		"stevearc/aerial.nvim",
+		cmd = "AerialToggle",
+		config = true,
+		opts = { close_automatic_events = { "unsupported" } },
+	},
 	{ "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
-		event = { "BufReadPre", "BufNewFile" },
+		event = { "CursorHold", "CursorHoldI" },
 		dependencies = {
 			"williamboman/mason-lspconfig.nvim",
 			"mason.nvim",
@@ -825,10 +880,7 @@ require("lazy").setup({
 					border = { enable = user.ui },
 				},
 			},
-			{
-				"hrsh7th/cmp-nvim-lsp",
-				cond = function() return utils.has "nvim-cmp" end,
-			},
+			"hrsh7th/cmp-nvim-lsp",
 			{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
 			{ "folke/neodev.nvim", config = true, ft = "lua" },
 		},
@@ -934,6 +986,8 @@ require("lazy").setup({
 				mason_lspconfig.setup { ensure_installed = ensure_installed }
 				mason_lspconfig.setup_handlers { mason_handler }
 			end
+
+			vim.api.nvim_command [[LspStart]] -- Start LSPs
 		end,
 	},
 	{
@@ -1000,23 +1054,25 @@ require("lazy").setup({
 				end
 			end
 
-			if user.ui then
-				local cmp_window = require "cmp.utils.window"
-				local prev_info = cmp_window.info
-				---@diagnostic disable-next-line: duplicate-set-field
-				cmp_window.info = function(self)
-					local info = prev_info(self)
-					info.scrollable = false
-					return info
-				end
-			end
-
 			local check_backspace = function()
 				local col = vim.fn.col "." - 1
 				---@diagnostic disable-next-line: param-type-mismatch
 				local current_line = vim.fn.getline "."
 				---@diagnostic disable-next-line: undefined-field
 				return col == 0 or current_line:sub(col, col):match "%s"
+			end
+
+			local compare = require "cmp.config.compare"
+
+			compare.lsp_scores = function(entry1, entry2)
+				local diff
+				if entry1.completion_item.score and entry2.completion_item.score then
+					diff = (entry2.completion_item.score * entry2.score)
+						- (entry1.completion_item.score * entry1.score)
+				else
+					diff = entry2.score - entry1.score
+				end
+				return (diff < 0)
 			end
 
 			---@param str string
@@ -1026,7 +1082,7 @@ require("lazy").setup({
 			end
 
 			local opts = {
-				preselect = cmp.PreselectMode.None,
+				preselect = cmp.PreselectMode.Item,
 				completion = {
 					completeopt = "menu,menuone,noinsert",
 				},
@@ -1036,13 +1092,36 @@ require("lazy").setup({
 				formatting = {
 					fields = { "menu", "abbr", "kind" },
 					format = function(entry, vim_item)
-						return cmp_format { maxwidth = 40 }(entry, vim_item)
+						return cmp_format { maxwidth = 80 }(entry, vim_item)
 					end,
+				},
+				sorting = {
+					priority_weight = 2,
+					comparators = {
+						compare.offset, -- Items closer to cursor will have lower priority
+						compare.exact,
+						-- compare.scopes,
+						compare.lsp_scores,
+						compare.sort_text,
+						compare.score,
+						compare.recently_used,
+						-- compare.locality, -- Items closer to cursor will have higher priority, conflicts with `offset`
+						compare.kind,
+						compare.length,
+						compare.order,
+					},
 				},
 				experimental = {
 					ghost_text = {
 						hl_group = "LspCodeLens",
 					},
+				},
+				matching = {
+					disallow_partial_fuzzy_matching = false,
+				},
+				performance = {
+					async_budget = 1,
+					max_view_entries = 120,
 				},
 				mapping = cmp.mapping.preset.insert {
 					["<CR>"] = cmp.mapping.confirm {
@@ -1073,7 +1152,7 @@ require("lazy").setup({
 					end,
 				},
 				sources = {
-					{ name = "nvim_lsp" },
+					{ name = "nvim_lsp", max_item_count = 350 },
 					{ name = "buffer" },
 					{ name = "luasnip" },
 					{ name = "path" },

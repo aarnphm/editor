@@ -6,7 +6,11 @@ local M = {
 	-- NOTE: Windows opts
 	window = { resize = 10, border = "single" },
 	-- NOTE: Whether to show the diagnostic popup
-	diagnostic = { show_float = false, use_virtual_text = true },
+	-- entry: diagnostics_level:
+	--  Set it to one of the values below if you want to change the visible severity level of lsp diagnostics.
+	--  Priority: `Error` > `Warning` > `Information` > `Hint`.
+	--  > e.g. if you set this option to `Warning`, only lsp warnings and errors will be shown.
+	diagnostic = { show_float = false, use_virtual_text = false, diagnostics_level = "Hint" },
 	-- NOTE: Whether to make completion fancy or simple border
 	ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false,
 	-- NOTE: colorscheme go brr
@@ -38,27 +42,30 @@ end
 
 -- Some defaults and don't question it
 -- stylua: ignore start
-vim.o.wrap           = false                                    -- egh i don't like wrap
-vim.o.writebackup    = false                                    -- whos needs backup btw (i do sometimes)
-vim.o.autowrite      = true                                     -- sometimes I forget to save
-vim.o.guicursor      = ""                                       -- no gui cursor
-vim.o.cursorline     = false                                    -- show cursor line
-vim.o.cursorcolumn   = false                                    -- show cursor column
-vim.o.undofile       = true                                     -- set undofile to infinite undo
-vim.o.breakindent    = true                                     -- enable break indent
-vim.o.breakindentopt = "shift:2,min:20"                         -- wrap two spaces, with min of 20 text width
-vim.o.clipboard      = "unnamedplus"                            -- sync system clipboard
-vim.o.pumheight      = 8                                        -- larger completion windows
-vim.o.expandtab      = true                                     -- convert spaces to tabs
-vim.o.mouse          = "a"                                      -- ugh who needs mouse (accept on SSH maybe)
-vim.o.number         = true                                     -- number is good for nav
-vim.o.relativenumber = true                                     -- relativenumber is useful, grow up
-vim.o.swapfile       = false                                    -- I don't like swap files personally, found undofile to be better
-vim.o.undofile       = true                                     -- better than swapfile
-vim.o.undolevels     = 9999                                     -- infinite undo
-vim.o.shortmess      = "aoOTIcF"                                -- insanely complex shortmess, but its cleannn
-vim.o.laststatus     = 2                                        -- show statusline on buffer
-vim.o.statusline     = require("user.utils").statusline.build() -- statusline PepeLaugh
+vim.o.wrap           = false                                                    -- egh i don't like wrap
+vim.o.writebackup    = false                                                    -- whos needs backup btw (i do sometimes)
+vim.o.autowrite      = true                                                     -- sometimes I forget to save
+vim.o.guicursor      = ""                                                       -- no gui cursor
+vim.o.cursorline     = false                                                    -- show cursor line
+vim.o.cursorcolumn   = false                                                    -- show cursor column
+vim.o.undofile       = true                                                     -- set undofile to infinite undo
+vim.o.breakindent    = true                                                     -- enable break indent
+vim.o.breakindentopt = "shift:2,min:20"                                         -- wrap two spaces, with min of 20 text width
+vim.o.clipboard      = "unnamedplus"                                            -- sync system clipboard
+vim.o.pumheight      = 8                                                        -- larger completion windows
+vim.o.expandtab      = true                                                     -- convert spaces to tabs
+vim.o.mouse          = "a"                                                      -- ugh who needs mouse (accept on SSH maybe)
+vim.o.number         = true                                                     -- number is good for nav
+vim.o.relativenumber = true                                                     -- relativenumber is useful, grow up
+vim.o.swapfile       = false                                                    -- I don't like swap files personally, found undofile to be better
+vim.o.undofile       = true                                                     -- better than swapfile
+vim.o.undolevels     = 9999                                                     -- infinite undo
+vim.o.shortmess      = "aoOTIcF"                                                -- insanely complex shortmess, but its cleannn
+vim.o.laststatus     = 2                                                        -- show statusline on buffer
+vim.o.diffopt        = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
+vim.o.statusline     = require("user.utils").statusline.build()                 -- statusline PepeLaugh
+vim.o.sessionoptions = "buffers,curdir,help,tabpages,winsize"                   -- session options
+vim.o.shada          = "!,'500,<50,@100,s10,h"                                  -- shada options
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions

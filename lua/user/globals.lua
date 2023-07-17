@@ -119,7 +119,7 @@ autocmd("VimLeave", {
 	pattern = "*",
 	callback = function(_)
 		if vim.fn.has "nvim" == 1 then
-			api.nvim_command [[wshada!]]
+			api.nvim_command [[wshada]]
 		else
 			api.nvim_command [[wviminfo!]]
 		end
