@@ -163,7 +163,9 @@ M.on_attach = function(client, bufnr)
 			vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
 				signs = true,
 				underline = true,
-				virtual_text = require("user.options").diagnostic.use_virtual_text,
+				virtual_text = require("user.options").diagnostic.use_virtual_text and {
+					severity_limit = require("users.options").diagnostic.diagnostics_level,
+				} or false,
 				update_in_insert = true,
 			})
 	end
@@ -205,29 +207,26 @@ M.on_attach = function(client, bufnr)
 	)
 end
 
-M._capabilities = nil
-
 M.gen_capabilities = function()
-	if not M._capabilities then
-		local capabilities = vim.lsp.protocol.make_client_capabilities()
-		local ok, cmp = pcall(require, "cmp_nvim_lsp")
-		if ok then capabilities = cmp.default_capabilities(capabilities) end
-
-		-- NOTE: some custom completion options
-		capabilities.textDocument.completion.completionItem = {
-			documentationFormat = { "markdown", "plaintext" },
-			snippetSupport = true,
-			preselectSupport = true,
-			insertReplaceSupport = true,
-			labelDetailsSupport = true,
-			deprecatedSupport = true,
-			commitCharactersSupport = true,
-			tagSupport = { valueSet = { 1 } },
-			resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
-		}
-		M._capabilities = capabilities
+	local capabilities = vim.lsp.protocol.make_client_capabilities()
+	local ok, cmp = pcall(require, "cmp_nvim_lsp")
+	if ok then
+		capabilities = cmp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 	end
-	return M._capabilities
+
+	-- NOTE: some custom completion options
+	capabilities.textDocument.completion.completionItem = {
+		documentationFormat = { "markdown", "plaintext" },
+		snippetSupport = true,
+		preselectSupport = true,
+		insertReplaceSupport = true,
+		labelDetailsSupport = true,
+		deprecatedSupport = true,
+		commitCharactersSupport = true,
+		tagSupport = { valueSet = { 1 } },
+		resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
+	}
+	return capabilities
 end
 
 return M

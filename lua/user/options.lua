@@ -6,7 +6,11 @@ local M = {
 	-- NOTE: Windows opts
 	window = { resize = 10, border = "single" },
 	-- NOTE: Whether to show the diagnostic popup
-	diagnostic = { show_float = false, use_virtual_text = false },
+	-- entry: diagnostics_level:
+	--  Set it to one of the values below if you want to change the visible severity level of lsp diagnostics.
+	--  Priority: `Error` > `Warning` > `Information` > `Hint`.
+	--  > e.g. if you set this option to `Warning`, only lsp warnings and errors will be shown.
+	diagnostic = { show_float = false, use_virtual_text = false, diagnostics_level = "Hint" },
 	-- NOTE: Whether to make completion fancy or simple border
 	ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false,
 	-- NOTE: colorscheme go brr
@@ -61,6 +65,7 @@ vim.o.laststatus     = 2                                                        
 vim.o.diffopt        = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 vim.o.statusline     = require("user.utils").statusline.build()                 -- statusline PepeLaugh
 vim.o.sessionoptions = "buffers,curdir,help,tabpages,winsize"                   -- session options
+vim.o.shada          = "!,'500,<50,@100,s10,h"                                  -- shada options
 
 -- NOTE: "1jcroql"
 vim.opt.formatoptions = vim.opt.formatoptions
