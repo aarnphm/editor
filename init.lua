@@ -1016,7 +1016,6 @@ require("lazy").setup({
 	{
 		"lvimuser/lsp-inlayhints.nvim",
 		lazy = true,
-		branch = "anticonceal",
 		event = { "LspAttach" },
 		opts = {
 			inlay_hints = {
