@@ -111,17 +111,17 @@ require("lazy").setup({
 						vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
 					end
                     -- stylua: ignore start
-					map("n", "]h", gs.next_hunk, "git: next hunk")
-					map("n", "[h", gs.prev_hunk, "git: prev hunk")
-					map("n", "<leader>hu", gs.undo_stage_hunk, "git: undo stage hunk")
-					map("n", "<leader>hR", gs.reset_buffer, "git: reset buffer")
-					map("n", "<leader>hS", gs.stage_buffer, "git: stage buffer")
-					map("n", "<leader>hp", gs.preview_hunk, "git: preview hunk")
+                    map("n", "]h", gs.next_hunk, "git: next hunk")
+                    map("n", "[h", gs.prev_hunk, "git: prev hunk")
+                    map("n", "<leader>hu", gs.undo_stage_hunk, "git: undo stage hunk")
+                    map("n", "<leader>hR", gs.reset_buffer, "git: reset buffer")
+                    map("n", "<leader>hS", gs.stage_buffer, "git: stage buffer")
+                    map("n", "<leader>hp", gs.preview_hunk, "git: preview hunk")
                     map("n", "<leader>hd", gs.diffthis, "git: diff this")
                     map("n", "<leader>hD", function() gs.diffthis("~") end, "git: diff this ~")
                     map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "git: blame Line")
-					map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
-					map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
+                    map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
+                    map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
                     map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
 					-- stylua: ignore end
 				end,
@@ -915,7 +915,7 @@ require("lazy").setup({
 			require("rust-tools").setup {
 				tools = {
 					inlay_hints = {
-						auto = true,
+						auto = false,
 						other_hints_prefix = ":: ",
 						only_current_line = true,
 						show_parameter_hints = false,
@@ -925,9 +925,9 @@ require("lazy").setup({
 				server = {
 					on_attach = function(_, bufnr)
                         -- stylua: ignore start
-						vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
-						vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-						vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
+                        vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
+                        vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+                        vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
 						-- stylua: ignore end
 					end,
 					capabilities = require("lsp").gen_capabilities(),
@@ -1151,12 +1151,44 @@ require("lazy").setup({
 			return options
 		end,
 		config = function(_, opts)
-			require("null-ls").setup(opts)
+			local null_ls = require "null-ls"
+			null_ls.setup(opts)
 			require("mason-null-ls").setup {
 				ensure_installed = nil,
 				automatic_installation = true,
 				handlers = {},
 			}
+
+			-- Setup usercmd to register/deregister available source(s)
+			local _gen_completion = function()
+				local sources_cont = null_ls.get_source {
+					filetype = vim.api.nvim_get_option_value("filetype", { scope = "local" }),
+				}
+				local completion_items = {}
+				for _, server in pairs(sources_cont) do
+					table.insert(completion_items, server.name)
+				end
+				return completion_items
+			end
+
+			local toggle_command = function(args)
+				if vim.tbl_contains(_gen_completion(), args.args) then
+					null_ls.toggle { name = opts.args }
+				else
+					vim.notify(
+						string.format(
+							"[Null-ls] Unable to find any registered source named [%s].",
+							opts.args
+						),
+						vim.log.levels.ERROR,
+						{ title = "Null-ls Internal Error" }
+					)
+				end
+			end
+			vim.api.nvim_create_user_command("NullLsToggle", toggle_command, {
+				nargs = 1,
+				complete = _gen_completion,
+			})
 		end,
 	},
 	-- NOTE: lua related
@@ -1324,6 +1356,10 @@ require("lazy").setup({
 							runtime = {
 								version = "LuaJIT",
 								special = { reload = "require" },
+							},
+							diagnostics = {
+								globals = { "vim" },
+								disable = { "different-requires" },
 							},
 							workspace = { checkThirdParty = false },
 							telemetry = { enable = false },
@@ -1502,17 +1538,12 @@ require("lazy").setup({
 	{
 		"lvimuser/lsp-inlayhints.nvim",
 		lazy = true,
-		branch = "anticonceal",
 		event = { "LspAttach" },
 		opts = {
 			inlay_hints = {
-				parameter_hints = {
-					show = true,
-				},
-				type_hints = {
-					show = true,
-				},
-				label_formatter = function(tbl, kind, opts, client_name)
+				parameter_hints = { show = true },
+				type_hints = { show = true },
+				label_formatter = function(tbl, kind, opts)
 					if kind == 2 and not opts.parameter_hints.show then
 						return ""
 					elseif not opts.type_hints.show then
@@ -1539,8 +1570,7 @@ require("lazy").setup({
 				end,
 				only_current_line = false,
 				-- highlight group
-				highlight = "LspInlayHint",
-				-- highlight = "Comment",
+				highlight = "Comment",
 				-- virt_text priority
 				priority = 0,
 			},
@@ -1956,9 +1986,9 @@ require("lazy").setup({
 			completion = { nvim_cmp = true },
 		},
 		config = function(_, opts)
-			-- stylua: ignore
-			-- NOTE: this is for my garden, you can remove this
-			opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
+            -- stylua: ignore
+            -- NOTE: this is for my garden, you can remove this
+            opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
 			opts.note_frontmatter_func = function(note)
 				local out = { id = note.id, tags = note.tags }
 				-- `note.metadata` contains any manually added fields in the frontmatter.
