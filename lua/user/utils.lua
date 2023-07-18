@@ -31,6 +31,23 @@ M.opts = function(name)
 	return require("lazy.core.plugin").values(plugin, "opts", false)
 end
 
+M.on_load = function(name, fn)
+	local Config = require "lazy.core.config"
+	if Config.plugins[name] and Config.plugins[name]._.loaded then
+		vim.schedule(function() fn(name) end)
+	else
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "LazyLoad",
+			callback = function(event)
+				if event.data == name then
+					fn(name)
+					return true
+				end
+			end,
+		})
+	end
+end
+
 M.root_patterns = { ".git", "lua" }
 
 -- returns the root directory based on:
