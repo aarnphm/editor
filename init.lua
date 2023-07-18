@@ -944,6 +944,7 @@ require("lazy").setup({
 					},
 				},
 				pylyzer = {
+					mason = false,
 					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
 						return require("lspconfig.util").root_pattern(
@@ -1096,7 +1097,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright", "pylyzer" } },
+		opts = { ensure_installed = { "lua-language-server", "pyright" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
