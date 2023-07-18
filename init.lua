@@ -888,29 +888,29 @@ require("lazy").setup({
 		opts = {
 			---@type lspconfig.options
 			servers = {
-				pyright = {
-					flags = { debounce_text_changes = 500 },
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
-					settings = {
-						python = {
-							autoImportCompletions = true,
-							autoSearchPaths = true,
-							diagnosticMode = "workspace", -- workspace
-							useLibraryCodeForTypes = true,
-						},
-					},
-				},
+				-- pyright = {
+				-- 	flags = { debounce_text_changes = 500 },
+				-- 	root_dir = function(fname)
+				-- 		return require("lspconfig.util").root_pattern(
+				-- 			"WORKSPACE",
+				-- 			".git",
+				-- 			"Pipfile",
+				-- 			"pyrightconfig.json",
+				-- 			"setup.py",
+				-- 			"setup.cfg",
+				-- 			"pyproject.toml",
+				-- 			"requirements.txt"
+				-- 		)(fname) or require("lspconfig.util").path.dirname(fname)
+				-- 	end,
+				-- 	settings = {
+				-- 		python = {
+				-- 			autoImportCompletions = true,
+				-- 			autoSearchPaths = true,
+				-- 			diagnosticMode = "workspace", -- workspace
+				-- 			useLibraryCodeForTypes = true,
+				-- 		},
+				-- 	},
+				-- },
 				pylyzer = {
 					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
@@ -927,8 +927,8 @@ require("lazy").setup({
 					end,
 					settings = {
 						python = {
-							checkOnType = false,
-							diagnostics = false,
+							checkOnType = true,
+							diagnostics = true,
 							inlayHints = true,
 							smartCompletion = true,
 						},
@@ -1066,7 +1066,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pylyzer", "pyright" } },
+		opts = { ensure_installed = { "lua-language-server", "pylyzer" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
