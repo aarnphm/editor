@@ -927,7 +927,7 @@ require("lazy").setup({
 					end,
 					settings = {
 						python = {
-							checkOnType = true,
+							checkOnType = false,
 							diagnostics = false,
 							inlayHints = true,
 							smartCompletion = true,
