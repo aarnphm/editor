@@ -1043,7 +1043,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright" } },
+		opts = { ensure_installed = { "lua-language-server", "pylyzer" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
