@@ -1357,6 +1357,29 @@ require("lazy").setup({
 				denols = {},
 				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
 				-- pylsp = {},
+				pyright = {
+					flags = { debounce_text_changes = 500 },
+					root_dir = function(fname)
+						return require("lspconfig.util").root_pattern(
+							"WORKSPACE",
+							".git",
+							"Pipfile",
+							"pyrightconfig.json",
+							"setup.py",
+							"setup.cfg",
+							"pyproject.toml",
+							"requirements.txt"
+						)(fname) or require("lspconfig.util").path.dirname(fname)
+					end,
+					settings = {
+						python = {
+							autoImportCompletions = true,
+							autoSearchPaths = true,
+							diagnosticMode = "workspace", -- workspace
+							useLibraryCodeForTypes = true,
+						},
+					},
+				},
 				pylyzer = {
 					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
@@ -1373,8 +1396,8 @@ require("lazy").setup({
 					end,
 					settings = {
 						python = {
-							checkOnType = true,
-							diagnostics = true,
+							checkOnType = false,
+							diagnostics = false,
 							inlayHints = true,
 							smartCompletion = true,
 						},
@@ -1529,7 +1552,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright" } }, -- "python-lsp-server",
+		opts = { ensure_installed = { "lua-language-server", "pylyzer", "pyright" } }, -- "python-lsp-server",
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
