@@ -236,7 +236,52 @@ require("lazy").setup({
 				},
 			}
 		end,
-		config = function(_, opts) require("mini.ai").setup(opts) end,
+		config = function(_, opts)
+			require("mini.ai").setup(opts)
+			utils.on_load("which-key.nvim", function()
+				---@type table<string, string|table>
+				local i = {
+					[" "] = "Whitespace",
+					['"'] = 'Balanced "',
+					["'"] = "Balanced '",
+					["`"] = "Balanced `",
+					["("] = "Balanced (",
+					[")"] = "Balanced ) including white-space",
+					[">"] = "Balanced > including white-space",
+					["<lt>"] = "Balanced <",
+					["]"] = "Balanced ] including white-space",
+					["["] = "Balanced [",
+					["}"] = "Balanced } including white-space",
+					["{"] = "Balanced {",
+					["?"] = "User Prompt",
+					_ = "Underscore",
+					a = "Argument",
+					b = "Balanced ), ], }",
+					c = "Class",
+					f = "Function",
+					o = "Block, conditional, loop",
+					q = "Quote `, \", '",
+					t = "Tag",
+				}
+				local a = vim.deepcopy(i)
+				for k, v in pairs(a) do
+					a[k] = v:gsub(" including.*", "")
+				end
+				local ic = vim.deepcopy(i)
+				local ac = vim.deepcopy(a)
+				for key, name in pairs { n = "Next", l = "Last" } do
+					i[key] =
+						vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
+					a[key] =
+						vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
+				end
+				require("which-key").register {
+					mode = { "o", "x" },
+					i = i,
+					a = a,
+				}
+			end)
+		end,
 	},
 	{
 		"echasnovski/mini.align",
@@ -308,35 +353,40 @@ require("lazy").setup({
 		},
 	},
 	-- NOTE: easily jump to any location and enhanced f/t motions for Leap
+	-- using flash.nvim
 	{
-		"ggandor/flit.nvim",
-		opts = { labeled_modes = "nx" },
-		---@diagnostic disable-next-line: assign-type-mismatch
-		keys = function()
-			---@type table<string, LazyKeys[]>
-			local ret = {}
-			for _, key in ipairs { "f", "F", "t", "T" } do
-				ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-			end
-			return ret
-		end,
-	},
-	{
-		"ggandor/leap.nvim",
+		"folke/flash.nvim",
+		event = "VeryLazy",
+		vscode = true,
+		---@type Flash.Config
+		opts = {},
 		keys = {
-			{ "s", mode = { "n", "x", "o" }, desc = "motion: Leap forward to" },
-			{ "S", mode = { "n", "x", "o" }, desc = "motion: Leap backward to" },
-			{ "gs", mode = { "n", "x", "o" }, desc = "motion: Leap from windows" },
+			{
+				"s",
+				mode = { "n", "x", "o" },
+				function() require("flash").jump() end,
+				desc = "motion: Flash",
+			},
+			{
+				"S",
+				mode = { "n", "o", "x" },
+				function() require("flash").treesitter() end,
+				desc = "motion: Flash Treesitter",
+			},
+			{ "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+			{
+				"R",
+				mode = { "o", "x" },
+				function() require("flash").treesitter_search() end,
+				desc = "motion: Treesitter Search",
+			},
+			{
+				"<c-s>",
+				mode = { "c" },
+				function() require("flash").toggle() end,
+				desc = "motion: Toggle Flash Search",
+			},
 		},
-		config = function(_, opts)
-			local leap = require "leap"
-			for key, val in pairs(opts) do
-				leap.opts[key] = val
-			end
-			leap.add_default_mappings(true)
-			vim.keymap.del({ "x", "o" }, "x")
-			vim.keymap.del({ "x", "o" }, "X")
-		end,
 	},
 	-- NOTE: better UI components
 	{
@@ -486,7 +536,7 @@ require("lazy").setup({
 			},
 		},
 		config = function()
-			require("telescope").setup {
+			local opts = {
 				defaults = {
 					vimgrep_arguments = {
 						"rg",
@@ -561,6 +611,34 @@ require("lazy").setup({
 					},
 				},
 			}
+
+			if utils.has "flash.nvim" then
+				local flash = function(prompt_bufnr)
+					require("flash").jump {
+						pattern = "^",
+						label = { after = { 0, 0 } },
+						search = {
+							mode = "search",
+							exclude = {
+								function(win)
+									return vim.bo[vim.api.nvim_win_get_buf(win)].filetype
+										~= "TelescopeResults"
+								end,
+							},
+						},
+						action = function(match)
+							local picker =
+								require("telescope.actions.state").get_current_picker(prompt_bufnr)
+							picker:set_selection(match.pos[1] - 1)
+						end,
+					}
+				end
+				opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
+					mappings = { n = { s = flash }, i = { ["<c-s>"] = flash } },
+				})
+			end
+
+			require("telescope").setup(opts)
 			require("telescope").load_extension "live_grep_args"
 			require("telescope").load_extension "fzf"
 			require("telescope").load_extension "zoxide"
@@ -885,7 +963,7 @@ require("lazy").setup({
 				scrollview_mode = "virtual",
 				excluded_filetypes = { "NvimTree", "terminal", "nofile" },
 				winblend = 0,
-				signs_on_startup = { "folds", "marks", "search", "spell" },
+				signs_on_startup = { "folds", "marks", "search" },
 			}
 		end,
 	},
@@ -913,7 +991,12 @@ require("lazy").setup({
 				},
 			},
 			"hrsh7th/cmp-nvim-lsp",
-			{ "folke/neoconf.nvim", cmd = "Neoconf", config = true },
+			{
+				"folke/neoconf.nvim",
+				cmd = "Neoconf",
+				config = false,
+				dependencies = { "nvim-lspconfig" },
+			},
 			{ "folke/neodev.nvim", config = true, ft = "lua" },
 		},
 		---@class LspOptions
@@ -1000,6 +1083,11 @@ require("lazy").setup({
 			local setup = opts.setup
 
 			require("lspconfig.ui.windows").default_options.border = user.window.border
+
+			if utils.has "neoconf.nvim" then
+				local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
+				require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
+			end
 
 			utils.on_attach(require("lsp").on_attach)
 
