@@ -1417,6 +1417,7 @@ require("lazy").setup({
 					},
 				},
 				pylyzer = {
+					mason = false,
 					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
 						return require("lspconfig.util").root_pattern(
