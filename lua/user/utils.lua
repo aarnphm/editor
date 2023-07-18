@@ -6,7 +6,10 @@ local M = {}
 M.on_attach = function(on_attach)
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
-			on_attach(vim.lsp.get_client_by_id(args.data.client_id), args.buf)
+			local client = vim.lsp.get_client_by_id(args.data.client_id)
+			local ok, inlay_hints = pcall(require, "lsp-inlayhints")
+			if ok then inlay_hints.on_attach(client, args.buf) end
+			on_attach(client, args.buf)
 		end,
 	})
 end
