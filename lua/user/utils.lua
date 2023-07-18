@@ -7,9 +7,17 @@ M.on_attach = function(on_attach)
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
 			local client = vim.lsp.get_client_by_id(args.data.client_id)
-			local ok, inlay_hints = pcall(require, "lsp-inlayhints")
-			if ok then inlay_hints.on_attach(client, args.buf) end
-			on_attach(client, args.buf)
+			if client ~= nil then
+				if client.server_capabilities["inlayHintProvider"] then
+					vim.lsp.inlay_hint(0, true)
+				else
+					local ok, inlay_hints = pcall(require, "lsp-inlayhints")
+					if ok then inlay_hints.on_attach(client, args.buf) end
+				end
+				on_attach(client, args.buf)
+			else
+				vim.notify "Failed to find given client_id for given LSP"
+			end
 		end,
 	})
 end
