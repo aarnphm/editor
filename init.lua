@@ -91,6 +91,7 @@ require("lazy").setup({
 	{
 		"lewis6991/gitsigns.nvim",
 		event = "BufReadPost",
+		enabled = false,
 		opts = {
 			numhl = true,
 			watch_gitdir = { interval = 1000, follow_files = true },
@@ -1189,7 +1190,7 @@ require("lazy").setup({
 		cmd = "Mason",
 		build = ":MasonUpdate",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright", "mypy" } },
+		opts = { ensure_installed = { "lua-language-server", "pyright" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
