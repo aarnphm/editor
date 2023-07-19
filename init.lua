@@ -93,24 +93,29 @@ require("lazy").setup({
 		event = "BufReadPost",
 		opts = {
 			numhl = true,
+			watch_gitdir = { interval = 1000, follow_files = true },
+			current_line_blame = true,
+			current_line_blame_opts = { delay = 1000, virtual_text_pos = "eol" },
+			sign_priority = 6,
+			update_debounce = 100,
+			status_formatter = nil, -- Use default
 			word_diff = false,
-			current_line_blame = false,
 			diff_opts = { internal = true },
 			on_attach = function(bufnr)
-				local gs = package.loaded.gitsigns
+				local actions = require "gitsigns.actions"
 				local map = function(mode, l, r, desc)
 					vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
 				end
                 -- stylua: ignore start
-                map("n", "]h", gs.next_hunk, "git: next hunk")
-                map("n", "[h", gs.prev_hunk, "git: prev hunk")
-                map("n", "<leader>hu", gs.undo_stage_hunk, "git: undo stage hunk")
-                map("n", "<leader>hR", gs.reset_buffer, "git: reset buffer")
-                map("n", "<leader>hS", gs.stage_buffer, "git: stage buffer")
-                map("n", "<leader>hp", gs.preview_hunk, "git: preview hunk")
-                map("n", "<leader>hd", gs.diffthis, "git: diff this")
-                map("n", "<leader>hD", function() gs.diffthis("~") end, "git: diff this ~")
-                map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "git: blame Line")
+                map("n", "]h", actions.next_hunk, "git: next hunk")
+                map("n", "[h", actions.prev_hunk, "git: prev hunk")
+                map("n", "<leader>hu", actions.undo_stage_hunk, "git: undo stage hunk")
+                map("n", "<leader>hR", actions.reset_buffer, "git: reset buffer")
+                map("n", "<leader>hS", actions.stage_buffer, "git: stage buffer")
+                map("n", "<leader>hp", actions.preview_hunk, "git: preview hunk")
+                map("n", "<leader>hd", actions.diffthis, "git: diff this")
+                map("n", "<leader>hD", function() actions.diffthis("~") end, "git: diff this ~")
+                map("n", "<leader>hb", function() actions.blame_line({ full = true }) end, "git: blame Line")
                 map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
                 map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
                 map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
@@ -1184,7 +1189,7 @@ require("lazy").setup({
 		cmd = "Mason",
 		build = ":MasonUpdate",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright", "pylyzer" } },
+		opts = { ensure_installed = { "lua-language-server", "pyright", "mypy" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)

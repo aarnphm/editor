@@ -12,7 +12,9 @@ M.on_attach = function(on_attach)
 					vim.lsp.inlay_hint(0, true)
 				else
 					local ok, inlay_hints = pcall(require, "lsp-inlayhints")
-					if ok then inlay_hints.on_attach(client, args.buf) end
+					if ok and client.supports_method "textDocument/inlayHints" then
+						inlay_hints.on_attach(client, args.buf)
+					end
 				end
 				on_attach(client, args.buf)
 			else
