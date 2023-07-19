@@ -147,6 +147,13 @@ autocmd({ "BufNewFile", "BufRead" }, {
 	command = "setlocal filetype=c",
 })
 
+-- set filetype for dockerfile
+autocmd({ "BufNewFile", "BufRead", "FileType" }, {
+	group = augroup "dockerfile",
+	pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
+	command = "setlocal filetype=dockerfile",
+})
+
 -- Set mapping for switching header and source file
 autocmd("FileType", {
 	group = augroup "cpp",
