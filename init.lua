@@ -87,43 +87,6 @@ require("lazy").setup({
 			{ "<Leader>P", function() vim.cmd [[ Git push ]] end, desc = "git: push" },
 		},
 	},
-	-- NOTE: nice git integration and UI
-	{
-		"lewis6991/gitsigns.nvim",
-		event = "BufReadPost",
-		enabled = false,
-		opts = {
-			numhl = true,
-			watch_gitdir = { interval = 1000, follow_files = true },
-			current_line_blame = true,
-			current_line_blame_opts = { delay = 1000, virtual_text_pos = "eol" },
-			sign_priority = 6,
-			update_debounce = 100,
-			status_formatter = nil, -- Use default
-			word_diff = false,
-			diff_opts = { internal = true },
-			on_attach = function(bufnr)
-				local actions = require "gitsigns.actions"
-				local map = function(mode, l, r, desc)
-					vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
-				end
-                -- stylua: ignore start
-                map("n", "]h", actions.next_hunk, "git: next hunk")
-                map("n", "[h", actions.prev_hunk, "git: prev hunk")
-                map("n", "<leader>hu", actions.undo_stage_hunk, "git: undo stage hunk")
-                map("n", "<leader>hR", actions.reset_buffer, "git: reset buffer")
-                map("n", "<leader>hS", actions.stage_buffer, "git: stage buffer")
-                map("n", "<leader>hp", actions.preview_hunk, "git: preview hunk")
-                map("n", "<leader>hd", actions.diffthis, "git: diff this")
-                map("n", "<leader>hD", function() actions.diffthis("~") end, "git: diff this ~")
-                map("n", "<leader>hb", function() actions.blame_line({ full = true }) end, "git: blame Line")
-                map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
-                map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
-                map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
-				-- stylua: ignore end
-			end,
-		},
-	},
 	-- NOTE: exit fast af
 	{
 		"max397574/better-escape.nvim",
@@ -302,37 +265,6 @@ require("lazy").setup({
 		event = "InsertEnter",
 		config = function(_, opts) require("mini.pairs").setup(opts) end,
 	},
-	{
-		-- active indent guide and indent text objects
-		"echasnovski/mini.indentscope",
-		event = { "BufReadPre", "BufNewFile" },
-		enabled = false,
-		opts = {
-			symbol = "│",
-			options = { try_as_border = true },
-		},
-		init = function()
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = {
-					"help",
-					"alpha",
-					"dashboard",
-					"neo-tree",
-					"Trouble",
-					"lazy",
-					"mason",
-					"TelescopePrompt",
-					"NvimTree",
-					"scratch",
-					"nofile",
-					"toggleterm",
-					"terminal",
-				},
-				callback = function() vim.b.miniindentscope_disable = true end,
-			})
-		end,
-		config = function(_, opts) require("mini.indentscope").setup(opts) end,
-	},
 	-- NOTE: cuz sometimes `set list` is not enough and you need some indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
@@ -391,16 +323,6 @@ require("lazy").setup({
 				desc = "motion: Toggle Flash Search",
 			},
 		},
-	},
-	-- NOTE: better UI components
-	{
-		"kevinhwang91/nvim-bqf",
-		ft = "qf",
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
-			{ "junegunn/fzf", lazy = true, build = ":call fzf#install()" },
-		},
-		config = true,
 	},
 	-- NOTE: folke is neovim's tpope
 	{
@@ -832,7 +754,7 @@ require("lazy").setup({
 		opts = {
 			-- size can be a number or function which is passed the current terminal
 			size = function(term)
-				local factor = 0.45
+				local factor = 0.38
 				if term.direction == "horizontal" then
 					return vim.o.lines * factor
 				elseif term.direction == "vertical" then
@@ -881,18 +803,13 @@ require("lazy").setup({
 				),
 				sources = {
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.black,
-					f.ruff.with {
-						extra_args = {
-							string.format("--config %s/pyproject.toml", utils.get_root()),
-						},
-					},
 					f.stylua,
 					f.jq,
 
 					-- NOTE: diagnostics
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
+					d.ruff,
 				},
 			}
 		end,
@@ -958,25 +875,6 @@ require("lazy").setup({
 			show_modified = true,
 		},
 	},
-	-- NOTE: scrollview
-	{
-		"dstein64/nvim-scrollview",
-		event = { "BufReadPost", "BufAdd", "BufNewFile" },
-		config = function()
-			require("scrollview").setup {
-				scrollview_mode = "virtual",
-				excluded_filetypes = { "NvimTree", "terminal", "nofile" },
-				winblend = 0,
-				signs_on_startup = { "folds", "marks", "search" },
-			}
-		end,
-	},
-	{
-		"stevearc/aerial.nvim",
-		cmd = "AerialToggle",
-		config = true,
-		opts = { close_automatic_events = { "unsupported" } },
-	},
 	{ "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
 	-- NOTE: lspconfig
 	{
@@ -995,65 +893,12 @@ require("lazy").setup({
 				},
 			},
 			"hrsh7th/cmp-nvim-lsp",
-			{
-				"folke/neoconf.nvim",
-				cmd = "Neoconf",
-				config = false,
-				dependencies = { "nvim-lspconfig" },
-			},
-			{ "folke/neodev.nvim", config = true, ft = "lua" },
 		},
 		---@class LspOptions
 		opts = {
 			---@type lspconfig.options
 			servers = {
-				pyright = {
-					flags = { debounce_text_changes = 500 },
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
-					settings = {
-						python = {
-							autoImportCompletions = true,
-							autoSearchPaths = true,
-							diagnosticMode = "workspace", -- workspace
-							useLibraryCodeForTypes = true,
-						},
-					},
-				},
-				pylyzer = {
-					mason = false,
-					flags = { debounce_text_changes = 500 },
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
-					settings = {
-						python = {
-							checkOnType = false,
-							diagnostics = false,
-							inlayHints = true,
-							smartCompletion = true,
-						},
-					},
-				},
+				ruff_lsp = {},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -1073,7 +918,6 @@ require("lazy").setup({
 						},
 					},
 				},
-				ruff_lsp = {},
 			},
 			---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
 			setup = {},
@@ -1190,7 +1034,7 @@ require("lazy").setup({
 		cmd = "Mason",
 		build = ":MasonUpdate",
 		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
-		opts = { ensure_installed = { "lua-language-server", "pyright" } },
+		opts = { ensure_installed = { "lua-language-server" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
 			require("mason").setup(opts)
