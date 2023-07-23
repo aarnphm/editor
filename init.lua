@@ -4,7 +4,6 @@
 if vim.g.vscode then return end
 
 require "user.globals"
-
 local icons = _G.icons
 local utils = require "user.utils"
 local user = require "user.options"
@@ -1066,6 +1065,9 @@ require("lazy").setup({
 					".null-ls-root",
 					".neoconf.json",
 					"Makefile",
+					"pyproject.toml",
+					"WORKSPACE",
+					"hatch.toml",
 					".git"
 				),
 				sources = {
@@ -1119,44 +1121,12 @@ require("lazy").setup({
 			return options
 		end,
 		config = function(_, opts)
-			local null_ls = require "null-ls"
-			null_ls.setup(opts)
+			require("null-ls").setup(opts)
 			require("mason-null-ls").setup {
 				ensure_installed = nil,
 				automatic_installation = true,
 				handlers = {},
 			}
-
-			-- Setup usercmd to register/deregister available source(s)
-			local _gen_completion = function()
-				local sources_cont = null_ls.get_source {
-					filetype = vim.api.nvim_get_option_value("filetype", { scope = "local" }),
-				}
-				local completion_items = {}
-				for _, server in pairs(sources_cont) do
-					table.insert(completion_items, server.name)
-				end
-				return completion_items
-			end
-
-			local toggle_command = function(args)
-				if vim.tbl_contains(_gen_completion(), args.args) then
-					null_ls.toggle { name = opts.args }
-				else
-					vim.notify(
-						string.format(
-							"[Null-ls] Unable to find any registered source named [%s].",
-							opts.args
-						),
-						vim.log.levels.ERROR,
-						{ title = "Null-ls Internal Error" }
-					)
-				end
-			end
-			vim.api.nvim_create_user_command("NullLsToggle", toggle_command, {
-				nargs = 1,
-				complete = _gen_completion,
-			})
 		end,
 	},
 	-- NOTE: nice winbar
