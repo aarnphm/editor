@@ -210,7 +210,6 @@ require("lazy").setup({
 			require("nvim-treesitter.configs").setup(opts)
 		end,
 	},
-	{ "m-demare/hlargs.nvim", lazy = true, config = true },
 	-- NOTE: comments, you say what?
 	{
 		"numToStr/Comment.nvim",
@@ -319,37 +318,6 @@ require("lazy").setup({
 		event = "InsertEnter",
 		config = function(_, opts) require("mini.pairs").setup(opts) end,
 	},
-	{
-		-- active indent guide and indent text objects
-		"echasnovski/mini.indentscope",
-		event = { "BufReadPre", "BufNewFile" },
-		cond = user.ui,
-		opts = {
-			symbol = "│",
-			options = { try_as_border = true },
-		},
-		init = function()
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = {
-					"help",
-					"alpha",
-					"dashboard",
-					"neo-tree",
-					"Trouble",
-					"lazy",
-					"mason",
-					"TelescopePrompt",
-					"NvimTree",
-					"scratch",
-					"nofile",
-					"toggleterm",
-					"terminal",
-				},
-				callback = function() vim.b.miniindentscope_disable = true end,
-			})
-		end,
-		config = function(_, opts) require("mini.indentscope").setup(opts) end,
-	},
 	-- NOTE: cuz sometimes `set list` is not enough and you need some indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
@@ -421,24 +389,6 @@ require("lazy").setup({
 	},
 	-- NOTE: folke is neovim's tpope
 	{ "folke/paint.nvim", event = "BufReadPost", config = true },
-	{
-		"folke/noice.nvim",
-		event = { "BufWinEnter", "BufNewFile", "WinEnter" },
-		cond = user.ui,
-		opts = {
-			lsp = {
-				progress = { enabled = user.ui },
-				signature = { enabled = false },
-				hover = { enabled = false },
-			},
-			cmdline = { view = "cmdline" },
-			messages = { view = "mini", view_error = "mini", view_warn = "mini" },
-			hover = { enabled = false },
-			signature = { enabled = false },
-			popupmenu = { backend = "cmp" },
-			presets = { bottom_search = true, command_palette = false, inc_rename = true },
-		},
-	},
 	{
 		"folke/trouble.nvim",
 		cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -734,7 +684,6 @@ require("lazy").setup({
 								buftype = { "terminal", "quickfix", "Scratch" },
 							},
 						},
-						other_win_hl_color = "#e35e4f",
 					}
 				end,
 			},
@@ -751,15 +700,6 @@ require("lazy").setup({
 				desc = "explorer: root dir",
 			},
 		},
-		deactivate = function() vim.cmd [[Neotree close]] end,
-		init = function()
-			vim.g.neo_tree_remove_legacy_commands = 1
-			if vim.fn.argc() == 1 then
-				---@diagnostic disable-next-line: param-type-mismatch
-				local stat = vim.loop.fs_stat(vim.fn.argv(0))
-				if stat and stat.type == "directory" then require "neo-tree" end
-			end
-		end,
 		opts = {
 			close_if_last_window = true,
 			enable_diagnostics = false, -- default is set to true here.
@@ -771,42 +711,8 @@ require("lazy").setup({
 					visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
 					hide_dotfiles = false,
 					hide_gitignored = true,
-					hide_by_name = {
-						"node_modules",
-						"pdm.lock",
-					},
-					hide_by_pattern = { -- uses glob style patterns
-						"*.meta",
-						"*/src/*/tsconfig.json",
-					},
-				},
-			},
-			event_handlers = {
-				{
-					event = "neo_tree_window_after_open",
-					handler = function(args)
-						if args.position == "left" or args.position == "right" then
-							vim.cmd "wincmd ="
-						end
-					end,
-				},
-				{
-					event = "neo_tree_window_after_close",
-					handler = function(args)
-						if args.position == "left" or args.position == "right" then
-							vim.cmd "wincmd ="
-						end
-					end,
-				},
-				-- disable last status on neo-tree
-				-- If I use laststatus, then uncomment this
-				{
-					event = "neo_tree_buffer_enter",
-					handler = function() vim.opt_local.laststatus = 0 end,
-				},
-				{
-					event = "neo_tree_buffer_leave",
-					handler = function() vim.opt_local.laststatus = 2 end,
+					hide_by_name = { "node_modules", "pdm.lock" },
+					hide_by_pattern = { "*.meta", "*/src/*/tsconfig.json" },
 				},
 			},
 			always_show = { ".github" },
@@ -1164,18 +1070,7 @@ require("lazy").setup({
 				),
 				sources = {
 					-- NOTE: formatting
-					f.prettierd.with {
-						extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" },
-						extra_filetypes = { "jsonc", "astro", "svelte" },
-						disabled_filetypes = { "markdown" },
-					},
 					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.black,
-					f.ruff.with {
-						extra_args = {
-							string.format("--config %s/pyproject.toml", utils.get_root()),
-						},
-					},
 					f.stylua,
 					f.beautysh,
 					f.jq,
@@ -1192,21 +1087,13 @@ require("lazy").setup({
 							string.format("indent_string=%s", string.rep(" ", 4)),
 						},
 					},
-					f.deno_fmt.with {
-						extra_args = { "--line-width", "80" },
-						disabled_filetypes = {
-							"javascript",
-							"javascriptreact",
-							"typescript",
-							"typescriptreact",
-						},
-					},
 					f.yamlfmt,
 
 					-- NOTE: diagnostics
 					d.clang_check,
 					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 					d.selene,
+					d.ruff,
 					d.golangci_lint,
 					d.markdownlint.with { extra_args = { "--disable MD033" } },
 					d.zsh,
@@ -1272,28 +1159,6 @@ require("lazy").setup({
 			})
 		end,
 	},
-	-- NOTE: lua related
-	{
-		"ii14/neorepl.nvim",
-		ft = "lua",
-		keys = {
-			{
-				"<LocalLeader>or",
-				function()
-					-- get current buffer and window
-					local buf = vim.api.nvim_get_current_buf()
-					local win = vim.api.nvim_get_current_win()
-					-- create a new split for the repl
-					vim.cmd "split"
-					-- spawn repl and set the context to our buffer
-					require("neorepl").new { lang = "lua", buffer = buf, window = win }
-					-- resize repl window and make it fixed height
-					vim.cmd "resize 10 | setl winfixheight"
-				end,
-				desc = "repl: Open lua repl",
-			},
-		},
-	},
 	-- NOTE: nice winbar
 	{
 		"utilyre/barbecue.nvim",
@@ -1323,16 +1188,10 @@ require("lazy").setup({
 			require("scrollview").setup {
 				scrollview_mode = "virtual",
 				excluded_filetypes = { "NvimTree", "terminal", "nofile" },
-				winblend = 0,
+				winblend = 1,
 				signs_on_startup = { "folds", "marks", "search" },
 			}
 		end,
-	},
-	{
-		"stevearc/aerial.nvim",
-		cmd = "AerialToggle",
-		config = true,
-		opts = { close_automatic_events = { "unsupported" } },
 	},
 	{ "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
 	-- NOTE: lspconfig
@@ -1457,6 +1316,11 @@ require("lazy").setup({
 				dockerls = {},
 				marksman = {},
 				rnix = {},
+				svelte = {},
+				cssls = {},
+				spectral = {},
+				taplo = {},
+				-- NOTE: Python
 				ruff_lsp = {
 					root_dir = function(fname)
 						return require("lspconfig.util").root_pattern(
@@ -1472,13 +1336,6 @@ require("lazy").setup({
 					end,
 					settings = {},
 				},
-				svelte = {},
-				cssls = {},
-				spectral = {},
-				taplo = {},
-				denols = {},
-				-- NOTE: There are currently some issue with pyright treesitter parser, so using pylsp atm.
-				-- pylsp = {},
 				pyright = {
 					flags = { debounce_text_changes = 500 },
 					root_dir = function(fname)
@@ -1502,30 +1359,30 @@ require("lazy").setup({
 						},
 					},
 				},
-				pylyzer = {
-					mason = false,
-					flags = { debounce_text_changes = 500 },
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
-					settings = {
-						python = {
-							checkOnType = false,
-							diagnostics = false,
-							inlayHints = true,
-							smartCompletion = true,
-						},
-					},
-				},
+				-- pylyzer = {
+				-- 	mason = false,
+				-- 	flags = { debounce_text_changes = 500 },
+				-- 	root_dir = function(fname)
+				-- 		return require("lspconfig.util").root_pattern(
+				-- 			"WORKSPACE",
+				-- 			".git",
+				-- 			"Pipfile",
+				-- 			"pyrightconfig.json",
+				-- 			"setup.py",
+				-- 			"setup.cfg",
+				-- 			"pyproject.toml",
+				-- 			"requirements.txt"
+				-- 		)(fname) or require("lspconfig.util").path.dirname(fname)
+				-- 	end,
+				-- 	settings = {
+				-- 		python = {
+				-- 			checkOnType = false,
+				-- 			diagnostics = false,
+				-- 			inlayHints = true,
+				-- 			smartCompletion = true,
+				-- 		},
+				-- 	},
+				-- },
 				-- NOTE: isolated servers will have their own plugins for setup
 				clangd = { isolated = true },
 				rust_analyzer = { isolated = true },
@@ -1623,8 +1480,6 @@ require("lazy").setup({
 				mason_lspconfig.setup { ensure_installed = ensure_installed }
 				mason_lspconfig.setup_handlers { mason_handler }
 			end
-
-			vim.api.nvim_command [[LspStart]] -- Start LSPs
 		end,
 	},
 	{
@@ -1684,146 +1539,6 @@ require("lazy").setup({
 				local p = mr.get_package(tool)
 				if not p:is_installed() then p:install() end
 			end
-		end,
-	},
-	-- NOTE: lets do some dap
-	{
-		"mfussenegger/nvim-dap",
-		dependencies = {
-			-- Creates a beautiful debugger UI
-			"rcarriga/nvim-dap-ui",
-			-- Installs the debug adapters for you
-			"williamboman/mason.nvim",
-			"jay-babu/mason-nvim-dap.nvim",
-			-- Add your own debuggers here
-			"leoluz/nvim-dap-go",
-		},
-		config = function()
-			local dap = require "dap"
-			local dapui = require "dapui"
-
-			require("mason-nvim-dap").setup {
-				automatic_setup = true,
-				ensure_installed = { "delve", "codelldb" },
-			}
-
-			-- You can provide additional configuration to the handlers,
-			-- see mason-nvim-dap README for more information
-			require("mason-nvim-dap").setup_handlers()
-
-			-- Dap UI setup
-			-- For more information, see |:help nvim-dap-ui|
-			dapui.setup {
-				icons = {
-					expanded = icons.ui_space.ArrowOpen,
-					collapsed = icons.ui_space.ArrowClosed,
-					current_frame = icons.ui_space.Indicator,
-				},
-				layouts = {
-					{
-						elements = {
-							-- Provide as ID strings or tables with "id" and "size" keys
-							{
-								id = "scopes",
-								size = 0.25, -- Can be float or integer > 1
-							},
-							{ id = "breakpoints", size = 0.25 },
-							{ id = "stacks", size = 0.25 },
-							{ id = "watches", size = 0.25 },
-						},
-						size = 40,
-						position = "left",
-					},
-					{ elements = { "repl" }, size = 10, position = "bottom" },
-				},
-				controls = {
-					icons = {
-						pause = icons.dap_space.Pause,
-						play = icons.dap_space.Play,
-						step_into = icons.dap_space.StepInto,
-						step_over = icons.dap_space.StepOver,
-						step_out = icons.dap_space.StepOut,
-						step_back = icons.dap_space.StepBack,
-						run_last = icons.dap_space.RunLast,
-						terminate = icons.dap_space.Terminate,
-					},
-				},
-				windows = { indent = 1 },
-			}
-
-			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
-			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-			dap.listeners.before.event_exited["dapui_config"] = dapui.close
-
-			for _, v in ipairs {
-				"Breakpoint",
-				"BreakpointRejected",
-				"BreakpointCondition",
-				"LogPoint",
-				"Stopped",
-			} do
-				vim.fn.sign_define(
-					"Dap" .. v,
-					{ text = icons.dap_space[v], texthl = "Dap" .. v, line = "", numhl = "" }
-				)
-			end
-
-			-- Basic debugging keymaps, feel free to change to your liking!
-			vim.keymap.set("n", "<F6>", dap.continue, { desc = "dap: continue" })
-			vim.keymap.set("n", "<F7>", function()
-				dap.terminate()
-				dapui.close()
-			end, { desc = "dap: stop" })
-			vim.keymap.set("n", "<F8>", dap.toggle_breakpoint, { desc = "dap: toggle breakpoint" })
-			vim.keymap.set("n", "<F9>", dap.step_into, { desc = "dap: step into" })
-			vim.keymap.set("n", "<F10>", dap.step_out, { desc = "dap: step out" })
-			vim.keymap.set("n", "<F10>", dap.step_over, { desc = "dap: step over" })
-			vim.keymap.set(
-				"n",
-				"<leader>db",
-				function() dap.set_breakpoint(vim.fn.input "Breakpoint condition: ") end,
-				{ desc = "dap: set breakpoint condition" }
-			)
-
-			-- Install golang specific config
-			require("dap-go").setup()
-
-			dap.adapters.lldb = {
-				type = "executable",
-				command = "/usr/bin/lldb-vscode",
-				name = "lldb",
-			}
-			dap.configurations.cpp = {
-				{
-					name = "Launch",
-					type = "lldb",
-					request = "launch",
-					program = function()
-						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-					end,
-					cwd = "${workspaceFolder}",
-					stopOnEntry = false,
-					args = function()
-						local input = vim.fn.input "Input args: "
-						return vim.fn.split(input, " ", true)
-					end,
-
-					-- if you change `runInTerminal` to true, you might need to change the yama/ptrace_scope setting:
-					--
-					--    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
-					--
-					-- Otherwise you might get the following error:
-					--
-					--    Error on launch: Failed to attach to the target process
-					--
-					-- But you should be aware of the implications:
-					-- https://www.kernel.org/doc/html/latest/admin-guide/LSM/Yama.html
-					runInTerminal = false,
-				},
-			}
-
-			dap.configurations.c = dap.configurations.cpp
-			dap.configurations.rust = dap.configurations.cpp
 		end,
 	},
 	-- NOTE: Setup completions.
@@ -2138,7 +1853,6 @@ require("lazy").setup({
 				"getscript",
 				"getscriptPlugin",
 				"gzip",
-				"logipat",
 				"netrw",
 				"netrwPlugin",
 				"netrwSettings",
@@ -2148,21 +1862,11 @@ require("lazy").setup({
 				"tar",
 				"tarPlugin",
 				"tohtml",
-				"tutor",
-				"rrhelper",
 				"spellfile_plugin",
 				"vimball",
 				"vimballPlugin",
 				"zip",
-				"rplugin",
 				"zipPlugin",
-				"syntax",
-				"synmenu",
-				"optwin",
-				"compiler",
-				"bugreport",
-				"ftplugin",
-				"editorconfig",
 			},
 		},
 	},
