@@ -899,30 +899,40 @@ require("lazy").setup({
 			---@type lspconfig.options
 			servers = {
 				ruff_lsp = {},
-				pyright = {
-					flags = { debounce_text_changes = 500 },
-					root_dir = function(fname)
-						return require("lspconfig.util").root_pattern(
-							"WORKSPACE",
-							".git",
-							"Pipfile",
-							"pyrightconfig.json",
-							"hatch.toml",
-							"setup.py",
-							"setup.cfg",
-							"pyproject.toml",
-							"requirements.txt"
-						)(fname) or require("lspconfig.util").path.dirname(fname)
-					end,
-					settings = {
-						python = {
-							autoImportCompletions = true,
-							autoSearchPaths = true,
-							diagnosticMode = "workspace", -- workspace
-							useLibraryCodeForTypes = true,
-						},
-					},
-				},
+				-- pyright = {
+				-- 	flags = { debounce_text_changes = 500 },
+				-- 	root_dir = function(fname)
+				-- 		return require("lspconfig.util").root_pattern(
+				-- 			"WORKSPACE",
+				-- 			".git",
+				-- 			"Pipfile",
+				-- 			"pyrightconfig.json",
+				-- 			"hatch.toml",
+				-- 			"setup.py",
+				-- 			"setup.cfg",
+				-- 			"pyproject.toml",
+				-- 			"requirements.txt"
+				-- 		)(fname) or require("lspconfig.util").path.dirname(fname)
+				-- 	end,
+				-- 	settings = {
+				-- 		python = {
+				-- 			autoImportCompletions = true,
+				-- 			autoSearchPaths = true,
+				-- 			diagnosticMode = "workspace", -- workspace
+				-- 			useLibraryCodeForTypes = true,
+				-- 		},
+				-- 	},
+				-- },
+				-- pylyzer = {
+				-- 	settings = {
+				-- 		python = {
+				-- 			checkOnType = false,
+				-- 			diagnostics = false,
+				-- 			inlayHints = false,
+				-- 			smartCompletion = true,
+				-- 		},
+				-- 	},
+				-- },
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -1009,49 +1019,6 @@ require("lazy").setup({
 
 			vim.api.nvim_command [[LspStart]] -- Start LSPs
 		end,
-	},
-	{
-		"lvimuser/lsp-inlayhints.nvim",
-		lazy = true,
-		event = { "LspAttach" },
-		opts = {
-			inlay_hints = {
-				parameter_hints = { show = true },
-				type_hints = { show = true },
-				label_formatter = function(tbl, kind, opts)
-					if kind == 2 and not opts.parameter_hints.show then
-						return ""
-					elseif not opts.type_hints.show then
-						return ""
-					end
-
-					return table.concat(tbl, ", ")
-				end,
-				virt_text_formatter = function(label, hint, opts, client_name)
-					if client_name == "lua_ls" then
-						if hint.kind == 2 then
-							hint.paddingLeft = false
-						else
-							hint.paddingRight = false
-						end
-					end
-
-					local vt = {}
-					vt[#vt + 1] = hint.paddingLeft and { " ", "None" } or nil
-					vt[#vt + 1] = { label, opts.highlight }
-					vt[#vt + 1] = hint.paddingRight and { " ", "None" } or nil
-
-					return vt
-				end,
-				only_current_line = false,
-				-- highlight group
-				highlight = "Comment",
-				-- virt_text priority
-				priority = 0,
-			},
-			enabled_at_startup = true,
-			debug_mode = false,
-		},
 	},
 	{
 		"williamboman/mason.nvim",
