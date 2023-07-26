@@ -899,6 +899,30 @@ require("lazy").setup({
 			---@type lspconfig.options
 			servers = {
 				ruff_lsp = {},
+				pyright = {
+					flags = { debounce_text_changes = 500 },
+					root_dir = function(fname)
+						return require("lspconfig.util").root_pattern(
+							"WORKSPACE",
+							".git",
+							"Pipfile",
+							"pyrightconfig.json",
+							"hatch.toml",
+							"setup.py",
+							"setup.cfg",
+							"pyproject.toml",
+							"requirements.txt"
+						)(fname) or require("lspconfig.util").path.dirname(fname)
+					end,
+					settings = {
+						python = {
+							autoImportCompletions = true,
+							autoSearchPaths = true,
+							diagnosticMode = "workspace", -- workspace
+							useLibraryCodeForTypes = true,
+						},
+					},
+				},
 				lua_ls = {
 					settings = {
 						Lua = {
