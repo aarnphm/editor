@@ -430,10 +430,7 @@ require("lazy").setup({
 		"folke/which-key.nvim",
 		event = "BufReadPost",
 		opts = { plugins = { presets = { operators = false } } },
-		config = function(_, opts)
-			if user.ui then opts.window = { border = user.window.border } end
-			require("which-key").setup(opts)
-		end,
+		config = function(_, opts) require("which-key").setup(opts) end,
 	},
 	{
 		"folke/todo-comments.nvim",
@@ -1131,23 +1128,17 @@ require("lazy").setup({
 	},
 	-- NOTE: nice winbar
 	{
-		"utilyre/barbecue.nvim",
-		event = "BufReadPost",
-		version = "*",
-		dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
+		"Bekaboo/dropbar.nvim",
+		config = true,
+		event = { "BufReadPre", "BufNewFile" },
 		opts = {
-			attach_navic = false, -- handled via on_attach hooks
-			exclude_filetypes = {
-				"toggleterm",
-				"Scratch",
-				"Trouble",
-				"gitrebase",
-				"gitcommit",
-				"gitconfig",
-				"gitignore",
+			icons = {
+				enable = true,
+				ui = {
+					bar = { separator = "  ", extends = "…" },
+					menu = { separator = " ", indicator = "  " },
+				},
 			},
-			symbols = { separator = icons.ui_space.Separator },
-			show_modified = true,
 		},
 	},
 	-- NOTE: scrollview
@@ -1167,7 +1158,7 @@ require("lazy").setup({
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
-		event = { "CursorHold", "CursorHoldI" },
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"williamboman/mason-lspconfig.nvim",
 			"mason.nvim",
@@ -1176,9 +1167,7 @@ require("lazy").setup({
 				cmd = "Glance",
 				lazy = true,
 				config = true,
-				opts = {
-					border = { enable = user.ui },
-				},
+				opts = { border = { enable = false } },
 			},
 			"hrsh7th/cmp-nvim-lsp",
 			{
@@ -1191,6 +1180,26 @@ require("lazy").setup({
 		},
 		---@class LspOptions
 		opts = {
+			-- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
+			-- Be aware that you also will need to properly configure your LSP server to
+			-- provide the inlay hints.
+			inlay_hints = {
+				enabled = false,
+			},
+			-- add any global capabilities here
+			capabilities = {},
+			-- Automatically format on save
+			autoformat = true,
+			-- Enable this to show formatters used in a notification
+			-- Useful for debugging formatter issues
+			format_notify = false,
+			-- options for vim.lsp.buf.format
+			-- `bufnr` and `filter` is handled by the formatter,
+			-- but can be also overridden when specified
+			format = {
+				formatting_options = nil,
+				timeout_ms = nil,
+			},
 			---@type lspconfig.options
 			servers = {
 				bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
@@ -1395,21 +1404,53 @@ require("lazy").setup({
 			---@module "lspconfig"
 			local lspconfig = require "lspconfig"
 
-			local servers = opts.servers
-			local setup = opts.setup
-
-			require("lspconfig.ui.windows").default_options.border = user.window.border
-
 			if utils.has "neoconf.nvim" then
 				local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
 				require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
 			end
 
-			utils.on_attach(require("lsp").on_attach)
+			-- setup autoformat
+			require("user.format").setup(opts)
+
+			utils.on_attach(function(client, bufnr) require("lsp").on_attach(client, bufnr) end)
+
+			local register_capability = vim.lsp.handlers["client/registerCapability"]
+
+			vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
+				local ret = register_capability(err, res, ctx)
+				local client_id = ctx.client_id
+				---@type lsp.Client
+				local client = vim.lsp.get_client_by_id(client_id)
+				local buffer = vim.api.nvim_get_current_buf()
+				require("lsp").on_attach(client, buffer)
+				return ret
+			end
+
+			local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+
+			if opts.inlay_hints.enabled and inlay_hint then
+				utils.on_attach(function(client, buffer)
+					if client.supports_method "textDocument/inlayHint" then
+						inlay_hint(buffer, true)
+					end
+				end)
+			end
+
+			local servers = opts.servers
+			local setup = opts.setup
+
+			local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+			local capabilities = vim.tbl_deep_extend(
+				"force",
+				{},
+				vim.lsp.protocol.make_client_capabilities(),
+				has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+				opts.capabilities or {}
+			)
 
 			local mason_handler = function(server)
 				local server_opts = vim.tbl_deep_extend("force", {
-					capabilities = require("lsp").gen_capabilities(),
+					capabilities = vim.deepcopy(capabilities),
 					flags = { debounce_text_changes = 150 },
 				}, servers[server] or {})
 
@@ -1661,21 +1702,6 @@ require("lazy").setup({
 				pattern = "Cargo.toml",
 				callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
 			})
-
-			if user.ui then
-				opts.window = {
-					completion = cmp.config.window.bordered {
-						border = user.window.border,
-						winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:PmenuSel",
-						scrollbar = false,
-					},
-					documentation = cmp.config.window.bordered {
-						border = user.window.border,
-						winhighlight = "Normal:CmpDoc",
-					},
-				}
-			end
-
 			cmp.setup(opts)
 		end,
 	},
@@ -1749,7 +1775,7 @@ require("lazy").setup({
 	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 	checker = { enable = true },
 	ui = {
-		border = user.ui and user.window.border or "none",
+		border = "none",
 		icons = {
 			cmd = icons.misc.Code,
 			config = icons.ui.Gear,
