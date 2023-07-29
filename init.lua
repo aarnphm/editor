@@ -22,6 +22,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
+local load_textobjects = true
+
 require("lazy").setup({
 	-- NOTE: utilities
 	"lewis6991/impatient.nvim",
@@ -139,34 +141,27 @@ require("lazy").setup({
 	-- NOTE: treesitter-based dependencies
 	{
 		"nvim-treesitter/nvim-treesitter",
-		build = function()
-			if #vim.api.nvim_list_uis() ~= 0 then vim.api.nvim_command "TSUpdate" end
-		end,
-		event = "BufReadPost",
+		version = false, -- last release is way too old and doesn't work on Windows
+		build = ":TSUpdate",
+		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
-			"windwp/nvim-ts-autotag",
 			{
 				"nvim-treesitter/nvim-treesitter-textobjects",
 				init = function()
-					-- PERF: no need to load the plugin, if we only need its queries for mini.ai
-					local plugin = require("lazy.core.config").spec.plugins["nvim-treesitter"]
-					local opts = require("lazy.core.plugin").values(plugin, "opts", false)
-					local enabled = false
-					if opts.textobjects then
-						for _, mod in ipairs { "move", "select", "swap", "lsp_interop" } do
-							if opts.textobjects[mod] and opts.textobjects[mod].enable then
-								enabled = true
-								break
-							end
-						end
-					end
-					if not enabled then
-						require("lazy.core.loader").disable_rtp_plugin "nvim-treesitter-textobjects"
-					end
+					-- disable rtp plugin, as we only need its queries for mini.ai
+					-- In case other textobject modules are enabled, we will load them
+					-- once nvim-treesitter is loaded
+					require("lazy.core.loader").disable_rtp_plugin "nvim-treesitter-textobjects"
+					load_textobjects = true
 				end,
 			},
+			"windwp/nvim-ts-autotag",
 		},
-		keys = { { "<bs>", desc = "Decrement selection", mode = "x" } },
+		cmd = { "TSUpdateSync" },
+		keys = {
+			{ "<c-space>", desc = "Increment selection" },
+			{ "<bs>", desc = "Decrement selection", mode = "x" },
+		},
 		opts = {
 			ensure_installed = {
 				"python",
@@ -183,8 +178,16 @@ require("lazy").setup({
 				"markdown_inline",
 				"yaml",
 				"go",
+				"typescript",
+				"tsx",
+				"zig",
+				"query",
+				"regex",
+				"luap",
+				"luadoc",
+				"javascript",
 			},
-			ignore_install = { "phpdoc", "gitcommit" },
+			ignore_install = { "phpdoc" },
 			indent = { enable = true },
 			highlight = { enable = true },
 			context_commentstring = { enable = true, enable_autocmd = false },
@@ -194,19 +197,41 @@ require("lazy").setup({
 				keymaps = {
 					init_selection = "<C-a>",
 					node_incremental = "<C-a>",
-					scope_incremental = "<nop>",
+					scope_incremental = false,
 					node_decremental = "<bs>",
 				},
 			},
 		},
 		config = function(_, opts)
-			if utils.has "typescript.nvim" then
-				vim.list_extend(opts.ensure_installed, { "typescript", "tsx" })
-			end
 			if utils.has "SchemaStore.nvim" then
 				vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" })
 			end
+			if type(opts.ensure_installed) == "table" then
+				---@type table<string, boolean>
+				local added = {}
+				opts.ensure_installed = vim.tbl_filter(function(lang)
+					if added[lang] then return false end
+					added[lang] = true
+					return true
+				end, opts.ensure_installed)
+			end
 			require("nvim-treesitter.configs").setup(opts)
+
+			if load_textobjects then
+				-- PERF: no need to load the plugin, if we only need its queries for mini.ai
+				if opts.textobjects then
+					for _, mod in ipairs { "move", "select", "swap", "lsp_interop" } do
+						if opts.textobjects[mod] and opts.textobjects[mod].enable then
+							local Loader = require "lazy.core.loader"
+							Loader.disabled_rtp_plugins["nvim-treesitter-textobjects"] = nil
+							local plugin =
+								require("lazy.core.config").plugins["nvim-treesitter-textobjects"]
+							require("lazy.core.loader").source_runtime(plugin.dir, "plugin")
+							break
+						end
+					end
+				end
+			end
 		end,
 	},
 	-- NOTE: comments, you say what?
@@ -302,21 +327,42 @@ require("lazy").setup({
 			end)
 		end,
 	},
-	{
-		"echasnovski/mini.align",
-		event = "InsertEnter",
-		config = function(_, opts) require("mini.align").setup(opts) end,
-	},
+	{ "echasnovski/mini.align", event = "VeryLazy" },
 	{
 		"echasnovski/mini.surround",
-		event = "InsertEnter",
-		config = function(_, opts) require("mini.surround").setup(opts) end,
+		keys = function(_, keys)
+			-- Populate the keys based on the user's options
+			local plugin = require("lazy.core.config").spec.plugins["mini.surround"]
+			local opts = require("lazy.core.plugin").values(plugin, "opts", false)
+			local mappings = {
+				{
+					opts.mappings.add,
+					desc = "Add surrounding",
+					mode = { "n", "v" },
+				},
+				{ opts.mappings.delete, desc = "Delete surrounding" },
+				{ opts.mappings.find, desc = "Find right surrounding" },
+				{ opts.mappings.find_left, desc = "Find left surrounding" },
+				{ opts.mappings.highlight, desc = "Highlight surrounding" },
+				{ opts.mappings.replace, desc = "Replace surrounding" },
+				{ opts.mappings.update_n_lines, desc = "Update `MiniSurround.config.n_lines`" },
+			}
+			mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings)
+			return vim.list_extend(mappings, keys)
+		end,
+		opts = {
+			mappings = {
+				add = "gsa", -- Add surrounding in Normal and Visual modes
+				delete = "gsd", -- Delete surrounding
+				find = "gsf", -- Find surrounding (to the right)
+				find_left = "gsF", -- Find surrounding (to the left)
+				highlight = "gsh", -- Highlight surrounding
+				replace = "gsr", -- Replace surrounding
+				update_n_lines = "gsn", -- Update `n_lines`
+			},
+		},
 	},
-	{
-		"echasnovski/mini.pairs",
-		event = "InsertEnter",
-		config = function(_, opts) require("mini.pairs").setup(opts) end,
-	},
+	{ "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
 	-- NOTE: cuz sometimes `set list` is not enough and you need some indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
@@ -345,7 +391,6 @@ require("lazy").setup({
 	{
 		"folke/flash.nvim",
 		event = "VeryLazy",
-		vscode = true,
 		---@type Flash.Config
 		opts = {},
 		keys = {
@@ -454,6 +499,9 @@ require("lazy").setup({
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "BufReadPost",
+		commit = vim.fn.has "nvim-0.9.0" == 0 and "057ee0f8783" or nil,
+		cmd = "Telescope",
+		version = false, -- telescope did only one release, so use HEAD for now
 		dependencies = {
 			"nvim-telescope/telescope-live-grep-args.nvim",
 			"jvgrootveld/telescope-zoxide",
@@ -464,70 +512,89 @@ require("lazy").setup({
 		},
 		keys = {
 			{
-				"<Leader>f",
-				function()
-					require("telescope.builtin").find_files {
-						find_command = {
-							"fd",
-							"-H",
-							"-tf",
-							"-E",
-							"lazy-lock.json",
-							"--strip-cwd-prefix",
-						},
-						theme = "dropdown",
-						previewer = false,
-					}
-				end,
-				desc = "telescope: Find files in current directory",
-				noremap = true,
-				silent = true,
+				"<Leader>b",
+				"<cmd>Telescope buffers show_all_buffers=true previewer=false<cr>",
+				desc = "telescope: Manage buffers",
+			},
+			{ "<leader>;", "<cmd>Telescope command_history<cr>", desc = "Command History" },
+			{
+				"<leader>f",
+				utils.telescope("files", { theme = "dropdown" }),
+				desc = "Find Files (root dir)",
+			},
+			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+			{ "<leader>fF", utils.telescope("files", { cwd = false }), desc = "Find Files (cwd)" },
+			{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent" },
+			{
+				"<leader>fR",
+				utils.telescope("oldfiles", { cwd = vim.loop.cwd() }),
+				desc = "Recent (cwd)",
+			},
+			-- search
+			{ '<leader>s"', "<cmd>Telescope registers<cr>", desc = "Registers" },
+			{
+				"<leader>sa",
+				"<cmd>Telescope autocommands<cr>",
+				desc = "Auto Commands",
+			},
+			{ "<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Buffer" },
+			{
+				"<leader>sc",
+				"<cmd>Telescope command_history<cr>",
+				desc = "Command History",
+			},
+			{ "<leader>sC", "<cmd>Telescope commands<cr>", desc = "Commands" },
+			{
+				"<leader>sd",
+				"<cmd>Telescope diagnostics bufnr=0<cr>",
+				desc = "Document diagnostics",
 			},
 			{
-				"<Leader>r",
-				function()
-					require("telescope.builtin").git_files {
-						find_command = {
-							"fd",
-							"-H",
-							"-tf",
-							"-E",
-							"lazy-lock.json",
-							"--strip-cwd-prefix",
-						},
-						theme = "dropdown",
-						previewer = false,
-					}
-				end,
-				desc = "telescope: Find files in git repository",
-				noremap = true,
-				silent = true,
+				"<leader>sD",
+				"<cmd>Telescope diagnostics<cr>",
+				desc = "Workspace diagnostics",
 			},
 			{
-				"<Leader>'",
-				function() require("telescope.builtin").live_grep {} end,
-				desc = "telescope: Live grep",
-				noremap = true,
-				silent = true,
+				"<leader>sg",
+				utils.telescope "live_grep",
+				desc = "Grep (root dir)",
+			},
+			{ "<leader>sG", utils.telescope("live_grep", { cwd = false }), desc = "Grep (cwd)" },
+			{ "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
+			{
+				"<leader>sH",
+				"<cmd>Telescope highlights<cr>",
+				desc = "Search Highlight Groups",
+			},
+			{ "<leader>sm", "<cmd>Telescope marks<cr>", desc = "Jump to Mark" },
+			{ "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "Options" },
+			{ "<leader>sR", "<cmd>Telescope resume<cr>", desc = "Resume" },
+			{
+				"<leader>/",
+				utils.telescope("grep_string", { word_match = "-w" }),
+				desc = "Word (root dir)",
+			},
+			{
+				"<leader>sW",
+				utils.telescope("grep_string", { cwd = false, word_match = "-w" }),
+				desc = "Word (cwd)",
+			},
+			{
+				"<leader>?",
+				utils.telescope "grep_string",
+				mode = "v",
+				desc = "Selection (root dir)",
+			},
+			{
+				"<leader>sW",
+				utils.telescope("grep_string", { cwd = false }),
+				mode = "v",
+				desc = "Selection (cwd)",
 			},
 			{
 				"<Leader>w",
 				function() require("telescope").extensions.live_grep_args.live_grep_args() end,
 				desc = "telescope: Live grep args",
-				noremap = true,
-				silent = true,
-			},
-			{
-				"<Leader>/",
-				"<cmd>Telescope grep_string<cr>",
-				desc = "telescope: Grep string under cursor",
-				noremap = true,
-				silent = true,
-			},
-			{
-				"<Leader>b",
-				"<cmd>Telescope buffers show_all_buffers=true previewer=false<cr>",
-				desc = "telescope: Manage buffers",
 				noremap = true,
 				silent = true,
 			},
@@ -572,6 +639,42 @@ require("lazy").setup({
 						i = {
 							["<C-a>"] = { "<esc>0i", type = "command" },
 							["<Esc>"] = require("telescope.actions").close,
+							["<c-t>"] = function(...)
+								return require("trouble.providers.telescope").open_with_trouble(...)
+							end,
+							["<a-t>"] = function(...)
+								return require("trouble.providers.telescope").open_selected_with_trouble(
+									...
+								)
+							end,
+							["<a-i>"] = function()
+								local action_state = require "telescope.actions.state"
+								local line = action_state.get_current_line()
+								utils.telescope(
+									"find_files",
+									{ no_ignore = true, default_text = line }
+								)()
+							end,
+							["<a-h>"] = function()
+								local action_state = require "telescope.actions.state"
+								local line = action_state.get_current_line()
+								utils.telescope(
+									"find_files",
+									{ hidden = true, default_text = line }
+								)()
+							end,
+							["<C-Down>"] = function(...)
+								return require("telescope.actions").cycle_history_next(...)
+							end,
+							["<C-Up>"] = function(...)
+								return require("telescope.actions").cycle_history_prev(...)
+							end,
+							["<C-f>"] = function(...)
+								return require("telescope.actions").preview_scrolling_down(...)
+							end,
+							["<C-b>"] = function(...)
+								return require("telescope.actions").preview_scrolling_up(...)
+							end,
 						},
 						n = { ["q"] = require("telescope.actions").close },
 					},
@@ -579,12 +682,6 @@ require("lazy").setup({
 					selection_strategy = "reset",
 					sorting_strategy = "ascending",
 					color_devicons = true,
-					file_previewer = require("telescope.previewers").vim_buffer_cat.new,
-					grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
-					qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
-					file_sorter = require("telescope.sorters").get_fuzzy_file,
-					generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
-					buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
 				},
 				extensions = {
 					live_grep_args = {
@@ -1129,6 +1226,7 @@ require("lazy").setup({
 	-- NOTE: nice winbar
 	{
 		"Bekaboo/dropbar.nvim",
+		enabled = false,
 		config = true,
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
