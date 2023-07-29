@@ -20,11 +20,6 @@ local M = {
 	background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark",
 }
 
--- disable some default providers
-for _, provider in ipairs { "node", "perl", "python3", "ruby" } do
-	vim.g["loaded_" .. provider .. "_provider"] = 0
-end
-
 if vim.loop.os_uname().sysname == "Darwin" then
 	vim.g.clipboard = {
 		name = "macOS-clipboard",
@@ -32,12 +27,6 @@ if vim.loop.os_uname().sysname == "Darwin" then
 		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
 		cache_enabled = 0,
 	}
-end
-
--- NOTE: Keymaps that are useful, use it and never come back.
-local map = function(mode, lhs, rhs, opts)
-	opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
-	vim.keymap.set(mode, lhs, rhs, opts)
 end
 
 -- Some defaults and don't question it
@@ -82,16 +71,11 @@ vim.opt.formatoptions = vim.opt.formatoptions
 -- better completion menu
 vim.opt.completeopt = { "menuone", "noselect" }
 
--- Better folding using tree-sitter
-vim.o.foldlevelstart = 99
-vim.o.foldmethod     = "expr"
-vim.o.foldexpr       = "nvim_treesitter#foldexpr()"
-
 -- searching and grep stuff
 vim.o.smartcase   = true
 vim.o.ignorecase  = true
 vim.o.infercase   = true
-vim.o.grepprg     = "rg --hidden --vimgrep --smart-case --"  -- also its 2023 use rg
+vim.o.grepprg     = "rg --vimgrep"  -- also its 2023 use rg
 vim.o.linebreak   = true
 vim.o.jumpoptions = "stack"
 vim.o.listchars   = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -103,8 +87,8 @@ vim.o.shiftwidth  = 4
 vim.o.shiftround  = true
 
 -- UI config
+vim.opt.smartindent = true
 vim.o.cmdheight     = 1
-vim.o.showtabline   = 0
 vim.o.showcmd       = false
 vim.o.showmode      = true
 vim.o.showbreak     = "↳  "
@@ -130,6 +114,43 @@ vim.g.maplocalleader = "+"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
+-- NOTE: diagnostic config
+for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
+	local hl = string.format("DiagnosticSign%s", type[1])
+	vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
+end
+
+vim.diagnostic.config {
+	severity_sort = true,
+	underline = false,
+	update_in_insert = false,
+	virtual_text = M.diagnostic.use_virtual_text and { prefix = "", spacing = 4 } or false,
+	float = {
+		close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+		focusable = false,
+		focus = false,
+		format = function(diagnostic)
+			return string.format("%s (%s)", diagnostic.message, diagnostic.source)
+		end,
+		source = "if_many",
+		border = M.ui and M.window.border or "none",
+	},
+}
+
+-- NOTE: Keymaps that are useful, use it and never come back.
+local function map(mode, lhs, rhs, opts)
+    opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+    vim.keymap.set(mode, lhs, rhs, opts)
+	-- local keys = require("lazy.core.handler").handlers.keys
+	-- ---@cast keys LazyKeysHandler
+	-- -- do not create the keymap if a lazy keys handler exists
+	-- if not keys.active[keys.parse({ lhs, mode = mode }).id] then
+	-- 	opts = opts or {}
+	-- 	opts.silent = opts.silent ~= false
+	-- 	if opts.remap and not vim.g.vscode then opts.remap = nil end
+	-- 	vim.keymap.set(mode, lhs, rhs, opts)
+	-- end
+end
 -- NOTE: normal mode
 map("n", "<S-Tab>",         "<cmd>normal za<cr>",                                           { desc = "edit: Toggle code fold"                            })
 map("n", "Y",               "y$",                                                           { desc = "edit: Yank text to EOL"                            })
@@ -165,7 +186,7 @@ map("n", "<LocalLeader>]",  string.format("<cmd>vertical resize -%s<cr>", M.wind
 map("n", "<LocalLeader>[",  string.format("<cmd>vertical resize +%s<cr>", M.window.resize), { noremap = false, desc = "windows: resize left 10px"        })
 map("n", "<LocalLeader>-",  string.format("<cmd>resize -%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize down 10px"        })
 map("n", "<LocalLeader>+",  string.format("<cmd>resize +%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize up 10px"          })
-map("n", "<LocalLeader>f",  require('lsp').toggle,                                          { desc = "lsp: Toggle formatter"                             })
+map("n", "<LocalLeader>f",  require('user.format').toggle,                                  { desc = "lsp: Toggle formatter"                             })
 map("n", "<LocalLeader>p",  "<cmd>Lazy<cr>",                                                { desc = "package: show manager"                             })
 map("n", "<C-\\>",          "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>", { desc = "terminal: Toggle horizontal"                       })
 map("i", "<C-\\>",          "<Esc><cmd>ToggleTerm direction=horizontal<cr>",                { desc = "terminal: Toggle horizontal"                       })
@@ -173,31 +194,10 @@ map("t", "<C-\\>",          "<Esc><cmd>ToggleTerm<cr>",                         
 map("n", "<C-t>",           "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>",   { desc = "terminal: Toggle vertical"                         })
 map("i", "<C-t>",           "<Esc><cmd>ToggleTerm direction=vertical<cr>",                  { desc = "terminal: Toggle vertical"                         })
 map("t", "<C-t>",           "<Esc><cmd>ToggleTerm<cr>",                                     { desc = "terminal: Toggle vertical"                         })
--- stylua: ignore end
-
--- NOTE: diagnostic config
-for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
-	local hl = string.format("DiagnosticSign%s", type[1])
-	vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
+if vim.lsp.inlay_hint then
+  map("n", "<leader>uh", function() vim.lsp.inlay_hint(0, nil) end, { desc = "lsp: Toggle Inlay Hints" })
 end
-
-vim.diagnostic.config {
-	severity_sort = true,
-	underline = false,
-	update_in_insert = false,
-	virtual_text = M.diagnostic.use_virtual_text and { prefix = "", spacing = 4 } or false,
-	float = {
-		close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-		focusable = false,
-		focus = false,
-		format = function(diagnostic)
-			return string.format("%s (%s)", diagnostic.message, diagnostic.source)
-		end,
-		source = "if_many",
-		border = M.ui and M.window.border or "none",
-	},
-}
-
+-- stylua: ignore end
 M.toggle_float_diagnostic = function()
 	M.diagnostic.show_float = not M.diagnostic.show_float
 	if M.diagnostic.show_float then

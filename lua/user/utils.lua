@@ -6,12 +6,9 @@ local M = {}
 M.on_attach = function(on_attach)
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
+			local buffer = args.buf
 			local client = vim.lsp.get_client_by_id(args.data.client_id)
-			if client ~= nil then
-				on_attach(client, args.buf)
-			else
-				vim.notify "Failed to find given client_id for given LSP"
-			end
+			on_attach(client, buffer)
 		end,
 	})
 end
