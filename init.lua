@@ -1106,8 +1106,44 @@ require("lazy").setup({
 					visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
 					hide_dotfiles = false,
 					hide_gitignored = true,
-					hide_by_name = { "node_modules", "pdm.lock" },
-					hide_by_pattern = { "*.meta", "*/src/*/tsconfig.json" },
+					hide_by_name = {
+						"node_modules",
+						"pdm.lock",
+					},
+					hide_by_pattern = { -- uses glob style patterns
+						"*.meta",
+						"*/src/*/tsconfig.json",
+						"*/.ruff_cache/*",
+						"*/__pycache__/*",
+					},
+				},
+			},
+			event_handlers = {
+				{
+					event = "neo_tree_window_after_open",
+					handler = function(args)
+						if args.position == "left" or args.position == "right" then
+							vim.cmd "wincmd ="
+						end
+					end,
+				},
+				{
+					event = "neo_tree_window_after_close",
+					handler = function(args)
+						if args.position == "left" or args.position == "right" then
+							vim.cmd "wincmd ="
+						end
+					end,
+				},
+				-- disable last status on neo-tree
+				-- If I use laststatus, then uncomment this
+				{
+					event = "neo_tree_buffer_enter",
+					handler = function() vim.opt_local.laststatus = 0 end,
+				},
+				{
+					event = "neo_tree_buffer_leave",
+					handler = function() vim.opt_local.laststatus = 2 end,
 				},
 			},
 			always_show = { ".github" },
