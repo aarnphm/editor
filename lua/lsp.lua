@@ -9,12 +9,12 @@ end
 M._keys = nil
 
 M.get = function()
-	local format = function() require("user.format").format { force = true } end
+	local format = function() require("format").format { force = true } end
 	if not M._keys then
         --@class PluginLspKeys
         -- stylua: ignore
 		M._keys = {
-			{ "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
+            { "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
 			{ "<leader>i", "<cmd>LspInfo<cr>", desc = "lsp: info" },
 			{ "gh", vim.show_pos, desc = "lsp: current position" },
 			{ "gR", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
@@ -32,6 +32,7 @@ M.get = function()
 			{ "<leader><leader>", format, desc = "lsp: Format range", mode = "v", has = "documentRangeFormatting" },
             { "K", vim.lsp.buf.hover, desc = "Hover" },
 			{ "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: Code action", mode = { "n", "v" }, has = "codeAction" },
+            { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
 			{ "<leader>cA",
 				function()
 					vim.lsp.buf.code_action {
@@ -48,27 +49,9 @@ M.get = function()
             {"ds", vim.lsp.buf.document_symbol, desc = "lsp: document symbols", has = "documentSymbol" },
             {"<localleader>ws", vim.lsp.buf.workspace_symbol, desc = "lsp: workspace symbols", has = "workspaceSymbol" },
 		}
-		if require("user.utils").has "inc-rename.nvim" then
-			M._keys[#M._keys + 1] = {
-				"gr",
-				function()
-					require "inc_rename"
-					return ":IncRename " .. vim.fn.expand "<cword>"
-				end,
-				expr = true,
-				desc = "lsp: rename",
-				has = "rename",
-				silent = true,
-			}
-		else
-            -- stylua: ignore
-			M._keys[#M._keys + 1] = { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" }
-		end
 	end
 	return M._keys
 end
-
-M.ui = vim.NIL ~= vim.env.SIMPLE_UI and vim.env.SIMPLE_UI == "true" or false
 
 M.resolve = function(buffer)
 	local Keys = require "lazy.core.handler.keys"
@@ -86,7 +69,7 @@ M.resolve = function(buffer)
 		add(keymap)
 	end
 
-	local opts = require("user.utils").opts "nvim-lspconfig"
+	local opts = require("utils").opts "nvim-lspconfig"
 	local clients = vim.lsp.get_active_clients { bufnr = buffer }
 	for _, client in ipairs(clients) do
 		local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
@@ -127,9 +110,7 @@ M.on_attach = function(client, bufnr)
 			vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
 				signs = true,
 				underline = true,
-				virtual_text = require("user.options").diagnostic.use_virtual_text and {
-					severity_limit = require("users.options").diagnostic.diagnostics_level,
-				} or false,
+				virtual_text = false,
 				update_in_insert = true,
 			})
 	end
@@ -138,7 +119,7 @@ M.on_attach = function(client, bufnr)
 	vim.api.nvim_buf_create_user_command(
 		bufnr,
 		"Format",
-		function(_) require("user.format").format { force = true } end,
+		function(_) require("format").format { force = true } end,
 		{ desc = "format: current buffer (alt for <Leader><Leader>)" }
 	)
 end
