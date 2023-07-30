@@ -34,7 +34,7 @@ function M.format(opts)
 	vim.lsp.buf.format(vim.tbl_deep_extend("force", {
 		bufnr = buf,
 		filter = function(client) return vim.tbl_contains(client_ids, client.id) end,
-	}, require("user.utils").opts("nvim-lspconfig").format or {}))
+	}, require("utils").opts("nvim-lspconfig").format or {}))
 end
 
 ---@param formatters LazyVimFormatters

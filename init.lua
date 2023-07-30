@@ -1,12 +1,332 @@
 --# selene: allow(global_usage)
+_G.P = function(v)
+	print(vim.inspect(v))
+	return v
+end
+
+local api, wo, o, g, autocmd = vim.api, vim.wo, vim.o, vim.g, vim.api.nvim_create_autocmd
+
+local icons = require "icons"
+local utils = require "utils"
+
+o.wrap = false
+o.autowrite = true
+o.undofile = true -- enable undofile
+o.undodir = "/tmp/.vim-undo-dir"
+wo.breakindent = true -- use breakindent
+o.clipboard = "unnamedplus" -- sync system clipboard
+o.expandtab = true -- space to tabs
+o.number = true -- number is good for nav
+o.relativenumber = true -- relativenumber is useful, grow up
+o.mouse = "a" -- because sometimes mouse is needed for ssh
+o.copyindent = true
+o.splitright = true
+vim.opt.smartcase = true
+o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
+-- o.shortmess = "aoOTIcF"  -- eh if I'm a pain then uncomment this
+vim.opt.completeopt = { "menuone", "noselect" }
+o.grepprg = "rg --vimgrep"
+o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
+o.tabstop = 4
+o.softtabstop = 4
+o.shiftwidth = 4
+o.shiftround = true
+o.timeoutlen = 200
+o.updatetime = 200
+o.statusline = utils.statusline.build()
+
+g.mapleader = " "
+g.maplocalleader = "+"
+
+vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
+
+for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
+	local hl = string.format("DiagnosticSign%s", type[1])
+	vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
+end
+
+vim.diagnostic.config {
+	severity_sort = true,
+	underline = false,
+	update_in_insert = false,
+	virtual_text = false,
+	float = {
+		close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+		focusable = false,
+		focus = false,
+		format = function(diagnostic)
+			return string.format("%s (%s)", diagnostic.message, diagnostic.source)
+		end,
+		source = "if_many",
+		border = "none",
+	},
+}
+
+-- NOTE: Keymaps that are useful, use it and never come back.
+local function map(mode, lhs, rhs, opts)
+	opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+	vim.keymap.set(mode, lhs, rhs, opts)
+end
+-- NOTE: normal mode
+map("n", "<S-Tab>", "<cmd>normal za<cr>", {
+	desc = "edit: Toggle code fold",
+})
+map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
+map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
+map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
+map("n", "\\", ":let @/=''<CR>:noh<CR>", {
+	silent = true,
+	desc = "window: Clean highlight",
+})
+map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
+map("n", ";;", ";", { silent = false, desc = "normal: Enter Ex mode" })
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })
+map("v", "<", "<gv", { desc = "edit: Decrease indent" })
+map("v", ">", ">gv", { desc = "edit: Increase indent" })
+map(
+	"c",
+	"W!!",
+	"execute 'silent! write !sudo tee % >/dev/null' <bar> edit!",
+	{ desc = "edit: Save file using sudo" }
+)
+map("n", "<C-h>", "<C-w>h", { desc = "window: Focus left" })
+map("n", "<C-l>", "<C-w>l", { desc = "window: Focus right" })
+map("n", "<C-j>", "<C-w>j", { desc = "window: Focus down" })
+map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up" })
+map("n", "<LocalLeader>|", "<C-w>|", { desc = "window: Maxout width" })
+map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
+map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
+map("n", "<Leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
+map("n", "<Leader>.", "<cmd>bnext<cr>", {
+	desc = "buffer: next",
+})
+map("n", "<Leader>,", "<cmd>bprevious<cr>", {
+	desc = "buffer: previous",
+})
+map("n", "<Leader>q", "<cmd>copen<cr>", {
+	desc = "quickfix: Open quickfix",
+})
+map("n", "<Leader>l", "<cmd>lopen<cr>", {
+	desc = "quickfix: Open location list",
+})
+map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
+map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
+map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
+map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
+map(
+	"n",
+	"<LocalLeader>cd",
+	":lcd %:p:h<cr>",
+	{ desc = "misc: change directory to current file buffer" }
+)
+map(
+	"n",
+	"<LocalLeader>l",
+	"<cmd>set list! list?<cr>",
+	{ silent = false, desc = "misc: toggle invisible characters" }
+)
+map(
+	"n",
+	"<LocalLeader>]",
+	string.format("<cmd>vertical resize -%s<cr>", 10),
+	{ noremap = false, desc = "windows: resize right 10px" }
+)
+map(
+	"n",
+	"<LocalLeader>[",
+	string.format("<cmd>vertical resize +%s<cr>", 10),
+	{ noremap = false, desc = "windows: resize left 10px" }
+)
+map(
+	"n",
+	"<LocalLeader>-",
+	string.format("<cmd>resize -%s<cr>", 10),
+	{ noremap = false, desc = "windows: resize down 10px" }
+)
+map(
+	"n",
+	"<LocalLeader>+",
+	string.format("<cmd>resize +%s<cr>", 10),
+	{ noremap = false, desc = "windows: resize up 10px" }
+)
+map("n", "<LocalLeader>f", require("format").toggle, {
+	desc = "lsp: Toggle formatter",
+})
+map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", {
+	desc = "package: show manager",
+})
+map(
+	"n",
+	"<C-\\>",
+	"<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>",
+	{ desc = "terminal: Toggle horizontal" }
+)
+map(
+	"i",
+	"<C-\\>",
+	"<Esc><cmd>ToggleTerm direction=horizontal<cr>",
+	{ desc = "terminal: Toggle horizontal" }
+)
+map("t", "<C-\\>", "<Esc><cmd>ToggleTerm<cr>", {
+	desc = "terminal: Toggle horizontal",
+})
+map(
+	"n",
+	"<C-t>",
+	"<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>",
+	{ desc = "terminal: Toggle vertical" }
+)
+map(
+	"i",
+	"<C-t>",
+	"<Esc><cmd>ToggleTerm direction=vertical<cr>",
+	{ desc = "terminal: Toggle vertical" }
+)
+map("t", "<C-t>", "<Esc><cmd>ToggleTerm<cr>", {
+	desc = "terminal: Toggle vertical",
+})
 
 -- NOTE: compatible block with vscode
 if vim.g.vscode then return end
 
-require "user.globals"
-local icons = _G.icons
-local utils = require "user.utils"
-local user = require "user.options"
+-- NOTE: augroup la autocmd setup
+local augroup_name = function(name) return "simple_" .. name end
+local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
+
+-- auto place to last edit
+autocmd("BufReadPost", {
+	group = augroup "last_edit",
+	pattern = "*",
+	command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]],
+})
+
+-- close some filetypes with <q>
+autocmd("FileType", {
+	group = augroup "filetype",
+	pattern = {
+		"qf",
+		"help",
+		"man",
+		"nowrite", -- fugitive
+		"prompt",
+		"spectre_panel",
+		"startuptime",
+		"tsplayground",
+		"neorepl",
+		"alpha",
+		"toggleterm",
+		"health",
+		"PlenaryTestPopup",
+		"nofile",
+		"scratch",
+		"",
+	},
+	callback = function(event)
+		vim.bo[event.buf].buflisted = false
+		vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
+	end,
+})
+
+-- Makes switching between buffer and termmode feels like normal mode
+autocmd("TermOpen", {
+	group = augroup "term",
+	pattern = "term://*",
+	callback = function(_)
+		local opts = { noremap = true, silent = true }
+		api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
+		api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
+	end,
+})
+
+-- Force write shada on leaving nvim
+autocmd("VimLeave", {
+	group = augroup "write_shada",
+	pattern = "*",
+	callback = function(_)
+		if vim.fn.has "nvim" == 1 then
+			api.nvim_command [[wshada]]
+		else
+			api.nvim_command [[wviminfo!]]
+		end
+	end,
+})
+
+-- Check if we need to reload the file when it changed
+autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+	group = augroup "checktime",
+	pattern = "*",
+	command = "checktime",
+})
+autocmd("VimResized", { group = augroup "resized", command = "tabdo wincmd =" })
+
+-- Set noundofile for temporary files
+autocmd("BufWritePre", {
+	group = augroup "tempfile",
+	pattern = { "/tmp/*", "*.tmp", "*.bak" },
+	command = "setlocal noundofile",
+})
+-- set filetype for header files
+autocmd({ "BufNewFile", "BufRead" }, {
+	group = augroup "cpp_headers",
+	pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" },
+	command = "setlocal filetype=c",
+})
+
+-- set filetype for dockerfile
+autocmd({ "BufNewFile", "BufRead", "FileType" }, {
+	group = augroup "dockerfile",
+	pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
+	command = "setlocal filetype=dockerfile",
+})
+
+-- Set mapping for switching header and source file
+autocmd("FileType", {
+	group = augroup "cpp",
+	pattern = "c,cpp",
+	callback = function(event)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>h",
+			":ClangdSwitchSourceHeaderVSplit<CR>",
+			{ noremap = true }
+		)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>v",
+			":ClangdSwitchSourceHeaderSplit<CR>",
+			{ noremap = true }
+		)
+		api.nvim_buf_set_keymap(
+			event.buf,
+			"n",
+			"<Leader><Leader>oh",
+			":ClangdSwitchSourceHeader<CR>",
+			{ noremap = true }
+		)
+	end,
+})
+
+-- Highlight on yank
+autocmd("TextYankPost", {
+	group = augroup "highlight_yank",
+	pattern = "*",
+	callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
+})
+
+-- NOTE: vim options
+if vim.loop.os_uname().sysname == "Darwin" then
+	vim.g.clipboard = {
+		name = "macOS-clipboard",
+		copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
+		paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
+		cache_enabled = 0,
+	}
+end
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -23,6 +343,9 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 local load_textobjects = true
+local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME
+	or "rose-pine"
+local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark"
 
 require("lazy").setup({
 	-- NOTE: utilities
@@ -76,26 +399,6 @@ require("lazy").setup({
 			},
 		},
 	},
-	{ "nyoom-engineering/oxocarbon.nvim", lazy = false },
-	-- NOTE: scratch buffer
-	{
-		"mtth/scratch.vim",
-		cmd = "Scratch",
-		keys = { { "<Space><Space>s", "<cmd>Scratch<cr>", desc = "buffer: open scratch" } },
-	},
-	-- NOTE: Gigachad Git
-	{
-		"tpope/vim-fugitive",
-		cmd = { "Git", "G" },
-		keys = {
-			{
-				"<Leader>p",
-				function() vim.cmd [[ Git pull --rebase ]] end,
-				desc = "git: pull rebase",
-			},
-			{ "<Leader>P", function() vim.cmd [[ Git push ]] end, desc = "git: push" },
-		},
-	},
 	-- NOTE: nice git integration and UI
 	{
 		"lewis6991/gitsigns.nvim",
@@ -112,22 +415,22 @@ require("lazy").setup({
 			diff_opts = { internal = true },
 			on_attach = function(bufnr)
 				local actions = require "gitsigns.actions"
-				local map = function(mode, l, r, desc)
+				local kmap = function(mode, l, r, desc)
 					vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
 				end
                 -- stylua: ignore start
-                map("n", "]h", actions.next_hunk, "git: next hunk")
-                map("n", "[h", actions.prev_hunk, "git: prev hunk")
-                map("n", "<leader>hu", actions.undo_stage_hunk, "git: undo stage hunk")
-                map("n", "<leader>hR", actions.reset_buffer, "git: reset buffer")
-                map("n", "<leader>hS", actions.stage_buffer, "git: stage buffer")
-                map("n", "<leader>hp", actions.preview_hunk, "git: preview hunk")
-                map("n", "<leader>hd", actions.diffthis, "git: diff this")
-                map("n", "<leader>hD", function() actions.diffthis("~") end, "git: diff this ~")
-                map("n", "<leader>hb", function() actions.blame_line({ full = true }) end, "git: blame Line")
-                map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
-                map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
-                map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+                kmap("n", "]h", actions.next_hunk, "git: next hunk")
+                kmap("n", "[h", actions.prev_hunk, "git: prev hunk")
+                kmap("n", "<leader>hu", actions.undo_stage_hunk, "git: undo stage hunk")
+                kmap("n", "<leader>hR", actions.reset_buffer, "git: reset buffer")
+                kmap("n", "<leader>hS", actions.stage_buffer, "git: stage buffer")
+                kmap("n", "<leader>hp", actions.preview_hunk, "git: preview hunk")
+                kmap("n", "<leader>hd", actions.diffthis, "git: diff this")
+                kmap("n", "<leader>hD", function() actions.diffthis("~") end, "git: diff this ~")
+                kmap("n", "<leader>hb", function() actions.blame_line({ full = true }) end, "git: blame Line")
+                kmap({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
+                kmap({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
+                kmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
 				-- stylua: ignore end
 			end,
 		},
@@ -363,7 +666,6 @@ require("lazy").setup({
 		},
 	},
 	{ "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
-	-- NOTE: cuz sometimes `set list` is not enough and you need some indent guides
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		event = { "BufReadPost", "BufNewFile" },
@@ -626,8 +928,8 @@ require("lazy").setup({
 						"--column",
 						"--smart-case",
 					},
-					prompt_prefix = " " .. icons.ui_space.Telescope .. " ",
-					selection_caret = icons.ui_space.DoubleSeparator,
+					prompt_prefix = "  ",
+					selection_caret = "󰄾",
 					file_ignore_patterns = {
 						".git/",
 						"node_modules/",
@@ -939,36 +1241,6 @@ require("lazy").setup({
 		config = true,
 	},
 	-- NOTE: all specific language plugins
-	{
-		"jose-elias-alvarez/typescript.nvim",
-		ft = { "typescript", "tsx" },
-		dependencies = { "neovim/nvim-lspconfig" },
-		config = function()
-			utils.on_attach(function(client, buffer)
-				if client.name == "tsserver" then
-					vim.keymap.set(
-						"n",
-						"<leader>co",
-						"<cmd>TypescriptOrganizeImports<CR>",
-						{ buffer = buffer, desc = "lsp: organize imports" }
-					)
-					vim.keymap.set(
-						"n",
-						"<leader>cR",
-						"<cmd>TypescriptRenameFile<CR>",
-						{ desc = "lsp: rename file", buffer = buffer }
-					)
-				end
-			end)
-			require("typescript").setup {
-				server = {
-					capabilities = require("lsp").gen_capabilities(),
-					completions = { completeFunctionCalls = true },
-					single_file_support = false,
-				},
-			}
-		end,
-	},
 	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
 	{
 		"simrat39/rust-tools.nvim",
@@ -1239,20 +1511,6 @@ require("lazy").setup({
 			},
 		},
 	},
-	-- NOTE: scrollview
-	{
-		"dstein64/nvim-scrollview",
-		event = { "BufReadPost", "BufAdd", "BufNewFile" },
-		config = function()
-			require("scrollview").setup {
-				scrollview_mode = "virtual",
-				excluded_filetypes = { "NvimTree", "terminal", "nofile" },
-				winblend = 1,
-				signs_on_startup = { "folds", "marks", "search" },
-			}
-		end,
-	},
-	{ "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
 	-- NOTE: lspconfig
 	{
 		"neovim/nvim-lspconfig",
@@ -1281,9 +1539,7 @@ require("lazy").setup({
 			-- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
 			-- Be aware that you also will need to properly configure your LSP server to
 			-- provide the inlay hints.
-			inlay_hints = {
-				enabled = false,
-			},
+			inlay_hints = { enabled = false },
 			-- add any global capabilities here
 			capabilities = {},
 			-- Automatically format on save
@@ -1508,7 +1764,7 @@ require("lazy").setup({
 			end
 
 			-- setup autoformat
-			require("user.format").setup(opts)
+			require("format").setup(opts)
 
 			utils.on_attach(function(client, bufnr) require("lsp").on_attach(client, bufnr) end)
 
@@ -1796,7 +2052,7 @@ require("lazy").setup({
 
 			-- special cases with crates.nvim
 			vim.api.nvim_create_autocmd({ "BufRead" }, {
-				group = _G.simple_augroup "cmp_source_cargo",
+				group = augroup "cmp_source_cargo",
 				pattern = "Cargo.toml",
 				callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
 			})
@@ -1867,36 +2123,12 @@ require("lazy").setup({
 		end,
 	},
 }, {
-	install = { colorscheme = { user.colorscheme } },
+	install = { colorscheme = { colorscheme } },
 	defaults = { lazy = true },
 	change_detection = { notify = false },
 	concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
 	checker = { enable = true },
-	ui = {
-		border = "none",
-		icons = {
-			cmd = icons.misc.Code,
-			config = icons.ui.Gear,
-			event = icons.kind.Event,
-			ft = icons.documents.Files,
-			init = icons.misc.ManUp,
-			import = icons.documents.Import,
-			keys = icons.ui.Keyboard,
-			lazy = icons.misc.BentoBox,
-			loaded = icons.ui.Check,
-			not_loaded = icons.misc.Ghost,
-			plugin = icons.ui.Package,
-			runtime = icons.misc.Vim,
-			source = icons.kind.StaticMethod,
-			start = icons.ui.Play,
-			list = {
-				icons.ui_space.BigCircle,
-				icons.ui_space.BigUnfilledCircle,
-				icons.ui_space.Square,
-				icons.ui_space.ChevronRight,
-			},
-		},
-	},
+	ui = { border = "none" },
 	performance = {
 		rtp = {
 			disabled_plugins = {
@@ -1923,5 +2155,5 @@ require("lazy").setup({
 	},
 })
 
-vim.o.background = user.background
-vim.cmd.colorscheme(user.colorscheme)
+vim.o.background = background
+vim.cmd.colorscheme(colorscheme)

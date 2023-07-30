@@ -2,6 +2,8 @@
 --# selene: allow(global_usage)
 local M = {}
 
+local icons = require "icons"
+
 ---@param on_attach fun(client, buffer)
 M.on_attach = function(on_attach)
 	vim.api.nvim_create_autocmd("LspAttach", {
@@ -181,14 +183,14 @@ M.statusline = {
 	build = function()
 		local spacer = "%="
 		return table.concat({
-			"%{%luaeval('require(\"user.utils\").statusline.git()')%}",
+			"%{%luaeval('require(\"utils\").statusline.git()')%}",
 			"%m",
 			spacer,
 			spacer,
-			"%{%luaeval('require(\"user.utils\").statusline.diagnostic()')%}",
+			"%{%luaeval('require(\"utils\").statusline.diagnostic()')%}",
 			"%y",
 			"%l:%c",
-			_G.icons.misc_space.Love,
+			icons.misc.Love,
 		}, " ")
 	end,
 }
