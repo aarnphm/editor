@@ -6,6 +6,7 @@ M.diagnostic_goto = function(next, severity)
 	return function() goto_impl { severity = severity } end
 end
 
+---@type PluginLspKeys
 M._keys = nil
 
 M.get = function()
@@ -20,8 +21,6 @@ M.get = function()
 			{ "gR", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
 			{ "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
 			{ "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
-            { "gI", function() require("telescope.builtin").lsp_implementations({ reuse_win = true }) end, desc = "Goto Implementation" },
-            { "gy", function() require("telescope.builtin").lsp_type_definitions({ reuse_win = true }) end, desc = "Goto T[y]pe Definition" },
             { "]d", M.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
 			{ "[d", M.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
 			{ "]e", M.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
@@ -33,18 +32,6 @@ M.get = function()
             { "K", vim.lsp.buf.hover, desc = "Hover" },
 			{ "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: Code action", mode = { "n", "v" }, has = "codeAction" },
             { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
-			{ "<leader>cA",
-				function()
-					vim.lsp.buf.code_action {
-						context = {
-							only = { "source" },
-							diagnostics = {},
-						},
-					}
-				end,
-				desc = "lsp: see source action",
-				has = "codeAction",
-			},
             -- document symbols
             {"ds", vim.lsp.buf.document_symbol, desc = "lsp: document symbols", has = "documentSymbol" },
             {"<localleader>ws", vim.lsp.buf.workspace_symbol, desc = "lsp: workspace symbols", has = "workspaceSymbol" },
@@ -103,16 +90,6 @@ M.on_attach = function(client, bufnr)
 			opts.buffer = bufnr
 			vim.keymap.set(keys.mode or "n", keys[1], keys[2], opts)
 		end
-	end
-
-	if client.supports_method "textDocument/publishDiagnostics" then
-		vim.lsp.handlers["textDocument/publishDiagnostics"] =
-			vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-				signs = true,
-				underline = true,
-				virtual_text = false,
-				update_in_insert = true,
-			})
 	end
 
 	-- Create a command `:Format` local to the LSP buffer

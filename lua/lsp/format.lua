@@ -29,7 +29,7 @@ function M.format(opts)
 
 	if #client_ids == 0 then return end
 
-	if M.opts.format_notify then M.notify(formatters) end
+	if M.opts.notify then M.notify(formatters) end
 
 	vim.lsp.buf.format(vim.tbl_deep_extend("force", {
 		bufnr = buf,
@@ -123,7 +123,7 @@ function M.supports_format(client)
 		or client.supports_method "textDocument/rangeFormatting"
 end
 
----@param opts LspOpts
+---@param opts PluginLspOpts
 function M.setup(opts)
 	M.opts = opts
 	vim.api.nvim_create_autocmd("BufWritePre", {

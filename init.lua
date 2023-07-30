@@ -40,28 +40,6 @@ g.maplocalleader = "+"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
-for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
-	local hl = string.format("DiagnosticSign%s", type[1])
-	vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
-end
-
-vim.diagnostic.config {
-	severity_sort = true,
-	underline = false,
-	update_in_insert = false,
-	virtual_text = false,
-	float = {
-		close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-		focusable = false,
-		focus = false,
-		format = function(diagnostic)
-			return string.format("%s (%s)", diagnostic.message, diagnostic.source)
-		end,
-		source = "if_many",
-		border = "none",
-	},
-}
-
 -- NOTE: Keymaps that are useful, use it and never come back.
 local function map(mode, lhs, rhs, opts)
 	opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
@@ -150,7 +128,7 @@ map(
 	string.format("<cmd>resize +%s<cr>", 10),
 	{ noremap = false, desc = "windows: resize up 10px" }
 )
-map("n", "<LocalLeader>f", require("format").toggle, {
+map("n", "<LocalLeader>f", require("lsp.format").toggle, {
 	desc = "lsp: Toggle formatter",
 })
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", {
@@ -804,6 +782,7 @@ require("lazy").setup({
 		commit = vim.fn.has "nvim-0.9.0" == 0 and "057ee0f8783" or nil,
 		cmd = "Telescope",
 		version = false, -- telescope did only one release, so use HEAD for now
+		enabled = false,
 		dependencies = {
 			"nvim-telescope/telescope-live-grep-args.nvim",
 			"jvgrootveld/telescope-zoxide",
@@ -818,15 +797,14 @@ require("lazy").setup({
 				"<cmd>Telescope buffers show_all_buffers=true previewer=false<cr>",
 				desc = "telescope: Manage buffers",
 			},
+			{ "<leader>B", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
 			{ "<leader>;", "<cmd>Telescope command_history<cr>", desc = "Command History" },
 			{
 				"<leader>f",
 				utils.telescope("files", { theme = "dropdown" }),
 				desc = "Find Files (root dir)",
 			},
-			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-			{ "<leader>fF", utils.telescope("files", { cwd = false }), desc = "Find Files (cwd)" },
-			{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent" },
+			{ "<leader>r", "<cmd>Telescope oldfiles<cr>", desc = "Recent" },
 			{
 				"<leader>fR",
 				utils.telescope("oldfiles", { cwd = vim.loop.cwd() }),
@@ -864,12 +842,12 @@ require("lazy").setup({
 			{ "<leader>sG", utils.telescope("live_grep", { cwd = false }), desc = "Grep (cwd)" },
 			{ "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
 			{
-				"<leader>sH",
+				"<leader>H",
 				"<cmd>Telescope highlights<cr>",
 				desc = "Search Highlight Groups",
 			},
-			{ "<leader>sm", "<cmd>Telescope marks<cr>", desc = "Jump to Mark" },
-			{ "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "Options" },
+			{ "<leader>m", "<cmd>Telescope marks<cr>", desc = "Jump to Mark" },
+			{ "<leader>o", "<cmd>Telescope vim_options<cr>", desc = "Options" },
 			{ "<leader>sR", "<cmd>Telescope resume<cr>", desc = "Resume" },
 			{
 				"<leader>/",
@@ -877,15 +855,15 @@ require("lazy").setup({
 				desc = "Word (root dir)",
 			},
 			{
-				"<leader>sW",
-				utils.telescope("grep_string", { cwd = false, word_match = "-w" }),
-				desc = "Word (cwd)",
-			},
-			{
-				"<leader>?",
+				"<leader>/",
 				utils.telescope "grep_string",
 				mode = "v",
 				desc = "Selection (root dir)",
+			},
+			{
+				"<leader>?",
+				utils.telescope("grep_string", { cwd = false, word_match = "-w" }),
+				desc = "Word (cwd)",
 			},
 			{
 				"<leader>sW",
@@ -916,6 +894,16 @@ require("lazy").setup({
 				noremap = true,
 				silent = true,
 			},
+			{
+				"gI",
+				function() util.telescope("lsp_implementations", { reuse_win = true }) end,
+				desc = "lsp: Goto Implementation",
+			},
+			{
+				"gy",
+				function() util.telescope("lsp_type_definitions", { reuse_win = true }) end,
+				desc = "lsp: Goto T[y]pe Definition",
+			},
 		},
 		config = function()
 			local opts = {
@@ -929,13 +917,14 @@ require("lazy").setup({
 						"--smart-case",
 					},
 					prompt_prefix = "  ",
-					selection_caret = "󰄾",
+					selection_caret = "󰄾 ",
 					file_ignore_patterns = {
 						".git/",
 						"node_modules/",
 						"static_content/",
 						"lazy-lock.json",
 						"pdm.lock",
+						"__pycache__",
 					},
 					mappings = {
 						i = {
@@ -1277,175 +1266,6 @@ require("lazy").setup({
 		config = true,
 	},
 	-- NOTE: all specific language plugins
-	{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
-	{
-		"simrat39/rust-tools.nvim",
-		ft = "rust",
-		dependencies = { "neovim/nvim-lspconfig" },
-		config = function()
-			local get_rust_adapters = function()
-				if vim.loop.os_uname().sysname == "Windows_NT" then
-					return {
-						type = "executable",
-						command = "lldb-vscode",
-						name = "rt_lldb",
-					}
-				end
-				local codelldb_extension_path = vim.fn.stdpath "data"
-					.. "/mason/packages/codelldb/extension"
-				local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
-				local extension = ".so"
-				if vim.loop.os_uname().sysname == "Darwin" then extension = ".dylib" end
-				local liblldb_path = codelldb_extension_path .. "/lldb/lib/liblldb" .. extension
-				return require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path)
-			end
-
-			require("rust-tools").setup {
-				tools = {
-					inlay_hints = {
-						auto = false,
-						other_hints_prefix = ":: ",
-						only_current_line = true,
-						show_parameter_hints = false,
-					},
-				},
-				dap = { adapter = get_rust_adapters() },
-				server = {
-					on_attach = function(_, bufnr)
-                        -- stylua: ignore start
-                        vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
-                        vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-                        vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
-						-- stylua: ignore end
-					end,
-					capabilities = require("lsp").gen_capabilities(),
-					standalone = true,
-					settings = {
-						["rust-analyzer"] = {
-							cargo = {
-								loadOutDirsFromCheck = true,
-								buildScripts = { enable = true },
-							},
-							diagnostics = {
-								disabled = { "unresolved-proc-macro" },
-								enableExperimental = true,
-							},
-							checkOnSave = { command = "clippy" },
-							procMacro = { enable = true },
-						},
-					},
-				},
-			}
-		end,
-	},
-	{
-		"p00f/clangd_extensions.nvim",
-		ft = { "c", "cpp", "hpp", "h" },
-		dependencies = { "neovim/nvim-lspconfig" },
-		config = function()
-			local lspconfig = require "lspconfig"
-			local capabilities = require("lsp").gen_capabilities()
-
-			capabilities.offsetEncoding = { "utf-16", "utf-8" }
-
-			local switch_source_header_splitcmd = function(bufnr, splitcmd)
-				bufnr = lspconfig.util.validate_bufnr(bufnr)
-				local params = { uri = vim.uri_from_bufnr(bufnr) }
-
-				local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
-
-				if clangd_client then
-					clangd_client.request(
-						"textDocument/switchSourceHeader",
-						params,
-						function(err, result)
-							if err then error(tostring(err)) end
-							if not result then
-								error(
-									"Corresponding file can’t be determined",
-									vim.log.levels.ERROR
-								)
-								return
-							end
-							vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
-						end
-					)
-				else
-					error(
-						"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
-						vim.log.levels.ERROR
-					)
-				end
-			end
-
-			local get_binary_path_list = function(binaries)
-				local get_binary_path = function(binary)
-					local path = nil
-					if vim.loop.os_uname().sysname == "Windows_NT" then
-						path = vim.fn.trim(vim.fn.system("where " .. binary))
-					else
-						path = vim.fn.trim(vim.fn.system("which " .. binary))
-					end
-					if vim.v.shell_error ~= 0 then path = nil end
-					return path
-				end
-
-				local path_list = {}
-				for _, binary in ipairs(binaries) do
-					local path = get_binary_path(binary)
-					if path then table.insert(path_list, path) end
-				end
-				return table.concat(path_list, ",")
-			end
-
-			require("clangd_extensions").setup {
-				-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
-				server = {
-					capabilities = capabilities,
-					single_file_support = true,
-					cmd = {
-						"clangd",
-						"-j=12",
-						"--enable-config",
-						"--background-index",
-						"--pch-storage=memory",
-						-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-						"--query-driver="
-							.. get_binary_path_list {
-								"clang++",
-								"clang",
-								"gcc",
-								"g++",
-							},
-						"--clang-tidy",
-						"--all-scopes-completion",
-						"--completion-style=detailed",
-						"--header-insertion-decorators",
-						"--header-insertion=iwyu",
-						"--limit-references=3000",
-						"--limit-results=350",
-					},
-					filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-					commands = {
-						ClangdSwitchSourceHeader = {
-							function() switch_source_header_splitcmd(0, "edit") end,
-							description = "cpp: Open source/header in current buffer",
-						},
-						ClangdSwitchSourceHeaderVSplit = {
-							function() switch_source_header_splitcmd(0, "vsplit") end,
-							description = "cpp: Open source/header in a new vsplit",
-						},
-						ClangdSwitchSourceHeaderSplit = {
-							function() switch_source_header_splitcmd(0, "split") end,
-							description = "cpp: Open source/header in a new split",
-						},
-					},
-				},
-			}
-		end,
-	},
-	---@diagnostic disable-next-line: assign-type-mismatch
-	{ "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
 	-- NOTE: format for days
 	{
 		"jose-elias-alvarez/null-ls.nvim",
@@ -1534,7 +1354,6 @@ require("lazy").setup({
 	-- NOTE: nice winbar
 	{
 		"Bekaboo/dropbar.nvim",
-		enabled = false,
 		config = true,
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
@@ -1569,8 +1388,209 @@ require("lazy").setup({
 				dependencies = { "nvim-lspconfig" },
 			},
 			{ "folke/neodev.nvim", config = true, ft = "lua" },
+			{ "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
+			{
+				"simrat39/rust-tools.nvim",
+				ft = "rust",
+				dependencies = { "neovim/nvim-lspconfig" },
+				lazy = true,
+				opts = {
+					tools = {
+						inlay_hints = {
+							auto = false,
+							other_hints_prefix = ":: ",
+							only_current_line = true,
+							show_parameter_hints = false,
+						},
+					},
+					server = {
+						on_attach = function(_, bufnr)
+							vim.api.nvim_buf_set_option(
+								bufnr,
+								"formatexpr",
+								"v:lua.vim.lsp.formatexpr()"
+							)
+							vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+							vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
+						end,
+						standalone = true,
+						settings = {
+							["rust-analyzer"] = {
+								cargo = {
+									loadOutDirsFromCheck = true,
+									buildScripts = { enable = true },
+								},
+								diagnostics = {
+									disabled = { "unresolved-proc-macro" },
+									enableExperimental = true,
+								},
+								checkOnSave = { command = "clippy" },
+								procMacro = { enable = true },
+							},
+						},
+					},
+				},
+				config = function(_, opts)
+					local get_rust_adapters = function()
+						if vim.loop.os_uname().sysname == "Windows_NT" then
+							return {
+								type = "executable",
+								command = "lldb-vscode",
+								name = "rt_lldb",
+							}
+						end
+						local codelldb_extension_path = vim.fn.stdpath "data"
+							.. "/mason/packages/codelldb/extension"
+						local codelldb_path = codelldb_extension_path .. "/adapter/codelldb"
+						local extension = ".so"
+						if vim.loop.os_uname().sysname == "Darwin" then extension = ".dylib" end
+						local liblldb_path = codelldb_extension_path
+							.. "/lldb/lib/liblldb"
+							.. extension
+						return require("rust-tools.dap").get_codelldb_adapter(
+							codelldb_path,
+							liblldb_path
+						)
+					end
+
+					local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+					local capabilities = vim.tbl_deep_extend(
+						"force",
+						{},
+						vim.lsp.protocol.make_client_capabilities(),
+						has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+						opts.server.capabilities or {}
+					)
+					opts.server.capabilities = capabilities
+					opts.dap = { adapter = get_rust_adapters() }
+					require("rust-tools").setup(opts)
+				end,
+			},
+			{
+				"p00f/clangd_extensions.nvim",
+				ft = { "c", "cpp", "hpp", "h" },
+				dependencies = { "neovim/nvim-lspconfig" },
+				lazy = true,
+				opts = {
+					-- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
+					server = {
+						single_file_support = true,
+						filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+					},
+				},
+				config = function(_, opts)
+					local lspconfig = require "lspconfig"
+					local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+					local capabilities = vim.tbl_deep_extend(
+						"force",
+						{},
+						vim.lsp.protocol.make_client_capabilities(),
+						has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+						opts.server.capabilities or {}
+					)
+
+					capabilities.offsetEncoding = { "utf-16", "utf-8" }
+
+					local switch_source_header_splitcmd = function(bufnr, splitcmd)
+						bufnr = lspconfig.util.validate_bufnr(bufnr)
+						local params = { uri = vim.uri_from_bufnr(bufnr) }
+
+						local clangd_client =
+							lspconfig.util.get_active_client_by_name(bufnr, "clangd")
+
+						if clangd_client then
+							clangd_client.request(
+								"textDocument/switchSourceHeader",
+								params,
+								function(err, result)
+									if err then error(tostring(err)) end
+									if not result then
+										error(
+											"Corresponding file can’t be determined",
+											vim.log.levels.ERROR
+										)
+										return
+									end
+									vim.api.nvim_command(
+										splitcmd .. " " .. vim.uri_to_fname(result)
+									)
+								end
+							)
+						else
+							error(
+								"Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
+								vim.log.levels.ERROR
+							)
+						end
+					end
+
+					opts.server.commands = {
+						ClangdSwitchSourceHeader = {
+							function() switch_source_header_splitcmd(0, "edit") end,
+							description = "cpp: Open source/header in current buffer",
+						},
+						ClangdSwitchSourceHeaderVSplit = {
+							function() switch_source_header_splitcmd(0, "vsplit") end,
+							description = "cpp: Open source/header in a new vsplit",
+						},
+						ClangdSwitchSourceHeaderSplit = {
+							function() switch_source_header_splitcmd(0, "split") end,
+							description = "cpp: Open source/header in a new split",
+						},
+					}
+
+					local get_binary_path_list = function(binaries)
+						local get_binary_path = function(binary)
+							local path = nil
+							if vim.loop.os_uname().sysname == "Windows_NT" then
+								path = vim.fn.trim(vim.fn.system("where " .. binary))
+							else
+								path = vim.fn.trim(vim.fn.system("which " .. binary))
+							end
+							if vim.v.shell_error ~= 0 then path = nil end
+							return path
+						end
+
+						local path_list = {}
+						for _, binary in ipairs(binaries) do
+							local path = get_binary_path(binary)
+							if path then table.insert(path_list, path) end
+						end
+						return table.concat(path_list, ",")
+					end
+
+					opts.server.cmd = {
+						"clangd",
+						"-j=12",
+						"--enable-config",
+						"--background-index",
+						"--pch-storage=memory",
+						-- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
+						"--query-driver="
+							.. get_binary_path_list {
+								"clang++",
+								"clang",
+								"gcc",
+								"g++",
+							},
+						"--clang-tidy",
+						"--all-scopes-completion",
+						"--completion-style=detailed",
+						"--header-insertion-decorators",
+						"--header-insertion=iwyu",
+						"--limit-references=3000",
+						"--limit-results=350",
+					}
+
+					opts.server.capabilities = capabilities
+
+					require("clangd_extensions").setup(opts)
+				end,
+			},
+			---@diagnostic disable-next-line: assign-type-mismatch
+			{ "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
 		},
-		---@class LspOptions
+		---@class PluginLspOptions
 		opts = {
 			-- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
 			-- Be aware that you also will need to properly configure your LSP server to
@@ -1582,14 +1602,11 @@ require("lazy").setup({
 			autoformat = true,
 			-- Enable this to show formatters used in a notification
 			-- Useful for debugging formatter issues
-			format_notify = false,
+			notify = false,
 			-- options for vim.lsp.buf.format
 			-- `bufnr` and `filter` is handled by the formatter,
 			-- but can be also overridden when specified
-			format = {
-				formatting_options = nil,
-				timeout_ms = nil,
-			},
+			format = { formatting_options = nil, timeout_ms = nil },
 			---@type lspconfig.options
 			servers = {
 				bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
@@ -1632,8 +1649,6 @@ require("lazy").setup({
 							},
 							-- Multi-module projects
 							{ "build.gradle", "build.gradle.kts" },
-							{ "$BENTOML_GIT_ROOT/grpc-client/java" },
-							{ "$BENTOML_GIT_ROOT/grpc-client/kotlin" },
 						} or vim.fn.getcwd(),
 					},
 				},
@@ -1728,30 +1743,6 @@ require("lazy").setup({
 						},
 					},
 				},
-				-- pylyzer = {
-				-- 	mason = false,
-				-- 	flags = { debounce_text_changes = 500 },
-				-- 	root_dir = function(fname)
-				-- 		return require("lspconfig.util").root_pattern(
-				-- 			"WORKSPACE",
-				-- 			".git",
-				-- 			"Pipfile",
-				-- 			"pyrightconfig.json",
-				-- 			"setup.py",
-				-- 			"setup.cfg",
-				-- 			"pyproject.toml",
-				-- 			"requirements.txt"
-				-- 		)(fname) or require("lspconfig.util").path.dirname(fname)
-				-- 	end,
-				-- 	settings = {
-				-- 		python = {
-				-- 			checkOnType = false,
-				-- 			diagnostics = false,
-				-- 			inlayHints = true,
-				-- 			smartCompletion = true,
-				-- 		},
-				-- 	},
-				-- },
 				-- NOTE: isolated servers will have their own plugins for setup
 				clangd = { isolated = true },
 				rust_analyzer = { isolated = true },
@@ -1789,105 +1780,14 @@ require("lazy").setup({
 				end,
 			},
 		},
-		---@param opts LspOptions
-		config = function(_, opts)
-			---@module "lspconfig"
-			local lspconfig = require "lspconfig"
-
-			if utils.has "neoconf.nvim" then
-				local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
-				require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
-			end
-
-			-- setup autoformat
-			require("format").setup(opts)
-
-			utils.on_attach(function(client, bufnr) require("lsp").on_attach(client, bufnr) end)
-
-			local register_capability = vim.lsp.handlers["client/registerCapability"]
-
-			vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
-				local ret = register_capability(err, res, ctx)
-				local client_id = ctx.client_id
-				---@type lsp.Client
-				local client = vim.lsp.get_client_by_id(client_id)
-				local buffer = vim.api.nvim_get_current_buf()
-				require("lsp").on_attach(client, buffer)
-				return ret
-			end
-
-			local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
-
-			if opts.inlay_hints.enabled and inlay_hint then
-				utils.on_attach(function(client, buffer)
-					if client.supports_method "textDocument/inlayHint" then
-						inlay_hint(buffer, true)
-					end
-				end)
-			end
-
-			local servers = opts.servers
-			local setup = opts.setup
-
-			local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-			local capabilities = vim.tbl_deep_extend(
-				"force",
-				{},
-				vim.lsp.protocol.make_client_capabilities(),
-				has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-				opts.capabilities or {}
-			)
-
-			local mason_handler = function(server)
-				local server_opts = vim.tbl_deep_extend("force", {
-					capabilities = vim.deepcopy(capabilities),
-					flags = { debounce_text_changes = 150 },
-				}, servers[server] or {})
-
-				if setup[server] then
-					if setup[server](lspconfig, server_opts) then return end
-				elseif setup["*"] then
-					if setup["*"](lspconfig, server_opts) then return end
-				end
-				lspconfig[server].setup(server_opts)
-			end
-
-			local have_mason, mason_lspconfig = pcall(require, "mason-lspconfig")
-			local available = have_mason and mason_lspconfig.get_available_servers() or {}
-
-			local ensure_installed = {} ---@type string[]
-			for server, server_opts in pairs(servers) do
-				if server_opts then
-					server_opts = server_opts == true and {} or server_opts
-					-- NOTE: servers that are isolated should be setup manually.
-					if server_opts.isolated then
-						ensure_installed[#ensure_installed + 1] = server
-					else
-						-- NOTE: run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-						if
-							server_opts.mason == false
-							or not vim.tbl_contains(available, server)
-						then
-							mason_handler(server)
-						else
-							ensure_installed[#ensure_installed + 1] = server
-						end
-					end
-				end
-			end
-
-			-- check if mason is available, then call setup
-			if have_mason then
-				mason_lspconfig.setup { ensure_installed = ensure_installed }
-				mason_lspconfig.setup_handlers { mason_handler }
-			end
-		end,
+		---@param opts PluginLspOptions
+		config = function(client, opts) require("lsp").setup(client, opts) end,
 	},
 	{
 		"williamboman/mason.nvim",
 		cmd = "Mason",
 		build = ":MasonUpdate",
-		keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+		keys = { { "<leader>m", "<cmd>Mason<cr>", desc = "Mason" } },
 		opts = { ensure_installed = { "lua-language-server", "pyright", "mypy" } },
 		---@param opts MasonSettings | {ensure_installed: string[]}
 		config = function(_, opts)
