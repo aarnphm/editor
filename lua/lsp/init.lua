@@ -7,11 +7,6 @@ M.setup = function(_, opts)
 	local lsp_format = require "lsp.format"
 	local lsp_keymaps = require "lsp.keymaps"
 
-	if utils.has "neoconf.nvim" then
-		local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
-		require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
-	end
-
 	-- setup autoformat
 	lsp_format.setup(opts)
 

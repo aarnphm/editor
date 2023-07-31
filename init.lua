@@ -1384,6 +1384,7 @@ require("lazy").setup({
 	{
 		"Bekaboo/dropbar.nvim",
 		config = true,
+		enabled = vim.fn.has "nvim-0.9.0" == 0,
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
 			icons = {
@@ -1810,7 +1811,13 @@ require("lazy").setup({
 			},
 		},
 		---@param opts PluginLspOptions
-		config = function(client, opts) require("lsp").setup(client, opts) end,
+		config = function(client, opts)
+			if utils.has "neoconf.nvim" then
+				local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
+				require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
+			end
+			require("lsp").setup(client, opts)
+		end,
 	},
 	{
 		"williamboman/mason.nvim",
