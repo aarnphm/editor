@@ -778,18 +778,10 @@ require("lazy").setup({
 	-- NOTE: fuzzy finder ftw
 	{
 		"nvim-telescope/telescope.nvim",
-		event = "BufReadPost",
-		commit = vim.fn.has "nvim-0.9.0" == 0 and "057ee0f8783" or nil,
 		cmd = "Telescope",
-		version = false, -- telescope did only one release, so use HEAD for now
-		enabled = false,
 		dependencies = {
 			"nvim-telescope/telescope-live-grep-args.nvim",
-			"jvgrootveld/telescope-zoxide",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				build = "make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim",
-			},
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 		},
 		keys = {
 			{
@@ -905,114 +897,113 @@ require("lazy").setup({
 				desc = "lsp: Goto T[y]pe Definition",
 			},
 		},
-		config = function()
-			local opts = {
-				defaults = {
-					vimgrep_arguments = {
-						"rg",
-						"--no-heading",
-						"--with-filename",
-						"--line-number",
-						"--column",
-						"--smart-case",
+		opts = {
+			defaults = {
+				vimgrep_arguments = {
+					"rg",
+					"--no-heading",
+					"--with-filename",
+					"--line-number",
+					"--column",
+					"--smart-case",
+				},
+				prompt_prefix = "  ",
+				selection_caret = "󰄾 ",
+				file_ignore_patterns = {
+					".git/",
+					"node_modules/",
+					"static_content/",
+					"lazy-lock.json",
+					"pdm.lock",
+					"__pycache__",
+				},
+				mappings = {
+					i = {
+						["<C-a>"] = { "<esc>0i", type = "command" },
+						["<Esc>"] = function(...) return require("telescope.actions").close(...) end,
+						["<c-t>"] = function(...)
+							return require("trouble.providers.telescope").open_with_trouble(...)
+						end,
+						["<a-t>"] = function(...)
+							return require("trouble.providers.telescope").open_selected_with_trouble(
+								...
+							)
+						end,
+						["<a-i>"] = function()
+							local action_state = require "telescope.actions.state"
+							local line = action_state.get_current_line()
+							utils.telescope("find_files", { no_ignore = true, default_text = line })()
+						end,
+						["<a-h>"] = function()
+							local action_state = require "telescope.actions.state"
+							local line = action_state.get_current_line()
+							utils.telescope("find_files", { hidden = true, default_text = line })()
+						end,
+						["<C-Down>"] = function(...)
+							return require("telescope.actions").cycle_history_next(...)
+						end,
+						["<C-Up>"] = function(...)
+							return require("telescope.actions").cycle_history_prev(...)
+						end,
+						["<C-f>"] = function(...)
+							return require("telescope.actions").preview_scrolling_down(...)
+						end,
+						["<C-b>"] = function(...)
+							return require("telescope.actions").preview_scrolling_up(...)
+						end,
 					},
-					prompt_prefix = "  ",
-					selection_caret = "󰄾 ",
-					file_ignore_patterns = {
-						".git/",
-						"node_modules/",
-						"static_content/",
-						"lazy-lock.json",
-						"pdm.lock",
-						"__pycache__",
-					},
+					n = { ["q"] = function(...) return require("telescope.actions").close(...) end },
+				},
+				layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
+				selection_strategy = "reset",
+				sorting_strategy = "ascending",
+				color_devicons = true,
+			},
+			extensions = {
+				live_grep_args = {
+					auto_quoting = false,
 					mappings = {
 						i = {
-							["<C-a>"] = { "<esc>0i", type = "command" },
-							["<Esc>"] = require("telescope.actions").close,
-							["<c-t>"] = function(...)
-								return require("trouble.providers.telescope").open_with_trouble(...)
+							["<C-k>"] = function(...)
+								return require("telescope-live-grep-args.actions").quote_prompt()
 							end,
-							["<a-t>"] = function(...)
-								return require("trouble.providers.telescope").open_selected_with_trouble(
-									...
-								)
-							end,
-							["<a-i>"] = function()
-								local action_state = require "telescope.actions.state"
-								local line = action_state.get_current_line()
-								utils.telescope(
-									"find_files",
-									{ no_ignore = true, default_text = line }
-								)()
-							end,
-							["<a-h>"] = function()
-								local action_state = require "telescope.actions.state"
-								local line = action_state.get_current_line()
-								utils.telescope(
-									"find_files",
-									{ hidden = true, default_text = line }
-								)()
-							end,
-							["<C-Down>"] = function(...)
-								return require("telescope.actions").cycle_history_next(...)
-							end,
-							["<C-Up>"] = function(...)
-								return require("telescope.actions").cycle_history_prev(...)
-							end,
-							["<C-f>"] = function(...)
-								return require("telescope.actions").preview_scrolling_down(...)
-							end,
-							["<C-b>"] = function(...)
-								return require("telescope.actions").preview_scrolling_up(...)
-							end,
-						},
-						n = { ["q"] = require("telescope.actions").close },
-					},
-					layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
-					selection_strategy = "reset",
-					sorting_strategy = "ascending",
-					color_devicons = true,
-				},
-				extensions = {
-					live_grep_args = {
-						auto_quoting = false,
-						mappings = {
-							i = {
-								["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
-								["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt {
+							["<C-i>"] = function(...)
+								return require("telescope-live-grep-args.actions").quote_prompt {
 									postfix = " --iglob ",
-								},
-								["<C-j>"] = require("telescope-live-grep-args.actions").quote_prompt {
+								}
+							end,
+							["<C-j>"] = function(...)
+								return require("telescope-live-grep-args.actions").quote_prompt {
 									postfix = " -t ",
-								},
-							},
+								}
+							end,
 						},
 					},
 				},
-				fzf = {
-					fuzzy = false, -- false will only do exact matching
-					override_generic_sorter = true, -- override the generic sorter
-					override_file_sorter = true, -- override the file sorter
-					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+			},
+			fzf = {
+				fuzzy = false, -- false will only do exact matching
+				override_generic_sorter = true, -- override the generic sorter
+				override_file_sorter = true, -- override the file sorter
+				case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+			},
+			pickers = {
+				find_files = { hidden = true },
+				live_grep = {
+					on_input_filter_cb = function(prompt)
+						-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
+						return { prompt = prompt:gsub("%s", ".*") }
+					end,
+					attach_mappings = function(_)
+						require("telescope.actions.set").select:enhance {
+							post = function() vim.cmd ":normal! zx" end,
+						}
+						return true
+					end,
 				},
-				pickers = {
-					find_files = { hidden = true },
-					live_grep = {
-						on_input_filter_cb = function(prompt)
-							-- AND operator for live_grep like how fzf handles spaces with wildcards in rg
-							return { prompt = prompt:gsub("%s", ".*") }
-						end,
-						attach_mappings = function(_)
-							require("telescope.actions.set").select:enhance {
-								post = function() vim.cmd ":normal! zx" end,
-							}
-							return true
-						end,
-					},
-				},
-			}
-
+			},
+		},
+		config = function(_, opts)
 			if utils.has "flash.nvim" then
 				local flash = function(prompt_bufnr)
 					require("flash").jump {
@@ -1041,10 +1032,51 @@ require("lazy").setup({
 
 			require("telescope").setup(opts)
 			require("telescope").load_extension "live_grep_args"
-			require("telescope").load_extension "fzf"
-			require("telescope").load_extension "zoxide"
 		end,
 	},
+	-- Automatically highlights other instances of the word under your cursor.
+	-- This works with LSP, Treesitter, and regexp matching to find the other
+	-- instances.
+	{
+		"RRethy/vim-illuminate",
+		event = { "BufReadPost", "BufNewFile" },
+		opts = {
+			delay = 200,
+			large_file_cutoff = 2000,
+			large_file_overrides = {
+				providers = { "lsp" },
+			},
+		},
+		config = function(_, opts)
+			require("illuminate").configure(opts)
+
+			local function imap(key, dir, buffer)
+				vim.keymap.set(
+					"n",
+					key,
+					function() require("illuminate")["goto_" .. dir .. "_reference"](false) end,
+					{ desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer }
+				)
+			end
+
+			imap("]]", "next")
+			imap("[[", "prev")
+
+			-- also set it after loading ftplugins, since a lot overwrite [[ and ]]
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function()
+					local buffer = vim.api.nvim_get_current_buf()
+					imap("]]", "next", buffer)
+					imap("[[", "prev", buffer)
+				end,
+			})
+		end,
+		keys = {
+			{ "]]", desc = "Next Reference" },
+			{ "[[", desc = "Prev Reference" },
+		},
+	},
+
 	-- NOTE: better nvim-tree.lua
 	{
 		"nvim-neo-tree/neo-tree.nvim",
@@ -1076,10 +1108,7 @@ require("lazy").setup({
 			{
 				"<C-n>",
 				function()
-					require("neo-tree.command").execute {
-						toggle = true,
-						dir = vim.loop.cwd(),
-					}
+					require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() }
 				end,
 				desc = "explorer: root dir",
 			},
