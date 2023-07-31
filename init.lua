@@ -27,9 +27,11 @@ o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better d
 vim.opt.completeopt = { "menuone", "noselect" }
 o.grepprg = "rg --vimgrep"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
-o.tabstop = 4
-o.softtabstop = 4
-o.shiftwidth = 4
+local TAB_WIDTH = 2
+o.tabstop = TAB_WIDTH
+o.softtabstop = TAB_WIDTH
+o.shiftwidth = TAB_WIDTH
+o.expandtab = true
 o.shiftround = true
 o.timeoutlen = 200
 o.updatetime = 200
@@ -686,7 +688,6 @@ require("lazy").setup({
 				function() require("flash").treesitter() end,
 				desc = "motion: Flash Treesitter",
 			},
-			{ "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
 			{
 				"R",
 				mode = { "o", "x" },
