@@ -1416,7 +1416,7 @@ require("lazy").setup({
 			{
 				"folke/neoconf.nvim",
 				cmd = "Neoconf",
-				config = false,
+				config = true,
 				dependencies = { "nvim-lspconfig" },
 			},
 			{ "folke/neodev.nvim", config = true, ft = "lua" },
@@ -1631,7 +1631,7 @@ require("lazy").setup({
 			-- add any global capabilities here
 			capabilities = {},
 			-- Automatically format on save
-			autoformat = true,
+			autoformat = false,
 			-- Enable this to show formatters used in a notification
 			-- Useful for debugging formatter issues
 			notify = false,
@@ -1813,13 +1813,7 @@ require("lazy").setup({
 			},
 		},
 		---@param opts PluginLspOptions
-		config = function(client, opts)
-			if utils.has "neoconf.nvim" then
-				local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
-				require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
-			end
-			require("lsp").setup(client, opts)
-		end,
+		config = function(client, opts) require("lsp").setup(client, opts) end,
 	},
 	{
 		"williamboman/mason.nvim",

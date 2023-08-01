@@ -10,7 +10,7 @@ end
 M._keys = nil
 
 M.get = function()
-	local format = function() require("format").format { force = true } end
+	local format = function() require("lsp.format").format { force = true } end
 	if not M._keys then
         --@class PluginLspKeys
         -- stylua: ignore
@@ -96,7 +96,7 @@ M.on_attach = function(client, bufnr)
 	vim.api.nvim_buf_create_user_command(
 		bufnr,
 		"Format",
-		function(_) require("format").format { force = true } end,
+		function(_) require("lsp.format").format { force = true } end,
 		{ desc = "format: current buffer (alt for <Leader><Leader>)" }
 	)
 end
