@@ -74,6 +74,42 @@ require("lazy").setup({
 			},
 		},
 	},
+	-- NOTE: nice git integration and UI
+	{
+		"lewis6991/gitsigns.nvim",
+		event = "BufReadPost",
+		opts = {
+			numhl = true,
+			watch_gitdir = { interval = 1000, follow_files = true },
+			current_line_blame = true,
+			current_line_blame_opts = { delay = 1000, virtual_text_pos = "eol" },
+			sign_priority = 6,
+			update_debounce = 100,
+			status_formatter = nil, -- Use default
+			word_diff = false,
+			diff_opts = { internal = true },
+			on_attach = function(bufnr)
+				local actions = require "gitsigns.actions"
+				local kmap = function(mode, l, r, desc)
+					vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
+				end
+                -- stylua: ignore start
+                kmap("n", "]h", actions.next_hunk, "git: next hunk")
+                kmap("n", "[h", actions.prev_hunk, "git: prev hunk")
+                kmap("n", "<leader>hu", actions.undo_stage_hunk, "git: undo stage hunk")
+                kmap("n", "<leader>hR", actions.reset_buffer, "git: reset buffer")
+                kmap("n", "<leader>hS", actions.stage_buffer, "git: stage buffer")
+                kmap("n", "<leader>hp", actions.preview_hunk, "git: preview hunk")
+                kmap("n", "<leader>hd", actions.diffthis, "git: diff this")
+                kmap("n", "<leader>hD", function() actions.diffthis("~") end, "git: diff this ~")
+                kmap("n", "<leader>hb", function() actions.blame_line({ full = true }) end, "git: blame Line")
+                kmap({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
+                kmap({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
+                kmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+				-- stylua: ignore end
+			end,
+		},
+	},
 	-- NOTE: Gigachad Git
 	{
 		"tpope/vim-fugitive",
@@ -604,45 +640,31 @@ require("lazy").setup({
 			{
 				"s1n7ax/nvim-window-picker",
 				lazy = true,
-				config = function()
-					require("window-picker").setup {
-						autoselect_one = true,
-						include_current = false,
-						filter_rules = {
-							-- filter using buffer options
-							bo = {
-								-- if the file type is one of following, the window will be ignored
-								filetype = { "neo-tree", "neo-tree-popup", "notify" },
-								-- if the buffer type is one of following, the window will be ignored
-								buftype = { "terminal", "quickfix" },
-							},
+				opts = {
+					autoselect_one = true,
+					include_current = false,
+					filter_rules = {
+						-- filter using buffer options
+						bo = {
+							-- if the file type is one of following, the window will be ignored
+							filetype = { "neo-tree", "neo-tree-popup", "notify" },
+							-- if the buffer type is one of following, the window will be ignored
+							buftype = { "terminal", "quickfix", "Scratch" },
 						},
-						other_win_hl_color = "#e35e4f",
-					}
-				end,
+					},
+				},
+				config = function(_, opts) require("window-picker").setup(opts) end,
 			},
 		},
 		keys = {
 			{
 				"<C-n>",
 				function()
-					require("neo-tree.command").execute {
-						toggle = true,
-						dir = vim.loop.cwd(),
-					}
+					require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() }
 				end,
 				desc = "explorer: root dir",
 			},
 		},
-		deactivate = function() vim.cmd [[Neotree close]] end,
-		init = function()
-			vim.g.neo_tree_remove_legacy_commands = 1
-			if vim.fn.argc() == 1 then
-				---@diagnostic disable-next-line: param-type-mismatch
-				local stat = vim.loop.fs_stat(vim.fn.argv(0))
-				if stat and stat.type == "directory" then require "neo-tree" end
-			end
-		end,
 		opts = {
 			close_if_last_window = true,
 			enable_diagnostics = false, -- default is set to true here.
@@ -661,6 +683,8 @@ require("lazy").setup({
 					hide_by_pattern = { -- uses glob style patterns
 						"*.meta",
 						"*/src/*/tsconfig.json",
+						"*/.ruff_cache/*",
+						"*/__pycache__/*",
 					},
 				},
 			},
