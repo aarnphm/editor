@@ -81,9 +81,10 @@ vim.o.jumpoptions = "stack"
 vim.o.listchars   = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 
 -- Spaces and tabs config
-vim.o.tabstop     = 4
-vim.o.softtabstop = 4
-vim.o.shiftwidth  = 4
+local TABWIDTH = 2
+vim.o.tabstop     = TABWIDTH
+vim.o.softtabstop = TABWIDTH
+vim.o.shiftwidth  = TABWIDTH
 vim.o.shiftround  = true
 
 -- UI config
