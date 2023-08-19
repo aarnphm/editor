@@ -1070,7 +1070,6 @@ require("lazy").setup({
 	{
 		"Bekaboo/dropbar.nvim",
 		config = true,
-		enabled = vim.fn.has "nvim-0.9.0" == 0,
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
 			icons = {
