@@ -41,4 +41,3 @@ luac.out
 *.hex
 zettelkasten/*
 !zettelkasten/templates
-plugin

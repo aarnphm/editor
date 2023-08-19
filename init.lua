@@ -641,123 +641,10 @@ require("lazy").setup({
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
+    version = false,
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-    },
-    keys = {
-      {
-        "<Leader>b",
-        "<cmd>Telescope buffers show_all_buffers=true previewer=false<cr>",
-        desc = "telescope: Manage buffers",
-      },
-      { "<leader>B", "<cmd>Telescope buffers<cr>",         desc = "Buffers" },
-      { "<leader>;", "<cmd>Telescope command_history<cr>", desc = "Command History" },
-      {
-        "<leader>f",
-        utils.telescope("files", { theme = "dropdown" }),
-        desc = "Find Files (root dir)",
-      },
-      { "<leader>r",  "<cmd>Telescope oldfiles<cr>",  desc = "Recent" },
-      {
-        "<leader>fR",
-        utils.telescope("oldfiles", { cwd = vim.loop.cwd() }),
-        desc = "Recent (cwd)",
-      },
-      -- search
-      { '<leader>s"', "<cmd>Telescope registers<cr>", desc = "Registers" },
-      {
-        "<leader>sa",
-        "<cmd>Telescope autocommands<cr>",
-        desc = "Auto Commands",
-      },
-      { "<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Buffer" },
-      {
-        "<leader>sc",
-        "<cmd>Telescope command_history<cr>",
-        desc = "Command History",
-      },
-      { "<leader>sC", "<cmd>Telescope commands<cr>",                  desc = "Commands" },
-      {
-        "<leader>sd",
-        "<cmd>Telescope diagnostics bufnr=0<cr>",
-        desc = "Document diagnostics",
-      },
-      {
-        "<leader>sD",
-        "<cmd>Telescope diagnostics<cr>",
-        desc = "Workspace diagnostics",
-      },
-      {
-        "<leader>sg",
-        utils.telescope "live_grep",
-        desc = "Grep (root dir)",
-      },
-      { "<leader>sG", utils.telescope("live_grep", { cwd = false }), desc = "Grep (cwd)" },
-      { "<leader>sh", "<cmd>Telescope help_tags<cr>",                desc = "Help Pages" },
-      {
-        "<leader>H",
-        "<cmd>Telescope highlights<cr>",
-        desc = "Search Highlight Groups",
-      },
-      { "<leader>m",  "<cmd>Telescope marks<cr>",       desc = "Jump to Mark" },
-      { "<leader>o",  "<cmd>Telescope vim_options<cr>", desc = "Options" },
-      { "<leader>sR", "<cmd>Telescope resume<cr>",      desc = "Resume" },
-      {
-        "<leader>/",
-        utils.telescope("grep_string", { word_match = "-w" }),
-        desc = "Word (root dir)",
-      },
-      {
-        "<leader>/",
-        utils.telescope "grep_string",
-        mode = "v",
-        desc = "Selection (root dir)",
-      },
-      {
-        "<leader>?",
-        utils.telescope("grep_string", { cwd = false, word_match = "-w" }),
-        desc = "Word (cwd)",
-      },
-      {
-        "<leader>sW",
-        utils.telescope("grep_string", { cwd = false }),
-        mode = "v",
-        desc = "Selection (cwd)",
-      },
-      {
-        "<Leader>w",
-        function() require("telescope").extensions.live_grep_args.live_grep_args() end,
-        desc = "telescope: Live grep args",
-        noremap = true,
-        silent = true,
-      },
-      {
-        "<C-p>",
-        function()
-          require("telescope.builtin").keymaps {
-            lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-            layout_config = {
-              width = 0.6,
-              height = 0.6,
-              prompt_position = "top",
-            },
-          }
-        end,
-        desc = "telescope: Keymaps",
-        noremap = true,
-        silent = true,
-      },
-      {
-        "gI",
-        function() util.telescope("lsp_implementations", { reuse_win = true }) end,
-        desc = "lsp: Goto Implementation",
-      },
-      {
-        "gy",
-        function() util.telescope("lsp_type_definitions", { reuse_win = true }) end,
-        desc = "lsp: Goto T[y]pe Definition",
-      },
     },
     opts = {
       defaults = {
@@ -854,9 +741,7 @@ require("lazy").setup({
       require("telescope").load_extension "live_grep_args"
     end,
   },
-  -- Automatically highlights other instances of the word under your cursor.
-  -- This works with LSP, Treesitter, and regexp matching to find the other
-  -- instances.
+  -- Automatically highlights other instances of the word under your cursor. This works with LSP, Treesitter, and regexp matching to find the other instances.
   {
     "RRethy/vim-illuminate",
     event = { "BufReadPost", "BufNewFile" },
@@ -892,7 +777,6 @@ require("lazy").setup({
       { "[[", desc = "Prev Reference" },
     },
   },
-
   -- NOTE: better nvim-tree.lua
   {
     "nvim-neo-tree/neo-tree.nvim",
