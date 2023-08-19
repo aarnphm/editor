@@ -1,5 +1,6 @@
 column_width = 256
-indent_width = 4
+indent_width = 2
+indent_type = "Space"
 line_endings = "Unix"
 quote_style = "AutoPreferDouble"
 call_parentheses = "None"
