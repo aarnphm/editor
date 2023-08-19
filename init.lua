@@ -52,7 +52,6 @@ require("lazy").setup({
 			end
 		end,
 		config = true,
-		enabled = false,
 	},
 	-- NOTE: cozy colorscheme
 	{
@@ -324,42 +323,6 @@ require("lazy").setup({
 			show_current_context = false,
 		},
 	},
-	-- NOTE: easily jump to any location and enhanced f/t motions for Leap
-	-- using flash.nvim
-	{
-		"folke/flash.nvim",
-		event = "VeryLazy",
-		vscode = true,
-		---@type Flash.Config
-		opts = {},
-		keys = {
-			{
-				"s",
-				mode = { "n", "x", "o" },
-				function() require("flash").jump() end,
-				desc = "motion: Flash",
-			},
-			{
-				"S",
-				mode = { "n", "o", "x" },
-				function() require("flash").treesitter() end,
-				desc = "motion: Flash Treesitter",
-			},
-			{ "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-			{
-				"R",
-				mode = { "o", "x" },
-				function() require("flash").treesitter_search() end,
-				desc = "motion: Treesitter Search",
-			},
-			{
-				"<c-s>",
-				mode = { "c" },
-				function() require("flash").toggle() end,
-				desc = "motion: Toggle Flash Search",
-			},
-		},
-	},
 	-- NOTE: folke is neovim's tpope
 	{
 		"folke/trouble.nvim",
@@ -598,32 +561,6 @@ require("lazy").setup({
 				},
 			}
 
-			if utils.has "flash.nvim" then
-				local flash = function(prompt_bufnr)
-					require("flash").jump {
-						pattern = "^",
-						label = { after = { 0, 0 } },
-						search = {
-							mode = "search",
-							exclude = {
-								function(win)
-									return vim.bo[vim.api.nvim_win_get_buf(win)].filetype
-										~= "TelescopeResults"
-								end,
-							},
-						},
-						action = function(match)
-							local picker =
-								require("telescope.actions.state").get_current_picker(prompt_bufnr)
-							picker:set_selection(match.pos[1] - 1)
-						end,
-					}
-				end
-				opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
-					mappings = { n = { s = flash }, i = { ["<c-s>"] = flash } },
-				})
-			end
-
 			require("telescope").setup(opts)
 			require("telescope").load_extension "live_grep_args"
 			require("telescope").load_extension "fzf"
@@ -825,82 +762,6 @@ require("lazy").setup({
 			shell = vim.o.shell,
 		},
 		config = true,
-	},
-	-- NOTE: format for days
-	{
-		"jose-elias-alvarez/null-ls.nvim",
-		event = { "BufReadPre", "BufNewFile" },
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"jayp0521/mason-null-ls.nvim",
-			"mason.nvim",
-		},
-		opts = function()
-			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins
-			local f = require("null-ls").builtins.formatting
-			local d = require("null-ls").builtins.diagnostics
-			return {
-				debug = true,
-				-- NOTE: add neoconf.json to root pattern
-				root_dir = require("null-ls.utils").root_pattern(
-					".null-ls-root",
-					".neoconf.json",
-					"Makefile",
-					".git",
-					"pyproject.toml"
-				),
-				sources = {
-					f.shfmt.with { extra_args = { "-i", 4, "-ci", "-sr" } },
-					f.stylua,
-					f.jq,
-
-					-- NOTE: diagnostics
-					d.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
-					d.selene,
-					d.ruff,
-				},
-			}
-		end,
-		config = function(_, opts)
-			local null_ls = require "null-ls"
-			null_ls.setup(opts)
-			require("mason-null-ls").setup {
-				ensure_installed = nil,
-				automatic_installation = false,
-				handlers = {},
-			}
-
-			-- Setup usercmd to register/deregister available source(s)
-			local _gen_completion = function()
-				local sources_cont = null_ls.get_source {
-					filetype = vim.api.nvim_get_option_value("filetype", { scope = "local" }),
-				}
-				local completion_items = {}
-				for _, server in pairs(sources_cont) do
-					table.insert(completion_items, server.name)
-				end
-				return completion_items
-			end
-
-			local toggle_command = function(args)
-				if vim.tbl_contains(_gen_completion(), args.args) then
-					null_ls.toggle { name = opts.args }
-				else
-					vim.notify(
-						string.format(
-							"[Null-ls] Unable to find any registered source named [%s].",
-							opts.args
-						),
-						vim.log.levels.ERROR,
-						{ title = "Null-ls Internal Error" }
-					)
-				end
-			end
-			vim.api.nvim_create_user_command("NullLsToggle", toggle_command, {
-				nargs = 1,
-				complete = _gen_completion,
-			})
-		end,
 	},
 	-- NOTE: nice winbar
 	{
