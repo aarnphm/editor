@@ -971,7 +971,7 @@ require("lazy").setup({
   {
     "Bekaboo/dropbar.nvim",
     config = true,
-    enabled = false,
+    enabled = vim.fn.has("nvim-0.10") == 1,
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       icons = {
@@ -986,6 +986,7 @@ require("lazy").setup({
   {
     "utilyre/barbecue.nvim",
     event = "BufReadPost",
+    enabled = vim.fn.has("nvim-0.9") == 1,
     version = "*",
     dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
     opts = {
