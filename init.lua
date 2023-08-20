@@ -1071,7 +1071,7 @@ require("lazy").setup({
         config = true,
         dependencies = { "nvim-lspconfig" },
       },
-      { "folke/neodev.nvim",  config = true,                    ft = "lua" },
+      { "folke/neodev.nvim",  config = true, ft = "lua" },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
       {
         "simrat39/rust-tools.nvim",
@@ -1145,6 +1145,27 @@ require("lazy").setup({
           server = {
             single_file_support = true,
             filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+            capabilities = {
+              offsetEncoding = { "utf-8" },
+              textDocument = {
+                completion = {
+                  completionItem = {
+                    commitCharactersSupport = true,
+                    deprecatedSupport = true,
+                    insertReplaceSupport = true,
+                    labelDetailsSupport = true,
+                    preselectSupport = true,
+                    resolveSupport = {
+                      properties = { "documentation", "detail", "additionalTextEdits" }
+                    },
+                    snippetSupport = false,
+                    tagSupport = {
+                      valueSet = { 1 }
+                    }
+                  }
+                }
+              }
+            },
           },
         },
         config = function(_, opts)
@@ -1152,8 +1173,6 @@ require("lazy").setup({
           local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
           local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(),
             has_cmp and cmp_nvim_lsp.default_capabilities() or {}, opts.server.capabilities or {})
-
-          capabilities.offsetEncoding = { "utf-16", "utf-8" }
 
           local switch_source_header_splitcmd = function(bufnr, splitcmd)
             bufnr = lspconfig.util.validate_bufnr(bufnr)
@@ -1238,7 +1257,6 @@ require("lazy").setup({
           require("clangd_extensions").setup(opts)
         end,
       },
-      ---@diagnostic disable-next-line: assign-type-mismatch
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
