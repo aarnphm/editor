@@ -106,13 +106,6 @@ if vim.g.vscode then return end
 local augroup_name = function(name) return "simple_" .. name end
 local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
 
--- auto place to last edit
-autocmd("BufReadPost",
-  {
-    group = augroup "last_edit",
-    pattern = "*",
-    command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g'\"" | endif]]
-  })
 -- close some filetypes with <q>
 autocmd("FileType", {
   group = augroup "filetype",
@@ -149,18 +142,6 @@ autocmd("TermOpen", {
     api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
     api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
     api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
-  end,
-})
--- Force write shada on leaving nvim
-autocmd("VimLeave", {
-  group = augroup "write_shada",
-  pattern = "*",
-  callback = function(_)
-    if vim.fn.has "nvim" == 1 then
-      api.nvim_command [[wshada]]
-    else
-      api.nvim_command [[wviminfo!]]
-    end
   end,
 })
 -- Check if we need to reload the file when it changed
@@ -990,6 +971,7 @@ require("lazy").setup({
   {
     "Bekaboo/dropbar.nvim",
     config = true,
+    enabled = false,
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       icons = {
@@ -1000,6 +982,47 @@ require("lazy").setup({
         },
       },
     },
+  },
+  {
+    "utilyre/barbecue.nvim",
+    event = "BufReadPost",
+    version = "*",
+    dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
+    opts = {
+      attach_navic = false, -- handled via on_attach hooks
+      exclude_filetypes = {
+        "toggleterm",
+        "Scratch",
+        "Trouble",
+        "gitrebase",
+        "gitcommit",
+        "gitconfig",
+        "gitignore",
+      },
+      symbols = { separator = icons.ui.Separator },
+      create_autocmd = false,
+      show_modified = true,
+    },
+    init = function()
+      autocmd({
+        "BufWinEnter",
+        "CursorHold",
+        "InsertLeave",
+        -- include these if you have set `show_modified` to `true`
+        "BufWritePost",
+        "TextChanged",
+        "TextChangedI",
+      }, {
+        group = augroup "barbecue",
+        callback = function(_) require("barbecue.ui").update() end,
+      })
+    end,
+  },
+  {
+    "stevearc/aerial.nvim",
+    cmd = "AerialToggle",
+    config = true,
+    opts = { close_automatic_events = { "unsupported" } },
   },
   -- NOTE: lspconfig
   {

@@ -33,6 +33,9 @@ M.setup = function(_, opts)
   end
 
   utils.on_attach(function(client, bufnr)
+    if client.server_capabilities["documentSymbolProvider"] then
+      require("nvim-navic").attach(client, bufnr)
+    end
     if client.supports_method "textDocument/publishDiagnostics" then
       vim.lsp.handlers["textDocument/publishDiagnostics"] =
           vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -41,13 +44,6 @@ M.setup = function(_, opts)
             virtual_text = false,
             update_in_insert = true,
           })
-    end
-  end)
-
-  utils.on_attach(function(client, bufnr)
-    if client.name == "ruff_lsp" then
-      -- Disable hover in favor of Pyright
-      client.server_capabilities.hoverProvider = false
     end
   end)
 
