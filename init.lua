@@ -1674,7 +1674,7 @@ require("lazy").setup({
     config = function(_, opts)
       -- stylua: ignore
       -- NOTE: this is for my garden, you can remove this
-      opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
+      -- opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
       opts.note_frontmatter_func = function(note)
         local out = { id = note.id, tags = note.tags }
         -- `note.metadata` contains any manually added fields in the frontmatter.
