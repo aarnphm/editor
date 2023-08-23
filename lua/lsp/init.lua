@@ -95,8 +95,9 @@ M.setup = function(_, opts)
       if opts.setup[server](lspconfig, server_opts) then return end
     elseif opts.setup["*"] then
       if opts.setup["*"](lspconfig, server_opts) then return end
+    else
+      lspconfig[server].setup(server_opts)
     end
-    lspconfig[server].setup(server_opts)
   end
 
   local have_mason, mason_lspconfig = pcall(require, "mason-lspconfig")
@@ -123,9 +124,7 @@ M.setup = function(_, opts)
     end
   end
 
-  if have_mason then
-    mason_lspconfig.setup { ensure_installed = ensure_installed, handlers = { mason_handler } }
-  end
+  if have_mason then mason_lspconfig.setup { ensure_installed = ensure_installed, handlers = { mason_handler } } end
 end
 
 return M

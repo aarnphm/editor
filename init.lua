@@ -1076,23 +1076,20 @@ require("lazy").setup({
       {
         "simrat39/rust-tools.nvim",
         ft = "rust",
-        dependencies = { "neovim/nvim-lspconfig" },
+        dependencies = { "nvim-lua/plenary.nvim" },
         lazy = true,
         opts = {
           tools = {
+            -- automatically call RustReloadWorkspace when writing to a Cargo.toml file.
+            reload_workspace_from_cargo_toml = true,
             inlay_hints = {
-              auto = false,
+              auto = true,
               other_hints_prefix = ":: ",
               only_current_line = true,
               show_parameter_hints = false,
             },
           },
           server = {
-            on_attach = function(_, bufnr)
-              vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
-              vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-              vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
-            end,
             standalone = true,
             settings = {
               ["rust-analyzer"] = {
@@ -1257,7 +1254,7 @@ require("lazy").setup({
           require("clangd_extensions").setup(opts)
         end,
       },
-      { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
+      { "b0o/SchemaStore.nvim", version = false,                  ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
     opts = {
