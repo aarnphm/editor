@@ -5,10 +5,11 @@ _G.P = function(v)
 end
 
 local api, wo, o, g, autocmd = vim.api, vim.wo, vim.o, vim.g, vim.api.nvim_create_autocmd
+-- NOTE: augroup la autocmd setup
+local augroup_name = function(name) return "simple_" .. name end
+local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
 
-vim.filetype.add({
-  extensions = { mdx = 'mdx' }
-})
+vim.treesitter.language.register('mdx', 'markdown')
 
 local icons = require "icons"
 local utils = require "utils"
@@ -105,10 +106,6 @@ map("t", "<C-t>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle vertica
 
 -- NOTE: compatible block with vscode
 if vim.g.vscode then return end
-
--- NOTE: augroup la autocmd setup
-local augroup_name = function(name) return "simple_" .. name end
-local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
 
 -- close some filetypes with <q>
 autocmd("FileType", {
@@ -361,7 +358,6 @@ require("lazy").setup({
         end, opts.ensure_installed)
       end
       require("nvim-treesitter.configs").setup(opts)
-      vim.treesitter.language.register('mdx', 'markdown')
       if load_textobjects then
         -- PERF: no need to load the plugin, if we only need its queries for mini.ai
         if opts.textobjects then
@@ -1701,30 +1697,6 @@ require("lazy").setup({
   concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
   checker = { enable = true },
   ui = { border = "none" },
-  performance = {
-    rtp = {
-      disabled_plugins = {
-        "2html_plugin",
-        "getscript",
-        "getscriptPlugin",
-        "gzip",
-        "netrw",
-        "netrwPlugin",
-        "netrwSettings",
-        "netrwFileHandlers",
-        "matchit",
-        "matchparen",
-        "tar",
-        "tarPlugin",
-        "tohtml",
-        "spellfile_plugin",
-        "vimball",
-        "vimballPlugin",
-        "zip",
-        "zipPlugin",
-      },
-    },
-  },
 })
 
 vim.o.background = background
