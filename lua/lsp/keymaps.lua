@@ -14,23 +14,23 @@ M.get = function()
   if not M._keys then
     --@class PluginLspKeys
     M._keys = {
-      { "<leader>d", vim.diagnostic.open_float,           desc = "lsp: show line diagnostics" },
-      { "<leader>i", "<cmd>LspInfo<cr>",                  desc = "lsp: info" },
-      { "gh",        vim.show_pos,                        desc = "lsp: current position" },
-      { "gR",        "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
-      { "gD",        vim.lsp.buf.declaration,             desc = "lsp: Goto declaration" },
-      { "]d",        M.diagnostic_goto(true),             desc = "lsp: Next diagnostic" },
-      { "[d",        M.diagnostic_goto(false),            desc = "lsp: Prev diagnostic" },
-      { "]e",        M.diagnostic_goto(true, "ERROR"),    desc = "lsp: Next error" },
-      { "[e",        M.diagnostic_goto(false, "ERROR"),   desc = "lsp: Prev error" },
-      { "]w",        M.diagnostic_goto(true, "WARN"),     desc = "lsp: Next warning" },
-      { "[w",        M.diagnostic_goto(false, "WARN"),    desc = "lsp: Prev warning" },
-      { "K",         vim.lsp.buf.hover,                   desc = "Hover" },
-      { "gd",               "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition",   has = "definition" },
-      { "<leader><leader>", format,                        desc = "lsp: Format document",   has = "documentFormatting" },
-      { "gr",               vim.lsp.buf.rename,            desc = "lsp: rename",            has = "rename" },
-      { "ds",               vim.lsp.buf.document_symbol,   desc = "lsp: document symbols",  has = "documentSymbol" },
-      { "<localleader>ws",  vim.lsp.buf.workspace_symbol,  desc = "lsp: workspace symbols", has = "workspaceSymbol" },
+      { "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
+      { "<leader>i", "<cmd>LspInfo<cr>", desc = "lsp: info" },
+      { "gh", vim.show_pos, desc = "lsp: current position" },
+      { "gR", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
+      { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
+      { "]d", M.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
+      { "[d", M.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
+      { "]e", M.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
+      { "[e", M.diagnostic_goto(false, "ERROR"), desc = "lsp: Prev error" },
+      { "]w", M.diagnostic_goto(true, "WARN"), desc = "lsp: Next warning" },
+      { "[w", M.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
+      { "K", vim.lsp.buf.hover, desc = "Hover" },
+      { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
+      { "<leader><leader>", format, desc = "lsp: Format document", has = "documentFormatting" },
+      { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
+      { "ds", vim.lsp.buf.document_symbol, desc = "lsp: document symbols", has = "documentSymbol" },
+      { "<localleader>ws", vim.lsp.buf.workspace_symbol, desc = "lsp: workspace symbols", has = "workspaceSymbol" },
       { "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: Code action", mode = { "n", "v" }, has = "codeAction" },
       { "<leader><leader>", format, desc = "lsp: Format range", mode = "v", has = "documentRangeFormatting" },
     }
@@ -91,12 +91,7 @@ M.on_attach = function(client, bufnr)
   end
 
   -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(
-    bufnr,
-    "Format",
-    function(_) require("lsp.format").format { force = true } end,
-    { desc = "format: current buffer (alt for <Leader><Leader>)" }
-  )
+  vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_) require("lsp.format").format { force = true } end, { desc = "format: current buffer (alt for <Leader><Leader>)" })
 end
 
 return M

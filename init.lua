@@ -10,6 +10,12 @@ local augroup_name = function(name) return "simple_" .. name end
 local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
 
 vim.treesitter.language.register('mdx', 'markdown')
+autocmd({ "BufNewFile", "BufRead", "FileType" },
+{
+  group = augroup "mdx",
+  pattern = { "*.mdx" },
+  command = "setlocal filetype=jsx"
+})
 
 local icons = require "icons"
 local utils = require "utils"

@@ -57,10 +57,7 @@ M.get_root = function()
   if path then
     for _, client in pairs(vim.lsp.get_active_clients { bufnr = 0 }) do
       local workspace = client.config.workspace_folders
-      local paths = workspace
-          and vim.tbl_map(function(ws) return vim.uri_to_fname(ws.uri) end, workspace)
-          or client.config.root_dir and { client.config.root_dir }
-          or {}
+      local paths = workspace and vim.tbl_map(function(ws) return vim.uri_to_fname(ws.uri) end, workspace) or client.config.root_dir and { client.config.root_dir } or {}
       for _, p in ipairs(paths) do
         local r = vim.loop.fs_realpath(p)
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -103,15 +100,7 @@ M.telescope = function(builtin, opts)
         map("i", "<a-c>", function()
           local action_state = require "telescope.actions.state"
           local line = action_state.get_current_line()
-          M.telescope(
-            params.builtin,
-            vim.tbl_deep_extend(
-              "force",
-              {},
-              params.opts or {},
-              { cwd = false, default_text = line }
-            )
-          )()
+          M.telescope(params.builtin, vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line }))()
         end)
         return true
       end
@@ -126,12 +115,11 @@ local fmt = string.format
 
 -- NOTE: git
 local concat_hunks = function(hunks)
-  return vim.tbl_isempty(hunks) and ""
-      or table.concat({
-        fmt("+%d", hunks[1]),
-        fmt("~%d", hunks[2]),
-        fmt("-%d", hunks[3]),
-      }, " ")
+  return vim.tbl_isempty(hunks) and "" or table.concat({
+    fmt("+%d", hunks[1]),
+    fmt("~%d", hunks[2]),
+    fmt("-%d", hunks[3]),
+  }, " ")
 end
 
 local get_hunks = function()
@@ -171,13 +159,7 @@ M.statusline = {
   end,
   diagnostic = function() -- NOTE: diagnostic
     local buf = vim.api.nvim_get_current_buf()
-    return vim.diagnostic.get(buf)
-        and fmt(
-          "[W:%d | E:%d]",
-          #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
-          #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
-        )
-        or ""
+    return vim.diagnostic.get(buf) and fmt("[W:%d | E:%d]", #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }), #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })) or ""
   end,
   build = function()
     local spacer = "%="

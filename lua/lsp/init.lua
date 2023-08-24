@@ -26,24 +26,19 @@ M.setup = function(_, opts)
 
   local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
 
-  if opts.inlay_hints.enabled and inlay_hint then
-    utils.on_attach(function(client, bufnr)
-      if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
-    end)
-  end
+  if opts.inlay_hints.enabled and inlay_hint then utils.on_attach(function(client, bufnr)
+    if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
+  end) end
 
   utils.on_attach(function(client, bufnr)
-    if client.server_capabilities["documentSymbolProvider"] then
-      require("nvim-navic").attach(client, bufnr)
-    end
+    if client.server_capabilities["documentSymbolProvider"] then require("nvim-navic").attach(client, bufnr) end
     if client.supports_method "textDocument/publishDiagnostics" then
-      vim.lsp.handlers["textDocument/publishDiagnostics"] =
-          vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-            signs = true,
-            underline = true,
-            virtual_text = false,
-            update_in_insert = true,
-          })
+      vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+        signs = true,
+        underline = true,
+        virtual_text = false,
+        update_in_insert = true,
+      })
     end
   end)
 
@@ -67,9 +62,7 @@ M.setup = function(_, opts)
       close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
       focusable = false,
       focus = false,
-      format = function(diagnostic)
-        return string.format("%s (%s)", diagnostic.message, diagnostic.source)
-      end,
+      format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
       source = "if_many",
       border = "none",
     },
@@ -77,13 +70,7 @@ M.setup = function(_, opts)
 
   local servers = opts.servers
   local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-  local capabilities = vim.tbl_deep_extend(
-    "force",
-    {},
-    vim.lsp.protocol.make_client_capabilities(),
-    has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-    opts.capabilities or {}
-  )
+  local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), has_cmp and cmp_nvim_lsp.default_capabilities() or {}, opts.capabilities or {})
 
   local mason_handler = function(server)
     local server_opts = vim.tbl_deep_extend("force", {
@@ -102,9 +89,7 @@ M.setup = function(_, opts)
 
   local have_mason, mason_lspconfig = pcall(require, "mason-lspconfig")
   local available = {}
-  if have_mason then
-    available = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
-  end
+  if have_mason then available = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
 
   local ensure_installed = {} ---@type string[]
   for server, server_opts in pairs(servers) do
