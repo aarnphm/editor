@@ -6,6 +6,10 @@ end
 
 local api, wo, o, g, autocmd = vim.api, vim.wo, vim.o, vim.g, vim.api.nvim_create_autocmd
 
+vim.filetype.add({
+  extensions = { mdx = 'mdx' }
+})
+
 local icons = require "icons"
 local utils = require "utils"
 local TAB_WIDTH = 2
@@ -357,7 +361,7 @@ require("lazy").setup({
         end, opts.ensure_installed)
       end
       require("nvim-treesitter.configs").setup(opts)
-
+      vim.treesitter.language.register('mdx', 'markdown')
       if load_textobjects then
         -- PERF: no need to load the plugin, if we only need its queries for mini.ai
         if opts.textobjects then
@@ -1071,7 +1075,7 @@ require("lazy").setup({
         config = true,
         dependencies = { "nvim-lspconfig" },
       },
-      { "folke/neodev.nvim",  config = true, ft = "lua" },
+      { "folke/neodev.nvim",  config = true,                    ft = "lua" },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
       {
         "simrat39/rust-tools.nvim",
@@ -1254,7 +1258,7 @@ require("lazy").setup({
           require("clangd_extensions").setup(opts)
         end,
       },
-      { "b0o/SchemaStore.nvim", version = false,                  ft = { "json", "yaml", "yml" } },
+      { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
     opts = {
@@ -1434,7 +1438,7 @@ require("lazy").setup({
     cmd = "Mason",
     build = ":MasonUpdate",
     keys = { { "<leader>m", "<cmd>Mason<cr>", desc = "Mason" } },
-    opts = { ensure_installed = { "lua-language-server", "pyright", "mypy" } },
+    opts = { ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" } },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)
       require("mason").setup(opts)
