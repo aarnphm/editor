@@ -11,11 +11,11 @@ local augroup = function(name) return api.nvim_create_augroup(augroup_name(name)
 
 vim.treesitter.language.register('mdx', 'markdown')
 autocmd({ "BufNewFile", "BufRead", "FileType" },
-{
-  group = augroup "mdx",
-  pattern = { "*.mdx" },
-  command = "setlocal filetype=jsx"
-})
+  {
+    group = augroup "mdx",
+    pattern = { "*.mdx" },
+    command = "setlocal filetype=jsx"
+  })
 
 local icons = require "icons"
 local utils = require "utils"
@@ -653,53 +653,10 @@ require("lazy").setup({
           "pdm.lock",
           "__pycache__",
         },
-        mappings = {
-          i = {
-            ["<C-a>"] = { "<esc>0i", type = "command" },
-            ["<Esc>"] = function(...) return require("telescope.actions").close(...) end,
-            ["<c-t>"] = function(...) return require("trouble.providers.telescope").open_with_trouble(...) end,
-            ["<a-t>"] = function(...) return require("trouble.providers.telescope").open_selected_with_trouble(...) end,
-            ["<a-i>"] = function()
-              local action_state = require "telescope.actions.state"
-              local line = action_state.get_current_line()
-              utils.telescope("find_files", { no_ignore = true, default_text = line })()
-            end,
-            ["<a-h>"] = function()
-              local action_state = require "telescope.actions.state"
-              local line = action_state.get_current_line()
-              utils.telescope("find_files", { hidden = true, default_text = line })()
-            end,
-            ["<C-Down>"] = function(...) return require("telescope.actions").cycle_history_next(...) end,
-            ["<C-Up>"] = function(...) return require("telescope.actions").cycle_history_prev(...) end,
-            ["<C-f>"] = function(...) return require("telescope.actions").preview_scrolling_down(...) end,
-            ["<C-b>"] = function(...) return require("telescope.actions").preview_scrolling_up(...) end,
-          },
-          n = { ["q"] = function(...) return require("telescope.actions").close(...) end },
-        },
         layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
         selection_strategy = "reset",
         sorting_strategy = "ascending",
         color_devicons = true,
-      },
-      extensions = {
-        live_grep_args = {
-          auto_quoting = false,
-          mappings = {
-            i = {
-              ["<C-k>"] = function(...) return require("telescope-live-grep-args.actions").quote_prompt() end,
-              ["<C-i>"] = function(...)
-                return require("telescope-live-grep-args.actions").quote_prompt {
-                  postfix = " --iglob ",
-                }
-              end,
-              ["<C-j>"] = function(...)
-                return require("telescope-live-grep-args.actions").quote_prompt {
-                  postfix = " -t ",
-                }
-              end,
-            },
-          },
-        },
       },
       fzf = {
         fuzzy = false,                  -- false will only do exact matching
@@ -724,6 +681,42 @@ require("lazy").setup({
       },
     },
     config = function(_, opts)
+      opts.defaults.mappings = {
+        i = {
+          ["<C-a>"] = { "<esc>0i", type = "command" },
+          ["<Esc>"] = function(...) return require("telescope.actions").close(...) end,
+          ["<c-t>"] = function(...) return require("trouble.providers.telescope").open_with_trouble(...) end,
+          ["<a-t>"] = function(...) return require("trouble.providers.telescope").open_selected_with_trouble(...) end,
+          ["<a-i>"] = function()
+            local action_state = require "telescope.actions.state"
+            local line = action_state.get_current_line()
+            utils.telescope("find_files", { no_ignore = true, default_text = line })()
+          end,
+          ["<a-h>"] = function()
+            local action_state = require "telescope.actions.state"
+            local line = action_state.get_current_line()
+            utils.telescope("find_files", { hidden = true, default_text = line })()
+          end,
+          ["<C-Down>"] = function(...) return require("telescope.actions").cycle_history_next(...) end,
+          ["<C-Up>"] = function(...) return require("telescope.actions").cycle_history_prev(...) end,
+          ["<C-f>"] = function(...) return require("telescope.actions").preview_scrolling_down(...) end,
+          ["<C-b>"] = function(...) return require("telescope.actions").preview_scrolling_up(...) end,
+        },
+        n = { ["q"] = function(...) return require("telescope.actions").close(...) end },
+      }
+      opts.extensions = {
+        live_grep_args = {
+          auto_quoting = false,
+          mappings = {
+            i = {
+              ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
+              ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " --iglob " },
+              ["<C-j>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " -t " }
+            },
+          },
+        },
+      }
+
       require("telescope").setup(opts)
       require("telescope").load_extension "live_grep_args"
     end,
