@@ -873,6 +873,7 @@ require("lazy").setup({
 					},
 				},
 			},
+      taplo = {},
 			---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
 			setup = {},
 		},
