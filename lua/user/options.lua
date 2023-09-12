@@ -17,7 +17,7 @@ local M = {
 	colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME
 		or "rose-pine",
 	-- NOTE: dark or light go brr
-	background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark",
+	background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light",
 }
 
 if vim.loop.os_uname().sysname == "Darwin" then
