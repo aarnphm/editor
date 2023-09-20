@@ -46,7 +46,7 @@ o.updatetime = 200
 o.statusline = utils.statusline.build()
 
 g.mapleader = " "
-g.maplocalleader = "+"
+g.maplocalleader = ","
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
