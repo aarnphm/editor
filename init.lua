@@ -1516,5 +1516,6 @@ require("lazy").setup({
 
 vim.o.background = background
 vim.cmd.colorscheme(colorscheme)
+-- NOTE: this should only be run on Terminal.app
 require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
 vim.opt.termguicolors = false
