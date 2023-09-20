@@ -4,18 +4,16 @@ _G.P = function(v)
   return v
 end
 
+-- NOTE: Keymaps that are useful, use it and never come back.
+local map = function(mode, lhs, rhs, opts)
+  opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
+
 local api, wo, o, g, autocmd = vim.api, vim.wo, vim.o, vim.g, vim.api.nvim_create_autocmd
 -- NOTE: augroup la autocmd setup
 local augroup_name = function(name) return "simple_" .. name end
 local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
-
-vim.treesitter.language.register('mdx', 'markdown')
-autocmd({ "BufNewFile", "BufRead", "FileType" },
-  {
-    group = augroup "mdx",
-    pattern = { "*.mdx" },
-    command = "setlocal filetype=jsx"
-  })
 
 local icons = require "icons"
 local utils = require "utils"
@@ -35,7 +33,6 @@ o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better d
 o.copyindent = true
 o.splitright = true
 vim.opt.smartcase = true
--- o.shortmess = "aoOTIcF"  -- eh if I'm a pain then uncomment this
 vim.opt.completeopt = { "menuone", "noselect" }
 o.grepprg = "rg --vimgrep"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
@@ -43,7 +40,6 @@ o.tabstop = TAB_WIDTH
 o.shiftwidth = TAB_WIDTH
 o.softtabstop = TAB_WIDTH
 o.expandtab = true
-o.copyindent = true
 o.signcolumn = "yes"
 o.timeoutlen = 200
 o.updatetime = 200
@@ -54,15 +50,8 @@ g.maplocalleader = "+"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
--- NOTE: Keymaps that are useful, use it and never come back.
-local function map(mode, lhs, rhs, opts)
-  opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
-  vim.keymap.set(mode, lhs, rhs, opts)
-end
 -- NOTE: normal mode
-map("n", "<S-Tab>", "<cmd>normal za<cr>", {
-  desc = "edit: Toggle code fold",
-})
+map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
 map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
 map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
 map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
@@ -102,13 +91,6 @@ map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", 10),
   { noremap = false, desc = "windows: resize up 10px" })
 map("n", "<LocalLeader>f", require("lsp.format").toggle, { desc = "lsp: Toggle formatter" })
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
-map("n", "<C-\\>", "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>",
-  { desc = "terminal: Toggle horizontal" })
-map("i", "<C-\\>", "<Esc><cmd>ToggleTerm direction=horizontal<cr>", { desc = "terminal: Toggle horizontal" })
-map("t", "<C-\\>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle horizontal" })
-map("n", "<C-t>", "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>", { desc = "terminal: Toggle vertical" })
-map("i", "<C-t>", "<Esc><cmd>ToggleTerm direction=vertical<cr>", { desc = "terminal: Toggle vertical" })
-map("t", "<C-t>", "<Esc><cmd>ToggleTerm<cr>", { desc = "terminal: Toggle vertical" })
 
 -- NOTE: compatible block with vscode
 if vim.g.vscode then return end
@@ -139,18 +121,6 @@ autocmd("FileType", {
     vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
   end,
 })
--- Makes switching between buffer and termmode feels like normal mode
-autocmd("TermOpen", {
-  group = augroup "term",
-  pattern = "term://*",
-  callback = function(_)
-    local opts = { noremap = true, silent = true }
-    api.nvim_buf_set_keymap(0, "t", "<C-h>", [[<C-\><C-n><C-W>h]], opts)
-    api.nvim_buf_set_keymap(0, "t", "<C-j>", [[<C-\><C-n><C-W>j]], opts)
-    api.nvim_buf_set_keymap(0, "t", "<C-k>", [[<C-\><C-n><C-W>k]], opts)
-    api.nvim_buf_set_keymap(0, "t", "<C-l>", [[<C-\><C-n><C-W>l]], opts)
-  end,
-})
 -- Check if we need to reload the file when it changed
 autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup "checktime",
@@ -172,17 +142,6 @@ autocmd({ "BufNewFile", "BufRead", "FileType" },
     pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
     command = "setlocal filetype=dockerfile"
   })
--- Set mapping for switching header and source file
-autocmd("FileType", {
-  group = augroup "cpp",
-  pattern = "c,cpp",
-  callback = function(event)
-    api.nvim_buf_set_keymap(event.buf, "n", "<Leader><Leader>h", ":ClangdSwitchSourceHeaderVSplit<CR>",
-      { noremap = true })
-    api.nvim_buf_set_keymap(event.buf, "n", "<Leader><Leader>v", ":ClangdSwitchSourceHeaderSplit<CR>", { noremap = true })
-    api.nvim_buf_set_keymap(event.buf, "n", "<Leader><Leader>oh", ":ClangdSwitchSourceHeader<CR>", { noremap = true })
-  end,
-})
 -- Highlight on yank
 autocmd("TextYankPost", {
   group = augroup "highlight_yank",
@@ -224,7 +183,6 @@ require("lazy").setup({
   "nvim-lua/plenary.nvim",
   "jghauser/mkdir.nvim",
   "nvim-tree/nvim-web-devicons",
-  { "dstein64/vim-startuptime", cmd = "StartupTime" },
   {
     "stevearc/dressing.nvim",
     opts = {
@@ -389,8 +347,10 @@ require("lazy").setup({
     config = true,
   },
   -- NOTE: mini libraries of deps because it is light and easy to use.
+  { 'echasnovski/mini.colors',  version = false },
   {
     "echasnovski/mini.bufremove",
+    version = false,
     keys = {
       { "<C-x>", function() require("mini.bufremove").delete(0, false) end, desc = "buf: delete" },
       { "<C-q>", function() require("mini.bufremove").delete(0, true) end,  desc = "buf: force delete" },
@@ -461,7 +421,7 @@ require("lazy").setup({
       end)
     end,
   },
-  { "echasnovski/mini.align",   event = "VeryLazy" },
+  { "echasnovski/mini.align", event = "VeryLazy" },
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
@@ -496,7 +456,7 @@ require("lazy").setup({
       },
     },
   },
-  { "echasnovski/mini.pairs", event = "VeryLazy",    opts = {} },
+  { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
@@ -561,7 +521,7 @@ require("lazy").setup({
     config = true,
   },
   -- NOTE: folke is neovim's tpope
-  { "folke/paint.nvim",       event = "BufReadPost", config = true },
+  { "folke/paint.nvim", event = "BufReadPost", config = true },
   {
     "folke/trouble.nvim",
     cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -934,38 +894,6 @@ require("lazy").setup({
       },
     },
   },
-  -- NOTE: terminal-in-terminal PacMan (also we only really need this with LspAttach)
-  {
-    "akinsho/toggleterm.nvim",
-    cmd = "ToggleTerm",
-    ---@diagnostic disable-next-line: assign-type-mismatch
-    module = true,
-    opts = {
-      -- size can be a number or function which is passed the current terminal
-      size = function(term)
-        local factor = 0.3
-        if term.direction == "horizontal" then
-          return vim.o.lines * factor
-        elseif term.direction == "vertical" then
-          return vim.o.columns * factor
-        end
-      end,
-      on_open = function(_)
-        vim.cmd "startinsert!"
-        vim.opt_local.statusline = '%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
-      end,
-      highlights = {
-        Normal = { link = "Normal" },
-        NormalFloat = { link = "NormalFloat" },
-        FloatBorder = { link = "FloatBorder" },
-      },
-      open_mapping = false, -- default mapping
-      shade_terminals = false,
-      direction = "vertical",
-      shell = vim.o.shell,
-    },
-    config = true,
-  },
   -- NOTE: nice winbar
   {
     "Bekaboo/dropbar.nvim",
@@ -982,48 +910,6 @@ require("lazy").setup({
       },
     },
   },
-  {
-    "utilyre/barbecue.nvim",
-    event = "BufReadPost",
-    enabled = vim.fn.has("nvim-0.9") == 1,
-    version = "*",
-    dependencies = { "SmiteshP/nvim-navic", "nvim-tree/nvim-web-devicons" },
-    opts = {
-      attach_navic = false, -- handled via on_attach hooks
-      exclude_filetypes = {
-        "toggleterm",
-        "Scratch",
-        "Trouble",
-        "gitrebase",
-        "gitcommit",
-        "gitconfig",
-        "gitignore",
-      },
-      symbols = { separator = icons.ui.Separator },
-      create_autocmd = false,
-      show_modified = true,
-    },
-    init = function()
-      autocmd({
-        "BufWinEnter",
-        "CursorHold",
-        "InsertLeave",
-        -- include these if you have set `show_modified` to `true`
-        "BufWritePost",
-        "TextChanged",
-        "TextChangedI",
-      }, {
-        group = augroup "barbecue",
-        callback = function(_) require("barbecue.ui").update() end,
-      })
-    end,
-  },
-  {
-    "stevearc/aerial.nvim",
-    cmd = "AerialToggle",
-    config = true,
-    opts = { close_automatic_events = { "unsupported" } },
-  },
   -- NOTE: lspconfig
   {
     "neovim/nvim-lspconfig",
@@ -1037,7 +923,7 @@ require("lazy").setup({
         lazy = true,
         config = true,
         opts = {
-          border = { enable = false },
+          border = { enable = true },
           height = 20,
           zindex = 50,
           preview_win_opts = {
@@ -1049,18 +935,6 @@ require("lazy").setup({
             position = "right",
             width = 0.33, -- 33% width relative to the active window, min 0.1, max 0.5
           },
-          hooks = {
-            before_open = function(results, open, _, method)
-              if #results == 0 then
-                vim.notify("This method is not supported by any of the servers registered for the current buffer",
-                  vim.log.levels.WARN, { title = "Glance" })
-              elseif #results == 1 and method == "references" then
-                vim.notify("The identifier under cursor is the only one found", vim.log.levels.INFO, { title = "Glance" })
-              else
-                open(results)
-              end
-            end,
-          },
         },
       },
       "hrsh7th/cmp-nvim-lsp",
@@ -1070,7 +944,7 @@ require("lazy").setup({
         config = true,
         dependencies = { "nvim-lspconfig" },
       },
-      { "folke/neodev.nvim",  config = true,                    ft = "lua" },
+      { "folke/neodev.nvim",  config = true, ft = "lua" },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
       {
         "simrat39/rust-tools.nvim",
@@ -1631,72 +1505,16 @@ require("lazy").setup({
       cmp.setup(opts)
     end,
   },
-  -- NOTE: obsidian integration with garden
-  {
-    "epwalsh/obsidian.nvim",
-    ft = "markdown",
-    cmd = {
-      "ObsidianBacklinks",
-      "ObsidianFollowLink",
-      "ObsidianSearch",
-      "ObsidianOpen",
-      "ObsidianLink",
-    },
-    keys = {
-      {
-        "<Leader>gf",
-        function()
-          if require("obsidian").utils.cursor_on_markdown_link() then pcall(vim.cmd.ObsidianFollowLink) end
-        end,
-        desc = "obsidian: follow link",
-      },
-      {
-        "<LocalLeader>obl",
-        "<cmd>ObsidianBacklinks<cr>",
-        desc = "obsidian: go backlinks",
-      },
-      {
-        "<LocalLeader>on",
-        "<cmd>ObsidianNew<cr>",
-        desc = "obsidian: new notes",
-      },
-      {
-        "<LocalLeader>op",
-        "<cmd>ObsidianOpen<cr>",
-        desc = "obsidian: open",
-      },
-    },
-    opts = {
-      use_advanced_uri = true,
-      completion = { nvim_cmp = true },
-    },
-    config = function(_, opts)
-      -- stylua: ignore
-      -- NOTE: this is for my garden, you can remove this
-      -- opts.dir = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/garden/content/" or vim.fn.getcwd()
-      opts.note_frontmatter_func = function(note)
-        local out = { id = note.id, tags = note.tags }
-        -- `note.metadata` contains any manually added fields in the frontmatter.
-        -- So here we just make sure those fields are kept in the frontmatter.
-        if note.metadata ~= nil and require("obsidian").util.table_length(note.metadata) > 0 then
-          for key, value in pairs(note.metadata) do
-            out[key] = value
-          end
-        end
-        return out
-      end
-
-      require("obsidian").setup(opts)
-    end,
-  },
 }, {
   install = { colorscheme = { colorscheme } },
   defaults = { lazy = true },
   change_detection = { notify = false },
   concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
   checker = { enable = true },
-  ui = { border = "none" },
+  ui = { border = "single" },
 })
 
 vim.o.background = background
 vim.cmd.colorscheme(colorscheme)
+require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
+vim.opt.termguicolors = false

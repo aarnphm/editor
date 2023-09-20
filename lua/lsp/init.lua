@@ -31,7 +31,7 @@ M.setup = function(_, opts)
   end) end
 
   utils.on_attach(function(client, bufnr)
-    if client.server_capabilities["documentSymbolProvider"] then require("nvim-navic").attach(client, bufnr) end
+    -- if client.server_capabilities["documentSymbolProvider"] then require("nvim-navic").attach(client, bufnr) end
     if client.supports_method "textDocument/publishDiagnostics" then
       vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
         signs = true,
@@ -64,7 +64,7 @@ M.setup = function(_, opts)
       focus = false,
       format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
       source = "if_many",
-      border = "none",
+      border = "single",
     },
   }
 
