@@ -347,7 +347,7 @@ require("lazy").setup({
     config = true,
   },
   -- NOTE: mini libraries of deps because it is light and easy to use.
-  { 'echasnovski/mini.colors',  version = false },
+  { 'echasnovski/mini.colors', version = false },
   {
     "echasnovski/mini.bufremove",
     version = false,
@@ -421,7 +421,7 @@ require("lazy").setup({
       end)
     end,
   },
-  { "echasnovski/mini.align", event = "VeryLazy" },
+  { "echasnovski/mini.align",  event = "VeryLazy" },
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
@@ -456,7 +456,7 @@ require("lazy").setup({
       },
     },
   },
-  { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
+  { "echasnovski/mini.pairs", event = "VeryLazy",    opts = {} },
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
@@ -521,7 +521,7 @@ require("lazy").setup({
     config = true,
   },
   -- NOTE: folke is neovim's tpope
-  { "folke/paint.nvim", event = "BufReadPost", config = true },
+  { "folke/paint.nvim",       event = "BufReadPost", config = true },
   {
     "folke/trouble.nvim",
     cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -938,14 +938,11 @@ require("lazy").setup({
         },
       },
       "hrsh7th/cmp-nvim-lsp",
-      {
-        "folke/neoconf.nvim",
-        cmd = "Neoconf",
-        config = true,
-        dependencies = { "nvim-lspconfig" },
-      },
+      -- stylua: ignore start
       { "folke/neodev.nvim",  config = true, ft = "lua" },
+      { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
+      -- stylua: ignore stop
       {
         "simrat39/rust-tools.nvim",
         ft = "rust",
@@ -1214,6 +1211,13 @@ require("lazy").setup({
         lua_ls = {
           settings = {
             Lua = {
+              format = {
+                enable = true,
+                defaultConfig = {
+                  indent_style = "space",
+                  indent_size = "2",
+                }
+              },
               completion = { callSnippet = "Replace" },
               hint = { enable = true, setType = true },
               runtime = {
@@ -1307,7 +1311,10 @@ require("lazy").setup({
     cmd = "Mason",
     build = ":MasonUpdate",
     keys = { { "<leader>m", "<cmd>Mason<cr>", desc = "Mason" } },
-    opts = { ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" } },
+    opts = {
+      ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" },
+      ui = { border = 'single' },
+    },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)
       require("mason").setup(opts)
