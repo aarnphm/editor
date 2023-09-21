@@ -216,6 +216,7 @@ require("lazy").setup({
 			},
 		},
 	},
+  { 'echasnovski/mini.colors', version = false },
 	{
 		-- better text-objects
 		"echasnovski/mini.ai",
@@ -730,39 +731,6 @@ require("lazy").setup({
 			},
 		},
 	},
-	-- NOTE: terminal-in-terminal PacMan (also we only really need this with LspAttach)
-	{
-		"akinsho/toggleterm.nvim",
-		cmd = "ToggleTerm",
-		---@diagnostic disable-next-line: assign-type-mismatch
-		module = true,
-		opts = {
-			-- size can be a number or function which is passed the current terminal
-			size = function(term)
-				local factor = 0.38
-				if term.direction == "horizontal" then
-					return vim.o.lines * factor
-				elseif term.direction == "vertical" then
-					return vim.o.columns * factor
-				end
-			end,
-			on_open = function(_)
-				vim.cmd "startinsert!"
-				vim.opt_local.statusline =
-					'%{&ft == "toggleterm" ? "terminal (".b:toggle_number.")" : ""}'
-			end,
-			highlights = {
-				Normal = { link = "Normal" },
-				NormalFloat = { link = "NormalFloat" },
-				FloatBorder = { link = "FloatBorder" },
-			},
-			open_mapping = false, -- default mapping
-			shade_terminals = false,
-			direction = "vertical",
-			shell = vim.o.shell,
-		},
-		config = true,
-	},
 	-- NOTE: nice winbar
 	{
 		"Bekaboo/dropbar.nvim",
@@ -1200,3 +1168,6 @@ require("lazy").setup({
 
 vim.o.background = user.background
 vim.cmd.colorscheme(user.colorscheme)
+-- NOTE: this should only be run on Terminal.app
+require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
+vim.opt.termguicolors = false

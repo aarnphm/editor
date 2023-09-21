@@ -111,7 +111,7 @@ vim.opt.wildignore   = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Carg
 
 -- map leader to <Space> and localeader to +
 vim.g.mapleader      = " "
-vim.g.maplocalleader = "+"
+vim.g.maplocalleader = ","
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
@@ -189,12 +189,6 @@ map("n", "<LocalLeader>-",  string.format("<cmd>resize -%s<cr>",          M.wind
 map("n", "<LocalLeader>+",  string.format("<cmd>resize +%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize up 10px"          })
 map("n", "<LocalLeader>f",  require('user.format').toggle,                                  { desc = "lsp: Toggle formatter"                             })
 map("n", "<LocalLeader>p",  "<cmd>Lazy<cr>",                                                { desc = "package: show manager"                             })
-map("n", "<C-\\>",          "<cmd>execute v:count . 'ToggleTerm direction=horizontal'<cr>", { desc = "terminal: Toggle horizontal"                       })
-map("i", "<C-\\>",          "<Esc><cmd>ToggleTerm direction=horizontal<cr>",                { desc = "terminal: Toggle horizontal"                       })
-map("t", "<C-\\>",          "<Esc><cmd>ToggleTerm<cr>",                                     { desc = "terminal: Toggle horizontal"                       })
-map("n", "<C-t>",           "<cmd>execute v:count . 'ToggleTerm direction=vertical'<cr>",   { desc = "terminal: Toggle vertical"                         })
-map("i", "<C-t>",           "<Esc><cmd>ToggleTerm direction=vertical<cr>",                  { desc = "terminal: Toggle vertical"                         })
-map("t", "<C-t>",           "<Esc><cmd>ToggleTerm<cr>",                                     { desc = "terminal: Toggle vertical"                         })
 if vim.lsp.inlay_hint then
   map("n", "<leader>uh", function() vim.lsp.inlay_hint(0, nil) end, { desc = "lsp: Toggle Inlay Hints" })
 end
