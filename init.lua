@@ -460,6 +460,7 @@ require("lazy").setup({
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
+    main = "ibl",
     opts = {
       context_char = "┃",
       show_first_indent_level = false,
