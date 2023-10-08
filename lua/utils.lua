@@ -16,6 +16,8 @@ end
 
 M.has = function(plugin) return require("lazy.core.config").plugins[plugin] ~= nil end
 
+M.get_clients = vim.lsp.get_clients or vim.lsp.get_active_clients
+
 ---@param name string
 M.opts = function(name)
   local plugin = require("lazy.core.config").plugins[name]
