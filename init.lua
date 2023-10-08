@@ -173,7 +173,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
-local load_textobjects = true
 local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
 local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark"
 
@@ -277,11 +276,27 @@ require("lazy").setup({
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter-textobjects",
-        init = function()
-          -- disable rtp plugin, as we only need its queries for mini.ai
-          -- In case other textobject modules are enabled, we will load them once nvim-treesitter is loaded
-          require("lazy.core.loader").disable_rtp_plugin "nvim-treesitter-textobjects"
-          load_textobjects = true
+        config = function()
+          -- When in diff mode, we want to use the default
+          -- vim text objects c & C instead of the treesitter ones.
+          local move = require("nvim-treesitter.textobjects.move") ---@type table<string,fun(...)>
+          local configs = require("nvim-treesitter.configs")
+          for name, fn in pairs(move) do
+            if name:find("goto") == 1 then
+              move[name] = function(q, ...)
+                if vim.wo.diff then
+                  local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
+                  for key, query in pairs(config or {}) do
+                    if q == query and key:find("[%]%[][cC]") then
+                      vim.cmd("normal! " .. key)
+                      return
+                    end
+                  end
+                end
+                return fn(q, ...)
+              end
+            end
+          end
         end,
       },
       "windwp/nvim-ts-autotag",
@@ -300,6 +315,15 @@ require("lazy").setup({
       highlight = { enable = true },
       context_commentstring = { enable = true, enable_autocmd = false },
       autotag = { enable = true },
+      textobjects = {
+        move = {
+          enable = true,
+          goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
+          goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
+          goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
+          goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+        },
+      },
       incremental_selection = {
         enable = true,
         keymaps = {
@@ -322,20 +346,6 @@ require("lazy").setup({
         end, opts.ensure_installed)
       end
       require("nvim-treesitter.configs").setup(opts)
-      if load_textobjects then
-        -- PERF: no need to load the plugin, if we only need its queries for mini.ai
-        if opts.textobjects then
-          for _, mod in ipairs { "move", "select", "swap", "lsp_interop" } do
-            if opts.textobjects[mod] and opts.textobjects[mod].enable then
-              local Loader = require "lazy.core.loader"
-              Loader.disabled_rtp_plugins["nvim-treesitter-textobjects"] = nil
-              local plugin = require("lazy.core.config").plugins["nvim-treesitter-textobjects"]
-              require("lazy.core.loader").source_runtime(plugin.dir, "plugin")
-              break
-            end
-          end
-        end
-      end
     end,
   },
   -- NOTE: comments, you say what?
@@ -460,24 +470,98 @@ require("lazy").setup({
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
-    main = "ibl",
+    main = 'ibl',
     opts = {
-      context_char = "┃",
-      show_first_indent_level = false,
-      buftype_exclude = { "terminal", "nofile" },
-      filetype_exclude = {
-        "help",
-        "alpha",
-        "dashboard",
-        "neo-tree",
-        "TelescopePrompt",
-        "undotree",
-        "Trouble",
-        "lazy",
-        "Mason",
+      debounce = 200,
+      indent = {
+        char = "│",
+        tab_char = "│",
+        smart_indent_cap = true,
+        priority = 2,
       },
-      show_trailing_blankline_indent = false,
-      show_current_context = false,
+      whitespace = { remove_blankline_trail = true },
+      -- Note: The `scope` field requires treesitter to be set up
+      scope = {
+        enabled = true,
+        char = "┃",
+        show_start = false,
+        show_end = false,
+        injected_languages = true,
+        priority = 1000,
+        include = {
+          node_type = {
+            ["*"] = {
+              "argument_list",
+              "arguments",
+              "assignment_statement",
+              "Block",
+              "chunk",
+              "class",
+              "ContainerDecl",
+              "dictionary",
+              "do_block",
+              "do_statement",
+              "element",
+              "except",
+              "FnCallArguments",
+              "for",
+              "for_statement",
+              "function",
+              "function_declaration",
+              "function_definition",
+              "if_statement",
+              "IfExpr",
+              "IfStatement",
+              "import",
+              "InitList",
+              "list_literal",
+              "method",
+              "object",
+              "ParamDeclList",
+              "repeat_statement",
+              "selector",
+              "SwitchExpr",
+              "table",
+              "table_constructor",
+              "try",
+              "tuple",
+              "type",
+              "var",
+              "while",
+              "while_statement",
+              "with",
+            },
+          },
+        },
+      },
+      exclude = {
+        filetypes = {
+          "", -- for all buffers without a file type
+          "alpha",
+          "big_file_disabled_ft",
+          "dashboard",
+          "dotooagenda",
+          "flutterToolsOutline",
+          "fugitive",
+          "git",
+          "gitcommit",
+          "help",
+          "json",
+          "log",
+          "markdown",
+          "NvimTree",
+          "Outline",
+          "peekaboo",
+          "startify",
+          "TelescopePrompt",
+          "todoist",
+          "txt",
+          "undotree",
+          "vimwiki",
+          "vista",
+        },
+        buftypes = { "terminal", "nofile", "quickfix", "prompt" },
+      },
     },
   },
   -- NOTE: easily jump to any location and enhanced f/t motions for Leap
@@ -940,8 +1024,8 @@ require("lazy").setup({
       },
       "hrsh7th/cmp-nvim-lsp",
       -- stylua: ignore start
-      { "folke/neodev.nvim",  config = true, ft = "lua" },
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
+      { "folke/neodev.nvim",  config = true,                    ft = "lua" },
+      { "folke/neoconf.nvim", cmd = "Neoconf",                  config = true, dependencies = { "nvim-lspconfig" } },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
       -- stylua: ignore stop
       {
@@ -1525,5 +1609,5 @@ require("lazy").setup({
 vim.o.background = background
 vim.cmd.colorscheme(colorscheme)
 -- NOTE: this should only be run on Terminal.app
-require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
-vim.opt.termguicolors = false
+-- require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
+-- vim.opt.termguicolors = false
