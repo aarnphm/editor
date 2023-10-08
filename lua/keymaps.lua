@@ -6,9 +6,6 @@ M._keys = nil
 ---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string}
 ---@alias LazyKeysLsp LazyKeys|{has?:string}
 
----@type PluginLspKeys
-M._keys = nil
-
 M.get = function()
   if not M._keys then
     --@class PluginLspKeys
