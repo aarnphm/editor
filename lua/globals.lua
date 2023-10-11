@@ -223,7 +223,7 @@ autocmd({ "WinLeave, BufLeave" }, {
 	pattern = "*",
 	callback = function()
 		vim.o.laststatus = 2
-		vim.o.statusline = require("user.utils").statusline.build()
+		vim.o.statusline = require("utils").statusline.build()
 	end,
 })
 
