@@ -52,7 +52,7 @@ vim.o.undolevels     = 9999                                                     
 vim.o.shortmess      = "aoOTIcF"                                                -- insanely complex shortmess, but its cleannn
 vim.o.laststatus     = 2                                                        -- show statusline on buffer
 vim.o.diffopt        = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
-vim.o.statusline     = require("user.utils").statusline.build()                 -- statusline PepeLaugh
+vim.o.statusline     = require("utils").statusline.build()                      -- statusline PepeLaugh
 vim.o.sessionoptions = "buffers,curdir,help,tabpages,winsize"                   -- session options
 vim.o.shada          = "!,'500,<50,@100,s10,h"                                  -- shada options
 
@@ -187,7 +187,6 @@ map("n", "<LocalLeader>]",  string.format("<cmd>vertical resize -%s<cr>", M.wind
 map("n", "<LocalLeader>[",  string.format("<cmd>vertical resize +%s<cr>", M.window.resize), { noremap = false, desc = "windows: resize left 10px"        })
 map("n", "<LocalLeader>-",  string.format("<cmd>resize -%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize down 10px"        })
 map("n", "<LocalLeader>+",  string.format("<cmd>resize +%s<cr>",          M.window.resize), { noremap = false, desc = "windows: resize up 10px"          })
-map("n", "<LocalLeader>f",  require('user.format').toggle,                                  { desc = "lsp: Toggle formatter"                             })
 map("n", "<LocalLeader>p",  "<cmd>Lazy<cr>",                                                { desc = "package: show manager"                             })
 if vim.lsp.inlay_hint then
   map("n", "<leader>uh", function() vim.lsp.inlay_hint(0, nil) end, { desc = "lsp: Toggle Inlay Hints" })
@@ -221,7 +220,7 @@ autocmd({ "CursorHold", "CursorHoldI" }, {
 	group = _G.simple_augroup "diagnostic_show_float",
 	pattern = "*",
 	callback = function()
-		if require("user.options").diagnostic.show_float then
+		if require("options").diagnostic.show_float then
 			vim.diagnostic.open_float(nil, { focus = false })
 		end
 	end,
