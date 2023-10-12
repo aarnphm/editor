@@ -641,6 +641,7 @@ require("lazy").setup({
   {
     "hrsh7th/nvim-cmp",
     version = false,
+    lazy = false,
     event = "InsertEnter",
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
@@ -656,32 +657,6 @@ require("lazy").setup({
           or nil,
         config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
         opts = { history = true, delete_check_events = "TextChanged" },
-      },
-      {
-        "zbirenbaum/copilot.lua",
-        cmd = "Copilot",
-        event = "InsertEnter",
-        opts = {
-          cmp = { enabled = true, method = "getCompletionsCycling" },
-          panel = { enabled = false },
-          suggestion = { enabled = true, auto_trigger = true },
-          filetypes = {
-            markdown = true,
-            help = false,
-            terraform = false,
-            hgcommit = false,
-            svn = false,
-            cvs = false,
-            ["dap-repl"] = false,
-            octo = false,
-            TelescopePrompt = false,
-            big_file_disabled_ft = false,
-            neogitCommitMessage = false,
-          },
-        },
-        config = function(_, opts)
-          vim.defer_fn(function() require("copilot").setup(opts) end, 100)
-        end,
       },
     },
   },

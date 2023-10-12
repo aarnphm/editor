@@ -64,7 +64,7 @@ local opts = {
     comparators = {
       compare.offset, -- Items closer to cursor will have lower priority
       compare.exact,
-      compare.scopes,
+      -- compare.scopes,
       compare.lsp_scores,
       compare.sort_text,
       compare.score,
@@ -86,9 +86,7 @@ local opts = {
     ["<C-k>"] = cmp.mapping.select_prev_item(),
     ["<C-j>"] = cmp.mapping.select_next_item(),
     ["<Tab>"] = function(fallback)
-      if require("copilot.suggestion").is_visible() then
-        require("copilot.suggestion").accept()
-      elseif cmp.visible() then
+      if cmp.visible() then
         cmp.select_next_item()
       elseif require("luasnip").expand_or_jumpable() then
         vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
