@@ -464,13 +464,6 @@ require("lazy").setup({
       inlay_hints = { enabled = false },
       -- add any global capabilities here
       capabilities = {},
-      -- Enable this to show formatters used in a notification
-      -- Useful for debugging formatter issues
-      notify = false,
-      -- options for vim.lsp.buf.format
-      -- `bufnr` and `filter` is handled by the formatter,
-      -- but can be also overridden when specified
-      format = { formatting_options = nil, timeout_ms = nil },
       ---@type lspconfig.options
       servers = {
         jsonls = {
