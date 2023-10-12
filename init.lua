@@ -1,164 +1,7 @@
---# selene: allow(global_usage)
-_G.P = function(v)
-  print(vim.inspect(v))
-  return v
-end
+require("aarnphm")  -- default setup
+if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
--- NOTE: Keymaps that are useful, use it and never come back.
-local map = function(mode, lhs, rhs, opts)
-  opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
-  vim.keymap.set(mode, lhs, rhs, opts)
-end
-
-local api, wo, o, g, autocmd = vim.api, vim.wo, vim.o, vim.g, vim.api.nvim_create_autocmd
--- NOTE: augroup la autocmd setup
-local augroup_name = function(name) return "simple_" .. name end
-local augroup = function(name) return api.nvim_create_augroup(augroup_name(name), { clear = true }) end
-
-local icons = require "icons"
-local utils = require "utils"
-local TAB_WIDTH = 2
-
-vim.opt.termguicolors = true
-
-o.wrap = false
-o.autowrite = true
-o.undodir = "/tmp/.vim-undo-dir"
-o.undofile = true                                                    -- enable undofile
-wo.breakindent = true                                                -- use breakindent
-o.clipboard = "unnamedplus"                                          -- sync system clipboard
-o.expandtab = true                                                   -- space to tabs
-o.number = true                                                      -- number is good for nav
-o.relativenumber = true                                              -- relativenumber is useful, grow up
-o.mouse = "a"                                                        -- because sometimes mouse is needed for ssh
-o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
-o.copyindent = true
-o.splitright = true
-vim.opt.smartcase = true
-vim.opt.completeopt = { "menuone", "noselect" }
-o.grepprg = "rg --vimgrep"
-o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
-o.tabstop = TAB_WIDTH
-o.shiftwidth = TAB_WIDTH
-o.softtabstop = TAB_WIDTH
-o.expandtab = true
-o.signcolumn = "yes"
-o.timeoutlen = 200
-o.updatetime = 200
-o.statusline = utils.statusline.build()
-
-g.mapleader = " "
-g.maplocalleader = ","
-
-vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
-
--- NOTE: normal mode
-map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
-map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
-map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
-map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
-map("n", "\\", ":let @/=''<CR>:noh<CR>", { silent = true, desc = "window: Clean highlight" })
-map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
-map("n", ";;", ";", { silent = false, desc = "normal: Enter Ex mode" })
-map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
-map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })
-map("v", "<", "<gv", { desc = "edit: Decrease indent" })
-map("v", ">", ">gv", { desc = "edit: Increase indent" })
-map("c", "W!!", "execute 'silent! write !sudo tee % >/dev/null' <bar> edit!", { desc = "edit: Save file using sudo" })
-map("n", "<C-h>", "<C-w>h", { desc = "window: Focus left" })
-map("n", "<C-l>", "<C-w>l", { desc = "window: Focus right" })
-map("n", "<C-j>", "<C-w>j", { desc = "window: Focus down" })
-map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up" })
-map("n", "<LocalLeader>|", "<C-w>|", { desc = "window: Maxout width" })
-map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
-map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
-map("n", "<Leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
-map("n", "<Leader>.", "<cmd>bnext<cr>", { desc = "buffer: next" })
-map("n", "<Leader>,", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
-map("n", "<Leader>q", "<cmd>copen<cr>", { desc = "quickfix: Open quickfix" })
-map("n", "<Leader>l", "<cmd>lopen<cr>", { desc = "quickfix: Open location list" })
-map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
-map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
-map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
-map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
-map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
-map("n", "<LocalLeader>l", "<cmd>set list! list?<cr>", { silent = false, desc = "misc: toggle invisible characters" })
-map("n", "<LocalLeader>]", string.format("<cmd>vertical resize -%s<cr>", 10),
-  { noremap = false, desc = "windows: resize right 10px" })
-map("n", "<LocalLeader>[", string.format("<cmd>vertical resize +%s<cr>", 10),
-  { noremap = false, desc = "windows: resize left 10px" })
-map("n", "<LocalLeader>-", string.format("<cmd>resize -%s<cr>", 10),
-  { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", 10),
-  { noremap = false, desc = "windows: resize up 10px" })
-map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
-
--- NOTE: compatible block with vscode
-if vim.g.vscode then return end
-
--- close some filetypes with <q>
-autocmd("FileType", {
-  group = augroup "filetype",
-  pattern = {
-    "qf",
-    "help",
-    "man",
-    "nowrite", -- fugitive
-    "prompt",
-    "spectre_panel",
-    "startuptime",
-    "tsplayground",
-    "neorepl",
-    "alpha",
-    "toggleterm",
-    "health",
-    "PlenaryTestPopup",
-    "nofile",
-    "scratch",
-    "",
-  },
-  callback = function(event)
-    vim.bo[event.buf].buflisted = false
-    vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
-  end,
-})
--- Check if we need to reload the file when it changed
-autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
-  group = augroup "checktime",
-  pattern = "*",
-  command = "checktime",
-})
-autocmd("VimResized", { group = augroup "resized", command = "tabdo wincmd =" })
-
--- Set noundofile for temporary files
-autocmd("BufWritePre",
-  { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" })
--- set filetype for header files
-autocmd({ "BufNewFile", "BufRead" },
-  { group = augroup "cpp_headers", pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" }, command = "setlocal filetype=c" })
--- set filetype for dockerfile
-autocmd({ "BufNewFile", "BufRead", "FileType" },
-  {
-    group = augroup "dockerfile",
-    pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
-    command = "setlocal filetype=dockerfile"
-  })
--- Highlight on yank
-autocmd("TextYankPost", {
-  group = augroup "highlight_yank",
-  pattern = "*",
-  callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
-})
-
--- NOTE: vim options
-if vim.loop.os_uname().sysname == "Darwin" then
-  vim.g.clipboard = {
-    name = "macOS-clipboard",
-    copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
-    paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
-    cache_enabled = 0,
-  }
-end
+local utils = require("utils")
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -272,6 +115,7 @@ require("lazy").setup({
   {
     "nvim-treesitter/nvim-treesitter",
     version = false, -- last release is way too old and doesn't work on Windows
+    cmd = { "TSUpdateSync" },
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     dependencies = {
@@ -303,50 +147,6 @@ require("lazy").setup({
       "windwp/nvim-ts-autotag",
       "nvim-treesitter/playground",
     },
-    cmd = { "TSUpdateSync" },
-    keys = {
-      { "<c-space>", desc = "Increment selection" },
-      { "<bs>", desc = "Decrement selection", mode = "x" },
-    },
-    opts = {
-      ensure_installed = { "python", "rust", "lua", "c", "cpp", "toml", "bash", "css", "vim", "regex", "markdown", "markdown_inline", "yaml", "go", "typescript", "tsx", "zig", "query", "regex", "luap", "luadoc", "javascript", "proto" },
-      ignore_install = { "phpdoc" },
-      indent = { enable = true },
-      highlight = { enable = true },
-      context_commentstring = { enable = true, enable_autocmd = false },
-      autotag = { enable = true },
-      textobjects = {
-        move = {
-          enable = true,
-          goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
-          goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
-          goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
-          goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
-        },
-      },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<C-a>",
-          node_incremental = "<C-a>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
-    },
-    config = function(_, opts)
-      if utils.has "SchemaStore.nvim" then vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" }) end
-      if type(opts.ensure_installed) == "table" then
-        ---@type table<string, boolean>
-        local added = {}
-        opts.ensure_installed = vim.tbl_filter(function(lang)
-          if added[lang] then return false end
-          added[lang] = true
-          return true
-        end, opts.ensure_installed)
-      end
-      require("nvim-treesitter.configs").setup(opts)
-    end,
   },
   -- NOTE: comments, you say what?
   {
@@ -456,13 +256,13 @@ require("lazy").setup({
     end,
     opts = {
       mappings = {
-        add = "gsa",            -- Add surrounding in Normal and Visual modes
-        delete = "gsd",         -- Delete surrounding
-        find = "gsf",           -- Find surrounding (to the right)
-        find_left = "gsF",      -- Find surrounding (to the left)
-        highlight = "gsh",      -- Highlight surrounding
-        replace = "gsr",        -- Replace surrounding
-        update_n_lines = "gsn", -- Update `n_lines`
+        add = "sa",            -- Add surrounding in Normal and Visual modes
+        delete = "sd",         -- Delete surrounding
+        find = "sf",           -- Find surrounding (to the right)
+        find_left = "sF",      -- Find surrounding (to the left)
+        highlight = "sh",      -- Highlight surrounding
+        replace = "sr",        -- Replace surrounding
+        update_n_lines = "sn", -- Update `n_lines`
       },
     },
   },
@@ -606,7 +406,7 @@ require("lazy").setup({
     config = true,
   },
   -- NOTE: folke is neovim's tpope
-  { "folke/paint.nvim",       event = "BufReadPost", config = true },
+  { "folke/paint.nvim", event = "BufReadPost", config = true },
   {
     "folke/trouble.nvim",
     cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -678,130 +478,9 @@ require("lazy").setup({
       "nvim-telescope/telescope-live-grep-args.nvim",
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     },
-    opts = {
-      defaults = {
-        vimgrep_arguments = {
-          "rg",
-          "--no-heading",
-          "--with-filename",
-          "--line-number",
-          "--column",
-          "--smart-case",
-        },
-        prompt_prefix = "  ",
-        selection_caret = "󰄾 ",
-        file_ignore_patterns = {
-          ".git/",
-          "node_modules/",
-          "static_content/",
-          "lazy-lock.json",
-          "pdm.lock",
-          "__pycache__",
-        },
-        layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
-        selection_strategy = "reset",
-        sorting_strategy = "ascending",
-        color_devicons = true,
-      },
-      fzf = {
-        fuzzy = false,                  -- false will only do exact matching
-        override_generic_sorter = true, -- override the generic sorter
-        override_file_sorter = true,    -- override the file sorter
-        case_mode = "smart_case",       -- or "ignore_case" or "respect_case"
-      },
-      pickers = {
-        find_files = { hidden = true },
-        live_grep = {
-          on_input_filter_cb = function(prompt)
-            -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
-            return { prompt = prompt:gsub("%s", ".*") }
-          end,
-          attach_mappings = function(_)
-            require("telescope.actions.set").select:enhance {
-              post = function() vim.cmd ":normal! zx" end,
-            }
-            return true
-          end,
-        },
-      },
-    },
-    config = function(_, opts)
-      opts.defaults.mappings = {
-        i = {
-          ["<C-a>"] = { "<esc>0i", type = "command" },
-          ["<Esc>"] = function(...) return require("telescope.actions").close(...) end,
-          ["<c-t>"] = function(...) return require("trouble.providers.telescope").open_with_trouble(...) end,
-          ["<a-t>"] = function(...) return require("trouble.providers.telescope").open_selected_with_trouble(...) end,
-          ["<a-i>"] = function()
-            local action_state = require "telescope.actions.state"
-            local line = action_state.get_current_line()
-            utils.telescope("find_files", { no_ignore = true, default_text = line })()
-          end,
-          ["<a-h>"] = function()
-            local action_state = require "telescope.actions.state"
-            local line = action_state.get_current_line()
-            utils.telescope("find_files", { hidden = true, default_text = line })()
-          end,
-          ["<C-Down>"] = function(...) return require("telescope.actions").cycle_history_next(...) end,
-          ["<C-Up>"] = function(...) return require("telescope.actions").cycle_history_prev(...) end,
-          ["<C-f>"] = function(...) return require("telescope.actions").preview_scrolling_down(...) end,
-          ["<C-b>"] = function(...) return require("telescope.actions").preview_scrolling_up(...) end,
-        },
-        n = { ["q"] = function(...) return require("telescope.actions").close(...) end },
-      }
-      opts.extensions = {
-        live_grep_args = {
-          auto_quoting = false,
-          mappings = {
-            i = {
-              ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
-              ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " --iglob " },
-              ["<C-j>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " -t " }
-            },
-          },
-        },
-      }
-
-      require("telescope").setup(opts)
-      require("telescope").load_extension "live_grep_args"
-    end,
   },
   -- Automatically highlights other instances of the word under your cursor. This works with LSP, Treesitter, and regexp matching to find the other instances.
-  {
-    "RRethy/vim-illuminate",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {
-      delay = 200,
-      large_file_cutoff = 2000,
-      large_file_overrides = {
-        providers = { "lsp" },
-      },
-    },
-    config = function(_, opts)
-      require("illuminate").configure(opts)
-
-      local function imap(key, dir, buffer)
-        vim.keymap.set("n", key, function() require("illuminate")["goto_" .. dir .. "_reference"](false) end,
-          { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
-      end
-
-      imap("]]", "next")
-      imap("[[", "prev")
-
-      -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
-      vim.api.nvim_create_autocmd("FileType", {
-        callback = function()
-          local buffer = vim.api.nvim_get_current_buf()
-          imap("]]", "next", buffer)
-          imap("[[", "prev", buffer)
-        end,
-      })
-    end,
-    keys = {
-      { "]]", desc = "Next Reference" },
-      { "[[", desc = "Prev Reference" },
-    },
-  },
+  { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" }, lazy = true },
   -- NOTE: better nvim-tree.lua
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -838,98 +517,6 @@ require("lazy").setup({
         config = function(_, opts) require("window-picker").setup(opts) end,
       },
     },
-    keys = {
-      {
-        "<C-n>",
-        function() require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() } end,
-        desc = "explorer: root dir",
-      },
-    },
-    opts = {
-      close_if_last_window = true,
-      enable_diagnostics = false, -- default is set to true here.
-      filesystem = {
-        bind_to_cwd = false,
-        use_libuv_file_watcher = true, -- use system level watcher for file change
-        follow_current_file = { enabled = true },
-        filtered_items = {
-          visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
-          hide_dotfiles = false,
-          hide_gitignored = true,
-          hide_by_name = {
-            "node_modules",
-            "pdm.lock",
-          },
-          hide_by_pattern = { -- uses glob style patterns
-            "*.meta",
-            "*/src/*/tsconfig.json",
-            "*/.ruff_cache/*",
-            "*/__pycache__/*",
-          },
-        },
-      },
-      event_handlers = {
-        {
-          event = "neo_tree_window_after_open",
-          handler = function(args)
-            if args.position == "left" or args.position == "right" then vim.cmd "wincmd =" end
-          end,
-        },
-        {
-          event = "neo_tree_window_after_close",
-          handler = function(args)
-            if args.position == "left" or args.position == "right" then vim.cmd "wincmd =" end
-          end,
-        },
-        -- disable last status on neo-tree
-        -- If I use laststatus, then uncomment this
-        {
-          event = "neo_tree_buffer_enter",
-          handler = function() vim.opt_local.laststatus = 0 end,
-        },
-        {
-          event = "neo_tree_buffer_leave",
-          handler = function() vim.opt_local.laststatus = 2 end,
-        },
-      },
-      always_show = { ".github" },
-      window = {
-        mappings = {
-          ["<space>"] = "none", -- disable space since it is leader
-          ["s"] = "split_with_window_picker",
-          ["v"] = "vsplit_with_window_picker",
-        },
-      },
-      default_component_configs = {
-        indent = {
-          with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-          expander_collapsed = "",
-          expander_expanded = "",
-          expander_highlight = "NeoTreeExpander",
-        },
-      },
-    },
-    config = function(_, opts)
-      local function on_move(data)
-        utils.on_rename(data.source, data.destination)
-      end
-
-      local events = require("neo-tree.events")
-      opts.event_handlers = opts.event_handlers or {}
-      vim.list_extend(opts.event_handlers, {
-        { event = events.FILE_MOVED, handler = on_move },
-        { event = events.FILE_RENAMED, handler = on_move },
-      })
-      require("neo-tree").setup(opts)
-      vim.api.nvim_create_autocmd("TermClose", {
-        pattern = "*lazygit",
-        callback = function()
-          if package.loaded["neo-tree.sources.git_status"] then
-            require("neo-tree.sources.git_status").refresh()
-          end
-        end,
-      })
-    end,
   },
   -- NOTE: Chad colorizer
   {
@@ -1056,11 +643,9 @@ require("lazy").setup({
         },
       },
       "hrsh7th/cmp-nvim-lsp",
-      -- stylua: ignore start
-      { "folke/neodev.nvim",  config = true,                    ft = "lua" },
-      { "folke/neoconf.nvim", cmd = "Neoconf",                  config = true, dependencies = { "nvim-lspconfig" } },
+      { "folke/neodev.nvim",  config = true, ft = "lua" },
+      { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
-      -- stylua: ignore stop
       {
         "simrat39/rust-tools.nvim",
         ft = "rust",
@@ -1363,18 +948,14 @@ require("lazy").setup({
         -- NOTE: Python
         ruff_lsp = {
           root_dir = function(fname)
-            return require("lspconfig.util").root_pattern("WORKSPACE", ".git", "Pipfile", "pyrightconfig.json",
-                  "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt")(fname) or
-                require("lspconfig.util").path.dirname(fname)
+            return require("lspconfig.util").root_pattern("WORKSPACE", ".git", "Pipfile", "pyrightconfig.json", "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt")(fname) or require("lspconfig.util").path.dirname(fname)
           end,
           settings = {},
         },
         pyright = {
           flags = { debounce_text_changes = 500 },
           root_dir = function(fname)
-            return require("lspconfig.util").root_pattern("WORKSPACE", ".git", "Pipfile", "pyrightconfig.json",
-                  "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt")(fname) or
-                require("lspconfig.util").path.dirname(fname)
+            return require("lspconfig.util").root_pattern("WORKSPACE", ".git", "Pipfile", "pyrightconfig.json", "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt")(fname) or require("lspconfig.util").path.dirname(fname)
           end,
           settings = {
             python = {
@@ -1454,32 +1035,6 @@ require("lazy").setup({
         })
       end
     end)
-
-    -- diagnostic
-    for _, type in pairs {
-      { "Error", "✖" },
-      { "Warn", "▲" },
-      { "Hint", "⚑" },
-      { "Info", "●" },
-    } do
-      local hl = string.format("DiagnosticSign%s", type[1])
-      vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
-    end
-
-    vim.diagnostic.config {
-      severity_sort = true,
-      underline = false,
-      update_in_insert = false,
-      virtual_text = false,
-      float = {
-        close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-        focusable = false,
-        focus = false,
-        format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-        source = "if_many",
-        border = "single",
-      },
-    }
 
     local servers = opts.servers
     local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
@@ -1600,8 +1155,7 @@ require("lazy").setup({
         return function(entry, vim_item)
           if opts.before then vim_item = opts.before(entry, vim_item) end
 
-          local item = icons.kind[vim_item.kind] or icons.type[vim_item.kind] or icons.cmp[vim_item.kind] or
-              icons.kind.Undefined
+          local item = icons.kind[vim_item.kind] or icons.type[vim_item.kind] or icons.cmp[vim_item.kind] or icons.kind.Undefined
 
           vim_item.kind = string.format("  %s  %s", item, vim_item.kind)
 
@@ -1734,9 +1288,7 @@ require("lazy").setup({
   {
     "JoosepAlviste/nvim-ts-context-commentstring",
     lazy = true,
-    opts = {
-      enable_autocmd = false,
-    },
+    opts = { enable_autocmd = false },
   },
 }, {
   install = { colorscheme = { colorscheme } },
