@@ -1,7 +1,6 @@
 require("conform").setup {
   formatters_by_ft = {
     lua = { "stylua" },
-    python = { "yapf", "ruff_fix", "ruff_format" },
     toml = { "taplo" },
     ["*"] = { "codespell" },
     ["_"] = { "trim_whitespace" },
