@@ -1,5 +1,6 @@
-column_width = 100                   # NOTE: conform with Linux max line length
-indent_width = 4
+column_width = 119
+indent_width = 2
+indent_type = "Spaces"
 line_endings = "Unix"
 quote_style = "AutoPreferDouble"
 call_parentheses = "None"
