@@ -621,7 +621,7 @@ require("lazy").setup({
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
-      "mason.nvim",
+      { "williamboman/mason.nvim", cmd = "Mason", build = ":MasonUpdate" },
       {
         "dnlhc/glance.nvim",
         cmd = "Glance",
@@ -896,25 +896,6 @@ require("lazy").setup({
     end
 
     if have_mason then mason_lspconfig.setup { ensure_installed = ensure_installed, handlers = { mason_handler } } end
-    end,
-  },
-  {
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    build = ":MasonUpdate",
-    keys = { { "<leader>m", "<cmd>Mason<cr>", desc = "Mason" } },
-    opts = {
-      ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" },
-      ui = { border = 'single' },
-    },
-    ---@param opts MasonSettings | {ensure_installed: string[]}
-    config = function(_, opts)
-      require("mason").setup(opts)
-      local mr = require "mason-registry"
-      for _, tool in ipairs(opts.ensure_installed) do
-        local p = mr.get_package(tool)
-        if not p:is_installed() then p:install() end
-      end
     end,
   },
   -- NOTE: Setup completions.
