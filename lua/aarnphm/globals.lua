@@ -11,11 +11,12 @@ local fmt = string.format
 
 -- NOTE: git
 local concat_hunks = function(hunks)
-  return vim.tbl_isempty(hunks) and "" or table.concat({
-    fmt("+%d", hunks[1]),
-    fmt("~%d", hunks[2]),
-    fmt("-%d", hunks[3]),
-  }, " ")
+  return vim.tbl_isempty(hunks) and ""
+    or table.concat({
+      fmt("+%d", hunks[1]),
+      fmt("~%d", hunks[2]),
+      fmt("-%d", hunks[3]),
+    }, " ")
 end
 
 local get_hunks = function()
@@ -55,9 +56,13 @@ _G.statusline = {
   end,
   diagnostic = function() -- NOTE: diagnostic
     local buf = vim.api.nvim_get_current_buf()
-    return vim.diagnostic.get(buf) and
-    fmt("[W:%d | E:%d]", #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
-      #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })) or ""
+    return vim.diagnostic.get(buf)
+        and fmt(
+          "[W:%d | E:%d]",
+          #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
+          #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
+        )
+      or ""
   end,
   build = function()
     local spacer = "%="

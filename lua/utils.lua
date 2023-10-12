@@ -21,7 +21,7 @@ M.get_clients = vim.lsp.get_clients or vim.lsp.get_active_clients
 M.on_rename = function(from, to)
   local clients = M.get_clients()
   for _, client in ipairs(clients) do
-    if client.supports_method("workspace/willRenameFiles") then
+    if client.supports_method "workspace/willRenameFiles" then
       ---@diagnostic disable-next-line: invisible
       local resp = client.request_sync("workspace/willRenameFiles", {
         files = {
@@ -31,9 +31,7 @@ M.on_rename = function(from, to)
           },
         },
       }, 1000, 0)
-      if resp and resp.result ~= nil then
-        vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
-      end
+      if resp and resp.result ~= nil then vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding) end
     end
   end
 end
@@ -79,8 +77,9 @@ M.get_root = function()
   if path then
     for _, client in pairs(vim.lsp.get_active_clients { bufnr = 0 }) do
       local workspace = client.config.workspace_folders
-      local paths = workspace and vim.tbl_map(function(ws) return vim.uri_to_fname(ws.uri) end, workspace) or
-      client.config.root_dir and { client.config.root_dir } or {}
+      local paths = workspace and vim.tbl_map(function(ws) return vim.uri_to_fname(ws.uri) end, workspace)
+        or client.config.root_dir and { client.config.root_dir }
+        or {}
       for _, p in ipairs(paths) do
         local r = vim.loop.fs_realpath(p)
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -123,8 +122,10 @@ M.telescope = function(builtin, opts)
         map("i", "<a-c>", function()
           local action_state = require "telescope.actions.state"
           local line = action_state.get_current_line()
-          M.telescope(params.builtin,
-            vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line }))()
+          M.telescope(
+            params.builtin,
+            vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line })
+          )()
         end)
         return true
       end
