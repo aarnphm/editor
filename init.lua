@@ -70,46 +70,12 @@ require("lazy").setup({
     },
   },
   -- NOTE: nice git integration and UI
-  {
-    "lewis6991/gitsigns.nvim",
-    event = "BufReadPost",
-    opts = {
-      numhl = true,
-      watch_gitdir = { interval = 1000, follow_files = true },
-      current_line_blame = true,
-      current_line_blame_opts = { delay = 1000, virtual_text_pos = "eol" },
-      sign_priority = 6,
-      update_debounce = 100,
-      status_formatter = nil, -- Use default
-      word_diff = false,
-      diff_opts = { internal = true },
-      on_attach = function(bufnr)
-        local actions = require "gitsigns.actions"
-        local kmap = function(mode, l, r, desc) vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc }) end
-        kmap("n", "]h", actions.next_hunk, "git: next hunk")
-        kmap("n", "[h", actions.prev_hunk, "git: prev hunk")
-        kmap("n", "<leader>hu", actions.undo_stage_hunk, "git: undo stage hunk")
-        kmap("n", "<leader>hR", actions.reset_buffer, "git: reset buffer")
-        kmap("n", "<leader>hS", actions.stage_buffer, "git: stage buffer")
-        kmap("n", "<leader>hp", actions.preview_hunk, "git: preview hunk")
-        kmap("n", "<leader>hd", actions.diffthis, "git: diff this")
-        kmap("n", "<leader>hD", function() actions.diffthis "~" end, "git: diff this ~")
-        kmap("n", "<leader>hb", function() actions.blame_line { full = true } end, "git: blame Line")
-        kmap({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
-        kmap({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
-        kmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
-      end,
-    },
-  },
+  { "lewis6991/gitsigns.nvim", event = "BufReadPost" },
   -- NOTE: exit fast af
   {
     "max397574/better-escape.nvim",
     event = "InsertEnter",
-    opts = {
-      timeout = 200,
-      clear_empty_lines = true,
-      keys = "<Esc>",
-    },
+    opts = { timeout = 200, clear_empty_lines = true, keys = "<Esc>" },
   },
   -- NOTE: treesitter-based dependencies
   {
@@ -139,40 +105,7 @@ require("lazy").setup({
   { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
   { "echasnovski/mini.align", event = "VeryLazy" },
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
-  {
-    "echasnovski/mini.surround",
-    keys = function(_, keys)
-      -- Populate the keys based on the user's options
-      local plugin = require("lazy.core.config").spec.plugins["mini.surround"]
-      local opts = require("lazy.core.plugin").values(plugin, "opts", false)
-      local mappings = {
-        {
-          opts.mappings.add,
-          desc = "Add surrounding",
-          mode = { "n", "v" },
-        },
-        { opts.mappings.delete, desc = "Delete surrounding" },
-        { opts.mappings.find, desc = "Find right surrounding" },
-        { opts.mappings.find_left, desc = "Find left surrounding" },
-        { opts.mappings.highlight, desc = "Highlight surrounding" },
-        { opts.mappings.replace, desc = "Replace surrounding" },
-        { opts.mappings.update_n_lines, desc = "Update `MiniSurround.config.n_lines`" },
-      }
-      mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings)
-      return vim.list_extend(mappings, keys)
-    end,
-    opts = {
-      mappings = {
-        add = "sa", -- Add surrounding in Normal and Visual modes
-        delete = "sd", -- Delete surrounding
-        find = "sf", -- Find surrounding (to the right)
-        find_left = "sF", -- Find surrounding (to the left)
-        highlight = "sh", -- Highlight surrounding
-        replace = "sr", -- Replace surrounding
-        update_n_lines = "sn", -- Update `n_lines`
-      },
-    },
-  },
+  { "echasnovski/mini.surround", event = "VeryLazy", config = true },
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
@@ -417,20 +350,20 @@ require("lazy").setup({
   },
   -- NOTE: lspconfig
   {
-    "stevearc/conform.nvim",
-    event = { "BufWritePre" },
-    cmd = { "ConformInfo" },
-    init = function()
-      -- If you want the formatexpr, here is the place to set it
-      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-    end,
-  },
-  {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
       { "williamboman/mason.nvim", cmd = "Mason", build = ":MasonUpdate" },
+      {
+        "stevearc/conform.nvim",
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        init = function()
+          -- If you want the formatexpr, here is the place to set it
+          vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+        end,
+      },
       {
         "dnlhc/glance.nvim",
         cmd = "Glance",
@@ -657,8 +590,6 @@ require("lazy").setup({
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
       inlay_hints = { enabled = false },
-      -- add any global capabilities here
-      capabilities = {},
       ---@type lspconfig.options
       servers = {
         jsonls = {
