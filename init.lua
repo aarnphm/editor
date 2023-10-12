@@ -824,6 +824,7 @@ require("lazy").setup({
     "hrsh7th/nvim-cmp",
     version = false,
     event = "InsertEnter",
+    lazy = false,
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
