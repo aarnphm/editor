@@ -1,7 +1,7 @@
-require("aarnphm")  -- default setup
+require "aarnphm" -- default setup
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
-local utils = require("utils")
+local utils = require "utils"
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -108,8 +108,8 @@ require("lazy").setup({
     opts = {
       timeout = 200,
       clear_empty_lines = true,
-      keys = "<Esc>"
-    }
+      keys = "<Esc>",
+    },
   },
   -- NOTE: treesitter-based dependencies
   {
@@ -134,10 +134,10 @@ require("lazy").setup({
     config = true,
   },
   -- NOTE: mini libraries of deps because it is light and easy to use.
-  { 'echasnovski/mini.colors', version = false },
+  { "echasnovski/mini.colors", version = false },
   { "echasnovski/mini.bufremove", version = false },
   { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
-  { "echasnovski/mini.align",  event = "VeryLazy" },
+  { "echasnovski/mini.align", event = "VeryLazy" },
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   {
     "echasnovski/mini.surround",
@@ -151,11 +151,11 @@ require("lazy").setup({
           desc = "Add surrounding",
           mode = { "n", "v" },
         },
-        { opts.mappings.delete,         desc = "Delete surrounding" },
-        { opts.mappings.find,           desc = "Find right surrounding" },
-        { opts.mappings.find_left,      desc = "Find left surrounding" },
-        { opts.mappings.highlight,      desc = "Highlight surrounding" },
-        { opts.mappings.replace,        desc = "Replace surrounding" },
+        { opts.mappings.delete, desc = "Delete surrounding" },
+        { opts.mappings.find, desc = "Find right surrounding" },
+        { opts.mappings.find_left, desc = "Find left surrounding" },
+        { opts.mappings.highlight, desc = "Highlight surrounding" },
+        { opts.mappings.replace, desc = "Replace surrounding" },
         { opts.mappings.update_n_lines, desc = "Update `MiniSurround.config.n_lines`" },
       }
       mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings)
@@ -163,12 +163,12 @@ require("lazy").setup({
     end,
     opts = {
       mappings = {
-        add = "sa",            -- Add surrounding in Normal and Visual modes
-        delete = "sd",         -- Delete surrounding
-        find = "sf",           -- Find surrounding (to the right)
-        find_left = "sF",      -- Find surrounding (to the left)
-        highlight = "sh",      -- Highlight surrounding
-        replace = "sr",        -- Replace surrounding
+        add = "sa", -- Add surrounding in Normal and Visual modes
+        delete = "sd", -- Delete surrounding
+        find = "sf", -- Find surrounding (to the right)
+        find_left = "sF", -- Find surrounding (to the left)
+        highlight = "sh", -- Highlight surrounding
+        replace = "sr", -- Replace surrounding
         update_n_lines = "sn", -- Update `n_lines`
       },
     },
@@ -176,7 +176,7 @@ require("lazy").setup({
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
-    main = 'ibl',
+    main = "ibl",
     opts = {
       debounce = 200,
       indent = {
@@ -313,7 +313,8 @@ require("lazy").setup({
   },
   -- NOTE: folke is neovim's tpope
   { "folke/paint.nvim", event = "BufReadPost", config = true },
-  { "folke/trouble.nvim",
+  {
+    "folke/trouble.nvim",
     cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
     opts = { use_diagnostic_signs = true },
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -346,13 +347,11 @@ require("lazy").setup({
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
     branch = "v3.x",
-    deactivate = function () vim.cmd([[Neotree close]]) end,
+    deactivate = function() vim.cmd [[Neotree close]] end,
     init = function()
       if vim.fn.argc() == 1 then
         local stat = vim.loop.fs_stat(vim.fn.argv(0))
-        if stat and stat.type == "directory" then
-          require("neo-tree")
-        end
+        if stat and stat.type == "directory" then require "neo-tree" end
       end
     end,
     dependencies = {
@@ -386,12 +385,12 @@ require("lazy").setup({
       require("colorizer").setup {
         filetypes = { "*" },
         user_default_options = {
-          names = false,   -- "Name" codes like Blue
+          names = false, -- "Name" codes like Blue
           RRGGBBAA = true, -- #RRGGBBAA hex codes
-          rgb_fn = true,   -- CSS rgb() and rgba() functions
-          hsl_fn = true,   -- CSS hsl() and hsla() functions
-          css = true,      -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-          css_fn = true,   -- Enable all CSS *functions*: rgb_fn, hsl_fn
+          rgb_fn = true, -- CSS rgb() and rgba() functions
+          hsl_fn = true, -- CSS hsl() and hsla() functions
+          css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+          css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
           sass = { enable = true, parsers = { "css" } },
           mode = "background",
         },
@@ -404,7 +403,7 @@ require("lazy").setup({
   {
     "Bekaboo/dropbar.nvim",
     config = true,
-    enabled = vim.fn.has("nvim-0.10") == 1,
+    enabled = vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       icons = {
@@ -417,6 +416,15 @@ require("lazy").setup({
     },
   },
   -- NOTE: lspconfig
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    init = function()
+      -- If you want the formatexpr, here is the place to set it
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
+  },
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
@@ -444,7 +452,7 @@ require("lazy").setup({
         },
       },
       "hrsh7th/cmp-nvim-lsp",
-      { "folke/neodev.nvim",  config = true, ft = "lua" },
+      { "folke/neodev.nvim", config = true, ft = "lua" },
       { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
@@ -493,7 +501,7 @@ require("lazy").setup({
                 defaultConfig = {
                   indent_style = "space",
                   indent_size = "2",
-                }
+                },
               },
               completion = { callSnippet = "Replace" },
               hint = { enable = true, setType = true },
@@ -518,7 +526,16 @@ require("lazy").setup({
         pyright = {
           flags = { debounce_text_changes = 500 },
           root_dir = function(fname)
-            return require("lspconfig.util").root_pattern("WORKSPACE", ".git", "Pipfile", "pyrightconfig.json", "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt")(fname) or require("lspconfig.util").path.dirname(fname)
+            return require("lspconfig.util").root_pattern(
+              "WORKSPACE",
+              ".git",
+              "Pipfile",
+              "pyrightconfig.json",
+              "setup.py",
+              "setup.cfg",
+              "pyproject.toml",
+              "requirements.txt"
+            )(fname) or require("lspconfig.util").path.dirname(fname)
           end,
           settings = {
             python = {
@@ -536,77 +553,88 @@ require("lazy").setup({
     ---@param opts PluginLspOptions
     config = function(client, opts)
       local lspconfig = require "lspconfig"
-      utils.on_attach(function(cl, bufnr) require('keymaps').on_attach(cl, bufnr) end)
-    local register_capability = vim.lsp.handlers["client/registerCapability"]
+      utils.on_attach(function(cl, bufnr) require("keymaps").on_attach(cl, bufnr) end)
+      local register_capability = vim.lsp.handlers["client/registerCapability"]
 
-    vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
-      local ret = register_capability(err, res, ctx)
-      local client_id = ctx.client_id
-      ---@type lsp.Client
-      local cl = vim.lsp.get_client_by_id(client_id)
-      local buffer = vim.api.nvim_get_current_buf()
-      require('keymaps').on_attach(cl, buffer)
-      return ret
-    end
-
-    local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
-
-    if opts.inlay_hints.enabled and inlay_hint then utils.on_attach(function(client, bufnr)
-      if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
-    end) end
-
-    utils.on_attach(function(cl, bufnr)
-      if cl.supports_method "textDocument/publishDiagnostics" then
-        vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-          signs = true,
-          underline = true,
-          virtual_text = false,
-          update_in_insert = true,
-        })
+      vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
+        local ret = register_capability(err, res, ctx)
+        local client_id = ctx.client_id
+        ---@type lsp.Client
+        local cl = vim.lsp.get_client_by_id(client_id)
+        local buffer = vim.api.nvim_get_current_buf()
+        require("keymaps").on_attach(cl, buffer)
+        return ret
       end
-    end)
 
-    local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-    local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), has_cmp and cmp_nvim_lsp.default_capabilities() or {}, opts.capabilities or {})
+      local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
 
-    local mason_handler = function(server)
-      local server_opts = vim.tbl_deep_extend("force", {
-        capabilities = vim.deepcopy(capabilities),
-        flags = { debounce_text_changes = 150 },
-      }, opts.servers[server] or {})
-
-      if opts.setup[server] then
-        if opts.setup[server](lspconfig, server_opts) then return end
-      elseif opts.setup["*"] then
-        if opts.setup["*"](lspconfig, server_opts) then return end
-      else
-        lspconfig[server].setup(server_opts)
+      if opts.inlay_hints.enabled and inlay_hint then
+        utils.on_attach(function(client, bufnr)
+          if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
+        end)
       end
-    end
 
-    local have_mason, mason_lspconfig = pcall(require, "mason-lspconfig")
-    local available = {}
-    if have_mason then available = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
+      utils.on_attach(function(cl, bufnr)
+        if cl.supports_method "textDocument/publishDiagnostics" then
+          vim.lsp.handlers["textDocument/publishDiagnostics"] =
+            vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+              signs = true,
+              underline = true,
+              virtual_text = false,
+              update_in_insert = true,
+            })
+        end
+      end)
 
-    local ensure_installed = {} ---@type string[]
-    for server, server_opts in pairs(opts.servers) do
-      if server_opts then
-        server_opts = server_opts == true and {} or server_opts
-        -- NOTE: servers that are isolated should be setup manually.
-        if server_opts.isolated then
-          ensure_installed[#ensure_installed + 1] = server
+      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+      local capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+        opts.capabilities or {}
+      )
+
+      local mason_handler = function(server)
+        local server_opts = vim.tbl_deep_extend("force", {
+          capabilities = vim.deepcopy(capabilities),
+          flags = { debounce_text_changes = 150 },
+        }, opts.servers[server] or {})
+
+        if opts.setup[server] then
+          if opts.setup[server](lspconfig, server_opts) then return end
+        elseif opts.setup["*"] then
+          if opts.setup["*"](lspconfig, server_opts) then return end
         else
-          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-          if server_opts.mason == false or not vim.tbl_contains(available, server) then
-            mason_handler(server)
-          else
+          lspconfig[server].setup(server_opts)
+        end
+      end
+
+      local have_mason, mason_lspconfig = pcall(require, "mason-lspconfig")
+      local available = {}
+      if have_mason then available = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
+
+      local ensure_installed = {} ---@type string[]
+      for server, server_opts in pairs(opts.servers) do
+        if server_opts then
+          server_opts = server_opts == true and {} or server_opts
+          -- NOTE: servers that are isolated should be setup manually.
+          if server_opts.isolated then
             ensure_installed[#ensure_installed + 1] = server
+          else
+            -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+            if server_opts.mason == false or not vim.tbl_contains(available, server) then
+              mason_handler(server)
+            else
+              ensure_installed[#ensure_installed + 1] = server
+            end
           end
         end
       end
-    end
 
-    if have_mason then mason_lspconfig.setup { ensure_installed = ensure_installed, handlers = { mason_handler } } end
+      if have_mason then
+        mason_lspconfig.setup { ensure_installed = ensure_installed, handlers = { mason_handler } }
+      end
     end,
   },
   -- NOTE: Setup completions.
@@ -623,9 +651,9 @@ require("lazy").setup({
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
-        build = (not jit.os:find "Windows") and
-            "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp" or
-            nil,
+        build = (not jit.os:find "Windows")
+            and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+          or nil,
         config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
         opts = { history = true, delete_check_events = "TextChanged" },
       },
@@ -664,7 +692,10 @@ require("lazy").setup({
         return function(entry, vim_item)
           if opts.before then vim_item = opts.before(entry, vim_item) end
 
-          local item = icons.kind[vim_item.kind] or icons.type[vim_item.kind] or icons.cmp[vim_item.kind] or icons.kind.Undefined
+          local item = icons.kind[vim_item.kind]
+            or icons.type[vim_item.kind]
+            or icons.cmp[vim_item.kind]
+            or icons.kind.Undefined
 
           vim_item.kind = string.format("  %s  %s", item, vim_item.kind)
 
@@ -716,7 +747,7 @@ require("lazy").setup({
         },
         formatting = {
           fields = { "menu", "abbr", "kind" },
-          format = function(entry, vim_item) return cmp_format { maxwidth = 80 } (entry, vim_item) end,
+          format = function(entry, vim_item) return cmp_format { maxwidth = 80 }(entry, vim_item) end,
         },
         sorting = {
           priority_weight = 2,
