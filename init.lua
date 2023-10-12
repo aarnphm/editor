@@ -119,33 +119,10 @@ require("lazy").setup({
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     dependencies = {
-      {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-        config = function()
-          -- When in diff mode, we want to use the default
-          -- vim text objects c & C instead of the treesitter ones.
-          local move = require("nvim-treesitter.textobjects.move") ---@type table<string,fun(...)>
-          local configs = require("nvim-treesitter.configs")
-          for name, fn in pairs(move) do
-            if name:find("goto") == 1 then
-              move[name] = function(q, ...)
-                if vim.wo.diff then
-                  local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
-                  for key, query in pairs(config or {}) do
-                    if q == query and key:find("[%]%[][cC]") then
-                      vim.cmd("normal! " .. key)
-                      return
-                    end
-                  end
-                end
-                return fn(q, ...)
-              end
-            end
-          end
-        end,
-      },
+      "nvim-treesitter/nvim-treesitter-textobjects",
       "windwp/nvim-ts-autotag",
       "nvim-treesitter/playground",
+      { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
     },
   },
   -- NOTE: comments, you say what?
@@ -158,80 +135,10 @@ require("lazy").setup({
   },
   -- NOTE: mini libraries of deps because it is light and easy to use.
   { 'echasnovski/mini.colors', version = false },
-  {
-    "echasnovski/mini.bufremove",
-    version = false,
-    keys = {
-      { "<C-x>", function() require("mini.bufremove").delete(0, false) end, desc = "buf: delete" },
-      { "<C-q>", function() require("mini.bufremove").delete(0, true) end,  desc = "buf: force delete" },
-    },
-  },
-  {
-    -- better text-objects
-    "echasnovski/mini.ai",
-    event = "InsertEnter",
-    dependencies = { "nvim-treesitter-textobjects" },
-    opts = function()
-      local ai = require "mini.ai"
-      return {
-        n_lines = 500,
-        custom_textobjects = {
-          o = ai.gen_spec.treesitter(
-            {
-              a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-              i = { "@block.inner", "@conditional.inner", "@loop.inner" }
-            }, {}),
-          f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
-          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
-        },
-      }
-    end,
-    config = function(_, opts)
-      require("mini.ai").setup(opts)
-      utils.on_load("which-key.nvim", function()
-        ---@type table<string, string|table>
-        local i = {
-          [" "] = "Whitespace",
-          ['"'] = 'Balanced "',
-          ["'"] = "Balanced '",
-          ["`"] = "Balanced `",
-          ["("] = "Balanced (",
-          [")"] = "Balanced ) including white-space",
-          [">"] = "Balanced > including white-space",
-          ["<lt>"] = "Balanced <",
-          ["]"] = "Balanced ] including white-space",
-          ["["] = "Balanced [",
-          ["}"] = "Balanced } including white-space",
-          ["{"] = "Balanced {",
-          ["?"] = "User Prompt",
-          _ = "Underscore",
-          a = "Argument",
-          b = "Balanced ), ], }",
-          c = "Class",
-          f = "Function",
-          o = "Block, conditional, loop",
-          q = "Quote `, \", '",
-          t = "Tag",
-        }
-        local a = vim.deepcopy(i)
-        for k, v in pairs(a) do
-          a[k] = v:gsub(" including.*", "")
-        end
-        local ic = vim.deepcopy(i)
-        local ac = vim.deepcopy(a)
-        for key, name in pairs { n = "Next", l = "Last" } do
-          i[key] = vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
-          a[key] = vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
-        end
-        require("which-key").register {
-          mode = { "o", "x" },
-          i = i,
-          a = a,
-        }
-      end)
-    end,
-  },
+  { "echasnovski/mini.bufremove", version = false },
+  { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
   { "echasnovski/mini.align",  event = "VeryLazy" },
+  { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
@@ -266,7 +173,6 @@ require("lazy").setup({
       },
     },
   },
-  { "echasnovski/mini.pairs", event = "VeryLazy",    opts = {} },
   {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
@@ -407,43 +313,10 @@ require("lazy").setup({
   },
   -- NOTE: folke is neovim's tpope
   { "folke/paint.nvim", event = "BufReadPost", config = true },
-  {
-    "folke/trouble.nvim",
+  { "folke/trouble.nvim",
     cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
     opts = { use_diagnostic_signs = true },
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    keys = {
-      {
-        "[q",
-        function()
-          if #vim.fn.getqflist() > 0 then
-            if require("trouble").is_open() then
-              require("trouble").previous { skip_groups = true, jump = true }
-            else
-              vim.cmd.cprev()
-            end
-          else
-            vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
-          end
-        end,
-        desc = "qf: Previous item",
-      },
-      {
-        "]q",
-        function()
-          if #vim.fn.getqflist() > 0 then
-            if require("trouble").is_open() then
-              require("trouble").next { skip_groups = true, jump = true }
-            else
-              vim.cmd.cnext()
-            end
-          else
-            vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
-          end
-        end,
-        desc = "qf: Next item",
-      },
-    },
   },
   {
     "folke/which-key.nvim",
@@ -456,18 +329,6 @@ require("lazy").setup({
     cmd = { "TodoTrouble", "TodoTelescope" },
     event = { "BufReadPost", "BufNewFile" },
     config = true,
-    keys = {
-      {
-        "]t",
-        function() require("todo-comments").jump_next() end,
-        desc = "todo: Next comment",
-      },
-      {
-        "[t",
-        function() require("todo-comments").jump_prev() end,
-        desc = "todo: Previous comment",
-      },
-    },
   },
   -- NOTE: fuzzy finder ftw
   {
@@ -479,7 +340,6 @@ require("lazy").setup({
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     },
   },
-  -- Automatically highlights other instances of the word under your cursor. This works with LSP, Treesitter, and regexp matching to find the other instances.
   { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" }, lazy = true },
   -- NOTE: better nvim-tree.lua
   {
@@ -539,66 +399,7 @@ require("lazy").setup({
     end,
   },
   -- NOTE: spectre for magic search and replace
-  {
-    "nvim-pack/nvim-spectre",
-    event = "BufReadPost",
-    cmd = "Spectre",
-    keys = {
-      {
-        "<Leader>so",
-        function() require("spectre").open() end,
-        desc = "replace: Open panel",
-      },
-      {
-        "<Leader>so",
-        function() require("spectre").open_visual() end,
-        desc = "replace: Open panel",
-        mode = "v",
-      },
-      {
-        "<Leader>sw",
-        function() require("spectre").open_visual { select_word = true } end,
-        desc = "replace: Replace word under cursor",
-      },
-      {
-        "<Leader>sp",
-        function() require("spectre").open_file_search() end,
-        desc = "replace: Replace word under file search",
-      },
-    },
-    opts = {
-      open_cmd = "noswapfile vnew" ,
-      live_update = true,
-      mapping = {
-        ["change_replace_sed"] = {
-          map = "<LocalLeader>trs",
-          cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
-          desc = "replace: Using sed",
-        },
-        ["change_replace_oxi"] = {
-          map = "<LocalLeader>tro",
-          cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
-          desc = "replace: Using oxi",
-        },
-        ["toggle_live_update"] = {
-          map = "<LocalLeader>tu",
-          cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
-          desc = "replace: update live changes",
-        },
-        -- only work if the find_engine following have that option
-        ["toggle_ignore_case"] = {
-          map = "<LocalLeader>ti",
-          cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
-          desc = "replace: toggle ignore case",
-        },
-        ["toggle_ignore_hidden"] = {
-          map = "<LocalLeader>th",
-          cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
-          desc = "replace: toggle search hidden",
-        },
-      },
-    },
-  },
+  { "nvim-pack/nvim-spectre", event = "BufReadPost", cmd = "Spectre" },
   -- NOTE: nice winbar
   {
     "Bekaboo/dropbar.nvim",
@@ -655,8 +456,6 @@ require("lazy").setup({
       inlay_hints = { enabled = false },
       -- add any global capabilities here
       capabilities = {},
-      -- Automatically format on save
-      autoformat = false,
       -- Enable this to show formatters used in a notification
       -- Useful for debugging formatter issues
       notify = false,
@@ -666,49 +465,6 @@ require("lazy").setup({
       format = { formatting_options = nil, timeout_ms = nil },
       ---@type lspconfig.options
       servers = {
-        bufls = { cmd = { "bufls", "serve", "--debug" }, filetypes = { "proto" } },
-        gopls = {
-          flags = { debounce_text_changes = 500 },
-          cmd = { "gopls", "-remote=auto" },
-          settings = {
-            gopls = {
-              usePlaceholders = true,
-              analyses = {
-                nilness = true,
-                shadow = true,
-                unusedparams = true,
-                unusewrites = true,
-              },
-            },
-          },
-        },
-        html = {
-          cmd = { "html-languageserver", "--stdio" },
-          filetypes = { "html" },
-          init_options = {
-            configurationSection = { "html", "css", "javascript" },
-            embeddedLanguages = { css = true, javascript = true },
-          },
-          settings = {},
-          single_file_support = true,
-          flags = { debounce_text_changes = 500 },
-        },
-        jdtls = {
-          flags = { debounce_text_changes = 500 },
-          settings = {
-            root_dir = {
-              -- Single-module projects
-              {
-                "build.xml",           -- Ant
-                "pom.xml",             -- Maven
-                "settings.gradle",     -- Gradle
-                "settings.gradle.kts", -- Gradle
-              },
-              -- Multi-module projects
-              { "build.gradle", "build.gradle.kts" },
-            } or vim.fn.getcwd(),
-          },
-        },
         jsonls = {
           -- lazy-load schemastore when needed
           on_new_config = function(config)
@@ -756,20 +512,9 @@ require("lazy").setup({
           },
         },
         bashls = {},
-        dockerls = {},
         marksman = {},
-        rnix = {},
-        svelte = {},
-        cssls = {},
         spectral = {},
         taplo = {},
-        -- NOTE: Python
-        ruff_lsp = {
-          root_dir = function(fname)
-            return require("lspconfig.util").root_pattern("WORKSPACE", ".git", "Pipfile", "pyrightconfig.json", "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt")(fname) or require("lspconfig.util").path.dirname(fname)
-          end,
-          settings = {},
-        },
         pyright = {
           flags = { debounce_text_changes = 500 },
           root_dir = function(fname)
@@ -784,41 +529,9 @@ require("lazy").setup({
             },
           },
         },
-        -- NOTE: isolated servers will have their own plugins for setup
-        clangd = { isolated = true },
-        rust_analyzer = { isolated = true },
-        tsserver = { isolated = true },
-        -- NOTE: servers that mason is currently not supported but nvim-lspconfig is.
-        starlark_rust = { mason = false },
       },
       ---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
-      setup = {
-        starlark_rust = function(lspconfig, options)
-          lspconfig.starlark_rust.setup {
-            capabilities = options.capabilities,
-            cmd = { "starlark", "--lsp" },
-            filetypes = {
-              "bzl",
-              "WORKSPACE",
-              "star",
-              "BUILD.bazel",
-              "bazel",
-              "bzlmod",
-            },
-            root_dir = function(fname)
-              return require("lspconfig").util.root_pattern(unpack {
-                    "WORKSPACE",
-                    "WORKSPACE.bzlmod",
-                    "WORKSPACE.bazel",
-                    "MODULE.bazel",
-                    "MODULE",
-                  })(fname) or require("lspconfig").util.find_git_ancestor(fname) or
-                  require("lspconfig").util.path.dirname(fname)
-            end,
-          }
-          return true
-        end,
-      },
+      setup = {},
     },
     ---@param opts PluginLspOptions
     config = function(client, opts)
@@ -843,7 +556,6 @@ require("lazy").setup({
     end) end
 
     utils.on_attach(function(cl, bufnr)
-      -- if client.server_capabilities["documentSymbolProvider"] then require("nvim-navic").attach(client, bufnr) end
       if cl.supports_method "textDocument/publishDiagnostics" then
         vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
           signs = true,
@@ -900,7 +612,6 @@ require("lazy").setup({
   -- NOTE: Setup completions.
   {
     "hrsh7th/nvim-cmp",
-    ---@diagnostic disable-next-line: assign-type-mismatch
     version = false,
     event = "InsertEnter",
     dependencies = {
@@ -1076,11 +787,6 @@ require("lazy").setup({
 
       cmp.setup(opts)
     end,
-  },
-  {
-    "JoosepAlviste/nvim-ts-context-commentstring",
-    lazy = true,
-    opts = { enable_autocmd = false },
   },
 }, {
   install = { colorscheme = { colorscheme } },
