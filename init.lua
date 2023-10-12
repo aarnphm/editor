@@ -507,8 +507,13 @@ require("lazy").setup({
           end
 
           local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-          local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(),
-            has_cmp and cmp_nvim_lsp.default_capabilities() or {}, opts.server.capabilities or {})
+          local capabilities = vim.tbl_deep_extend(
+            "force",
+            {},
+            vim.lsp.protocol.make_client_capabilities(),
+            has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+            opts.server.capabilities or {}
+          )
           opts.server.capabilities = capabilities
           opts.dap = { adapter = get_rust_adapters() }
           require("rust-tools").setup(opts)
@@ -535,23 +540,28 @@ require("lazy").setup({
                     labelDetailsSupport = true,
                     preselectSupport = true,
                     resolveSupport = {
-                      properties = { "documentation", "detail", "additionalTextEdits" }
+                      properties = { "documentation", "detail", "additionalTextEdits" },
                     },
                     snippetSupport = false,
                     tagSupport = {
-                      valueSet = { 1 }
-                    }
-                  }
-                }
-              }
+                      valueSet = { 1 },
+                    },
+                  },
+                },
+              },
             },
           },
         },
         config = function(_, opts)
           local lspconfig = require "lspconfig"
           local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-          local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(),
-            has_cmp and cmp_nvim_lsp.default_capabilities() or {}, opts.server.capabilities or {})
+          local capabilities = vim.tbl_deep_extend(
+            "force",
+            {},
+            vim.lsp.protocol.make_client_capabilities(),
+            has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+            opts.server.capabilities or {}
+          )
 
           local switch_source_header_splitcmd = function(bufnr, splitcmd)
             bufnr = lspconfig.util.validate_bufnr(bufnr)
@@ -569,8 +579,10 @@ require("lazy").setup({
                 vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
               end)
             else
-              error("Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
-                vim.log.levels.ERROR)
+              error(
+                "Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
+                vim.log.levels.ERROR
+              )
             end
           end
 
@@ -616,12 +628,13 @@ require("lazy").setup({
             "--background-index",
             "--pch-storage=memory",
             -- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-            "--query-driver=" .. get_binary_path_list {
-              "clang++",
-              "clang",
-              "gcc",
-              "g++",
-            },
+            "--query-driver="
+              .. get_binary_path_list {
+                "clang++",
+                "clang",
+                "gcc",
+                "g++",
+              },
             "--clang-tidy",
             "--all-scopes-completion",
             "--completion-style=detailed",
