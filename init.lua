@@ -823,16 +823,16 @@ require("lazy").setup({
     ---@param opts PluginLspOptions
     config = function(client, opts)
       local lspconfig = require "lspconfig"
-      utils.on_attach(function(client, bufnr) require('keymaps').on_attach(client, bufnr) end)
+      utils.on_attach(function(cl, bufnr) require('keymaps').on_attach(cl, bufnr) end)
     local register_capability = vim.lsp.handlers["client/registerCapability"]
 
     vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
       local ret = register_capability(err, res, ctx)
       local client_id = ctx.client_id
       ---@type lsp.Client
-      local client = vim.lsp.get_client_by_id(client_id)
+      local cl = vim.lsp.get_client_by_id(client_id)
       local buffer = vim.api.nvim_get_current_buf()
-      require('keymaps').on_attach(client, buffer)
+      require('keymaps').on_attach(cl, buffer)
       return ret
     end
 
@@ -842,9 +842,9 @@ require("lazy").setup({
       if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
     end) end
 
-    utils.on_attach(function(client, bufnr)
+    utils.on_attach(function(cl, bufnr)
       -- if client.server_capabilities["documentSymbolProvider"] then require("nvim-navic").attach(client, bufnr) end
-      if client.supports_method "textDocument/publishDiagnostics" then
+      if cl.supports_method "textDocument/publishDiagnostics" then
         vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
           signs = true,
           underline = true,
@@ -854,7 +854,6 @@ require("lazy").setup({
       end
     end)
 
-    local servers = opts.servers
     local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
     local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), has_cmp and cmp_nvim_lsp.default_capabilities() or {}, opts.capabilities or {})
 
@@ -862,7 +861,7 @@ require("lazy").setup({
       local server_opts = vim.tbl_deep_extend("force", {
         capabilities = vim.deepcopy(capabilities),
         flags = { debounce_text_changes = 150 },
-      }, servers[server] or {})
+      }, opts.servers[server] or {})
 
       if opts.setup[server] then
         if opts.setup[server](lspconfig, server_opts) then return end
@@ -878,7 +877,7 @@ require("lazy").setup({
     if have_mason then available = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
 
     local ensure_installed = {} ---@type string[]
-    for server, server_opts in pairs(servers) do
+    for server, server_opts in pairs(opts.servers) do
       if server_opts then
         server_opts = server_opts == true and {} or server_opts
         -- NOTE: servers that are isolated should be setup manually.
