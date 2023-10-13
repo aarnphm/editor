@@ -1,4 +1,4 @@
-local o, opt, g = vim.o, vim.opt, vim.g
+local o, opt, g, wo = vim.o, vim.opt, vim.g, vim.wo
 
 if vim.loop.os_uname().sysname == "Darwin" then
   g.clipboard = {
@@ -8,6 +8,11 @@ if vim.loop.os_uname().sysname == "Darwin" then
     cache_enabled = 0,
   }
 end
+
+wo.scrolloff = 8
+wo.sidescrolloff = 8
+wo.wrap = false
+wo.cursorline = true
 
 -- Some defaults and don't question it
 o.wrap = false -- egh i don't like wrap
@@ -24,16 +29,25 @@ o.pumheight = 8 -- larger completion windows
 o.expandtab = true -- convert spaces to tabs
 o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
 o.number = true -- number is good for nav
-o.relativenumber = true -- relativenumber is useful, grow up
 o.swapfile = false -- I don't like swap files personally, found undofile to be better
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
 o.shortmess = "aoOTIcF" -- insanely complex shortmess, but its cleannn
 o.laststatus = 2 -- show statusline on buffer
+
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
-o.shada = "!,'500,<50,@100,s10,h" -- shada options
-o.statusline = _G.statusline.build()
+
+o.statusline = table.concat({
+  "%{%luaeval('statusline.git()')%}",
+  "%m",
+  "%=",
+  "%=",
+  "%{%luaeval('statusline.diagnostic()')%}",
+  "%y",
+  "%l:%c",
+  "♥",
+}, " ")
 
 opt.pumblend = 17 -- make completion window transparent
 opt.completeopt = { "menuone", "noselect" } -- better completion menu

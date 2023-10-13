@@ -4,7 +4,7 @@ _G.P = function(v)
   return v
 end
 
-_G.augroup = function(name) return vim.api.nvim_create_augroup(string.format("simple_%s", name), { clear = true }) end
+_G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 
 -- statusline and simple
 local fmt = string.format
@@ -54,7 +54,7 @@ _G.statusline = {
     if hunks ~= "" and branch ~= "" then branch = branch .. " " end
     return fmt("%s", table.concat { branch, hunks })
   end,
-  diagnostic = function() -- NOTE: diagnostic
+  diagnostic = function()
     local buf = vim.api.nvim_get_current_buf()
     return vim.diagnostic.get(buf)
         and fmt(
@@ -63,19 +63,6 @@ _G.statusline = {
           #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
         )
       or ""
-  end,
-  build = function()
-    local spacer = "%="
-    return table.concat({
-      "%{%luaeval('_G.statusline.git()')%}",
-      "%m",
-      spacer,
-      spacer,
-      "%{%luaeval('_G.statusline.diagnostic()')%}",
-      "%y",
-      "%l:%c",
-      "♥",
-    }, " ")
   end,
 }
 

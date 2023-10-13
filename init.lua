@@ -1,7 +1,8 @@
 require "aarnphm" -- default setup
-if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
-local utils = require "utils"
+local Util = require "utils"
+
+if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -488,7 +489,7 @@ require("lazy").setup({
         yamlls = {
           -- lazy-load schemastore when needed
           on_new_config = function(config)
-            if utils.has "SchemaStore" then config.settings.yaml.schemas = require("schemastore").yaml.schemas() end
+            if Util.has "SchemaStore" then config.settings.yaml.schemas = require("schemastore").yaml.schemas() end
           end,
           settings = { yaml = { hover = true, validate = true, completion = true } },
         },
@@ -538,15 +539,15 @@ require("lazy").setup({
       setup = {},
     },
     ---@param opts PluginLspOptions
-    config = function(client, opts)
+    config = function(_, opts)
       local lspconfig = require "lspconfig"
-      utils.on_attach(function(cl, bufnr) require("keymaps").on_attach(cl, bufnr) end)
+      Util.on_attach(function(cl, bufnr) require("keymaps").on_attach(cl, bufnr) end)
       local register_capability = vim.lsp.handlers["client/registerCapability"]
 
       vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
         local ret = register_capability(err, res, ctx)
         local client_id = ctx.client_id
-        ---@type lsp.Client
+        ---@type lsp.Client|nil
         local cl = vim.lsp.get_client_by_id(client_id)
         local buffer = vim.api.nvim_get_current_buf()
         require("keymaps").on_attach(cl, buffer)
@@ -556,12 +557,12 @@ require("lazy").setup({
       local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
 
       if opts.inlay_hints.enabled and inlay_hint then
-        utils.on_attach(function(client, bufnr)
+        Util.on_attach(function(client, bufnr)
           if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
         end)
       end
 
-      utils.on_attach(function(cl, bufnr)
+      Util.on_attach(function(cl, bufnr)
         if cl.supports_method "textDocument/publishDiagnostics" then
           vim.lsp.handlers["textDocument/publishDiagnostics"] =
             vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -578,8 +579,7 @@ require("lazy").setup({
         "force",
         {},
         vim.lsp.protocol.make_client_capabilities(),
-        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-        opts.capabilities or {}
+        has_cmp and cmp_nvim_lsp.default_capabilities() or {}
       )
 
       local mason_handler = function(server)

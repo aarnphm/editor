@@ -19,8 +19,13 @@ require "aarnphm.bindings"
 autocmd("FileType", {
   group = augroup "filetype",
   pattern = {
-    "qf",
+    "PlenaryTestPopup",
     "help",
+    "lspinfo",
+    "man",
+    "notify",
+    "qf",
+    "query",
     "man",
     "nowrite", -- fugitive
     "prompt",
@@ -31,7 +36,6 @@ autocmd("FileType", {
     "alpha",
     "toggleterm",
     "health",
-    "PlenaryTestPopup",
     "nofile",
     "scratch",
     "",
@@ -42,11 +46,28 @@ autocmd("FileType", {
   end,
 })
 -- Check if we need to reload the file when it changed
-autocmd(
-  { "FocusGained", "TermClose", "TermLeave" },
-  { group = augroup "checktime", pattern = "*", command = "checktime" }
-)
-autocmd("VimResized", { group = augroup "resized", command = "tabdo wincmd =" })
+autocmd({ "FocusGained", "TermClose", "TermLeave" }, { group = augroup "checktime", command = "checktime" })
+autocmd("VimResized", {
+  group = augroup "resized",
+  callback = function()
+    local current = vim.fn.tabpagenr()
+    vim.cmd "tabdo wincmd ="
+    vim.cmd("tabnext  " .. current)
+  end,
+})
+-- go to last loc when opening a buffer
+autocmd("BufReadPost", {
+  group = augroup "last_loc",
+  callback = function(event)
+    local exclude = { "gitcommit" }
+    local buf = event.buf
+    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].simple_last_loc then return end
+    vim.b[buf].simple_last_loc = true
+    local mark = vim.api.nvim_buf_get_mark(buf, '"')
+    local lcount = vim.api.nvim_buf_line_count(buf)
+    if mark[1] > 0 and mark[1] <= lcount then pcall(vim.api.nvim_win_set_cursor, 0, mark) end
+  end,
+})
 autocmd(
   "BufWritePre",
   { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" }
@@ -84,3 +105,11 @@ autocmd("FileType", {
     if parsers.has_parser(lang) then vim.treesitter.start(ev.buf) end
   end,
 })
+
+vim.cmd [[
+  augroup numbertoggle
+    autocmd!
+    autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
+    autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
+  augroup END
+]]
