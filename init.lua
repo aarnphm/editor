@@ -104,6 +104,7 @@ require("lazy").setup({
   { "echasnovski/mini.bufremove", version = false },
   { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
   { "echasnovski/mini.align", event = "VeryLazy" },
+  { "echasnovski/mini.trailspace", event = "VeryLazy" },
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   { "echasnovski/mini.surround", event = "VeryLazy", config = true },
   {
@@ -338,15 +339,6 @@ require("lazy").setup({
     config = true,
     enabled = vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
-    opts = {
-      icons = {
-        enable = true,
-        ui = {
-          bar = { separator = "  ", extends = "…" },
-          menu = { separator = " ", indicator = "  " },
-        },
-      },
-    },
   },
   -- NOTE: lspconfig
   {
@@ -448,25 +440,13 @@ require("lazy").setup({
         spectral = {},
         taplo = {},
         pyright = {
-          flags = { debounce_text_changes = 500 },
-          root_dir = function(fname)
-            return require("lspconfig.util").root_pattern(
-              "WORKSPACE",
-              ".git",
-              "Pipfile",
-              "pyrightconfig.json",
-              "setup.py",
-              "setup.cfg",
-              "pyproject.toml",
-              "requirements.txt"
-            )(fname) or require("lspconfig.util").path.dirname(fname)
-          end,
           settings = {
             python = {
               autoImportCompletions = true,
               autoSearchPaths = true,
-              diagnosticMode = "workspace", -- workspace
+              diagnosticMode = "openFilesOnly", -- workspace
               useLibraryCodeForTypes = true,
+              typeCheckingMode = "strict", -- off, basic, strict
             },
           },
         },
@@ -523,6 +503,7 @@ require("lazy").setup({
         local server_opts = vim.tbl_deep_extend("force", {
           capabilities = vim.deepcopy(capabilities),
           flags = { debounce_text_changes = 150 },
+          root_dir = require("lspconfig.util").root_pattern ".git",
         }, opts.servers[server] or {})
 
         if opts.setup[server] then
@@ -587,6 +568,24 @@ require("lazy").setup({
 }, {
   install = { colorscheme = { colorscheme } },
   defaults = { lazy = true },
+  performance = {
+    cache = { enabled = true },
+    reset_packpath = true,
+    rtp = {
+      reset = true,
+      disabled_plugins = {
+        "gzip",
+        "matchit",
+        "matchparen",
+        "netrwPlugin",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+        "man",
+      },
+    },
+  },
   change_detection = { notify = false },
   concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
   checker = { enable = true },

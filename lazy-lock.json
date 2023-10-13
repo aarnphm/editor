@@ -1,7 +1,7 @@
 {
   "Comment.nvim": { "branch": "master", "commit": "0236521ea582747b58869cb72f70ccfa967d2e89" },
   "LuaSnip": { "branch": "master", "commit": "0df29db3543837f8b41597f2640397c5ec792b7b" },
-  "SchemaStore.nvim": { "branch": "main", "commit": "ca3b59653595583ea3d7b0874aaf74b5f2a916ae" },
+  "SchemaStore.nvim": { "branch": "main", "commit": "f3c4985093716c8ddf93731609ebfc1df7c5335d" },
   "better-escape.nvim": { "branch": "master", "commit": "7031dc734add47bb71c010e0551829fa5799375f" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
   "cmp-emoji": { "branch": "main", "commit": "19075c36d5820253d32e2478b6aaf3734aeaafa0" },
@@ -28,6 +28,7 @@
   "mini.colors": { "branch": "main", "commit": "9b97254bed6258d8174fa436cc9e54b13ba4c0ac" },
   "mini.pairs": { "branch": "main", "commit": "6f6bd7ed5757b40bc29c73dac0d743e4e6978124" },
   "mini.surround": { "branch": "main", "commit": "68ce058ef9716d7d955b79363845d2dd003d6500" },
+  "mini.trailspace": { "branch": "main", "commit": "e8c144ee11f6a827ac9c5732f20aefbbd7b26035" },
   "mkdir.nvim": { "branch": "main", "commit": "c55d1dee4f099528a1853b28bb28caa802eba217" },
   "neo-tree.nvim": { "branch": "v3.x", "commit": "6f8c49956c89e9fefae6acdfe1d57c6293b0a03d" },
   "neoconf.nvim": { "branch": "main", "commit": "393d37abd9d82adcac627309a41758ae8e140d9e" },
