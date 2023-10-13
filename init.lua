@@ -101,6 +101,7 @@ require("lazy").setup({
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     config = true,
   },
+  { "j-hui/fidget.nvim", lazy = true, event = "LspAttach", config = true, opts = { fmt = { max_messages = 3 } } },
   { "echasnovski/mini.colors", version = false },
   { "echasnovski/mini.bufremove", version = false },
   { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
@@ -173,10 +174,14 @@ require("lazy").setup({
     version = false,
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
-      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+      },
     },
   },
   { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" }, lazy = true },
+  { "nvim-pack/nvim-spectre", event = "BufReadPost", cmd = "Spectre" },
   {
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
@@ -227,7 +232,6 @@ require("lazy").setup({
       }
     end,
   },
-  { "nvim-pack/nvim-spectre", event = "BufReadPost", cmd = "Spectre" },
   {
     "Bekaboo/dropbar.nvim",
     config = true,
@@ -245,10 +249,7 @@ require("lazy").setup({
         "stevearc/conform.nvim",
         event = { "BufWritePre" },
         cmd = { "ConformInfo" },
-        init = function()
-          -- If you want the formatexpr, here is the place to set it
-          vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-        end,
+        init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
       },
       { "dnlhc/glance.nvim", cmd = "Glance", lazy = true },
       { "folke/neodev.nvim", config = true, ft = "lua" },
@@ -645,6 +646,7 @@ require("lazy").setup({
             help = false,
             terraform = false,
             hgcommit = false,
+            gitcommit = false,
             svn = false,
             cvs = false,
             ["dap-repl"] = false,
@@ -689,6 +691,7 @@ require("lazy").setup({
 
 vim.o.background = background
 vim.cmd.colorscheme(colorscheme)
+
 -- NOTE: this should only be run on Terminal.app
 -- require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
 -- vim.opt.termguicolors = false

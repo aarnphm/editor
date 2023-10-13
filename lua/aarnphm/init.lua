@@ -1,8 +1,19 @@
+-- NOTE: Loading shada is slow, so we load it manually after UIEnter
+local shada = vim.o.shada
+local autocmd = vim.api.nvim_create_autocmd
+
+vim.o.shada = ""
+autocmd("User", {
+  pattern = "VeryLazy",
+  callback = function()
+    vim.o.shada = shada
+    pcall(vim.api.nvim_exec2, "rshada", {})
+  end,
+})
+
 require "aarnphm.globals"
 require "aarnphm.options"
 require "aarnphm.bindings"
-
-local autocmd = vim.api.nvim_create_autocmd
 
 -- close some filetypes with <q>
 autocmd("FileType", {

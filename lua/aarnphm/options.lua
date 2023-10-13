@@ -35,6 +35,7 @@ o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
 o.shada = "!,'500,<50,@100,s10,h" -- shada options
 o.statusline = _G.statusline.build()
 
+opt.pumblend = 17 -- make completion window transparent
 opt.completeopt = { "menuone", "noselect" } -- better completion menu
 -- NOTE: "1jcroql"
 opt.formatoptions = opt.formatoptions
