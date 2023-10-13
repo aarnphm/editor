@@ -1,6 +1,6 @@
-local utils = require('utils')
-local telescope = require('telescope')
-local builtin = require("telescope.builtin")
+local utils = require "utils"
+local telescope = require "telescope"
+local builtin = require "telescope.builtin"
 
 local opts = {
   defaults = {
@@ -28,10 +28,10 @@ local opts = {
     color_devicons = true,
   },
   fzf = {
-    fuzzy = false,                  -- false will only do exact matching
+    fuzzy = false, -- false will only do exact matching
     override_generic_sorter = true, -- override the generic sorter
-    override_file_sorter = true,    -- override the file sorter
-    case_mode = "smart_case",       -- or "ignore_case" or "respect_case"
+    override_file_sorter = true, -- override the file sorter
+    case_mode = "smart_case", -- or "ignore_case" or "respect_case"
   },
   pickers = {
     find_files = { hidden = true },
@@ -79,7 +79,7 @@ opts.extensions = {
       i = {
         ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
         ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " --iglob " },
-        ["<C-j>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " -t " }
+        ["<C-j>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " -t " },
       },
     },
   },
@@ -88,13 +88,19 @@ opts.extensions = {
 telescope.setup(opts)
 telescope.load_extension "live_grep_args"
 
-vim.keymap.set('n', 'gI', function(...)
-  builtin.lsp_implementation { reuse_win = true }
-end, { desc = 'lsp: Goto implementation' })
-vim.keymap.set('n', 'gY', function(...)
-  builtin.lsp_type_definitions { reuse_win = true }
-end, { desc = 'lsp: Goto type definitions' })
-vim.keymap.set('n', '<C-p>', function(...)
+vim.keymap.set(
+  "n",
+  "gI",
+  function(...) builtin.lsp_implementation { reuse_win = true } end,
+  { desc = "lsp: Goto implementation" }
+)
+vim.keymap.set(
+  "n",
+  "gY",
+  function(...) builtin.lsp_type_definitions { reuse_win = true } end,
+  { desc = "lsp: Goto type definitions" }
+)
+vim.keymap.set("n", "<C-p>", function(...)
   builtin.keymaps {
     lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
     layout_config = {
@@ -104,19 +110,30 @@ vim.keymap.set('n', '<C-p>', function(...)
     },
   }
 end, { desc = "telescope: Keymaps", noremap = true, silent = true })
-vim.keymap.set('n', '<leader>b', function(...)
-  builtin.buffers {
-    layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
-    show_all_buffers = true,
-    previewer = false,
-  }
-end, { desc = "telescope: Manage buffers" })
-vim.keymap.set('n', "<leader>f", builtin.find_files, { desc = "telescope: Find files" })
-vim.keymap.set('n', "<LocalLeader>f", builtin.git_files, { desc = "telescope: Find files (git)" })
-vim.keymap.set("n", "<leader>/", function()
-  builtin.grep_string { word_match = '-w' }
-end, { desc = "telescope: Grep string" })
+vim.keymap.set(
+  "n",
+  "<leader>b",
+  function(...)
+    builtin.buffers {
+      layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+      show_all_buffers = true,
+      previewer = false,
+    }
+  end,
+  { desc = "telescope: Manage buffers" }
+)
+vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "telescope: Find files" })
+vim.keymap.set("n", "<LocalLeader>f", builtin.git_files, { desc = "telescope: Find files (git)" })
+vim.keymap.set(
+  "n",
+  "<leader>/",
+  function() builtin.grep_string { word_match = "-w" } end,
+  { desc = "telescope: Grep string" }
+)
 vim.keymap.set("v", "<leader>/", builtin.grep_string, { desc = "telescope: Grep string" })
-vim.keymap.set("n", "<leader>w",
+vim.keymap.set(
+  "n",
+  "<leader>w",
   function() require("telescope").extensions.live_grep_args.live_grep_args() end,
-  { desc = "telescope: Help tags" })
+  { desc = "telescope: Help tags" }
+)

@@ -1,4 +1,4 @@
-vim.keymap.set('n', '[q', function ()
+vim.keymap.set("n", "[q", function()
   if #vim.fn.getqflist() > 0 then
     if require("trouble").is_open() then
       require("trouble").previous { skip_groups = true, jump = true }
@@ -8,9 +8,9 @@ vim.keymap.set('n', '[q', function ()
   else
     vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
   end
-end, {desc = "qf: Previous items"})
+end, { desc = "qf: Previous items" })
 
-vim.keymap.set('n', ']q', function ()
+vim.keymap.set("n", "]q", function()
   if #vim.fn.getqflist() > 0 then
     if require("trouble").is_open() then
       require("trouble").next { skip_groups = true, jump = true }
@@ -20,4 +20,4 @@ vim.keymap.set('n', ']q', function ()
   else
     vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
   end
-end, {desc = "qf: Next items"})
+end, { desc = "qf: Next items" })

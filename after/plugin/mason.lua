@@ -1,9 +1,9 @@
 local opts = {
   ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" },
-  ui = { border = 'single' },
+  ui = { border = "single" },
 }
 
-require('mason').setup(opts)
+require("mason").setup(opts)
 
 local mr = require "mason-registry"
 for _, tool in ipairs(opts.ensure_installed) do
@@ -11,4 +11,4 @@ for _, tool in ipairs(opts.ensure_installed) do
   if not p:is_installed() then p:install() end
 end
 
-vim.keymap.set('n', '<leader>m', "<cmd>Mason<cr>", {desc = "Mason"})
+vim.keymap.set("n", "<leader>m", "<cmd>Mason<cr>", { desc = "Mason" })
