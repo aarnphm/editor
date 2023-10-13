@@ -21,7 +21,6 @@ local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COL
 local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark"
 
 require("lazy").setup({
-  -- NOTE: utilities
   "lewis6991/impatient.nvim",
   "nvim-lua/plenary.nvim",
   "jghauser/mkdir.nvim",
@@ -49,7 +48,6 @@ require("lazy").setup({
     end,
     config = true,
   },
-  -- NOTE: cozy colorscheme
   {
     "rose-pine/neovim",
     name = "rose-pine",
@@ -66,18 +64,23 @@ require("lazy").setup({
         TelescopePromptNormal = { fg = "text" },
         TelescopeSelection = { fg = "text" },
         TelescopeSelectionCaret = { fg = "iris" },
+        WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
+        WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
+        GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
+        GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },
+        GlanceWinBarFilename = { fg = "love", bg = "surface" },
+        GlancePreviewNormal = { fg = "highlight_high" },
+        GlancePreviewMatch = { fg = "love" },
+        IblScope = { fg = "rose" },
       },
     },
   },
-  -- NOTE: nice git integration and UI
   { "lewis6991/gitsigns.nvim", event = "BufReadPost" },
-  -- NOTE: exit fast af
   {
     "max397574/better-escape.nvim",
     event = "InsertEnter",
     opts = { timeout = 200, clear_empty_lines = true, keys = "<Esc>" },
   },
-  -- NOTE: treesitter-based dependencies
   {
     "nvim-treesitter/nvim-treesitter",
     version = false, -- last release is way too old and doesn't work on Windows
@@ -91,7 +94,6 @@ require("lazy").setup({
       { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
     },
   },
-  -- NOTE: comments, you say what?
   {
     "numToStr/Comment.nvim",
     lazy = true,
@@ -99,7 +101,6 @@ require("lazy").setup({
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     config = true,
   },
-  -- NOTE: mini libraries of deps because it is light and easy to use.
   { "echasnovski/mini.colors", version = false },
   { "echasnovski/mini.bufremove", version = false },
   { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
@@ -111,100 +112,7 @@ require("lazy").setup({
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
     main = "ibl",
-    opts = {
-      debounce = 200,
-      indent = {
-        char = "│",
-        tab_char = "│",
-        smart_indent_cap = true,
-        priority = 2,
-      },
-      whitespace = { remove_blankline_trail = true },
-      -- Note: The `scope` field requires treesitter to be set up
-      scope = {
-        enabled = true,
-        char = "┃",
-        show_start = false,
-        show_end = false,
-        injected_languages = true,
-        priority = 1000,
-        include = {
-          node_type = {
-            ["*"] = {
-              "argument_list",
-              "arguments",
-              "assignment_statement",
-              "Block",
-              "chunk",
-              "class",
-              "ContainerDecl",
-              "dictionary",
-              "do_block",
-              "do_statement",
-              "element",
-              "except",
-              "FnCallArguments",
-              "for",
-              "for_statement",
-              "function",
-              "function_declaration",
-              "function_definition",
-              "if_statement",
-              "IfExpr",
-              "IfStatement",
-              "import",
-              "InitList",
-              "list_literal",
-              "method",
-              "object",
-              "ParamDeclList",
-              "repeat_statement",
-              "selector",
-              "SwitchExpr",
-              "table",
-              "table_constructor",
-              "try",
-              "tuple",
-              "type",
-              "var",
-              "while",
-              "while_statement",
-              "with",
-            },
-          },
-        },
-      },
-      exclude = {
-        filetypes = {
-          "", -- for all buffers without a file type
-          "alpha",
-          "big_file_disabled_ft",
-          "dashboard",
-          "dotooagenda",
-          "flutterToolsOutline",
-          "fugitive",
-          "git",
-          "gitcommit",
-          "help",
-          "json",
-          "log",
-          "markdown",
-          "NvimTree",
-          "Outline",
-          "peekaboo",
-          "startify",
-          "TelescopePrompt",
-          "todoist",
-          "txt",
-          "undotree",
-          "vimwiki",
-          "vista",
-        },
-        buftypes = { "terminal", "nofile", "quickfix", "prompt" },
-      },
-    },
   },
-  -- NOTE: easily jump to any location and enhanced f/t motions for Leap
   {
     "ggandor/flit.nvim",
     opts = { labeled_modes = "nx" },
@@ -220,11 +128,7 @@ require("lazy").setup({
   },
   {
     "ggandor/leap.nvim",
-    keys = {
-      -- { "s", mode = { "n", "x", "o" }, desc = "motion: Leap forward to" },
-      -- { "S", mode = { "n", "x", "o" }, desc = "motion: Leap backward to" },
-      { "gs", mode = { "n", "x", "o" }, desc = "motion: Leap from windows" },
-    },
+    keys = { { "gs", mode = { "n", "x", "o" }, desc = "motion: Leap from windows" } },
     config = function(_, opts)
       local leap = require "leap"
       for key, val in pairs(opts) do
@@ -235,7 +139,6 @@ require("lazy").setup({
       vim.keymap.del({ "x", "o" }, "X")
     end,
   },
-  -- NOTE: better UI components
   {
     "kevinhwang91/nvim-bqf",
     ft = "qf",
@@ -245,7 +148,6 @@ require("lazy").setup({
     },
     config = true,
   },
-  -- NOTE: folke is neovim's tpope
   { "folke/paint.nvim", event = "BufReadPost", config = true },
   {
     "folke/trouble.nvim",
@@ -265,7 +167,6 @@ require("lazy").setup({
     event = { "BufReadPost", "BufNewFile" },
     config = true,
   },
-  -- NOTE: fuzzy finder ftw
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
@@ -276,7 +177,6 @@ require("lazy").setup({
     },
   },
   { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" }, lazy = true },
-  -- NOTE: better nvim-tree.lua
   {
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
@@ -293,25 +193,21 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       {
         "s1n7ax/nvim-window-picker",
+        name = "window-picker",
         lazy = true,
         opts = {
           autoselect_one = true,
           include_current = false,
           filter_rules = {
-            -- filter using buffer options
             bo = {
-              -- if the file type is one of following, the window will be ignored
               filetype = { "neo-tree", "neo-tree-popup", "notify" },
-              -- if the buffer type is one of following, the window will be ignored
               buftype = { "terminal", "quickfix", "Scratch" },
             },
           },
         },
-        config = function(_, opts) require("window-picker").setup(opts) end,
       },
     },
   },
-  -- NOTE: Chad colorizer
   {
     "NvChad/nvim-colorizer.lua",
     event = "LspAttach",
@@ -331,21 +227,19 @@ require("lazy").setup({
       }
     end,
   },
-  -- NOTE: spectre for magic search and replace
   { "nvim-pack/nvim-spectre", event = "BufReadPost", cmd = "Spectre" },
-  -- NOTE: nice winbar
   {
     "Bekaboo/dropbar.nvim",
     config = true,
     enabled = vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
   },
-  -- NOTE: lspconfig
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp",
       { "williamboman/mason.nvim", cmd = "Mason", build = ":MasonUpdate" },
       {
         "stevearc/conform.nvim",
@@ -356,27 +250,7 @@ require("lazy").setup({
           vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
         end,
       },
-      {
-        "dnlhc/glance.nvim",
-        cmd = "Glance",
-        lazy = true,
-        config = true,
-        opts = {
-          border = { enable = true },
-          height = 20,
-          zindex = 50,
-          preview_win_opts = {
-            cursorline = true,
-            number = true,
-            wrap = true,
-          },
-          list = {
-            position = "right",
-            width = 0.33, -- 33% width relative to the active window, min 0.1, max 0.5
-          },
-        },
-      },
-      "hrsh7th/cmp-nvim-lsp",
+      { "dnlhc/glance.nvim", cmd = "Glance", lazy = true },
       { "folke/neodev.nvim", config = true, ft = "lua" },
       { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
@@ -639,7 +513,7 @@ require("lazy").setup({
             python = {
               autoImportCompletions = true,
               autoSearchPaths = true,
-              diagnosticMode = "openFilesOnly", -- workspace
+              diagnosticMode = "workspace", -- workspace
               useLibraryCodeForTypes = true,
               typeCheckingMode = "strict", -- off, basic, strict
             },
@@ -810,7 +684,7 @@ require("lazy").setup({
   change_detection = { notify = false },
   concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
   checker = { enable = true },
-  ui = { border = "single" },
+  ui = { border = "none" },
 })
 
 vim.o.background = background

@@ -21,6 +21,7 @@ M.get = function()
       { "[w", M.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
       { "K", vim.lsp.buf.hover, desc = "Hover" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
+      { "gh", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
     }
   end

@@ -1,6 +1,6 @@
 local opts = {
   ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" },
-  ui = { border = "single" },
+  ui = { border = "none" },
 }
 
 require("mason").setup(opts)
