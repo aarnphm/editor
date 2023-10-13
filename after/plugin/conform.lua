@@ -2,8 +2,7 @@ require("conform").setup {
   formatters_by_ft = {
     lua = { "stylua" },
     toml = { "taplo" },
-    ["*"] = { "codespell" },
-    ["_"] = { "trim_whitespace" },
+    proto = { { "buf", "protolint" } },
   },
   format_on_save = function(bufnr)
     -- Disable autoformat on certain filetypes
