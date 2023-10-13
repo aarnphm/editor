@@ -1,6 +1,7 @@
-local utils = require "utils"
+local Util = require "utils"
 local telescope = require "telescope"
 local builtin = require "telescope.builtin"
+local actions = require "telescope.actions"
 
 local opts = {
   defaults = {
@@ -14,6 +15,17 @@ local opts = {
     },
     prompt_prefix = "  ",
     selection_caret = "󰄾 ",
+    -- open files in the first window that is an actual file.
+    -- use the current window if no other window is available.
+    get_selection_window = function()
+      local wins = vim.api.nvim_list_wins()
+      table.insert(wins, 1, vim.api.nvim_get_current_win())
+      for _, win in ipairs(wins) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].buftype == "" then return win end
+      end
+      return 0
+    end,
     file_ignore_patterns = {
       ".git/",
       "node_modules/",
@@ -52,25 +64,25 @@ local opts = {
 opts.defaults.mappings = {
   i = {
     ["<C-a>"] = { "<esc>0i", type = "command" },
-    ["<Esc>"] = function(...) return require("telescope.actions").close(...) end,
+    ["<Esc>"] = function(...) return actions.close(...) end,
     ["<c-t>"] = function(...) return require("trouble.providers.telescope").open_with_trouble(...) end,
     ["<a-t>"] = function(...) return require("trouble.providers.telescope").open_selected_with_trouble(...) end,
     ["<a-i>"] = function()
       local action_state = require "telescope.actions.state"
       local line = action_state.get_current_line()
-      utils.telescope("find_files", { no_ignore = true, default_text = line })()
+      Util.telescope("find_files", { no_ignore = true, default_text = line })()
     end,
     ["<a-h>"] = function()
       local action_state = require "telescope.actions.state"
       local line = action_state.get_current_line()
-      utils.telescope("find_files", { hidden = true, default_text = line })()
+      Util.telescope("find_files", { hidden = true, default_text = line })()
     end,
-    ["<C-Down>"] = function(...) return require("telescope.actions").cycle_history_next(...) end,
-    ["<C-Up>"] = function(...) return require("telescope.actions").cycle_history_prev(...) end,
-    ["<C-f>"] = function(...) return require("telescope.actions").preview_scrolling_down(...) end,
-    ["<C-b>"] = function(...) return require("telescope.actions").preview_scrolling_up(...) end,
+    ["<C-Down>"] = function(...) return actions.cycle_history_next(...) end,
+    ["<C-Up>"] = function(...) return actions.cycle_history_prev(...) end,
+    ["<C-f>"] = function(...) return actions.preview_scrolling_down(...) end,
+    ["<C-b>"] = function(...) return actions.preview_scrolling_up(...) end,
   },
-  n = { ["q"] = function(...) return require("telescope.actions").close(...) end },
+  n = { ["q"] = function(...) return actions.close(...) end },
 }
 opts.extensions = {
   live_grep_args = {

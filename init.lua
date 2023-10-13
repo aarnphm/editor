@@ -18,7 +18,7 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
-local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "dark"
+local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
 
 require("lazy").setup({
   "lewis6991/impatient.nvim",
@@ -89,6 +89,7 @@ require("lazy").setup({
     event = { "BufReadPost", "BufNewFile" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
+      "nvim-treesitter/nvim-treesitter-context",
       "windwp/nvim-ts-autotag",
       "nvim-treesitter/playground",
       { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
@@ -98,10 +99,22 @@ require("lazy").setup({
     "numToStr/Comment.nvim",
     lazy = true,
     event = "BufReadPost",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    config = true,
+    dependencies = { "nvim-treesitter/nvim-treesitter", "JoosepAlviste/nvim-ts-context-commentstring" },
   },
-  { "j-hui/fidget.nvim", lazy = true, event = "LspAttach", config = true, opts = { fmt = { max_messages = 3 } } },
+  {
+    "j-hui/fidget.nvim",
+    lazy = true,
+    branch = "legacy",
+    event = "LspAttach",
+    config = true,
+    opts = {
+      window = { blend = 0 },
+      sources = {
+        ["conform"] = { ignore = true },
+      },
+      fmt = { max_messages = 3 },
+    },
+  },
   { "echasnovski/mini.colors", version = false },
   { "echasnovski/mini.bufremove", version = false },
   { "echasnovski/mini.ai", event = "InsertEnter", dependencies = { "nvim-treesitter-textobjects" } },
@@ -512,11 +525,11 @@ require("lazy").setup({
         pyright = {
           settings = {
             python = {
-              autoImportCompletions = true,
-              autoSearchPaths = true,
-              diagnosticMode = "workspace", -- workspace
-              useLibraryCodeForTypes = true,
-              typeCheckingMode = "strict", -- off, basic, strict
+              analysis = {
+                autoSearchPaths = true,
+                diagnosticMode = "workspace", -- workspace
+                useLibraryCodeForTypes = true,
+              },
             },
           },
         },

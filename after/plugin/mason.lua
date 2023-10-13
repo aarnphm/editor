@@ -1,5 +1,5 @@
 local opts = {
-  ensure_installed = { "lua-language-server", "pyright", "mypy", "mdx-analyzer" },
+  ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "pyright", "ruff-lsp" },
   ui = { border = "none" },
 }
 

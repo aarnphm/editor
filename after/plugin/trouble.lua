@@ -21,3 +21,10 @@ vim.keymap.set("n", "]q", function()
     vim.notify("trouble: No items in quickfix", vim.log.levels.INFO)
   end
 end, { desc = "qf: Next items" })
+
+vim.keymap.set(
+  "n",
+  "<leader>qf",
+  function() require("trouble").toggle { mode = "quickfix" } end,
+  { desc = "qf: Toggle" }
+)
