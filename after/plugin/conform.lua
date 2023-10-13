@@ -49,7 +49,7 @@ end, { range = true })
 
 vim.keymap.set(
   "n",
-  "<Leader><Leader>f",
+  "<Leader><Leader>",
   function() require("conform").format { async = true, lsp_fallback = true } end,
   { desc = "style: format buffer" }
 )
