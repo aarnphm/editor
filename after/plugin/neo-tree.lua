@@ -1,4 +1,4 @@
-local utils = require "utils"
+local Util = require "utils"
 
 local opts = {
   close_if_last_window = true,
@@ -65,7 +65,7 @@ local opts = {
   },
 }
 
-local on_move = function(data) utils.on_rename(data.source, data.destination) end
+local on_move = function(data) Util.on_rename(data.source, data.destination) end
 
 local events = require "neo-tree.events"
 

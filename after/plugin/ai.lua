@@ -1,5 +1,5 @@
 local ai = require "mini.ai"
-local utils = require "utils"
+local Util = require "utils"
 
 ai.setup {
   n_lines = 500,
@@ -13,7 +13,7 @@ ai.setup {
   },
 }
 
-utils.on_load("which-key.nvim", function()
+Util.on_load("which-key.nvim", function()
   ---@type table<string, string|table>
   local i = {
     [" "] = "Whitespace",

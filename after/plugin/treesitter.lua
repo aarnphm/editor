@@ -1,4 +1,4 @@
-local utils = require "utils"
+local Util = require "utils"
 
 local opts = {
   ensure_installed = {
@@ -50,7 +50,7 @@ local opts = {
   },
 }
 
-if utils.has "SchemaStore.nvim" then vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" }) end
+if Util.has "SchemaStore.nvim" then vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" }) end
 if type(opts.ensure_installed) == "table" then
   ---@type table<string, boolean>
   local added = {}

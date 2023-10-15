@@ -1,3 +1,4 @@
+local Util = require "utils"
 local M = {}
 
 ---@type LazyKeysLspSpec[]|nil
@@ -31,7 +32,7 @@ end
 ---@param method string
 function M.has(buffer, method)
   method = method:find "/" and method or "textDocument/" .. method
-  local clients = require("utils").get_clients { bufnr = buffer }
+  local clients = Util.get_clients { bufnr = buffer }
   for _, client in ipairs(clients) do
     if client.supports_method(method) then return true end
   end
@@ -43,8 +44,8 @@ function M.resolve(buffer)
   local Keys = require "lazy.core.handler.keys"
   if not Keys.resolve then return {} end
   local spec = M.get()
-  local opts = require("utils").opts "nvim-lspconfig"
-  local clients = require("utils").get_clients { bufnr = buffer }
+  local opts = Util.opts "nvim-lspconfig"
+  local clients = Util.get_clients { bufnr = buffer }
   for _, client in ipairs(clients) do
     local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
     vim.list_extend(spec, maps)

@@ -541,7 +541,7 @@ require("lazy").setup({
     ---@param opts PluginLspOptions
     config = function(_, opts)
       local lspconfig = require "lspconfig"
-      Util.on_attach(function(cl, bufnr) require("keymaps").on_attach(cl, bufnr) end)
+      Util.on_attach(function(cl, bufnr) require("utils.lsp").on_attach(cl, bufnr) end)
       local register_capability = vim.lsp.handlers["client/registerCapability"]
 
       vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
@@ -550,7 +550,7 @@ require("lazy").setup({
         ---@type lsp.Client|nil
         local cl = vim.lsp.get_client_by_id(client_id)
         local buffer = vim.api.nvim_get_current_buf()
-        require("keymaps").on_attach(cl, buffer)
+        require("utils.lsp").on_attach(cl, buffer)
         return ret
       end
 
