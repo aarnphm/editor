@@ -252,7 +252,12 @@ require("lazy").setup({
       },
       { "dnlhc/glance.nvim", cmd = "Glance", lazy = true },
       { "folke/neodev.nvim", config = true, ft = "lua" },
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
+      {
+        "folke/neoconf.nvim",
+        cmd = "Neoconf",
+        config = true,
+        dependencies = { "nvim-lspconfig" },
+      },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions

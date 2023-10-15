@@ -1,7 +1,30 @@
-local utils = require("utils")
+local utils = require "utils"
 
 local opts = {
-  ensure_installed = {"python", "rust", "lua", "c", "cpp", "toml", "bash", "css", "vim", "regex", "markdown", "markdown_inline", "yaml", "go", "typescript", "tsx", "query", "regex", "luap", "luadoc", "javascript", "proto"},
+  ensure_installed = {
+    "python",
+    "rust",
+    "lua",
+    "c",
+    "cpp",
+    "toml",
+    "bash",
+    "css",
+    "vim",
+    "regex",
+    "markdown",
+    "markdown_inline",
+    "yaml",
+    "go",
+    "typescript",
+    "tsx",
+    "query",
+    "regex",
+    "luap",
+    "luadoc",
+    "javascript",
+    "proto",
+  },
   ignore_install = { "phpdoc" },
   indent = { enable = true },
   highlight = { enable = true },

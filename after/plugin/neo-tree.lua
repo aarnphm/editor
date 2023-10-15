@@ -1,4 +1,4 @@
-local utils = require("utils")
+local utils = require "utils"
 
 local opts = {
   close_if_last_window = true,
@@ -65,11 +65,9 @@ local opts = {
   },
 }
 
-local on_move = function(data)
-  utils.on_rename(data.source, data.destination)
-end
+local on_move = function(data) utils.on_rename(data.source, data.destination) end
 
-local events = require("neo-tree.events")
+local events = require "neo-tree.events"
 
 vim.list_extend(opts.event_handlers, {
   { event = events.FILE_MOVED, handler = on_move },
@@ -81,10 +79,13 @@ require("neo-tree").setup(opts)
 vim.api.nvim_create_autocmd("TermClose", {
   pattern = "*lazygit",
   callback = function()
-    if package.loaded["neo-tree.sources.git_status"] then
-      require("neo-tree.sources.git_status").refresh()
-    end
+    if package.loaded["neo-tree.sources.git_status"] then require("neo-tree.sources.git_status").refresh() end
   end,
 })
 
-vim.keymap.set('n', "<C-n>", function() require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() } end, { desc = "explorer: root dir" })
+vim.keymap.set(
+  "n",
+  "<C-n>",
+  function() require("neo-tree.command").execute { toggle = true, dir = vim.loop.cwd() } end,
+  { desc = "explorer: root dir" }
+)
