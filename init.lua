@@ -86,7 +86,7 @@ require("lazy").setup({
     version = false, -- last release is way too old and doesn't work on Windows
     cmd = { "TSUpdateSync" },
     build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
+    event = { "VeryLazy" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
       "nvim-treesitter/nvim-treesitter-context",
@@ -193,9 +193,9 @@ require("lazy").setup({
       },
     },
   },
-  { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" }, lazy = true },
+  { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" } },
   { "nvim-pack/nvim-spectre", event = "BufReadPost", cmd = "Spectre" },
-  { "MunifTanjim/nui.nvim", lazy = true },
+  "MunifTanjim/nui.nvim",
   {
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
@@ -250,12 +250,6 @@ require("lazy").setup({
     config = true,
     enabled = vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
-  },
-  {
-    "stevearc/conform.nvim",
-    event = { "BufWritePre" },
-    cmd = { "ConformInfo" },
-    init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
   },
   {
     "williamboman/mason.nvim",
@@ -475,7 +469,6 @@ require("lazy").setup({
     "hrsh7th/nvim-cmp",
     version = false,
     event = "InsertEnter",
-    lazy = false,
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
@@ -483,6 +476,12 @@ require("lazy").setup({
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
+      {
+        "stevearc/conform.nvim",
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
+      },
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
@@ -523,7 +522,7 @@ require("lazy").setup({
   },
 }, {
   install = { colorscheme = { colorscheme } },
-  defaults = { lazy = true },
+  defaults = { lazy = false, version = false },
   performance = {
     cache = { enabled = true },
     reset_packpath = true,
