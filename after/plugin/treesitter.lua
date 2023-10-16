@@ -3,6 +3,8 @@ local Util = require "utils"
 local opts = {
   ensure_installed = {
     "python",
+    "ninja",
+    "rst",
     "rust",
     "lua",
     "c",
