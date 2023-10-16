@@ -1,5 +1,8 @@
 local o, opt, g, wo = vim.o, vim.opt, vim.g, vim.wo
 
+-- Don't use defer it because it affects start screen appearance
+if vim.fn.exists "syntax_on" ~= 1 then vim.cmd [[syntax enable]] end
+
 if vim.loop.os_uname().sysname == "Darwin" then
   g.clipboard = {
     name = "macOS-clipboard",
@@ -26,14 +29,20 @@ o.breakindent = true -- enable break indent
 o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
 o.clipboard = "unnamedplus" -- sync system clipboard
 o.pumheight = 8 -- larger completion windows
+o.autoindent = true -- auto indent
 o.expandtab = true -- convert spaces to tabs
 o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
 o.number = true -- number is good for nav
 o.swapfile = false -- I don't like swap files personally, found undofile to be better
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
-o.shortmess = "aoOTIcF" -- insanely complex shortmess, but its cleannn
+o.formatoptions = "rqnl1j" -- NOTE: "1jcroql"
 o.laststatus = 2 -- show statusline on buffer
+
+if vim.fn.has "nvim-0.9" == 1 then
+  opt.shortmess:append "C" -- Don't show "Scanning..." messages
+  o.splitkeep = "screen" -- Reduce scroll during window split
+end
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
@@ -51,17 +60,6 @@ o.statusline = table.concat({
 
 opt.pumblend = 17 -- make completion window transparent
 opt.completeopt = { "menuone", "noselect" } -- better completion menu
--- NOTE: "1jcroql"
-opt.formatoptions = opt.formatoptions
-  - "a" -- Auto formatting is BAD.
-  - "t" -- Don't auto format my code. I got linters for that.
-  + "c" -- In general, I like it when comments respect textwidth
-  + "q" -- Allow formatting comments w/ gq
-  - "o" -- O and o, don't continue comments
-  + "r" -- But do continue when pressing enter.
-  + "n" -- Indent past the formatlistpat, not underneath it.
-  + "j" -- Auto-remove comments if possible.
-  - "2" -- I'm not in gradeschool anymore
 
 -- searching and grep stuff
 o.smartcase = true
