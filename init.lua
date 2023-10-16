@@ -1,6 +1,8 @@
 require "aarnphm" -- default setup
 
 local Util = require "utils"
+local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
+local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
@@ -18,9 +20,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
-local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
-local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
-
 require("lazy").setup({
   "lewis6991/impatient.nvim",
   "nvim-lua/plenary.nvim",
@@ -28,6 +27,7 @@ require("lazy").setup({
   "nvim-tree/nvim-web-devicons",
   {
     "stevearc/dressing.nvim",
+    lazy = true,
     opts = {
       input = {
         enabled = true,
@@ -47,7 +47,6 @@ require("lazy").setup({
         return vim.ui.input(...)
       end
     end,
-    config = true,
   },
   {
     "rose-pine/neovim",
@@ -196,6 +195,7 @@ require("lazy").setup({
   },
   { "RRethy/vim-illuminate", event = { "BufReadPost", "BufNewFile" }, lazy = true },
   { "nvim-pack/nvim-spectre", event = "BufReadPost", cmd = "Spectre" },
+  { "MunifTanjim/nui.nvim", lazy = true },
   {
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
@@ -208,8 +208,8 @@ require("lazy").setup({
       end
     end,
     dependencies = {
-      { "MunifTanjim/nui.nvim", lazy = true },
       "nvim-lua/plenary.nvim",
+      "nui.nvim",
       {
         "s1n7ax/nvim-window-picker",
         name = "window-picker",
@@ -230,21 +230,20 @@ require("lazy").setup({
   {
     "NvChad/nvim-colorizer.lua",
     event = "LspAttach",
-    config = function()
-      require("colorizer").setup {
-        filetypes = { "*" },
-        user_default_options = {
-          names = false, -- "Name" codes like Blue
-          RRGGBBAA = true, -- #RRGGBBAA hex codes
-          rgb_fn = true, -- CSS rgb() and rgba() functions
-          hsl_fn = true, -- CSS hsl() and hsla() functions
-          css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-          css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-          sass = { enable = true, parsers = { "css" } },
-          mode = "background",
-        },
-      }
-    end,
+    opts = {
+      filetypes = { "*" },
+      user_default_options = {
+        names = false, -- "Name" codes like Blue
+        RRGGBBAA = true, -- #RRGGBBAA hex codes
+        rgb_fn = true, -- CSS rgb() and rgba() functions
+        hsl_fn = true, -- CSS hsl() and hsla() functions
+        css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+        css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
+        sass = { enable = true, parsers = { "css" } },
+        mode = "background",
+      },
+    },
+    config = function(_, opts) require("colorizer").setup(opts) end,
   },
   {
     "Bekaboo/dropbar.nvim",
@@ -368,136 +367,6 @@ require("lazy").setup({
           require("rust-tools").setup(opts)
         end,
       },
-      {
-        "p00f/clangd_extensions.nvim",
-        ft = { "c", "cpp", "hpp", "h" },
-        dependencies = { "neovim/nvim-lspconfig" },
-        lazy = true,
-        opts = {
-          -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
-          server = {
-            single_file_support = true,
-            filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-            capabilities = {
-              offsetEncoding = { "utf-8" },
-              textDocument = {
-                completion = {
-                  completionItem = {
-                    commitCharactersSupport = true,
-                    deprecatedSupport = true,
-                    insertReplaceSupport = true,
-                    labelDetailsSupport = true,
-                    preselectSupport = true,
-                    resolveSupport = {
-                      properties = { "documentation", "detail", "additionalTextEdits" },
-                    },
-                    snippetSupport = false,
-                    tagSupport = {
-                      valueSet = { 1 },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        config = function(_, opts)
-          local lspconfig = require "lspconfig"
-          local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-          local capabilities = vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-            opts.server.capabilities or {}
-          )
-
-          local switch_source_header_splitcmd = function(bufnr, splitcmd)
-            bufnr = lspconfig.util.validate_bufnr(bufnr)
-            local params = { uri = vim.uri_from_bufnr(bufnr) }
-
-            local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
-
-            if clangd_client then
-              clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
-                if err then error(tostring(err)) end
-                if not result then
-                  error("Corresponding file can’t be determined", vim.log.levels.ERROR)
-                  return
-                end
-                vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
-              end)
-            else
-              error(
-                "Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
-                vim.log.levels.ERROR
-              )
-            end
-          end
-
-          opts.server.commands = {
-            ClangdSwitchSourceHeader = {
-              function() switch_source_header_splitcmd(0, "edit") end,
-              description = "cpp: Open source/header in current buffer",
-            },
-            ClangdSwitchSourceHeaderVSplit = {
-              function() switch_source_header_splitcmd(0, "vsplit") end,
-              description = "cpp: Open source/header in a new vsplit",
-            },
-            ClangdSwitchSourceHeaderSplit = {
-              function() switch_source_header_splitcmd(0, "split") end,
-              description = "cpp: Open source/header in a new split",
-            },
-          }
-
-          local get_binary_path_list = function(binaries)
-            local get_binary_path = function(binary)
-              local path = nil
-              if vim.loop.os_uname().sysname == "Windows_NT" then
-                path = vim.fn.trim(vim.fn.system("where " .. binary))
-              else
-                path = vim.fn.trim(vim.fn.system("which " .. binary))
-              end
-              if vim.v.shell_error ~= 0 then path = nil end
-              return path
-            end
-
-            local path_list = {}
-            for _, binary in ipairs(binaries) do
-              local path = get_binary_path(binary)
-              if path then table.insert(path_list, path) end
-            end
-            return table.concat(path_list, ",")
-          end
-
-          opts.server.cmd = {
-            "clangd",
-            "-j=12",
-            "--enable-config",
-            "--background-index",
-            "--pch-storage=memory",
-            -- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-            "--query-driver="
-              .. get_binary_path_list {
-                "clang++",
-                "clang",
-                "gcc",
-                "g++",
-              },
-            "--clang-tidy",
-            "--all-scopes-completion",
-            "--completion-style=detailed",
-            "--header-insertion-decorators",
-            "--header-insertion=iwyu",
-            "--limit-references=3000",
-            "--limit-results=350",
-          }
-
-          opts.server.capabilities = capabilities
-
-          require("clangd_extensions").setup(opts)
-        end,
-      },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
@@ -558,7 +427,23 @@ require("lazy").setup({
         marksman = {},
         spectral = {},
         taplo = {},
-        ruff_lsp = {},
+        ruff_lsp = {
+          keys = {
+            {
+              "<leader>co",
+              function()
+                vim.lsp.buf.code_action {
+                  apply = true,
+                  context = {
+                    only = { "source.organizeImports" },
+                    diagnostics = {},
+                  },
+                }
+              end,
+              desc = "Organize Imports",
+            },
+          },
+        },
         pyright = {
           settings = {
             python = {
@@ -739,12 +624,12 @@ require("lazy").setup({
   change_detection = { notify = false },
   concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
   checker = { enable = true },
-  ui = { border = "none" },
+  ui = { border = "single" },
 })
 
 vim.o.background = background
 vim.cmd.colorscheme(colorscheme)
 
 -- NOTE: this should only be run on Terminal.app
--- require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
+require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
 -- vim.opt.termguicolors = false

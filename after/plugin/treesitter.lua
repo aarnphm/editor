@@ -10,6 +10,7 @@ local opts = {
     "c",
     "cpp",
     "toml",
+    "dockerfile",
     "bash",
     "css",
     "vim",
@@ -53,6 +54,7 @@ local opts = {
 }
 
 if Util.has "SchemaStore.nvim" then vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" }) end
+
 if type(opts.ensure_installed) == "table" then
   ---@type table<string, boolean>
   local added = {}
