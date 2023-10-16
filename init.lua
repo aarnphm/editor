@@ -263,7 +263,7 @@ require("lazy").setup({
     build = ":MasonUpdate",
     keys = { { "<leader>m", "<cmd>Mason<cr>", desc = "Mason" } },
     opts = {
-      ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "ruff-lsp", "pyright", "stylua", "shfmt" },
+      ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt" },
       ui = { border = "single" },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -445,6 +445,7 @@ require("lazy").setup({
           },
         },
         pyright = {
+          mason = false,
           settings = {
             python = {
               analysis = {
