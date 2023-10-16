@@ -93,6 +93,9 @@ o.updatetime = 200
 o.virtualedit = "block"
 o.whichwrap = "h,l,<,>,[,],~"
 
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+
 -- last but def not least, wildmenu
 o.wildchar = 9
 o.wildignorecase = true

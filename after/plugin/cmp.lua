@@ -1,30 +1,5 @@
 local cmp = require "cmp"
 
-local cmp_format = function(opts)
-  opts = opts or {}
-  return function(entry, vim_item)
-    if opts.before then vim_item = opts.before(entry, vim_item) end
-
-    local item = icons.kind[vim_item.kind]
-      or icons.type[vim_item.kind]
-      or icons.cmp[vim_item.kind]
-      or icons.kind.Undefined
-
-    vim_item.kind = string.format("  %s  %s", item, vim_item.kind)
-
-    if opts.maxwidth ~= nil then
-      if opts.ellipsis_char == nil then
-        vim_item.abbr = string.sub(vim_item.abbr, 1, opts.maxwidth)
-      else
-        local label = vim_item.abbr
-        local truncated_label = vim.fn.strcharpart(label, 0, opts.maxwidth)
-        if truncated_label ~= label then vim_item.abbr = truncated_label .. opts.ellipsis_char end
-      end
-    end
-    return vim_item
-  end
-end
-
 local check_backspace = function()
   local col = vim.fn.col "." - 1
   ---@diagnostic disable-next-line: param-type-mismatch
@@ -57,7 +32,7 @@ local opts = {
   snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
   formatting = {
     fields = { "menu", "abbr", "kind" },
-    format = function(entry, vim_item) return cmp_format { maxwidth = 80 }(entry, vim_item) end,
+    format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
   },
   sorting = {
     priority_weight = 2,
