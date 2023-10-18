@@ -10,7 +10,7 @@ return {
       formatters_by_ft = {
         lua = { "stylua" },
         toml = { "taplo" },
-        python = { "yapf", "ruff_fix" },
+        python = { "ruff_fix" },
         proto = { { "buf", "protolint" } },
       },
       format_on_save = function(bufnr)
