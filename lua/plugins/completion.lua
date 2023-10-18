@@ -97,7 +97,10 @@ return {
         build = (not jit.os:find "Windows")
             and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
           or nil,
-        config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
+        config = function()
+          require("luasnip.loaders.from_vscode").lazy_load()
+          require("luasnip.loaders.from_lua").lazy_load { paths = vim.fn.stdpath "config" .. "/snippets/" }
+        end,
         opts = { history = true, delete_check_events = "TextChanged" },
       },
       {
@@ -144,7 +147,17 @@ return {
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 
       local cmp = require "cmp"
-      local defaults = require "cmp.config.default"()
+      local compare = require "cmp.config.compare"
+
+      compare.lsp_scores = function(entry1, entry2)
+        local diff
+        if entry1.completion_item.score and entry2.completion_item.score then
+          diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
+        else
+          diff = entry2.score - entry1.score
+        end
+        return (diff < 0)
+      end
 
       return {
         preselect = cmp.PreselectMode.Item,
@@ -154,7 +167,22 @@ return {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
-        sorting = defaults.sorting,
+        sorting = {
+          priority_weight = 2,
+          comparators = {
+            compare.offset, -- Items closer to cursor will have lower priority
+            compare.exact,
+            compare.scopes,
+            compare.lsp_scores,
+            compare.sort_text,
+            compare.score,
+            compare.recently_used,
+            -- compare.locality, -- Items closer to cursor will have higher priority, conflicts with `offset`
+            compare.kind,
+            compare.length,
+            compare.order,
+          },
+        },
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
         matching = { disallow_partial_fuzzy_matching = false },
         performance = { async_budget = 1, max_view_entries = 120 },

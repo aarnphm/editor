@@ -72,7 +72,10 @@ return {
       },
       ignore_install = { "phpdoc" },
       indent = { enable = true },
-      highlight = { enable = true },
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = { "markdown" },
+      },
       context_commentstring = { enable = true, enable_autocmd = false },
       autotag = { enable = true },
       textobjects = {

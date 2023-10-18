@@ -94,6 +94,20 @@ return {
       { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
       {
+        "lukas-reineke/headlines.nvim",
+        opts = function()
+          local opts = {}
+          for _, ft in ipairs { "markdown", "norg", "rmd", "org" } do
+            opts[ft] = { headline_highlights = {} }
+            for i = 1, 6 do
+              table.insert(opts[ft].headline_highlights, "Headline" .. i)
+            end
+          end
+          return opts
+        end,
+        ft = { "markdown", "norg", "rmd", "org" },
+      },
+      {
         "simrat39/rust-tools.nvim",
         ft = "rust",
         dependencies = { "nvim-lua/plenary.nvim" },
@@ -181,11 +195,40 @@ return {
           },
         },
         yamlls = {
+          -- Have to add this for yamlls to understand that we support line folding
+          capabilities = {
+            textDocument = {
+              foldingRange = {
+                dynamicRegistration = false,
+                lineFoldingOnly = true,
+              },
+            },
+          },
           -- lazy-load schemastore when needed
-          on_new_config = function(config)
-            if Util.has "SchemaStore" then config.settings.yaml.schemas = require("schemastore").yaml.schemas() end
+          on_new_config = function(new_config)
+            new_config.settings.yaml.schemas = vim.tbl_deep_extend(
+              "force",
+              new_config.settings.yaml.schemas or {},
+              require("schemastore").yaml.schemas()
+            )
           end,
-          settings = { yaml = { hover = true, validate = true, completion = true } },
+          settings = {
+            redhat = { telemetry = { enabled = false } },
+            yaml = {
+              keyOrdering = false,
+              format = {
+                enable = true,
+              },
+              validate = true,
+              schemaStore = {
+                -- Must disable built-in schemaStore support to use
+                -- schemas from SchemaStore.nvim plugin
+                enable = false,
+                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+                url = "",
+              },
+            },
+          },
         },
         lua_ls = {
           settings = {
@@ -216,7 +259,19 @@ return {
         bashls = {},
         marksman = {},
         spectral = {},
-        taplo = {},
+        taplo = {
+          keys = {
+            "K",
+            function()
+              if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
+                require("crates").show_popup()
+              else
+                vim.lsp.buf.hover()
+              end
+            end,
+            desc = "lsp: Show Crate Documentation",
+          },
+        },
         ruff_lsp = {
           keys = {
             {
@@ -255,6 +310,19 @@ return {
           Util.on_attach(function(client, _)
             if client.name == "ruff_lsp" then client.server_capabilities.hoverProvider = false end
           end)
+        end,
+        rust_analyzer = function(_, opts)
+          local rt_opts = require("lazyvim.util").opts "rust-tools.nvim"
+          require("rust-tools").setup(vim.tbl_deep_extend("force", rt_opts or {}, { server = opts }))
+          return true
+        end,
+        yamlls = function()
+          -- Neovim < 0.10 does not have dynamic registration for formatting
+          if vim.fn.has "nvim-0.10" == 0 then
+            require("lazyvim.util").lsp.on_attach(function(client, _)
+              if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
+            end)
+          end
         end,
       },
     },
