@@ -33,32 +33,16 @@ return {
     opts = function()
       return {
         content = {
-          set_vim_settings = false,
+          set_vim_settings = true,
           active = function()
-            local get_filetype_icon = function()
-              -- Have this `require()` here to not depend on plugin initialization order
-              local has_devicons, devicons = pcall(require, "nvim-web-devicons")
-              if not has_devicons then return "" end
+            local mode_info = statusline.modes[vim.fn.mode()]
+            local mode_hl = mode_info.hl
 
-              local file_name, file_ext = vim.fn.expand "%:t", vim.fn.expand "%:e"
-              return devicons.get_icon(file_name, file_ext, { default = true })
-            end
-
-            -- For more information see ":h buftype"
-            local isnt_normal_buffer = function() return vim.bo.buftype ~= "" end
-
-            local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
-
-            local construct_filetype = function()
-              local filetype = vim.bo.filetype
-              -- Don't show anything if can't detect file type or not inside a "normal buffer"
-              if (filetype == "") or isnt_normal_buffer() then return "" end
-
-              -- Add filetype icon
-              local icon = get_filetype_icon()
-              if icon ~= "" then filetype = string.format("%s  %s", icon, filetype) end
-              return filetype
-            end
+            local mode = statusline.mode {}
+            local git = statusline.git {}
+            local diagnostic = statusline.diagnostic {}
+            local filetype = statusline.filetype {}
+            local filename = statusline.filename { trunc_width = 75 }
 
             if vim.tbl_contains(simplified_status_ft, vim.bo.filetype) then
               return MiniStatusline.combine_groups {
@@ -69,13 +53,12 @@ return {
 
             return MiniStatusline.combine_groups {
               { hl = mode_hl, strings = { mode } },
-              { hl = "MiniStatuslineDevinfo", strings = { statusline.git() } },
+              { hl = "MiniStatuslineDevinfo", strings = { git } },
               "%<",
-              { hl = "MiniStatuslineFilename", strings = { MiniStatusline.section_filename { trunc_width = 140 } } },
+              { hl = "MiniStatuslineFilename", strings = { filename } },
               "%=",
-              "%=",
-              { hl = "MiniStatuslineDevinfo", strings = { statusline.diagnostic() } },
-              { hl = "MiniStatuslineFileinfo", strings = { construct_filetype() } },
+              { hl = "MiniStatuslineDevinfo", strings = { diagnostic } },
+              { hl = "MiniStatuslineFileinfo", strings = { filetype } },
               { hl = mode_hl, strings = { "%l:%c" } },
               { hl = mode_hl, strings = { "♥" } },
             }
@@ -240,8 +223,8 @@ return {
     "echasnovski/mini.comment",
     dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
     keys = {
-      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
-      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
+      { "<Leader>c", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
+      { "<Leader>c", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
     },
     event = "VeryLazy",
     opts = {
