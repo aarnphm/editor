@@ -1,3 +1,5 @@
+local simplified_status_ft = { "neo-tree", "qf" }
+
 return {
   { "echasnovski/mini.colors", version = false },
   {
@@ -55,6 +57,13 @@ return {
               local icon = get_filetype_icon()
               if icon ~= "" then filetype = string.format("%s  %s", icon, filetype) end
               return filetype
+            end
+
+            if vim.tbl_contains(simplified_status_ft, vim.bo.filetype) then
+              return MiniStatusline.combine_groups {
+                { hl = "MiniStatuslineInactive", strings = { "%F" } },
+                "%=",
+              }
             end
 
             return MiniStatusline.combine_groups {

@@ -243,7 +243,9 @@ return {
           hide_gitignored = true,
           hide_by_name = {
             "node_modules",
+            "lazy-lock.json",
             "pdm.lock",
+            ".venv",
           },
           hide_by_pattern = { -- uses glob style patterns
             "*.meta",
@@ -251,20 +253,6 @@ return {
             "*/.ruff_cache/*",
             "*/__pycache__/*",
           },
-        },
-      },
-      event_handlers = {
-        {
-          event = "neo_tree_window_after_open",
-          handler = function(args)
-            if args.position == "left" or args.position == "right" then vim.cmd "wincmd =" end
-          end,
-        },
-        {
-          event = "neo_tree_window_after_close",
-          handler = function(args)
-            if args.position == "left" or args.position == "right" then vim.cmd "wincmd =" end
-          end,
         },
       },
       always_show = { ".github" },
