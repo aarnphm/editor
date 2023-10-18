@@ -1,4 +1,4 @@
-local nit = require "nit"
+local nit = require "utils.nit"
 local ls = require "luasnip"
 local fmt = require("luasnip.extras.fmt").fmt
 local s = ls.snippet
