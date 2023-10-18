@@ -2,12 +2,6 @@ local vault = vim.fn.expand "~" .. "/workspace/garden/content"
 
 return {
   {
-    "NStefan002/speedtyper.nvim",
-    lazy = true,
-    cmd = "Speedtyper",
-    opts = {},
-  },
-  {
     "epwalsh/obsidian.nvim",
     lazy = true,
     event = {
