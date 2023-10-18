@@ -62,6 +62,7 @@ return {
       vim.keymap.del({ "x", "o" }, "X")
     end,
   },
+  { "tpope/vim-repeat", event = "VeryLazy" },
   {
     "folke/trouble.nvim",
     cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
