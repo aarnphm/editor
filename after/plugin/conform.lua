@@ -6,7 +6,7 @@ require("conform").setup {
   },
   format_on_save = function(bufnr)
     -- Disable autoformat on certain filetypes
-    local ignore_filetypes = { "gitcommit", "java" }
+    local ignore_filetypes = { "gitcommit" }
     if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then return end
     -- Disable with a global or buffer-local variable
     if vim.g.autoformat or vim.b[bufnr].autoformat then return end
