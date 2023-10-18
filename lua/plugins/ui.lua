@@ -2,7 +2,7 @@ return {
   {
     "Bekaboo/dropbar.nvim",
     config = true,
-    enabled = vim.fn.has "nvim-0.10" == 1,
+    enabled = vim.g.started_by_firenvim ~= true and vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
     keys = {
       {
