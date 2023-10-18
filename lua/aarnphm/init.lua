@@ -15,6 +15,12 @@ require "aarnphm.globals"
 require "aarnphm.options"
 require "aarnphm.bindings"
 
+local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
+local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
+
+vim.g.simple_colorscheme = colorscheme
+vim.g.simple_background = background
+
 -- close some filetypes with <q>
 autocmd("FileType", {
   group = augroup "filetype",
@@ -115,3 +121,5 @@ vim.cmd [[
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
 ]]
+
+if vim.g.vscode then return end -- NOTE: compatible block with vscode

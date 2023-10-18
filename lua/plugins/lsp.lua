@@ -1,5 +1,3 @@
-local Util = require "utils"
-
 return {
   {
     "NvChad/nvim-colorizer.lua",

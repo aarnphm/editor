@@ -1,5 +1,3 @@
-local Util = require "utils"
-
 return {
   { "echasnovski/mini.colors", version = false },
   {

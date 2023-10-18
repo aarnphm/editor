@@ -1,4 +1,6 @@
 --# selene: allow(global_usage)
+_G.Util = require "utils"
+
 _G.P = function(v)
   print(vim.inspect(v))
   return v

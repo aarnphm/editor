@@ -1,5 +1,3 @@
-local Util = require "utils"
-
 local K = {}
 
 ---@type LazyKeysLspSpec[]|nil

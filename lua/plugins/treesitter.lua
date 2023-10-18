@@ -1,5 +1,3 @@
-local Util = require "utils"
-
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -60,6 +58,8 @@ return {
         "markdown",
         "markdown_inline",
         "yaml",
+        "gitcommit",
+        "git_config",
         "go",
         "typescript",
         "tsx",
@@ -74,7 +74,8 @@ return {
       indent = { enable = true },
       highlight = {
         enable = true,
-        additional_vim_regex_highlighting = { "markdown" },
+        additional_vim_regex_highlighting = string.match(vim.g.simple_colorscheme, "catppuccin") ~= nil and false
+          or { "markdown" },
       },
       context_commentstring = { enable = true, enable_autocmd = false },
       autotag = { enable = true },

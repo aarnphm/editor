@@ -1,7 +1,5 @@
 require "aarnphm" -- default setup
 
-if vim.g.vscode then return end -- NOTE: compatible block with vscode
-
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -17,7 +15,7 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup("plugins", {
-  install = { colorscheme = { "rose-pine" } },
+  install = { colorscheme = { vim.g.simple_colorscheme } },
   defaults = { lazy = false, version = false },
   performance = {
     cache = { enabled = true },
@@ -39,11 +37,10 @@ require("lazy").setup("plugins", {
   change_detection = { notify = false },
   concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
   checker = { enable = true },
-  ui = { border = "single" },
 })
 
-vim.o.background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
-vim.cmd.colorscheme(vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine")
+vim.o.background = vim.g.simple_background
+vim.cmd.colorscheme(vim.g.simple_colorscheme)
 
 require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
 -- vim.opt.termguicolors = false -- NOTE: this should only be run on Terminal.app

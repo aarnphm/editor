@@ -1,4 +1,4 @@
-local transparent_background = false
+local transparent_background = true
 local clear = {}
 
 return {
@@ -37,14 +37,14 @@ return {
     branch = "refactor/syntax-highlighting",
     name = "catppuccin",
     opts = {
-      flavour = "latte", -- Can be one of: latte, frappe, macchiato, mocha
-      background = { light = "latte", dark = "mocha" },
+      flavour = vim.g.simple_background == "light" and "latte" or "macchiato", -- Can be one of: latte, frappe, macchiato, mocha
+      background = { light = "latte", dark = "macchiato" },
       dim_inactive = {
         enabled = false,
         -- Dim inactive splits/windows/buffers.
         -- NOT recommended if you use old palette (a.k.a., mocha).
         shade = "dark",
-        percentage = 0.15,
+        percentage = 0.5,
       },
       transparent_background = transparent_background,
       show_end_of_buffer = false, -- show the '~' characters after the end of buffers
@@ -87,7 +87,7 @@ return {
         beacon = false,
         cmp = true,
         coc_nvim = false,
-        dap = { enabled = true, enable_ui = true },
+        dap = { enabled = false, enable_ui = true },
         dashboard = false,
         dropbar = { enabled = true, color_mode = true },
         fern = false,
@@ -97,10 +97,10 @@ return {
         gitsigns = true,
         harpoon = false,
         headlines = false,
-        hop = true,
+        hop = false,
         illuminate = true,
         indent_blankline = { enabled = true, colored_indent_levels = false },
-        leap = false,
+        leap = true,
         lightspeed = false,
         lsp_saga = false,
         lsp_trouble = true,
@@ -110,10 +110,10 @@ return {
         navic = { enabled = false },
         neogit = false,
         neotest = false,
-        neotree = { enabled = false, show_root = true, transparent_panel = false },
+        neotree = { enabled = true, show_root = true, transparent_panel = false },
         noice = false,
         notify = false,
-        nvimtree = true,
+        nvimtree = false,
         overseer = false,
         pounce = false,
         rainbow_delimiters = true,
