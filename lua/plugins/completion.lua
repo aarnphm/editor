@@ -3,7 +3,7 @@ local slow_format_filetypes = {}
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre" },
+    event = { "VeryLazy" },
     cmd = { "ConformInfo" },
     init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
     opts = {
@@ -83,7 +83,7 @@ return {
   {
     "hrsh7th/nvim-cmp",
     version = false,
-    event = "InsertEnter",
+    event = { "CmdlineEnter", "InsertEnter" },
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
@@ -94,14 +94,29 @@ return {
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
+        keys = {
+          { "<C-l>", function() require("luasnip").expand_or_jump() end, mode = { "i", "s" } },
+        },
         build = (not jit.os:find "Windows")
             and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
           or nil,
-        config = function()
+        config = function(_, opts)
+          require("luasnip").setup(opts)
           require("luasnip.loaders.from_vscode").lazy_load()
           require("luasnip.loaders.from_lua").lazy_load { paths = vim.fn.stdpath "config" .. "/snippets/" }
+          vim.api.nvim_create_user_command(
+            "LuaSnipEdit",
+            function() require("luasnip.loaders.from_lua").edit_snippet_files() end,
+            {}
+          )
         end,
-        opts = { history = true, delete_check_events = "TextChanged" },
+        opts = {
+          history = true,
+          -- Event on which to check for exiting a snippet's region
+          region_check_events = "InsertEnter",
+          delete_check_events = "InsertLeave",
+          ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+        },
       },
       {
         "zbirenbaum/copilot.lua",
@@ -159,6 +174,7 @@ return {
         return (diff < 0)
       end
 
+      ---@type cmp.ConfigSchema
       return {
         preselect = cmp.PreselectMode.Item,
         completion = { completeopt = "menu,menuone,noinsert" },
@@ -182,6 +198,9 @@ return {
             compare.length,
             compare.order,
           },
+        },
+        window = {
+          documentation = { winhighlight = "Normal:Pmenu" },
         },
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
         matching = { disallow_partial_fuzzy_matching = false },
