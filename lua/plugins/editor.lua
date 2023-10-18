@@ -154,6 +154,20 @@ return {
     opts = {
       sources = { "filesystem", "buffers", "git_status", "document_symbols" },
       open_files_do_not_replace_types = { "terminal", "Trouble", "qf", "Outline" },
+      event_handlers = {
+        {
+          event = "neo_tree_window_after_open",
+          handler = function(args)
+            if args.position == "left" or args.position == "right" then vim.cmd "wincmd =" end
+          end,
+        },
+        {
+          event = "neo_tree_window_after_close",
+          handler = function(args)
+            if args.position == "left" or args.position == "right" then vim.cmd "wincmd =" end
+          end,
+        },
+      },
       filesystem = {
         bind_to_cwd = false,
         follow_current_file = { enabled = true },
