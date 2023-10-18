@@ -92,11 +92,30 @@ return {
       { "folke/neoconf.nvim", cmd = "Neoconf", config = true, dependencies = { "nvim-lspconfig" } },
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, config = true },
       {
+        "iamcco/markdown-preview.nvim",
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+        build = function() vim.fn["mkdp#util#install"]() end,
+        keys = {
+          {
+            "<leader>cp",
+            ft = "markdown",
+            "<cmd>MarkdownPreviewToggle<cr>",
+            desc = "Markdown Preview",
+          },
+        },
+        config = function() vim.cmd [[do FileType]] end,
+      },
+      {
         "lukas-reineke/headlines.nvim",
         opts = function()
           local opts = {}
           for _, ft in ipairs { "markdown", "norg", "rmd", "org" } do
-            opts[ft] = { headline_highlights = {} }
+            opts[ft] = {
+              headline_highlights = {},
+              fat_headlines = true,
+              fat_headline_upper_string = "█",
+              fat_headline_lower_string = "█",
+            }
             for i = 1, 6 do
               table.insert(opts[ft].headline_highlights, "Headline" .. i)
             end
