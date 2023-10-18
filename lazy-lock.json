@@ -2,6 +2,7 @@
   "LuaSnip": { "branch": "master", "commit": "0df29db3543837f8b41597f2640397c5ec792b7b" },
   "SchemaStore.nvim": { "branch": "main", "commit": "417c413278c369d2c5f52d0509f7e8ba0ada6418" },
   "better-escape.nvim": { "branch": "master", "commit": "7031dc734add47bb71c010e0551829fa5799375f" },
+  "catppuccin": { "branch": "refactor/syntax-highlighting", "commit": "2c814f46dd02e8b8cc6ab5f5f3c38781573cb20b" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
   "cmp-emoji": { "branch": "main", "commit": "19075c36d5820253d32e2478b6aaf3734aeaafa0" },
   "cmp-nvim-lsp": { "branch": "main", "commit": "44b16d11215dce86f253ce0c30949813c0a90765" },
