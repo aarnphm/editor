@@ -54,7 +54,7 @@ return {
         desc = "telescope: Find files",
       },
       {
-        "<LocalLeader>f",
+        "<leader>F",
         function() require("telescope.builtin").git_files() end,
         desc = "telescope: Find files (git)",
       },

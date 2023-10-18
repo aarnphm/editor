@@ -179,7 +179,8 @@ return {
       always_show = { ".github" },
       window = {
         mappings = {
-          ["<space>"] = "none",
+          ["<space>"] = "none", -- <space> is Leader
+          [","] = "none", -- , is LocalLeader
           ["s"] = "split_with_window_picker",
           ["v"] = "vsplit_with_window_picker",
         },
