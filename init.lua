@@ -14,6 +14,23 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
+-- setup statusline line here
+if not Util.has "mini.statusline" then
+  vim.o.statusline = table.concat({
+    "%{%luaeval('statusline.git()')%}",
+    "%m",
+    "%=",
+    "%=",
+    "%{%luaeval('statusline.diagnostic()')%}",
+    "%y",
+    "%l:%c",
+    "♥",
+  }, " ")
+  vim.o.showmode = true
+else
+  vim.o.showmode = false
+end
+
 require("lazy").setup("plugins", {
   install = { colorscheme = { vim.g.simple_colorscheme } },
   defaults = { lazy = false, version = false },

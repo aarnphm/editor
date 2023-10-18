@@ -25,6 +25,34 @@ return {
     },
   },
   { "echasnovski/mini.align", event = "VeryLazy" },
+  {
+    "echasnovski/mini.statusline",
+    opts = function()
+      return {
+        content = {
+          active = function()
+            local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
+            local git = statusline.git()
+            local diagnostic = statusline.diagnostic()
+            local filename = MiniStatusline.section_filename { trunc_width = 140 }
+            return MiniStatusline.combine_groups {
+              { hl = mode_hl, strings = { mode } },
+              { hl = "MiniStatuslineDevinfo", strings = { git } },
+              "%<",
+              { hl = "MiniStatuslineFilename", strings = { filename } },
+              "%=",
+              "%=",
+              { hl = "MiniStatuslineDevinfo", strings = { diagnostic } },
+              { hl = "MiniStatuslineFileinfo", strings = { "%y" } },
+              { hl = mode_hl, strings = { "%l:%c" } },
+              { hl = mode_hl, strings = { "♥" } },
+            }
+          end,
+        },
+      }
+    end,
+    config = function(_, opts) require("mini.statusline").setup(opts) end,
+  },
   { "echasnovski/mini.trailspace", event = "VeryLazy" },
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   {

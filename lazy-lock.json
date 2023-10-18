@@ -35,6 +35,7 @@
   "mini.colors": { "branch": "main", "commit": "9b97254bed6258d8174fa436cc9e54b13ba4c0ac" },
   "mini.comment": { "branch": "main", "commit": "2c7a512dad27e34a26d0f7d5d5bc2579f88167dc" },
   "mini.pairs": { "branch": "main", "commit": "6f6bd7ed5757b40bc29c73dac0d743e4e6978124" },
+  "mini.statusline": { "branch": "main", "commit": "1b99ae4c45de2df6c6ede1a2c136d1116a1911d4" },
   "mini.surround": { "branch": "main", "commit": "68ce058ef9716d7d955b79363845d2dd003d6500" },
   "mini.trailspace": { "branch": "main", "commit": "e8c144ee11f6a827ac9c5732f20aefbbd7b26035" },
   "mkdir.nvim": { "branch": "main", "commit": "c55d1dee4f099528a1853b28bb28caa802eba217" },

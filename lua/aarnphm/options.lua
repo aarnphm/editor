@@ -47,17 +47,6 @@ end
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
 
-o.statusline = table.concat({
-  "%{%luaeval('statusline.git()')%}",
-  "%m",
-  "%=",
-  "%=",
-  "%{%luaeval('statusline.diagnostic()')%}",
-  "%y",
-  "%l:%c",
-  "♥",
-}, " ")
-
 opt.pumblend = 17 -- make completion window transparent
 opt.completeopt = { "menuone", "noselect" } -- better completion menu
 
@@ -81,7 +70,6 @@ o.shiftround = true
 opt.smartindent = true
 o.cmdheight = 1
 o.showcmd = false
-o.showmode = true
 o.showbreak = "↳  "
 o.sidescrolloff = 5
 o.signcolumn = "yes:1"
@@ -128,3 +116,6 @@ vim.diagnostic.config {
     border = "single",
   },
 }
+
+-- Fix markdown indentation settings
+vim.g.markdown_recommended_style = 0
