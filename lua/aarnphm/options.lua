@@ -36,7 +36,7 @@ o.number = true -- number is good for nav
 o.swapfile = false -- I don't like swap files personally, found undofile to be better
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
-o.formatoptions = "rqnl1j" -- NOTE: "1jcroql"
+o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 o.laststatus = 2 -- show statusline on buffer
 
 if vim.fn.has "nvim-0.9" == 1 then
@@ -67,10 +67,10 @@ o.shiftwidth = TABWIDTH
 o.shiftround = true
 
 -- UI config
+opt.showmode = false -- This is set with mini.statusline
 opt.smartindent = true
 o.cmdheight = 1
 o.showcmd = false
-o.showmode = false -- This is set with mini.statusline
 o.showbreak = "↳  "
 o.sidescrolloff = 5
 o.signcolumn = "yes:1"

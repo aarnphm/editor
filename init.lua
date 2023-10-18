@@ -17,16 +17,16 @@ vim.opt.runtimepath:prepend(lazypath)
 -- setup statusline line here
 if not Util.has "mini.statusline" then
   vim.o.statusline = table.concat({
-    "%{%luaeval('statusline.git()')%}",
+    "%{%luaeval('statusline.mode {}')%}",
+    "%{%luaeval('statusline.git {}')%}",
     "%m",
     "%=",
     "%=",
-    "%{%luaeval('statusline.diagnostic()')%}",
+    "%{%luaeval('statusline.diagnostic {}')%}",
     "%y",
     "%l:%c",
     "♥",
   }, " ")
-  vim.o.showmode = true
 end
 
 require("lazy").setup("plugins", {
