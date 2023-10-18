@@ -1,6 +1,7 @@
 return {
   {
     "lewis6991/gitsigns.nvim",
+    event = "BufReadPost",
     opts = {
       numhl = true,
       watch_gitdir = { interval = 1000, follow_files = true },

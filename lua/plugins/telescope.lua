@@ -12,6 +12,65 @@ return {
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
       },
     },
+    keys = {
+      {
+        "gI",
+        function() require("telescope.builtin").lsp_implementations { reuse_win = true } end,
+        desc = "lsp: Goto implementation",
+      },
+      {
+        "gY",
+        function() require("telescope.builtin").lsp_type_definitions { reuse_win = true } end,
+        desc = "lsp: Goto type definitions",
+      },
+      {
+        "<C-p>",
+        function()
+          require("telescope.builtin").keymaps {
+            lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+            layout_config = {
+              width = 0.6,
+              height = 0.6,
+              prompt_position = "top",
+            },
+          }
+        end,
+        desc = "telescope: Keymaps",
+        noremap = true,
+        silent = true,
+      },
+      {
+        "<leader>b",
+        function()
+          require("telescope.builtin").buffers {
+            layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+            show_all_buffers = true,
+            previewer = false,
+          }
+        end,
+        desc = "telescope: Manage buffers",
+      },
+      {
+        "<leader>f",
+        function() require("telescope.builtin").find_files() end,
+        desc = "telescope: Find files",
+      },
+      {
+        "<LocalLeader>f",
+        function() require("telescope.builtin").git_files() end,
+        desc = "telescope: Find files (git)",
+      },
+      {
+        "<leader>/",
+        function() require("telescope.builtin").grep_string { word_match = "-w" } end,
+        desc = "telescope: Grep string",
+      },
+      {
+        "<leader>w",
+        function() require("telescope").extensions.live_grep_args.live_grep_args() end,
+        desc = "telescope: Grep word",
+      },
+    },
     opts = {
       defaults = {
         vimgrep_arguments = {

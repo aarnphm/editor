@@ -6,41 +6,63 @@ return {
     event = { "BufWritePre" },
     cmd = { "ConformInfo" },
     init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
-  },
-  {
-    "L3MON4D3/LuaSnip",
-    dependencies = { "rafamadriz/friendly-snippets" },
-    build = (not jit.os:find "Windows")
-        and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-      or nil,
-    config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
-    opts = { history = true, delete_check_events = "TextChanged" },
-  },
-  {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
     opts = {
-      cmp = { enabled = true, method = "getCompletionsCycling" },
-      panel = { enabled = false },
-      suggestion = { enabled = true, auto_trigger = true },
-      filetypes = {
-        markdown = true,
-        help = false,
-        terraform = false,
-        hgcommit = false,
-        gitcommit = false,
-        svn = false,
-        cvs = false,
-        ["dap-repl"] = false,
-        octo = false,
-        TelescopePrompt = false,
-        big_file_disabled_ft = false,
-        neogitCommitMessage = false,
+      formatters_by_ft = {
+        lua = { "stylua" },
+        toml = { "taplo" },
+        proto = { { "buf", "protolint" } },
+      },
+      format_on_save = function(bufnr)
+        -- Disable autoformat on certain filetypes
+        local ignore_filetypes = { "gitcommit" }
+        if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then return end
+        -- Disable with a global or buffer-local variable
+        if vim.g.autoformat or vim.b[bufnr].autoformat then return end
+        -- Disable autoformat for files in a certain path
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        if bufname:match "/node_modules/" then return end
+        return { timeout_ms = 500, lsp_fallback = true }
+      end,
+    },
+    keys = {
+      {
+        "<Leader><Leader>",
+        function() require("conform").format { async = true, lsp_fallback = true } end,
+        desc = "style: format buffer",
       },
     },
     config = function(_, opts)
-      vim.defer_fn(function() require("copilot").setup(opts) end, 100)
+      require("conform").setup(opts)
+
+      vim.api.nvim_create_user_command("FormatDisable", function(args)
+        -- FormatDisable! will disable formatting just for this buffer
+        if args.bang then
+          vim.b.autoformat = true
+        else
+          vim.g.autoformat = true
+        end
+      end, {
+        desc = "Disable autoformat-on-save",
+        bang = true,
+      })
+      vim.api.nvim_create_user_command("FormatEnable", function()
+        vim.b.autoformat = false
+        vim.g.autoformat = false
+      end, {
+        desc = "Re-enable autoformat-on-save",
+      })
+
+      vim.api.nvim_create_user_command("Format", function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+        require("conform").format { async = true, lsp_fallback = true, range = range }
+      end, { range = true })
     end,
   },
   {
@@ -54,6 +76,42 @@ return {
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
+      {
+        "L3MON4D3/LuaSnip",
+        dependencies = { "rafamadriz/friendly-snippets" },
+        build = (not jit.os:find "Windows")
+            and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+          or nil,
+        config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
+        opts = { history = true, delete_check_events = "TextChanged" },
+      },
+      {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        opts = {
+          cmp = { enabled = true, method = "getCompletionsCycling" },
+          panel = { enabled = false },
+          suggestion = { enabled = true, auto_trigger = true },
+          filetypes = {
+            markdown = true,
+            help = false,
+            terraform = false,
+            hgcommit = false,
+            gitcommit = false,
+            svn = false,
+            cvs = false,
+            ["dap-repl"] = false,
+            octo = false,
+            TelescopePrompt = false,
+            big_file_disabled_ft = false,
+            neogitCommitMessage = false,
+          },
+        },
+        config = function(_, opts)
+          vim.defer_fn(function() require("copilot").setup(opts) end, 100)
+        end,
+      },
     },
     opts = function()
       local check_backspace = function()
