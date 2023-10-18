@@ -162,16 +162,16 @@ return {
             IblScope = { fg = cp.surface2, style = { "bold" } },
 
             -- For nvim-cmp and wilder.nvim
-            Pmenu = { fg = cp.overlay2, bg = transparent_background and cp.none or cp.base },
-            PmenuBorder = { fg = cp.surface1, bg = transparent_background and cp.none or cp.base },
-            PmenuSel = { bg = cp.green, fg = cp.base },
-            CmpItemAbbr = { fg = cp.overlay2 },
-            CmpItemAbbrMatch = { fg = cp.blue, style = { "bold" } },
-            CmpDoc = { link = "NormalFloat" },
-            CmpDocBorder = {
-              fg = transparent_background and cp.surface1 or cp.mantle,
-              bg = transparent_background and cp.none or cp.mantle,
-            },
+            -- Pmenu = { fg = cp.overlay2, bg = transparent_background and cp.none or cp.base },
+            -- PmenuBorder = { fg = cp.surface1, bg = transparent_background and cp.none or cp.base },
+            -- PmenuSel = { bg = cp.green, fg = cp.base },
+            -- CmpItemAbbr = { fg = cp.overlay2 },
+            -- CmpItemAbbrMatch = { fg = cp.blue, style = { "bold" } },
+            -- CmpDoc = { link = "NormalFloat" },
+            -- CmpDocBorder = {
+            --   fg = transparent_background and cp.surface1 or cp.mantle,
+            --   bg = transparent_background and cp.none or cp.mantle,
+            -- },
 
             -- For fidget
             FidgetTask = { bg = cp.none, fg = cp.surface2 },

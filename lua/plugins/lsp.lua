@@ -24,7 +24,7 @@ return {
     keys = { { "<leader>m", "<cmd>Mason<cr>", desc = "Mason" } },
     opts = {
       ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt" },
-      ui = { border = "single" },
+      ui = { border = "none" },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)

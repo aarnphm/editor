@@ -114,7 +114,7 @@ vim.diagnostic.config {
     focus = false,
     format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
     source = "if_many",
-    border = "single",
+    border = "none",
   },
 }
 
