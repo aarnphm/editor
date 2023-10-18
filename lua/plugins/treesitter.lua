@@ -48,6 +48,7 @@ return {
         "rust",
         "lua",
         "c",
+        "diff",
         "cpp",
         "toml",
         "dockerfile",
