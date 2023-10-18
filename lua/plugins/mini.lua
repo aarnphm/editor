@@ -24,7 +24,7 @@ return {
       { "<C-q>", function() require("mini.bufremove").delete(0, true) end, desc = "buf: force delete" },
     },
   },
-  { "echasnovski/mini.align", event = "VeryLazy" },
+  { "echasnovski/mini.align", event = "VeryLazy", opts = {} },
   {
     "echasnovski/mini.statusline",
     opts = function()
@@ -75,11 +75,12 @@ return {
     end,
     config = function(_, opts) require("mini.statusline").setup(opts) end,
   },
-  { "echasnovski/mini.trailspace", event = "VeryLazy" },
+  { "echasnovski/mini.trailspace", event = { "BufRead", "BufNewFile" }, opts = {} },
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   {
     "echasnovski/mini.ai",
-    event = "InsertEnter",
+    event = "VeryLazy",
+    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
     opts = function()
       local ai = require "mini.ai"
       return {
@@ -174,6 +175,11 @@ return {
   },
   {
     "echasnovski/mini.comment",
+    dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
+    keys = {
+      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
+      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
+    },
     event = "VeryLazy",
     opts = {
       options = {
