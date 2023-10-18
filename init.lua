@@ -27,8 +27,6 @@ if not Util.has "mini.statusline" then
     "♥",
   }, " ")
   vim.o.showmode = true
-else
-  vim.o.showmode = false
 end
 
 require("lazy").setup("plugins", {

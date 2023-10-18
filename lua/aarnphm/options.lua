@@ -70,6 +70,7 @@ o.shiftround = true
 opt.smartindent = true
 o.cmdheight = 1
 o.showcmd = false
+o.showmode = false -- This is set with mini.statusline
 o.showbreak = "↳  "
 o.sidescrolloff = 5
 o.signcolumn = "yes:1"

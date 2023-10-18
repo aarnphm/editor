@@ -30,20 +30,42 @@ return {
     opts = function()
       return {
         content = {
+          set_vim_settings = false,
           active = function()
+            local get_filetype_icon = function()
+              -- Have this `require()` here to not depend on plugin initialization order
+              local has_devicons, devicons = pcall(require, "nvim-web-devicons")
+              if not has_devicons then return "" end
+
+              local file_name, file_ext = vim.fn.expand "%:t", vim.fn.expand "%:e"
+              return devicons.get_icon(file_name, file_ext, { default = true })
+            end
+
+            -- For more information see ":h buftype"
+            local isnt_normal_buffer = function() return vim.bo.buftype ~= "" end
+
             local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
-            local git = statusline.git()
-            local diagnostic = statusline.diagnostic()
-            local filename = MiniStatusline.section_filename { trunc_width = 140 }
+
+            local construct_filetype = function()
+              local filetype = vim.bo.filetype
+              -- Don't show anything if can't detect file type or not inside a "normal buffer"
+              if (filetype == "") or isnt_normal_buffer() then return "" end
+
+              -- Add filetype icon
+              local icon = get_filetype_icon()
+              if icon ~= "" then filetype = string.format("%s  %s", icon, filetype) end
+              return filetype
+            end
+
             return MiniStatusline.combine_groups {
               { hl = mode_hl, strings = { mode } },
-              { hl = "MiniStatuslineDevinfo", strings = { git } },
+              { hl = "MiniStatuslineDevinfo", strings = { statusline.git() } },
               "%<",
-              { hl = "MiniStatuslineFilename", strings = { filename } },
+              { hl = "MiniStatuslineFilename", strings = { MiniStatusline.section_filename { trunc_width = 140 } } },
               "%=",
               "%=",
-              { hl = "MiniStatuslineDevinfo", strings = { diagnostic } },
-              { hl = "MiniStatuslineFileinfo", strings = { "%y" } },
+              { hl = "MiniStatuslineDevinfo", strings = { statusline.diagnostic() } },
+              { hl = "MiniStatuslineFileinfo", strings = { construct_filetype() } },
               { hl = mode_hl, strings = { "%l:%c" } },
               { hl = mode_hl, strings = { "♥" } },
             }

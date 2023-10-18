@@ -61,6 +61,10 @@ autocmd("VimResized", {
     vim.cmd("tabnext  " .. current)
   end,
 })
+autocmd({ "BufEnter", "BufWinEnter", "WinEnter", "CmdwinEnter" }, {
+  group = augroup "disable_statusline",
+  command = [[if match(bufname('%'), 'neo-tree') != -1 || match(bufname('%'), 'nofile') != -1 || bufname('%') == '' | set laststatus=0 | else | set laststatus=2 | endif]],
+})
 -- go to last loc when opening a buffer
 autocmd("BufReadPost", {
   group = augroup "last_loc",
