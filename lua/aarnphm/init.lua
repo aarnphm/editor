@@ -112,21 +112,6 @@ autocmd("BufWritePost", {
   callback = function() require("mini.trailspace").trim() end,
 })
 
-autocmd("FileType", {
-  group = augroup "treesitter",
-  callback = function(ev)
-    local has_trailspace, mini_trailspace = pcall(require, "mini.trailspace")
-    if not has_trailspace then return end
-    if vim.bo[ev.buf].buftype ~= "" then vim.api.nvim_buf_call(ev.buf, mini_trailspace.unhighlight) end
-    if vim.bo[ev.buf].buftype ~= "" then return end
-    local parsers = require "nvim-treesitter.parsers"
-    local ft = vim.bo[ev.buf].filetype
-    local lang = parsers.ft_to_lang(ft)
-    if not lang then return end
-    if parsers.has_parser(lang) then vim.treesitter.start(ev.buf) end
-  end,
-})
-
 vim.cmd [[
   augroup simple_numbertoggle
     autocmd!
