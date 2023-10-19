@@ -136,30 +136,33 @@ return {
       end,
       provider_selector = function(bufnr, filetype, buftype)
         --- cascade from lsp -> treesitter -> indent
-        ---@param bufnr number
+        ---@param buf number
         ---@return Promise
-        local cascadeSelector = function(bufnr)
+        local cascadeSelector = function(buf)
           local handleFallbackException = function(err, providerName)
             if type(err) == "string" and err:match "UfoFallbackException" then
-              return require("ufo").getFolds(bufnr, providerName)
+              return require("ufo").getFolds(buf, providerName)
             else
               return require("promise").reject(err)
             end
           end
 
           return require("ufo")
-            .getFolds(bufnr, "lsp")
+            .getFolds(buf, "lsp")
             :catch(function(err) return handleFallbackException(err, "treesitter") end)
             :catch(function(err) return handleFallbackException(err, "indent") end)
         end
         return cascadeSelector
       end,
     },
-    init = function()
-      vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "fold: open all" })
-      vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "fold: close all" })
-      vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "fold: open all except" })
-      vim.keymap.set("n", "zm", require("ufo").closeFoldsWith, { desc = "fold: close all with" })
+    config = function(_, opts)
+      local ufo = require "ufo"
+      ufo.setup(opts)
+
+      vim.keymap.set("n", "zR", ufo.openAllFolds, { desc = "fold: open all" })
+      vim.keymap.set("n", "zM", ufo.closeAllFolds, { desc = "fold: close all" })
+      vim.keymap.set("n", "zr", ufo.openFoldsExceptKinds, { desc = "fold: open all except" })
+      vim.keymap.set("n", "zm", ufo.closeFoldsWith, { desc = "fold: close all with" })
     end,
   },
   {

@@ -30,13 +30,24 @@ local ensure_installed = {
 }
 return {
   {
+    "windwp/nvim-ts-autotag",
+    event = "InsertEnter",
+    opts = {},
+  },
+  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
+  {
+    "nvim-treesitter/playground",
+    lazy = true,
+    cmd = { "TSPlaygroundToggle" },
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
+  {
     "nvim-treesitter/nvim-treesitter",
     version = false, -- last release is way too old and doesn't work on Windows
     cmd = "TSUpdateSync",
     build = ":TSUpdate",
     event = "VeryLazy",
     dependencies = {
-      "nvim-treesitter/playground",
       "nvim-treesitter/nvim-treesitter-context",
       {
         "nvim-treesitter/nvim-treesitter-textobjects",
@@ -63,12 +74,6 @@ return {
           end
         end,
       },
-      {
-        "windwp/nvim-ts-autotag",
-        event = "InsertEnter",
-        opts = {},
-      },
-      { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
     },
     opts = {
       ensure_installed = ensure_installed,

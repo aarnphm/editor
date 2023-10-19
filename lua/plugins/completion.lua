@@ -3,7 +3,7 @@ local slow_format_filetypes = {}
 return {
   {
     "stevearc/conform.nvim",
-    event = { "VeryLazy" },
+    event = "VeryLazy",
     cmd = { "ConformInfo" },
     init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
     opts = {
