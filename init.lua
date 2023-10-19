@@ -28,30 +28,7 @@ if not Util.has "mini.statusline" then
   }, " ")
 end
 
-require("lazy").setup("plugins", {
-  install = { colorscheme = { vim.g.simple_colorscheme } },
-  defaults = { lazy = false, version = false },
-  performance = {
-    cache = { enabled = true },
-    reset_packpath = true,
-    rtp = {
-      reset = true,
-      disabled_plugins = {
-        "gzip",
-        "matchit",
-        "matchparen",
-        "tarPlugin",
-        "tohtml",
-        "tutor",
-        "zipPlugin",
-        "man",
-      },
-    },
-  },
-  change_detection = { notify = false },
-  concurrency = vim.loop.os_uname() == "Darwin" and 30 or nil,
-  checker = { enable = true },
-})
+require("lazy").setup("plugins", { change_detection = { notify = false } })
 
 vim.o.background = vim.g.simple_background
 vim.cmd.colorscheme(vim.g.simple_colorscheme)

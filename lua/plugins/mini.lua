@@ -1,7 +1,33 @@
-local simplified_status_ft = { "neo-tree", "qf" }
+local simplified_status_ft = {
+  "neo-tree",
+  "qf",
+  "PlenaryTestPopup",
+  "help",
+  "lspinfo",
+  "man",
+  "notify",
+  "qf",
+  "query",
+  "man",
+  "nowrite", -- fugitive
+  "fugitive",
+  "prompt",
+  "spectre_panel",
+  "startuptime",
+  "tsplayground",
+  "neorepl",
+  "alpha",
+  "toggleterm",
+  "health",
+  "nofile",
+  "scratch",
+  "starter",
+  "",
+}
 
 return {
-  { "echasnovski/mini.colors", version = false },
+  "echasnovski/mini.colors",
+  "echasnovski/mini.doc",
   { "echasnovski/mini.align", event = "VeryLazy", opts = {} },
   { "echasnovski/mini.trailspace", event = { "BufRead", "BufNewFile" }, opts = {} },
   {
@@ -219,20 +245,65 @@ return {
       return vim.list_extend(mappings, keys)
     end,
   },
-  "echasnovski/mini.doc",
   {
     "echasnovski/mini.starter",
     event = "BufEnter",
-    opts = {},
-    config = function(_, opts)
-      local starter = require "mini.starter"
-      starter.setup {
-        items = { starter.sections.telescope(), starter.sections.builtin_actions() },
-        content_hook = {
-          starter.gen_hook.adding_bullet(),
-          starter.gen_hook.aligning("center", "center"),
+    opts = function()
+      return {
+        items = {
+          function()
+            return {
+              { action = Util.telescope("files", {}), name = "Files (.git dependent)", section = "Telescope" },
+              { action = Util.telescope("help_tags", {}), name = "Help tags", section = "Telescope" },
+              { action = Util.telescope("live_grep", {}), name = "Live grep", section = "Telescope" },
+              {
+                action = Util.telescope("oldfiles", {}),
+                name = "Recent files",
+                section = "Telescope",
+              },
+              {
+                action = Util.telescope("command_history", {}),
+                name = "Command history",
+                section = "Telescope",
+              },
+              {
+                action = Util.telescope("colorscheme", {}),
+                name = "Colorscheme",
+                section = "Telescope",
+              },
+              {
+                action = function() require("telescope").extensions.frecency.frecency {} end,
+                name = "Frequency",
+                section = "Telescope",
+              },
+            }
+          end,
+          {
+            { name = "Edit new buffer", action = "enew", section = "Shortcut" },
+            {
+              name = "Neovim config",
+              action = Util.telescope("files", { cwd = vim.fn.stdpath "config" }),
+              section = "Shortcut",
+            },
+            {
+              name = "Garden",
+              action = Util.telescope("files", { cwd = vim.fn.expand "~" .. "/workspace/garden" }),
+              section = "Shortcut",
+            },
+            { name = "Quit Neovim", action = "qall", section = "Shortcut" },
+          },
         },
       }
+    end,
+    config = function(_, opts)
+      local starter = require "mini.starter"
+
+      opts.content_hook = {
+        starter.gen_hook.adding_bullet(),
+        starter.gen_hook.aligning("center", "center"),
+      }
+
+      starter.setup(opts)
     end,
   },
   {

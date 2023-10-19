@@ -31,6 +31,18 @@ K.get = function()
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
       { "gh", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
+      {
+        "gI",
+        function() require("telescope.builtin").lsp_implementations { reuse_win = true } end,
+        desc = "lsp: Goto implementation",
+        has = "implementation",
+      },
+      {
+        "gY",
+        function() require("telescope.builtin").lsp_type_definitions { reuse_win = true } end,
+        desc = "lsp: Goto type definitions",
+        has = "typeImplementation",
+      },
     }
   end
   return K._keys

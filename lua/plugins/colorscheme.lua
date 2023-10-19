@@ -1,6 +1,8 @@
 local transparent_background = true
 local clear = {}
 
+---@alias RosePineOptions Options
+
 return {
   {
     "rose-pine/neovim",
@@ -8,24 +10,28 @@ return {
     priority = 1000,
     lazy = not (vim.g.simple_colorscheme == "rose-pine"),
     opts = function()
+      ---@type RosePineOptions
       local opts = {
         disable_italics = true,
+        disable_background = transparent_background,
         dark_variant = "main",
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "iris", blend = 10 },
           StatusLineNC = { fg = "subtle", bg = "surface" },
-          TelescopeBorder = { fg = "highlight_high" },
-          TelescopeNormal = { fg = "subtle" },
-          TelescopePromptNormal = { fg = "text" },
-          TelescopeSelection = { fg = "text" },
-          TelescopeSelectionCaret = { fg = "iris" },
+          TelescopeBorder = { fg = "highlight_high", bg = transparent_background and "none" or "base" },
+          TelescopeNormal = { fg = "subtle", bg = "none" },
+          TelescopePromptNormal = { bg = "base" },
+          TelescopeResultsNormal = { fg = "subtle", bg = "none" },
+          TelescopeSelection = { fg = "text", bg = "none" },
+          TelescopeSelectionCaret = { fg = "rose", bg = "none" },
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
           GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
           GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },
           GlanceWinBarFilename = { fg = "love", bg = "surface" },
-          GlancePreviewNormal = { fg = "highlight_high" },
+          GlancePreviewNormal = { bg = "surface" },
+          GlanceListNormal = { bg = "overlay" },
           GlancePreviewMatch = { fg = "love" },
           Headline1 = { bg = "love" },
           Headline2 = { bg = "gold" },

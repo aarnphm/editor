@@ -34,6 +34,7 @@ autocmd("FileType", {
     "query",
     "man",
     "nowrite", -- fugitive
+    "fugitive",
     "prompt",
     "spectre_panel",
     "startuptime",

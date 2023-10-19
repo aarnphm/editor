@@ -5,22 +5,14 @@ return {
     version = false,
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
+      "jvgrootveld/telescope-zoxide",
+      "nvim-telescope/telescope-frecency.nvim",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
       },
     },
     keys = {
-      {
-        "gI",
-        function() require("telescope.builtin").lsp_implementations { reuse_win = true } end,
-        desc = "lsp: Goto implementation",
-      },
-      {
-        "gY",
-        function() require("telescope.builtin").lsp_type_definitions { reuse_win = true } end,
-        desc = "lsp: Goto type definitions",
-      },
       {
         "<C-p>",
         function()
@@ -67,6 +59,11 @@ return {
         "<leader>w",
         function() require("telescope").extensions.live_grep_args.live_grep_args() end,
         desc = "telescope: Grep word",
+      },
+      {
+        "<leader>r",
+        function() require("telescope").extensions.frecency.frecency() end,
+        desc = "telescope: Recent files",
       },
     },
     opts = function()
@@ -131,12 +128,6 @@ return {
             n = { ["q"] = function(...) return actions.close(...) end },
           },
         },
-        fzf = {
-          fuzzy = false, -- false will only do exact matching
-          override_generic_sorter = true, -- override the generic sorter
-          override_file_sorter = true, -- override the file sorter
-          case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-        },
         pickers = {
           find_files = { hidden = true },
           live_grep = {
@@ -153,6 +144,18 @@ return {
           },
         },
         extensions = {
+          fzf = {
+            fuzzy = false, -- false will only do exact matching
+            override_generic_sorter = true, -- override the generic sorter
+            override_file_sorter = true, -- override the file sorter
+            case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+          },
+          frecency = {
+            use_sqlite = false,
+            show_scores = true,
+            show_unindexed = true,
+            ignore_patterns = { "*.git/*", "*/tmp/*" },
+          },
           live_grep_args = {
             auto_quoting = false,
             mappings = {
@@ -171,6 +174,9 @@ return {
     config = function(_, opts)
       require("telescope").setup(opts)
       require("telescope").load_extension "live_grep_args"
+      require("telescope").load_extension "frecency"
+      require("telescope").load_extension "fzf"
+      require("telescope").load_extension "zoxide"
     end,
   },
 }
