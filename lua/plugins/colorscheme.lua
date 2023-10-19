@@ -37,7 +37,7 @@ return {
         },
       }
       if vim.g.simple_background == "light" then
-        opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { bg = "rose" } })
+        opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { fg = "rose" } })
       end
       return opts
     end,
