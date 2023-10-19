@@ -11,7 +11,7 @@ autocmd("BufWinEnter", {
     vim.keymap.set(
       "n",
       "<leader>p",
-      ":Git pull --rebase",
+      "<CMD>Git pull --rebase<CR>",
       { desc = "git: pull rebase", buffer = bufnr, remap = false }
     )
     vim.keymap.set(
