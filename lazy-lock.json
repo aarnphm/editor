@@ -56,7 +56,7 @@
   "nvim-ts-autotag": { "branch": "main", "commit": "6be1192965df35f94b8ea6d323354f7dc7a557e4" },
   "nvim-ts-context-commentstring": { "branch": "main", "commit": "92e688f013c69f90c9bbd596019ec10235bc51de" },
   "nvim-web-devicons": { "branch": "master", "commit": "3af745113ea537f58c4b1573b64a429fefad9e07" },
-  "obsidian.nvim": { "branch": "main", "commit": "25f57d541361548f8b5873809e0907d646c5f3f4" },
+  "obsidian.nvim": { "branch": "main", "commit": "1387498bfba0c67a9bed4f615eafaac035250116" },
   "paint.nvim": { "branch": "main", "commit": "6ce64212804f425073c61ab0d9c2b034f0435260" },
   "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" },
   "plenary.nvim": { "branch": "master", "commit": "50012918b2fc8357b87cff2a7f7f0446e47da174" },
