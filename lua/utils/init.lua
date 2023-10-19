@@ -2,7 +2,7 @@
 --# selene: allow(global_usage)
 local M = {}
 
----@param on_attach fun(client, buffer)
+---@param on_attach fun(client?:lsp.Client, buffer?:integer): nil
 M.on_attach = function(on_attach)
   vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
@@ -12,6 +12,8 @@ M.on_attach = function(on_attach)
   })
 end
 
+---@param plugin string
+---@return boolean
 M.has = function(plugin) return require("lazy.core.config").plugins[plugin] ~= nil end
 
 M.get_clients = vim.lsp.get_clients or vim.lsp.get_active_clients
@@ -43,6 +45,8 @@ M.opts = function(name)
   return require("lazy.core.plugin").values(plugin, "opts", false)
 end
 
+---@param name string
+---@param fn fun(name: string): nil
 M.on_load = function(name, fn)
   local Config = require "lazy.core.config"
   if Config.plugins[name] and Config.plugins[name]._.loaded then
@@ -68,14 +72,14 @@ M.root_patterns = { ".git", "lua" }
 -- * root pattern of filename of the current buffer
 -- * root pattern of cwd
 ---@return string
-M.get_root = function()
+M.root = function()
   ---@type string?
   local path = vim.api.nvim_buf_get_name(0)
   path = path ~= "" and vim.loop.fs_realpath(path) or nil
   ---@type string[]
   local roots = {}
   if path then
-    for _, client in pairs(vim.lsp.get_active_clients { bufnr = 0 }) do
+    for _, client in pairs(M.get_clients { bufnr = 0 }) do
       local workspace = client.config.workspace_folders
       local paths = workspace and vim.tbl_map(function(ws) return vim.uri_to_fname(ws.uri) end, workspace)
         or client.config.root_dir and { client.config.root_dir }
@@ -108,7 +112,7 @@ M.telescope = function(builtin, opts)
   return function()
     builtin = params.builtin
     opts = params.opts
-    opts = vim.tbl_deep_extend("force", { cwd = M.get_root() }, opts or {})
+    opts = vim.tbl_deep_extend("force", { cwd = M.root() }, opts or {})
     if builtin == "files" then
       if vim.loop.fs_stat((opts.cwd or vim.loop.cwd()) .. "/.git") then
         opts.show_untracked = true
@@ -293,7 +297,7 @@ end
 ---Generate universal highlight groups
 ---@param overwrite palette? @The color to be overwritten | highest priority
 ---@return palette
-M.get_palette = function(overwrite)
+M.palette = function(overwrite)
   if not overwrite then
     return init_palette()
   else

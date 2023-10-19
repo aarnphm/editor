@@ -223,8 +223,8 @@ return {
     "echasnovski/mini.comment",
     dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
     keys = {
-      { "<Leader>c", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
-      { "<Leader>c", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
+      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
+      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
     },
     event = "VeryLazy",
     opts = {

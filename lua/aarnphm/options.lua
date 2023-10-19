@@ -59,6 +59,14 @@ o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 
+-- fold with nvim-ufo
+o.foldenable = true
+o.fillchars = "eob: ,fold: ,foldopen:,foldsep: ,foldclose:"
+o.foldcolumn = "auto:1"
+o.foldlevel = 99
+o.foldlevelstart = 99
+o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
+
 -- Spaces and tabs config
 local TABWIDTH = 2
 o.tabstop = TABWIDTH
@@ -81,9 +89,6 @@ o.timeoutlen = 200
 o.updatetime = 200
 o.virtualedit = "block"
 o.whichwrap = "h,l,<,>,[,],~"
-
--- opt.foldmethod = "expr"
--- opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
 -- last but def not least, wildmenu
 o.wildchar = 9

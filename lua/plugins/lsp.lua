@@ -7,6 +7,13 @@ K._keys = nil
 ---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string}
 ---@alias LazyKeysLsp LazyKeys|{has?:string}
 
+K.hover = function()
+  local has_ufo, ufo = pcall(require, "ufo")
+  if not has_ufo then vim.lsp.buf.hover() end
+  local win_id = ufo.peekFoldedLinesUnderCursor()
+  if not win_id then vim.lsp.buf.hover() end
+end
+
 K.get = function()
   if not K._keys then
     --@class PluginLspKeys
@@ -20,7 +27,7 @@ K.get = function()
       { "[e", K.diagnostic_goto(false, "ERROR"), desc = "lsp: Prev error" },
       { "]w", K.diagnostic_goto(true, "WARN"), desc = "lsp: Next warning" },
       { "[w", K.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
-      { "K", vim.lsp.buf.hover, desc = "Hover" },
+      { "K", K.hover, desc = "Hover" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
       { "gh", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
@@ -93,6 +100,86 @@ return {
       },
     },
     config = function(_, opts) require("colorizer").setup(opts) end,
+  },
+  {
+    "kevinhwang91/nvim-ufo",
+    name = "ufo",
+    event = "BufReadPost",
+    dependencies = { "kevinhwang91/promise-async" },
+    opts = {
+      fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+        local newVirtText = {}
+        local suffix = (" 󰁂 %d "):format(endLnum - lnum)
+        local sufWidth = vim.fn.strdisplaywidth(suffix)
+        local targetWidth = width - sufWidth
+        local curWidth = 0
+        for _, chunk in ipairs(virtText) do
+          local chunkText = chunk[1]
+          local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+          if targetWidth > curWidth + chunkWidth then
+            table.insert(newVirtText, chunk)
+          else
+            chunkText = truncate(chunkText, targetWidth - curWidth)
+            local hlGroup = chunk[2]
+            table.insert(newVirtText, { chunkText, hlGroup })
+            chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            -- str width returned from truncate() may less than 2nd argument, need padding
+            if curWidth + chunkWidth < targetWidth then
+              suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
+            end
+            break
+          end
+          curWidth = curWidth + chunkWidth
+        end
+        table.insert(newVirtText, { suffix, "MoreMsg" })
+        return newVirtText
+      end,
+      provider_selector = function(bufnr, filetype, buftype)
+        --- cascade from lsp -> treesitter -> indent
+        ---@param bufnr number
+        ---@return Promise
+        local cascadeSelector = function(bufnr)
+          local handleFallbackException = function(err, providerName)
+            if type(err) == "string" and err:match "UfoFallbackException" then
+              return require("ufo").getFolds(bufnr, providerName)
+            else
+              return require("promise").reject(err)
+            end
+          end
+
+          return require("ufo")
+            .getFolds(bufnr, "lsp")
+            :catch(function(err) return handleFallbackException(err, "treesitter") end)
+            :catch(function(err) return handleFallbackException(err, "indent") end)
+        end
+        return cascadeSelector
+      end,
+    },
+    init = function()
+      vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "fold: open all" })
+      vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "fold: close all" })
+      vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "fold: open all except" })
+      vim.keymap.set("n", "zm", require("ufo").closeFoldsWith, { desc = "fold: close all with" })
+    end,
+  },
+  {
+    "ray-x/lsp_signature.nvim",
+    event = "VeryLazy",
+    opts = {
+      bind = true,
+      -- TODO: Remove the following line when nvim-cmp#1613 gets resolved
+      check_completion_visible = false,
+      floating_window = true,
+      floating_window_above_cur_line = true,
+      hi_parameter = "Search",
+      hint_enable = false,
+      transparency = nil, -- disabled by default, allow floating win transparent value 1~100
+      wrap = true,
+      zindex = 45, -- avoid overlap with nvim.cmp
+      handler_opts = { border = "none" },
+      auto_close_after = 15000,
+    },
+    config = function(_, opts) require("lsp_signature").setup(opts) end,
   },
   {
     "williamboman/mason.nvim",
@@ -273,6 +360,34 @@ return {
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
       inlay_hints = { enabled = false },
+      capabilities = {
+        offsetEncoding = { "utf-16" },
+        textDocument = {
+          foldingRange = { -- nvim-ufo
+            dynamicRegistration = false,
+            lineFoldingOnly = true,
+          },
+          completion = {
+            completionItem = {
+              documentationFormat = { "markdown", "plaintext" },
+              snippetSupport = true,
+              preselectSupport = true,
+              insertReplaceSupport = true,
+              labelDetailsSupport = true,
+              deprecatedSupport = true,
+              commitCharactersSupport = true,
+              tagSupport = { valueSet = { 1 } },
+              resolveSupport = {
+                properties = {
+                  "documentation",
+                  "detail",
+                  "additionalTextEdits",
+                },
+              },
+            },
+          },
+        },
+      },
       ---@type lspconfig.options
       servers = {
         jsonls = {
@@ -360,7 +475,7 @@ return {
               if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
                 require("crates").show_popup()
               else
-                vim.lsp.buf.hover()
+                K.hover()
               end
             end,
             desc = "lsp: Show Crate Documentation",
@@ -424,6 +539,12 @@ return {
     config = function(_, opts)
       local lspconfig = require "lspconfig"
 
+      -- setup ufo before everything else
+      Util.on_attach(function(client, bufnr)
+        local ok, ufo = pcall(require, "ufo")
+        if ok then ufo.attach(bufnr) end
+      end)
+
       Util.on_attach(function(cl, bufnr) K.on_attach(cl, bufnr) end)
       local register_capability = vim.lsp.handlers["client/registerCapability"]
 
@@ -445,8 +566,8 @@ return {
         end)
       end
 
-      Util.on_attach(function(cl, _)
-        if cl.supports_method "textDocument/publishDiagnostics" then
+      Util.on_attach(function(cl, bufnr)
+        if cl.supports_method("textDocument/publishDiagnostics", { bufnr = bufnr }) then
           vim.lsp.handlers["textDocument/publishDiagnostics"] =
             vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
               signs = true,
@@ -455,18 +576,26 @@ return {
               update_in_insert = true,
             })
         end
+        if cl.supports_method("textDocument/hover", { bufnr = bufnr }) then
+          vim.lsp.handlers["textDocument/hover"] =
+            vim.lsp.with(vim.lsp.handlers.hover, { border = "none", focusable = true })
+        end
+        if cl.supports_method("textDocument/signatureHelp", { bufnr = bufnr }) then
+          vim.lsp.handlers["textDocument/signatureHelp"] =
+            vim.lsp.with(vim.lsp.handlers.signatureHelp, { border = "none", focusable = true })
+        end
       end)
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       local capabilities = vim.tbl_deep_extend(
         "force",
-        {},
+        opts.capabilities or {},
         vim.lsp.protocol.make_client_capabilities(),
         has_cmp and cmp_nvim_lsp.default_capabilities() or {}
       )
 
-      local function setup(server)
+      local setup = function(server)
         local server_opts = vim.tbl_deep_extend("force", {
           capabilities = vim.deepcopy(capabilities),
           flags = { debounce_text_changes = 500 },

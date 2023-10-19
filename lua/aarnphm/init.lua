@@ -1,3 +1,7 @@
+require "aarnphm.globals"
+require "aarnphm.options"
+require "aarnphm.bindings"
+
 -- NOTE: Loading shada is slow, so we load it manually after UIEnter
 local shada = vim.o.shada
 local autocmd = vim.api.nvim_create_autocmd
@@ -10,10 +14,6 @@ autocmd("User", {
     pcall(vim.api.nvim_exec2, "rshada", {})
   end,
 })
-
-require "aarnphm.globals"
-require "aarnphm.options"
-require "aarnphm.bindings"
 
 local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
 local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
@@ -119,5 +119,26 @@ vim.cmd [[
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
 ]]
+
+vim.cmd [[
+  augroup simple_diagnostics
+    autocmd!
+      autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()
+    augroup END
+]]
+
+autocmd("CursorHold", {
+  group = augroup "floating_diagnostics",
+  callback = function()
+    vim.diagnostic.open_float(nil, {
+      focusable = false,
+      close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+      border = "none",
+      source = "always",
+      prefix = "",
+      scope = "cursor",
+    })
+  end,
+})
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
