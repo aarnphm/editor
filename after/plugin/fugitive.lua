@@ -22,6 +22,12 @@ autocmd("BufWinEnter", {
     )
     vim.keymap.set(
       "n",
+      "<leader>cc",
+      "<CMD>Git commit -S --signoff -sv<CR>",
+      { desc = "git: commit", buffer = bufnr, remap = false }
+    )
+    vim.keymap.set(
+      "n",
       "<leader>t",
       ":Git push -u origin ",
       { desc = "git: push to specific branch", buffer = bufnr, remap = false }
