@@ -30,20 +30,23 @@ K.get = function()
       { "K", K.hover, desc = "Hover" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
       { "gh", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
-      { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
-      {
-        "gI",
-        function() require("telescope.builtin").lsp_implementations { reuse_win = true } end,
-        desc = "lsp: Goto implementation",
-        has = "implementation",
-      },
-      {
-        "gY",
-        function() require("telescope.builtin").lsp_type_definitions { reuse_win = true } end,
-        desc = "lsp: Goto type definitions",
-        has = "typeImplementation",
-      },
+      { "gI", Util.telescope("lsp_implementations", { reuse_win = true }), desc = "lsp: Goto implementation" },
+      { "gY", Util.telescope("lsp_type_definitions", { reuse_win = true }), desc = "lsp: Goto type definitions" },
     }
+    if Util.has "inc-rename.nvim" then
+      K._keys[#K._keys + 1] = {
+        "gr",
+        function()
+          local inc_rename = require "inc_rename"
+          return ":" .. inc_rename.config.cmd_name .. " " .. vim.fn.expand "<cword>"
+        end,
+        expr = true,
+        desc = "Rename",
+        has = "rename",
+      }
+    else
+      K._keys[#K._keys + 1] = { "gr", vim.lsp.buf.rename, desc = "Rename", has = "rename" }
+    end
   end
   return K._keys
 end
@@ -112,6 +115,11 @@ return {
       },
     },
     config = function(_, opts) require("colorizer").setup(opts) end,
+  },
+  {
+    "smjonas/inc-rename.nvim",
+    dependencies = { "stevearc/dressing.nvim" },
+    opts = { input_buffer_type = "dressing" },
   },
   {
     "kevinhwang91/nvim-ufo",
