@@ -37,12 +37,12 @@ end
 
 local get_branch = function(icon)
   local branch = ""
-  if vim.g.loaded_fugitive then
+  if vim.b.gitsigns_head ~= nil then
+    branch = vim.b.gitsigns_head
+  elseif vim.g.loaded_fugitive then
     branch = vim.fn.FugitiveHead()
   elseif vim.g.loaded_gitbranch then
     branch = vim.fn["gitbranch#name"]()
-  elseif vim.b.gitsigns_head ~= nil then
-    branch = vim.b.gitsigns_head
   end
   return branch ~= "" and fmt("(%s %s)", icon, branch) or ""
 end

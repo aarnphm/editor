@@ -1,4 +1,4 @@
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "fugitive" })
+vim.keymap.set("n", "<leader>gs", "<cmd>vertical Git<CR>", { desc = "fugitive" })
 
 local autocmd = vim.api.nvim_create_autocmd
 
