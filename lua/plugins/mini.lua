@@ -33,7 +33,7 @@ return {
     opts = function()
       return {
         content = {
-          set_vim_settings = true,
+          set_vim_settings = false,
           active = function()
             local mode_info = statusline.modes[vim.fn.mode()]
             local mode_hl = mode_info.hl

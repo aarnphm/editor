@@ -64,7 +64,7 @@ autocmd("VimResized", {
 })
 autocmd({ "BufEnter", "BufWinEnter", "WinEnter", "CmdwinEnter" }, {
   group = augroup "disable_statusline",
-  command = [[if match(bufname('%'), 'starter') != -1 || match(bufname('%'), 'nofile') != -1 || bufname('%') == '' | set laststatus=0 | else | set laststatus=2 | endif]],
+  command = [[if match(bufname('%'), 'starter') != -1 || match(bufname('%'), 'nofile') != -1 || bufname('%') == '' | set laststatus=0 | else | set laststatus=3 | endif]],
 })
 -- go to last loc when opening a buffer
 autocmd("BufReadPost", {
@@ -127,19 +127,5 @@ vim.cmd [[
       autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()
     augroup END
 ]]
-
-autocmd("CursorHold", {
-  group = augroup "floating_diagnostics",
-  callback = function()
-    vim.diagnostic.open_float(nil, {
-      focusable = false,
-      close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-      border = "none",
-      source = "always",
-      prefix = "",
-      scope = "cursor",
-    })
-  end,
-})
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
