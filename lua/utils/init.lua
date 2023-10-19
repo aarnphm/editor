@@ -4,6 +4,7 @@
 ---@class simple.util: LazyUtilCore
 ---@field inject simple.util.inject
 ---@field palette simple.util.palette
+---@field nit simple.util.nit
 local M = {}
 
 setmetatable(M, {
