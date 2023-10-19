@@ -219,6 +219,48 @@ return {
       return vim.list_extend(mappings, keys)
     end,
   },
+  "echasnovski/mini.doc",
+  {
+    "echasnovski/mini.starter",
+    event = "BufEnter",
+    opts = {},
+    config = function(_, opts)
+      local starter = require "mini.starter"
+      starter.setup {
+        items = { starter.sections.telescope(), starter.sections.builtin_actions() },
+        content_hook = {
+          starter.gen_hook.adding_bullet(),
+          starter.gen_hook.aligning("center", "center"),
+        },
+      }
+    end,
+  },
+  {
+    "echasnovski/mini.indentscope",
+    version = false, -- wait till new 0.7.0 release to put it back on semver
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    opts = {
+      symbol = "│", -- "▏"
+      options = { try_as_border = true },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "help",
+          "alpha",
+          "dashboard",
+          "neo-tree",
+          "Trouble",
+          "lazy",
+          "mason",
+          "notify",
+          "toggleterm",
+          "lazyterm",
+        },
+        callback = function() vim.b.miniindentscope_disable = true end,
+      })
+    end,
+  },
   {
     "echasnovski/mini.comment",
     dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
@@ -226,7 +268,7 @@ return {
       { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
       { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
     },
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     opts = {
       options = {
         custom_commentstring = function()

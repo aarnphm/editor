@@ -1,4 +1,3 @@
-local nit = require "utils.nit"
 local ls = require "luasnip"
 local fmt = require("luasnip.extras.fmt").fmt
 local s = ls.snippet
@@ -9,12 +8,12 @@ local f = ls.function_node
 
 return {
   s("checkbox", fmt("- {} {}", { c(1, { t "[ ]", t "[x]" }), i(0, "Todo") })),
-  s("today", fmt("{}", nit.current_date())),
-  s("todaylink", fmt("[[{}]]", nit.current_date())),
-  s("tomorrow", fmt("{}", nit.tomorrow_date())),
-  s("tomorrowlink", fmt("[[{}]]", nit.tomorrow_date())),
-  s("yesterday", fmt("{}", nit.yesterday_date())),
-  s("yesterdaylink", fmt("[[{}]]", nit.yesterday_date())),
+  s("today", fmt("{}", Util.nit.current_date())),
+  s("todaylink", fmt("[[{}]]", Util.nit.current_date())),
+  s("tomorrow", fmt("{}", Util.nit.tomorrow_date())),
+  s("tomorrowlink", fmt("[[{}]]", Util.nit.tomorrow_date())),
+  s("yesterday", fmt("{}", Util.nit.yesterday_date())),
+  s("yesterdaylink", fmt("[[{}]]", Util.nit.yesterday_date())),
   s(
     "callout",
     fmt("> [!{}] {}\n> {}", {

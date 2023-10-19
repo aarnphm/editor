@@ -42,13 +42,33 @@ return {
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
+    "nvim-treesitter/nvim-treesitter-context",
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    enabled = true,
+    opts = { mode = "cursor" },
+    keys = {
+      {
+        "<leader>ut",
+        function()
+          local tsc = require "treesitter-context"
+          tsc.toggle()
+          if Util.inject.get_upvalue(tsc.toggle, "enabled") then
+            vim.notify("Enabled Treesitter Context", vim.log.levels.INFO, { title = "Option" })
+          else
+            vim.notify("Disabled Treesitter Context", vim.log.levels.WARN, { title = "Option" })
+          end
+        end,
+        desc = "Toggle Treesitter Context",
+      },
+    },
+  },
+  {
     "nvim-treesitter/nvim-treesitter",
     version = false, -- last release is way too old and doesn't work on Windows
     cmd = "TSUpdateSync",
     build = ":TSUpdate",
     event = "VeryLazy",
     dependencies = {
-      "nvim-treesitter/nvim-treesitter-context",
       {
         "nvim-treesitter/nvim-treesitter-textobjects",
         config = function()

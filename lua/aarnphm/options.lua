@@ -22,6 +22,7 @@ o.wrap = false -- egh i don't like wrap
 o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
 o.guicursor = "" -- no gui cursor
+o.signcolumn = "yes" -- always show sign column
 o.cursorline = false -- show cursor line
 o.cursorcolumn = false -- show cursor column
 o.undofile = true -- set undofile to infinite undo
@@ -36,8 +37,10 @@ o.number = true -- number is good for nav
 o.swapfile = false -- I don't like swap files personally, found undofile to be better
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
-o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 o.laststatus = 2 -- show statusline on buffer
+o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
+
+opt.shortmess:append { W = true, I = true, c = true, C = true }
 
 if vim.fn.has "nvim-0.9" == 1 then
   opt.shortmess:append "C" -- Don't show "Scanning..." messages
@@ -54,6 +57,7 @@ opt.completeopt = { "menuone", "noselect" } -- better completion menu
 o.smartcase = true
 o.ignorecase = true
 o.infercase = true
+o.grepformat = "%f:%l:%c:%m"
 o.grepprg = "rg --vimgrep" -- also its 2023 use rg
 o.linebreak = true
 o.jumpoptions = "stack"

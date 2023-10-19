@@ -2,6 +2,7 @@ return {
   {
     "lewis6991/gitsigns.nvim",
     event = "BufReadPost",
+    ---@type Gitsigns.Config
     opts = {
       numhl = true,
       watch_gitdir = { interval = 1000, follow_files = true },
@@ -11,6 +12,7 @@ return {
       update_debounce = 100,
       status_formatter = nil, -- Use default
       word_diff = false,
+      preview_config = { border = "none" },
       diff_opts = { internal = true },
       on_attach = function(bufnr)
         local actions = require "gitsigns.actions"

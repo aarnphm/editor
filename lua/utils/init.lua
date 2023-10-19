@@ -1,6 +1,17 @@
 ---@diagnostic disable: undefined-field
 --# selene: allow(global_usage)
+
+---@class simple.util: LazyUtilCore
+---@field inject simple.util.inject
 local M = {}
+
+setmetatable(M, {
+  __index = function(t, k)
+    ---@diagnostic disable-next-line: no-unknown
+    t[k] = require("utils." .. k)
+    return t[k]
+  end,
+})
 
 ---@param on_attach fun(client?:lsp.Client, buffer?:integer): nil
 M.on_attach = function(on_attach)
