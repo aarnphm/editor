@@ -62,7 +62,7 @@ o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 -- fold with nvim-ufo
 o.foldenable = true
 o.fillchars = "eob: ,fold: ,foldopen:,foldsep: ,foldclose:"
-o.foldcolumn = "auto:1"
+o.foldcolumn = "auto:2"
 o.foldlevel = 99
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"

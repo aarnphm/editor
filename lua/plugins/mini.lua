@@ -38,10 +38,11 @@ return {
             local mode_info = statusline.modes[vim.fn.mode()]
             local mode_hl = mode_info.hl
 
-            local mode = statusline.mode {}
-            local git = statusline.git {}
-            local diagnostic = statusline.diagnostic {}
-            local filetype = statusline.filetype {}
+            local mode = statusline.mode { trunc_width = 75 }
+            local git = statusline.git { trunc_width = 120 }
+            local diagnostic = statusline.diagnostic { trunc_width = 90 }
+            local filetype = statusline.filetype { trunc_width = 75 }
+            local location = statusline.location { trunc_width = 90 }
             local filename = statusline.filename { trunc_width = 75 }
 
             if vim.tbl_contains(simplified_status_ft, vim.bo.filetype) then
@@ -59,8 +60,7 @@ return {
               "%=",
               { hl = "MiniStatuslineDevinfo", strings = { diagnostic } },
               { hl = "MiniStatuslineFileinfo", strings = { filetype } },
-              { hl = mode_hl, strings = { "%l:%c" } },
-              { hl = mode_hl, strings = { "♥" } },
+              { hl = mode_hl, strings = { location } },
             }
           end,
         },

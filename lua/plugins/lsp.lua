@@ -106,7 +106,9 @@ return {
     name = "ufo",
     event = "BufReadPost",
     dependencies = { "kevinhwang91/promise-async" },
+    ---@type UfoConfig
     opts = {
+      preview = { win_config = { border = "none" } },
       fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
         local newVirtText = {}
         local suffix = (" 󰁂 %d "):format(endLnum - lnum)

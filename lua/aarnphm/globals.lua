@@ -35,7 +35,7 @@ local get_hunks = function()
   return concat_hunks(hunks)
 end
 
-local get_branch = function()
+local get_branch = function(icon)
   local branch = ""
   if vim.g.loaded_fugitive then
     branch = vim.fn.FugitiveHead()
@@ -44,7 +44,7 @@ local get_branch = function()
   elseif vim.b.gitsigns_head ~= nil then
     branch = vim.b.gitsigns_head
   end
-  return branch ~= "" and fmt("(b: %s)", branch) or ""
+  return branch ~= "" and fmt("(%s %s)", icon, branch) or ""
 end
 
 -- For more information see ":h buftype"
@@ -88,24 +88,51 @@ local modes = setmetatable({
   __index = function() return { long = "UNKNOWN", short = "U", hl = "%#MiniStatuslineModeOther#" } end,
 })
 
+-- diagnostic levels
+
+local diagnostic_levels = {
+  { id = vim.diagnostic.severity.ERROR, sign = "E" },
+  { id = vim.diagnostic.severity.WARN, sign = "W" },
+  { id = vim.diagnostic.severity.INFO, sign = "I" },
+  { id = vim.diagnostic.severity.HINT, sign = "H" },
+}
+
+local get_diagnostic_count = function(id) return #vim.diagnostic.get(0, { severity = id }) end
+
+---@class SimpleStatuslineArgs
+---@field icon string|nil
+---@field trunc_width number|nil
+
 -- I refuse to have a complex statusline, *proceeds to have a complex statusline* PepeLaugh (lualine is cool though.)
 -- [hunk] [branch] [modified]  --------- [diagnostic] [filetype] [line:col] [heart]
+---@type table<string, fun(args: SimpleStatuslineArgs): string>
 _G.statusline = {
   git = function(args)
-    local hunks, branch = get_hunks(), get_branch()
-    if hunks == concat_hunks { 0, 0, 0 } and branch == "" then hunks = "" end
-    if hunks ~= "" and branch ~= "" then branch = branch .. " " end
-    return fmt("%s", table.concat { branch, hunks })
+    if isnt_normal_buffer() then return "" end
+    local icon = args.icon or ""
+    local head = get_branch(icon)
+    local hunks = get_hunks()
+
+    if hunks == concat_hunks { 0, 0, 0 } and head == "" then hunks = "" end
+    if hunks ~= "" and head ~= "" then head = head .. " " end
+    return fmt("%s", table.concat { head, hunks })
   end,
   diagnostic = function(args)
-    local buf = vim.api.nvim_get_current_buf()
-    return vim.diagnostic.get(buf)
-        and fmt(
-          "[W:%d | E:%d]",
-          #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.WARN }),
-          #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity.ERROR })
-        )
-      or ""
+    local hasnt_attached_client = next(Util.get_clients {}) == nil
+    local dont_show_lsp = is_truncated(args.trunc_width) or isnt_normal_buffer() or hasnt_attached_client
+    if dont_show_lsp then return "" end
+
+    -- construct diagnostic info
+    local t = {}
+    for _, level in ipairs(diagnostic_levels) do
+      local n = get_diagnostic_count(level.id)
+      -- Add level info only if diagnostic is present
+      if n > 0 then table.insert(t, string.format(" %s:%s", level.sign, n)) end
+    end
+
+    local icon = args.icon or ""
+    if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
+    return fmt("[%s %s]", icon, table.concat(t, " |"))
   end,
   filetype = function(args)
     local filetype = vim.bo.filetype
@@ -129,6 +156,11 @@ _G.statusline = {
       -- Use fullpath if not truncated
       return "%F%m%r"
     end
+  end,
+  location = function(args)
+    local icon = args.icon or "♥"
+    if is_truncated(args.trunc_width) then return "%l:%2v" .. (" %s"):format(icon) end
+    return '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
   end,
   mode = function(args)
     local mi = modes[vim.fn.mode()]

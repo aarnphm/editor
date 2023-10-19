@@ -1,6 +1,6 @@
 {
   "LuaSnip": { "branch": "master", "commit": "80a8528f084a97b624ae443a6f50ff8074ba486b" },
-  "SchemaStore.nvim": { "branch": "main", "commit": "a8fa6a36f09f00d32577fae0b3cee2f25ffc5c74" },
+  "SchemaStore.nvim": { "branch": "main", "commit": "f4915aef564f695a2c1e6e65e3c41f8f8ee16af4" },
   "better-escape.nvim": { "branch": "master", "commit": "7031dc734add47bb71c010e0551829fa5799375f" },
   "catppuccin": { "branch": "refactor/syntax-highlighting", "commit": "2c814f46dd02e8b8cc6ab5f5f3c38781573cb20b" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },

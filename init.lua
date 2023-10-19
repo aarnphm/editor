@@ -17,15 +17,14 @@ vim.opt.runtimepath:prepend(lazypath)
 -- setup statusline line here
 if not Util.has "mini.statusline" then
   vim.o.statusline = table.concat({
-    "%{%luaeval('statusline.mode {}')%}",
-    "%{%luaeval('statusline.git {}')%}",
-    "%m",
+    "%{%luaeval('statusline.mode {trunc_width = 75}')%}",
+    "%{%luaeval('statusline.git {trunc_width = 120}')%}",
+    "%<",
+    "%{%luaeval('statusline.filename {trunc_width = 75}')%}",
     "%=",
-    "%=",
-    "%{%luaeval('statusline.diagnostic {}')%}",
-    "%y",
-    "%l:%c",
-    "♥",
+    "%{%luaeval('statusline.diagnostic {trunc_width = 90}')%}",
+    "%{%luaeval('statusline.filetype {trunc_width = 75}')%}",
+    "%{%luaeval('statusline.location {trunc_width = 90}')%}",
   }, " ")
 end
 
