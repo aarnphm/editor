@@ -5,6 +5,7 @@
 ---@field inject simple.util.inject
 ---@field palette simple.util.palette
 ---@field nit simple.util.nit
+---@field terminal simple.util.terminal
 local M = {}
 
 setmetatable(M, {

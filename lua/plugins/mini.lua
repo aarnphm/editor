@@ -706,21 +706,29 @@ return {
     version = false, -- wait till new 0.7.0 release to put it back on semver
     event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     opts = {
-      symbol = "│", -- "▏"
+      symbol = "│",
       options = { try_as_border = true },
     },
     init = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
-          "help",
+          "", -- for all buffers without a file type
           "alpha",
-          "dashboard",
+          "fugitive",
+          "git",
+          "gitcommit",
+          "help",
+          "json",
+          "log",
+          "markdown",
           "neo-tree",
-          "Trouble",
-          "lazy",
-          "mason",
-          "notify",
-          "toggleterm",
+          "Outline",
+          "startify",
+          "TelescopePrompt",
+          "txt",
+          "undotree",
+          "vimwiki",
+          "vista",
           "lazyterm",
         },
         callback = function() vim.b.miniindentscope_disable = true end,

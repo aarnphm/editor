@@ -34,3 +34,17 @@ autocmd("BufWinEnter", {
     )
   end,
 })
+
+-- lazygit
+vim.keymap.set(
+  "n",
+  "<leader>gg",
+  function() Util.terminal({ "lazygit" }, { cwd = Util.root(), esc_esc = false, ctrl_hjkl = false }) end,
+  { desc = "Lazygit (root dir)" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>gG",
+  function() Util.terminal({ "lazygit" }, { esc_esc = false, ctrl_hjkl = false }) end,
+  { desc = "Lazygit (cwd)" }
+)

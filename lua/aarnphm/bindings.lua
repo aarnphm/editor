@@ -24,8 +24,8 @@ map("n", "<LocalLeader>|", "<C-w>|", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
 map("n", "<Leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
-map("n", "<Leader>.", "<cmd>bnext<cr>", { desc = "buffer: next" })
-map("n", "<Leader>,", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
+map("n", "]b", "<cmd>bnext<cr>", { desc = "buffer: next" })
+map("n", "[b", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
 map("n", "<Leader>q", "<cmd>copen<cr>", { desc = "quickfix: Open quickfix" })
 map("n", "<Leader>l", "<cmd>lopen<cr>", { desc = "quickfix: Open location list" })
 map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
@@ -58,4 +58,23 @@ map(
   string.format("<cmd>resize +%s<cr>", 10),
   { noremap = false, desc = "windows: resize up 10px" }
 )
+
+-- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
+map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "Next search result" })
+map("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
+map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
+map("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "Prev search result" })
+map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+
+-- floating terminal
+local lazyterm = function() Util.terminal(nil, { cwd = Util.root() }) end
+vim.keymap.set("n", "<LocalLeader>t", lazyterm, { desc = "Terminal (root dir)" })
+vim.keymap.set("n", "<LocalLeader>T", function() Util.terminal() end, { desc = "Terminal (cwd)" })
+
+-- Add undo break-points
+map("i", ",", ",<c-g>u")
+map("i", ".", ".<c-g>u")
+map("i", ";", ";<c-g>u")
+
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
