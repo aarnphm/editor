@@ -450,9 +450,7 @@ return {
             redhat = { telemetry = { enabled = false } },
             yaml = {
               keyOrdering = false,
-              format = {
-                enable = true,
-              },
+              format = { enable = true, singleQuote = true, bracketSpacing = false, printWidth = 120 },
               validate = true,
               schemaStore = {
                 -- Must disable built-in schemaStore support to use
@@ -553,7 +551,7 @@ return {
         yamlls = function()
           -- Neovim < 0.10 does not have dynamic registration for formatting
           if vim.fn.has "nvim-0.10" == 0 then
-            require("lazyvim.util").lsp.on_attach(function(client, _)
+            Util.on_attach(function(client, _)
               if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
             end)
           end
