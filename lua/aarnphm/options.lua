@@ -39,6 +39,16 @@ o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
 o.laststatus = 3 -- show statusline on buffer
 o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
+o.statusline = table.concat({
+  "%{%luaeval('statusline.mode {trunc_width = 75}')%}",
+  "%{%luaeval('statusline.git {trunc_width = 120}')%}",
+  "%<",
+  "%{%luaeval('statusline.filename {trunc_width = 75}')%}",
+  "%=",
+  "%{%luaeval('statusline.diagnostic {trunc_width = 90}')%}",
+  "%{%luaeval('statusline.filetype {trunc_width = 75}')%}",
+  "%{%luaeval('statusline.location {trunc_width = 90}')%}",
+}, " ")
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
 

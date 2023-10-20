@@ -37,16 +37,12 @@ return {
     },
     keys = {
       {
-        "<Leader><Leader>",
+        "<Leader><Leader>f",
         function() require("conform").format { async = true, lsp_fallback = true } end,
         desc = "style: format buffer",
       },
     },
     config = function(_, opts)
-      opts.formatters = {
-        yapf = { cwd = require("conform.util").root_file { ".editorconfig", ".git" } },
-      }
-
       require("conform").setup(opts)
 
       vim.api.nvim_create_user_command("FormatDisable", function(args)
@@ -95,7 +91,15 @@ return {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
         keys = {
-          { "<C-l>", function() require("luasnip").expand_or_jump() end, mode = { "i", "s" } },
+          {
+            "<tab>",
+            function() return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>" end,
+            expr = true,
+            silent = true,
+            mode = "i",
+          },
+          { "<tab>", function() require("luasnip").jump(1) end, mode = "s" },
+          { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
         },
         build = (not jit.os:find "Windows")
             and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"

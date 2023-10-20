@@ -53,7 +53,6 @@ return {
     },
     config = true,
   },
-  { "folke/paint.nvim", event = "BufReadPost", config = true },
   {
     "folke/which-key.nvim",
     event = "BufReadPost",
