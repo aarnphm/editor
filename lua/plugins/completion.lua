@@ -1,16 +1,18 @@
 local slow_format_filetypes = {}
+local ignore_folders = { "/openllm/", "/node_modules/" }
 
 return {
   {
     "stevearc/conform.nvim",
-    event = "VeryLazy",
+    event = { "BufWritePre" },
     cmd = { "ConformInfo" },
     init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
     opts = {
+      log_level = vim.log.levels.DEBUG,
       formatters_by_ft = {
         lua = { "stylua" },
         toml = { "taplo" },
-        python = { "ruff_fix" },
+        python = { "yapf", "ruff_fix" },
         proto = { { "buf", "protolint" } },
       },
       format_on_save = function(bufnr)
@@ -26,7 +28,9 @@ return {
         if vim.g.autoformat or vim.b[bufnr].autoformat then return end
         -- Disable autoformat for files in a certain path
         local bufname = vim.api.nvim_buf_get_name(bufnr)
-        if bufname:match "/node_modules/" then return end
+        for _, folder in ipairs(ignore_folders) do
+          if bufname:match(folder) then return end
+        end
 
         return { timeout_ms = 200, lsp_fallback = true }, on_format
       end,
@@ -43,6 +47,11 @@ return {
       },
     },
     config = function(_, opts)
+      require("conform").formatters.yapf = {
+        prepend_args = {
+          "--style={based_on_style: google, indent_width: 2, join_multiple_lines: True, column_limit: 192, use_tabs: False, DISABLE_ENDING_COMMA_HEURISTIC: True, BLANK_LINE_BEFORE_CLASS_DOCSTRING: False, BLANK_LINE_BEFORE_MODULE_DOCSTRING: False, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION: 1, BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES: 1, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, COALESCE_BRACKETS: True, DEDENT_CLOSING_BRACKETS: True}",
+        },
+      }
       require("conform").setup(opts)
 
       vim.api.nvim_create_user_command("FormatDisable", function(args)
@@ -87,6 +96,8 @@ return {
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
+      "hrsh7th/cmp-cmdline",
+      "kdheepak/cmp-latex-symbols",
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
@@ -241,22 +252,40 @@ return {
         },
         sources = {
           { name = "nvim_lsp", max_item_count = 350 },
-          { name = "buffer" },
           { name = "luasnip" },
           { name = "path" },
           { name = "emoji" },
+          { name = "buffer" },
+          { name = "latex_symbols" },
         },
       }
     end,
     ---@param opts cmp.ConfigSchema
     config = function(_, opts)
+      local cmp = require "cmp"
       for _, source in ipairs(opts.sources) do
         source.group_index = source.group_index or 1
       end
       if Util.has "clangd_extensions.nvim" then
         table.insert(opts.sorting.comparators, 1, require "clangd_extensions.cmp_scores")
       end
-      require("cmp").setup(opts)
+
+      cmp.setup(opts)
+      if Util.has "cmp-cmdline" then
+        cmp.setup.cmdline("/", {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = {
+            { name = "buffer" },
+          },
+        })
+        cmp.setup.cmdline(":", {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = cmp.config.sources(
+            { { name = "path" } },
+            { { name = "cmdline", option = { ignore_cmds = { "Man", "!" } } } }
+          ),
+        })
+      end
       -- special cases with crates.nvim
       vim.api.nvim_create_autocmd({ "BufRead" }, {
         group = augroup "cmp_source_cargo",
