@@ -25,6 +25,7 @@ local ensure_installed = {
   "regex",
   "luap",
   "luadoc",
+  "java",
   "javascript",
   "proto",
 }
