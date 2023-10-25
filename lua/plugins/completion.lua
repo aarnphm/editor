@@ -15,6 +15,13 @@ return {
         python = { "yapf", "ruff_fix" },
         proto = { { "buf", "protolint" } },
       },
+      formatters = {
+        yapf = {
+          prepend_args = {
+            "--style={based_on_style: google, indent_width: 2, join_multiple_lines: True, column_limit: 192, use_tabs: False, DISABLE_ENDING_COMMA_HEURISTIC: True, BLANK_LINE_BEFORE_CLASS_DOCSTRING: False, BLANK_LINE_BEFORE_MODULE_DOCSTRING: False, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION: 1, BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES: 1, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, COALESCE_BRACKETS: True, DEDENT_CLOSING_BRACKETS: True}",
+          },
+        },
+      },
       format_on_save = function(bufnr)
         if slow_format_filetypes[vim.bo[bufnr].filetype] then return end
         local on_format = function(err)
@@ -47,12 +54,8 @@ return {
       },
     },
     config = function(_, opts)
-      require("conform").formatters.yapf = {
-        prepend_args = {
-          "--style={based_on_style: google, indent_width: 2, join_multiple_lines: True, column_limit: 192, use_tabs: False, DISABLE_ENDING_COMMA_HEURISTIC: True, BLANK_LINE_BEFORE_CLASS_DOCSTRING: False, BLANK_LINE_BEFORE_MODULE_DOCSTRING: False, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION: 1, BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES: 1, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, COALESCE_BRACKETS: True, DEDENT_CLOSING_BRACKETS: True}",
-        },
-      }
-      require("conform").setup(opts)
+      local conform = require "conform"
+      conform.setup(opts)
 
       vim.api.nvim_create_user_command("FormatDisable", function(args)
         -- FormatDisable! will disable formatting just for this buffer
@@ -81,7 +84,7 @@ return {
             ["end"] = { args.line2, end_line:len() },
           }
         end
-        require("conform").format { async = true, lsp_fallback = true, range = range }
+        conform.format { async = true, lsp_fallback = true, range = range }
       end, { range = true })
     end,
   },
