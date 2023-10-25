@@ -316,58 +316,9 @@ return {
       {
         "p00f/clangd_extensions.nvim",
         ft = { "c", "cpp", "hpp", "h" },
-        dependencies = { "neovim/nvim-lspconfig" },
         lazy = true,
         opts = function()
-          local opts = {
-            -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
-            root_dir = function(fname)
-              return require("lspconfig.util").root_pattern(
-                "Makefile",
-                "configure.ac",
-                "configure.in",
-                "config.h.in",
-                "meson.build",
-                "meson_options.txt",
-                "WORKSPACE",
-                "BUILD.bazel",
-                "build.ninja"
-              )(fname) or require("lspconfig.util").root_pattern(
-                "compile_commands.json",
-                "compile_flags.txt"
-              )(fname) or require("lspconfig.util").find_git_ancestor(fname)
-            end,
-            server = {
-              single_file_support = true,
-              filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-              capabilities = {
-                offsetEncoding = { "utf-8" },
-                textDocument = {
-                  completion = {
-                    completionItem = {
-                      commitCharactersSupport = true,
-                      deprecatedSupport = true,
-                      insertReplaceSupport = true,
-                      labelDetailsSupport = true,
-                      preselectSupport = true,
-                      resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
-                      snippetSupport = false,
-                      tagSupport = { valueSet = { 1 } },
-                    },
-                  },
-                },
-              },
-            },
-          }
           local lspconfig = require "lspconfig"
-          local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-          local capabilities = vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-            opts.server.capabilities or {}
-          )
 
           local switch_source_header_splitcmd = function(bufnr, splitcmd)
             bufnr = lspconfig.util.validate_bufnr(bufnr)
@@ -392,21 +343,6 @@ return {
             end
           end
 
-          opts.server.commands = {
-            ClangdSwitchSourceHeader = {
-              function() switch_source_header_splitcmd(0, "edit") end,
-              description = "cpp: Open source/header in current buffer",
-            },
-            ClangdSwitchSourceHeaderVSplit = {
-              function() switch_source_header_splitcmd(0, "vsplit") end,
-              description = "cpp: Open source/header in a new vsplit",
-            },
-            ClangdSwitchSourceHeaderSplit = {
-              function() switch_source_header_splitcmd(0, "split") end,
-              description = "cpp: Open source/header in a new split",
-            },
-          }
-
           local get_binary_path_list = function(binaries)
             local get_binary_path = function(binary)
               local path = nil
@@ -427,31 +363,66 @@ return {
             return table.concat(path_list, ",")
           end
 
-          opts.server.cmd = {
-            "clangd",
-            "-j=12",
-            "--enable-config",
-            "--background-index",
-            "--pch-storage=memory",
-            -- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
-            "--query-driver="
-              .. get_binary_path_list {
-                "clang++",
-                "clang",
-                "gcc",
-                "g++",
+          return {
+            -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
+            root_dir = function(fname)
+              return require("lspconfig.util").root_pattern(
+                "Makefile",
+                "configure.ac",
+                "configure.in",
+                "config.h.in",
+                "meson.build",
+                "meson_options.txt",
+                "WORKSPACE",
+                "BUILD.bazel",
+                "build.ninja"
+              )(fname) or require("lspconfig.util").root_pattern(
+                "compile_commands.json",
+                "compile_flags.txt"
+              )(fname) or require("lspconfig.util").find_git_ancestor(fname)
+            end,
+            server = {
+              single_file_support = true,
+              filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+              capabilities = { offsetEncoding = { "utf-16" } },
+              command = {
+                ClangdSwitchSourceHeader = {
+                  function() switch_source_header_splitcmd(0, "edit") end,
+                  description = "cpp: Open source/header in current buffer",
+                },
+                ClangdSwitchSourceHeaderVSplit = {
+                  function() switch_source_header_splitcmd(0, "vsplit") end,
+                  description = "cpp: Open source/header in a new vsplit",
+                },
+                ClangdSwitchSourceHeaderSplit = {
+                  function() switch_source_header_splitcmd(0, "split") end,
+                  description = "cpp: Open source/header in a new split",
+                },
               },
-            "--clang-tidy",
-            "--all-scopes-completion",
-            "--completion-style=detailed",
-            "--header-insertion-decorators",
-            "--header-insertion=iwyu",
-            "--limit-references=3000",
-            "--limit-results=350",
+              cmd = {
+                "clangd",
+                "-j=12",
+                "--enable-config",
+                "--background-index",
+                "--pch-storage=memory",
+                -- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
+                "--query-driver="
+                  .. get_binary_path_list {
+                    "clang++",
+                    "clang",
+                    "gcc",
+                    "g++",
+                  },
+                "--clang-tidy",
+                "--all-scopes-completion",
+                "--completion-style=detailed",
+                "--header-insertion-decorators",
+                "--header-insertion=iwyu",
+                "--limit-references=3000",
+                "--limit-results=350",
+              },
+            },
           }
-
-          opts.server.capabilities = capabilities
-          return opts
         end,
         config = function() end,
       },
@@ -694,7 +665,7 @@ return {
         rust_analyzer = function(_, opts)
           local rt_opts = Util.opts "rust-tools.nvim"
           require("rust-tools").setup(vim.tbl_deep_extend("force", rt_opts or {}, { server = opts }))
-          return true
+          return false
         end,
         yamlls = function()
           -- Neovim < 0.10 does not have dynamic registration for formatting
@@ -707,7 +678,7 @@ return {
         clangd = function(_, opts)
           local clangd_opts = Util.opts "rust-tools.nvim"
           require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_opts or {}, { server = opts }))
-          return true
+          return false
         end,
       },
     },
