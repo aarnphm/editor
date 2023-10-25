@@ -193,6 +193,44 @@ M.telescope = function(builtin, opts)
   end
 end
 
+---@param opts? string|{msg:string, on_error:fun(msg)}
+M.try = function(fn, opts)
+  opts = type(opts) == "string" and { msg = opts } or opts or {}
+  local msg = opts.msg
+  -- error handler
+  local error_handler = function(err)
+    msg = (msg and (msg .. "\n\n") or "") .. err .. M.pretty_trace()
+    if opts.on_error then
+      opts.on_error(msg)
+    else
+      vim.schedule(function() M.error(msg) end)
+    end
+    return err
+  end
+
+  ---@type boolean, any
+  local ok, result = xpcall(fn, error_handler)
+  return ok and result or nil
+end
+
+---@param name "autocmds" | "options" | "keymaps"
+M.load = function(name)
+  local function _load(mod)
+    if require("lazy.core.cache").find(mod)[1] then
+      Util.try(function() require(mod) end, { msg = "Failed loading " .. mod })
+    end
+  end
+  -- always load lazyvim, then user file
+  if M.defaults[name] or name == "options" then _load("lazyvim.config." .. name) end
+  _load("config." .. name)
+  if vim.bo.filetype == "lazy" then
+    -- HACK: LazyVim may have overwritten options of the Lazy ui, so reset this here
+    vim.cmd [[do VimResized]]
+  end
+  local pattern = "LazyVim" .. name:sub(1, 1):upper() .. name:sub(2)
+  vim.api.nvim_exec_autocmds("User", { pattern = pattern, modeline = false })
+end
+
 M.use_lazy_file = true
 M.lazy_file_events = { "BufReadPost", "BufNewFile", "BufWritePre" }
 -- Properly load file based plugins without blocking the UI

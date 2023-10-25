@@ -314,40 +314,153 @@ return {
         ft = { "markdown", "norg", "rmd", "org" },
       },
       {
+        "p00f/clangd_extensions.nvim",
+        ft = { "c", "cpp", "hpp", "h" },
+        dependencies = { "neovim/nvim-lspconfig" },
+        lazy = true,
+        opts = function()
+          local opts = {
+            -- https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/server_configurations/clangd.lua
+            root_dir = function(fname)
+              return require("lspconfig.util").root_pattern(
+                "Makefile",
+                "configure.ac",
+                "configure.in",
+                "config.h.in",
+                "meson.build",
+                "meson_options.txt",
+                "WORKSPACE",
+                "BUILD.bazel",
+                "build.ninja"
+              )(fname) or require("lspconfig.util").root_pattern(
+                "compile_commands.json",
+                "compile_flags.txt"
+              )(fname) or require("lspconfig.util").find_git_ancestor(fname)
+            end,
+            server = {
+              single_file_support = true,
+              filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+              capabilities = {
+                offsetEncoding = { "utf-8" },
+                textDocument = {
+                  completion = {
+                    completionItem = {
+                      commitCharactersSupport = true,
+                      deprecatedSupport = true,
+                      insertReplaceSupport = true,
+                      labelDetailsSupport = true,
+                      preselectSupport = true,
+                      resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
+                      snippetSupport = false,
+                      tagSupport = { valueSet = { 1 } },
+                    },
+                  },
+                },
+              },
+            },
+          }
+          local lspconfig = require "lspconfig"
+          local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+          local capabilities = vim.tbl_deep_extend(
+            "force",
+            {},
+            vim.lsp.protocol.make_client_capabilities(),
+            has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+            opts.server.capabilities or {}
+          )
+
+          local switch_source_header_splitcmd = function(bufnr, splitcmd)
+            bufnr = lspconfig.util.validate_bufnr(bufnr)
+            local params = { uri = vim.uri_from_bufnr(bufnr) }
+
+            local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
+
+            if clangd_client then
+              clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
+                if err then error(tostring(err)) end
+                if not result then
+                  error("Corresponding file can’t be determined", vim.log.levels.ERROR)
+                  return
+                end
+                vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
+              end)
+            else
+              error(
+                "Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
+                vim.log.levels.ERROR
+              )
+            end
+          end
+
+          opts.server.commands = {
+            ClangdSwitchSourceHeader = {
+              function() switch_source_header_splitcmd(0, "edit") end,
+              description = "cpp: Open source/header in current buffer",
+            },
+            ClangdSwitchSourceHeaderVSplit = {
+              function() switch_source_header_splitcmd(0, "vsplit") end,
+              description = "cpp: Open source/header in a new vsplit",
+            },
+            ClangdSwitchSourceHeaderSplit = {
+              function() switch_source_header_splitcmd(0, "split") end,
+              description = "cpp: Open source/header in a new split",
+            },
+          }
+
+          local get_binary_path_list = function(binaries)
+            local get_binary_path = function(binary)
+              local path = nil
+              if vim.loop.os_uname().sysname == "Windows_NT" then
+                path = vim.fn.trim(vim.fn.system("where " .. binary))
+              else
+                path = vim.fn.trim(vim.fn.system("which " .. binary))
+              end
+              if vim.v.shell_error ~= 0 then path = nil end
+              return path
+            end
+
+            local path_list = {}
+            for _, binary in ipairs(binaries) do
+              local path = get_binary_path(binary)
+              if path then table.insert(path_list, path) end
+            end
+            return table.concat(path_list, ",")
+          end
+
+          opts.server.cmd = {
+            "clangd",
+            "-j=12",
+            "--enable-config",
+            "--background-index",
+            "--pch-storage=memory",
+            -- You MUST set this arg ↓ to your c/cpp compiler location (if not included)!
+            "--query-driver="
+              .. get_binary_path_list {
+                "clang++",
+                "clang",
+                "gcc",
+                "g++",
+              },
+            "--clang-tidy",
+            "--all-scopes-completion",
+            "--completion-style=detailed",
+            "--header-insertion-decorators",
+            "--header-insertion=iwyu",
+            "--limit-references=3000",
+            "--limit-results=350",
+          }
+
+          opts.server.capabilities = capabilities
+          return opts
+        end,
+        config = function() end,
+      },
+      {
         "simrat39/rust-tools.nvim",
         ft = "rust",
         dependencies = { "nvim-lua/plenary.nvim" },
         lazy = true,
-        opts = {
-          tools = {
-            -- automatically call RustReloadWorkspace when writing to a Cargo.toml file.
-            reload_workspace_from_cargo_toml = true,
-            inlay_hints = {
-              auto = true,
-              other_hints_prefix = ":: ",
-              only_current_line = true,
-              show_parameter_hints = false,
-            },
-          },
-          server = {
-            standalone = true,
-            settings = {
-              ["rust-analyzer"] = {
-                cargo = {
-                  loadOutDirsFromCheck = true,
-                  buildScripts = { enable = true },
-                },
-                diagnostics = {
-                  disabled = { "unresolved-proc-macro" },
-                  enableExperimental = true,
-                },
-                checkOnSave = { command = "clippy" },
-                procMacro = { enable = true },
-              },
-            },
-          },
-        },
-        config = function(_, opts)
+        opts = function()
           local get_rust_adapters = function()
             if vim.loop.os_uname().sysname == "Windows_NT" then
               return {
@@ -363,19 +476,47 @@ return {
             local liblldb_path = codelldb_extension_path .. "/lldb/lib/liblldb" .. extension
             return require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path)
           end
-
-          local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-          local capabilities = vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-            opts.server.capabilities or {}
-          )
-          opts.server.capabilities = capabilities
-          opts.dap = { adapter = get_rust_adapters() }
-          require("rust-tools").setup(opts)
+          return {
+            dap = { adapter = get_rust_adapters() },
+            tools = {
+              on_initialized = function()
+                vim.cmd [[
+                  augroup RustLSP
+                    autocmd CursorHold                      *.rs silent! lua vim.lsp.buf.document_highlight()
+                    autocmd CursorMoved,InsertEnter         *.rs silent! lua vim.lsp.buf.clear_references()
+                    autocmd BufEnter,CursorHold,InsertLeave *.rs silent! lua vim.lsp.codelens.refresh()
+                  augroup END
+                ]]
+              end,
+              -- automatically call RustReloadWorkspace when writing to a Cargo.toml file.
+              reload_workspace_from_cargo_toml = true,
+              inlay_hints = {
+                auto = true,
+                other_hints_prefix = ":: ",
+                only_current_line = true,
+                show_parameter_hints = false,
+              },
+            },
+            server = {
+              standalone = true,
+              settings = {
+                ["rust-analyzer"] = {
+                  cargo = {
+                    loadOutDirsFromCheck = true,
+                    buildScripts = { enable = true },
+                  },
+                  diagnostics = {
+                    disabled = { "unresolved-proc-macro" },
+                    enableExperimental = true,
+                  },
+                  checkOnSave = { command = "clippy" },
+                  procMacro = { enable = true },
+                },
+              },
+            },
+          }
         end,
+        config = function() end,
       },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
@@ -504,6 +645,13 @@ return {
             desc = "lsp: Show Crate Documentation",
           },
         },
+        rust_analyzer = {
+          keys = {
+            { "K", "<cmd>RustHoverActions<cr>", desc = "Hover Actions (Rust)" },
+            { "<leader>cR", "<cmd>RustCodeAction<cr>", desc = "Code Action (Rust)" },
+            { "<leader>dr", "<cmd>RustDebuggables<cr>", desc = "Run Debuggables (Rust)" },
+          },
+        },
         ruff_lsp = {
           keys = {
             {
@@ -544,7 +692,7 @@ return {
           end)
         end,
         rust_analyzer = function(_, opts)
-          local rt_opts = require("lazyvim.util").opts "rust-tools.nvim"
+          local rt_opts = Util.opts "rust-tools.nvim"
           require("rust-tools").setup(vim.tbl_deep_extend("force", rt_opts or {}, { server = opts }))
           return true
         end,
@@ -555,6 +703,11 @@ return {
               if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
             end)
           end
+        end,
+        clangd = function(_, opts)
+          local clangd_opts = Util.opts "rust-tools.nvim"
+          require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_opts or {}, { server = opts }))
+          return true
         end,
       },
     },

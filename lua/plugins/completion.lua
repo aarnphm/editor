@@ -253,6 +253,9 @@ return {
       for _, source in ipairs(opts.sources) do
         source.group_index = source.group_index or 1
       end
+      if Util.has "clangd_extensions.nvim" then
+        table.insert(opts.sorting.comparators, 1, require "clangd_extensions.cmp_scores")
+      end
       require("cmp").setup(opts)
       -- special cases with crates.nvim
       vim.api.nvim_create_autocmd({ "BufRead" }, {
