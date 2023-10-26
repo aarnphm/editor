@@ -52,6 +52,11 @@ return {
     config = function(_, opts) require("which-key").setup(opts) end,
   },
   {
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+    opts = { plugins = { gitsigns = { enabled = true }, alacritty = { enabled = true } } },
+  },
+  {
     "j-hui/fidget.nvim",
     branch = "legacy",
     event = "LspAttach",

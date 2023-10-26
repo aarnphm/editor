@@ -14,6 +14,7 @@ return {
         toml = { "taplo" },
         python = { "yapf", "ruff_fix" },
         proto = { { "buf", "protolint" } },
+        markdown = { "prettier", "cbfmt" },
       },
       formatters = {
         yapf = {

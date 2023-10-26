@@ -127,6 +127,7 @@ return {
     },
     config = function(_, opts)
       if Util.has "SchemaStore.nvim" then vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" }) end
+      if Util.has "vimtex" then vim.list_extend(opts.ensure_installed, { "bibtex", "latex" }) end
 
       if type(opts.ensure_installed) == "table" then
         ---@type table<string, boolean>
