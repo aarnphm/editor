@@ -1,9 +1,45 @@
+local dropbar_enable = {
+  "PlenaryTestPopup",
+  "help",
+  "lspinfo",
+  "man",
+  "notify",
+  "gitcommit",
+  "qf",
+  "query",
+  "man",
+  "nowrite",
+  "fugitive",
+  "prompt",
+  "spectre_panel",
+  "startuptime",
+  "tsplayground",
+  "neorepl",
+  "neo-tree",
+  "alpha",
+  "toggleterm",
+  "health",
+  "nofile",
+  "scratch",
+  "starter",
+  "",
+}
+
 return {
   {
     "Bekaboo/dropbar.nvim",
     enabled = vim.g.started_by_firenvim ~= true and vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
+    ---@type dropbar_configs_t
     opts = {
+      general = {
+        ---@type boolean|fun(buf:integer, win: integer): boolean
+        enable = function(buf, win)
+          return not vim.api.nvim_win_get_config(win).zindex
+            and not vim.wo[win].diff
+            and not vim.tbl_contains(dropbar_enable, vim.bo[buf].filetype)
+        end,
+      },
       icons = {
         enable = true,
         ui = {

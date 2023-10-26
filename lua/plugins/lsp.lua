@@ -795,11 +795,7 @@ return {
         marksman = {},
         spectral = {},
         jdtls = {},
-        matlab_ls = {
-          settings = {
-            matlab = { installPath = "/Applications/MATLAB_R2023a.app" },
-          },
-        },
+        matlab_ls = { settings = { matlab = { installPath = "/Applications/MATLAB_R2023a.app" } } },
         texlab = {
           keys = {
             { "<Leader>K", "<plug>(vimtex-doc-package)", desc = "Vimtex Docs", silent = true },
