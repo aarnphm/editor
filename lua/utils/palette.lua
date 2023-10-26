@@ -59,7 +59,7 @@ local create = function()
   if not _has_palette_autocmd then
     _has_palette_autocmd = true
     vim.api.nvim_create_autocmd("ColorScheme", {
-      group = vim.api.nvim_create_augroup("__builtin_palette", { clear = true }),
+      group = augroup "__builtin_palette",
       pattern = "*",
       callback = function()
         palette = nil

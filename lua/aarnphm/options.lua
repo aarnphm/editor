@@ -37,6 +37,7 @@ o.number = true -- number is good for nav
 o.swapfile = false -- I don't like swap files personally, found undofile to be better
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
+o.showtabline = 0
 o.laststatus = 3 -- show statusline on buffer
 o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 o.statusline = table.concat({
