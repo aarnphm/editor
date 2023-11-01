@@ -105,7 +105,7 @@ local java_filetypes = { "java" }
 -- that Plugin.opts works.
 ---@param config table
 ---@param custom function | table | nil
-local function extend_or_override(config, custom, ...)
+local extend_or_override = function(config, custom, ...)
   if type(custom) == "function" then
     config = custom(config, ...) or config
   elseif custom then
@@ -423,7 +423,7 @@ return {
     config = function()
       vim.api.nvim_create_autocmd({ "FileType" }, {
         group = augroup "vimtex_conceal",
-        pattern = { "bib", "tex" },
+        pattern = { "bib", "tex", "md" },
         callback = function() vim.wo.conceallevel = 2 end,
       })
 
