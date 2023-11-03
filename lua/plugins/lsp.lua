@@ -205,25 +205,6 @@ return {
     end,
   },
   {
-    "ray-x/lsp_signature.nvim",
-    event = "VeryLazy",
-    opts = {
-      bind = true,
-      -- TODO: Remove the following line when nvim-cmp#1613 gets resolved
-      check_completion_visible = false,
-      floating_window = true,
-      floating_window_above_cur_line = true,
-      hi_parameter = "Search",
-      hint_enable = false,
-      transparency = nil, -- disabled by default, allow floating win transparent value 1~100
-      wrap = true,
-      zindex = 45, -- avoid overlap with nvim.cmp
-      handler_opts = { border = "none" },
-      auto_close_after = 15000,
-    },
-    config = function(_, opts) require("lsp_signature").setup(opts) end,
-  },
-  {
     "williamboman/mason.nvim",
     cmd = "Mason",
     build = ":MasonUpdate",
