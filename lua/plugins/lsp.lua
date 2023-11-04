@@ -19,7 +19,7 @@ K.get = function()
     --@class PluginLspKeys
     K._keys = {
       { "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
-      { "gR", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
+      { "gh", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
       { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
       { "]d", K.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
       { "[d", K.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
@@ -29,7 +29,7 @@ K.get = function()
       { "[w", K.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
       { "K", K.hover, desc = "Hover" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
-      { "gh", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
+      { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gI", Util.telescope("lsp_implementations", { reuse_win = true }), desc = "lsp: Goto implementation" },
       { "gY", Util.telescope("lsp_type_definitions", { reuse_win = true }), desc = "lsp: Goto type definitions" },
     }
@@ -203,25 +203,6 @@ return {
       vim.keymap.set("n", "zr", ufo.openFoldsExceptKinds, { desc = "fold: open all except" })
       vim.keymap.set("n", "zm", ufo.closeFoldsWith, { desc = "fold: close all with" })
     end,
-  },
-  {
-    "ray-x/lsp_signature.nvim",
-    event = "VeryLazy",
-    opts = {
-      bind = true,
-      -- TODO: Remove the following line when nvim-cmp#1613 gets resolved
-      check_completion_visible = false,
-      floating_window = true,
-      floating_window_above_cur_line = true,
-      hi_parameter = "Search",
-      hint_enable = false,
-      transparency = nil, -- disabled by default, allow floating win transparent value 1~100
-      wrap = true,
-      zindex = 45, -- avoid overlap with nvim.cmp
-      handler_opts = { border = "none" },
-      auto_close_after = 15000,
-    },
-    config = function(_, opts) require("lsp_signature").setup(opts) end,
   },
   {
     "williamboman/mason.nvim",

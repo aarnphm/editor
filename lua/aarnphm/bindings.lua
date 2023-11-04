@@ -68,7 +68,7 @@ map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result
 map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 
 -- floating terminal
-local lazyterm = function() Util.terminal(nil, { cwd = Util.root() }) end
+local lazyterm = function() Util.terminal(nil, { cwd = Util.root(), esc_esc = false, ctrl_hjkl = false }) end
 vim.keymap.set("n", "<LocalLeader>t", lazyterm, { desc = "Terminal (root dir)" })
 vim.keymap.set("n", "<LocalLeader>T", function() Util.terminal() end, { desc = "Terminal (cwd)" })
 
