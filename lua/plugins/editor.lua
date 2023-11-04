@@ -153,7 +153,7 @@ return {
     },
     opts = {
       sources = { "filesystem", "buffers", "git_status", "document_symbols" },
-      open_files_do_not_replace_types = { "terminal", "Trouble", "qf", "Outline" },
+      open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
       event_handlers = {
         {
           event = "neo_tree_window_after_open",
