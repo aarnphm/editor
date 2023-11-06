@@ -876,26 +876,6 @@ return {
         end)
       end
 
-      Util.on_attach(function(cl, bufnr)
-        if cl.supports_method("textDocument/publishDiagnostics", { bufnr = bufnr }) then
-          vim.lsp.handlers["textDocument/publishDiagnostics"] =
-            vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-              signs = true,
-              underline = false,
-              virtual_text = false,
-              update_in_insert = true,
-            })
-        end
-        if cl.supports_method("textDocument/hover", { bufnr = bufnr }) then
-          vim.lsp.handlers["textDocument/hover"] =
-            vim.lsp.with(vim.lsp.handlers.hover, { border = "none", focusable = true })
-        end
-        if cl.supports_method("textDocument/signatureHelp", { bufnr = bufnr }) then
-          vim.lsp.handlers["textDocument/signatureHelp"] =
-            vim.lsp.with(vim.lsp.handlers.signatureHelp, { border = "none", focusable = true })
-        end
-      end)
-
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       local capabilities = vim.tbl_deep_extend(
