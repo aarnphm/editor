@@ -387,9 +387,6 @@ return {
                 }, { mode = "n", buffer = args.buf })
               end
             end
-
-            -- User can set additional keymaps in opts.on_attach
-            if opts.on_attach then opts.on_attach(args) end
           end
         end,
       })
@@ -676,25 +673,25 @@ return {
             dynamicRegistration = false,
             lineFoldingOnly = true,
           },
-          completion = {
-            completionItem = {
-              documentationFormat = { "markdown", "plaintext" },
-              snippetSupport = true,
-              preselectSupport = true,
-              insertReplaceSupport = true,
-              labelDetailsSupport = true,
-              deprecatedSupport = true,
-              commitCharactersSupport = true,
-              tagSupport = { valueSet = { 1 } },
-              resolveSupport = {
-                properties = {
-                  "documentation",
-                  "detail",
-                  "additionalTextEdits",
-                },
-              },
-            },
-          },
+          -- completion = {
+          --   completionItem = {
+          --     documentationFormat = { "markdown", "plaintext" },
+          --     snippetSupport = true,
+          --     preselectSupport = true,
+          --     insertReplaceSupport = true,
+          --     labelDetailsSupport = true,
+          --     deprecatedSupport = true,
+          --     commitCharactersSupport = true,
+          --     tagSupport = { valueSet = { 1 } },
+          --     resolveSupport = {
+          --       properties = {
+          --         "documentation",
+          --         "detail",
+          --         "additionalTextEdits",
+          --       },
+          --     },
+          --   },
+          -- },
         },
       },
       ---@type lspconfig.options
