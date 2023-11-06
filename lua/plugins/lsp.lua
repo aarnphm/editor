@@ -209,7 +209,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt" },
+      ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "stylua", "shfmt" },
       ui = { border = "none" },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -800,23 +800,6 @@ return {
             { "K", "<cmd>RustHoverActions<cr>", desc = "Hover Actions (Rust)" },
             { "<leader>cR", "<cmd>RustCodeAction<cr>", desc = "Code Action (Rust)" },
             { "<leader>dr", "<cmd>RustDebuggables<cr>", desc = "Run Debuggables (Rust)" },
-          },
-        },
-        ruff_lsp = {
-          keys = {
-            {
-              "<leader>co",
-              function()
-                vim.lsp.buf.code_action {
-                  apply = true,
-                  context = {
-                    only = { "source.organizeImports" },
-                    diagnostics = {},
-                  },
-                }
-              end,
-              desc = "Organize Imports",
-            },
           },
         },
         pyright = {
