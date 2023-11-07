@@ -18,16 +18,9 @@ K.get = function()
   if not K._keys then
     --@class PluginLspKeys
     K._keys = {
-      { "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
       { "gh", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
       { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
-      { "]d", K.diagnostic_goto(true), desc = "lsp: Next diagnostic" },
-      { "[d", K.diagnostic_goto(false), desc = "lsp: Prev diagnostic" },
-      { "]e", K.diagnostic_goto(true, "ERROR"), desc = "lsp: Next error" },
-      { "[e", K.diagnostic_goto(false, "ERROR"), desc = "lsp: Prev error" },
-      { "]w", K.diagnostic_goto(true, "WARN"), desc = "lsp: Next warning" },
-      { "[w", K.diagnostic_goto(false, "WARN"), desc = "lsp: Prev warning" },
-      { "K", K.hover, desc = "Hover" },
+      { "K", vim.lsp.buf.hover, desc = "Hover" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
       { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gI", Util.telescope("lsp_implementations", { reuse_win = true }), desc = "lsp: Goto implementation" },

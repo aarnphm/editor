@@ -3,6 +3,20 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+local diagnostic_goto = function(next, severity)
+  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function() go { severity = severity } end
+end
+
+map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })
+map("n", "]d", diagnostic_goto(true), { desc = "lsp: Next diagnostic" })
+map("n", "[d", diagnostic_goto(false), { desc = "lsp: Prev diagnostic" })
+map("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "lsp: Next error" })
+map("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "lsp: Prev error" })
+map("n", "]w", diagnostic_goto(true, "WARN"), { desc = "lsp: Next warning" })
+map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "lsp: Prev warning" })
+
 -- NOTE: normal mode
 map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
 map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
