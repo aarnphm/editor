@@ -770,7 +770,7 @@ return {
               if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
                 require("crates").show_popup()
               else
-                K.hover()
+                vim.lsp.buf.hover()
               end
             end,
             desc = "lsp: Show Crate Documentation",
