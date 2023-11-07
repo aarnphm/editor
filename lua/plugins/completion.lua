@@ -1,5 +1,5 @@
 local slow_format_filetypes = {}
-local ignore_folders = { "/openllm/", "/node_modules/" }
+local ignore_folders = { "/openllm/", "/node_modules/", "/tinyllm/" }
 
 return {
   {
