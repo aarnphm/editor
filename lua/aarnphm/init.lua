@@ -122,11 +122,4 @@ vim.cmd [[
   augroup END
 ]]
 
-vim.cmd [[
-  augroup simple_diagnostics
-    autocmd!
-      autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()
-    augroup END
-]]
-
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
