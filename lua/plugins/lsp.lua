@@ -20,7 +20,8 @@ K.get = function()
     K._keys = {
       { "gh", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
       { "gD", vim.lsp.buf.declaration, desc = "lsp: Goto declaration" },
-      { "K", vim.lsp.buf.hover, desc = "Hover" },
+      { "K", K.hover, desc = "lsp: Hover" },
+      { "H", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
       { "gd", "<cmd>Glance definitions<cr>", desc = "lsp: Peek definition", has = "definition" },
       { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gI", Util.telescope("lsp_implementations", { reuse_win = true }), desc = "lsp: Goto implementation" },
@@ -763,7 +764,7 @@ return {
               if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
                 require("crates").show_popup()
               else
-                vim.lsp.buf.hover()
+                K.hover()
               end
             end,
             desc = "lsp: Show Crate Documentation",
