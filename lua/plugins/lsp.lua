@@ -26,6 +26,22 @@ K.get = function()
       { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
       { "gI", Util.telescope("lsp_implementations", { reuse_win = true }), desc = "lsp: Goto implementation" },
       { "gY", Util.telescope("lsp_type_definitions", { reuse_win = true }), desc = "lsp: Goto type definitions" },
+      { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Action", mode = { "n", "v" }, has = "codeAction" },
+      {
+        "<leader>cA",
+        function()
+          vim.lsp.buf.code_action {
+            context = {
+              only = {
+                "source",
+              },
+              diagnostics = {},
+            },
+          }
+        end,
+        desc = "Source Action",
+        has = "codeAction",
+      },
     }
     if Util.has "inc-rename.nvim" then
       K._keys[#K._keys + 1] = {

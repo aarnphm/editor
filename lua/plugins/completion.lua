@@ -1,5 +1,5 @@
 local slow_format_filetypes = {}
-local ignore_folders = { "/node_modules/" }
+local ignore_folders = { "/node_modules/", "/tinygrad/", "/tinyllm/" }
 
 return {
   {
@@ -150,6 +150,7 @@ return {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         event = "InsertEnter",
+        build = ":Copilot auth",
         opts = {
           cmp = { enabled = true, method = "getCompletionsCycling" },
           panel = { enabled = false },
@@ -202,10 +203,6 @@ return {
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
         sorting = defaults.sorting,
-        window = {
-          documentation = { winhighlight = "Normal:Pmenu" },
-          completion = { winhighlight = "Normal:Pmenu" },
-        },
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
         mapping = cmp.mapping.preset.insert {
           ["<CR>"] = cmp.mapping.confirm { select = true },

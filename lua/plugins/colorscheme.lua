@@ -115,6 +115,7 @@ return {
         gitsigns = true,
         harpoon = true,
         headlines = true,
+        ufo = true,
         hop = false,
         illuminate = true,
         indent_blankline = { enabled = true, colored_indent_levels = false },
@@ -187,9 +188,6 @@ return {
 
             -- For trouble.nvim
             TroubleNormal = { bg = transparent_background and cp.none or cp.base },
-
-            -- For nvim-ufo
-            UfoFoldedBg = { bg = transparent_background and cp.none or cp.base },
 
             -- For telescope.nvim
             TelescopeMatching = { fg = cp.lavender },
