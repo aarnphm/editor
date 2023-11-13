@@ -106,6 +106,7 @@ return {
       },
       context_commentstring = { enable = true, enable_autocmd = false },
       autotag = { enable = true },
+      indent = { enable = true },
       textobjects = {
         move = {
           enable = true,

@@ -1,10 +1,10 @@
 local slow_format_filetypes = {}
-local ignore_folders = { "/openllm/", "/node_modules/", "/tinyllm/" }
+local ignore_folders = { "/node_modules/" }
 
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre" },
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     cmd = { "ConformInfo" },
     init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
     opts = {
@@ -12,16 +12,25 @@ return {
       formatters_by_ft = {
         lua = { "stylua" },
         toml = { "taplo" },
-        python = { "yapf", "ruff_fix" },
+        python = { "ruff_fix", "ruff_format" },
         proto = { { "buf", "protolint" } },
-        markdown = { "prettier", "cbfmt" },
-      },
-      formatters = {
-        yapf = {
-          prepend_args = {
-            "--style={BASED_ON_STYLE: google, INDENT_WIDTH: 2, JOIN_MULTIPLE_LINES: True, COLUMN_LIMIT: 192, USE_TABS: False, DISABLE_ENDING_COMMA_HEURISTIC: True, BLANK_LINE_BEFORE_CLASS_DOCSTRING: False, BLANK_LINE_BEFORE_MODULE_DOCSTRING: False, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION: 1, BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES: 1, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, COALESCE_BRACKETS: True, DEDENT_CLOSING_BRACKETS: True}",
-          },
-        },
+        zsh = { "beautysh" },
+        ["javascript"] = { "prettier" },
+        ["javascriptreact"] = { "prettier" },
+        ["typescript"] = { "prettier" },
+        ["typescriptreact"] = { "prettier" },
+        ["vue"] = { "prettier" },
+        ["css"] = { "prettier" },
+        ["scss"] = { "prettier" },
+        ["less"] = { "prettier" },
+        ["html"] = { "prettier" },
+        ["json"] = { "prettier" },
+        ["jsonc"] = { "prettier" },
+        ["yaml"] = { "prettier" },
+        ["graphql"] = { "prettier" },
+        ["handlebars"] = { "prettier" },
+        ["markdown"] = { { "prettierd", "prettier", "cbfmt" } },
+        ["markdown.mdx"] = { { "prettierd", "prettier" } },
       },
       format_on_save = function(bufnr)
         if slow_format_filetypes[vim.bo[bufnr].filetype] then return end
@@ -181,17 +190,7 @@ return {
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 
       local cmp = require "cmp"
-      local compare = require "cmp.config.compare"
-
-      compare.lsp_scores = function(entry1, entry2)
-        local diff
-        if entry1.completion_item.score and entry2.completion_item.score then
-          diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
-        else
-          diff = entry2.score - entry1.score
-        end
-        return (diff < 0)
-      end
+      local defaults = require "cmp.config.default"()
 
       ---@type cmp.ConfigSchema
       return {
@@ -202,35 +201,17 @@ return {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
-        sorting = {
-          priority_weight = 2,
-          comparators = {
-            compare.offset, -- Items closer to cursor will have lower priority
-            compare.exact,
-            compare.scopes,
-            compare.lsp_scores,
-            compare.sort_text,
-            compare.score,
-            compare.recently_used,
-            -- compare.locality, -- Items closer to cursor will have higher priority, conflicts with `offset`
-            compare.kind,
-            compare.length,
-            compare.order,
-          },
-        },
+        sorting = defaults.sorting,
         window = {
           documentation = { winhighlight = "Normal:Pmenu" },
+          completion = { winhighlight = "Normal:Pmenu" },
         },
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
-        matching = { disallow_partial_fuzzy_matching = false },
-        performance = { async_budget = 1, max_view_entries = 120 },
         mapping = cmp.mapping.preset.insert {
-          ["<CR>"] = cmp.mapping.confirm {
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = true,
-          },
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<C-j>"] = cmp.mapping.select_next_item(),
+          ["<CR>"] = cmp.mapping.confirm { select = true },
+          ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
+          ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+          ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
           ["<Tab>"] = function(fallback)
             if require("copilot.suggestion").is_visible() then
               require("copilot.suggestion").accept()
@@ -255,7 +236,7 @@ return {
           end,
         },
         sources = {
-          { name = "nvim_lsp", max_item_count = 350 },
+          { name = "nvim_lsp" },
           { name = "luasnip" },
           { name = "path" },
           { name = "emoji" },

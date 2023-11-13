@@ -204,7 +204,7 @@ return {
     build = ":MasonUpdate",
     opts = {
       ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt" },
-      ui = { border = "none" },
+      ui = { border = "single" },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)
@@ -407,6 +407,36 @@ return {
     end,
   },
   {
+    "stevearc/aerial.nvim",
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    opts = function()
+      local opts = {
+        attach_mode = "global",
+        backends = { "lsp", "treesitter", "markdown", "man" },
+        show_guides = true,
+        nav = { border = "single" },
+        layout = {
+          resize_to_content = false,
+          win_opts = {
+            winhl = "Normal:NormalFloat,FloatBorder:NormalFloat,SignColumn:SignColumnSB",
+            signcolumn = "yes",
+            statuscolumn = " ",
+          },
+        },
+        guides = {
+          mid_item = "├╴",
+          last_item = "└╴",
+          nested_top = "│ ",
+          whitespace = "  ",
+        },
+      }
+      return opts
+    end,
+    keys = {
+      { "<leader>cs", "<cmd>AerialToggle<cr>", desc = "Aerial (Symbols)" },
+    },
+  },
+  {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
@@ -418,7 +448,7 @@ return {
         cmd = "Glance",
         ---@type GlanceOpts
         opts = {
-          border = { enable = false, top_char = "―", bottom_char = "―" },
+          border = { enable = true, top_char = "―", bottom_char = "―" },
           height = 20,
           zindex = 50,
           theme = { enable = false },
@@ -687,6 +717,56 @@ return {
             },
           },
         },
+        ---@type lspconfig.options.tsserver
+        tsserver = {
+          keys = {
+            {
+              "<leader>co",
+              function()
+                vim.lsp.buf.code_action {
+                  apply = true,
+                  context = {
+                    only = { "source.organizeImports.ts" },
+                    diagnostics = {},
+                  },
+                }
+              end,
+              desc = "Organize Imports",
+            },
+            {
+              "<leader>cR",
+              function()
+                vim.lsp.buf.code_action {
+                  apply = true,
+                  context = {
+                    only = { "source.removeUnused.ts" },
+                    diagnostics = {},
+                  },
+                }
+              end,
+              desc = "Remove Unused Imports",
+            },
+          },
+          settings = {
+            typescript = {
+              format = {
+                indentSize = vim.o.shiftwidth,
+                convertTabsToSpaces = vim.o.expandtab,
+                tabSize = vim.o.tabstop,
+              },
+            },
+            javascript = {
+              format = {
+                indentSize = vim.o.shiftwidth,
+                convertTabsToSpaces = vim.o.expandtab,
+                tabSize = vim.o.tabstop,
+              },
+            },
+            completions = {
+              completeFunctionCalls = true,
+            },
+          },
+        },
         yamlls = {
           -- Have to add this for yamlls to understand that we support line folding
           capabilities = {
@@ -757,19 +837,7 @@ return {
             { "<Leader>K", "<plug>(vimtex-doc-package)", desc = "Vimtex Docs", silent = true },
           },
         },
-        taplo = {
-          keys = {
-            "K",
-            function()
-              if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
-                require("crates").show_popup()
-              else
-                K.hover()
-              end
-            end,
-            desc = "lsp: Show Crate Documentation",
-          },
-        },
+        taplo = {},
         rust_analyzer = {
           keys = {
             { "K", "<cmd>RustHoverActions<cr>", desc = "Hover Actions (Rust)" },
@@ -802,10 +870,16 @@ return {
                 autoSearchPaths = true,
                 typeCheckingMode = "strict",
                 useLibraryCodeForTypes = true,
-                diagnosticMode = "workspace",
+                diagnosticMode = "openFilesOnly",
                 autoImportCompletions = true,
               },
             },
+          },
+        },
+        eslint = {
+          settings = {
+            -- helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
+            workingDirectory = { mode = "auto" },
           },
         },
       },
@@ -831,7 +905,7 @@ return {
           end
         end,
         clangd = function(_, opts)
-          local clangd_opts = Util.opts "rust-tools.nvim"
+          local clangd_opts = Util.opts "clangd_extensions.nvim"
           require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_opts or {}, { server = opts }))
           return false
         end,

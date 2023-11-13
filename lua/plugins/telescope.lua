@@ -131,10 +131,6 @@ return {
         pickers = {
           find_files = { hidden = true },
           live_grep = {
-            on_input_filter_cb = function(prompt)
-              -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
-              return { prompt = prompt:gsub("%s", ".*") }
-            end,
             attach_mappings = function(_)
               require("telescope.actions.set").select:enhance {
                 post = function() vim.cmd ":normal! zx" end,
@@ -155,6 +151,13 @@ return {
             show_scores = true,
             show_unindexed = true,
             ignore_patterns = { "*.git/*", "*/tmp/*" },
+          },
+          aerial = {
+            show_lines = false,
+            show_nesting = {
+              ["_"] = false, -- This key will be the default
+              lua = true, -- You can set the option for specific filetypes
+            },
           },
           live_grep_args = {
             auto_quoting = false,
@@ -177,6 +180,7 @@ return {
       require("telescope").load_extension "frecency"
       require("telescope").load_extension "fzf"
       require("telescope").load_extension "zoxide"
+      require("telescope").load_extension "aerial"
     end,
   },
 }

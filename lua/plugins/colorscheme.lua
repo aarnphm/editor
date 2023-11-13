@@ -99,7 +99,7 @@ return {
             information = { "underline" },
           },
         },
-        aerial = false,
+        aerial = true,
         alpha = false,
         barbar = false,
         beacon = false,
