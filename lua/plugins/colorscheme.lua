@@ -49,10 +49,10 @@ return {
     end,
   },
   {
-    "Jint-lzxy/nvim",
+    "catppuccin/nvim",
     priority = 1000,
-    branch = "refactor/syntax-highlighting",
     name = "catppuccin",
+    version = false,
     lazy = not (vim.g.simple_colorscheme == "catppuccin"),
     opts = {
       flavour = vim.g.simple_background == "light" and "latte" or "mocha", -- Can be one of: latte, frappe, macchiato, mocha

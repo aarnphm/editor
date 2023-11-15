@@ -886,7 +886,7 @@ return {
                 autoSearchPaths = true,
                 typeCheckingMode = "strict",
                 useLibraryCodeForTypes = true,
-                diagnosticMode = "openFilesOnly",
+                diagnosticMode = "off",
                 autoImportCompletions = true,
               },
             },
