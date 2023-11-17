@@ -219,7 +219,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "mypy", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt" },
+      ensure_installed = { "lua-language-server", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt", "mypy" },
       ui = { border = "single" },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -957,6 +957,13 @@ return {
           if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
         end)
       end
+
+      vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+        signs = true,
+        underline = false,
+        virtual_text = false,
+        update_in_insert = true,
+      })
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
