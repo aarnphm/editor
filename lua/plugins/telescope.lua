@@ -83,6 +83,18 @@ return {
             "pdm.lock",
             "__pycache__",
           },
+          layout_strategy = "horizontal",
+          layout_config = {
+            horizontal = {
+              prompt_position = "top",
+              preview_width = 0.5,
+            },
+            width = 0.8,
+            height = 0.8,
+            preview_cutoff = 120,
+          },
+          sorting_strategy = "ascending",
+          winblend = 0,
           prompt_prefix = "  ",
           selection_caret = "󰄾 ",
           -- open files in the first window that is an actual file.

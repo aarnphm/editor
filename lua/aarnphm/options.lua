@@ -18,6 +18,7 @@ wo.wrap = false
 wo.cursorline = true
 
 -- Some defaults and don't question it
+o.formatexpr = "v:lua.Util.format.expr()"
 o.wrap = false -- egh i don't like wrap
 o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save

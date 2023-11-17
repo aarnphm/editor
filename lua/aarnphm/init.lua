@@ -21,6 +21,8 @@ local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKG
 vim.g.simple_colorscheme = colorscheme
 vim.g.simple_background = background
 
+Util.format.setup()
+
 -- close some filetypes with <q>
 autocmd("FileType", {
   group = augroup "filetype",

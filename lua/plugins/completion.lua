@@ -1,14 +1,37 @@
-local slow_format_filetypes = {}
-local ignore_folders = { "/node_modules/", "/tinygrad/", "/tinyllm/" }
-
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-    cmd = { "ConformInfo" },
-    init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
+    dependencies = { "mason.nvim" },
+    lazy = true,
+    cmd = "ConformInfo",
+    init = function()
+      -- install conforn formatter on VeryLazy
+      Util.on_very_lazy(function()
+        Util.format.register {
+          name = "conform.nvim",
+          priority = 100,
+          primary = true,
+          format = function(buf)
+            local plugin = require("lazy.core.config").plugins["conform.nvim"]
+            local Plugin = require "lazy.core.plugin"
+            local opts = Plugin.values(plugin, "opts", false)
+            require("conform").format(Util.merge(opts.format, { bufnr = buf }))
+          end,
+          sources = function(buf)
+            local ret = require("conform").list_formatters(buf)
+            ---@param v conform.FormatterInfo
+            return vim.tbl_map(function(v) return v.name end, ret)
+          end,
+        }
+      end)
+    end,
     opts = {
       log_level = vim.log.levels.DEBUG,
+      format = {
+        timeout_ms = 3000,
+        async = false, -- not recommended to change
+        quiet = false, -- not recommended to change
+      },
       formatters_by_ft = {
         lua = { "stylua" },
         toml = { "taplo" },
@@ -19,89 +42,23 @@ return {
         ["javascriptreact"] = { "prettier" },
         ["typescript"] = { "prettier" },
         ["typescriptreact"] = { "prettier" },
-        ["vue"] = { "prettier" },
-        ["css"] = { "prettier" },
-        ["scss"] = { "prettier" },
-        ["less"] = { "prettier" },
-        ["html"] = { "prettier" },
-        ["json"] = { "prettier" },
-        ["jsonc"] = { "prettier" },
-        ["yaml"] = { "prettier" },
-        ["graphql"] = { "prettier" },
-        ["handlebars"] = { "prettier" },
         ["markdown"] = { { "prettierd", "prettier", "cbfmt" } },
         ["markdown.mdx"] = { { "prettierd", "prettier" } },
       },
-      format_on_save = function(bufnr)
-        if slow_format_filetypes[vim.bo[bufnr].filetype] then return end
-        local on_format = function(err)
-          if err and err:match "timeout$" then slow_format_filetypes[vim.bo[bufnr].filetype] = true end
-        end
-
-        -- Disable autoformat on certain filetypes
-        local ignore_filetypes = { "gitcommit" }
-        if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then return end
-        -- Disable with a global or buffer-local variable
-        if vim.g.autoformat or vim.b[bufnr].autoformat then return end
-        -- Disable autoformat for files in a certain path
-        local bufname = vim.api.nvim_buf_get_name(bufnr)
-        for _, folder in ipairs(ignore_folders) do
-          if bufname:match(folder) then return end
-        end
-
-        return { timeout_ms = 200, lsp_fallback = true }, on_format
-      end,
-      format_after_save = function(bufnr)
-        if not slow_format_filetypes[vim.bo[bufnr].filetype] then return end
-        return { lsp_fallback = true }
-      end,
-    },
-    keys = {
-      {
-        "<Leader><Leader>f",
-        function() require("conform").format { async = true, lsp_fallback = true } end,
-        desc = "style: format buffer",
+      ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
+      formatters = {
+        injected = { options = { ignore_errors = true } },
+        shfmt = {
+          prepend_args = { "-i", "2", "-ci" },
+        },
       },
     },
-    config = function(_, opts)
-      local conform = require "conform"
-      conform.setup(opts)
-
-      vim.api.nvim_create_user_command("FormatDisable", function(args)
-        -- FormatDisable! will disable formatting just for this buffer
-        if args.bang then
-          vim.b.autoformat = true
-        else
-          vim.g.autoformat = true
-        end
-      end, {
-        desc = "Disable autoformat-on-save",
-        bang = true,
-      })
-      vim.api.nvim_create_user_command("FormatEnable", function()
-        vim.b.autoformat = false
-        vim.g.autoformat = false
-      end, {
-        desc = "Re-enable autoformat-on-save",
-      })
-
-      vim.api.nvim_create_user_command("Format", function(args)
-        local range = nil
-        if args.count ~= -1 then
-          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
-          range = {
-            start = { args.line1, 0 },
-            ["end"] = { args.line2, end_line:len() },
-          }
-        end
-        conform.format { async = true, lsp_fallback = true, range = range }
-      end, { range = true })
-    end,
+    config = function(_, opts) require("conform").setup(opts) end,
   },
   {
     "hrsh7th/nvim-cmp",
     version = false,
-    event = { "CmdlineEnter", "InsertEnter" },
+    event = "InsertEnter",
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
@@ -109,8 +66,8 @@ return {
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
-      "hrsh7th/cmp-cmdline",
       "kdheepak/cmp-latex-symbols",
+      { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
@@ -202,6 +159,7 @@ return {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
+        window = { documentation = { border = "none" } },
         sorting = defaults.sorting,
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
         mapping = cmp.mapping.preset.insert {
@@ -253,21 +211,6 @@ return {
       end
 
       cmp.setup(opts)
-      if Util.has "cmp-cmdline" then
-        cmp.setup.cmdline("/", {
-          mapping = cmp.mapping.preset.cmdline(),
-          sources = {
-            { name = "buffer" },
-          },
-        })
-        cmp.setup.cmdline(":", {
-          mapping = cmp.mapping.preset.cmdline(),
-          sources = cmp.config.sources(
-            { { name = "path" } },
-            { { name = "cmdline", option = { ignore_cmds = { "Man", "!" } } } }
-          ),
-        })
-      end
       -- special cases with crates.nvim
       vim.api.nvim_create_autocmd({ "BufRead" }, {
         group = augroup "cmp_source_cargo",

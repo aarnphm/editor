@@ -3,6 +3,8 @@
 
 ---@class simple.util: LazyUtilCore
 ---@field inject simple.util.inject
+---@field format simple.util.format
+---@field lsp simple.util.lsp
 ---@field palette simple.util.palette
 ---@field nit simple.util.nit
 ---@field terminal simple.util.terminal
@@ -15,17 +17,6 @@ setmetatable(M, {
     return t[k]
   end,
 })
-
----@param on_attach fun(client?:lsp.Client, buffer?:integer): nil
-M.on_attach = function(on_attach)
-  vim.api.nvim_create_autocmd("LspAttach", {
-    callback = function(args)
-      local buffer = args.buf ---@type number
-      local client = vim.lsp.get_client_by_id(args.data.client_id)
-      on_attach(client, buffer)
-    end,
-  })
-end
 
 ---@param plugin string
 ---@return boolean
@@ -71,45 +62,6 @@ M.merge = function(...)
   return ret
 end
 
----@param opts? lsp.Client.filter
-M.get_clients = function(opts)
-  local ret = {} ---@type lsp.Client[]
-  if vim.lsp.get_clients then
-    ret = vim.lsp.get_clients(opts)
-  else
-    ---@diagnostic disable-next-line: deprecated
-    ret = vim.lsp.get_active_clients(opts)
-    if opts and opts.method then
-      ---@param client lsp.Client
-      ret = vim.tbl_filter(
-        function(client) return client.supports_method(opts.method, { bufnr = opts.bufnr }) end,
-        ret
-      )
-    end
-  end
-  return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
-end
-
----@param from string
----@param to string
-M.on_rename = function(from, to)
-  local clients = M.get_clients()
-  for _, client in ipairs(clients) do
-    if client.supports_method "workspace/willRenameFiles" then
-      ---@diagnostic disable-next-line: invisible
-      local resp = client.request_sync("workspace/willRenameFiles", {
-        files = {
-          {
-            oldUri = vim.uri_from_fname(from),
-            newUri = vim.uri_from_fname(to),
-          },
-        },
-      }, 1000, 0)
-      if resp and resp.result ~= nil then vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding) end
-    end
-  end
-end
-
 ---@param name string
 M.opts = function(name)
   local plugin = require("lazy.core.config").plugins[name]
@@ -136,6 +88,14 @@ M.on_load = function(name, fn)
   end
 end
 
+---@param fn fun()
+M.on_very_lazy = function(fn)
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "VeryLazy",
+    callback = function() fn() end,
+  })
+end
+
 M.root_patterns = { ".git", "lua" }
 
 -- returns the root directory based on:
@@ -151,7 +111,7 @@ M.root = function()
   ---@type string[]
   local roots = {}
   if path then
-    for _, client in pairs(M.get_clients { bufnr = 0 }) do
+    for _, client in pairs(M.lsp.get_clients { bufnr = 0 }) do
       local workspace = client.config.workspace_folders
       local paths = workspace and vim.tbl_map(function(ws) return vim.uri_to_fname(ws.uri) end, workspace)
         or client.config.root_dir and { client.config.root_dir }
