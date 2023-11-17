@@ -159,7 +159,7 @@ return {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
-        window = { documentation = { border = "none" } },
+        window = { documentation = { border = "none", winhighlight = "Normal:Pmenu" } },
         sorting = defaults.sorting,
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
         mapping = cmp.mapping.preset.insert {
