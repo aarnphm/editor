@@ -112,8 +112,6 @@ return {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
               ["<Esc>"] = function(...) return actions.close(...) end,
-              ["<c-t>"] = function(...) return require("trouble.providers.telescope").open_with_trouble(...) end,
-              ["<a-t>"] = function(...) return require("trouble.providers.telescope").open_selected_with_trouble(...) end,
               ["<a-i>"] = function()
                 local action_state = require "telescope.actions.state"
                 local line = action_state.get_current_line()

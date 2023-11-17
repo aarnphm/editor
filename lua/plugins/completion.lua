@@ -36,14 +36,7 @@ return {
         lua = { "stylua" },
         toml = { "taplo" },
         python = { "ruff_fix", "ruff_format" },
-        proto = { { "buf", "protolint" } },
         zsh = { "beautysh" },
-        ["javascript"] = { "prettier" },
-        ["javascriptreact"] = { "prettier" },
-        ["typescript"] = { "prettier" },
-        ["typescriptreact"] = { "prettier" },
-        ["markdown"] = { { "prettierd", "prettier", "cbfmt" } },
-        ["markdown.mdx"] = { { "prettierd", "prettier" } },
       },
       ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
       formatters = {
@@ -67,7 +60,6 @@ return {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
       "kdheepak/cmp-latex-symbols",
-      { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
@@ -209,14 +201,7 @@ return {
       if Util.has "clangd_extensions.nvim" then
         table.insert(opts.sorting.comparators, 1, require "clangd_extensions.cmp_scores")
       end
-
       cmp.setup(opts)
-      -- special cases with crates.nvim
-      vim.api.nvim_create_autocmd({ "BufRead" }, {
-        group = augroup "cmp_source_cargo",
-        pattern = "Cargo.toml",
-        callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
-      })
     end,
   },
 }

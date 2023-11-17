@@ -28,9 +28,7 @@ local simplified_status_ft = {
 local M = {}
 
 return {
-  "echasnovski/mini.colors",
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
-  { "echasnovski/mini.align", event = "VeryLazy", opts = {} },
   { "echasnovski/mini.trailspace", event = { "BufRead", "BufNewFile" }, opts = {} },
   {
     "echasnovski/mini.bufremove",
@@ -55,58 +53,6 @@ return {
       },
       { "<C-q>", function() require("mini.bufremove").delete(0, true) end, desc = "buf: force delete" },
     },
-  },
-  {
-    "echasnovski/mini.operators",
-    event = "VeryLazy",
-    opts = {
-      -- Evaluate text and replace with output
-      evaluate = { prefix = "g=", func = nil },
-      -- Exchange text regions
-      exchange = { prefix = "gX", reindent_linewise = true },
-      -- Multiply (duplicate) text
-      multiply = { prefix = "gm" },
-    },
-  },
-  {
-    "echasnovski/mini.statusline",
-    opts = function()
-      return {
-        content = {
-          set_vim_settings = false,
-          active = function()
-            local mode_info = statusline.modes[vim.fn.mode()]
-            local mode_hl = mode_info.hl
-
-            local mode = statusline.mode { trunc_width = 75 }
-            local git = statusline.git { trunc_width = 120 }
-            local diagnostic = statusline.diagnostic { trunc_width = 90 }
-            local filetype = statusline.filetype { trunc_width = 75 }
-            local location = statusline.location { trunc_width = 90 }
-            local filename = statusline.filename { trunc_width = 75 }
-
-            if vim.tbl_contains(simplified_status_ft, vim.bo.filetype) then
-              return MiniStatusline.combine_groups {
-                { hl = "MiniStatuslineInactive", strings = { "%F" } },
-                "%=",
-              }
-            end
-
-            return MiniStatusline.combine_groups {
-              { hl = mode_hl, strings = { mode } },
-              { hl = "MiniStatuslineDevinfo", strings = { git } },
-              "%<",
-              { hl = "MiniStatuslineFilename", strings = { filename } },
-              "%=",
-              { hl = "MiniStatuslineDevinfo", strings = { diagnostic } },
-              { hl = "MiniStatuslineFileinfo", strings = { filetype } },
-              { hl = mode_hl, strings = { location } },
-            }
-          end,
-        },
-      }
-    end,
-    config = function(_, opts) require("mini.statusline").setup(opts) end,
   },
   {
     "echasnovski/mini.files",
@@ -151,71 +97,6 @@ return {
         pattern = "MiniFilesActionRename",
         callback = function(ev) Util.lsp.on_rename(ev.data.from, ev.data.to) end,
       })
-    end,
-  },
-  {
-    "echasnovski/mini.ai",
-    event = "VeryLazy",
-    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
-    opts = function()
-      local ai = require "mini.ai"
-      return {
-        n_lines = 500,
-        custom_textobjects = {
-          o = ai.gen_spec.treesitter({
-            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
-          }, {}),
-          f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
-          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
-          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" },
-        },
-      }
-    end,
-    config = function(_, opts)
-      require("mini.ai").setup(opts)
-
-      Util.on_load("which-key.nvim", function()
-        ---@type table<string, string|table>
-        local i = {
-          [" "] = "Whitespace",
-          ['"'] = 'Balanced "',
-          ["'"] = "Balanced '",
-          ["`"] = "Balanced `",
-          ["("] = "Balanced (",
-          [")"] = "Balanced ) including white-space",
-          [">"] = "Balanced > including white-space",
-          ["<lt>"] = "Balanced <",
-          ["]"] = "Balanced ] including white-space",
-          ["["] = "Balanced [",
-          ["}"] = "Balanced } including white-space",
-          ["{"] = "Balanced {",
-          ["?"] = "User Prompt",
-          _ = "Underscore",
-          a = "Argument",
-          b = "Balanced ), ], }",
-          c = "Class",
-          f = "Function",
-          o = "Block, conditional, loop",
-          q = "Quote `, \", '",
-          t = "Tag",
-        }
-        local a = vim.deepcopy(i)
-        for k, v in pairs(a) do
-          a[k] = v:gsub(" including.*", "")
-        end
-        local ic = vim.deepcopy(i)
-        local ac = vim.deepcopy(a)
-        for key, name in pairs { n = "Next", l = "Last" } do
-          i[key] = vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
-          a[key] = vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
-        end
-        require("which-key").register {
-          mode = { "o", "x" },
-          i = i,
-          a = a,
-        }
-      end)
     end,
   },
   {
@@ -272,98 +153,6 @@ return {
         end
       )
       return vim.list_extend(mappings, keys)
-    end,
-  },
-  {
-    "echasnovski/mini.starter",
-    event = "BufEnter",
-    opts = function()
-      ---@class MiniStarterConfig
-      return {
-        items = {
-          function()
-            return {
-              { action = Util.telescope("files", {}), name = "Files (.git dependent)", section = "Telescope" },
-              { action = Util.telescope("help_tags", {}), name = "Help tags", section = "Telescope" },
-              { action = Util.telescope("live_grep", {}), name = "Live grep", section = "Telescope" },
-              {
-                action = Util.telescope("oldfiles", {}),
-                name = "Recent files",
-                section = "Telescope",
-              },
-              {
-                action = Util.telescope("command_history", {}),
-                name = "Command history",
-                section = "Telescope",
-              },
-              {
-                action = Util.telescope("colorscheme", {}),
-                name = "Colorscheme",
-                section = "Telescope",
-              },
-              {
-                action = function() require("telescope").extensions.frecency.frecency {} end,
-                name = "Frequency",
-                section = "Telescope",
-              },
-            }
-          end,
-          {
-            { name = "Edit new buffer", action = "enew", section = "Shortcut" },
-            {
-              name = "Neovim config",
-              action = Util.telescope("files", { cwd = vim.fn.stdpath "config" }),
-              section = "Shortcut",
-            },
-            {
-              name = "Garden",
-              action = Util.telescope("files", { cwd = vim.fn.expand "~" .. "/workspace/garden" }),
-              section = "Shortcut",
-            },
-            { name = "Quit Neovim", action = "qall", section = "Shortcut" },
-          },
-        },
-      }
-    end,
-    ---@class opts MiniStarterConfig
-    config = function(_, opts)
-      local starter = require "mini.starter"
-      opts.content_hook = { starter.gen_hook.adding_bullet(), starter.gen_hook.aligning("center", "center") }
-      starter.setup(opts)
-    end,
-  },
-  {
-    "echasnovski/mini.indentscope",
-    version = false, -- wait till new 0.7.0 release to put it back on semver
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-    opts = {
-      symbol = "│",
-      options = { try_as_border = true },
-    },
-    init = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = {
-          "", -- for all buffers without a file type
-          "alpha",
-          "fugitive",
-          "git",
-          "gitcommit",
-          "help",
-          "json",
-          "log",
-          "markdown",
-          "neo-tree",
-          "Outline",
-          "startify",
-          "TelescopePrompt",
-          "txt",
-          "undotree",
-          "vimwiki",
-          "vista",
-          "lazyterm",
-        },
-        callback = function() vim.b.miniindentscope_disable = true end,
-      })
     end,
   },
   {

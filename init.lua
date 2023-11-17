@@ -19,5 +19,4 @@ require("lazy").setup("plugins", { change_detection = { notify = false } })
 vim.o.background = vim.g.simple_background
 vim.cmd.colorscheme(vim.g.simple_colorscheme)
 
-require("mini.colors").get_colorscheme():add_cterm_attributes():apply()
 -- vim.opt.termguicolors = false -- NOTE: this should only be run on Terminal.app

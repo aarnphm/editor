@@ -28,6 +28,7 @@ K.get = function()
       { "gI", Util.telescope("lsp_implementations", { reuse_win = true }), desc = "lsp: Goto implementation" },
       { "gY", Util.telescope("lsp_type_definitions", { reuse_win = true }), desc = "lsp: Goto type definitions" },
       { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Action", mode = { "n", "v" }, has = "codeAction" },
+      { "gr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
       {
         "<leader>cA",
         function()
@@ -44,20 +45,6 @@ K.get = function()
         has = "codeAction",
       },
     }
-    if Util.has "inc-rename.nvim" then
-      K._keys[#K._keys + 1] = {
-        "gr",
-        function()
-          local inc_rename = require "inc_rename"
-          return ":" .. inc_rename.config.cmd_name .. " " .. vim.fn.expand "<cword>"
-        end,
-        expr = true,
-        desc = "Rename",
-        has = "rename",
-      }
-    else
-      K._keys[#K._keys + 1] = { "gr", vim.lsp.buf.rename, desc = "Rename", has = "rename" }
-    end
   end
   return K._keys
 end
@@ -122,29 +109,6 @@ local extend_or_override = function(config, custom, ...)
 end
 
 return {
-  {
-    "NvChad/nvim-colorizer.lua",
-    event = "LspAttach",
-    opts = {
-      filetypes = { "*" },
-      user_default_options = {
-        names = false, -- "Name" codes like Blue
-        RRGGBBAA = true, -- #RRGGBBAA hex codes
-        rgb_fn = true, -- CSS rgb() and rgba() functions
-        hsl_fn = true, -- CSS hsl() and hsla() functions
-        css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-        css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-        sass = { enable = true, parsers = { "css" } },
-        mode = "background",
-      },
-    },
-    config = function(_, opts) require("colorizer").setup(opts) end,
-  },
-  {
-    "smjonas/inc-rename.nvim",
-    dependencies = { "stevearc/dressing.nvim" },
-    opts = { input_buffer_type = "dressing" },
-  },
   {
     "kevinhwang91/nvim-ufo",
     name = "ufo",
@@ -337,10 +301,7 @@ return {
       },
       ---@type lspconfig.options
       servers = {
-        bashls = {},
         marksman = {},
-        spectral = {},
-        dockerls = {},
         taplo = {},
         jsonls = {
           -- lazy-load schemastore when needed
