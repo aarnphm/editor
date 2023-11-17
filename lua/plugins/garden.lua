@@ -44,17 +44,14 @@ return {
         end
         return out
       end,
-      overwrite_mappings = true,
-    },
-    config = function(_, opts)
-      opts.mappings = {
+      mappings = {
         ["gf"] = {
           action = function() return require("obsidian").util.gf_passthrough() end,
           opts = { noremap = false, expr = true, buffer = true },
         },
-      }
-      require("obsidian").setup(opts)
-    end,
+      },
+    },
+    config = function(_, opts) require("obsidian").setup(opts) end,
   },
   {
     "glacambre/firenvim",
@@ -86,4 +83,5 @@ return {
     cmd = "Speedtyper",
     opts = {},
   },
+  { "pwntester/octo.nvim", opts = {}, cmd = "Octo" },
 }

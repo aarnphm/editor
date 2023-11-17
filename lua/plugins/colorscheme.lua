@@ -17,6 +17,7 @@ return {
         disable_background = transparent_background,
         dark_variant = "main",
         highlight_groups = {
+          NormalFloat = { fg = "text", bg = "none" },
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "iris", blend = 10 },
           StatusLineNC = { fg = "subtle", bg = "surface" },
@@ -34,7 +35,7 @@ return {
           GlancePreviewNormal = { bg = "surface" },
           GlanceListNormal = { bg = "overlay" },
           GlancePreviewMatch = { fg = "love" },
-          Headline1 = { bg = "love" },
+          Headline1 = { bg = "surface" },
           Headline2 = { bg = "gold" },
           Headline3 = { bg = "rose" },
           Headline4 = { bg = "pine" },

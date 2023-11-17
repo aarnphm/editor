@@ -139,11 +139,7 @@ return {
     },
     config = function(_, opts) require("colorizer").setup(opts) end,
   },
-  {
-    "smjonas/inc-rename.nvim",
-    dependencies = { "stevearc/dressing.nvim" },
-    opts = { input_buffer_type = "dressing" },
-  },
+  { "smjonas/inc-rename.nvim", cmd = "IncRename", config = true },
   {
     "kevinhwang91/nvim-ufo",
     name = "ufo",
@@ -273,6 +269,10 @@ return {
     keys = {
       { "<leader>cs", "<cmd>AerialToggle<cr>", desc = "Aerial (Symbols)" },
     },
+    config = function(_, opts)
+      require("aerial").setup(opts)
+      if Util.has "telescope.nvim" then require("telescope").load_extension "aerial" end
+    end,
   },
   {
     "neovim/nvim-lspconfig",
