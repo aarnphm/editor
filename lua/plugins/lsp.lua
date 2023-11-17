@@ -552,14 +552,22 @@ return {
         },
         pyright = {
           mason = false,
+          capabilities = {
+            textDocument = {
+              publishDiagnostics = {
+                tagSupport = { valueSet = { 2 } },
+              },
+            },
+          },
           settings = {
             python = {
               analysis = {
-                autoSearchPaths = true,
-                typeCheckingMode = "strict",
-                useLibraryCodeForTypes = true,
-                diagnosticMode = "off",
+                logLevel = "Trace",
                 autoImportCompletions = true,
+                diagnosticMode = "workspace",
+                autoSearchPaths = true,
+                typeCheckingMode = "off",
+                useLibraryCodeForTypes = true,
               },
             },
           },
