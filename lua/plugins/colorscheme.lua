@@ -55,8 +55,8 @@ return {
     version = false,
     lazy = not (vim.g.simple_colorscheme == "catppuccin"),
     opts = {
-      flavour = vim.g.simple_background == "light" and "latte" or "macchiato", -- Can be one of: latte, frappe, macchiato, mocha
-      background = { light = "latte", dark = "macchiato" },
+      flavour = vim.g.simple_background == "light" and "latte" or "mocha", -- Can be one of: latte, frappe, macchiato, mocha
+      background = { light = "latte", dark = "mocha" },
       dim_inactive = {
         enabled = false,
         -- Dim inactive splits/windows/buffers.
