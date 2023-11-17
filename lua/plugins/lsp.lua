@@ -340,7 +340,6 @@ return {
         bashls = {},
         marksman = {},
         spectral = {},
-        jdtls = {},
         dockerls = {},
         taplo = {},
         jsonls = {
@@ -353,72 +352,6 @@ return {
             json = {
               format = { enable = true },
               validate = { enable = true },
-            },
-          },
-        },
-        ---@type lspconfig.options.tsserver
-        tsserver = {
-          keys = {
-            {
-              "<leader>co",
-              function()
-                vim.lsp.buf.code_action {
-                  apply = true,
-                  context = {
-                    only = { "source.organizeImports.ts" },
-                    diagnostics = {},
-                  },
-                }
-              end,
-              desc = "Organize Imports",
-            },
-            {
-              "<leader>cR",
-              function()
-                vim.lsp.buf.code_action {
-                  apply = true,
-                  context = {
-                    only = { "source.removeUnused.ts" },
-                    diagnostics = {},
-                  },
-                }
-              end,
-              desc = "Remove Unused Imports",
-            },
-          },
-          single_file_support = false,
-          settings = {
-            typescript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "literal",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = false,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
-              },
-              format = {
-                indentSize = vim.o.shiftwidth,
-                convertTabsToSpaces = vim.o.expandtab,
-                tabSize = vim.o.tabstop,
-              },
-            },
-            javascript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
-              },
-              format = {
-                indentSize = vim.o.shiftwidth,
-                convertTabsToSpaces = vim.o.expandtab,
-                tabSize = vim.o.tabstop,
-              },
             },
           },
         },
@@ -521,19 +454,6 @@ return {
             },
           },
         },
-        matlab_ls = { settings = { matlab = { installPath = "/Applications/MATLAB_R2023a.app" } } },
-        texlab = {
-          keys = {
-            { "<Leader>K", "<plug>(vimtex-doc-package)", desc = "Vimtex Docs", silent = true },
-          },
-        },
-        rust_analyzer = {
-          keys = {
-            { "K", "<cmd>RustHoverActions<cr>", desc = "Hover Actions (Rust)" },
-            { "<leader>cR", "<cmd>RustCodeAction<cr>", desc = "Code Action (Rust)" },
-            { "<leader>dr", "<cmd>RustDebuggables<cr>", desc = "Run Debuggables (Rust)" },
-          },
-        },
         pyright = {
           mason = false,
           settings = {
@@ -548,12 +468,6 @@ return {
             },
           },
         },
-        eslint = {
-          settings = {
-            -- helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
-            workingDirectory = { mode = "auto" },
-          },
-        },
       },
       ---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
       setup = {
@@ -562,12 +476,6 @@ return {
             if client.name == "ruff_lsp" then client.server_capabilities.hoverProvider = false end
           end)
         end,
-        rust_analyzer = function(_, opts)
-          local rt_opts = Util.opts "rust-tools.nvim"
-          require("rust-tools").setup(vim.tbl_deep_extend("force", rt_opts or {}, { server = opts }))
-          return false
-        end,
-        jdtls = function() return true end, -- avoid duplicate servers
         yamlls = function()
           -- Neovim < 0.10 does not have dynamic registration for formatting
           if vim.fn.has "nvim-0.10" == 0 then
@@ -580,19 +488,6 @@ return {
           local clangd_opts = Util.opts "clangd_extensions.nvim"
           require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_opts or {}, { server = opts }))
           return false
-        end,
-        eslint = function()
-          local function get_client(buf) return Util.lsp.get_clients({ name = "eslint", bufnr = buf })[1] end
-
-          local formatter = Util.lsp.formatter {
-            name = "eslint: lsp",
-            primary = false,
-            priority = 200,
-            filter = "eslint",
-          }
-
-          -- register the formatter with LazyVim
-          Util.format.register(formatter)
         end,
       },
     },

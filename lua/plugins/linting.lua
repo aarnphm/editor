@@ -8,7 +8,6 @@ return {
       events = { "BufWritePost", "BufReadPost", "InsertLeave" },
       linters_by_ft = {
         fish = { "fish" },
-        lua = { "selene" },
         markdown = { "markdownlint" },
         python = { "ruff", "mypy" },
         -- Use the "*" filetype to run linters on all filetypes.
@@ -19,11 +18,6 @@ return {
       ---@type table<string,table>
       linters = {
         -- -- Example of using selene only when a selene.toml file is present
-        selene = {
-          -- `condition` is another LazyVim extension that allows you to
-          -- dynamically enable/disable linters based on the context.
-          condition = function(ctx) return vim.fs.find({ "selene.toml" }, { path = ctx.filename, upward = true })[1] end,
-        },
         ruff = {
           condition = function(ctx)
             return vim.fs.find({ "ruff.toml", "pyproject.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
