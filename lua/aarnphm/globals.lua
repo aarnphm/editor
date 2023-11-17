@@ -118,7 +118,7 @@ _G.statusline = {
     return fmt("%s", table.concat { head, hunks })
   end,
   diagnostic = function(args)
-    local hasnt_attached_client = next(Util.get_clients {}) == nil
+    local hasnt_attached_client = next(Util.lsp.get_clients {}) == nil
     local dont_show_lsp = is_truncated(args.trunc_width) or isnt_normal_buffer() or hasnt_attached_client
     if dont_show_lsp then return "" end
 

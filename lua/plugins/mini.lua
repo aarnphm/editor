@@ -478,9 +478,7 @@ return {
   {
     "echasnovski/mini.files",
     opts = {
-      windows = { preview = true, width_focus = 30, width_nofocus = 30, width_preview = 90 },
-      -- Disabled by default because neo-tree is used for that
-      options = { use_as_default_explorer = false },
+      windows = { preview = true, width_focus = 30, width_nofocus = 30, width_preview = 30 },
     },
     keys = {
       {
@@ -518,7 +516,7 @@ return {
 
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesActionRename",
-        callback = function(ev) Util.on_rename(ev.data.from, ev.data.to) end,
+        callback = function(ev) Util.lsp.on_rename(ev.data.from, ev.data.to) end,
       })
     end,
   },

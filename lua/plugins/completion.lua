@@ -1,98 +1,64 @@
-local slow_format_filetypes = {}
-local ignore_folders = { "/openllm/", "/node_modules/" }
-
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre" },
-    cmd = { "ConformInfo" },
-    init = function() vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" end,
+    dependencies = { "mason.nvim" },
+    lazy = true,
+    cmd = "ConformInfo",
+    init = function()
+      -- install conforn formatter on VeryLazy
+      Util.on_very_lazy(function()
+        Util.format.register {
+          name = "conform.nvim",
+          priority = 100,
+          primary = true,
+          format = function(buf)
+            local plugin = require("lazy.core.config").plugins["conform.nvim"]
+            local Plugin = require "lazy.core.plugin"
+            local opts = Plugin.values(plugin, "opts", false)
+            require("conform").format(Util.merge(opts.format, { bufnr = buf }))
+          end,
+          sources = function(buf)
+            local ret = require("conform").list_formatters(buf)
+            ---@param v conform.FormatterInfo
+            return vim.tbl_map(function(v) return v.name end, ret)
+          end,
+        }
+      end)
+    end,
     opts = {
       log_level = vim.log.levels.DEBUG,
+      format = {
+        timeout_ms = 3000,
+        async = false, -- not recommended to change
+        quiet = false, -- not recommended to change
+      },
       formatters_by_ft = {
         lua = { "stylua" },
         toml = { "taplo" },
-        python = { "yapf", "ruff_fix" },
+        python = { "ruff_fix", "ruff_format" },
         proto = { { "buf", "protolint" } },
-        markdown = { "prettier", "cbfmt" },
+        zsh = { "beautysh" },
+        ["javascript"] = { "prettier" },
+        ["javascriptreact"] = { "prettier" },
+        ["typescript"] = { "prettier" },
+        ["typescriptreact"] = { "prettier" },
+        ["markdown"] = { { "prettierd", "prettier", "cbfmt" } },
+        ["markdown.mdx"] = { { "prettierd", "prettier" } },
       },
+      ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
       formatters = {
-        yapf = {
-          prepend_args = {
-            "--style={BASED_ON_STYLE: google, INDENT_WIDTH: 2, JOIN_MULTIPLE_LINES: True, COLUMN_LIMIT: 192, USE_TABS: False, DISABLE_ENDING_COMMA_HEURISTIC: True, BLANK_LINE_BEFORE_CLASS_DOCSTRING: False, BLANK_LINE_BEFORE_MODULE_DOCSTRING: False, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION: 1, BLANK_LINES_BETWEEN_TOP_LEVEL_IMPORTS_AND_VARIABLES: 1, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: False, COALESCE_BRACKETS: True, DEDENT_CLOSING_BRACKETS: True}",
-          },
+        injected = { options = { ignore_errors = true } },
+        shfmt = {
+          prepend_args = { "-i", "2", "-ci" },
         },
       },
-      format_on_save = function(bufnr)
-        if slow_format_filetypes[vim.bo[bufnr].filetype] then return end
-        local on_format = function(err)
-          if err and err:match "timeout$" then slow_format_filetypes[vim.bo[bufnr].filetype] = true end
-        end
-
-        -- Disable autoformat on certain filetypes
-        local ignore_filetypes = { "gitcommit" }
-        if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then return end
-        -- Disable with a global or buffer-local variable
-        if vim.g.autoformat or vim.b[bufnr].autoformat then return end
-        -- Disable autoformat for files in a certain path
-        local bufname = vim.api.nvim_buf_get_name(bufnr)
-        for _, folder in ipairs(ignore_folders) do
-          if bufname:match(folder) then return end
-        end
-
-        return { timeout_ms = 200, lsp_fallback = true }, on_format
-      end,
-      format_after_save = function(bufnr)
-        if not slow_format_filetypes[vim.bo[bufnr].filetype] then return end
-        return { lsp_fallback = true }
-      end,
     },
-    keys = {
-      {
-        "<Leader><Leader>f",
-        function() require("conform").format { async = true, lsp_fallback = true } end,
-        desc = "style: format buffer",
-      },
-    },
-    config = function(_, opts)
-      local conform = require "conform"
-      conform.setup(opts)
-
-      vim.api.nvim_create_user_command("FormatDisable", function(args)
-        -- FormatDisable! will disable formatting just for this buffer
-        if args.bang then
-          vim.b.autoformat = true
-        else
-          vim.g.autoformat = true
-        end
-      end, {
-        desc = "Disable autoformat-on-save",
-        bang = true,
-      })
-      vim.api.nvim_create_user_command("FormatEnable", function()
-        vim.b.autoformat = false
-        vim.g.autoformat = false
-      end, {
-        desc = "Re-enable autoformat-on-save",
-      })
-
-      vim.api.nvim_create_user_command("Format", function(args)
-        local range = nil
-        if args.count ~= -1 then
-          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
-          range = {
-            start = { args.line1, 0 },
-            ["end"] = { args.line2, end_line:len() },
-          }
-        end
-        conform.format { async = true, lsp_fallback = true, range = range }
-      end, { range = true })
-    end,
+    config = function(_, opts) require("conform").setup(opts) end,
   },
   {
     "hrsh7th/nvim-cmp",
     version = false,
-    event = { "CmdlineEnter", "InsertEnter" },
+    event = "InsertEnter",
     dependencies = {
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
@@ -100,8 +66,8 @@ return {
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
-      "hrsh7th/cmp-cmdline",
       "kdheepak/cmp-latex-symbols",
+      { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets" },
@@ -141,6 +107,7 @@ return {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         event = "InsertEnter",
+        build = ":Copilot auth",
         opts = {
           cmp = { enabled = true, method = "getCompletionsCycling" },
           panel = { enabled = false },
@@ -181,17 +148,7 @@ return {
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 
       local cmp = require "cmp"
-      local compare = require "cmp.config.compare"
-
-      compare.lsp_scores = function(entry1, entry2)
-        local diff
-        if entry1.completion_item.score and entry2.completion_item.score then
-          diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
-        else
-          diff = entry2.score - entry1.score
-        end
-        return (diff < 0)
-      end
+      local defaults = require "cmp.config.default"()
 
       ---@type cmp.ConfigSchema
       return {
@@ -202,35 +159,14 @@ return {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
-        sorting = {
-          priority_weight = 2,
-          comparators = {
-            compare.offset, -- Items closer to cursor will have lower priority
-            compare.exact,
-            compare.scopes,
-            compare.lsp_scores,
-            compare.sort_text,
-            compare.score,
-            compare.recently_used,
-            -- compare.locality, -- Items closer to cursor will have higher priority, conflicts with `offset`
-            compare.kind,
-            compare.length,
-            compare.order,
-          },
-        },
-        window = {
-          documentation = { winhighlight = "Normal:Pmenu" },
-        },
+        window = { documentation = { border = "none", winhighlight = "Normal:Pmenu" } },
+        sorting = defaults.sorting,
         experimental = { ghost_text = { hl_group = "CmpGhostText" } },
-        matching = { disallow_partial_fuzzy_matching = false },
-        performance = { async_budget = 1, max_view_entries = 120 },
         mapping = cmp.mapping.preset.insert {
-          ["<CR>"] = cmp.mapping.confirm {
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = true,
-          },
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<C-j>"] = cmp.mapping.select_next_item(),
+          ["<CR>"] = cmp.mapping.confirm { select = true },
+          ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
+          ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+          ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
           ["<Tab>"] = function(fallback)
             if require("copilot.suggestion").is_visible() then
               require("copilot.suggestion").accept()
@@ -255,7 +191,7 @@ return {
           end,
         },
         sources = {
-          { name = "nvim_lsp", max_item_count = 350 },
+          { name = "nvim_lsp" },
           { name = "luasnip" },
           { name = "path" },
           { name = "emoji" },
@@ -275,21 +211,6 @@ return {
       end
 
       cmp.setup(opts)
-      if Util.has "cmp-cmdline" then
-        cmp.setup.cmdline("/", {
-          mapping = cmp.mapping.preset.cmdline(),
-          sources = {
-            { name = "buffer" },
-          },
-        })
-        cmp.setup.cmdline(":", {
-          mapping = cmp.mapping.preset.cmdline(),
-          sources = cmp.config.sources(
-            { { name = "path" } },
-            { { name = "cmdline", option = { ignore_cmds = { "Man", "!" } } } }
-          ),
-        })
-      end
       -- special cases with crates.nvim
       vim.api.nvim_create_autocmd({ "BufRead" }, {
         group = augroup "cmp_source_cargo",

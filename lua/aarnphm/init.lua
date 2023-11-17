@@ -21,6 +21,8 @@ local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKG
 vim.g.simple_colorscheme = colorscheme
 vim.g.simple_background = background
 
+Util.format.setup()
+
 -- close some filetypes with <q>
 autocmd("FileType", {
   group = augroup "filetype",
@@ -120,13 +122,6 @@ vim.cmd [[
     autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
-]]
-
-vim.cmd [[
-  augroup simple_diagnostics
-    autocmd!
-      autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()
-    augroup END
 ]]
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode

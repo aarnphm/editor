@@ -117,6 +117,7 @@ return {
           "", -- for all buffers without a file type
           "alpha",
           "fugitive",
+          "aerial",
           "git",
           "gitcommit",
           "help",

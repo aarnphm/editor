@@ -49,10 +49,10 @@ return {
     end,
   },
   {
-    "Jint-lzxy/nvim",
+    "catppuccin/nvim",
     priority = 1000,
-    branch = "refactor/syntax-highlighting",
     name = "catppuccin",
+    version = false,
     lazy = not (vim.g.simple_colorscheme == "catppuccin"),
     opts = {
       flavour = vim.g.simple_background == "light" and "latte" or "mocha", -- Can be one of: latte, frappe, macchiato, mocha
@@ -99,7 +99,7 @@ return {
             information = { "underline" },
           },
         },
-        aerial = false,
+        aerial = true,
         alpha = false,
         barbar = false,
         beacon = false,
@@ -115,6 +115,7 @@ return {
         gitsigns = true,
         harpoon = true,
         headlines = true,
+        ufo = true,
         hop = false,
         illuminate = true,
         indent_blankline = { enabled = true, colored_indent_levels = false },
@@ -128,7 +129,7 @@ return {
         navic = { enabled = false },
         neogit = false,
         neotest = false,
-        neotree = { enabled = true, show_root = true, transparent_panel = false },
+        neotree = { enabled = false, show_root = true, transparent_panel = false },
         noice = false,
         notify = false,
         nvimtree = false,
@@ -177,19 +178,8 @@ return {
             WindowPickerStatusLine = { fg = cp.surface0, blend = 10 },
             WindowPickerStatusLineNC = { fg = cp.surface2 },
 
-            -- For fidget
-            FidgetTask = { bg = cp.none, fg = cp.surface2 },
-            FidgetTitle = { fg = cp.blue, style = { "bold" } },
-
-            -- For nvim-tree
-            NvimTreeRootFolder = { fg = cp.pink },
-            NvimTreeIndentMarker = { fg = cp.surface2 },
-
             -- For trouble.nvim
             TroubleNormal = { bg = transparent_background and cp.none or cp.base },
-
-            -- For nvim-ufo
-            UfoFoldedBg = { bg = transparent_background and cp.none or cp.base },
 
             -- For telescope.nvim
             TelescopeMatching = { fg = cp.lavender },

@@ -10,6 +10,10 @@ return {
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        enabled = vim.fn.executable "cmake" == 1,
+        config = function()
+          Util.on_load("telescope.nvim", function() require("telescope").load_extension "fzf" end)
+        end,
       },
     },
     keys = {
@@ -71,14 +75,26 @@ return {
       ---@class TelescopeOptions
       local opts = {
         defaults = {
-          vimgrep_arguments = {
-            "rg",
-            "--no-heading",
-            "--with-filename",
-            "--line-number",
-            "--column",
-            "--smart-case",
+          file_ignore_patterns = {
+            ".git/",
+            "node_modules/",
+            "static_content/",
+            "lazy-lock.json",
+            "pdm.lock",
+            "__pycache__",
           },
+          layout_strategy = "horizontal",
+          layout_config = {
+            horizontal = {
+              prompt_position = "top",
+              preview_width = 0.5,
+            },
+            width = 0.8,
+            height = 0.8,
+            preview_cutoff = 120,
+          },
+          sorting_strategy = "ascending",
+          winblend = 0,
           prompt_prefix = "  ",
           selection_caret = "󰄾 ",
           -- open files in the first window that is an actual file.
@@ -92,18 +108,6 @@ return {
             end
             return 0
           end,
-          file_ignore_patterns = {
-            ".git/",
-            "node_modules/",
-            "static_content/",
-            "lazy-lock.json",
-            "pdm.lock",
-            "__pycache__",
-          },
-          layout_config = { width = 0.8, height = 0.8, prompt_position = "top" },
-          selection_strategy = "reset",
-          sorting_strategy = "ascending",
-          color_devicons = true,
           mappings = {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
@@ -131,10 +135,6 @@ return {
         pickers = {
           find_files = { hidden = true },
           live_grep = {
-            on_input_filter_cb = function(prompt)
-              -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
-              return { prompt = prompt:gsub("%s", ".*") }
-            end,
             attach_mappings = function(_)
               require("telescope.actions.set").select:enhance {
                 post = function() vim.cmd ":normal! zx" end,
@@ -144,17 +144,18 @@ return {
           },
         },
         extensions = {
-          fzf = {
-            fuzzy = false, -- false will only do exact matching
-            override_generic_sorter = true, -- override the generic sorter
-            override_file_sorter = true, -- override the file sorter
-            case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-          },
           frecency = {
             use_sqlite = false,
             show_scores = true,
             show_unindexed = true,
             ignore_patterns = { "*.git/*", "*/tmp/*" },
+          },
+          aerial = {
+            show_lines = false,
+            show_nesting = {
+              ["_"] = false, -- This key will be the default
+              lua = true, -- You can set the option for specific filetypes
+            },
           },
           live_grep_args = {
             auto_quoting = false,
@@ -175,8 +176,8 @@ return {
       require("telescope").setup(opts)
       require("telescope").load_extension "live_grep_args"
       require("telescope").load_extension "frecency"
-      require("telescope").load_extension "fzf"
       require("telescope").load_extension "zoxide"
+      require("telescope").load_extension "aerial"
     end,
   },
 }

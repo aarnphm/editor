@@ -3,6 +3,21 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+local diagnostic_goto = function(next, severity)
+  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function() go { severity = severity } end
+end
+
+map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })
+map("n", "]d", diagnostic_goto(true), { desc = "lsp: Next diagnostic" })
+map("n", "[d", diagnostic_goto(false), { desc = "lsp: Prev diagnostic" })
+map("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "lsp: Next error" })
+map("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "lsp: Prev error" })
+map("n", "]w", diagnostic_goto(true, "WARN"), { desc = "lsp: Next warning" })
+map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "lsp: Prev warning" })
+map({ "n", "v" }, "<leader><leader>f", function() Util.format { force = true } end, { desc = "style: format buffer" })
+
 -- NOTE: normal mode
 map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
 map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
@@ -26,8 +41,6 @@ map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
 map("n", "<Leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
 map("n", "]b", "<cmd>bnext<cr>", { desc = "buffer: next" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
-map("n", "<Leader>q", "<cmd>copen<cr>", { desc = "quickfix: Open quickfix" })
-map("n", "<Leader>l", "<cmd>lopen<cr>", { desc = "quickfix: Open location list" })
 map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
 map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
 map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
