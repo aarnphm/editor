@@ -1,13 +1,6 @@
 return {
   "tpope/vim-fugitive",
   {
-    "sindrets/diffview.nvim",
-    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
-    ---@type DiffviewConfig
-    opts = { diff_binaries = true },
-    keys = { { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "DiffView" } },
-  },
-  {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     ---@type Gitsigns.Config

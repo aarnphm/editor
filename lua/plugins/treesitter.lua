@@ -30,38 +30,7 @@ local ensure_installed = {
   "proto",
 }
 return {
-  {
-    "windwp/nvim-ts-autotag",
-    event = "InsertEnter",
-    opts = {},
-  },
   { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
-  {
-    "nvim-treesitter/playground",
-    lazy = true,
-    cmd = { "TSPlaygroundToggle" },
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-  },
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-    opts = { mode = "cursor" },
-    keys = {
-      {
-        "<leader>ut",
-        function()
-          local tsc = require "treesitter-context"
-          tsc.toggle()
-          if Util.inject.get_upvalue(tsc.toggle, "enabled") then
-            vim.notify("Enabled Treesitter Context", vim.log.levels.INFO, { title = "Option" })
-          else
-            vim.notify("Disabled Treesitter Context", vim.log.levels.WARN, { title = "Option" })
-          end
-        end,
-        desc = "Toggle Treesitter Context",
-      },
-    },
-  },
   {
     "nvim-treesitter/nvim-treesitter",
     version = false, -- last release is way too old and doesn't work on Windows
@@ -128,7 +97,6 @@ return {
     },
     config = function(_, opts)
       if Util.has "SchemaStore.nvim" then vim.list_extend(opts.ensure_installed, { "json", "jsonc", "json5" }) end
-      if Util.has "vimtex" then vim.list_extend(opts.ensure_installed, { "bibtex", "latex" }) end
 
       if type(opts.ensure_installed) == "table" then
         ---@type table<string, boolean>

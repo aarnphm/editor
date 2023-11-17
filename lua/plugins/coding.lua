@@ -1,38 +1,9 @@
--- This is the same as in lspconfig.server_configurations.jdtls, but avoids
--- needing to require that when this module loads.
-local java_filetypes = { "java" }
-
 return {
   {
     "p00f/clangd_extensions.nvim",
     ft = { "c", "cpp", "hpp", "h" },
     lazy = true,
     opts = function()
-      local lspconfig = require "lspconfig"
-
-      local switch_source_header_splitcmd = function(bufnr, splitcmd)
-        bufnr = lspconfig.util.validate_bufnr(bufnr)
-        local params = { uri = vim.uri_from_bufnr(bufnr) }
-
-        local clangd_client = lspconfig.util.get_active_client_by_name(bufnr, "clangd")
-
-        if clangd_client then
-          clangd_client.request("textDocument/switchSourceHeader", params, function(err, result)
-            if err then error(tostring(err)) end
-            if not result then
-              error("Corresponding file can’t be determined", vim.log.levels.ERROR)
-              return
-            end
-            vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
-          end)
-        else
-          error(
-            "Method textDocument/switchSourceHeader is not supported by any active server on this buffer",
-            vim.log.levels.ERROR
-          )
-        end
-      end
-
       local get_binary_path_list = function(binaries)
         local get_binary_path = function(binary)
           local path = nil
