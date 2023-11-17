@@ -24,7 +24,6 @@ o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
 o.guicursor = "" -- no gui cursor
 o.signcolumn = "yes" -- always show sign column
-o.cursorline = false -- show cursor line
 o.cursorcolumn = false -- show cursor column
 o.undofile = true -- set undofile to infinite undo
 o.breakindent = true -- enable break indent

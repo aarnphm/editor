@@ -4,6 +4,7 @@ local clear = {}
 ---@alias RosePineOptions Options
 
 return {
+  { "kepano/flexoki-neovim", name = "flexoki", priority = 1000, config = true },
   {
     "rose-pine/neovim",
     name = "rose-pine",
@@ -135,16 +136,10 @@ return {
         nvimtree = false,
         overseer = false,
         pounce = false,
-        rainbow_delimiters = true,
         sandwich = false,
         semantic_tokens = true,
-        symbols_outline = false,
-        telekasten = false,
         telescope = { enabled = true, style = "nvchad" },
         treesitter_context = true,
-        ts_rainbow = false,
-        vim_sneak = false,
-        vimwiki = false,
         which_key = true,
       },
       color_overrides = {},
@@ -153,7 +148,8 @@ return {
         all = function(cp)
           return {
             -- For base configs
-            NormalFloat = { fg = cp.text, bg = transparent_background and cp.none or cp.mantle },
+            -- NormalFloat = { fg = cp.text, bg = transparent_background and cp.none or cp.mantle },
+            NormalFloat = { fg = cp.text, bg = cp.none },
             FloatBorder = {
               fg = transparent_background and cp.blue or cp.mantle,
               bg = transparent_background and cp.none or cp.mantle,
