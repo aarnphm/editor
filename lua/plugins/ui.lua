@@ -1,20 +1,30 @@
 return {
   {
-    "j-hui/fidget.nvim",
-    branch = "legacy",
-    event = "LspAttach",
-    config = true,
+    "Bekaboo/dropbar.nvim",
+    enabled = vim.fn.has "nvim-0.10" == 1,
+    event = { "BufReadPre", "BufNewFile" },
+    ---@type dropbar_configs_t
     opts = {
-      window = { blend = 0 },
-      sources = {
-        ["conform"] = { ignore = true },
+      general = {
+        ---@type boolean|fun(buf:integer, win: integer): boolean
+        enable = function(buf, win)
+          return not vim.api.nvim_win_get_config(win).zindex
+            and not vim.wo[win].diff
+            and not vim.tbl_contains(dropbar_enable, vim.bo[buf].filetype)
+        end,
       },
-      fmt = { max_messages = 3 },
+      icons = {
+        enable = true,
+        ui = {
+          bar = { separator = "  ", extends = "…" },
+          menu = { separator = " ", indicator = "  " },
+        },
+      },
     },
   },
   {
     "lukas-reineke/indent-blankline.nvim",
-    event = { "BufReadPost", "BufNewFile" },
+    event = Util.lazy_file_events,
     main = "ibl",
     opts = {
       indent = { char = "│", tab_char = "│" },

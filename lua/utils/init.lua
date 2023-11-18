@@ -3,6 +3,7 @@
 
 ---@class simple.util: LazyUtilCore
 ---@field inject simple.util.inject
+---@field ui simple.util.ui
 ---@field format simple.util.format
 ---@field lsp simple.util.lsp
 ---@field palette simple.util.palette

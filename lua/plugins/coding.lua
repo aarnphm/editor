@@ -4,7 +4,10 @@ return {
     ft = { "c", "cpp", "hpp", "h" },
     lazy = true,
     opts = function()
+      ---@param binaries string[]
       local get_binary_path_list = function(binaries)
+        ---@param binary string
+        ---@return string|nil
         local get_binary_path = function(binary)
           local path = nil
           if vim.loop.os_uname().sysname == "Windows_NT" then

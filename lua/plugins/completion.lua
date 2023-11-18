@@ -26,9 +26,8 @@ return {
       end)
     end,
     opts = {
-      log_level = vim.log.levels.DEBUG,
       format = {
-        timeout_ms = 3000,
+        timeout_ms = 2000,
         async = false, -- not recommended to change
         quiet = false, -- not recommended to change
       },

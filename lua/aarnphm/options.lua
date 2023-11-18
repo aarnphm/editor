@@ -16,26 +16,24 @@ wo.scrolloff = 8
 wo.sidescrolloff = 8
 wo.wrap = false
 wo.cursorline = true
+wo.cursorcolumn = false
 
 -- Some defaults and don't question it
 o.formatexpr = "v:lua.Util.format.expr()"
-o.wrap = false -- egh i don't like wrap
 o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
 o.guicursor = "" -- no gui cursor
 o.signcolumn = "yes" -- always show sign column
-o.cursorline = false -- show cursor line
-o.cursorcolumn = false -- show cursor column
 o.undofile = true -- set undofile to infinite undo
 o.breakindent = true -- enable break indent
 o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
 o.clipboard = "unnamedplus" -- sync system clipboard
-o.pumheight = 8 -- larger completion windows
-o.autoindent = true -- auto indent
+o.pumheight = 5 -- larger completion windows
 o.expandtab = true -- convert spaces to tabs
 o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
 o.number = true -- number is good for nav
 o.swapfile = false -- I don't like swap files personally, found undofile to be better
+o.autowrite = true
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
 o.showtabline = 0
@@ -54,16 +52,9 @@ o.statusline = table.concat({
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
 
-if vim.fn.has "nvim-0.9" == 1 then
-  opt.shortmess:append "C" -- Don't show "Scanning..." messages
-  o.splitkeep = "screen" -- Reduce scroll during window split
-end
-
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
-
-opt.pumblend = 17 -- make completion window transparent
-opt.completeopt = { "menuone", "noselect" } -- better completion menu
+opt.pumblend = 8 -- make completion window transparent
 
 -- searching and grep stuff
 o.smartcase = true
@@ -88,6 +79,7 @@ opt.fillchars = {
 o.foldmethod = "expr"
 o.foldcolumn = "0"
 o.foldlevel = 99
+opt.foldtext = "v:lua.Util.ui.foldtext()"
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
 
@@ -113,6 +105,7 @@ o.timeoutlen = 200
 o.updatetime = 200
 o.virtualedit = "block"
 o.whichwrap = "h,l,<,>,[,],~"
+opt.smoothscroll = true
 
 -- last but def not least, wildmenu
 o.wildchar = 9

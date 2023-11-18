@@ -28,6 +28,7 @@ local simplified_status_ft = {
 local M = {}
 
 return {
+  "echasnovski/mini.colors",
   { "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
   { "echasnovski/mini.trailspace", event = { "BufRead", "BufNewFile" }, opts = {} },
   {
@@ -57,7 +58,7 @@ return {
   {
     "echasnovski/mini.files",
     opts = {
-      windows = { preview = true, width_focus = 30, width_nofocus = 30, width_preview = 30 },
+      windows = { preview = true, width_focus = 30, width_nofocus = 30, widthopreview = 30 },
     },
     keys = {
       {

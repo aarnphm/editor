@@ -238,6 +238,10 @@ return {
     keys = {
       { "<leader>cs", "<cmd>AerialToggle<cr>", desc = "Aerial (Symbols)" },
     },
+    config = function(_, opts)
+      require("aerial").setup(opts)
+      if Util.has "telescope.nvim" then require("telescope").load_extension "aerial" end
+    end,
   },
   {
     "neovim/nvim-lspconfig",
@@ -285,7 +289,7 @@ return {
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
-      inlay_hints = { enabled = true },
+      inlay_hints = { enabled = false },
       capabilities = {
         workspace = {
           didChangeWatchedFiles = {
@@ -417,14 +421,22 @@ return {
         },
         pyright = {
           mason = false,
+          capabilities = {
+            textDocument = {
+              publishDiagnostics = {
+                tagSupport = { valueSet = { 2 } },
+              },
+            },
+          },
           settings = {
             python = {
               analysis = {
-                autoSearchPaths = true,
-                typeCheckingMode = "strict",
-                useLibraryCodeForTypes = true,
-                diagnosticMode = "off",
+                logLevel = "Trace",
                 autoImportCompletions = true,
+                diagnosticMode = "workspace",
+                autoSearchPaths = true,
+                typeCheckingMode = "off",
+                useLibraryCodeForTypes = true,
               },
             },
           },
