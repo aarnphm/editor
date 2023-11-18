@@ -7,11 +7,7 @@ return {
     opts = {
       general = {
         ---@type boolean|fun(buf:integer, win: integer): boolean
-        enable = function(buf, win)
-          return not vim.api.nvim_win_get_config(win).zindex
-            and not vim.wo[win].diff
-            and not vim.tbl_contains(dropbar_enable, vim.bo[buf].filetype)
-        end,
+        enable = function(buf, win) return not vim.api.nvim_win_get_config(win).zindex and not vim.wo[win].diff end,
       },
       icons = {
         enable = true,
