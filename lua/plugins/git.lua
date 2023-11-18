@@ -9,7 +9,7 @@ return {
   },
   {
     "lewis6991/gitsigns.nvim",
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    event = Util.lazy_file_events,
     ---@type Gitsigns.Config
     opts = {
       signs = {

@@ -28,7 +28,7 @@ local dropbar_enable = {
 return {
   {
     "Bekaboo/dropbar.nvim",
-    enabled = vim.g.started_by_firenvim ~= true and vim.fn.has "nvim-0.10" == 1,
+    enabled = vim.fn.has "nvim-0.10" == 1,
     event = { "BufReadPre", "BufNewFile" },
     ---@type dropbar_configs_t
     opts = {
@@ -73,15 +73,6 @@ return {
     end,
   },
   {
-    "kevinhwang91/nvim-bqf",
-    ft = "qf",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      { "junegunn/fzf", lazy = true, build = ":call fzf#install()" },
-    },
-    config = true,
-  },
-  {
     "folke/which-key.nvim",
     event = "BufReadPost",
     opts = { plugins = { presets = { operators = false } } },
@@ -93,21 +84,8 @@ return {
     opts = { plugins = { gitsigns = { enabled = true }, alacritty = { enabled = true } } },
   },
   {
-    "j-hui/fidget.nvim",
-    branch = "legacy",
-    event = "LspAttach",
-    config = true,
-    opts = {
-      window = { blend = 0 },
-      sources = {
-        ["conform"] = { ignore = true },
-      },
-      fmt = { max_messages = 3 },
-    },
-  },
-  {
     "lukas-reineke/indent-blankline.nvim",
-    event = { "BufReadPost", "BufNewFile" },
+    event = Util.lazy_file_events,
     main = "ibl",
     opts = {
       indent = { char = "│", tab_char = "│" },

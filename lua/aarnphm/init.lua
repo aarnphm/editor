@@ -65,10 +65,6 @@ autocmd("VimResized", {
     vim.cmd("tabnext  " .. current)
   end,
 })
-autocmd({ "BufEnter", "BufWinEnter", "WinEnter", "CmdwinEnter" }, {
-  group = augroup "disable_statusline",
-  command = [[if match(bufname('%'), 'starter') != -1 || match(bufname('%'), 'nofile') != -1 || bufname('%') == '' | set laststatus=0 | else | set laststatus=3 | endif]],
-})
 -- go to last loc when opening a buffer
 autocmd("BufReadPost", {
   group = augroup "last_loc",
@@ -123,24 +119,5 @@ vim.cmd [[
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
 ]]
--- Show cursorline on active windows only
-autocmd({ "InsertEnter", "WinEnter" }, {
-  callback = function()
-    local ok, cl = pcall(vim.api.nvim_win_get_var, 0, "auto-cursorline")
-    if ok and cl then
-      vim.wo.cursorline = true
-      vim.api.nvim_win_del_var(0, "auto-cursorline")
-    end
-  end,
-})
-autocmd({ "InsertEnter", "WinLeave" }, {
-  callback = function()
-    local cl = vim.wo.cursorline
-    if cl then
-      vim.api.nvim_win_set_var(0, "auto-cursorline", cl)
-      vim.wo.cursorline = false
-    end
-  end,
-})
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
