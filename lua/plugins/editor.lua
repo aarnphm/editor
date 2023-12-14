@@ -97,7 +97,7 @@ return {
     event = "BufReadPost",
     dependencies = { "kevinhwang91/promise-async" },
     opts = {
-      preview = { win_config = { border = "none" } },
+      preview = { win_config = { border = BORDER } },
       fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
         local newVirtText = {}
         local suffix = (" 󰇘 %d "):format(endLnum - lnum)

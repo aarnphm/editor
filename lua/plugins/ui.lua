@@ -12,15 +12,15 @@ return {
   {
     "stevearc/dressing.nvim",
     opts = {
-      input = { border = "none", win_options = { winhighlight = "TelescopeNormal:StatusLine" } },
-      builtin = { border = "none" },
+      input = { border = BORDER, win_options = { winhighlight = "TelescopeNormal:StatusLine" } },
+      builtin = { border = BORDER },
     },
   },
   {
     "kevinhwang91/nvim-bqf",
     lazy = true,
     ft = "qf",
-    opts = { preview = { border = "none", wrap = true, winblend = 0 } },
+    opts = { preview = { border = BORDER, wrap = true, winblend = 0 } },
   },
   {
     "Bekaboo/dropbar.nvim",

@@ -98,6 +98,7 @@ return {
       {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
+        version = false,
         event = "InsertEnter",
         build = ":Copilot auth",
         opts = {
@@ -107,7 +108,6 @@ return {
           filetypes = {
             markdown = true,
             help = false,
-            terraform = false,
             hgcommit = false,
             gitcommit = false,
             svn = false,
@@ -140,10 +140,9 @@ return {
           format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
         },
         window = {
-          completion = { border = "none" },
-          -- documentation = { border = "none", winhighlight = "Normal:Pmenu" },
+          completion = { border = BORDER },
           documentation = {
-            border = "none",
+            border = BORDER,
             winhighlight = "Normal:CmpDocumentation,FloatBorder:CmpDocumentation,Search:None",
             side_padding = 1,
           },
