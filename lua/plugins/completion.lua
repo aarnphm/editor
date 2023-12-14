@@ -55,6 +55,7 @@ return {
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
+      "kdheepak/cmp-latex-symbols",
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "L3MON4D3/LuaSnip",
@@ -137,7 +138,7 @@ return {
         snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
-          format = require("lspkind").cmp_format { mode = "symbol", maxwidth = 50 },
+          format = require("lspkind").cmp_format { mode = "symbol" },
         },
         window = {
           completion = { border = BORDER },
@@ -224,6 +225,12 @@ return {
           { name = "buffer", keyword_length = 3 },
           { name = "luasnip", keyword_length = 2 },
           { name = "emoji" },
+          {
+            name = "latex_symbols",
+            option = {
+              strategy = 2, -- insert command only
+            },
+          },
         },
       }
     end,
