@@ -16,7 +16,6 @@ wo.cursorline = true
 wo.cursorcolumn = false
 
 -- Some defaults and don't question it
-o.formatexpr = "v:lua.Util.format.formatexpr()"
 o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
 o.guicursor = "" -- no gui cursor
@@ -35,7 +34,6 @@ o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
 o.showtabline = 0
 o.laststatus = 3 -- show statusline on buffer
-o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 o.statusline = table.concat({
   "%{%luaeval('statusline.mode {trunc_width = 75}')%}",
   "%{%luaeval('statusline.git {trunc_width = 120}')%}",
@@ -46,6 +44,8 @@ o.statusline = table.concat({
 }, " ")
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
+opt.formatexpr = "v:lua.Util.format.formatexpr()"
+o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
@@ -73,7 +73,7 @@ opt.fillchars = {
 }
 o.foldmethod = "expr"
 o.foldlevel = 99
-o.foldtext = "v:lua.Util.ui.foldtext()"
+-- o.foldtext = "v:lua.Util.ui.foldtext()"
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
 

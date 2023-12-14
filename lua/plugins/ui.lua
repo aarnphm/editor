@@ -46,7 +46,6 @@ return {
         },
       },
     },
-    keys = { { "<LocalLeader>b", function() require("dropbar.api").pick() end, desc = "winbar: pick" } },
   },
   {
     "j-hui/fidget.nvim",
