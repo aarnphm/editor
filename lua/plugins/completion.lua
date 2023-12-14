@@ -55,7 +55,6 @@ return {
       "onsails/lspkind.nvim",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
-      "kdheepak/cmp-latex-symbols",
       { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "L3MON4D3/LuaSnip",
@@ -103,7 +102,7 @@ return {
         build = ":Copilot auth",
         opts = {
           cmp = { enabled = true, method = "getCompletionsCycling" },
-          panel = { enabled = true },
+          panel = { enabled = false },
           suggestion = { enabled = true, auto_trigger = true },
           filetypes = {
             markdown = true,
@@ -130,9 +129,10 @@ return {
       local cmp = require "cmp"
       local compare = require "cmp.config.compare"
 
+      local select_opts = { behavior = cmp.SelectBehavior.Select }
       return {
         preselect = cmp.PreselectMode.Item,
-        completion = { completeopt = "menu,menuone,noinsert" },
+        completion = { completeopt = "menuone,noselect" },
         matching = { disallow_partial_fuzzy_matching = false },
         snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
         formatting = {
@@ -178,34 +178,52 @@ return {
           ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
           ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
           ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-          ["<Tab>"] = function(fallback)
+          ["<localleader>["] = cmp.mapping(function(fallback)
             if require("copilot.suggestion").is_visible() then
-              require("copilot.suggestion").accept()
-            elseif cmp.visible() then
-              cmp.select_next_item()
-            elseif require("luasnip").expand_or_jumpable() then
-              vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
+              require("copilot.suggestion").next()
             else
               fallback()
             end
-          end,
-          ["<S-Tab>"] = function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
+          end, { "i", "s" }),
+          ["<localleader>]"] = cmp.mapping(function(fallback)
+            if require("copilot.suggestion").is_visible() then
+              require("copilot.suggestion").prev()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            local col = vim.fn.col "." - 1
+            if require("copilot.suggestion").is_visible() then
+              require("copilot.suggestion").accept()
+            elseif cmp.visible() then
+              cmp.select_next_item(select_opts)
+            elseif require("luasnip").expand_or_jumpable() then
+              vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
+            elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
+              fallback()
+            else
+              cmp.complete()
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if require("copilot.suggestion").is_visible() then
+              require("copilot.suggestion").accept()
+            elseif cmp.visible() then
+              cmp.select_prev_item(select_opts)
             elseif require("luasnip").jumpable(-1) then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
             else
               fallback()
             end
-          end,
+          end, { "i", "s" }),
         },
         sources = {
-          { name = "nvim_lsp", max_item_count = 350 },
-          { name = "luasnip" },
-          { name = "path" },
+          { name = "path", priority = 250 },
+          { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
+          { name = "buffer", keyword_length = 3 },
+          { name = "luasnip", keyword_length = 2 },
           { name = "emoji" },
-          { name = "buffer" },
-          { name = "latex_symbols" },
         },
       }
     end,
