@@ -13,25 +13,29 @@ return {
       ---@type RosePineOptions
       local opts = {
         disable_italics = true,
-        disable_background = false,
+        disable_background = not transparent_background,
         dark_variant = "main",
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "iris", blend = 10 },
           StatusLineNC = { fg = "subtle", bg = "surface" },
+          --- telescope.nvim
           TelescopeNormal = { bg = "none" },
           TelescopeBorder = { fg = "highlight_high", bg = "none" },
           TelescopeResultsNormal = { fg = "subtle", bg = "none" },
           TelescopeSelection = { fg = "text", bg = "none" },
           TelescopeSelectionCaret = { fg = "rose", bg = "none" },
+          --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
+          --- glance.nvim
           GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
           GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },
           GlanceWinBarFilename = { fg = "love", bg = "surface" },
           GlancePreviewNormal = { bg = "surface" },
           GlanceListNormal = { bg = "overlay" },
           GlancePreviewMatch = { fg = "love" },
+          --- headlines.nvim
           Headline1 = { bg = "surface" },
           Headline2 = { bg = "gold" },
           Headline3 = { bg = "rose" },
@@ -48,10 +52,11 @@ return {
     end,
   },
   {
-    "catppuccin/nvim",
+    "Jint-lzxy/nvim",
     priority = 1000,
     name = "catppuccin",
     version = false,
+    branch = "refactor/syntax-highlighting",
     lazy = not (vim.g.simple_colorscheme == "catppuccin"),
     opts = {
       flavour = vim.g.simple_background == "light" and "latte" or "mocha", -- Can be one of: latte, frappe, macchiato, mocha

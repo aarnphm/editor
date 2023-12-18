@@ -20,7 +20,7 @@ return {
   { "fatih/vim-go", ft = { "go", "gomod" } },
   {
     "p00f/clangd_extensions.nvim",
-    ft = { "c", "cpp", "hpp", "h" },
+    ft = { "c", "cpp", "hpp", "h", "cu" },
     lazy = true,
     opts = function()
       return {
@@ -35,20 +35,16 @@ return {
             "meson_options.txt",
             "WORKSPACE",
             "BUILD.bazel",
-            "build.ninja"
-          )(fname) or require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt")(
-            fname
-          ) or require("lspconfig.util").find_git_ancestor(fname)
+            "build.ninja",
+            "compile_commands.json",
+            "compile_flags.txt"
+          )(fname) or require("lspconfig.util").find_git_ancestor(fname)
         end,
         server = {
           single_file_support = true,
           filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
           capabilities = { offsetEncoding = { "utf-16" } },
-          init_options = {
-            usePlaceholders = true,
-            completeUnimported = true,
-            clangdFileStatus = true,
-          },
+          init_options = { usePlaceholders = true, completeUnimported = true, clangdFileStatus = true },
           cmd = {
             "clangd",
             "-j=12",
@@ -74,7 +70,7 @@ return {
             "--limit-results=350",
           },
         },
-        inlay_hints = { inline = false },
+        inlay_hints = { inline = true },
         ast = {
           --These require codicons (https://github.com/microsoft/vscode-codicons)
           role_icons = {
