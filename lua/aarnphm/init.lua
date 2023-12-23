@@ -174,3 +174,9 @@ if not vim.loop.fs_stat(lazypath) then
   }
 end
 vim.opt.runtimepath:prepend(lazypath)
+
+require("lazy").setup("plugins", { change_detection = { notify = false }, ui = { border = BORDER } })
+
+-- NOTE: need to set background and colorscheme here after plugins are loaded.
+vim.o.background = background
+vim.cmd.colorscheme(colorscheme)

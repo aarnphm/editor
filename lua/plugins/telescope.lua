@@ -17,44 +17,39 @@ return {
     keys = {
       {
         "<C-p>",
-        function()
-          require("telescope.builtin").keymaps {
-            lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-            layout_config = {
-              width = 0.6,
-              height = 0.6,
-              prompt_position = "top",
-            },
-          }
-        end,
+        Util.telescope("keymaps", {
+          lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+          layout_config = {
+            width = 0.6,
+            height = 0.6,
+            prompt_position = "top",
+          },
+        }),
         desc = "telescope: Keymaps",
         noremap = true,
         silent = true,
       },
       {
         "<leader>b",
-        function()
-          require("telescope.builtin").buffers {
-            layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
-            show_all_buffers = true,
-            previewer = false,
-          }
-        end,
+        Util.telescope("buffers", {
+          layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+          show_all_buffers = true,
+        }),
         desc = "telescope: Manage buffers",
       },
       {
         "<leader>f",
-        function() require("telescope.builtin").find_files() end,
+        Util.telescope("find_files", { hidden = true }),
         desc = "telescope: Find files",
       },
       {
         "<leader>F",
-        function() require("telescope.builtin").git_files() end,
+        Util.telescope("git_files", { hidden = true }),
         desc = "telescope: Find files (git)",
       },
       {
         "<leader>/",
-        function() require("telescope.builtin").grep_string { word_match = "-w" } end,
+        Util.telescope("grep_string", { word_match = "-w" }),
         desc = "telescope: Grep string",
       },
       {
@@ -75,10 +70,10 @@ return {
             height = 0.8,
             preview_cutoff = 120,
           },
-          initial_mode = "insert",
           winblend = 20,
           prompt_prefix = "  ",
           selection_caret = " 󰄾 ",
+          path_display = { "shorten" },
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
           get_selection_window = function()
