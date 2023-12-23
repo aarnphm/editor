@@ -39,12 +39,12 @@ return {
       },
       {
         "<leader>f",
-        Util.telescope("find_files", { hidden = true }),
+        Util.telescope("find_files", {}),
         desc = "telescope: Find files",
       },
       {
         "<leader>F",
-        Util.telescope("git_files", { hidden = true }),
+        Util.telescope("git_files", {}),
         desc = "telescope: Find files (git)",
       },
       {
@@ -105,6 +105,21 @@ return {
               ["<C-b>"] = function(...) return actions.preview_scrolling_up(...) end,
             },
             n = { ["q"] = function(...) return actions.close(...) end },
+          },
+        },
+        pickers = {
+          find_files = { hidden = true },
+          live_grep = {
+            on_input_filter_cb = function(prompt)
+              -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
+              return { prompt = prompt:gsub("%s", ".*") }
+            end,
+            attach_mappings = function(_)
+              require("telescope.actions.set").select:enhance {
+                post = function() vim.cmd ":normal! zx" end,
+              }
+              return true
+            end,
           },
         },
         extensions = {
