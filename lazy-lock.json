@@ -19,7 +19,7 @@
   "friendly-snippets": { "branch": "main", "commit": "53d3df271d031c405255e99410628c26a8f0d2b0" },
   "gitsigns.nvim": { "branch": "main", "commit": "d195f0c35ced5174d3ecce1c4c8ebb3b5bc23fa9" },
   "glance.nvim": { "branch": "master", "commit": "8ed5cf3b3b1231ea696d88c9efd977027429d869" },
-  "indent-blankline.nvim": { "branch": "master", "commit": "3084950d1b66426d207064a509477cbfa96362c6" },
+  "indent-blankline.nvim": { "branch": "master", "commit": "0dca9284bce128e60da18693d92999968d6cb523" },
   "lazy.nvim": { "branch": "main", "commit": "96584866b9c5e998cbae300594d0ccfd0c464627" },
   "leap.nvim": { "branch": "main", "commit": "b20691cc8824826571e5298d1402730bb9c721d2" },
   "lspkind.nvim": { "branch": "master", "commit": "d11d58c3fc3edbd8c0112b5850ef4ed553d98752" },
@@ -59,7 +59,7 @@
   "toggleterm.nvim": { "branch": "main", "commit": "91be5f327e42aa016da13b277540de8dba0b14e3" },
   "ufo": { "branch": "main", "commit": "a15944ff8e3d570f504f743d55209275ed1169c4" },
   "vim-fugitive": { "branch": "master", "commit": "59659093581aad2afacedc81f009ed6a4bfad275" },
-  "vim-go": { "branch": "master", "commit": "7fb38264e3ab5c57a43de2470f22eccc62f82c02" },
+  "vim-go": { "branch": "master", "commit": "425784a271fecc38e3a32ce9948428ec0aa64c4b" },
   "vim-repeat": { "branch": "master", "commit": "24afe922e6a05891756ecf331f39a1f6743d3d5a" },
   "which-key.nvim": { "branch": "main", "commit": "4433e5ec9a507e5097571ed55c02ea9658fb268a" },
   "window-picker": { "branch": "main", "commit": "41cfaa428577c53552200a404ae9b3a0b5719706" }
