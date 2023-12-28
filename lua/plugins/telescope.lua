@@ -34,6 +34,7 @@ return {
         Util.telescope("buffers", {
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,
+          previewer = false,
         }),
         desc = "telescope: Manage buffers",
       },
@@ -73,7 +74,6 @@ return {
           winblend = 20,
           prompt_prefix = "  ",
           selection_caret = " 󰄾 ",
-          path_display = { "shorten" },
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
           get_selection_window = function()
