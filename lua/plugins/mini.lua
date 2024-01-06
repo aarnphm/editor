@@ -56,8 +56,8 @@ return {
       },
       {
         "<LocalLeader>F",
-        function() require("mini.files").open(vim.loop.cwd(), true) end,
-        desc = "Open mini.files (cwd)",
+        function() require("mini.files").open(Util.root(), true) end,
+        desc = "Open mini.files (working root)",
       },
     },
     config = function(_, opts)
