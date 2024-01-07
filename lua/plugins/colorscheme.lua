@@ -1,8 +1,6 @@
 local transparent_background = true
 local clear = {}
 
----@alias RosePineOptions Options
-
 return {
   {
     "rose-pine/neovim",
@@ -10,21 +8,15 @@ return {
     priority = 1000,
     lazy = not (vim.g.simple_colorscheme == "rose-pine"),
     opts = function()
-      ---@type RosePineOptions
       local opts = {
         disable_italics = true,
         disable_background = not transparent_background,
+        dim_nc_background = true,
         dark_variant = "main",
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
-          StatusLine = { fg = "rose", bg = "iris", blend = 10 },
-          StatusLineNC = { fg = "subtle", bg = "surface" },
-          --- telescope.nvim
-          TelescopeNormal = { bg = "none" },
-          TelescopeBorder = { fg = "highlight_high", bg = "none" },
-          TelescopeResultsNormal = { fg = "subtle", bg = "none" },
-          TelescopeSelection = { fg = "text", bg = "none" },
-          TelescopeSelectionCaret = { fg = "rose", bg = "none" },
+          StatusLine = { fg = "rose", bg = "base", blend = 10 },
+          StatusLineNC = { fg = "subtle", bg = "base" },
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },

@@ -5,6 +5,7 @@ return {
     version = false,
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
+      "nvim-telescope/telescope-media-files.nvim",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
@@ -134,6 +135,7 @@ return {
     config = function(_, opts)
       require("telescope").setup(opts)
       require("telescope").load_extension "live_grep_args"
+      require("telescope").load_extension "media_files"
     end,
   },
 }
