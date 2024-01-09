@@ -9,17 +9,17 @@ return {
     lazy = not (vim.g.simple_colorscheme == "rose-pine"),
     opts = function()
       local opts = {
-        disable_italics = true,
-        disable_background = not transparent_background,
-        dim_nc_background = true,
+        dim_inactive_windows = true,
+        styles = { transparency = not transparent_background },
         dark_variant = "main",
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
-          StatusLine = { fg = "rose", bg = "base", blend = 10 },
-          StatusLineNC = { fg = "subtle", bg = "base" },
+          StatusLine = { fg = "rose", bg = "overlay", blend = 10 },
+          StatusLineNC = { fg = "subtle", bg = "overlay" },
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
+          -- --- telescope.nvim
           --- glance.nvim
           GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
           GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },
@@ -34,7 +34,6 @@ return {
           Headline4 = { bg = "pine" },
           Headline5 = { bg = "foam" },
           Headline6 = { bg = "iris" },
-          UfoFoldedBg = { bg = "surface" },
         },
       }
       if vim.g.simple_background == "light" then
