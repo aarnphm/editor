@@ -9,9 +9,9 @@ return {
     lazy = not (vim.g.simple_colorscheme == "rose-pine"),
     opts = function()
       local opts = {
-        dim_inactive_windows = true,
-        styles = { transparency = not transparent_background },
         dark_variant = "main",
+        dim_inactive_windows = true,
+        styles = { transparency = not transparent_background, italic = true },
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "overlay", blend = 10 },
@@ -19,7 +19,6 @@ return {
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
-          -- --- telescope.nvim
           --- glance.nvim
           GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
           GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },

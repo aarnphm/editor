@@ -45,6 +45,16 @@ return {
     config = function(_, opts) require("conform").setup(opts) end,
   },
   {
+    "iurimateus/luasnip-latex-snippets.nvim",
+    version = false,
+    event = "InsertEnter",
+    dependencies = { "L3MON4D3/LuaSnip" },
+    config = function()
+      require("luasnip-latex-snippets").setup { use_treesitter = true }
+      require("luasnip").config.setup { enable_autosnippets = true }
+    end,
+  },
+  {
     "hrsh7th/nvim-cmp",
     version = false,
     event = "InsertEnter",
@@ -87,13 +97,18 @@ return {
             {}
           )
         end,
-        opts = {
+        opts = function()
+          return {
           history = true,
           -- Event on which to check for exiting a snippet's region
           region_check_events = "InsertEnter",
           delete_check_events = "TextChanged",
           ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
-        },
+          load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+            markdown = { "lua", "json", "tex" },
+          },
+        }
+        end
       },
       {
         "zbirenbaum/copilot.lua",
