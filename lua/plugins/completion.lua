@@ -99,16 +99,16 @@ return {
         end,
         opts = function()
           return {
-          history = true,
-          -- Event on which to check for exiting a snippet's region
-          region_check_events = "InsertEnter",
-          delete_check_events = "TextChanged",
-          ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
-          load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
-            markdown = { "lua", "json", "tex" },
-          },
-        }
-        end
+            history = true,
+            -- Event on which to check for exiting a snippet's region
+            region_check_events = "InsertEnter",
+            delete_check_events = "TextChanged",
+            ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+            load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+              markdown = { "lua", "json", "tex" },
+            },
+          }
+        end,
       },
       {
         "zbirenbaum/copilot.lua",
