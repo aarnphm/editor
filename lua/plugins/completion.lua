@@ -146,6 +146,7 @@ return {
       local compare = require "cmp.config.compare"
 
       local select_opts = { behavior = cmp.SelectBehavior.Select }
+      ---@type cmp.ConfigSchema
       return {
         preselect = cmp.PreselectMode.Item,
         completion = { completeopt = "menuone,noselect" },
@@ -156,12 +157,8 @@ return {
           format = require("lspkind").cmp_format { mode = "symbol" },
         },
         window = {
-          completion = { border = BORDER },
-          documentation = {
-            border = BORDER,
-            winhighlight = "Normal:CmpDocumentation,FloatBorder:CmpDocumentation,Search:None",
-            side_padding = 1,
-          },
+          completion = { border = BORDER, scrollbar = false },
+          documentation = { border = BORDER, side_padding = 2 },
         },
         sorting = {
           priority_weight = 2,
