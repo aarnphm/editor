@@ -63,6 +63,7 @@ o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 
 -- fold with nvim-ufo
 o.foldenable = true
+opt.conceallevel = 2
 opt.fillchars = {
   foldopen = "",
   foldclose = "",

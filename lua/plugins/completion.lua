@@ -48,25 +48,7 @@ return {
     "iurimateus/luasnip-latex-snippets.nvim",
     version = false,
     event = "InsertEnter",
-    dependencies = { "L3MON4D3/LuaSnip" },
-    config = function()
-      require("luasnip-latex-snippets").setup { use_treesitter = true }
-      require("luasnip").config.setup { enable_autosnippets = true }
-    end,
-  },
-  {
-    "hrsh7th/nvim-cmp",
-    version = false,
-    event = "InsertEnter",
     dependencies = {
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-path",
-      "onsails/lspkind.nvim",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-emoji",
-      "kdheepak/cmp-latex-symbols",
-      { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "L3MON4D3/LuaSnip",
         dependencies = {
@@ -110,6 +92,25 @@ return {
           }
         end,
       },
+    },
+    config = function()
+      require("luasnip-latex-snippets").setup { use_treesitter = true }
+      require("luasnip").config.setup { enable_autosnippets = true }
+    end,
+  },
+  {
+    "hrsh7th/nvim-cmp",
+    version = false,
+    event = "InsertEnter",
+    dependencies = {
+      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-path",
+      "onsails/lspkind.nvim",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-emoji",
+      "kdheepak/cmp-latex-symbols",
+      { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
@@ -151,7 +152,8 @@ return {
         preselect = cmp.PreselectMode.Item,
         completion = { completeopt = "menuone,noselect" },
         matching = { disallow_partial_fuzzy_matching = false },
-        snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
+        -- snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
+        snippet = { expand = function(args) vim.snippet.expand(args.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol" },
@@ -211,6 +213,8 @@ return {
               require("copilot.suggestion").accept()
             elseif cmp.visible() then
               cmp.select_next_item(select_opts)
+            elseif vim.snippet.jumpable(1) then
+              vim.snippet.jump(1)
             elseif require("luasnip").expand_or_jumpable() then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
             elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
@@ -224,6 +228,8 @@ return {
               require("copilot.suggestion").accept()
             elseif cmp.visible() then
               cmp.select_prev_item(select_opts)
+            elseif vim.snippet.jumpable(-1) then
+              vim.snippet.jump(-1)
             elseif require("luasnip").jumpable(-1) then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
             else

@@ -11,11 +11,13 @@ return {
       local opts = {
         dark_variant = "main",
         dim_inactive_windows = true,
-        styles = { transparency = not transparent_background, italic = true },
+        styles = { transparency = not transparent_background },
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "overlay", blend = 10 },
           StatusLineNC = { fg = "subtle", bg = "overlay" },
+          WinBar = { fg = "rose", bg = "overlay", blend = 10 },
+          WinBarNC = { fg = "subtle", bg = "overlay" },
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
