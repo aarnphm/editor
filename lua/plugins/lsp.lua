@@ -400,6 +400,11 @@ return {
             end
           end)
         end,
+        tsserver = function()
+          Util.lsp.on_attach(function(client, _)
+            if client.name == "tsserver" then client.server_capabilities.documentFormattingProvider = false end
+          end)
+        end,
         rust_analyzer = function(_, opts)
           local rt_opts = Util.opts "rust-tools.nvim"
           require("rust-tools").setup(vim.tbl_deep_extend("force", rt_opts or {}, { server = opts }))
