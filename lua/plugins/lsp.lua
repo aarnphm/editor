@@ -103,7 +103,7 @@ return {
     build = ":MasonUpdate",
     opts = {
       ensure_installed = { "lua-language-server", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt", "mypy" },
-      ui = { border = "single" },
+      ui = { border = BORDER },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)
@@ -135,7 +135,7 @@ return {
     "dnlhc/glance.nvim",
     cmd = "Glance",
     opts = {
-      border = { enable = true, top_char = "―", bottom_char = "―" },
+      border = { enable = BORDER ~= "none" and true or false, top_char = "―", bottom_char = "―" },
       height = 20,
       zindex = 50,
       theme = { enable = true },
