@@ -164,15 +164,14 @@ return {
         preselect = cmp.PreselectMode.Item,
         completion = { completeopt = "menuone,noselect" },
         matching = { disallow_partial_fuzzy_matching = false },
-        -- snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
-        snippet = { expand = function(args) vim.snippet.expand(args.body) end },
+        snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
           format = require("lspkind").cmp_format { mode = "symbol" },
         },
         window = {
-          completion = { border = BORDER, scrollbar = false },
-          documentation = { border = BORDER, side_padding = 2 },
+          completion = cmp.config.window.bordered { border = BORDER, scrollbar = false },
+          documentation = cmp.config.window.bordered { border = BORDER, side_padding = 2, col_offset = 1 },
         },
         sorting = {
           priority_weight = 2,
@@ -225,8 +224,6 @@ return {
               require("copilot.suggestion").accept()
             elseif cmp.visible() then
               cmp.select_next_item(select_opts)
-            elseif vim.snippet.jumpable(1) then
-              vim.snippet.jump(1)
             elseif require("luasnip").expand_or_jumpable() then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
             elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
@@ -240,8 +237,6 @@ return {
               require("copilot.suggestion").accept()
             elseif cmp.visible() then
               cmp.select_prev_item(select_opts)
-            elseif vim.snippet.jumpable(-1) then
-              vim.snippet.jump(-1)
             elseif require("luasnip").jumpable(-1) then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
             else
