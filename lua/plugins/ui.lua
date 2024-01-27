@@ -65,7 +65,10 @@ return {
     event = "LspAttach",
     config = true,
     opts = {
-      progress = { display = { render_limit = 5, done_ttl = 2 } },
+      progress = {
+        suppress_on_insert = true,
+        display = { render_limit = 2, done_ttl = 2 },
+      },
       notification = { window = { winblend = 20, zindex = 75 } },
     },
   },
