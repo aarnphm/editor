@@ -9,6 +9,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
+      "windwp/nvim-ts-autotag",
       "nvim-treesitter/nvim-treesitter-textobjects",
       {
         "nvim-treesitter/nvim-treesitter-context",
@@ -22,30 +23,6 @@ return {
           mode = "cursor", -- Line used to calculate context. Choices: 'cursor', 'topline'
           zindex = 30,
         },
-      },
-      {
-        "mfussenegger/nvim-ts-hint-textobject",
-        config = function()
-          require("nvim-treesitter.configs").setup {
-            textobjects = {
-              select = {
-                enable = true,
-                lookahead = true,
-                keymaps = {
-                  ["af"] = "@function.outer",
-                  ["if"] = "@function.inner",
-                  ["ac"] = "@class.outer",
-                  ["ic"] = "@class.inner",
-                },
-                selection_modes = {
-                  ["@parameter.outer"] = "v", -- charwise
-                  ["@function.outer"] = "V", -- linewise
-                  ["@class.outer"] = "<c-v>", -- blockwise
-                },
-              },
-            },
-          }
-        end,
       },
     },
     version = false, -- last release is way too old and doesn't work on Windows
