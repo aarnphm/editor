@@ -41,7 +41,7 @@ return {
     event = Util.lazy_file_events,
     version = false,
     ---@type dropbar_configs_t
-    config = {
+    opts = {
       general = {
         enable = function(buf, win)
           return not vim.api.nvim_win_get_config(win).zindex

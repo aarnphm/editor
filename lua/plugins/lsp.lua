@@ -194,6 +194,7 @@ return {
         spectral = {},
         jdtls = {},
         dockerls = {},
+        docker_compose_language_service = {},
         taplo = {},
         gopls = {},
         jsonls = {
@@ -412,12 +413,9 @@ return {
         end,
         jdtls = function() return true end, -- avoid duplicate servers
         yamlls = function()
-          -- Neovim < 0.10 does not have dynamic registration for formatting
-          if vim.fn.has "nvim-0.10" == 0 then
-            Util.lsp.on_attach(function(client, _)
-              if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
-            end)
-          end
+          Util.lsp.on_attach(function(client, _)
+            if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
+          end)
         end,
         clangd = function(_, opts)
           local clangd_opts = Util.opts "clangd_extensions.nvim"
