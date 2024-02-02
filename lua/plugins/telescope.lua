@@ -65,7 +65,6 @@ return {
       ---@class TelescopeOptions
       local opts = {
         defaults = {
-          winblend = 20,
           prompt_prefix = "  ",
           selection_caret = " 󰄾 ",
           -- open files in the first window that is an actual file.
