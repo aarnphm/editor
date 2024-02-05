@@ -57,57 +57,46 @@ return {
     config = function(_, opts) require("conform").setup(opts) end,
   },
   {
-    "iurimateus/luasnip-latex-snippets.nvim",
-    version = false,
-    event = "InsertEnter",
+    "L3MON4D3/LuaSnip",
     dependencies = {
-      {
-        "L3MON4D3/LuaSnip",
-        dependencies = {
-          "rafamadriz/friendly-snippets",
-          config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
-        },
-        keys = {
-          {
-            "<tab>",
-            function() return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>" end,
-            expr = true,
-            silent = true,
-            mode = "i",
-          },
-          { "<tab>", function() require("luasnip").jump(1) end, mode = "s" },
-          { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
-        },
-        build = (not jit.os:find "Windows")
-            and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-          or nil,
-        config = function(_, opts)
-          require("luasnip").setup(opts)
-          require("luasnip.loaders.from_vscode").lazy_load()
-          require("luasnip.loaders.from_lua").lazy_load { paths = vim.fn.stdpath "config" .. "/snippets/" }
-          vim.api.nvim_create_user_command(
-            "LuaSnipEdit",
-            function() require("luasnip.loaders.from_lua").edit_snippet_files() end,
-            {}
-          )
-        end,
-        opts = function()
-          return {
-            history = true,
-            -- Event on which to check for exiting a snippet's region
-            region_check_events = "InsertEnter",
-            delete_check_events = "TextChanged",
-            ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
-            load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
-              markdown = { "lua", "json", "tex" },
-            },
-          }
-        end,
-      },
+      "rafamadriz/friendly-snippets",
+      config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
     },
-    config = function()
-      require("luasnip-latex-snippets").setup { use_treesitter = true }
-      require("luasnip").config.setup { enable_autosnippets = true }
+    keys = {
+      {
+        "<tab>",
+        function() return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>" end,
+        expr = true,
+        silent = true,
+        mode = "i",
+      },
+      { "<tab>", function() require("luasnip").jump(1) end, mode = "s" },
+      { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
+    },
+    build = (not jit.os:find "Windows")
+        and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+      or nil,
+    config = function(_, opts)
+      require("luasnip").setup(opts)
+      require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip.loaders.from_lua").lazy_load { paths = vim.fn.stdpath "config" .. "/snippets/" }
+      vim.api.nvim_create_user_command(
+        "LuaSnipEdit",
+        function() require("luasnip.loaders.from_lua").edit_snippet_files() end,
+        {}
+      )
+    end,
+    opts = function()
+      return {
+        history = true,
+        -- Event on which to check for exiting a snippet's region
+        region_check_events = "InsertEnter",
+        delete_check_events = "TextChanged",
+        ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+        load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+          markdown = { "lua", "json", "tex" },
+        },
+      }
     end,
   },
   {
