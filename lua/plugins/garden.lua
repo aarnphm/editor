@@ -48,6 +48,8 @@ return {
         end
         if out.title == nil then out.title = note.id end
         if out.date == nil then out.date = os.date "%Y-%m-%d" end
+        -- check if the length of out.aliases is 0, if so, remove it from the frontmatter
+        if #out.aliases == 0 then out.aliases = nil end
         return out
       end,
       note_id_func = function(title) return title end,
