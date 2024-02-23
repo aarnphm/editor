@@ -45,7 +45,7 @@ return {
         desc = "telescope: Find files",
       },
       {
-        "<leader>F",
+        "<LocalLeader>f",
         Util.telescope("git_files", {}),
         desc = "telescope: Find files (git)",
       },

@@ -10,7 +10,7 @@ return {
     opts = function()
       local opts = {
         dark_variant = "main",
-        dim_inactive_windows = true,
+        dim_inactive_windows = false,
         styles = { transparency = not transparent_background },
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
