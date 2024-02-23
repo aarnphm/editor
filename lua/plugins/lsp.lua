@@ -369,14 +369,12 @@ return {
         },
         ---@type lspconfig.options.pyright
         pyright = {
-          mason = false,
           capabilities = {},
           settings = {
             python = {
               analysis = {
                 logLevel = "Trace",
                 autoImportCompletions = true,
-                diagnosticMode = "openFilesOnly",
                 autoSearchPaths = true,
                 typeCheckingMode = "off",
                 useLibraryCodeForTypes = true,

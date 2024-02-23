@@ -17,7 +17,7 @@ return {
     },
     keys = {
       {
-        "<C-p>",
+        "<C-S-p>",
         Util.telescope("keymaps", {
           lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
           layout_config = {
