@@ -31,7 +31,13 @@ return {
     opts = {
       workspaces = { { name = "garden", path = vault, overrides = { notes_subdir = "thoughts" } } },
       open_app_foreground = true,
-      completion = { prepend_note_path = true, prepend_note_id = false },
+      wiki_link_func = function(opts)
+        if opts.label ~= opts.path then
+          return string.format("[[%s|%s]]", opts.path, opts.label)
+        else
+          return string.format("[[%s]]", opts.path)
+        end
+      end,
       new_notes_location = "notes_subdir",
       yaml_parser = "yq",
       backlinks = { wrap = false },
