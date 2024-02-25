@@ -32,16 +32,21 @@ return {
       workspaces = { { name = "garden", path = vault, overrides = { notes_subdir = "thoughts" } } },
       open_app_foreground = true,
       wiki_link_func = function(opts)
-        if opts.label ~= opts.path then
-          return string.format("[[%s|%s]]", opts.path, opts.label)
+        path = opts.path
+        if opts.label ~= path then
+          -- check if opts.path is a markdown file, if so, remove the extension
+          -- this is to make sure that the link is not broken when the file is renamed
+          if opts.path:match "%.md$" then path = path:sub(1, -4) end
+          -- if opts.path start with [, then remove it so that once we format the wikilink it is correct
+          if opts.path:match "^%[" then path = path:sub(2) end
+          return string.format("[[%s|%s]]", path, opts.label)
         else
-          return string.format("[[%s]]", opts.path)
+          return string.format("[[%s]]", path)
         end
       end,
       new_notes_location = "notes_subdir",
       yaml_parser = "yq",
-      backlinks = { wrap = false },
-      tags = { wrap = false },
+      preferred_link_style = "wiki",
       disable_frontmatter = false,
       ---@type fun(note: obsidian.Note): table<string, string>
       note_frontmatter_func = function(note)
