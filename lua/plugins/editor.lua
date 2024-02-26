@@ -1,43 +1,5 @@
 return {
   {
-    "akinsho/toggleterm.nvim",
-    enabled = false,
-    keys = {
-      { "<C-t>", "<Esc><Cmd>ToggleTerm direction=vertical<CR>" },
-      { "<C-\\>", "<Esc><Cmd>ToggleTerm direction=horizontal<CR>" },
-    },
-    ---@return ToggleTermConfig
-    opts = function()
-      if vim.g.simple_colorscheme == "rose-pine" then
-        highlights = require "rose-pine.plugins.toggleterm"
-      else
-        highlights = {
-          Normal = { link = "Normal" },
-          NormalFloat = { link = "NormalFloat" },
-          FloatBorder = { link = "FloatBorder" },
-        }
-      end
-      return {
-        ---@param term Terminal
-        size = function(term)
-          if term.direction == "horizontal" then
-            return 15
-          elseif term.direction == "vertical" then
-            return vim.o.columns * 0.33
-          end
-        end,
-        highlights = highlights,
-        open_mapping = false, -- [[<c-\>]],
-        persist_mode = false,
-      }
-    end,
-    config = function(_, opts)
-      require("toggleterm").setup(opts)
-      vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true, remap = false })
-      vim.keymap.set("t", "jk", "<C-\\><C-n>", { silent = true, remap = false })
-    end,
-  },
-  {
     "nvim-pack/nvim-spectre",
     event = "BufReadPost",
     cmd = "Spectre",

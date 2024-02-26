@@ -162,7 +162,7 @@ return {
       ---@type cmp.ConfigSchema
       return {
         preselect = cmp.PreselectMode.Item,
-        completion = { completeopt = "menuone,noselect" },
+        completion = { completeopt = "menuone" },
         matching = { disallow_partial_fuzzy_matching = false },
         snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
         formatting = {

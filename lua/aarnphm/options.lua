@@ -60,6 +60,7 @@ o.grepprg = "rg --vimgrep" -- also its 2023 use rg
 o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
+o.background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
 
 -- fold with nvim-ufo
 o.foldenable = true

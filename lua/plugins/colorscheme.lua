@@ -6,21 +6,28 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     priority = 1000,
-    lazy = not (vim.g.simple_colorscheme == "rose-pine"),
+    init = function() vim.cmd.colorscheme "rose-pine" end,
     opts = function()
       local opts = {
         dark_variant = "main",
         dim_inactive_windows = false,
+        enable = { migrations = true },
         styles = { transparency = not transparent_background },
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
-          StatusLine = { fg = "rose", bg = "overlay", blend = 10 },
+          StatusLine = { fg = "rose", bg = "overlay", blend = 0 },
           StatusLineNC = { fg = "subtle", bg = "overlay" },
-          WinBar = { fg = "rose", bg = "overlay", blend = 10 },
-          WinBarNC = { fg = "subtle", bg = "overlay" },
+          WinBar = { fg = "subtle", bg = "none", blend = 0 },
+          WinBarNC = { fg = "subtle", bg = "none" },
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
+          --- telescope.nvim
+          TelescopeNormal = { bg = "none" },
+          TelescopeBorder = { bg = "none" },
+          --- mini.files
+          MiniFilesBorder = { bg = "none" },
+          MiniFilesNormal = { bg = "none" },
           --- glance.nvim
           GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
           GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },
@@ -37,11 +44,12 @@ return {
           Headline6 = { bg = "iris" },
         },
       }
-      if vim.g.simple_background == "light" then
+      -- get background, if it is light, change the IblScope to rose
+      if vim.api.nvim_get_option "background" == "light" then
         opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { fg = "rose" } })
       end
       return opts
     end,
   },
-  { "kepano/flexoki-neovim", name = "flexoki" },
+  { "kepano/flexoki-neovim", name = "flexoki", priority = 1000 },
 }

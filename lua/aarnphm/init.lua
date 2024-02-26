@@ -7,9 +7,6 @@ require "aarnphm.bindings"
 local shada = vim.o.shada
 local autocmd = vim.api.nvim_create_autocmd
 
-local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
-local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
-
 vim.o.shada = ""
 autocmd("User", {
   pattern = "VeryLazy",
@@ -18,10 +15,11 @@ autocmd("User", {
     pcall(vim.api.nvim_exec2, "rshada", {})
   end,
 })
-vim.o.background = background
 
-vim.g.simple_colorscheme = colorscheme
-vim.g.simple_background = background
+-- local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
+-- local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
+-- vim.g.simple_colorscheme = colorscheme
+-- vim.g.simple_background = background
 
 Util.format.setup()
 
