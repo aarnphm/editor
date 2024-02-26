@@ -16,24 +16,24 @@ wo.cursorline = true
 wo.cursorcolumn = false
 
 -- Some defaults and don't question it
-o.writebackup = false               -- whos needs backup btw (i do sometimes)
-o.autowrite = true                  -- sometimes I forget to save
-o.guicursor = ""                    -- no gui cursor
-o.signcolumn = "yes"                -- always show sign column
-o.undofile = true                   -- set undofile to infinite undo
-o.breakindent = true                -- enable break indent
+o.writebackup = false -- whos needs backup btw (i do sometimes)
+o.autowrite = true -- sometimes I forget to save
+o.guicursor = "" -- no gui cursor
+o.signcolumn = "yes" -- always show sign column
+o.undofile = true -- set undofile to infinite undo
+o.breakindent = true -- enable break indent
 o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
-o.clipboard = "unnamedplus"         -- sync system clipboard
-o.pumheight = 15                    -- larger completion windows
-o.expandtab = true                  -- convert spaces to tabs
-o.mouse = "a"                       -- ugh who needs mouse (accept on SSH maybe)
-o.number = true                     -- number is good for nav
-o.swapfile = false                  -- I don't like swap files personally, found undofile to be better
+o.clipboard = "unnamedplus" -- sync system clipboard
+o.pumheight = 15 -- larger completion windows
+o.expandtab = true -- convert spaces to tabs
+o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
+o.number = true -- number is good for nav
+o.swapfile = false -- I don't like swap files personally, found undofile to be better
 o.autowrite = true
-o.undofile = true                   -- better than swapfile
-o.undolevels = 9999                 -- infinite undo
+o.undofile = true -- better than swapfile
+o.undolevels = 9999 -- infinite undo
 o.showtabline = 0
-o.laststatus = 3                    -- show statusline on buffer
+o.laststatus = 3 -- show statusline on buffer
 o.statusline = table.concat({
   "%{%luaeval('statusline.mode {trunc_width = 75}')%}",
   "%{%luaeval('statusline.git {trunc_width = 120}')%}",
@@ -45,11 +45,11 @@ o.statusline = table.concat({
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
 opt.formatexpr = "v:lua.Util.format.formatexpr()"
-o.formatoptions = "jcroqlnt"                                         -- NOTE: "1jcroql"
+o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
-o.sessionoptions = "buffers,curdir,help,tabpages,winsize"            -- session options
-opt.pumblend = 8                                                     -- make completion window transparent
+o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
+opt.pumblend = 8 -- make completion window transparent
 
 -- searching and grep stuff
 o.smartcase = true

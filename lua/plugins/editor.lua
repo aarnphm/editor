@@ -1,6 +1,7 @@
 return {
   {
     "akinsho/toggleterm.nvim",
+    enabled = false,
     keys = {
       { "<C-t>", "<Esc><Cmd>ToggleTerm direction=vertical<CR>" },
       { "<C-\\>", "<Esc><Cmd>ToggleTerm direction=horizontal<CR>" },

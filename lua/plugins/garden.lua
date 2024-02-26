@@ -12,7 +12,7 @@ return {
     keys = {
       {
         "<LocalLeader>n",
-        ":ObsidianNew ",
+        ":ObsidianTemplate ",
         desc = "obsidian: new notes",
       },
       {
@@ -25,8 +25,13 @@ return {
         "<cmd>ObsidianSearch<cr>",
         desc = "obsidian: open",
       },
+      {
+        "<Leader>ll",
+        "<cmd>ObsidianBacklinks<cr>",
+        desc = "obsidian: open",
+      },
     },
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-cmp" },
+    dependencies = { "nvim-lua/plenary.nvim", "nvim-cmp", "telescope.nvim" },
     ---@type obsidian.config.ClientOpts
     opts = {
       workspaces = { { name = "garden", path = vault, overrides = { notes_subdir = "thoughts" } } },
@@ -48,6 +53,8 @@ return {
       yaml_parser = "yq",
       preferred_link_style = "wiki",
       disable_frontmatter = false,
+      templates = { subdir = "templates" },
+      ui = { external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" } },
       ---@type fun(note: obsidian.Note): table<string, string>
       note_frontmatter_func = function(note)
         if note.path.filename:match "tags" then return note.metadata end

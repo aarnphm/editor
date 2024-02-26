@@ -6,7 +6,6 @@
 ---@field ui simple.util.ui
 ---@field format simple.util.format
 ---@field lsp simple.util.lsp
----@field palette simple.util.palette
 ---@field nit simple.util.nit
 local M = {}
 

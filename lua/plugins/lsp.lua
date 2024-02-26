@@ -171,7 +171,7 @@ return {
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
-      inlay_hints = { enabled = false },
+      inlay_hints = { enabled = true },
       ---@type lsp.ClientCapabilities
       capabilities = {
         workspace = {
@@ -338,6 +338,12 @@ return {
           },
         },
         matlab_ls = { settings = { matlab = { installPath = "/Applications/MATLAB_R2023a.app" } } },
+        ---@type lspconfig.options.ltex
+        ltex = {
+          settings = {
+            ltex = { language = "en-GB", additionalRules = { motherTongue = "fr" } },
+          },
+        },
         texlab = {
           keys = {
             { "<Leader>K", "<plug>(vimtex-doc-package)", desc = "Vimtex Docs", silent = true },

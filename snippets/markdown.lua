@@ -50,15 +50,17 @@ return {
       i(0, "Text"),
     })
   ),
-  -- s("latex_align", "$$\n\\begin{align*}\n{}\n\\end{align*}\n$$", {
-  --   i(1, "Equation"),
-  -- }),
-  -- s("frac", "\\frac{}{}", {
-  --   i(1, "Numerator"),
-  --   i(2, "Denominator"),
-  -- }),
-  -- s("ffrac", "$$\n\\frac{}{}\n$$", {
-  --   i(1, "Numerator"),
-  --   i(2, "Denominator"),
-  -- }),
+  s("link", fmt("[{}]({})", { i(1, "Text"), i(2, "URL") })),
+  s("backlinks", fmt "[[{}]]", { i(1, "path") }),
+  s("latex_align", "$$\n\\begin{align*}\n{}\n\\end{align*}\n$$", {
+    i(1, "Equation"),
+  }),
+  s("frac", "$\\frac{}{}$", {
+    i(1, "Numerator"),
+    i(2, "Denominator"),
+  }),
+  s("ffrac", "$$\n\\frac{}{}\n$$", {
+    i(1, "Numerator"),
+    i(2, "Denominator"),
+  }),
 }
