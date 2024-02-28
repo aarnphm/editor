@@ -405,11 +405,6 @@ return {
             if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
           end)
         end,
-        clangd = function(_, opts)
-          local clangd_opts = Util.opts "clangd_extensions.nvim"
-          require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_opts or {}, { server = opts }))
-          return false
-        end,
         eslint = function()
           local formatter = Util.lsp.formatter {
             name = "eslint: lsp",

@@ -51,5 +51,4 @@ return {
       return opts
     end,
   },
-  { "kepano/flexoki-neovim", name = "flexoki", priority = 1000 },
 }

@@ -34,12 +34,6 @@ return {
     },
   },
   {
-    "folke/which-key.nvim",
-    event = "BufReadPost",
-    opts = { plugins = { presets = { operators = false } } },
-    config = function(_, opts) require("which-key").setup(opts) end,
-  },
-  {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
     event = Util.lazy_file_events,

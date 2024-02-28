@@ -265,9 +265,6 @@ return {
       for _, source in ipairs(opts.sources) do
         source.group_index = source.group_index or 1
       end
-      if Util.has "clangd_extensions.nvim" and vim.tbl_contains({ "c", "cpp", "hpp", "h" }, vim.bo[buf].filetype) then
-        table.insert(opts.sorting.comparators, 1, require "clangd_extensions.cmp_scores")
-      end
 
       cmp.setup(opts)
     end,

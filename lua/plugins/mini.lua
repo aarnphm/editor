@@ -161,25 +161,6 @@ return {
         },
       }
       mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings)
-
-      Util.on_load(
-        "which-key.nvim",
-        function()
-          require("which-key").register {
-            mode = { "n", "v" },
-            s = {
-              name = "Surround",
-              a = "Add surrounding",
-              d = "Delete surrounding",
-              f = "Find surrounding (to the right)",
-              F = "Find surrounding (to the left)",
-              h = "Highlight surrounding",
-              r = "Replace surrounding",
-              n = "Update `MiniSurround.config.n_lines`",
-            },
-          }
-        end
-      )
       return vim.list_extend(mappings, keys)
     end,
   },
