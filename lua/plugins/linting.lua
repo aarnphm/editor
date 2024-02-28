@@ -1,6 +1,7 @@
 return {
   {
     "mfussenegger/nvim-lint",
+    version = false,
     event = Util.lazy_file_events,
     ---@alias LintOptions table<string,table>
     opts = {
@@ -14,16 +15,6 @@ return {
           -- `condition` is another LazyVim extension that allows you to
           -- dynamically enable/disable linters based on the context.
           condition = function(ctx) return vim.fs.find({ "selene.toml" }, { path = ctx.filename, upward = true })[1] end,
-        },
-        ruff = {
-          condition = function(ctx)
-            return vim.fs.find({ "ruff.toml", "pyproject.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
-          end,
-        },
-        mypy = {
-          condition = function(ctx)
-            return vim.fs.find({ "mypy.ini", "pyproject.toml" }, { path = ctx.filename, upward = true })[1]
-          end,
         },
       },
     },

@@ -122,7 +122,6 @@ return {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
       "kdheepak/cmp-latex-symbols",
-      { "saecki/crates.nvim", event = { "BufRead Cargo.toml" }, opts = { src = { cmp = { enabled = true } } } },
       {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
@@ -271,13 +270,6 @@ return {
       end
 
       cmp.setup(opts)
-
-      -- special cases with crates.nvim
-      vim.api.nvim_create_autocmd({ "BufRead" }, {
-        group = augroup "cmp_source_cargo",
-        pattern = "Cargo.toml",
-        callback = function() cmp.setup.buffer { sources = { { name = "crates" } } } end,
-      })
     end,
   },
 }

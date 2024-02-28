@@ -36,6 +36,7 @@ return {
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,
           previewer = false,
+          cwd = require("plenary.job"):new({ command = "git", args = { "rev-parse", "--show-toplevel" } }):sync()[1],
         }),
         desc = "telescope: Manage buffers",
       },

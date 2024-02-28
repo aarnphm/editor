@@ -55,7 +55,7 @@ return {
         desc = "Open mini.files (directory of current file)",
       },
       {
-        "<LocalLeader>'",
+        "<LocalLeader>.",
         function() require("mini.files").open(Util.root(), true) end,
         desc = "Open mini.files (working root)",
       },

@@ -345,18 +345,6 @@ return {
             ltex = { language = "en-GB", additionalRules = { motherTongue = "fr" } },
           },
         },
-        texlab = {
-          keys = {
-            { "<Leader>K", "<plug>(vimtex-doc-package)", desc = "Vimtex Docs", silent = true },
-          },
-        },
-        rust_analyzer = {
-          keys = {
-            { "K", "<cmd>RustHoverActions<cr>", desc = "Hover Actions (Rust)" },
-            { "<leader>cR", "<cmd>RustCodeAction<cr>", desc = "Code Action (Rust)" },
-            { "<leader>dr", "<cmd>RustDebuggables<cr>", desc = "Run Debuggables (Rust)" },
-          },
-        },
         ruff_lsp = {
           keys = {
             {
@@ -410,11 +398,6 @@ return {
           Util.lsp.on_attach(function(client, _)
             if client.name == "tsserver" then client.server_capabilities.documentFormattingProvider = false end
           end)
-        end,
-        rust_analyzer = function(_, opts)
-          local rt_opts = Util.opts "rust-tools.nvim"
-          require("rust-tools").setup(vim.tbl_deep_extend("force", rt_opts or {}, { server = opts }))
-          return false
         end,
         jdtls = function() return true end, -- avoid duplicate servers
         yamlls = function()
@@ -480,7 +463,7 @@ return {
       vim.diagnostic.config {
         severity_sort = true,
         underline = false,
-        update_in_insert = false,
+        update_in_insert = true,
         virtual_text = false,
         float = {
           close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },

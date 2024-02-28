@@ -34,22 +34,21 @@ return {
     },
   },
   {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    config = true,
-    opts = {
-      progress = {
-        suppress_on_insert = true,
-        display = { render_limit = 2, done_ttl = 2 },
-      },
-      notification = { window = { winblend = 20, zindex = 75 } },
-    },
-  },
-  {
     "folke/which-key.nvim",
     event = "BufReadPost",
     opts = { plugins = { presets = { operators = false } } },
     config = function(_, opts) require("which-key").setup(opts) end,
   },
-  { "lukas-reineke/indent-blankline.nvim", main = "ibl", event = Util.lazy_file_events, opts = {} },
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    event = Util.lazy_file_events,
+    opts = {
+      indent = {
+        char = "│",
+        tab_char = "│",
+      },
+      scope = { enabled = false },
+    },
+  },
 }

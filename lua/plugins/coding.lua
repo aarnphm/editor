@@ -94,49 +94,4 @@ return {
       }
     end,
   },
-  {
-    "simrat39/rust-tools.nvim",
-    ft = "rust",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    lazy = true,
-    opts = {
-      tools = {
-        on_initialized = function()
-          vim.cmd [[
-                  augroup RustLSP
-                    autocmd CursorHold                      *.rs silent! lua vim.lsp.buf.document_highlight()
-                    autocmd CursorMoved,InsertEnter         *.rs silent! lua vim.lsp.buf.clear_references()
-                    autocmd BufEnter,CursorHold,InsertLeave *.rs silent! lua vim.lsp.codelens.refresh()
-                  augroup END
-                ]]
-        end,
-        -- automatically call RustReloadWorkspace when writing to a Cargo.toml file.
-        reload_workspace_from_cargo_toml = true,
-        inlay_hints = {
-          auto = true,
-          other_hints_prefix = ":: ",
-          only_current_line = true,
-          show_parameter_hints = false,
-        },
-      },
-      server = {
-        standalone = true,
-        settings = {
-          ["rust-analyzer"] = {
-            cargo = {
-              loadOutDirsFromCheck = true,
-              buildScripts = { enable = true },
-            },
-            diagnostics = {
-              disabled = { "unresolved-proc-macro" },
-              enableExperimental = true,
-            },
-            checkOnSave = { command = "clippy" },
-            procMacro = { enable = true },
-          },
-        },
-      },
-    },
-    config = function() end,
-  },
 }

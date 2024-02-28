@@ -54,7 +54,7 @@ return {
       preferred_link_style = "wiki",
       disable_frontmatter = false,
       templates = { subdir = "templates" },
-      ui = { external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" } },
+      ui = { enable = false, external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" } },
       ---@type fun(note: obsidian.Note): table<string, string>
       note_frontmatter_func = function(note)
         if note.path.filename:match "tags" then return note.metadata end
