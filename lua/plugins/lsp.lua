@@ -9,19 +9,12 @@ K._keys = nil
 ---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string}
 ---@alias LazyKeysLsp LazyKeys|{has?:string}
 
-K.hover = function()
-  local has_ufo, ufo = pcall(require, "ufo")
-  if not has_ufo then vim.lsp.buf.hover() end
-  local win_id = ufo.peekFoldedLinesUnderCursor()
-  if not win_id then vim.lsp.buf.hover() end
-end
-
 K.get = function()
   if not K._keys then
     --@class PluginLspKeys
     K._keys = {
       { "gh", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
-      { "K", K.hover, desc = "lsp: Hover" },
+      { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
       { "H", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
       { "gd", H.definition, desc = "lsp: Peek definition", has = "definition" },
       { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
@@ -172,15 +165,13 @@ return {
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
-      inlay_hints = { enabled = false },
+      inlay_hints = { enabled = true },
       ---@type lsp.ClientCapabilities
       capabilities = {
         workspace = {
           didChangeWatchedFiles = { dynamicRegistration = false },
         },
         textDocument = {
-          -- nvim-ufo
-          foldingRange = { dynamicRegistration = false, lineFoldingOnly = true },
           completion = {
             snippetSupport = true,
             resolveSupport = {
@@ -427,11 +418,6 @@ return {
 
       Util.format.register(Util.lsp.formatter())
 
-      -- setup ufo before everything else
-      Util.lsp.on_attach(function(client, bufnr)
-        local ok, ufo = pcall(require, "ufo")
-        if ok then ufo.attach(bufnr) end
-      end)
       -- setup keymaps
       Util.lsp.on_attach(function(cl, bufnr) K.on_attach(cl, bufnr) end)
 

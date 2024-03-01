@@ -197,7 +197,7 @@ return {
             compare.order,
           },
         },
-        experimental = { ghost_text = { hl_group = "CmpGhostText" } },
+        experimental = { ghost_text = false, native_menu = false },
         mapping = cmp.mapping.preset.insert {
           ["<CR>"] = cmp.mapping.confirm { select = true },
           ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
