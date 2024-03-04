@@ -55,11 +55,13 @@ opt.pumblend = 8 -- make completion window transparent
 o.smartcase = true
 o.ignorecase = true
 o.infercase = true
+o.hlsearch = true
 o.grepformat = "%f:%l:%c:%m"
 o.grepprg = "rg --vimgrep" -- also its 2023 use rg
 o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
+o.inccommand = "split"
 o.background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
 
 -- fold with nvim-ufo
@@ -75,7 +77,6 @@ opt.fillchars = {
 }
 o.foldmethod = "expr"
 o.foldlevel = 99
--- o.foldtext = "v:lua.Util.ui.foldtext()"
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
 
@@ -86,7 +87,6 @@ o.shiftwidth = TABWIDTH
 
 -- UI config
 opt.showmode = false -- This is set with mini.statusline
-opt.smartindent = true
 o.cmdheight = 1
 o.showcmd = false
 o.showbreak = "↳  "
@@ -94,7 +94,7 @@ o.sidescrolloff = 5
 o.splitbelow = true
 o.splitright = true
 o.timeout = true
-o.timeoutlen = 200
+o.timeoutlen = 300
 o.updatetime = 250
 o.virtualedit = "block"
 o.whichwrap = "h,l,<,>,[,],~"

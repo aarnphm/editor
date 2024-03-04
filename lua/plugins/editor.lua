@@ -42,6 +42,7 @@ return {
     end,
   },
   { "tpope/vim-repeat", event = "VeryLazy" },
+  { "tpope/vim-sleuth", event = "VeryLazy" },
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTelescope" },
