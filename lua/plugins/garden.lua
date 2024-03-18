@@ -36,6 +36,7 @@ return {
     opts = {
       workspaces = { { name = "garden", path = vault, overrides = { notes_subdir = "thoughts" } } },
       open_app_foreground = true,
+      notes_subdir = "thoughts",
       wiki_link_func = function(opts)
         path = opts.path
         if opts.label ~= path then

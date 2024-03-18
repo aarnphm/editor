@@ -50,7 +50,7 @@
   "rose-pine": { "branch": "main", "commit": "c52167563e6aa44b5fa6fe007faa2bcac71050f0" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "9ef21b2e6bb6ebeaf349a0781745549bbb870d27" },
   "telescope-live-grep-args.nvim": { "branch": "master", "commit": "731a046da7dd3adff9de871a42f9b7fb85f60f47" },
-  "telescope.nvim": { "branch": "master", "commit": "8cd58c6e81ac4c919ae3ea70cdf1a17c265a508f" },
+  "telescope.nvim": { "branch": "master", "commit": "1fa3b801f034caa609e2570cd2e422cf9416819c" },
   "todo-comments.nvim": { "branch": "main", "commit": "833d8dd8b07eeda37a09e99460f72a02616935cb" },
   "vim-fugitive": { "branch": "master", "commit": "8d4e8d45385c63a0bf735fe1164772116bf0da0d" },
   "vim-go": { "branch": "master", "commit": "744aa9911aa6a86cff494a57efc22ca0e3d7e16b" },
