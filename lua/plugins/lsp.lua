@@ -354,8 +354,7 @@ return {
           },
         },
         ---@type lspconfig.options.pyright
-        pyright = {
-          capabilities = {},
+        basedpyright = {
           settings = {
             python = {
               analysis = {
