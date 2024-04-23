@@ -7,7 +7,7 @@ return {
     opts = {
       -- Event to trigger linters
       events = { "BufWritePost", "BufReadPost", "InsertLeave" },
-      linters_by_ft = { lua = { "selene" }, python = { "ruff", "mypy" }, dockerfile = { "hadolint" } },
+      linters_by_ft = { lua = { "selene" }, dockerfile = { "hadolint" } },
       ---@type table<string,table>
       linters = {
         -- -- Example of using selene only when a selene.toml file is present
