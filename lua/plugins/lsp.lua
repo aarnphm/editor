@@ -96,7 +96,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "mdx-analyzer", "ruff-lsp", "stylua", "shfmt", "mypy" },
+      ensure_installed = { "lua-language-server", "mdx-analyzer", "ruff", "stylua", "shfmt", "mypy" },
       ui = { border = BORDER },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -336,7 +336,7 @@ return {
             ltex = { language = "en-GB", additionalRules = { motherTongue = "fr" } },
           },
         },
-        ruff_lsp = {
+        ruff = {
           keys = {
             {
               "<leader>co",
@@ -376,9 +376,9 @@ return {
       },
       ---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
       setup = {
-        ruff_lsp = function()
+        ruff = function()
           Util.lsp.on_attach(function(client, _)
-            if client.name == "ruff_lsp" then
+            if client.name == "ruff" then
               client.server_capabilities.hoverProvider = false
               client.server_capabilities.documentFormattingProvider = false -- NOTE: disable ruff formatting because I don't like deterministic formatter  in python
             end

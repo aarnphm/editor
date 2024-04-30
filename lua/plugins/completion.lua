@@ -32,7 +32,7 @@ return {
         toml = { "taplo" },
         proto = { { "buf", "protolint" } },
         zsh = { "beautysh" },
-        python = { "ruff_fix", "ruff_format" },
+        python = { "ruff_fix" },
         sh = { "beautysh" },
         markdown = { "prettier" },
         ["javascript"] = { "prettier" },
