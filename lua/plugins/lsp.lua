@@ -55,7 +55,6 @@ K.on_attach = function(_, buffer)
 
   for _, keys in pairs(keymaps) do
     if not keys.has or K.has(buffer, keys.has) then
-      ---@class LazyKeysBase
       local opts = Keys.opts(keys)
       opts.has = nil
       opts.silent = opts.silent ~= false
@@ -69,6 +68,16 @@ K.diagnostic_goto = function(next, severity)
   local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
   severity = severity and vim.diagnostic.severity[severity] or nil
   return function() go { severity = severity } end
+end
+
+K.inlay_hints = function(buf, value)
+  local ih = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+  if type(ih) == "function" then
+    ih(buf, value)
+  elseif type(ih) == "table" and ih.enable then
+    if value == nil then value = not ih.is_enabled(buf) end
+    ih.enable(value, { bufnr = buf })
+  end
 end
 
 return {
@@ -162,10 +171,38 @@ return {
     },
     ---@class PluginLspOptions
     opts = {
+      -- options for vim.diagnostic.config()
+      ---@type vim.diagnostic.Opts
+      diagnostics = {
+        severity_sort = true,
+        underline = false,
+        update_in_insert = true,
+        virtual_text = false,
+        float = {
+          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+          focusable = false,
+          focus = false,
+          format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
+          source = "if_many",
+          border = BORDER,
+        },
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "✖",
+            [vim.diagnostic.severity.WARN] = "▲",
+            [vim.diagnostic.severity.HINT] = "⚑",
+            [vim.diagnostic.severity.INFO] = "●",
+          },
+        },
+      },
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
       inlay_hints = { enabled = false },
+      -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
+      -- Be aware that you also will need to properly configure your LSP server to
+      -- provide the code lenses.
+      codelens = { enabled = false },
       ---@type lsp.ClientCapabilities
       capabilities = {
         workspace = {
@@ -423,48 +460,49 @@ return {
       local register_capability = vim.lsp.handlers["client/registerCapability"]
 
       vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
+        ---@diagnostic disable-next-line: no-unknown
         local ret = register_capability(err, res, ctx)
-        local client_id = ctx.client_id
-        ---@type lsp.Client|nil
-        local cl = vim.lsp.get_client_by_id(client_id)
+        local client = vim.lsp.get_client_by_id(ctx.client_id)
         local buffer = vim.api.nvim_get_current_buf()
-        K.on_attach(cl, buffer)
+        K.on_attach(client, buffer)
         return ret
       end
 
-      local inlay_hint = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+      -- diagnostics signs
+      if vim.fn.has "nvim-0.10.0" == 0 then
+        for severity, icon in pairs(opts.diagnostics.signs.text) do
+          local name = vim.diagnostic.severity[severity]:lower():gsub("^%l", string.upper)
+          name = "DiagnosticSign" .. name
+          vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+        end
+      end
 
-      if opts.inlay_hints.enabled and inlay_hint then
+      if opts.inlay_hints.enabled then
         Util.lsp.on_attach(function(client, bufnr)
-          if client.supports_method "textDocument/inlayHint" then inlay_hint(bufnr, true) end
+          if client.supports_method "textDocument/inlayHint" then K.inlay_hints(bufnr, true) end
         end)
       end
 
-      vim.diagnostic.config {
-        severity_sort = true,
-        underline = false,
-        update_in_insert = true,
-        virtual_text = false,
-        float = {
-          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-          focusable = false,
-          focus = false,
-          format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-          source = "if_many",
-          border = BORDER,
-        },
-      }
-
-      -- NOTE: diagnostic config
-      for _, type in pairs { { "Error", "✖" }, { "Warn", "▲" }, { "Hint", "⚑" }, { "Info", "●" } } do
-        local hl = string.format("DiagnosticSign%s", type[1])
-        vim.fn.sign_define(hl, { text = type[2], texthl = hl, numhl = hl })
+      -- code lens
+      if opts.codelens.enabled and vim.lsp.codelens then
+        Util.lsp.on_attach(function(client, buffer)
+          if client.supports_method "textDocument/codeLens" then
+            vim.lsp.codelens.refresh()
+            --- autocmd BufEnter,CursorHold,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
+            vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+              buffer = buffer,
+              callback = vim.lsp.codelens.refresh,
+            })
+          end
+        end)
       end
+
+      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
       vim.lsp.handlers["textDocument/publishDiagnostics"] =
         vim.lsp.with(vim.lsp.handlers["textDocument/publishDiagnostics"], {
-          signs = { severity_limit = "Error" },
-          virtual_text = { spacing = 2, severity_limit = "Error" },
+          signs = { min = "Error" },
+          virtual_text = { spacing = 2, min = "Error" },
           underline = false,
         })
 

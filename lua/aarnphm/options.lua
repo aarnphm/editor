@@ -15,6 +15,10 @@ wo.wrap = false
 wo.cursorline = true
 wo.cursorcolumn = false
 
+if not vim.env.SSH_TTY then
+  opt.clipboard = "unnamedplus" -- sync system clipboard
+end
+
 -- Some defaults and don't question it
 o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
@@ -23,7 +27,6 @@ o.signcolumn = "yes" -- always show sign column
 o.undofile = true -- set undofile to infinite undo
 o.breakindent = true -- enable break indent
 o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
-o.clipboard = "unnamedplus" -- sync system clipboard
 o.pumheight = 15 -- larger completion windows
 o.expandtab = true -- convert spaces to tabs
 o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
@@ -45,6 +48,7 @@ o.statusline = table.concat({
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
 opt.formatexpr = "v:lua.Util.format.formatexpr()"
+opt.completeopt = "menu,menuone,noselect"
 o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
@@ -84,6 +88,7 @@ o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
 o.tabstop = TABWIDTH
 o.softtabstop = TABWIDTH
 o.shiftwidth = TABWIDTH
+o.shiftround = true
 
 -- UI config
 opt.showmode = false -- This is set with mini.statusline

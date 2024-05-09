@@ -129,10 +129,19 @@ return {
         version = false,
         event = "InsertEnter",
         build = ":Copilot auth",
+        keys = {
+          {
+            "<C-k>",
+            function() return require("copilot.suggestion").toggle_auto_trigger() end,
+            expr = true,
+            silent = true,
+            mode = "i",
+          },
+        },
         opts = {
           cmp = { enabled = true, method = "getCompletionsCycling" },
           panel = { enabled = false },
-          suggestion = { enabled = true, auto_trigger = true },
+          suggestion = { enabled = true, auto_trigger = false },
           filetypes = {
             markdown = true,
             help = false,
