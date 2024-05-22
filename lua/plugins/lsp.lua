@@ -225,7 +225,7 @@ return {
         dockerls = {},
         docker_compose_language_service = {},
         taplo = {},
-        gopls = {},
+        -- gopls = {},
         jsonls = {
           -- lazy-load schemastore when needed
           on_new_config = function(config)
@@ -391,11 +391,10 @@ return {
           },
         },
         ---@type lspconfig.options.pyright
-        basedpyright = {
+        pyright = {
           settings = {
             python = {
               analysis = {
-                logLevel = "Trace",
                 autoImportCompletions = true,
                 autoSearchPaths = true,
                 typeCheckingMode = "off",
