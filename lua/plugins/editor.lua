@@ -1,21 +1,5 @@
 return {
   {
-    "nvim-pack/nvim-spectre",
-    event = "BufReadPost",
-    cmd = "Spectre",
-    build = false,
-    opts = { open_cmd = "noswapfile vnew", live_update = true },
-    keys = {
-      { "<Leader>so", function() require("spectre").open() end, desc = "replace: Open panel" },
-      { "<Leader>so", function() require("spectre").open_visual() end, desc = "replace: Open panel", mode = "v" },
-      {
-        "<Leader>sw",
-        function() require("spectre").open_visual { select_word = true } end,
-        desc = "replace: Open panel",
-      },
-    },
-  },
-  {
     "ggandor/flit.nvim",
     opts = { labeled_modes = "nx" },
     ---@diagnostic disable-next-line: assign-type-mismatch
