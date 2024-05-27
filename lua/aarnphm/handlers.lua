@@ -24,7 +24,7 @@ M.definition = function()
       print "[LSP] Could not find definition"
       return
     end
-    if vim.tbl_islist(result) then
+    if vim.islist(result) then
       vim.lsp.util.jump_to_location(result[1], "utf-8")
     else
       local ok, glance = pcall(require, "glance")
