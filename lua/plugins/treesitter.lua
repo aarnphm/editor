@@ -10,12 +10,6 @@ return {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
       {
-        "windwp/nvim-ts-autotag",
-        event = Util.lazy_file_events,
-        opts = { opts = { enable_close = true } },
-        config = function(_, opts) require("nvim-ts-autotag").setup(opts) end,
-      },
-      {
         "nvim-treesitter/nvim-treesitter-textobjects",
         config = function()
           -- When in diff mode, we want to use the default
