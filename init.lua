@@ -179,4 +179,11 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
-require("lazy").setup("plugins", { change_detection = { notify = false }, ui = { border = BORDER } })
+require("lazy").setup("plugins", {
+  lockfile = vim.env.WORKSPACE .. "/editor/lazy-lock.json",
+  change_detection = { notify = false },
+  checker = { enabled = true, frequency = 3600 * 24 },
+  ui = {
+    border = BORDER, backdrop = 0, wrap = false
+  },
+})
