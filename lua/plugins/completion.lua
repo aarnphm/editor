@@ -35,6 +35,7 @@ return {
         python = { "ruff_fix" },
         sh = { "beautysh" },
         markdown = { "prettier" },
+        go = { "goimports", "gofumpt" },
         ["javascript"] = { "prettier" },
         ["javascriptreact"] = { "prettier" },
         ["typescript"] = { "prettier" },
