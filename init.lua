@@ -184,6 +184,8 @@ require("lazy").setup("plugins", {
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24 },
   ui = {
-    border = BORDER, backdrop = 0, wrap = false
+    border = BORDER,
+    backdrop = 100,
+    wrap = false,
   },
 })

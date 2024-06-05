@@ -1,17 +1,24 @@
 return {
+  { "tpope/vim-fugitive", keys = { { "<leader>gs", "<cmd>vertical Git<CR>", { desc = "fugitive" } } } },
+  -- setup mini.diff
   {
-    "tpope/vim-fugitive",
+    "echasnovski/mini.diff",
+    event = "VeryLazy",
     keys = {
-      { "<leader>gs", "<cmd>vertical Git<CR>", { desc = "fugitive" } },
       {
-        "<leader>gg",
-        function() Util.terminal({ "lazygit" }, { cwd = Util.root(), esc_esc = false, ctrl_hjkl = false }) end,
-        { desc = "Lazygit (root dir)" },
+        "<leader>go",
+        function() require("mini.diff").toggle_overlay(0) end,
+        desc = "Toggle mini.diff overlay",
       },
-      {
-        "<leader>gG",
-        function() Util.terminal({ "lazygit" }, { esc_esc = false, ctrl_hjkl = false }) end,
-        { desc = "Lazygit (cwd)" },
+    },
+    opts = {
+      view = {
+        style = "sign",
+        signs = {
+          add = "▎",
+          change = "▎",
+          delete = "",
+        },
       },
     },
   },

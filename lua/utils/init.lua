@@ -33,6 +33,11 @@ M.is_list = function(t)
   return true
 end
 
+M.is_loaded = function(name)
+  local Config = require "lazy.core.config"
+  return Config.plugins[name] and Config.plugins[name]._.loaded
+end
+
 local function can_merge(v) return type(v) == "table" and (vim.tbl_isempty(v) or not M.is_list(v)) end
 
 --- Merges the values similar to vim.tbl_deep_extend with the **force** behavior,

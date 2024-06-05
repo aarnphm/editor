@@ -26,14 +26,14 @@ return {
       end)
     end,
     opts = {
-      format = { timeout_ms = 2000, async = false, quiet = true },
+      format = { timeout_ms = 3000, async = false, quiet = false, lsp_fallback = true },
       formatters_by_ft = {
         lua = { "stylua" },
         toml = { "taplo" },
         proto = { { "buf", "protolint" } },
         zsh = { "beautysh" },
         python = { "ruff_fix" },
-        sh = { "beautysh" },
+        sh = { "shfmt" },
         markdown = { "prettier" },
         go = { "goimports", "gofumpt" },
         ["javascript"] = { "prettier" },

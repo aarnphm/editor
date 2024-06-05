@@ -7,57 +7,31 @@ return {
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
-    "nvim-treesitter/nvim-treesitter",
-    dependencies = {
+    "nvim-treesitter/nvim-treesitter-context",
+    opts = { max_lines = 3, mode = "cursor" },
+    keys = {
       {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-        config = function()
-          -- When in diff mode, we want to use the default
-          -- vim text objects c & C instead of the treesitter ones.
-          local move = require "nvim-treesitter.textobjects.move" ---@type table<string,fun(...)>
-          local configs = require "nvim-treesitter.configs"
-          for name, fn in pairs(move) do
-            if name:find "goto" == 1 then
-              move[name] = function(q, ...)
-                if vim.wo.diff then
-                  local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
-                  for key, query in pairs(config or {}) do
-                    if q == query and key:find "[%]%[][cC]" then
-                      vim.cmd("normal! " .. key)
-                      return
-                    end
-                  end
-                end
-                return fn(q, ...)
-              end
-            end
+        "<leader>ut",
+        function()
+          local tsc = require "treesitter-context"
+          tsc.toggle()
+          if Util.inject.get_upvalue(tsc.toggle, "enabled") then
+            Util.info("Enabled Treesitter Context", { title = "Option" })
+          else
+            Util.warn("Disabled Treesitter Context", { title = "Option" })
           end
         end,
-      },
-      {
-        "nvim-treesitter/nvim-treesitter-context",
-        opts = { max_lines = 3, mode = "cursor" },
-        keys = {
-          {
-            "<leader>ut",
-            function()
-              local tsc = require "treesitter-context"
-              tsc.toggle()
-              if Util.inject.get_upvalue(tsc.toggle, "enabled") then
-                Util.info("Enabled Treesitter Context", { title = "Option" })
-              else
-                Util.warn("Disabled Treesitter Context", { title = "Option" })
-              end
-            end,
-            desc = "Toggle Treesitter Context",
-          },
-        },
+        desc = "Toggle Treesitter Context",
       },
     },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
     version = false, -- last release is way too old and doesn't work on Windows
     cmd = "TSUpdateSync",
     build = ":TSUpdate",
     event = Util.lazy_file_events,
+    lazy = vim.fn.argc(-1) == 0,
     init = function(plugin)
       -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
       -- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which
@@ -93,5 +67,39 @@ return {
       },
     },
     config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
+  },
+  { "windwp/nvim-ts-autotag", event = Util.lazy_file_events, opts = {} },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    event = "VeryLazy",
+    enabled = true,
+    config = function()
+      -- If treesitter is already loaded, we need to run config again for textobjects
+      if Util.is_loaded "nvim-treesitter" then
+        local opts = Util.opts "nvim-treesitter"
+        require("nvim-treesitter.configs").setup { textobjects = opts.textobjects }
+      end
+
+      -- When in diff mode, we want to use the default
+      -- vim text objects c & C instead of the treesitter ones.
+      local move = require "nvim-treesitter.textobjects.move" ---@type table<string,fun(...)>
+      local configs = require "nvim-treesitter.configs"
+      for name, fn in pairs(move) do
+        if name:find "goto" == 1 then
+          move[name] = function(q, ...)
+            if vim.wo.diff then
+              local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
+              for key, query in pairs(config or {}) do
+                if q == query and key:find "[%]%[][cC]" then
+                  vim.cmd("normal! " .. key)
+                  return
+                end
+              end
+            end
+            return fn(q, ...)
+          end
+        end
+      end
+    end,
   },
 }
