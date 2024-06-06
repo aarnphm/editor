@@ -17,8 +17,7 @@ autocmd("User", {
 })
 
 -- local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
--- local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
--- vim.g.simple_colorscheme = colorscheme
+-- local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light" vim.g.simple_colorscheme = colorscheme
 -- vim.g.simple_background = background
 
 Util.format.setup()
@@ -184,8 +183,22 @@ require("lazy").setup("plugins", {
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24 },
   ui = {
-    border = BORDER,
+    border = "none",
     backdrop = 100,
     wrap = false,
   },
 })
+
+-- vim.opt.termguicolors = true
+-- vim.cmd.colorscheme "rose-pine"
+-- TODO: refactor this one day
+local hi = function(name, opts)
+  opts.default = opts.default or true
+  opts.force = opts.force or true
+  vim.api.nvim_set_hl(0, name, opts)
+end
+vim.cmd.colorscheme "habamax"
+hi("MiniFilesBorder", { link = "Normal" })
+hi("MiniFilesNormal", { link = "Normal" })
+hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
+hi("StatusLine", { link = "Normal" })

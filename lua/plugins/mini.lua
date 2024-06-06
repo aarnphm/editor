@@ -89,7 +89,7 @@ return {
       },
     },
     opts = {
-      windows = { preview = true, width_focus = 30, width_nofocus = 30, widthopreview = 30 },
+      windows = { preview = true, width_focus = 50, width_nofocus = 15, width_preview = 50 },
       mappings = { synchronize = "<leader>" },
     },
     keys = {

@@ -1,12 +1,10 @@
 local transparent_background = true
-local clear = {}
 
 return {
   {
     "rose-pine/neovim",
     name = "rose-pine",
     priority = 1000,
-    init = function() vim.cmd.colorscheme "rose-pine" end,
     opts = function()
       local opts = {
         dark_variant = "main",
@@ -44,8 +42,9 @@ return {
           Headline6 = { bg = "iris" },
         },
       }
+
       -- get background, if it is light, change the IblScope to rose
-      if vim.api.nvim_get_option "background" == "light" then
+      if vim.api.nvim_get_option_value("background", {}) == "light" then
         opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { fg = "rose" } })
       end
       return opts

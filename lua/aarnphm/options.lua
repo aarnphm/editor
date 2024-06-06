@@ -45,6 +45,9 @@ o.statusline = table.concat({
   "%{%luaeval('statusline.filetype {trunc_width = 75}')%}",
   "%{%luaeval('statusline.location {trunc_width = 90}')%}",
 }, " ")
+-- Window blending configuration
+opt.winblend = 0
+opt.pumblend = 0 -- make completion window transparent
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
 opt.formatexpr = "v:lua.Util.format.formatexpr()"
@@ -53,7 +56,6 @@ o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
-opt.pumblend = 8 -- make completion window transparent
 
 -- searching and grep stuff
 o.smartcase = true
@@ -78,6 +80,8 @@ opt.fillchars = {
   foldsep = " ",
   diff = "╱",
   eob = " ",
+  vert = "│",
+  horiz = "─",
 }
 o.foldmethod = "expr"
 o.foldlevel = 99

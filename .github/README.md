@@ -13,6 +13,6 @@ and more...
 
 Startup time: 12ms (with vim-startuptime and lazy.nvim)
 
-If you wish to try out something more structural, try out https://github.com/ayamir/nvimdots or https://github.com/lazyvim/lazyvim
+If you wish to try out something more structural, try out [nvimdots](https://github.com/ayamir/nvimdots) or [lazyvim](https://github.com/lazyvim/lazyvim)
 
-Used with https://github.com/aarnphm/dix
+Used with [dix](https://github.com/aarnphm/dix)

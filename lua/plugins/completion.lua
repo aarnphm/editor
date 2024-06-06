@@ -13,8 +13,7 @@ return {
           primary = true,
           format = function(buf)
             local plugin = require("lazy.core.config").plugins["conform.nvim"]
-            local Plugin = require "lazy.core.plugin"
-            local opts = Plugin.values(plugin, "opts", false)
+            local opts = require("lazy.core.plugin").values(plugin, "opts", false)
             require("conform").format(Util.merge(opts.format, { bufnr = buf }))
           end,
           sources = function(buf)
@@ -168,21 +167,32 @@ return {
       local cmp = require "cmp"
       local compare = require "cmp.config.compare"
 
+      local windows = cmp.config.window.bordered {
+        border = BORDER,
+        side_padding = 0,
+        scrollbar = false,
+        zindex = 30,
+        winhighlight = "Normal:Normal,FloatBorder:Normal",
+      }
+
       local select_opts = { behavior = cmp.SelectBehavior.Select }
       ---@type cmp.ConfigSchema
       return {
         preselect = cmp.PreselectMode.Item,
         completion = { completeopt = "menu,menuone,noinsert" },
-        matching = { disallow_partial_fuzzy_matching = false },
         snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
+          expandable_indicator = true,
           format = require("lspkind").cmp_format { mode = "symbol" },
         },
-        window = {
-          completion = cmp.config.window.bordered { border = BORDER, scrollbar = false },
-          documentation = cmp.config.window.bordered { border = BORDER, side_padding = 2, col_offset = 1 },
+        experimental = {
+          ghost_text = {
+            hl_group = "CmpGhostText",
+          },
         },
+        view = { entries = "native" },
+        window = { completion = windows, documentation = windows },
         sorting = {
           priority_weight = 2,
           comparators = {
@@ -208,7 +218,6 @@ return {
             compare.order,
           },
         },
-        experimental = { ghost_text = false, native_menu = false },
         mapping = cmp.mapping.preset.insert {
           ["<CR>"] = cmp.mapping.confirm { select = true },
           ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
