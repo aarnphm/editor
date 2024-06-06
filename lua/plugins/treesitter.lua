@@ -68,7 +68,6 @@ return {
     },
     config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
   },
-  { "windwp/nvim-ts-autotag", event = Util.lazy_file_events, opts = {} },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     event = "VeryLazy",

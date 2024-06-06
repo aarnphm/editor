@@ -124,6 +124,11 @@ return {
       "hrsh7th/cmp-emoji",
       "kdheepak/cmp-latex-symbols",
       {
+        "vrslev/cmp-pypi",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        ft = "toml",
+      },
+      {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         version = false,
@@ -266,6 +271,7 @@ return {
         sources = {
           { name = "path", priority = 250 },
           { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
+          { name = "pypi", keyword_length = 4 },
           { name = "buffer", keyword_length = 3 },
           { name = "luasnip", keyword_length = 2 },
           { name = "emoji" },
@@ -281,7 +287,6 @@ return {
     ---@param opts cmp.ConfigSchema
     config = function(_, opts)
       local cmp = require "cmp"
-      local buf = vim.api.nvim_get_current_buf()
       for _, source in ipairs(opts.sources) do
         source.group_index = source.group_index or 1
       end
