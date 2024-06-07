@@ -430,9 +430,14 @@ return {
         nil_ls = {
           settings = {
             ["nil"] = {
-              testSetting = 42,
               formatting = {
                 command = { "nixpkgs-fmt" },
+              },
+              nix = {
+                flake = {
+                  autoArchive = true,
+                  autoEvalInputs = true,
+                },
               },
             },
           },
