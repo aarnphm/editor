@@ -42,11 +42,40 @@ return {
       require "nvim-treesitter.query_predicates"
     end,
     opts = {
-      ensure_installed = "all",
+      ensure_installed = {
+        "bash",
+        "c",
+        "diff",
+        "html",
+        "javascript",
+        "rust",
+        "toml",
+        "jsdoc",
+        "json",
+        "jsonc",
+        "lua",
+        "luadoc",
+        "luap",
+        "markdown",
+        "markdown_inline",
+        "printf",
+        "python",
+        "jinja",
+        "go",
+        "gomod",
+        "query",
+        "regex",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "xml",
+        "yaml",
+      },
       ignore_install = { "phpdoc" },
       indent = { enable = true },
       highlight = { enable = true },
-      autotag = { enable = true },
       textobjects = {
         move = {
           enable = true,
@@ -100,5 +129,11 @@ return {
         end
       end
     end,
+  },
+  {
+    "windwp/nvim-ts-autotag",
+    event = Util.lazy_file_events,
+    opts = { enable_close = true },
+    config = function(_, opts) require("nvim-ts-autotag").setup(opts) end,
   },
 }
