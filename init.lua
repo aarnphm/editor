@@ -179,11 +179,13 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
-local lockfile = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/editor/lazy-lock.json"
-  or vim.fn.stdpath "config" .. "/lazy-lock.json"
+local get_lockfile = function()
+  local workspace = os.getenv "WORKSPACE"
+  return workspace ~= nil and workspace .. "/editor/lazy-lock.json" or vim.fn.stdpath "config" .. "/lazy-lock.json"
+end
 
 require("lazy").setup("plugins", {
-  lockfile = lockfile,
+  lockfile = get_lockfile(),
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24 },
   ui = {
