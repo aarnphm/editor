@@ -179,7 +179,8 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 require("lazy").setup("plugins", {
-  lockfile = vim.env.WORKSPACE .. "/editor/lazy-lock.json",
+  lockfile = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/editor/lazy-lock.json"
+    or vim.fn.stdpath "config" .. "/lazy-lock.json",
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24 },
   ui = {
