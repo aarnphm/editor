@@ -17,7 +17,8 @@ autocmd("User", {
 })
 
 -- local colorscheme = vim.NIL ~= vim.env.SIMPLE_COLORSCHEME and vim.env.SIMPLE_COLORSCHEME or "rose-pine"
--- local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light" vim.g.simple_colorscheme = colorscheme
+-- local background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
+-- vim.g.simple_colorscheme = colorscheme
 -- vim.g.simple_background = background
 
 Util.format.setup()
@@ -178,9 +179,11 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
+local lockfile = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/editor/lazy-lock.json"
+  or vim.fn.stdpath "config" .. "/lazy-lock.json"
+
 require("lazy").setup("plugins", {
-  lockfile = vim.NIL ~= vim.env.WORKSPACE and vim.env.WORKSPACE .. "/editor/lazy-lock.json"
-    or vim.fn.stdpath "config" .. "/lazy-lock.json",
+  lockfile = lockfile,
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24 },
   ui = {
