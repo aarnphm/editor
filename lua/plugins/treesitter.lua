@@ -60,7 +60,6 @@ return {
         "markdown_inline",
         "printf",
         "python",
-        "jinja",
         "go",
         "gomod",
         "query",
