@@ -1,8 +1,6 @@
 -- local LSP keys setup
 local K = {}
 
-local H = require "aarnphm.handlers"
-
 ---@type LazyKeysLspSpec[]|nil
 K._keys = nil
 
@@ -13,12 +11,12 @@ K.get = function()
   if not K._keys then
     --@class PluginLspKeys
     K._keys = {
-      { "gh", "<cmd>Telescope lsp_references<cr>", desc = "lsp: references" },
+      { "gh", "<cmd>Telescope lsp_references<CR>", desc = "lsp: references" },
       { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
       { "H", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
-      { "gd", H.definition, desc = "lsp: Peek definition", has = "definition" },
+      { "gd", "<cmd>Telescope lsp_definitions<CR>", desc = "lsp: Peek definition", has = "definition" },
+      { "gD", vim.lsp.buf.declaration, desc = "lsp: Peek definition", has = "declaration" },
       { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
-      { "gI", H.implementation, desc = "lsp: Goto implementation" },
       { "gr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
     }
   end
@@ -52,6 +50,8 @@ end
 K.on_attach = function(_, buffer)
   local Keys = require "lazy.core.handler.keys"
   local keymaps = K.resolve(buffer)
+
+  vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
 
   for _, keys in pairs(keymaps) do
     if not keys.has or K.has(buffer, keys.has) then
