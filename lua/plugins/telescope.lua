@@ -7,7 +7,7 @@ return {
       "nvim-telescope/telescope-live-grep-args.nvim",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        build = "make",
         enabled = vim.fn.executable "cmake" == 1,
         config = function()
           Util.on_load("telescope.nvim", function() require("telescope").load_extension "fzf" end)
