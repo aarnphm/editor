@@ -108,7 +108,7 @@ return {
   {
     "windwp/nvim-ts-autotag",
     event = Util.lazy_file_events,
-    opts = { enable_close = true },
+    opts = { opts = { enable_close = true } },
     config = function(_, opts) require("nvim-ts-autotag").setup(opts) end,
   },
 }
