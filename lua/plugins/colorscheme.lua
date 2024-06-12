@@ -10,7 +10,7 @@ return {
         dark_variant = "main",
         dim_inactive_windows = false,
         enable = { migrations = true },
-        styles = { transparency = not transparent_background },
+        styles = { transparency = not transparent_background, italic = false },
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "overlay", blend = 0 },

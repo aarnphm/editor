@@ -25,12 +25,6 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-apathy'
 
 Plug 'nathanaelkane/vim-indent-guides'
-" {{{
-  let g:indent_guides_default_mapping = 0
-  let g:indent_guides_enable_on_vim_startup = 1
-  let g:indent_guides_start_level = 2
-  let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue']
-" }}}
 
 " fzf with rg
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -47,6 +41,7 @@ Plug 'sheerun/vim-polyglot'
 " UI related
 Plug 'godlygeek/tabular'
 Plug 'yegappan/lsp'
+Plug 'rose-pine/vim'
 
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries', 'for': 'go' }
 call plug#end()
@@ -59,8 +54,8 @@ let g:is_termguicolors = has('termguicolors') && !g:is_gui && $COLORTERM isnot# 
 let g:netrw_liststyle=3
 
 " Minimal
-colorscheme habamax
-set background=dark
+set background=light
+colorscheme rosepine_dawn
 
 set number relativenumber
 
@@ -331,6 +326,11 @@ let g:suda#prompt = 'Mot de passe: '
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_conceal = 0
 let g:vim_markdown_conceal_code_blocks = 0
+
+let g:indent_guides_default_mapping = 0
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level = 2
+let g:indent_guides_exclude_filetypes = ['help', 'startify', 'man', 'rogue']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf

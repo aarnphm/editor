@@ -68,7 +68,7 @@ o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 o.inccommand = "split"
-o.background = vim.NIL ~= vim.env.SIMPLE_BACKGROUND and vim.env.SIMPLE_BACKGROUND or "light"
+o.background = "light"
 
 -- fold with nvim-ufo
 o.foldenable = true

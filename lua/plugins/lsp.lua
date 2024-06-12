@@ -403,13 +403,6 @@ return {
             },
           },
         },
-        matlab_ls = { settings = { matlab = { installPath = "/Applications/MATLAB_R2023a.app" } } },
-        ---@type lspconfig.options.ltex
-        ltex = {
-          settings = {
-            ltex = { language = "en-GB", additionalRules = { motherTongue = "fr" } },
-          },
-        },
         ruff = {
           keys = {
             {
