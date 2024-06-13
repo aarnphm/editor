@@ -424,7 +424,7 @@ return {
           settings = {
             ["nil"] = {
               formatting = {
-                command = { "nixpkgs-fmt" },
+                command = { "nix fmt" },
               },
               nix = {
                 maxMemoryMB = 4092,
