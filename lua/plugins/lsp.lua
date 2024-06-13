@@ -427,8 +427,9 @@ return {
                 command = { "nixpkgs-fmt" },
               },
               nix = {
+                maxMemoryMB = 4092,
                 flake = {
-                  autoArchive = true,
+                  autoArchive = false,
                   autoEvalInputs = true,
                 },
               },
