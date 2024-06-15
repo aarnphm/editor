@@ -105,7 +105,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "nil_ls", "ruff", "stylua", "shfmt", "mypy" },
+      ensure_installed = { "lua-language-server", "ruff", "stylua", "shfmt", "mypy" },
       ui = { border = BORDER },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
