@@ -5,6 +5,7 @@ require "aarnphm.bindings"
 
 -- NOTE: Loading shada is slow, so we load it manually after UIEnter
 local shada = vim.o.shada
+local set = vim.opt_local
 local autocmd = vim.api.nvim_create_autocmd
 
 vim.o.shada = ""
@@ -120,43 +121,29 @@ vim.cmd [[
   augroup END
 ]]
 
-autocmd({ "BufEnter", "BufWinEnter", "WinEnter", "CmdwinEnter" }, {
-  group = augroup "disable_statusline",
-  command = [[if match(bufname('%'), 'starter') != -1 || match(bufname('%'), 'nofile') != -1 || match(bufname('%'), 'toggleterm') != -1 || bufname('%') == '' | set laststatus=0 | else | set laststatus=3 | endif]],
-})
-
-autocmd("BufWinEnter", {
-  group = augroup "Fugitive",
-  pattern = "*",
+-- Set local settings for terminal buffers
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = vim.api.nvim_create_augroup("custom-term-open", {}),
   callback = function()
-    if vim.bo.ft ~= "fugitive" then return end
-    local bufnr = vim.api.nvim_get_current_buf()
-    vim.keymap.set(
-      "n",
-      "<leader>p",
-      "<CMD>Git pull --rebase<CR>",
-      { desc = "git: pull rebase", buffer = bufnr, remap = false }
-    )
-    vim.keymap.set(
-      "n",
-      "<leader>P",
-      function() vim.cmd.Git "push" end,
-      { desc = "git: push", buffer = bufnr, remap = false }
-    )
-    vim.keymap.set(
-      "n",
-      "<leader>cc",
-      "<CMD>Git commit -S --signoff -sv<CR>",
-      { desc = "git: commit", buffer = bufnr, remap = false }
-    )
-    vim.keymap.set(
-      "n",
-      "<leader>t",
-      ":Git push -u origin ",
-      { desc = "git: push to specific branch", buffer = bufnr, remap = false }
-    )
+    set.number = false
+    set.relativenumber = false
+    set.scrolloff = 0
+
+    vim.bo.filetype = "terminal"
   end,
 })
+
+-- Easily hit escape in terminal mode.
+vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
+
+-- Open a terminal at the bottom of the screen with a fixed height.
+vim.keymap.set("n", ",st", function()
+  vim.cmd.new()
+  vim.cmd.wincmd "J"
+  vim.api.nvim_win_set_height(0, 12)
+  vim.wo.winfixheight = true
+  vim.cmd.term()
+end)
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
@@ -182,7 +169,8 @@ end
 require("lazy").setup("plugins", {
   lockfile = get_lockfile(),
   change_detection = { notify = false },
-  checker = { enabled = true, frequency = 3600 * 24 },
+  checker = { enabled = true, frequency = 3600 * 24, notify = false },
+  colorscheme = { "rose-pine" },
   ui = {
     border = "none",
     backdrop = 100,

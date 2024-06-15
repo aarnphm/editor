@@ -82,7 +82,7 @@ end
 
 return {
   {
-    "NvChad/nvim-colorizer.lua",
+    "norcalli/nvim-colorizer.lua",
     event = "LspAttach",
     opts = {
       filetypes = { "*" },
@@ -95,7 +95,7 @@ return {
         css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
         sass = { enable = true, parsers = { "css" } },
         tailwind = true,
-        mode = "foreground",
+        mode = "background",
       },
     },
     config = function(_, opts) require("colorizer").setup(opts) end,
@@ -105,7 +105,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "mdx-analyzer", "ruff", "stylua", "shfmt", "mypy" },
+      ensure_installed = { "lua-language-server", "nil_ls", "ruff", "stylua", "shfmt", "mypy" },
       ui = { border = BORDER },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -166,7 +166,6 @@ return {
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
       { "folke/neodev.nvim", opts = {} },
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = false, dependencies = { "nvim-lspconfig" } },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
@@ -512,11 +511,6 @@ return {
     },
     ---@param opts PluginLspOptions
     config = function(_, opts)
-      if Util.has "neoconf.nvim" then
-        local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
-        require("neoconf").setup(require("lazy.core.plugin").values(plugin, "opts", false))
-      end
-
       Util.format.register(Util.lsp.formatter())
 
       -- setup keymaps

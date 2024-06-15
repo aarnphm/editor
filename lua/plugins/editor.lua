@@ -13,15 +13,6 @@ return {
     end,
   },
   {
-    "nvim-pack/nvim-spectre",
-    build = false,
-    cmd = "Spectre",
-    opts = { open_cmd = "noswapfile vnew" },
-    keys = {
-      { "<leader>sr", function() require("spectre").open() end, desc = "Replace in Files (Spectre)" },
-    },
-  },
-  {
     "ggandor/leap.nvim",
     keys = { { "gs", mode = { "n", "x", "o" }, desc = "motion: Leap from windows" } },
     config = function(_, opts)
@@ -35,7 +26,6 @@ return {
     end,
   },
   { "tpope/vim-repeat", event = "VeryLazy" },
-  { "tpope/vim-sleuth", event = "VeryLazy" },
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTelescope" },
