@@ -1,4 +1,3 @@
-require "aarnphm.disabled_builtin"
 require "aarnphm.globals"
 require "aarnphm.options"
 require "aarnphm.bindings"

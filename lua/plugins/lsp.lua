@@ -166,6 +166,7 @@ return {
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
       { "folke/neodev.nvim", opts = {} },
+      { "folke/neoconf.nvim", opts = {} },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
@@ -463,6 +464,11 @@ return {
               client.server_capabilities.hoverProvider = false
               client.server_capabilities.documentFormattingProvider = false -- NOTE: disable ruff formatting because I don't like deterministic formatter  in python
             end
+          end)
+        end,
+        taplo = function()
+          Util.lsp.on_attach(function(client, _)
+            if client.name == "taplo" then client.server_capabilities.documentFormattingProvider = false end
           end)
         end,
         tsserver = function()
