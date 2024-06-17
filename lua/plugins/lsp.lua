@@ -466,6 +466,11 @@ return {
             end
           end)
         end,
+        taplo = function()
+          Util.lsp.on_attach(function(client, _)
+            if client.name == "taplo" then client.server_capabilities.documentFormattingProvider = false end
+          end)
+        end,
         tsserver = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "tsserver" then client.server_capabilities.documentFormattingProvider = false end
