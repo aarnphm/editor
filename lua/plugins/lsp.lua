@@ -221,9 +221,6 @@ return {
         bashls = {},
         marksman = {},
         spectral = {},
-        jdtls = {},
-        dockerls = {},
-        docker_compose_language_service = {},
         taplo = {},
         gopls = {
           settings = {
@@ -476,7 +473,6 @@ return {
             if client.name == "tsserver" then client.server_capabilities.documentFormattingProvider = false end
           end)
         end,
-        jdtls = function() return true end, -- avoid duplicate servers
         yamlls = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
