@@ -142,7 +142,7 @@ vim.keymap.set("n", ",st", function()
   vim.api.nvim_win_set_height(0, 12)
   vim.wo.winfixheight = true
   vim.cmd.term()
-end)
+end, { desc = "terminal: open new buffer" })
 
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
