@@ -227,14 +227,14 @@ return {
           ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
           ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
           ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-          ["<localleader>["] = cmp.mapping(function(fallback)
+          ["<leader>["] = cmp.mapping(function(fallback)
             if require("copilot.suggestion").is_visible() then
               require("copilot.suggestion").next()
             else
               fallback()
             end
           end, { "i", "s" }),
-          ["<localleader>]"] = cmp.mapping(function(fallback)
+          ["<leader>]"] = cmp.mapping(function(fallback)
             if require("copilot.suggestion").is_visible() then
               require("copilot.suggestion").prev()
             else
