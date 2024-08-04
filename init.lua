@@ -181,13 +181,13 @@ require("lazy").setup("plugins", {
 -- vim.opt.termguicolors = true
 vim.cmd.colorscheme "rose-pine"
 -- TODO: refactor this one day
--- local hi = function(name, opts)
---   opts.default = opts.default or true
---   opts.force = opts.force or true
---   vim.api.nvim_set_hl(0, name, opts)
--- end
+local hi = function(name, opts)
+  opts.default = opts.default or true
+  opts.force = opts.force or true
+  vim.api.nvim_set_hl(0, name, opts)
+end
 -- vim.cmd.colorscheme "habamax"
--- hi("MiniFilesBorder", { link = "Normal" })
--- hi("MiniFilesNormal", { link = "Normal" })
--- hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
--- hi("StatusLine", { link = "Normal" })
+hi("MiniFilesBorder", { link = "Normal" })
+hi("MiniFilesNormal", { link = "Normal" })
+hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
+hi("StatusLine", { link = "Normal" })

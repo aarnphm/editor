@@ -1,4 +1,3 @@
-local rtp_path = vim.fn.fnamemodify(vim.env.VIMRUNTIME, ":h:h:h") .. "/lib/nvim/parser"
 return {
   { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
   {
@@ -41,13 +40,41 @@ return {
       -- during startup.
       require("lazy.core.loader").add_to_rtp(plugin)
       require "nvim-treesitter.query_predicates"
-
-      vim.opt.runtimepath:prepend(rtp_path)
+      -- vim.opt.runtimepath:prepend(rtp_path)
     end,
     opts = {
-      ensure_installed = {},
+      ensure_installed = {
+        "bash",
+        "c",
+        "diff",
+        "html",
+        "go",
+        "rust",
+        "gitcommit",
+        "gitignore",
+        "javascript",
+        "jsdoc",
+        "json",
+        "jsonc",
+        "lua",
+        "luadoc",
+        "luap",
+        "markdown",
+        "markdown_inline",
+        "printf",
+        "python",
+        "query",
+        "regex",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "xml",
+        "yaml",
+      },
       auto_install = false,
-      parser_install_dir = rtp_path,
+      -- parser_install_dir = rtp_path,
       ignore_install = { "phpdoc" },
       indent = { enable = true },
       highlight = { enable = true },
