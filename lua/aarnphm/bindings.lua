@@ -4,9 +4,9 @@ local map = function(mode, lhs, rhs, opts)
 end
 
 local diagnostic_goto = function(next, severity)
-  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
+  local pos = next and 1 or -1
   severity = severity and vim.diagnostic.severity[severity] or nil
-  return function() go { severity = severity } end
+  return function() vim.diagnostic.jump { severity = severity, count = pos } end
 end
 
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })

@@ -1,6 +1,55 @@
 local vault = vim.fn.expand "~" .. "/workspace/garden/content"
 
 return {
+  -- Markdown preview
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = "cd app && yarn install",
+    init = function() vim.g.mkdp_filetypes = { "markdown" } end,
+    keys = {
+      {
+        "<leader>cp",
+        ft = "markdown",
+        "<cmd>MarkdownPreviewToggle<cr>",
+        desc = "markdown: preview",
+      },
+    },
+    config = function() vim.cmd [[do FileType]] end,
+  },
+
+  {
+    "MeanderingProgrammer/markdown.nvim",
+    opts = {
+      file_types = { "markdown", "norg", "rmd", "org" },
+      code = {
+        sign = false,
+        width = "block",
+        right_pad = 1,
+      },
+      heading = {
+        sign = false,
+        icons = {},
+      },
+    },
+    ft = { "markdown", "norg", "rmd", "org" },
+    config = function(_, opts)
+      require("render-markdown").setup(opts)
+      Util.toggle.map("<leader>um", {
+        name = "markdown: render",
+        get = function() return require("render-markdown.state").enabled end,
+        set = function(enabled)
+          local m = require "render-markdown"
+          if enabled then
+            m.enable()
+          else
+            m.disable()
+          end
+        end,
+      })
+    end,
+  },
   {
     "epwalsh/obsidian.nvim",
     lazy = true,
@@ -36,9 +85,10 @@ return {
     opts = {
       workspaces = { { name = "garden", path = vault, overrides = { notes_subdir = "thoughts" } } },
       open_app_foreground = true,
-      notes_subdir = "thoughts",
+      log_level = vim.log.levels.INFO,
+      follow_url_func = function(url) vim.ui.open(url) end,
       wiki_link_func = function(opts)
-        path = opts.path
+        local path = opts.path
         if opts.label ~= path then
           -- check if opts.path is a markdown file, if so, remove the extension
           -- this is to make sure that the link is not broken when the file is renamed

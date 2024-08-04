@@ -128,9 +128,18 @@ return {
         ft = "toml",
       },
       {
+        "supermaven-inc/supermaven-nvim",
+        config = function()
+          require("supermaven-nvim").setup {
+            ignore_filetypes = { gitcommit = true, hgcommit = true },
+          }
+        end,
+      },
+      {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         version = false,
+        enabled = false,
         event = "InsertEnter",
         build = ":Copilot auth",
         keys = {
@@ -188,7 +197,13 @@ return {
         formatting = {
           fields = { "menu", "abbr", "kind" },
           expandable_indicator = true,
-          format = require("lspkind").cmp_format { mode = "symbol" },
+          format = require("lspkind").cmp_format {
+            mode = "symbol",
+            max_width = 50,
+            symbol_map = {
+              Supermaven = "",
+            },
+          },
         },
         experimental = {
           ghost_text = {
@@ -227,24 +242,26 @@ return {
           ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
           ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
           ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-          ["<leader>["] = cmp.mapping(function(fallback)
-            if require("copilot.suggestion").is_visible() then
-              require("copilot.suggestion").next()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<leader>]"] = cmp.mapping(function(fallback)
-            if require("copilot.suggestion").is_visible() then
-              require("copilot.suggestion").prev()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
+          -- ["<leader>["] = cmp.mapping(function(fallback)
+          --   if require("copilot.suggestion").is_visible() then
+          --     require("copilot.suggestion").next()
+          --   else
+          --     fallback()
+          --   end
+          -- end, { "i", "s" }),
+          -- ["<leader>]"] = cmp.mapping(function(fallback)
+          --   if require("copilot.suggestion").is_visible() then
+          --     require("copilot.suggestion").prev()
+          --   else
+          --     fallback()
+          --   end
+          -- end, { "i", "s" }),
           ["<Tab>"] = cmp.mapping(function(fallback)
             local col = vim.fn.col "." - 1
-            if require("copilot.suggestion").is_visible() then
-              require("copilot.suggestion").accept()
+            local suggestion = require "supermaven-nvim.completion_preview"
+
+            if suggestion.has_suggestion() then
+              suggestion.on_accept_suggestion()
             elseif cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif require("luasnip").expand_or_jumpable() then
@@ -256,8 +273,10 @@ return {
             end
           end, { "i", "s" }),
           ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if require("copilot.suggestion").is_visible() then
-              require("copilot.suggestion").accept()
+            local suggestion = require "supermaven-nvim.completion_preview"
+
+            if suggestion.has_suggestion() then
+              suggestion.on_accept_suggestion()
             elseif cmp.visible() then
               cmp.select_prev_item(select_opts)
             elseif require("luasnip").jumpable(-1) then
@@ -268,6 +287,7 @@ return {
           end, { "i", "s" }),
         },
         sources = {
+          -- { name = "supermaven" },
           { name = "path", priority = 250 },
           { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
           { name = "pypi", keyword_length = 4 },

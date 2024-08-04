@@ -161,8 +161,9 @@ end
 vim.opt.runtimepath:prepend(lazypath)
 
 local get_lockfile = function()
-  local workspace = os.getenv "WORKSPACE"
-  return workspace ~= nil and workspace .. "/editor/lazy-lock.json" or vim.fn.stdpath "config" .. "/lazy-lock.json"
+  -- local workspace = os.getenv "WORKSPACE"
+  -- return workspace ~= nil and workspace .. "/editor/lazy-lock.json" or vim.fn.stdpath "config" .. "/lazy-lock.json"
+  return vim.fn.stdpath "config" .. "/lazy-lock.json"
 end
 
 require("lazy").setup("plugins", {

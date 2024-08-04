@@ -21,7 +21,7 @@ end
 
 M.formatexpr = function()
   if Util.has "conform.nvim" then return require("conform").formatexpr() end
-  return vim.lsp.formatexpr { timeout_ms = 500 }
+  return vim.lsp.formatexpr { timeout_ms = 3000 }
 end
 
 ---@param buf? number
@@ -86,11 +86,16 @@ M.enabled = function(buf)
 end
 
 ---@param buf? boolean
-M.toggle = function(buf)
+M.toggle = function(buf) M.enable(not M.enabled(), buf) end
+
+---@param enable? boolean
+---@param buf? boolean
+M.enable = function(enable, buf)
+  if enable == nil then enable = true end
   if buf then
-    vim.b.autoformat = not M.enabled()
+    vim.b.autoformat = enable
   else
-    vim.g.autoformat = not M.enabled()
+    vim.g.autoformat = enable
     vim.b.autoformat = nil
   end
   M.info()

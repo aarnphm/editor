@@ -83,7 +83,7 @@ opt.fillchars = {
   vert = "│",
   horiz = "─",
 }
-o.foldmethod = "expr"
+o.foldmethod = "manual"
 o.foldlevel = 99
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
@@ -117,6 +117,7 @@ opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock
 -- map leader to <Space> and localeader to +
 g.mapleader = " "
 g.maplocalleader = ","
+g.autoformat = true
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
