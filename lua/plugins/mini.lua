@@ -100,7 +100,7 @@ return {
       },
       {
         "<LocalLeader>.",
-        function() require("mini.files").open(Util.root(), true) end,
+        function() require("mini.files").open(Util.root.git(), true) end,
         desc = "Open mini.files (working root)",
       },
     },

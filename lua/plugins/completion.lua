@@ -132,6 +132,7 @@ return {
         config = function()
           require("supermaven-nvim").setup {
             ignore_filetypes = { gitcommit = true, hgcommit = true },
+            disable_inline_completion = true,
           }
         end,
       },
@@ -238,31 +239,14 @@ return {
           },
         },
         mapping = cmp.mapping.preset.insert {
-          ["<CR>"] = cmp.mapping.confirm { select = true },
-          ["<S-CR>"] = cmp.mapping.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
+          ["<CR>"] = Util.cmp.confirm { select = true },
+          ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
           ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
           ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-          -- ["<leader>["] = cmp.mapping(function(fallback)
-          --   if require("copilot.suggestion").is_visible() then
-          --     require("copilot.suggestion").next()
-          --   else
-          --     fallback()
-          --   end
-          -- end, { "i", "s" }),
-          -- ["<leader>]"] = cmp.mapping(function(fallback)
-          --   if require("copilot.suggestion").is_visible() then
-          --     require("copilot.suggestion").prev()
-          --   else
-          --     fallback()
-          --   end
-          -- end, { "i", "s" }),
           ["<Tab>"] = cmp.mapping(function(fallback)
             local col = vim.fn.col "." - 1
-            local suggestion = require "supermaven-nvim.completion_preview"
 
-            if suggestion.has_suggestion() then
-              suggestion.on_accept_suggestion()
-            elseif cmp.visible() then
+            if cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif require("luasnip").expand_or_jumpable() then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
@@ -273,11 +257,7 @@ return {
             end
           end, { "i", "s" }),
           ["<S-Tab>"] = cmp.mapping(function(fallback)
-            local suggestion = require "supermaven-nvim.completion_preview"
-
-            if suggestion.has_suggestion() then
-              suggestion.on_accept_suggestion()
-            elseif cmp.visible() then
+            if cmp.visible() then
               cmp.select_prev_item(select_opts)
             elseif require("luasnip").jumpable(-1) then
               vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
@@ -287,8 +267,9 @@ return {
           end, { "i", "s" }),
         },
         sources = {
-          -- { name = "supermaven" },
+          { name = "supermaven" },
           { name = "path", priority = 250 },
+          { name = "lazydev", group_index = 0 },
           { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
           { name = "pypi", keyword_length = 4 },
           { name = "buffer", keyword_length = 3 },
@@ -303,14 +284,6 @@ return {
         },
       }
     end,
-    ---@param opts cmp.ConfigSchema
-    config = function(_, opts)
-      local cmp = require "cmp"
-      for _, source in ipairs(opts.sources) do
-        source.group_index = source.group_index or 1
-      end
-
-      cmp.setup(opts)
-    end,
+    main = "utils.cmp",
   },
 }

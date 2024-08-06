@@ -9,6 +9,17 @@ local diagnostic_goto = function(next, severity)
   return function() vim.diagnostic.jump { severity = severity, count = pos } end
 end
 
+
+-- Easily hit escape in terminal mode.
+map("t", "<esc><esc>", "<c-\\><c-n>")
+-- Open a terminal at the bottom of the screen with a fixed height.
+map("n", ",st", function()
+  vim.cmd.new()
+  vim.cmd.wincmd "J"
+  vim.api.nvim_win_set_height(0, 12)
+  vim.wo.winfixheight = true
+  vim.cmd.term()
+end, { desc = "terminal: open new buffer" })
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "lsp: Next diagnostic" })
 map("n", "[d", diagnostic_goto(false), { desc = "lsp: Prev diagnostic" })

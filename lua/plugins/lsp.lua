@@ -165,8 +165,21 @@ return {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
-      { "folke/neodev.nvim", opts = {} },
-      { "folke/neoconf.nvim", opts = {} },
+      {
+        "folke/lazydev.nvim",
+        ft = "lua",
+        cmd = "LazyDev",
+        opts = {
+          dependencies = {
+            -- Manage libuv types with lazy. Plugin will never be loaded
+            { "Bilal2453/luvit-meta", lazy = true },
+          },
+          library = {
+            { path = "luvit-meta/library", words = { "vim%.uv" } },
+            { path = "lazy.nvim", words = { "Util" } },
+          },
+        },
+      },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
@@ -198,11 +211,18 @@ return {
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
-      inlay_hints = { enabled = false },
+      inlay_hints = {
+        enabled = true,
+        exclude = { "vue" },
+      },
       -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the code lenses.
       codelens = { enabled = false },
+      -- Enable lsp cursor word highlighting
+      document_highlight = {
+        enabled = true,
+      },
       ---@type lsp.ClientCapabilities
       capabilities = {
         workspace = {
@@ -518,16 +538,9 @@ return {
       -- setup keymaps
       Util.lsp.on_attach(function(cl, bufnr) K.on_attach(cl, bufnr) end)
 
-      local register_capability = vim.lsp.handlers["client/registerCapability"]
-
-      vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
-        ---@diagnostic disable-next-line: no-unknown
-        local ret = register_capability(err, res, ctx)
-        local client = vim.lsp.get_client_by_id(ctx.client_id)
-        local buffer = vim.api.nvim_get_current_buf()
-        K.on_attach(client, buffer)
-        return ret
-      end
+      Util.lsp.setup()
+      Util.lsp.on_dynamic_capability(K.on_attach)
+      Util.lsp.words.setup(opts.document_highlight)
 
       -- diagnostics signs
       if vim.fn.has "nvim-0.10.0" == 0 then
@@ -538,23 +551,27 @@ return {
         end
       end
 
+      -- inlay hints
       if opts.inlay_hints.enabled then
-        Util.lsp.on_attach(function(client, bufnr)
-          if client.supports_method "textDocument/inlayHint" then K.inlay_hints(bufnr, true) end
+        Util.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
+          if
+            vim.api.nvim_buf_is_valid(buffer)
+            and vim.bo[buffer].buftype == ""
+            and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
+          then
+            vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+          end
         end)
       end
 
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
-        Util.lsp.on_attach(function(client, buffer)
-          if client.supports_method "textDocument/codeLens" then
-            vim.lsp.codelens.refresh()
-            --- autocmd BufEnter,CursorHold,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
-            vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-              buffer = buffer,
-              callback = vim.lsp.codelens.refresh,
-            })
-          end
+        Util.lsp.on_supports_method("textDocument/codeLens", function(client, buffer)
+          vim.lsp.codelens.refresh()
+          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+            buffer = buffer,
+            callback = vim.lsp.codelens.refresh,
+          })
         end)
       end
 
