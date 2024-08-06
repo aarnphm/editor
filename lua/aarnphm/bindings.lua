@@ -9,7 +9,6 @@ local diagnostic_goto = function(next, severity)
   return function() vim.diagnostic.jump { severity = severity, count = pos } end
 end
 
-
 -- Easily hit escape in terminal mode.
 map("t", "<esc><esc>", "<c-\\><c-n>")
 -- Open a terminal at the bottom of the screen with a fixed height.
@@ -58,6 +57,8 @@ map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
 map("n", "<Leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
 map("n", "]b", "<cmd>bnext<cr>", { desc = "buffer: next" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
+map("n", "<Leader>`", "<cmd>e #<cr>", { desc = "buffer: switch to other buffer" })
+map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
 map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
 map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
 map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })

@@ -36,7 +36,7 @@ return {
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
-    event = Util.lazy_file_events,
+    event = "LazyFile",
     opts = {
       indent = {
         char = "│",

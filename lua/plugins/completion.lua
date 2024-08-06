@@ -57,65 +57,10 @@ return {
     config = function(_, opts) require("conform").setup(opts) end,
   },
   {
-    "aarnphm/luasnip-latex-snippets.nvim",
-    version = false,
-    event = "InsertEnter",
-    dependencies = {
-      {
-        "L3MON4D3/LuaSnip",
-        dependencies = {
-          "rafamadriz/friendly-snippets",
-          config = function() require("luasnip.loaders.from_vscode").lazy_load() end,
-        },
-        keys = {
-          {
-            "<tab>",
-            function() return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>" end,
-            expr = true,
-            silent = true,
-            mode = "i",
-          },
-          { "<tab>", function() require("luasnip").jump(1) end, mode = "s" },
-          { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
-        },
-        build = (not jit.os:find "Windows")
-            and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-          or nil,
-        config = function(_, opts)
-          require("luasnip").setup(opts)
-          require("luasnip.loaders.from_vscode").lazy_load()
-          require("luasnip.loaders.from_lua").lazy_load { paths = vim.fn.stdpath "config" .. "/snippets/" }
-          vim.api.nvim_create_user_command(
-            "LuaSnipEdit",
-            function() require("luasnip.loaders.from_lua").edit_snippet_files() end,
-            {}
-          )
-        end,
-        opts = function()
-          return {
-            history = true,
-            -- Event on which to check for exiting a snippet's region
-            region_check_events = "InsertEnter",
-            delete_check_events = "TextChanged",
-            ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
-            load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
-              markdown = { "lua", "json", "tex" },
-            },
-          }
-        end,
-      },
-    },
-    config = function()
-      require("luasnip-latex-snippets").setup { use_treesitter = true }
-      require("luasnip").config.setup { enable_autosnippets = true }
-    end,
-  },
-  {
     "hrsh7th/nvim-cmp",
     version = false,
     event = "InsertEnter",
     dependencies = {
-      "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-path",
       "onsails/lspkind.nvim",
@@ -131,43 +76,18 @@ return {
         "supermaven-inc/supermaven-nvim",
         config = function()
           require("supermaven-nvim").setup {
-            ignore_filetypes = { gitcommit = true, hgcommit = true },
+            ignore_filetypes = { gitcommit = true, hgcommit = true, vimrc = true },
             disable_inline_completion = true,
           }
         end,
       },
       {
-        "zbirenbaum/copilot.lua",
-        cmd = "Copilot",
-        version = false,
-        enabled = false,
-        event = "InsertEnter",
-        build = ":Copilot auth",
-        keys = {
-          {
-            "<C-k>",
-            function() return require("copilot.suggestion").toggle_auto_trigger() end,
-            expr = true,
-            silent = true,
-            mode = "i",
-          },
-        },
+        "garymjr/nvim-snippets",
         opts = {
-          cmp = { enabled = true, method = "getCompletionsCycling" },
-          panel = { enabled = false },
-          suggestion = { enabled = true, auto_trigger = false },
-          filetypes = {
-            markdown = true,
-            help = false,
-            hgcommit = false,
-            gitcommit = false,
-            svn = false,
-            cvs = false,
-            TelescopePrompt = false,
-            big_file_disabled_ft = false,
-            neogitCommitMessage = false,
-          },
+          friendly_snippets = true,
+          ignored_filetypes = { "git" },
         },
+        dependencies = { "rafamadriz/friendly-snippets" },
       },
     },
     ---@return cmp.ConfigSchema
@@ -179,6 +99,7 @@ return {
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 
       local cmp = require "cmp"
+      local defaults = require "cmp.config.default"()
       local compare = require "cmp.config.compare"
 
       local windows = cmp.config.window.bordered {
@@ -191,10 +112,9 @@ return {
 
       local select_opts = { behavior = cmp.SelectBehavior.Select }
       ---@type cmp.ConfigSchema
-      return {
-        preselect = cmp.PreselectMode.Item,
+      return vim.tbl_deep_extend("force", defaults, {
         completion = { completeopt = "menu,menuone,noinsert" },
-        snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
+        snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
           expandable_indicator = true,
@@ -211,7 +131,6 @@ return {
             hl_group = "CmpGhostText",
           },
         },
-        view = { entries = "native" },
         window = { completion = windows, documentation = windows },
         sorting = {
           priority_weight = 2,
@@ -243,13 +162,15 @@ return {
           ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
           ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
           ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<Tab>"] = cmp.mapping(function(fallback)
             local col = vim.fn.col "." - 1
 
             if cmp.visible() then
               cmp.select_next_item(select_opts)
-            elseif require("luasnip").expand_or_jumpable() then
-              vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-expand-or-jump", "")
+            elseif vim.snippet.active { direction = 1 } then
+              vim.schedule(function() vim.snippet.jump(1) end)
             elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
               fallback()
             else
@@ -259,22 +180,22 @@ return {
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item(select_opts)
-            elseif require("luasnip").jumpable(-1) then
-              vim.fn.feedkeys(replace_termcodes "<Plug>luasnip-jump-prev", "")
+            elseif vim.snippet.active { direction = -1 } then
+              vim.schedule(function() vim.snippet.jump(-1) end)
             else
               fallback()
             end
           end, { "i", "s" }),
         },
-        sources = cmp.config.sources({
+        sources = cmp.config.sources {
           { name = "path", priority = 250 },
           { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
-        }, {
+
           { name = "buffer" },
           { name = "supermaven" },
+          { name = "snippets", keyword_length = 2 },
           { name = "pypi", keyword_length = 4 },
           { name = "buffer", keyword_length = 3 },
-          { name = "luasnip", keyword_length = 2 },
           { name = "emoji" },
           { name = "lazydev", group_index = 0 },
           {
@@ -283,8 +204,8 @@ return {
               strategy = 2, -- insert command only
             },
           },
-        }),
-      }
+        },
+      })
     end,
     main = "utils.cmp",
   },

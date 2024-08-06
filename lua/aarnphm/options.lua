@@ -1,6 +1,6 @@
 local o, opt, g, wo = vim.o, vim.opt, vim.g, vim.wo
 
-if vim.loop.os_uname().sysname == "Darwin" then
+if vim.uv.os_uname().sysname == "Darwin" then
   g.clipboard = {
     name = "macOS-clipboard",
     copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
@@ -45,12 +45,13 @@ o.statusline = table.concat({
   "%{%luaeval('statusline.filetype {trunc_width = 75}')%}",
   "%{%luaeval('statusline.location {trunc_width = 90}')%}",
 }, " ")
+opt.statuscolumn = [[%!v:lua.require'utils'.ui.statuscolumn()]]
 -- Window blending configuration
 opt.winblend = 0
 opt.pumblend = 0 -- make completion window transparent
 
 opt.shortmess:append { W = true, I = true, c = true, C = true }
-opt.formatexpr = "v:lua.Util.format.formatexpr()"
+opt.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 opt.completeopt = "menu,menuone,noselect"
 o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 
@@ -83,7 +84,10 @@ opt.fillchars = {
   vert = "│",
   horiz = "─",
 }
-o.foldmethod = "manual"
+o.smoothscroll = true
+o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
+o.foldmethod = "expr"
+o.foldtext = "v:lua.require'utils'.ui.foldtext()"
 o.foldlevel = 99
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"

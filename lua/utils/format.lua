@@ -14,19 +14,19 @@ local M = setmetatable({}, {
 M.formatters = {} ---@type SimpleFormatter[]
 
 ---@param formatter SimpleFormatter
-M.register = function(formatter)
+function M.register(formatter)
   M.formatters[#M.formatters + 1] = formatter
   table.sort(M.formatters, function(a, b) return a.priority > b.priority end)
 end
 
-M.formatexpr = function()
+function M.formatexpr()
   if Util.has "conform.nvim" then return require("conform").formatexpr() end
   return vim.lsp.formatexpr { timeout_ms = 3000 }
 end
 
 ---@param buf? number
 ---@return (SimpleFormatter|{active:boolean,resolved:string[]})[]
-M.resolve = function(buf)
+function M.resolve(buf)
   buf = buf or vim.api.nvim_get_current_buf()
   local have_primary = false
   ---@param formatter SimpleFormatter
@@ -42,7 +42,7 @@ M.resolve = function(buf)
 end
 
 ---@param buf? number
-M.info = function(buf)
+function M.info(buf)
   buf = buf or vim.api.nvim_get_current_buf()
   local gaf = vim.g.autoformat == nil or vim.g.autoformat
   local baf = vim.b[buf].autoformat
@@ -68,12 +68,12 @@ M.info = function(buf)
   if not have then lines[#lines + 1] = "\n***No formatters available for this buffer.***" end
   Util[enabled and "info" or "warn"](
     table.concat(lines, "\n"),
-    { title = "SimpleFormat (" .. (enabled and "enabled" or "disabled") .. ")" }
+    { title = "LazyFormat (" .. (enabled and "enabled" or "disabled") .. ")" }
   )
 end
 
 ---@param buf? number
-M.enabled = function(buf)
+function M.enabled(buf)
   buf = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
   local gaf = vim.g.autoformat
   local baf = vim.b[buf].autoformat
@@ -86,11 +86,11 @@ M.enabled = function(buf)
 end
 
 ---@param buf? boolean
-M.toggle = function(buf) M.enable(not M.enabled(), buf) end
+function M.toggle(buf) M.enable(not M.enabled(), buf) end
 
 ---@param enable? boolean
 ---@param buf? boolean
-M.enable = function(enable, buf)
+function M.enable(enable, buf)
   if enable == nil then enable = true end
   if buf then
     vim.b.autoformat = enable
@@ -102,7 +102,7 @@ M.enable = function(enable, buf)
 end
 
 ---@param opts? {force?:boolean, buf?:number}
-M.format = function(opts)
+function M.format(opts)
   opts = opts or {}
   local buf = opts.buf or vim.api.nvim_get_current_buf()
   if not ((opts and opts.force) or M.enabled(buf)) then return end

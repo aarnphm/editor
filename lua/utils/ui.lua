@@ -10,12 +10,7 @@ local M = {}
 function M.get_signs(buf, lnum)
   -- Get regular signs
   ---@type Sign[]
-  local signs = vim.tbl_map(function(sign)
-    ---@type Sign
-    local ret = vim.fn.sign_getdefined(sign.name)[1]
-    ret.priority = sign.priority
-    return ret
-  end, vim.fn.sign_getplaced(buf, { group = "*", lnum = lnum })[1].signs)
+  local signs = {}
 
   -- Get extmark signs
   local extmarks = vim.api.nvim_buf_get_extmarks(
@@ -27,7 +22,7 @@ function M.get_signs(buf, lnum)
   )
   for _, extmark in pairs(extmarks) do
     signs[#signs + 1] = {
-      name = extmark[4].sign_hl_group or "",
+      name = extmark[4].sign_hl_group or extmark[4].sign_name or "",
       text = extmark[4].sign_text,
       texthl = extmark[4].sign_hl_group,
       priority = extmark[4].priority,
@@ -69,23 +64,98 @@ function M.foldtext()
   if not ret or type(ret) == "string" then
     ret = { { vim.api.nvim_buf_get_lines(0, vim.v.lnum - 1, vim.v.lnum, false)[1], {} } }
   end
-  table.insert(ret, { " 󰇘" })
+
+  table.insert(ret, { (" 󰁂 %d"):format(vim.v.foldend - vim.v.foldstart) })
 
   if not vim.treesitter.foldtext then return table.concat(vim.tbl_map(function(line) return line[1] end, ret), " ") end
   return ret
 end
 
+function M.statuscolumn()
+  local win = vim.g.statusline_winid
+  local buf = vim.api.nvim_win_get_buf(win)
+  local is_file = vim.bo[buf].buftype == ""
+  local show_signs = vim.wo[win].signcolumn ~= "no"
+
+  local components = { "", "", "" } -- left, middle, right
+
+  -- show open folds sign
+  local show_open_folds = true
+  -- highlight fold sign with gitsign color
+  local use_githl = true
+
+  if show_signs then
+    local signs = M.get_signs(buf, vim.v.lnum)
+
+    ---@type Sign?,Sign?,Sign?
+    local left, right, fold, githl
+    for _, s in ipairs(signs) do
+      if s.name and (s.name:find "GitSign" or s.name:find "MiniDiffSign") then
+        right = s
+        if use_githl then githl = s["texthl"] end
+      else
+        left = s
+      end
+    end
+
+    vim.api.nvim_win_call(win, function()
+      if vim.fn.foldclosed(vim.v.lnum) >= 0 then
+        fold = { text = vim.opt.fillchars:get().foldclose or "", texthl = githl or "Folded" }
+      elseif
+        show_open_folds
+        and not Util.ui.skip_foldexpr[buf]
+        and tostring(vim.treesitter.foldexpr(vim.v.lnum)):sub(1, 1) == ">"
+      then -- fold start
+        fold = { text = vim.opt.fillchars:get().foldopen or "", texthl = githl }
+      end
+    end)
+    -- Left: mark or non-git sign
+    components[1] = M.icon(M.get_mark(buf, vim.v.lnum) or left)
+    -- Right: fold icon or git sign (only if file)
+    components[3] = is_file and M.icon(fold or right) or ""
+  end
+
+  -- Numbers in Neovim are weird
+  -- They show when either number or relativenumber is true
+  local is_num = vim.wo[win].number
+  local is_relnum = vim.wo[win].relativenumber
+  if (is_num or is_relnum) and vim.v.virtnum == 0 then
+    components[2] = "%=%l " -- right align
+  end
+
+  if vim.v.virtnum ~= 0 then components[2] = "%= " end
+
+  return table.concat(components, "")
+end
+
+---@return {fg?:string}?
 function M.fg(name)
+  local color = M.color(name)
+  return color and { fg = color } or nil
+end
+
+---@param name string
+---@param bg? boolean
+---@return string?
+function M.color(name, bg)
   ---@type {foreground?:number}?
   ---@diagnostic disable-next-line: deprecated
-  local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name }) or vim.api.nvim_get_hl_by_name(name, true)
+  local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
   ---@diagnostic disable-next-line: undefined-field
-  local fg = hl and (hl.fg or hl.foreground)
-  return fg and { fg = string.format("#%06x", fg) } or nil
+  ---@type string?
+  local color = nil
+  if hl then
+    if bg then
+      color = hl.bg or hl.background
+    else
+      color = hl.fg or hl.foreground
+    end
+  end
+  return color and string.format("#%06x", color) or nil
 end
 
 M.skip_foldexpr = {} ---@type table<number,boolean>
-local skip_check = assert(vim.loop.new_check())
+local skip_check = assert(vim.uv.new_check())
 
 function M.foldexpr()
   local buf = vim.api.nvim_get_current_buf()
@@ -112,6 +182,43 @@ function M.foldexpr()
     skip_check:stop()
   end)
   return "0"
+end
+
+---@param buf number?
+function M.bufremove(buf)
+  buf = buf or 0
+  buf = buf == 0 and vim.api.nvim_get_current_buf() or buf
+
+  if vim.bo.modified then
+    local choice = vim.fn.confirm(("Save changes to %q?"):format(vim.fn.bufname()), "&Yes\n&No\n&Cancel")
+    if choice == 0 or choice == 3 then -- 0 for <Esc>/<C-c> and 3 for Cancel
+      return
+    end
+    if choice == 1 then -- Yes
+      vim.cmd.write()
+    end
+  end
+
+  for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+    vim.api.nvim_win_call(win, function()
+      if not vim.api.nvim_win_is_valid(win) or vim.api.nvim_win_get_buf(win) ~= buf then return end
+      -- Try using alternate buffer
+      local alt = vim.fn.bufnr "#"
+      if alt ~= buf and vim.fn.buflisted(alt) == 1 then
+        vim.api.nvim_win_set_buf(win, alt)
+        return
+      end
+
+      -- Try using previous buffer
+      local has_previous = pcall(vim.cmd, "bprevious")
+      if has_previous and buf ~= vim.api.nvim_win_get_buf(win) then return end
+
+      -- Create new listed buffer
+      local new_buf = vim.api.nvim_create_buf(true, false)
+      vim.api.nvim_win_set_buf(win, new_buf)
+    end)
+  end
+  if vim.api.nvim_buf_is_valid(buf) then pcall(vim.cmd, "bdelete! " .. buf) end
 end
 
 return M

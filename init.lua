@@ -4,7 +4,6 @@ require "aarnphm.bindings"
 
 -- NOTE: Loading shada is slow, so we load it manually after UIEnter
 local shada = vim.o.shada
-local set = vim.opt_local
 local autocmd = vim.api.nvim_create_autocmd
 
 vim.o.shada = ""
@@ -29,6 +28,7 @@ autocmd("FileType", {
     "qf",
     "query",
     "man",
+    "gitsigns.blame",
     "nowrite", -- fugitive
     "fugitive",
     "prompt",
@@ -37,7 +37,6 @@ autocmd("FileType", {
     "tsplayground",
     "neorepl",
     "alpha",
-    "toggleterm",
     "health",
     "nofile",
     "scratch",
@@ -123,10 +122,9 @@ vim.cmd [[
 vim.api.nvim_create_autocmd("TermOpen", {
   group = vim.api.nvim_create_augroup("custom-term-open", {}),
   callback = function()
-    set.number = false
-    set.relativenumber = false
-    set.scrolloff = 0
-
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.scrolloff = 0
     vim.bo.filetype = "terminal"
   end,
 })
@@ -135,7 +133,7 @@ if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
     "git",
     "clone",
@@ -146,6 +144,10 @@ if not vim.loop.fs_stat(lazypath) then
   }
 end
 vim.opt.runtimepath:prepend(lazypath)
+
+Util.plugin.setup()
+Util.root.setup()
+Util.format.setup()
 
 local get_lockfile = function()
   -- local workspace = os.getenv "WORKSPACE"

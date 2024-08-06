@@ -23,7 +23,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "ruff", "stylua", "shfmt", "mypy" },
+      ensure_installed = { "lua-language-server", "ruff", "stylua", "shfmt", "mypy", "gofumpt", "goimports" },
       ui = { border = BORDER },
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -56,7 +56,7 @@ return {
     "dnlhc/glance.nvim",
     cmd = "Glance",
     opts = {
-      border = { enable = BORDER ~= "none" and true or false, top_char = "―", bottom_char = "―" },
+      border = { enable = false, top_char = "―", bottom_char = "―" },
       height = 20,
       zindex = 50,
       theme = { enable = true },
@@ -288,7 +288,7 @@ return {
               workspace = { checkThirdParty = false },
               telemetry = { enable = false },
               semantic = { enable = false },
-              completion = { workspaceWord = true, callSnippet = "Both" },
+              completion = { workspaceWord = true, callSnippet = "Replace" },
               hover = { expandAlias = false },
               hint = {
                 enable = true,
@@ -494,13 +494,6 @@ return {
       end
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
-
-      vim.lsp.handlers["textDocument/publishDiagnostics"] =
-        vim.lsp.with(vim.lsp.handlers["textDocument/publishDiagnostics"], {
-          signs = { min = "Error" },
-          virtual_text = { spacing = 2, min = "Error" },
-          underline = false,
-        })
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")

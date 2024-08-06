@@ -2,7 +2,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     version = false,
-    event = Util.lazy_file_events,
+    event = "LazyFile",
     ---@alias LintOptions table<string,table>
     opts = {
       -- Event to trigger linters
@@ -38,7 +38,7 @@ return {
 
       local M = {}
       M.debounce = function(ms, fn)
-        local timer = vim.loop.new_timer()
+        local timer = vim.uv.new_timer()
         return function(...)
           local argv = { ... }
           timer:start(ms, 0, function()

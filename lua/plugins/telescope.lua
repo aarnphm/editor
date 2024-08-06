@@ -7,10 +7,26 @@ return {
       "nvim-telescope/telescope-live-grep-args.nvim",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "make",
+        build = vim.fn.executable "make" == 1 and "make"
+          or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
         enabled = vim.fn.executable "cmake" == 1,
-        config = function()
-          Util.on_load("telescope.nvim", function() require("telescope").load_extension "fzf" end)
+        config = function(plugin)
+          Util.on_load("telescope.nvim", function()
+            local ok, err = pcall(require("telescope").load_extension, "fzf")
+            if not ok then
+              local lib = plugin.dir .. "/build/libfzf." .. (Util.is_win() and "dll" or "so")
+              if not vim.uv.fs_stat(lib) then
+                Util.warn "`telescope-fzf-native.nvim` not built. Rebuilding..."
+                require("lazy")
+                  .build({ plugins = { plugin }, show = false })
+                  :wait(
+                    function() Util.info "Rebuilding `telescope-fzf-native.nvim` done.\nPlease restart Neovim." end
+                  )
+              else
+                Util.error("Failed to load `telescope-fzf-native.nvim`:\n" .. err)
+              end
+            end
+          end)
         end,
       },
     },
@@ -67,6 +83,7 @@ return {
         defaults = {
           prompt_prefix = "  ",
           selection_caret = " 󰄾 ",
+          borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
           get_selection_window = function()
