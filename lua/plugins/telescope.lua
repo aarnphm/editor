@@ -5,6 +5,7 @@ return {
     version = false,
     dependencies = {
       "nvim-telescope/telescope-live-grep-args.nvim",
+      "s1n7ax/nvim-window-picker",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = vim.fn.executable "make" == 1 and "make"
@@ -35,6 +36,8 @@ return {
         "<C-S-p>",
         Util.telescope("keymaps", {
           lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+          layout_strategy = "vertical",
+          previewer = false,
           layout_config = {
             width = 0.6,
             height = 0.6,
@@ -77,7 +80,21 @@ return {
       },
     },
     opts = function()
-      local actions = require "telescope.actions"
+      local TSActions = require "telescope.actions"
+      local TSActionLayout = require "telescope.actions.layout"
+
+      local Layout = require "nui.layout"
+      local Popup = require "nui.popup"
+
+      local telescope = require "telescope"
+      local TSLayout = require "telescope.pickers.layout"
+
+      local function make_popup(options)
+        local popup = Popup(options)
+        function popup.border:change_title(title) popup.border.set_text(popup.border, "top", title) end
+        return TSLayout.Window(popup)
+      end
+
       ---@class TelescopeOptions
       local opts = {
         defaults = {
@@ -98,7 +115,7 @@ return {
           mappings = {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
-              ["<Esc>"] = function(...) return actions.close(...) end,
+              ["<Esc>"] = function(...) return TSActions.close(...) end,
               ["<a-i>"] = function()
                 local action_state = require "telescope.actions.state"
                 local line = action_state.get_current_line()
@@ -109,17 +126,27 @@ return {
                 local line = action_state.get_current_line()
                 Util.telescope("find_files", { hidden = true, default_text = line })()
               end,
-              ["<C-Down>"] = function(...) return actions.cycle_history_next(...) end,
-              ["<C-Up>"] = function(...) return actions.cycle_history_prev(...) end,
-              ["<C-f>"] = function(...) return actions.preview_scrolling_down(...) end,
-              ["<C-b>"] = function(...) return actions.preview_scrolling_up(...) end,
+              ["<C-Down>"] = TSActions.cycle_history_next,
+              ["<C-Up>"] = TSActions.cycle_history_prev,
+              ["<C-f>"] = TSActions.preview_scrolling_down,
+              ["<C-b>"] = TSActions.preview_scrolling_up,
+              ["<C-p>"] = TSActionLayout.toggle_preview,
             },
-            n = { ["q"] = function(...) return actions.close(...) end },
+            n = {
+              ["q"] = TSActions.close,
+              ["<C-p>"] = TSActionLayout.toggle_preview,
+            },
           },
         },
         pickers = {
-          find_files = { hidden = true },
+          find_files = {
+            find_command = { "fd", "--type", "f", "--color", "never" },
+            hidden = true,
+          },
           live_grep = {
+            additional_args = function() return { "--hidden" } end,
+            glob_pattern = { "!.git" },
+
             on_input_filter_cb = function(prompt)
               -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
               return { prompt = prompt:gsub("%s", ".*") }

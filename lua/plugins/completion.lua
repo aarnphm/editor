@@ -113,7 +113,7 @@ return {
       local select_opts = { behavior = cmp.SelectBehavior.Select }
       ---@type cmp.ConfigSchema
       return vim.tbl_deep_extend("force", defaults, {
-        completion = { completeopt = "menu,menuone,noinsert" },
+        completion = { completeopt = "menu,menuone,noinsert,noselect" },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
