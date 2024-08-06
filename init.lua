@@ -83,16 +83,34 @@ autocmd(
 -- wrap and check for spell in text filetypes
 autocmd("FileType", {
   group = augroup "wrap_spell",
-  pattern = { "gitcommit", "markdown" },
+  pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
   end,
 })
-autocmd(
-  { "BufNewFile", "BufRead" },
-  { group = augroup "cpp_headers", pattern = { "*.h", "*.hpp", "*.hxx", "*.hh" }, command = "setlocal filetype=c" }
-)
+-- make it easier to close man-files when opened inline
+autocmd("FileType", {
+  group = augroup "man_unlisted",
+  pattern = { "man" },
+  callback = function(event) vim.bo[event.buf].buflisted = false end,
+})
+-- Fix conceallevel for json files
+autocmd({ "FileType" }, {
+  group = augroup "json_conceal",
+  pattern = { "json", "jsonc", "json5" },
+  callback = function() vim.opt_local.conceallevel = 0 end,
+})
+-- Auto create dir when saving a file, in case some intermediate directory does not exist
+autocmd({ "BufWritePre" }, {
+  group = augroup "auto_create_dir",
+  callback = function(event)
+    if event.match:match "^%w%w+:[\\/][\\/]" then return end
+    local file = vim.uv.fs_realpath(event.match) or event.match
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+  end,
+})
+-- Set additional filetype for dockerfile
 autocmd({ "BufNewFile", "BufRead", "FileType" }, {
   group = augroup "dockerfile",
   pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
@@ -104,12 +122,12 @@ autocmd("TextYankPost", {
   pattern = "*",
   callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
 })
-
+-- auto trim trailing whitespace
 autocmd("BufWritePost", {
   group = augroup "trim_whitespace",
   callback = function() require("mini.trailspace").trim() end,
 })
-
+-- toggle number on focussed window
 vim.cmd [[
   augroup simple_numbertoggle
     autocmd!
@@ -117,7 +135,6 @@ vim.cmd [[
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
 ]]
-
 -- Set local settings for terminal buffers
 vim.api.nvim_create_autocmd("TermOpen", {
   group = vim.api.nvim_create_augroup("custom-term-open", {}),
@@ -126,6 +143,29 @@ vim.api.nvim_create_autocmd("TermOpen", {
     vim.opt_local.relativenumber = false
     vim.opt_local.scrolloff = 0
     vim.bo.filetype = "terminal"
+  end,
+})
+-- add bigfile filetype
+vim.filetype.add {
+  pattern = {
+    [".*"] = {
+      function(path, buf)
+        return vim.bo[buf]
+            and vim.bo[buf].filetype ~= "bigfile"
+            and path
+            and vim.fn.getfsize(path) > vim.g.bigfile_size
+            and "bigfile"
+          or nil
+      end,
+    },
+  },
+}
+autocmd({ "FileType" }, {
+  group = augroup "bigfile",
+  pattern = "bigfile",
+  callback = function(ev)
+    vim.b.minianimate_disable = true
+    vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
   end,
 })
 
@@ -164,7 +204,7 @@ require("lazy").setup {
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
   colorscheme = { "rose-pine" },
   ui = {
-    border = "none",
+    border = BORDER,
     backdrop = 100,
     wrap = false,
   },

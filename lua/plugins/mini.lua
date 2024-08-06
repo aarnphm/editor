@@ -42,7 +42,7 @@ return {
           include_current = false,
           filter_rules = {
             bo = {
-              filetype = { "neo-tree", "neo-tree-popup", "notify" },
+              filetype = { "notify" },
               buftype = { "terminal", "quickfix", "Scratch", "aerial" },
             },
           },
@@ -57,12 +57,12 @@ return {
       {
         "<LocalLeader>/",
         function() require("mini.files").open(vim.api.nvim_buf_get_name(0), true) end,
-        desc = "Open mini.files (directory of current file)",
+        desc = "mini.files: open (directory of current file)",
       },
       {
         "<LocalLeader>.",
         function() require("mini.files").open(Util.root.git(), true) end,
-        desc = "Open mini.files (working root)",
+        desc = "mini.files: open (working root)",
       },
     },
     config = function(_, opts)

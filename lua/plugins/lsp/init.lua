@@ -56,7 +56,7 @@ return {
     "dnlhc/glance.nvim",
     cmd = "Glance",
     opts = {
-      border = { enable = false, top_char = "―", bottom_char = "―" },
+      border = { enable = true },
       height = 20,
       zindex = 50,
       theme = { enable = true },
@@ -506,6 +506,8 @@ return {
       )
       capabilities.textDocument.completion.completionItem.snippetSupport = true
       capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
+
+      require("lspconfig.ui.windows").default_options.border = BORDER
 
       ---@param server string
       local setup = function(server)

@@ -146,7 +146,6 @@ return {
           live_grep = {
             additional_args = function() return { "--hidden" } end,
             glob_pattern = { "!.git" },
-
             on_input_filter_cb = function(prompt)
               -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
               return { prompt = prompt:gsub("%s", ".*") }

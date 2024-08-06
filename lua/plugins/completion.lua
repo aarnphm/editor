@@ -189,9 +189,7 @@ return {
         },
         sources = cmp.config.sources {
           { name = "path", priority = 250 },
-          { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
-
-          { name = "buffer" },
+          { name = "nvim_lsp", priority = 200, keyword_length = 3, max_item_count = 350 },
           { name = "supermaven" },
           { name = "snippets", keyword_length = 2 },
           { name = "pypi", keyword_length = 4 },

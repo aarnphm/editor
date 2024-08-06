@@ -122,6 +122,8 @@ opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock
 g.mapleader = " "
 g.maplocalleader = ","
 g.autoformat = true
+-- mini.animate will also be disabled.
+g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 
