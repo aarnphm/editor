@@ -238,7 +238,7 @@ M.words.enabled = false
 M.words.ns = vim.api.nvim_create_namespace "vim_lsp_references"
 
 ---@param opts? {enabled?: boolean}
-function M.words.setup(K, opts)
+function M.words.setup(opts)
   opts = opts or {}
   if not opts.enabled then return end
   M.words.enabled = true
@@ -254,7 +254,7 @@ function M.words.setup(K, opts)
       group = vim.api.nvim_create_augroup("lsp_word_" .. buf, { clear = true }),
       buffer = buf,
       callback = function(ev)
-        if not K.has(buf, "documentHighlight") then return false end
+        if not require("plugins.lsp.keymaps").has(buf, "documentHighlight") then return false end
 
         if not ({ M.words.get() })[2] then
           if ev.event:find "CursorMoved" then

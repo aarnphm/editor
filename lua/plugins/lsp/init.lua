@@ -1,85 +1,3 @@
--- local LSP keys setup
-local K = {}
-
----@type LazyKeysLspSpec[]|nil
-K._keys = nil
-
----@alias LazyKeysLspSpec LazyKeysSpec|{has?:string}
----@alias LazyKeysLsp LazyKeys|{has?:string}
-
-K.get = function()
-  if not K._keys then
-    --@class PluginLspKeys
-    K._keys = {
-      { "gh", "<cmd>Telescope lsp_references<CR>", desc = "lsp: references" },
-      { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
-      { "H", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
-      { "gd", "<cmd>Telescope lsp_definitions<CR>", desc = "lsp: Peek definition", has = "definition" },
-      { "gD", vim.lsp.buf.declaration, desc = "lsp: Peek definition", has = "declaration" },
-      { "gR", "<cmd>Glance references<cr>", desc = "lsp: Show references", has = "definition" },
-      { "gr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
-    }
-  end
-  return K._keys
-end
-
----@param method string
-K.has = function(buffer, method)
-  method = method:find "/" and method or "textDocument/" .. method
-  local clients = Util.lsp.get_clients { bufnr = buffer }
-  for _, client in ipairs(clients) do
-    if client.supports_method(method) then return true end
-  end
-  return false
-end
-
----@return (LazyKeys|{has?:string})[]
-K.resolve = function(buffer)
-  local Keys = require "lazy.core.handler.keys"
-  if not Keys.resolve then return {} end
-  local spec = K.get()
-  local opts = Util.opts "nvim-lspconfig"
-  local clients = Util.lsp.get_clients { bufnr = buffer }
-  for _, client in ipairs(clients) do
-    local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
-    vim.list_extend(spec, maps)
-  end
-  return Keys.resolve(spec)
-end
-
-K.on_attach = function(_, buffer)
-  local Keys = require "lazy.core.handler.keys"
-  local keymaps = K.resolve(buffer)
-
-  vim.opt_local.omnifunc = "v:lua.vim.lsp.omnifunc"
-
-  for _, keys in pairs(keymaps) do
-    if not keys.has or K.has(buffer, keys.has) then
-      local opts = Keys.opts(keys)
-      opts.has = nil
-      opts.silent = opts.silent ~= false
-      opts.buffer = buffer
-      vim.keymap.set(keys.mode or "n", keys.lhs, keys.rhs, opts)
-    end
-  end
-end
-
-K.diagnostic_goto = function(next, severity)
-  local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
-  severity = severity and vim.diagnostic.severity[severity] or nil
-  return function() go { severity = severity } end
-end
-
-K.inlay_hints = function(buf, value)
-  local ih = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
-  if type(ih) == "function" then
-    ih(buf, value)
-  elseif type(ih) == "table" and ih.enable then
-    if value == nil then value = not ih.is_enabled(buf) end
-    ih.enable(value, { bufnr = buf })
-  end
-end
-
 return {
   {
     "norcalli/nvim-colorizer.lua",
@@ -536,10 +454,10 @@ return {
       Util.format.register(Util.lsp.formatter())
 
       -- setup keymaps
-      Util.lsp.on_attach(function(cl, bufnr) K.on_attach(cl, bufnr) end)
+      Util.lsp.on_attach(function(cl, bufnr) require("plugins.lsp.keymaps").on_attach(cl, bufnr) end)
 
       Util.lsp.setup()
-      Util.lsp.on_dynamic_capability(K.on_attach)
+      Util.lsp.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
       Util.lsp.words.setup(opts.document_highlight)
 
       -- diagnostics signs

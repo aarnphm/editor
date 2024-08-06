@@ -200,7 +200,7 @@ return {
           expandable_indicator = true,
           format = require("lspkind").cmp_format {
             mode = "symbol",
-            max_width = 50,
+            max_width = 30,
             symbol_map = {
               Supermaven = "",
             },
@@ -266,22 +266,24 @@ return {
             end
           end, { "i", "s" }),
         },
-        sources = {
-          { name = "supermaven" },
+        sources = cmp.config.sources({
           { name = "path", priority = 250 },
-          { name = "lazydev", group_index = 0 },
           { name = "nvim_lsp", keyword_length = 3, max_item_count = 350 },
+        }, {
+          { name = "buffer" },
+          { name = "supermaven" },
           { name = "pypi", keyword_length = 4 },
           { name = "buffer", keyword_length = 3 },
           { name = "luasnip", keyword_length = 2 },
           { name = "emoji" },
+          { name = "lazydev", group_index = 0 },
           {
             name = "latex_symbols",
             option = {
               strategy = 2, -- insert command only
             },
           },
-        },
+        }),
       }
     end,
     main = "utils.cmp",

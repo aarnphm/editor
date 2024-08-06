@@ -22,7 +22,7 @@ autocmd("FileType", {
   pattern = {
     "PlenaryTestPopup",
     "help",
-    "gruq-far",
+    "grug-far",
     "lspinfo",
     "man",
     "notify",
@@ -153,7 +153,10 @@ local get_lockfile = function()
   return vim.fn.stdpath "config" .. "/lazy-lock.json"
 end
 
-require("lazy").setup("plugins", {
+require("lazy").setup {
+  spec = {
+    { import = "plugins" },
+  },
   lockfile = get_lockfile(),
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
@@ -163,10 +166,10 @@ require("lazy").setup("plugins", {
     backdrop = 100,
     wrap = false,
   },
-})
+}
 
 -- vim.opt.termguicolors = true
-vim.cmd.colorscheme "rose-pine"
+vim.cmd.colorscheme "rose-pine-dawn"
 -- TODO: refactor this one day
 local hi = function(name, opts)
   opts.default = opts.default or true
