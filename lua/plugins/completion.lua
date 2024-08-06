@@ -157,6 +157,10 @@ return {
             compare.order,
           },
         },
+        enabled = function()
+          local disabled = { gitcommit = true }
+          return not disabled[vim.bo.filetype]
+        end,
         mapping = cmp.mapping.preset.insert {
           ["<CR>"] = Util.cmp.confirm { select = true },
           ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
