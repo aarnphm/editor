@@ -13,9 +13,7 @@ function M.ai_indent(ai_type)
   local indents = {} ---@type {line: number, indent: number, text: string}[]
 
   for l, line in ipairs(lines) do
-    if not line:find "^%s*$" then
-      indents[#indents + 1] = { line = l, indent = #line:gsub("\t", spaces):match "^%s*", text = line }
-    end
+    if not line:find "^%s*$" then indents[#indents + 1] = { line = l, indent = #line:gsub("\t", spaces):match "^%s*", text = line } end
   end
 
   local ret = {} ---@type (Mini.ai.region | {indent: number})[]

@@ -8,8 +8,7 @@ return {
       "s1n7ax/nvim-window-picker",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = vim.fn.executable "make" == 1 and "make"
-          or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        build = vim.fn.executable "make" == 1 and "make" or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
         enabled = vim.fn.executable "cmake" == 1,
         config = function(plugin)
           Util.on_load("telescope.nvim", function()
@@ -18,11 +17,7 @@ return {
               local lib = plugin.dir .. "/build/libfzf." .. (Util.is_win() and "dll" or "so")
               if not vim.uv.fs_stat(lib) then
                 Util.warn "`telescope-fzf-native.nvim` not built. Rebuilding..."
-                require("lazy")
-                  .build({ plugins = { plugin }, show = false })
-                  :wait(
-                    function() Util.info "Rebuilding `telescope-fzf-native.nvim` done.\nPlease restart Neovim." end
-                  )
+                require("lazy").build({ plugins = { plugin }, show = false }):wait(function() Util.info "Rebuilding `telescope-fzf-native.nvim` done.\nPlease restart Neovim." end)
               else
                 Util.error("Failed to load `telescope-fzf-native.nvim`:\n" .. err)
               end
@@ -44,7 +39,7 @@ return {
             prompt_position = "top",
           },
         }),
-        desc = "telescope: Keymaps",
+        desc = "telescope: keymaps",
         noremap = true,
         silent = true,
       },
@@ -56,44 +51,37 @@ return {
           previewer = false,
           cwd = require("plenary.job"):new({ command = "git", args = { "rev-parse", "--show-toplevel" } }):sync()[1],
         }),
-        desc = "telescope: Manage buffers",
+        desc = "telescope: manage buffers",
       },
       {
         "<leader>f",
         Util.telescope("find_files", {}),
-        desc = "telescope: Find files",
+        desc = "telescope: find files",
       },
       {
         "<LocalLeader>f",
         Util.telescope("git_files", {}),
-        desc = "telescope: Find files (git)",
+        desc = "telescope: find files (git)",
       },
       {
-        "<leader>/",
+        "<LocalLeader>w",
         Util.telescope("grep_string", { word_match = "-w" }),
-        desc = "telescope: Grep string",
+        desc = "telescope: grep string (cursor)",
       },
       {
-        "<leader>w",
+        "<Leader>/",
+        Util.telescope "grep_string",
+        desc = "telescope: grep string",
+      },
+      {
+        "<Leader>w",
         function() require("telescope").extensions.live_grep_args.live_grep_args() end,
-        desc = "telescope: Grep word",
+        desc = "telescope: grep word",
       },
     },
     opts = function()
-      local TSActions = require "telescope.actions"
-      local TSActionLayout = require "telescope.actions.layout"
-
-      local Layout = require "nui.layout"
-      local Popup = require "nui.popup"
-
-      local telescope = require "telescope"
-      local TSLayout = require "telescope.pickers.layout"
-
-      local function make_popup(options)
-        local popup = Popup(options)
-        function popup.border:change_title(title) popup.border.set_text(popup.border, "top", title) end
-        return TSLayout.Window(popup)
-      end
+      local actions = require "telescope.actions"
+      local actions_layout = require "telescope.actions.layout"
 
       ---@class TelescopeOptions
       local opts = {
@@ -115,7 +103,7 @@ return {
           mappings = {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
-              ["<Esc>"] = function(...) return TSActions.close(...) end,
+              ["<Esc>"] = function(...) return actions.close(...) end,
               ["<a-i>"] = function()
                 local action_state = require "telescope.actions.state"
                 local line = action_state.get_current_line()
@@ -126,15 +114,15 @@ return {
                 local line = action_state.get_current_line()
                 Util.telescope("find_files", { hidden = true, default_text = line })()
               end,
-              ["<C-Down>"] = TSActions.cycle_history_next,
-              ["<C-Up>"] = TSActions.cycle_history_prev,
-              ["<C-f>"] = TSActions.preview_scrolling_down,
-              ["<C-b>"] = TSActions.preview_scrolling_up,
-              ["<C-p>"] = TSActionLayout.toggle_preview,
+              ["<C-Down>"] = actions.cycle_history_next,
+              ["<C-Up>"] = actions.cycle_history_prev,
+              ["<C-f>"] = actions.preview_scrolling_down,
+              ["<C-b>"] = actions.preview_scrolling_up,
+              ["<C-p>"] = actions_layout.toggle_preview,
             },
             n = {
-              ["q"] = TSActions.close,
-              ["<C-p>"] = TSActionLayout.toggle_preview,
+              ["q"] = actions.close,
+              ["<C-p>"] = actions_layout.toggle_preview,
             },
           },
         },

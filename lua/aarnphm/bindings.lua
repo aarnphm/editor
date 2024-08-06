@@ -65,30 +65,10 @@ map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" }
 map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
 map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
 map("n", "<LocalLeader>l", "<cmd>set list! list?<cr>", { silent = false, desc = "misc: toggle invisible characters" })
-map(
-  "n",
-  "<LocalLeader>]",
-  string.format("<cmd>vertical resize -%s<cr>", 10),
-  { noremap = false, desc = "windows: resize right 10px" }
-)
-map(
-  "n",
-  "<LocalLeader>[",
-  string.format("<cmd>vertical resize +%s<cr>", 10),
-  { noremap = false, desc = "windows: resize left 10px" }
-)
-map(
-  "n",
-  "<LocalLeader>-",
-  string.format("<cmd>resize -%s<cr>", 10),
-  { noremap = false, desc = "windows: resize down 10px" }
-)
-map(
-  "n",
-  "<LocalLeader>+",
-  string.format("<cmd>resize +%s<cr>", 10),
-  { noremap = false, desc = "windows: resize up 10px" }
-)
+map("n", "<LocalLeader>]", string.format("<cmd>vertical resize -%s<cr>", 10), { noremap = false, desc = "windows: resize right 10px" })
+map("n", "<LocalLeader>[", string.format("<cmd>vertical resize +%s<cr>", 10), { noremap = false, desc = "windows: resize left 10px" })
+map("n", "<LocalLeader>-", string.format("<cmd>resize -%s<cr>", 10), { noremap = false, desc = "windows: resize down 10px" })
+map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", 10), { noremap = false, desc = "windows: resize up 10px" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "Next search result" })

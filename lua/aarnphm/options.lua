@@ -121,9 +121,11 @@ opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock
 -- map leader to <Space> and localeader to +
 g.mapleader = " "
 g.maplocalleader = ","
+
+-- options
 g.autoformat = true
--- mini.animate will also be disabled.
-g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB
+g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
+g.use_glance = true
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 

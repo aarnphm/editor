@@ -50,10 +50,7 @@ function M.info(buf)
   local lines = {
     "# Status",
     ("- [%s] global **%s**"):format(gaf and "x" or " ", gaf and "enabled" or "disabled"),
-    ("- [%s] buffer **%s**"):format(
-      enabled and "x" or " ",
-      baf == nil and "inherit" or baf and "enabled" or "disabled"
-    ),
+    ("- [%s] buffer **%s**"):format(enabled and "x" or " ", baf == nil and "inherit" or baf and "enabled" or "disabled"),
   }
   local have = false
   for _, formatter in ipairs(M.resolve(buf)) do
@@ -66,10 +63,7 @@ function M.info(buf)
     end
   end
   if not have then lines[#lines + 1] = "\n***No formatters available for this buffer.***" end
-  Util[enabled and "info" or "warn"](
-    table.concat(lines, "\n"),
-    { title = "LazyFormat (" .. (enabled and "enabled" or "disabled") .. ")" }
-  )
+  Util[enabled and "info" or "warn"](table.concat(lines, "\n"), { title = "LazyFormat (" .. (enabled and "enabled" or "disabled") .. ")" })
 end
 
 ---@param buf? number
@@ -126,18 +120,10 @@ M.setup = function()
   })
 
   -- Manual format
-  vim.api.nvim_create_user_command(
-    "Format",
-    function() M.format { force = true } end,
-    { desc = "Format selection or buffer" }
-  )
+  vim.api.nvim_create_user_command("Format", function() M.format { force = true } end, { desc = "Format selection or buffer" })
 
   -- Format info
-  vim.api.nvim_create_user_command(
-    "FormatInfo",
-    function() M.info() end,
-    { desc = "Show info about the formatters for the current buffer" }
-  )
+  vim.api.nvim_create_user_command("FormatInfo", function() M.info() end, { desc = "Show info about the formatters for the current buffer" })
 
   vim.api.nvim_create_user_command("FormatDisable", function() M.toggle() end, { desc = "Toggle Format" })
   vim.api.nvim_create_user_command("FormatEnable", function() M.toggle(true) end, { desc = "Disable format" })

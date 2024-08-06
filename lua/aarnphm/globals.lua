@@ -16,12 +16,11 @@ local fmt = string.format
 
 -- NOTE: git
 local concat_hunks = function(hunks)
-  return vim.tbl_isempty(hunks) and ""
-    or table.concat({
-      fmt("+%d", hunks[1]),
-      fmt("~%d", hunks[2]),
-      fmt("-%d", hunks[3]),
-    }, " ")
+  return vim.tbl_isempty(hunks) and "" or table.concat({
+    fmt("+%d", hunks[1]),
+    fmt("~%d", hunks[2]),
+    fmt("-%d", hunks[3]),
+  }, " ")
 end
 
 local get_hunks = function()

@@ -18,8 +18,7 @@ end
 ---@return string
 function M.snippet_preview(snippet)
   local ok, parsed = pcall(function() return vim.lsp._snippet_grammar.parse(snippet) end)
-  return ok and tostring(parsed)
-    or M.snippet_replace(snippet, function(placeholder) return M.snippet_preview(placeholder.text) end):gsub("%$0", "")
+  return ok and tostring(parsed) or M.snippet_replace(snippet, function(placeholder) return M.snippet_preview(placeholder.text) end):gsub("%$0", "")
 end
 
 -- This function replaces nested placeholders in a snippet with LSP placeholders.
@@ -105,8 +104,7 @@ function M.expand(snippet)
     local fixed = M.snippet_fix(snippet)
     ok = pcall(vim.snippet.expand, fixed)
 
-    local msg = ok and "Failed to parse snippet,\nbut was able to fix it automatically."
-      or ("Failed to parse snippet.\n" .. err)
+    local msg = ok and "Failed to parse snippet,\nbut was able to fix it automatically." or ("Failed to parse snippet.\n" .. err)
 
     Util[ok and "warn" or "error"](
       ([[%s

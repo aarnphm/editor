@@ -198,9 +198,7 @@ function M.get_pkg_path(pkg, path, opts)
   path = path or ""
   local ret = root .. "/packages/" .. pkg .. "/" .. path
   if opts.warn and not vim.uv.fs_stat(ret) and not require("lazy.core.config").headless() then
-    M.warn(
-      ("Mason package path not found for **%s**:\n- `%s`\nYou may need to force update the package."):format(pkg, path)
-    )
+    M.warn(("Mason package path not found for **%s**:\n- `%s`\nYou may need to force update the package."):format(pkg, path))
   end
   return ret
 end
@@ -227,10 +225,7 @@ M.telescope = function(builtin, opts)
         map("i", "<a-c>", function()
           local action_state = require "telescope.actions.state"
           local line = action_state.get_current_line()
-          M.telescope(
-            params.builtin,
-            vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line })
-          )()
+          M.telescope(params.builtin, vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line }))()
         end)
         return true
       end
@@ -263,9 +258,7 @@ end
 ---@param name "autocmds" | "options" | "keymaps"
 M.load = function(name)
   local function _load(mod)
-    if require("lazy.core.cache").find(mod)[1] then
-      Util.try(function() require(mod) end, { msg = "Failed loading " .. mod })
-    end
+    if require("lazy.core.cache").find(mod)[1] then Util.try(function() require(mod) end, { msg = "Failed loading " .. mod }) end
   end
   -- always load lazyvim, then user file
   if M.defaults[name] or name == "options" then _load("lazyvim.config." .. name) end
@@ -297,9 +290,7 @@ function M.notify(msg, opts)
   if vim.in_fast_event() then return vim.schedule(function() M.notify(msg, opts) end) end
 
   opts = opts or {}
-  if type(msg) == "table" then
-    msg = table.concat(vim.tbl_filter(function(line) return line or false end, msg), "\n")
-  end
+  if type(msg) == "table" then msg = table.concat(vim.tbl_filter(function(line) return line or false end, msg), "\n") end
   if opts.stacktrace then msg = msg .. M.pretty_trace { level = opts.stacklevel or 2 } end
   local lang = opts.lang or "markdown"
   local n = opts.once and vim.notify_once or vim.notify

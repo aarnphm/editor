@@ -16,9 +16,9 @@ function M.wrap(toggle)
       toggle.set(not toggle.get())
       local state = toggle.get()
       if state then
-        Util.info("Enabled " .. toggle.name, { title = toggle.name })
+        Util.info("enabled: " .. toggle.name, { title = toggle.name })
       else
-        Util.warn("Disabled " .. toggle.name, { title = toggle.name })
+        Util.warn("disabled: " .. toggle.name, { title = toggle.name })
       end
       return state
     end,
@@ -37,17 +37,13 @@ function M.wk(lhs, toggle)
   if not Util.has "which-key.nvim" then return end
   local function safe_get()
     local ok, enabled = pcall(toggle.get)
-    if not ok then
-      Util.error({ "Failed to get toggle state for **" .. toggle.name .. "**:\n", enabled }, { once = true })
-    end
+    if not ok then Util.error({ "Failed to get toggle state for **" .. toggle.name .. "**:\n", enabled }, { once = true }) end
     return enabled
   end
   require("which-key").add {
     {
       lhs,
-      icon = function()
-        return safe_get() and { icon = " ", color = "green" } or { icon = " ", color = "yellow" }
-      end,
+      icon = function() return safe_get() and { icon = " ", color = "green" } or { icon = " ", color = "yellow" } end,
       desc = function() return (safe_get() and "Disable " or "Enable ") .. toggle.name end,
     },
   }

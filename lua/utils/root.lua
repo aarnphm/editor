@@ -104,11 +104,7 @@ function M.info()
   local first = true
   for _, root in ipairs(roots) do
     for _, path in ipairs(root.paths) do
-      lines[#lines + 1] = ("- [%s] `%s` **(%s)**"):format(
-        first and "x" or " ",
-        path,
-        type(root.spec) == "table" and table.concat(root.spec, ", ") or root.spec
-      )
+      lines[#lines + 1] = ("- [%s] `%s` **(%s)**"):format(first and "x" or " ", path, type(root.spec) == "table" and table.concat(root.spec, ", ") or root.spec)
       first = false
     end
   end
@@ -123,11 +119,7 @@ end
 M.cache = {}
 
 function M.setup()
-  vim.api.nvim_create_user_command(
-    "Root",
-    function() Util.root.info() end,
-    { desc = "Util roots for the current buffer" }
-  )
+  vim.api.nvim_create_user_command("Root", function() Util.root.info() end, { desc = "Util roots for the current buffer" })
 
   -- FIX: doesn't properly clear cache in neo-tree `set_root` (which should happen presumably on `DirChanged`),
   -- probably because the event is triggered in the neo-tree buffer, therefore add `BufEnter`
