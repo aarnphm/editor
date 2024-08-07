@@ -57,30 +57,32 @@ return {
     config = function(_, opts) require("conform").setup(opts) end,
   },
   {
+    "supermaven-inc/supermaven-nvim",
+    event = "LazyFile",
+    opts = {
+      ignore_filetypes = {
+        gitcommit = true,
+        hgcommit = true,
+        vimrc = true,
+        TelescopePrompt = true,
+        ministarter = true,
+        nofile = true,
+        startup = true,
+      },
+      disable_inline_completion = true,
+      log_level = "warn",
+    },
+  },
+  {
     "hrsh7th/nvim-cmp",
     version = false,
     event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
       "onsails/lspkind.nvim",
-      "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-emoji",
-      "kdheepak/cmp-latex-symbols",
-      {
-        "vrslev/cmp-pypi",
-        dependencies = { "nvim-lua/plenary.nvim" },
-        ft = "toml",
-      },
-      {
-        "supermaven-inc/supermaven-nvim",
-        config = function()
-          require("supermaven-nvim").setup {
-            ignore_filetypes = { gitcommit = true, hgcommit = true, vimrc = true },
-            disable_inline_completion = true,
-          }
-        end,
-      },
       {
         "garymjr/nvim-snippets",
         opts = {
@@ -194,18 +196,11 @@ return {
         sources = cmp.config.sources {
           { name = "path", priority = 250 },
           { name = "nvim_lsp", priority = 200, keyword_length = 3, max_item_count = 350 },
-          { name = "supermaven" },
-          { name = "snippets", keyword_length = 2 },
-          { name = "pypi", keyword_length = 4 },
+          { name = "supermaven", priority = 300 },
+          { name = "snippets", keyword_length = 2, priority = 100 },
           { name = "buffer", keyword_length = 3 },
           { name = "emoji" },
           { name = "lazydev", group_index = 0 },
-          {
-            name = "latex_symbols",
-            option = {
-              strategy = 2, -- insert command only
-            },
-          },
         },
       })
     end,

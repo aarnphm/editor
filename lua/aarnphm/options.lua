@@ -128,5 +128,6 @@ g.markdown_recommended_style = 0
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
 g.use_glance = true
+g.inline_diagnostics = true
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

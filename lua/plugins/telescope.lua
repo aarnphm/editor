@@ -4,8 +4,16 @@ return {
     cmd = "Telescope",
     version = false,
     dependencies = {
-      "nvim-telescope/telescope-live-grep-args.nvim",
       "s1n7ax/nvim-window-picker",
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        config = function()
+          Util.on_load("telescope.nvim", function()
+            local ok, err = pcall(require("telescope").load_extension, "live_grep_args")
+            if not ok then Util.error("Failed to load `telescope-live-grep-args.nvim`:\n" .. err) end
+          end)
+        end,
+      },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = vim.fn.executable "make" == 1 and "make" or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
@@ -173,12 +181,8 @@ return {
           },
         },
       }
+
       return opts
-    end,
-    ---@param opts TelescopeOptions
-    config = function(_, opts)
-      require("telescope").setup(opts)
-      require("telescope").load_extension "live_grep_args"
     end,
   },
 }

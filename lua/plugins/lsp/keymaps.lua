@@ -43,7 +43,6 @@ function M.has(buffer, method)
     for _, m in ipairs(method) do
       if M.has(buffer, m) then return true end
     end
-    Util.warn("lsp: " .. tostring(method) .. " not found")
     return false
   end
   method = method:find "/" and method or "textDocument/" .. method
@@ -51,7 +50,6 @@ function M.has(buffer, method)
   for _, client in ipairs(clients) do
     if client.supports_method(method) then return true end
   end
-  Util.warn("lsp: " .. tostring(method) .. " not found")
   return false
 end
 

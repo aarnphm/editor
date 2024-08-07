@@ -135,9 +135,6 @@ return {
       -- provide the code lenses.
       codelens = { enabled = false },
       -- Enable lsp cursor word highlighting
-      document_highlight = {
-        enabled = true,
-      },
       ---@type lsp.ClientCapabilities
       capabilities = {
         workspace = {
@@ -330,19 +327,22 @@ return {
           },
         },
         ruff = {
+          cmd_env = { RUFF_TRACE = "messages" },
+          init_options = { settings = { logLevel = "error" } },
           keys = {
             {
               "<leader>co",
-              function()
-                vim.lsp.buf.code_action {
-                  apply = true,
-                  context = {
-                    only = { "source.organizeImports" },
-                    diagnostics = {},
-                  },
-                }
-              end,
-              desc = "Organize Imports",
+              Util.lsp.action["source.organizeImports"],
+              desc = "lsp: organize imports",
+            },
+          },
+        },
+        ruff_lsp = {
+          keys = {
+            {
+              "<leader>co",
+              Util.lsp.action["source.organizeImports"],
+              desc = "lsp: organize imports",
             },
           },
         },
@@ -362,7 +362,6 @@ return {
             },
           },
         },
-        ---@type lspconfig.options.pyright
         pyright = {
           settings = {
             python = {
@@ -382,7 +381,6 @@ return {
           },
         },
       },
-      ---@type table<string, fun(lspconfig:any, options:_.lspconfig.options):boolean?>
       setup = {
         ruff = function()
           Util.lsp.on_attach(function(client, _)
@@ -390,7 +388,7 @@ return {
               client.server_capabilities.hoverProvider = false
               client.server_capabilities.documentFormattingProvider = false -- NOTE: disable ruff formatting because I don't like deterministic formatter  in python
             end
-          end)
+          end, "ruff")
         end,
         taplo = function()
           Util.lsp.on_attach(function(client, _)
@@ -444,12 +442,7 @@ return {
     config = function(_, opts)
       Util.format.register(Util.lsp.formatter())
 
-      -- setup keymaps
-      Util.lsp.on_attach(function(cl, bufnr) require("plugins.lsp.keymaps").on_attach(cl, bufnr) end)
-
       Util.lsp.setup()
-      Util.lsp.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
-      Util.lsp.words.setup(opts.document_highlight)
 
       -- inlay hints
       if opts.inlay_hints.enabled then
@@ -472,6 +465,14 @@ return {
       end
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
+
+      if vim.g.inline_diagnostics then
+        vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.handlers["textDocument/publishDiagnostics"], {
+          signs = { min = "Error" },
+          virtual_text = { spacing = 2, min = "Error" },
+          underline = false,
+        })
+      end
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")

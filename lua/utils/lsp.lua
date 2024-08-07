@@ -52,6 +52,13 @@ function M.setup()
   end
   M.on_attach(M._check_methods)
   M.on_dynamic_capability(M._check_methods)
+
+  -- keymaps
+  M.on_attach(function(cl, bufnr) require("plugins.lsp.keymaps").on_attach(cl, bufnr) end)
+  M.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
+
+  -- setup document highlight
+  M.words.setup()
 end
 
 ---@param client vim.lsp.Client
@@ -219,10 +226,7 @@ M.words = {}
 M.words.enabled = false
 M.words.ns = vim.api.nvim_create_namespace "vim_lsp_references"
 
----@param opts? {enabled?: boolean}
-function M.words.setup(opts)
-  opts = opts or {}
-  if not opts.enabled then return end
+function M.words.setup()
   M.words.enabled = true
   local handler = vim.lsp.handlers["textDocument/documentHighlight"]
   vim.lsp.handlers["textDocument/documentHighlight"] = function(err, result, ctx, config)

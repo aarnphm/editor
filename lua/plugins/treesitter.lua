@@ -8,22 +8,24 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    opts = { max_lines = 3, mode = "cursor" },
-    keys = {
-      {
-        "<leader>ut",
-        function()
-          local tsc = require "treesitter-context"
-          tsc.toggle()
-          if Util.inject.get_upvalue(tsc.toggle, "enabled") then
-            Util.info("Enabled Treesitter Context", { title = "Option" })
+    event = "VeryLazy",
+    opts = function()
+      local tsc = require "treesitter-context"
+
+      Util.toggle.map("<leader>ut", {
+        name = "Treesitter Context",
+        get = tsc.enabled,
+        set = function(state)
+          if state then
+            tsc.enable()
           else
-            Util.warn("Disabled Treesitter Context", { title = "Option" })
+            tsc.disable()
           end
         end,
-        desc = "Toggle Treesitter Context",
-      },
-    },
+      })
+
+      return { mode = "cursor", max_lines = 3 }
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter",

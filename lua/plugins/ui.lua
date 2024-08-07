@@ -21,11 +21,8 @@ return {
   },
   {
     "utilyre/barbecue.nvim",
-    version = "*",
-    dependencies = {
-      "SmiteshP/nvim-navic",
-      "nvim-tree/nvim-web-devicons", -- optional dependency
-    },
+    version = false,
+    dependencies = { "SmiteshP/nvim-navic" },
     opts = {
       show_modified = true,
       symbols = {
@@ -40,11 +37,23 @@ return {
       presets = {
         bottom_search = true,
         command_palette = false,
-      },
-      cmdline = {
-        view = "cmdline",
+        long_message_to_split = true,
       },
       notify = { enabled = false },
+      cmdline = { view = "cmdline" },
+      routes = {
+        {
+          filter = {
+            event = "msg_show",
+            any = {
+              { find = "%d+L, %d+B" },
+              { find = "; after #%d+" },
+              { find = "; before #%d+" },
+            },
+          },
+          view = "mini",
+        },
+      },
       lsp = {
         override = {
           -- override the default lsp markdown formatter with Noice
@@ -56,9 +65,29 @@ return {
         },
       },
     },
-    dependencies = {
-      "MunifTanjim/nui.nvim",
+  },
+  { "MunifTanjim/nui.nvim", lazy = true },
+  {
+    "echasnovski/mini.icons",
+    lazy = true,
+    opts = {
+      file = {
+        [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
+        ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
+      },
+      filetype = {
+        dotenv = { glyph = "", hl = "MiniIconsYellow" },
+      },
     },
+    specs = {
+      { "nvim-tree/nvim-web-devicons", enabled = false, optional = true },
+    },
+    init = function()
+      package.preload["nvim-web-devicons"] = function()
+        require("mini.icons").mock_nvim_web_devicons()
+        return package.loaded["nvim-web-devicons"]
+      end
+    end,
   },
   {
     "lukas-reineke/indent-blankline.nvim",

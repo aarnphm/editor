@@ -21,6 +21,12 @@ setmetatable(M, {
   end,
 })
 
+function M.setup()
+  M.plugin.setup()
+  M.root.setup()
+  M.format.setup()
+end
+
 function M.is_win() return vim.uv.os_uname().sysname:find "Windows" ~= nil end
 
 ---@param plugin string
