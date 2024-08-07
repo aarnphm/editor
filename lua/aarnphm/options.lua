@@ -45,14 +45,14 @@ o.statusline = table.concat({
   "%{%luaeval('statusline.filetype {trunc_width = 75}')%}",
   "%{%luaeval('statusline.location {trunc_width = 90}')%}",
 }, " ")
-opt.statuscolumn = [[%!v:lua.require'utils'.ui.statuscolumn()]]
+o.statuscolumn = [[%!v:lua.require'utils'.ui.statuscolumn()]]
 -- Window blending configuration
-opt.winblend = 0
-opt.pumblend = 0 -- make completion window transparent
+o.winblend = 0
+o.pumblend = 0 -- make completion window transparent
 
-opt.shortmess:append { W = true, I = true, c = true, C = true }
-opt.formatexpr = "v:lua.require'utils'.format.formatexpr()"
-opt.completeopt = "menu,menuone,noselect"
+opt.shortmess:append { W = true, c = true, C = true }
+o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
+o.completeopt = "menu,menuone,noselect"
 o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
@@ -73,7 +73,7 @@ o.background = "dark" -- "light"
 
 -- fold with nvim-ufo
 o.foldenable = true
-opt.conceallevel = 2
+o.conceallevel = 2
 opt.fillchars = {
   foldopen = "",
   foldclose = "",
@@ -99,7 +99,7 @@ o.shiftwidth = TABWIDTH
 o.shiftround = true
 
 -- UI config
-opt.showmode = false -- This is set with mini.statusline
+o.showmode = false -- This is set with mini.statusline
 o.cmdheight = 1
 o.showcmd = false
 o.showbreak = "↳  "
@@ -122,12 +122,11 @@ opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock
 g.mapleader = " "
 g.maplocalleader = ","
 
+-- Fix markdown indentation settings
+g.markdown_recommended_style = 0
 -- options
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
 g.use_glance = true
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
-
--- Fix markdown indentation settings
-vim.g.markdown_recommended_style = 0

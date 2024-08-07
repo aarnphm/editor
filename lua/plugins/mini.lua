@@ -210,14 +210,76 @@ return {
     "echasnovski/mini.comment",
     dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
     keys = {
-      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "Comment visual line" },
-      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "Uncomment visual line" },
+      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "comment: visual line" },
+      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "comment: visual line" },
     },
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    event = "LazyFile",
     opts = {
       options = {
         custom_commentstring = function() return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring end,
       },
     },
+  },
+  {
+    "echasnovski/mini.starter",
+    version = false, -- wait till new 0.7.0 release to put it back on semver
+    event = "VimEnter",
+    opts = function()
+      local logo = table.concat({
+        [[                                  __]],
+        [[     ___     ___    ___   __  __ /\_\    ___ ___]],
+        [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
+        [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
+        [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
+        [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
+      }, "\n")
+      local pad = string.rep(" ", 12)
+      local new_section = function(name, action, section) return { name = name, action = action, section = pad .. section } end
+
+      local starter = require "mini.starter"
+      --stylua: ignore
+      local config = {
+        evaluate_single = true,
+        header = logo,
+        items = {
+          new_section("Files",      Util.telescope('find_files'),          "Telescope"),
+          new_section("Recents",    Util.telescope("oldfiles"),            "Telescope"),
+          new_section("Text",       Util.telescope("live_grep"),           "Telescope"),
+          new_section("New",        "ene | startinsert",                   "Built-in"),
+          new_section("Quit",       "qa",                                  "Built-in"),
+          new_section("Lazy",       "Lazy",                                "Config"),
+        },
+        content_hooks = {
+          starter.gen_hook.adding_bullet(pad .. "░ ", false),
+          starter.gen_hook.aligning("center", "center"),
+        },
+      }
+      return config
+    end,
+    config = function(_, config)
+      -- close Lazy and re-open when starter is ready
+      if vim.o.filetype == "lazy" then
+        vim.cmd.close()
+        vim.api.nvim_create_autocmd("User", {
+          pattern = "MiniStarterOpened",
+          callback = function() require("lazy").show() end,
+        })
+      end
+
+      local starter = require "mini.starter"
+      starter.setup(config)
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimStarted",
+        callback = function(ev)
+          local stats = require("lazy").stats()
+          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+          local pad_footer = string.rep(" ", 8)
+          starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
+          -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
+          if vim.bo[ev.buf].filetype == "ministarter" then pcall(starter.refresh) end
+        end,
+      })
+    end,
   },
 }

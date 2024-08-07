@@ -45,14 +45,14 @@ return {
           }
         end,
         mode = { "n", "v" },
-        desc = "Search and Replace",
+        desc = "search: open and replace",
       },
     },
   },
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTelescope" },
-    event = { "BufReadPost", "BufNewFile" },
+    event = "LazyFile",
     opts = {},
     keys = {
       { "]t", function() require("todo-comments").jump_next() end, desc = "todo: next" },

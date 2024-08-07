@@ -1,5 +1,5 @@
 return {
-  { "tpope/vim-fugitive", keys = { { "<leader>gs", "<cmd>vertical Git<CR>", { desc = "fugitive" } } } },
+  { "tpope/vim-fugitive", keys = { { "<leader>gs", "<cmd>vertical Git<CR>", { desc = "git: fugitive" } } } },
   -- setup mini.diff
   {
     "echasnovski/mini.diff",
@@ -49,7 +49,7 @@ return {
         map("n", "<leader>hb", function() gs.blame_line { full = true } end, "git: blame Line")
         map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "git: stage hunk")
         map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>", "git: reset hunk")
-        map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+        map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "git: select hunk")
       end,
     },
   },

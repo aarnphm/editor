@@ -86,8 +86,8 @@ return {
       ---@class TelescopeOptions
       local opts = {
         defaults = {
-          prompt_prefix = "  ",
-          selection_caret = " 󰄾 ",
+          prompt_prefix = "󰄾 ",
+          selection_caret = " ",
           borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
@@ -100,6 +100,20 @@ return {
             end
             return 0
           end,
+          layout_config = {
+            horizontal = {
+              size = {
+                width = "90%",
+                height = "60%",
+              },
+            },
+            vertical = {
+              size = {
+                width = "90%",
+                height = "90%",
+              },
+            },
+          },
           mappings = {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
