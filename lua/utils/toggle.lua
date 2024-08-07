@@ -29,7 +29,7 @@ end
 ---@param toggle simple.Toggle
 function M.map(lhs, toggle)
   local t = M.wrap(toggle)
-  Util.safe_keymap_set("n", lhs, function() t() end, { desc = "Toggle " .. toggle.name })
+  Util.safe_keymap_set("n", lhs, function() t() end, { desc = "toggle: " .. toggle.name })
   M.wk(lhs, toggle)
 end
 

@@ -11,6 +11,7 @@
 ---@field toggle simple.util.toggle
 ---@field cmp simple.util.cmp
 ---@field mini simple.util.mini
+---@field treesitter simple.util.treesitter
 local M = {}
 
 setmetatable(M, {
@@ -25,6 +26,8 @@ function M.setup()
   M.plugin.setup()
   M.root.setup()
   M.format.setup()
+
+  vim.treesitter.language.register("markdown", "vimwiki")
 end
 
 function M.is_win() return vim.uv.os_uname().sysname:find "Windows" ~= nil end

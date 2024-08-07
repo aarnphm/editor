@@ -208,4 +208,3 @@ end
 hi("MiniFilesBorder", { link = "Normal" })
 hi("MiniFilesNormal", { link = "Normal" })
 hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
-hi("StatusLine", { link = "Normal" })

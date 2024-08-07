@@ -84,6 +84,3 @@ map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
 
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
-
-map("n", "<leader>qf", "<cmd>copen<cr>", { desc = "quickfix: open" })
-map("n", "<leader>lf", "<cmd>lopen<cr>", { desc = "locationfix: open" })

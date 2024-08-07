@@ -22,22 +22,22 @@ return {
   {
     "MeanderingProgrammer/markdown.nvim",
     opts = {
-      file_types = { "markdown", "norg", "rmd", "org" },
+      file_types = { "markdown", "norg", "rmd", "org", "vimwiki" },
+      heading = { sign = false },
       code = {
         sign = false,
-        width = "block",
+        width = "full",
         right_pad = 1,
       },
-      heading = {
-        sign = false,
-        icons = {},
-      },
+      latex = { enabled = false },
     },
-    ft = { "markdown", "norg", "rmd", "org" },
+    ft = { "markdown", "norg", "rmd", "org", "vimwiki" },
+    cmd = { "RenderMarkdown" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
+
       Util.toggle.map("<leader>um", {
-        name = "markdown: render",
+        name = "markdown render",
         get = function() return require("render-markdown.state").enabled end,
         set = function(enabled)
           local m = require "render-markdown"
@@ -122,5 +122,33 @@ return {
       note_id_func = function(title) return title end,
     },
     config = function(_, opts) require("obsidian").setup(opts) end,
+  },
+  {
+    "aarnphm/luasnip-latex-snippets.nvim",
+    version = false,
+    lazy = true,
+    ft = { "markdown", "norg", "rmd", "org" },
+    dependencies = {
+      {
+        "L3MON4D3/LuaSnip",
+        build = (not jit.os:find "Windows") and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp" or nil,
+        opts = function()
+          return {
+            history = true,
+            -- Event on which to check for exiting a snippet's region
+            region_check_events = "InsertEnter",
+            delete_check_events = "TextChanged",
+            ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+            load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+              markdown = { "lua", "json", "tex" },
+            },
+          }
+        end,
+      },
+    },
+    config = function()
+      require("luasnip-latex-snippets").setup { use_treesitter = true }
+      require("luasnip").config.setup { enable_autosnippets = true }
+    end,
   },
 }

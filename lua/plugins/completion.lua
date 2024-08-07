@@ -196,9 +196,9 @@ return {
         sources = cmp.config.sources {
           { name = "path", priority = 250 },
           { name = "nvim_lsp", priority = 200, keyword_length = 3, max_item_count = 350 },
-          { name = "supermaven", priority = 300 },
           { name = "snippets", keyword_length = 2, priority = 100 },
           { name = "buffer", keyword_length = 3 },
+          { name = "supermaven" },
           { name = "emoji" },
           { name = "lazydev", group_index = 0 },
         },

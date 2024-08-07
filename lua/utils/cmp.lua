@@ -96,7 +96,7 @@ function M.expand(snippet)
   -- Always use the top-level session.
   -- Otherwise, when on the first placeholder and selecting a new completion,
   -- the nested session will be used instead of the top-level session.
-  -- See: https://github.com/Util/Util/issues/3199
+  -- See: https://github.com/LazyVim/LazyVim/issues/3199
   local session = vim.snippet.active() and vim.snippet._session or nil
 
   local ok, err = pcall(vim.snippet.expand, snippet)

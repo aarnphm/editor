@@ -12,6 +12,7 @@ return {
         highlight_groups = {
           Comment = { fg = "muted", italic = true },
           StatusLine = { fg = "rose", bg = "overlay", blend = 0 },
+          QuickFixLine = { bg = "highlight_high" },
           StatusLineNC = { fg = "subtle", bg = "overlay" },
           WinBar = { fg = "subtle", bg = "none", blend = 0 },
           WinBarNC = { fg = "subtle", bg = "none" },

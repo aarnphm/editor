@@ -68,28 +68,6 @@ return {
   },
   { "MunifTanjim/nui.nvim", lazy = true },
   {
-    "echasnovski/mini.icons",
-    lazy = true,
-    opts = {
-      file = {
-        [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
-        ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
-      },
-      filetype = {
-        dotenv = { glyph = "", hl = "MiniIconsYellow" },
-      },
-    },
-    specs = {
-      { "nvim-tree/nvim-web-devicons", enabled = false, optional = true },
-    },
-    init = function()
-      package.preload["nvim-web-devicons"] = function()
-        require("mini.icons").mock_nvim_web_devicons()
-        return package.loaded["nvim-web-devicons"]
-      end
-    end,
-  },
-  {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
     event = "LazyFile",
@@ -101,6 +79,7 @@ return {
       scope = { enabled = false },
     },
   },
+  -- quickfix
   {
     "kevinhwang91/nvim-bqf",
     ft = "qf",
@@ -140,6 +119,46 @@ return {
         fzf = {
           action_for = { ["ctrl-s"] = "split", ["ctrl-t"] = "tab drop" },
           extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
+        },
+      },
+    },
+  },
+  {
+    "stevearc/quicker.nvim",
+    event = "LazyFile",
+    keys = {
+      {
+        "<leader>q",
+        function() require("quicker").toggle() end,
+        mode = { "n", "v" },
+        desc = "qf: toggle quickfix",
+      },
+      {
+        "<leader>l",
+        function() require("quicker").toggle { loclist = true } end,
+        mode = { "n", "v" },
+        desc = "qf: toggle loclist",
+      },
+    },
+    opts = {
+      opts = {
+        buflisted = false,
+        number = true,
+        relativenumber = true,
+        signcolumn = "auto",
+        winfixheight = true,
+        wrap = false,
+      },
+      keys = {
+        {
+          ">",
+          function() require("quicker").expand { before = 2, after = 2, add_to_existing = true } end,
+          desc = "qf: expand context",
+        },
+        {
+          "<",
+          function() require("quicker").collapse() end,
+          desc = "qf: collapse context",
         },
       },
     },

@@ -205,38 +205,91 @@ return {
             },
           },
         },
-        ---@type lspconfig.options.tsserver
-        tsserver = {
+        vtsls = {
+          filetypes = {
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            "typescript",
+            "typescriptreact",
+            "typescript.tsx",
+          },
           keys = {
             {
-              "<leader>co",
+              "gD",
               function()
-                vim.lsp.buf.code_action {
-                  apply = true,
-                  context = {
-                    only = { "source.organizeImports.ts" },
-                    diagnostics = {},
-                  },
+                local params = vim.lsp.util.make_position_params()
+                Util.lsp.execute {
+                  command = "typescript.goToSourceDefinition",
+                  arguments = { params.textDocument.uri, params.position },
+                  open = true,
                 }
               end,
-              desc = "Organize Imports",
+              desc = "lsp: goto source definition",
             },
             {
-              "<leader>cR",
+              "gR",
               function()
-                vim.lsp.buf.code_action {
-                  apply = true,
-                  context = {
-                    only = { "source.removeUnused.ts" },
-                    diagnostics = {},
-                  },
+                Util.lsp.execute {
+                  command = "typescript.findAllFileReferences",
+                  arguments = { vim.uri_from_bufnr(0) },
+                  open = true,
                 }
               end,
-              desc = "Remove Unused Imports",
+              desc = "lsp: file references",
+            },
+            {
+              "<leader>co",
+              Util.lsp.action["source.organizeImports"],
+              desc = "lsp: organize imports",
+            },
+            {
+              "<leader>cM",
+              Util.lsp.action["source.addMissingImports.ts"],
+              desc = "lsp: add missing imports",
+            },
+            {
+              "<leader>cu",
+              Util.lsp.action["source.removeUnused.ts"],
+              desc = "lsp: remove unused imports",
+            },
+            {
+              "<leader>cD",
+              Util.lsp.action["source.fixAll.ts"],
+              desc = "lsp: fix all diagnostics",
+            },
+            {
+              "<leader>cV",
+              function() Util.lsp.execute { command = "typescript.selectTypeScriptVersion" } end,
+              desc = "lsp: select TS workspace version",
             },
           },
-          single_file_support = false,
-          settings = { completions = { completeFunctionCalls = true } },
+          settings = {
+            complete_function_calls = true,
+            vtsls = {
+              enableMoveToFileCodeAction = true,
+              autoUseWorkspaceTsdk = true,
+              experimental = {
+                completion = {
+                  enableServerSideFuzzyMatch = true,
+                },
+              },
+            },
+            typescript = {
+              updateImportsOnFileMove = { enabled = "always" },
+              suggest = {
+                completeFunctionCalls = true,
+              },
+              inlayHints = {
+                enumMemberValues = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                parameterNames = { enabled = "literals" },
+                parameterTypes = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+                variableTypes = { enabled = false },
+              },
+            },
+          },
         },
         yamlls = {
           -- Have to add this for yamlls to understand that we support line folding
@@ -395,11 +448,6 @@ return {
             if client.name == "taplo" then client.server_capabilities.documentFormattingProvider = false end
           end)
         end,
-        tsserver = function()
-          Util.lsp.on_attach(function(client, _)
-            if client.name == "tsserver" then client.server_capabilities.documentFormattingProvider = false end
-          end)
-        end,
         yamlls = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
@@ -415,6 +463,56 @@ return {
 
           -- register the formatter with LazyVim
           Util.format.register(formatter)
+        end,
+        vtsls = function(_, opts)
+          Util.lsp.on_attach(function(client, _)
+            client.commands["_typescript.moveToFileRefactoring"] = function(command, ctx)
+              ---@type string, string, lsp.Range
+              local action, uri, range = unpack(command.arguments)
+
+              local function move(newf)
+                client.request("workspace/executeCommand", {
+                  command = command.command,
+                  arguments = { action, uri, range, newf },
+                })
+              end
+
+              local fname = vim.uri_to_fname(uri)
+              client.request("workspace/executeCommand", {
+                command = "typescript.tsserverRequest",
+                arguments = {
+                  "getMoveToRefactoringFileSuggestions",
+                  {
+                    file = fname,
+                    startLine = range.start.line + 1,
+                    startOffset = range.start.character + 1,
+                    endLine = range["end"].line + 1,
+                    endOffset = range["end"].character + 1,
+                  },
+                },
+              }, function(_, result)
+                ---@type string[]
+                local files = result.body.files
+                table.insert(files, 1, "Enter new path...")
+                vim.ui.select(files, {
+                  prompt = "Select move destination:",
+                  format_item = function(f) return vim.fn.fnamemodify(f, ":~:.") end,
+                }, function(f)
+                  if f and f:find "^Enter new path" then
+                    vim.ui.input({
+                      prompt = "Enter move destination:",
+                      default = vim.fn.fnamemodify(fname, ":h") .. "/",
+                      completion = "file",
+                    }, function(newf) return newf and move(newf) end)
+                  elseif f then
+                    move(f)
+                  end
+                end)
+              end)
+            end
+          end, "vtsls")
+          -- copy typescript settings to javascript
+          opts.settings.javascript = vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
         end,
         gopls = function()
           -- workaround for gopls not supporting semanticTokensProvider

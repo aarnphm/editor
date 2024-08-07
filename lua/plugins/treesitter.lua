@@ -13,7 +13,7 @@ return {
       local tsc = require "treesitter-context"
 
       Util.toggle.map("<leader>ut", {
-        name = "Treesitter Context",
+        name = "treesitter context",
         get = tsc.enabled,
         set = function(state)
           if state then
@@ -99,7 +99,7 @@ return {
         },
       },
     },
-    config = function(_, opts) require("nvim-treesitter.configs").setup(opts) end,
+    config = "utils.treesitter",
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
