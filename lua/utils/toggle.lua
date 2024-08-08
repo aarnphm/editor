@@ -18,6 +18,8 @@ M.setup = function()
   M.map("<leader>uf", M.format())
   M.map("<leader>uF", M.format(true))
   M.map("<leader>wm", M.maximize)
+  M.map("<leader>ud", M.diagnostics)
+  M.map("<leader>ua", M.agent)
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
 
@@ -28,9 +30,9 @@ function M.wrap(toggle)
       toggle.set(not toggle.get())
       local state = toggle.get()
       if state then
-        Util.info("enabled: " .. toggle.name, { title = toggle.name })
+        Util.info("enabled: " .. toggle.name, { title = "toggle" })
       else
-        Util.warn("disabled: " .. toggle.name, { title = toggle.name })
+        Util.info("disabled: " .. toggle.name, { title = "toggle" })
       end
       return state
     end,
@@ -60,6 +62,19 @@ function M.wk(lhs, toggle)
     },
   }
 end
+
+M.agent = M.wrap {
+  name = "code agent",
+  get = function() return vim.g.use_agent end,
+  set = function(state)
+    local ok, agent = pcall(require, "supermaven-nvim.api")
+    if not ok then Util.error("Failed to load agent", { once = true }) end
+    agent.toggle()
+
+    if state == nil then state = true end
+    vim.g.use_agent = state
+  end,
+}
 
 M.treesitter = M.wrap {
   name = "treesitter: highlight",
@@ -147,7 +162,7 @@ M.maximize = M.wrap {
       -- `VimLeavePre` might be another consideration? Not sure about differences between the 2
       vim.api.nvim_create_autocmd("ExitPre", {
         once = true,
-        group = vim.api.nvim_create_augroup("simple_restore_max_exit_pre", { clear = true }),
+        group = augroup "restore_max_exit_pre",
         desc = "Restore width/height when close Neovim while maximized",
         callback = function() M.maximize.set(false) end,
       })

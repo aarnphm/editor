@@ -6,14 +6,12 @@ return {
       ignore_filetypes = {
         gitcommit = true,
         hgcommit = true,
-        vimrc = true,
         TelescopePrompt = true,
         ministarter = true,
         nofile = true,
         startup = true,
         Trouble = true,
       },
-      disable_inline_completion = true,
       log_level = "warn",
     },
   },
@@ -52,10 +50,6 @@ return {
     },
     ---@return cmp.ConfigSchema
     opts = function()
-      ---@param str string
-      ---@return string
-      local replace_termcodes = function(str) return vim.api.nvim_replace_termcodes(str, true, true, true) end
-
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 
       local cmp = require "cmp"
@@ -65,7 +59,7 @@ return {
       local windows = cmp.config.window.bordered {
         border = BORDER,
         side_padding = 0,
-        scrollbar = false,
+        scrollbar = true,
         zindex = 30,
         winhighlight = "Normal:Normal,FloatBorder:Normal",
       }
@@ -74,11 +68,14 @@ return {
 
       local forward_cmpl = function(fallback)
         local col = vim.fn.col "." - 1
+        local suggestion = require "supermaven-nvim.completion_preview"
 
         if cmp.visible() then
           cmp.select_next_item(select_opts)
         elseif vim.snippet.active { direction = 1 } then
           vim.schedule(function() vim.snippet.jump(1) end)
+        elseif suggestion.has_suggestion() then
+          suggestion.on_accept_suggestion()
         elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
           fallback()
         else
@@ -86,10 +83,14 @@ return {
         end
       end
       local backward_cmpl = function(fallback)
+        local suggestion = require "supermaven-nvim.completion_preview"
+
         if cmp.visible() then
           cmp.select_prev_item(select_opts)
         elseif vim.snippet.active { direction = -1 } then
           vim.schedule(function() vim.snippet.jump(-1) end)
+        elseif suggestion.has_suggestion() then
+          suggestion.on_accept_suggestion()
         else
           fallback()
         end
@@ -98,6 +99,7 @@ return {
       ---@type cmp.ConfigSchema
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = { "python" },
+        preselect = cmp.PreselectMode.None,
         completion = { completeopt = "menu,menuone,noinsert" },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         formatting = {
@@ -105,7 +107,7 @@ return {
           expandable_indicator = true,
           format = require("lspkind").cmp_format {
             mode = "symbol",
-            max_width = 30,
+            max_width = 20,
             symbol_map = {
               Supermaven = "",
             },
@@ -122,6 +124,7 @@ return {
           comparators = {
             compare.offset,
             compare.exact,
+            compare.scopes,
             compare.score,
             -- copied from cmp-under
             ---@type cmp.ComparatorFunctor
@@ -157,11 +160,10 @@ return {
           ["<S-Tab>"] = cmp.mapping(backward_cmpl, { "i", "s" }),
         },
         sources = cmp.config.sources {
-          { name = "path", priority = 250 },
-          { name = "nvim_lsp", priority = 200, keyword_length = 3, max_item_count = 350 },
-          { name = "snippets", keyword_length = 2, priority = 100 },
-          { name = "buffer", keyword_length = 3, priority = 400 },
-          { name = "supermaven" },
+          { name = "path", priority = 200 },
+          { name = "nvim_lsp", priority = 400, keyword_length = 3, max_item_count = 200 },
+          { name = "snippets", keyword_length = 2, priority = 300 },
+          { name = "buffer", priority = 100 },
           { name = "lazydev", group_index = 0 },
         },
       })

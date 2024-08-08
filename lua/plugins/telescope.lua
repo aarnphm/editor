@@ -107,6 +107,7 @@ return {
       },
       { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
       { "<LocalLeader>f", Util.pick "files", desc = "telescope: find files (git)" },
+      { "<leader>F", Util.pick "oldfiles", desc = "telescope: recent files" },
       { "<LocalLeader>w", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
       { "<Leader>/", Util.pick "live_grep", desc = "telescope: grep string" },
       { "<Leader>w", function() require("telescope").extensions.live_grep_args.live_grep_args() end, desc = "telescope: grep word" },

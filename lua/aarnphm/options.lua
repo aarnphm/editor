@@ -119,6 +119,7 @@ g.markdown_recommended_style = 0
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
 g.use_glance = true
+g.use_agent = true
 g.inline_diagnostics = true
 g.picker = "telescope"
 g.additional_path_root_spec = { "content" }
