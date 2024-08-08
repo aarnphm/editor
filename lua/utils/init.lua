@@ -29,14 +29,6 @@ function M.setup()
   M.format.setup()
 
   vim.treesitter.language.register("markdown", "vimwiki")
-
-  -- setup toggle keymaps
-  -- M.toggle.map("<leader>ub", M.toggle("background", { values = { "dark", "light" }, name = "background" }))
-  -- M.toggle.map("<leader>us", M.toggle("spell", { name = "spelling" }))
-  -- M.toggle.map("<leader>uw", M.toggle("wrap", { name = "wrap" }))
-  -- M.toggle.map("<leader>uc", M.toggle("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
-
-  -- if vim.lsp.inlay_hint then M.toggle.map("<leader>uh", M.toggle.inlay_hints) end
 end
 
 M.is_win = function() return vim.uv.os_uname().sysname:find "Windows" ~= nil end

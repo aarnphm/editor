@@ -46,6 +46,7 @@ autocmd("FileType", {
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
+    vim.b[event.buf].ministatusline_disable = true
     vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
   end,
 })
@@ -133,9 +134,37 @@ vim.cmd [[
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
 ]]
+-- setup laststatus when entering
+local M = {
+  disable = {
+    filetypes = { "ministarter", "dashboard", "qf", "help", "grug-far", "TelescopePrompt" },
+    buftypes = { "quickfix", "prompt", "scratch" },
+  },
+}
+M.should_hide = function(bufnr)
+  local filetype = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
+  local buftype = vim.api.nvim_get_option_value("buftype", { buf = bufnr })
+  local is_filetype_disabled = vim.tbl_contains(M.disable.filetypes, filetype)
+  local is_buftype_disabled = vim.tbl_contains(M.disable.buftypes, buftype)
+
+  local function is_floating()
+    local winids = vim.fn.win_findbuf(bufnr)
+    for _, winid in ipairs(winids) do
+      if vim.api.nvim_win_get_config(winid).relative ~= "" then return true end
+    end
+    return false
+  end
+
+  return is_floating() or is_buftype_disabled or is_filetype_disabled
+end
+autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
+  group = augroup "last_status",
+  pattern = "*",
+  callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
+})
 -- Set local settings for terminal buffers
 vim.api.nvim_create_autocmd("TermOpen", {
-  group = vim.api.nvim_create_augroup("custom-term-open", {}),
+  group = augroup "custom-term-open",
   callback = function()
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
@@ -176,17 +205,11 @@ vim.opt.runtimepath:prepend(lazypath)
 
 Util.setup()
 
-local get_lockfile = function()
-  -- local workspace = os.getenv "WORKSPACE"
-  -- return workspace ~= nil and workspace .. "/editor/lazy-lock.json" or vim.fn.stdpath "config" .. "/lazy-lock.json"
-  return vim.fn.stdpath "config" .. "/lazy-lock.json"
-end
-
 require("lazy").setup {
   spec = {
     { import = "plugins" },
   },
-  lockfile = get_lockfile(),
+  lockfile = vim.fn.stdpath "config" .. "/lazy-lock.json",
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
   colorscheme = { "rose-pine" },
@@ -197,8 +220,10 @@ require("lazy").setup {
   },
 }
 
+Util.toggle.setup()
+
 -- vim.opt.termguicolors = true
-vim.cmd.colorscheme "rose-pine-dawn"
+vim.cmd.colorscheme "rose-pine"
 -- TODO: refactor this one day
 local hi = function(name, opts)
   opts.default = opts.default or true

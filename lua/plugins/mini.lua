@@ -599,9 +599,10 @@ return {
           new_section("Files",      Util.pick('files'),          "Telescope"),
           new_section("Recents",    Util.pick("oldfiles"),       "Telescope"),
           new_section("Text",       Util.pick("live_grep"),      "Telescope"),
-          new_section("New",        "ene | startinsert",         "Built-in"),
-          new_section("Quit",       "qa",                        "Built-in"),
           new_section("Lazy",       "Lazy",                      "Config"),
+          new_section("Config",     Util.pick.config_files(),    "Config"),
+          new_section("New",        "ene | startinsert",         "Builtin"),
+          new_section("Quit",       "qa",                        "Builtin"),
         },
         content_hooks = {
           starter.gen_hook.adding_bullet(pad .. "░ ", false),
@@ -631,7 +632,11 @@ return {
           local pad_footer = string.rep(" ", 8)
           starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
           -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
-          if vim.bo[ev.buf].filetype == "ministarter" then pcall(starter.refresh) end
+          if vim.bo[ev.buf].filetype == "ministarter" then
+            pcall(starter.refresh)
+            vim.b[ev.buf].ministatusline_disable = true
+            vim.o.laststatus = 0
+          end
         end,
       })
     end,
@@ -752,5 +757,34 @@ return {
       end
       require("mini.hipatterns").setup(opts)
     end,
+  },
+  {
+    "echasnovski/mini.statusline",
+    event = "LazyFile",
+    opts = {
+      content = {
+        active = function()
+          local mode, mode_hl = statusline.mode { trunc_width = 75 }
+          local git = statusline.git { trunc_width = 40 }
+          local diagnostics = statusline.diagnostic { trunc_width = 75 }
+          local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+          local fileinfo = statusline.fileinfo { trunc_width = 90 }
+          local location = statusline.location { trunc_width = 90 }
+
+          -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
+          -- correct padding with spaces between groups (accounts for 'missing'
+          -- sections, etc.)
+          return MiniStatusline.combine_groups {
+            { hl = mode_hl, strings = { mode } },
+            { hl = "MiniStatuslineDevinfo", strings = { git, lsp } },
+            "%=", -- End left alignment
+            { hl = "MiniStatuslineDevinfo", strings = { diagnostics } },
+            { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+            { hl = mode_hl, strings = { location } },
+          }
+        end,
+      },
+    },
+    config = function(_, opts) require("mini.statusline").setup(opts) end,
   },
 }

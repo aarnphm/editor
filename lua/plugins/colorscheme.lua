@@ -5,6 +5,7 @@ return {
     priority = 1000,
     opts = function()
       local opts = {
+        variant = "auto",
         dark_variant = "main",
         dim_inactive_windows = false,
         enable = { migrations = true },

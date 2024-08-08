@@ -49,19 +49,41 @@ local get_branch = function(icon)
   return branch ~= "" and fmt("(%s %s)", icon, branch) or ""
 end
 
+local H = {}
+
 -- For more information see ":h buftype"
-local isnt_normal_buffer = function() return vim.bo.buftype ~= "" end
+H.isnt_normal_buffer = function() return vim.bo.buftype ~= "" end
 
-local get_filetype_icon = function()
-  -- Have this `require()` here to not depend on plugin initialization order
-  local has_devicons, devicons = pcall(require, "nvim-web-devicons")
-  if not has_devicons then return "" end
+---@type fun(filetype?: string): string
+H.get_icon = nil
 
-  local file_name, file_ext = vim.fn.expand "%:t", vim.fn.expand "%:e"
-  return devicons.get_icon(file_name, file_ext, { default = true })
+H.ensure_get_icon = function()
+  if H.get_icon ~= nil then
+    -- Cache only once
+    return
+  elseif _G.MiniIcons ~= nil then
+    -- Prefer 'mini.icons'
+    H.get_icon = function(filetype) return (_G.MiniIcons.get("filetype", filetype)) end
+  else
+    -- Try falling back to 'nvim-web-devicons'
+    local has_devicons, devicons = pcall(require, "nvim-web-devicons")
+    if not has_devicons then return end
+    H.get_icon = function() return (devicons.get_icon(vim.fn.expand "%:t", nil, { default = true })) end
+  end
 end
 
-local is_truncated = function(trunc_width)
+H.get_filesize = function()
+  local size = vim.fn.getfsize(vim.fn.getreg "%")
+  if size < 1024 then
+    return string.format("%dB", size)
+  elseif size < 1048576 then
+    return string.format("%.2fKiB", size / 1024)
+  else
+    return string.format("%.2fMiB", size / 1048576)
+  end
+end
+
+H.is_truncated = function(trunc_width)
   -- Use -1 to default to 'not truncated'
   local cur_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
   return cur_width < (trunc_width or -1)
@@ -71,7 +93,7 @@ end
 -- (otherwise those symbols are not displayed).
 local CTRL_S = vim.api.nvim_replace_termcodes("<C-S>", true, true, true)
 local CTRL_V = vim.api.nvim_replace_termcodes("<C-V>", true, true, true)
-local modes = setmetatable({
+H.modes = setmetatable({
   ["n"] = { long = "NORMAL", short = "N", hl = "MiniStatuslineModeNormal" },
   ["v"] = { long = "VISUAL", short = "V", hl = "MiniStatuslineModeVisual" },
   ["V"] = { long = "V-LINE", short = "V-L", hl = "MiniStatuslineModeVisual" },
@@ -99,7 +121,7 @@ local diagnostic_levels = {
   { id = vim.diagnostic.severity.HINT, sign = "H" },
 }
 
-local get_diagnostic_count = function(id) return #vim.diagnostic.get(0, { severity = id }) end
+H.get_diagnostic_count = function(id) return #vim.diagnostic.get(0, { severity = id }) end
 
 ---@class SimpleStatuslineArgs
 ---@field icon string|nil
@@ -107,10 +129,10 @@ local get_diagnostic_count = function(id) return #vim.diagnostic.get(0, { severi
 
 -- I refuse to have a complex statusline, *proceeds to have a complex statusline* PepeLaugh (lualine is cool though.)
 -- [hunk] [branch] [modified]  --------- [diagnostic] [filetype] [line:col] [heart]
----@type table<string, fun(args: SimpleStatuslineArgs): string>
+---@type table<string, fun(args: SimpleStatuslineArgs): string | fun(args: SimpleStatuslineArgs): [string, string]>
 _G.statusline = {
   git = function(args)
-    if isnt_normal_buffer() then return "" end
+    if H.isnt_normal_buffer() then return "" end
     local icon = args.icon or ""
     local head = get_branch(icon)
     local hunks = get_hunks()
@@ -121,52 +143,45 @@ _G.statusline = {
   end,
   diagnostic = function(args)
     local hasnt_attached_client = next(Util.lsp.get_clients {}) == nil
-    local dont_show_lsp = is_truncated(args.trunc_width) or isnt_normal_buffer() or hasnt_attached_client
+    local dont_show_lsp = H.is_truncated(args.trunc_width) or H.isnt_normal_buffer() or hasnt_attached_client
     if dont_show_lsp then return "" end
 
     -- construct diagnostic info
     local t = {}
     for _, level in ipairs(diagnostic_levels) do
-      local n = get_diagnostic_count(level.id)
+      local n = H.get_diagnostic_count(level.id)
       -- Add level info only if diagnostic is present
-      if n > 0 then table.insert(t, string.format(" %s:%s", level.sign, n)) end
+      if n > 0 then table.insert(t, fmt("%s:%s", level.sign, n)) end
     end
 
     local icon = args.icon or ""
     if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
     return fmt("[%s %s]", icon, table.concat(t, " |"))
   end,
-  filetype = function(args)
+  fileinfo = function(args)
     local filetype = vim.bo.filetype
     -- Don't show anything if can't detect file type or not inside a "normal buffer"
-    if (filetype == "") or isnt_normal_buffer() then return "" end
+    if (filetype == "") or H.isnt_normal_buffer() then return "" end
 
     -- Add filetype icon
-    local icon = get_filetype_icon()
-    if icon ~= "" then filetype = string.format("%s %s", icon, filetype) end
-    return filetype
-  end,
-  filename = function(args)
-    -- In terminal always use plain name
-    if vim.bo.buftype == "terminal" then
-      return "%t"
-    elseif is_truncated(args.trunc_width) then
-      -- File name with 'truncate', 'modified', 'readonly' flags
-      -- Use relative path if truncated
-      return "%f%m%r"
-    else
-      -- Use fullpath if not truncated
-      return "%F%m%r"
-    end
+    H.ensure_get_icon()
+    if H.get_icon ~= nil then filetype = H.get_icon(filetype) .. " " .. filetype end
+
+    -- Construct output string if truncated or buffer is not normal
+    if H.is_truncated(args.trunc_width) or vim.bo.buftype ~= "" then return filetype end
+
+    -- Construct output string with extra file info
+    local format = vim.bo.fileformat
+    local size = H.get_filesize()
+    return fmt("%s [%s %s]", filetype, format, size)
   end,
   location = function(args)
-    local icon = args.icon or "♥ "
-    if is_truncated(args.trunc_width) then return "%l:%2v" .. (" %s"):format(icon) end
-    return '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
+    local icon = args.icon or "♥"
+    if H.is_truncated(args.trunc_width) then return '%l:%-2{virtcol("$") - 1}' .. (" %s"):format(icon) end
+    return '%l:%-2{virtcol("$") - 1}:%2v' .. (" %s"):format(icon)
   end,
   mode = function(args)
-    local mi = modes[vim.fn.mode()]
-    return is_truncated(args.trunc_width) and mi.short or mi.long
+    local mi = H.modes[vim.fn.mode()]
+    return H.is_truncated(args.trunc_width) and mi.short or mi.long, mi.hl
   end,
-  modes = modes,
 }

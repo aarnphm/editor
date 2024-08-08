@@ -9,6 +9,17 @@ local M = {}
 ---@class simple.Toggle.wrap: simple.Toggle
 ---@operator call:boolean
 
+-- setup toggle keymaps
+M.setup = function()
+  M.map("<leader>ub", M("background", { values = { "dark", "light" }, name = "background" }))
+  M.map("<leader>us", M("spell", { name = "spelling" }))
+  M.map("<leader>uw", M("wrap", { name = "wrap" }))
+  M.map("<leader>uc", M("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
+  M.map("<leader>uf", M.format())
+  M.map("<leader>uF", M.format(true))
+  if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
+end
+
 ---@param toggle simple.Toggle
 function M.wrap(toggle)
   return setmetatable(toggle, {
@@ -44,7 +55,7 @@ function M.wk(lhs, toggle)
     {
       lhs,
       icon = function() return safe_get() and { icon = " ", color = "green" } or { icon = " ", color = "yellow" } end,
-      desc = function() return (safe_get() and "Disable " or "Enable ") .. toggle.name end,
+      desc = function() return (safe_get() and "disable " or "enable ") .. toggle.name end,
     },
   }
 end
@@ -64,7 +75,7 @@ M.treesitter = M.wrap {
 ---@param buf? boolean
 function M.format(buf)
   return M.wrap {
-    name = "format: auto (" .. (buf and "buffer" or "global") .. ")",
+    name = "format auto (" .. (buf and "buffer" or "global") .. ")",
     get = function()
       if not buf then return vim.g.autoformat == nil or vim.g.autoformat end
       return Util.format.enabled()

@@ -36,15 +36,6 @@ o.autowrite = true
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
 o.showtabline = 0
-o.laststatus = 3 -- show statusline on buffer
-o.statusline = table.concat({
-  "%{%luaeval('statusline.mode {trunc_width = 75}')%}",
-  "%{%luaeval('statusline.git {trunc_width = 120}')%}",
-  "%=",
-  "%{%luaeval('statusline.diagnostic {trunc_width = 90}')%}",
-  "%{%luaeval('statusline.filetype {trunc_width = 75}')%}",
-  "%{%luaeval('statusline.location {trunc_width = 90}')%}",
-}, " ")
 o.statuscolumn = [[%!v:lua.require'utils'.ui.statuscolumn()]]
 -- Window blending configuration
 o.winblend = 0
@@ -69,7 +60,7 @@ o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 o.inccommand = "split"
-o.background = "dark" -- "light"
+o.background = "light" -- "dark"
 
 -- fold with nvim-ufo
 o.foldenable = true
@@ -131,5 +122,6 @@ g.use_glance = true
 g.inline_diagnostics = true
 g.picker = "telescope"
 g.additional_path_root_spec = { "content" }
+g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

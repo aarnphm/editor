@@ -38,7 +38,7 @@ return {
       },
       cmdline = { view = "cmdline" },
       views = {
-        split = { position = "right", size = "30%" },
+        split = { size = "30%" },
         popup = { border = { style = BORDER } },
         confirm = { border = { style = BORDER } },
       },
@@ -92,88 +92,58 @@ return {
       scope = { enabled = false },
     },
   },
-  -- quickfix
   {
-    "kevinhwang91/nvim-bqf",
-    ft = "qf",
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts_extend = { "spec" },
     opts = {
-      auto_enable = true,
-      auto_resize_height = true, -- highly recommended enable
-      preview = {
-        auto_preview = true,
-        win_height = 12,
-        win_vheight = 12,
-        delay_syntax = 80,
-        border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
-        show_title = false,
-        should_preview_cb = function(bufnr, _)
-          local ret = true
-          local bufname = vim.api.nvim_buf_get_name(bufnr)
-          local fsize = vim.fn.getfsize(bufname)
-          if fsize > vim.g.bigfile_size then
-            -- skip file size greater than 100k
-            ret = false
-          elseif bufname:match "^fugitive://" then
-            -- skip fugitive buffer
-            ret = false
-          end
-          return ret
-        end,
-      },
-      -- make `drop` and `tab drop` to become preferred
-      func_map = {
-        drop = "o",
-        openc = "O",
-        split = "<C-s>",
-        tabdrop = "<C-t>",
-        ptogglemode = "z,",
-      },
-      filter = {
-        fzf = {
-          action_for = { ["ctrl-s"] = "split", ["ctrl-t"] = "tab drop" },
-          extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
+      spec = {
+        {
+          mode = { "n", "v" },
+          { "<leader><tab>", group = "tabs" },
+          { "<leader>c", group = "code" },
+          { "<leader>f", group = "file/find" },
+          { "<leader>g", group = "git" },
+          { "<leader>gh", group = "hunks" },
+          { "<leader>q", group = "quit/session" },
+          { "<leader>s", group = "search" },
+          { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+          { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+          { "[", group = "prev" },
+          { "]", group = "next" },
+          { "g", group = "goto" },
+          { "gs", group = "surround" },
+          { "z", group = "fold" },
+          {
+            "<leader>b",
+            group = "buffer",
+            expand = function() return require("which-key.extras").expand.buf() end,
+          },
+          {
+            "<leader>w",
+            group = "windows",
+            proxy = "<c-w>",
+            expand = function() return require("which-key.extras").expand.win() end,
+          },
+          -- better descriptions
+          { "gx", desc = "Open with system app" },
+          { "<BS>", desc = "Decrement Selection", mode = "x" },
+          { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
         },
       },
     },
-  },
-  {
-    "stevearc/quicker.nvim",
-    event = "LazyFile",
     keys = {
       {
-        "<leader>q",
-        function() require("quicker").toggle() end,
-        mode = { "n", "v" },
-        desc = "qf: toggle quickfix",
+        "<leader>?",
+        function() require("which-key").show { global = false } end,
+        desc = "which-key: buffer keymaps",
       },
       {
-        "<leader>l",
-        function() require("quicker").toggle { loclist = true } end,
-        mode = { "n", "v" },
-        desc = "qf: toggle loclist",
+        "<c-w><space>",
+        function() require("which-key").show { keys = "<c-w>", loop = true } end,
+        desc = "which-key: window hydra mode",
       },
     },
-    opts = {
-      opts = {
-        buflisted = false,
-        number = true,
-        relativenumber = true,
-        signcolumn = "auto",
-        winfixheight = true,
-        wrap = false,
-      },
-      keys = {
-        {
-          ">",
-          function() require("quicker").expand { before = 2, after = 2, add_to_existing = true } end,
-          desc = "qf: expand context",
-        },
-        {
-          "<",
-          function() require("quicker").collapse() end,
-          desc = "qf: collapse context",
-        },
-      },
-    },
+    config = function(_, opts) require("which-key").setup(opts) end,
   },
 }

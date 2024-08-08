@@ -31,7 +31,7 @@ map("i", "jj", "<Esc>", { desc = "normal: escape" })
 map("i", "jk", "<Esc>", { desc = "normal: escape" })
 
 -- NOTE: normal mode
-map("n", "<S-Tab>", "<cmd>normal za<cr>", { desc = "edit: Toggle code fold" })
+map("n", "<leader><leader>a", "<CMD>normal za<CR>", { desc = "edit: Toggle code fold" })
 map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
 map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
 map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
