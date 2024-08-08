@@ -32,7 +32,7 @@ return {
     version = false, -- last release is way too old and doesn't work on Windows
     cmd = "TSUpdateSync",
     build = ":TSUpdate",
-    event = "LazyFile",
+    event = { "LazyFile", "VeryLazy" },
     lazy = vim.fn.argc(-1) == 0,
     init = function(plugin)
       -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
