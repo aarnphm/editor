@@ -38,7 +38,6 @@ jobs:
           cp "${GITHUB_WORKSPACE}/init.lua" "${HOME}/.config/nvim/init.lua"
           # setup directory of the config
           cp -r "${GITHUB_WORKSPACE}/after" "${HOME}/.config/nvim/after"
-          cp -r "${GITHUB_WORKSPACE}/snippets" "${HOME}/.config/nvim/snippets"
           cp -r "${GITHUB_WORKSPACE}/lua" "${HOME}/.config/nvim/lua"
 
           # Run update
