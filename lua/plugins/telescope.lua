@@ -1,10 +1,52 @@
+if
+  not Util.pick.register {
+    name = "telescope",
+    commands = {
+      files = "find_files",
+    },
+    -- this will return a function that calls telescope.
+    -- cwd will default to lazyvim.util.get_root
+    -- for `files`, git_files or find_files will be chosen depending on .git
+    ---@param builtin string
+    ---@param opts? simple.util.pick.Opts
+    open = function(builtin, opts)
+      opts = opts or {}
+      opts.follow = opts.follow ~= false
+      if opts.cwd and opts.cwd ~= vim.uv.cwd() then
+        ---@diagnostic disable-next-line: inject-field
+        opts.attach_mappings = function(_, map)
+          -- opts.desc is overridden by telescope, until it's changed there is this fix
+          map("i", "<a-c>", function()
+            local action_state = require "telescope.actions.state"
+            local line = action_state.get_current_line()
+            Util.pick.open(
+              builtin,
+              vim.tbl_deep_extend("force", {}, opts or {}, {
+                root = false,
+                default_text = line,
+              })
+            )
+          end, { desc = "telescope: open cwd" })
+          return true
+        end
+      end
+
+      require("telescope.builtin")[builtin](opts)
+    end,
+  }
+then
+  return {}
+end
+
 return {
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
+    enabled = Util.pick.want() == "telescope",
     version = false,
     dependencies = {
       "s1n7ax/nvim-window-picker",
+      { "folke/trouble.nvim", version = false, opts = {}, cmd = "Trouble" },
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
         config = function()
@@ -37,7 +79,7 @@ return {
     keys = {
       {
         "<C-S-p>",
-        Util.telescope("keymaps", {
+        Util.pick("keymaps", {
           lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
           layout_strategy = "vertical",
           previewer = false,
@@ -53,7 +95,7 @@ return {
       },
       {
         "<leader>b",
-        Util.telescope("buffers", {
+        Util.pick("buffers", {
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,
           previewer = false,
@@ -61,35 +103,41 @@ return {
         }),
         desc = "telescope: manage buffers",
       },
-      {
-        "<leader>f",
-        Util.telescope("find_files", {}),
-        desc = "telescope: find files",
-      },
-      {
-        "<LocalLeader>f",
-        Util.telescope("git_files", {}),
-        desc = "telescope: find files (git)",
-      },
-      {
-        "<LocalLeader>w",
-        Util.telescope("grep_string", { word_match = "-w" }),
-        desc = "telescope: grep string (cursor)",
-      },
-      {
-        "<Leader>/",
-        Util.telescope "grep_string",
-        desc = "telescope: grep string",
-      },
-      {
-        "<Leader>w",
-        function() require("telescope").extensions.live_grep_args.live_grep_args() end,
-        desc = "telescope: grep word",
-      },
+      { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
+      { "<LocalLeader>f", Util.pick "files", desc = "telescope: find files (git)" },
+      { "<LocalLeader>w", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
+      { "<Leader>/", Util.pick "live_grep", desc = "telescope: grep string" },
+      { "<Leader>w", function() require("telescope").extensions.live_grep_args.live_grep_args() end, desc = "telescope: grep word" },
     },
     opts = function()
       local actions = require "telescope.actions"
       local actions_layout = require "telescope.actions.layout"
+
+      local open_with_trouble = function(...) return require("trouble.sources.telescope").open(...) end
+      local find_files_no_ignore = function()
+        local action_state = require "telescope.actions.state"
+        local line = action_state.get_current_line()
+        Util.pick("find_files", { no_ignore = true, default_text = line })()
+      end
+      local find_files_with_hidden = function()
+        local action_state = require "telescope.actions.state"
+        local line = action_state.get_current_line()
+        Util.pick("find_files", { hidden = true, default_text = line })()
+      end
+
+      local find_command = function()
+        if 1 == vim.fn.executable "rg" then
+          return { "rg", "--files", "--color", "never", "-g", "!.git" }
+        elseif 1 == vim.fn.executable "fd" then
+          return { "fd", "--type", "f", "--color", "never", "-E", ".git" }
+        elseif 1 == vim.fn.executable "fdfind" then
+          return { "fdfind", "--type", "f", "--color", "never", "-E", ".git" }
+        elseif 1 == vim.fn.executable "find" and vim.fn.has "win32" == 0 then
+          return { "find", ".", "-type", "f" }
+        elseif 1 == vim.fn.executable "where" then
+          return { "where", "/r", ".", "*" }
+        end
+      end
 
       ---@class TelescopeOptions
       local opts = {
@@ -126,16 +174,9 @@ return {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
               ["<Esc>"] = function(...) return actions.close(...) end,
-              ["<a-i>"] = function()
-                local action_state = require "telescope.actions.state"
-                local line = action_state.get_current_line()
-                Util.telescope("find_files", { no_ignore = true, default_text = line })()
-              end,
-              ["<a-h>"] = function()
-                local action_state = require "telescope.actions.state"
-                local line = action_state.get_current_line()
-                Util.telescope("find_files", { hidden = true, default_text = line })()
-              end,
+              ["<C-t>"] = open_with_trouble,
+              ["<a-i>"] = find_files_no_ignore,
+              ["<a-h>"] = find_files_with_hidden,
               ["<C-Down>"] = actions.cycle_history_next,
               ["<C-Up>"] = actions.cycle_history_prev,
               ["<C-f>"] = actions.preview_scrolling_down,
@@ -150,7 +191,7 @@ return {
         },
         pickers = {
           find_files = {
-            find_command = { "fd", "--type", "f", "--color", "never" },
+            find_command = find_command,
             hidden = true,
           },
           live_grep = {

@@ -41,6 +41,7 @@ autocmd("FileType", {
     "nofile",
     "scratch",
     "starter",
+    "trouble",
     "",
   },
   callback = function(event)

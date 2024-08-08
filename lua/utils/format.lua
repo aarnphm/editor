@@ -4,16 +4,16 @@ local M = setmetatable({}, {
   __call = function(m, ...) return m.format(...) end,
 })
 
----@class SimpleFormatter
+---@class LazyFormatter
 ---@field name string
 ---@field primary? boolean
 ---@field format fun(bufnr:number)
 ---@field sources fun(bufnr:number):string[]
 ---@field priority number
 
-M.formatters = {} ---@type SimpleFormatter[]
+M.formatters = {} ---@type LazyFormatter[]
 
----@param formatter SimpleFormatter
+---@param formatter LazyFormatter
 function M.register(formatter)
   M.formatters[#M.formatters + 1] = formatter
   table.sort(M.formatters, function(a, b) return a.priority > b.priority end)
@@ -25,11 +25,11 @@ function M.formatexpr()
 end
 
 ---@param buf? number
----@return (SimpleFormatter|{active:boolean,resolved:string[]})[]
+---@return (LazyFormatter|{active:boolean,resolved:string[]})[]
 function M.resolve(buf)
   buf = buf or vim.api.nvim_get_current_buf()
   local have_primary = false
-  ---@param formatter SimpleFormatter
+  ---@param formatter LazyFormatter
   return vim.tbl_map(function(formatter)
     local sources = formatter.sources(buf)
     local active = #sources > 0 and (not formatter.primary or not have_primary)

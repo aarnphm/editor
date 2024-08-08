@@ -148,20 +148,19 @@ return {
     },
     keys = function(_, keys)
       -- Populate the keys based on the user's options
-      local plugin = require("lazy.core.config").spec.plugins["mini.surround"]
-      local opts = require("lazy.core.plugin").values(plugin, "opts", false)
+      local opts = Util.opts "mini.surround"
       local mappings = {
-        { opts.mappings.add, desc = "Add surrounding", mode = { "n", "v" } },
-        { opts.mappings.delete, desc = "Delete surrounding" },
-        { opts.mappings.find, desc = "Find right surrounding" },
-        { opts.mappings.find_left, desc = "Find left surrounding" },
-        { opts.mappings.highlight, desc = "Highlight surrounding" },
-        { opts.mappings.replace, desc = "Replace surrounding" },
-        { opts.mappings.update_n_lines, desc = "Update `MiniSurround.config.n_lines`" },
+        { opts.mappings.add, desc = "surround: add", mode = { "n", "v" } },
+        { opts.mappings.delete, desc = "surround: delete" },
+        { opts.mappings.find, desc = "surround: find right" },
+        { opts.mappings.find_left, desc = "surround: find left" },
+        { opts.mappings.highlight, desc = "surround: highlight" },
+        { opts.mappings.replace, desc = "surround: Replace" },
+        { opts.mappings.update_n_lines, desc = "config: update `MiniSurround.config.n_lines`" },
         {
           "<leader><leader>s",
           ":normal saiW`<Esc>",
-          desc = "Surround inner word with backticks",
+          desc = "surround: inner word with backticks",
           noremap = true,
         },
       }
@@ -242,12 +241,12 @@ return {
         evaluate_single = true,
         header = logo,
         items = {
-          new_section("Files",      Util.telescope('find_files'),          "Telescope"),
-          new_section("Recents",    Util.telescope("oldfiles"),            "Telescope"),
-          new_section("Text",       Util.telescope("live_grep"),           "Telescope"),
-          new_section("New",        "ene | startinsert",                   "Built-in"),
-          new_section("Quit",       "qa",                                  "Built-in"),
-          new_section("Lazy",       "Lazy",                                "Config"),
+          new_section("Files",      Util.pick('files'),          "Telescope"),
+          new_section("Recents",    Util.pick("oldfiles"),       "Telescope"),
+          new_section("Text",       Util.pick("live_grep"),      "Telescope"),
+          new_section("New",        "ene | startinsert",         "Built-in"),
+          new_section("Quit",       "qa",                        "Built-in"),
+          new_section("Lazy",       "Lazy",                      "Config"),
         },
         content_hooks = {
           starter.gen_hook.adding_bullet(pad .. "░ ", false),

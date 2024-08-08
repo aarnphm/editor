@@ -135,7 +135,6 @@ return {
       -- provide the code lenses.
       codelens = { enabled = false },
       -- Enable lsp cursor word highlighting
-      ---@type lsp.ClientCapabilities
       capabilities = {
         workspace = {
           didChangeWatchedFiles = { dynamicRegistration = false },
@@ -152,7 +151,13 @@ return {
       servers = {
         bashls = {},
         marksman = {},
-        spectral = {},
+        markdown_oxide = {
+          capabilities = {
+            workspace = {
+              didChangeWatchedFiles = { dynamicRegistration = true },
+            },
+          },
+        },
         taplo = {},
         gopls = {
           settings = {
@@ -189,19 +194,6 @@ return {
               staticcheck = true,
               directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
               semanticTokens = true,
-            },
-          },
-        },
-        jsonls = {
-          -- lazy-load schemastore when needed
-          on_new_config = function(config)
-            config.settings.json.schemas = config.settings.json.schemas or {}
-            vim.list_extend(config.settings.json.schemas, require("schemastore").json.schemas())
-          end,
-          settings = {
-            json = {
-              format = { enable = true },
-              validate = { enable = true },
             },
           },
         },
@@ -291,7 +283,25 @@ return {
             },
           },
         },
+        jsonls = {
+          -- lazy-load schemastore when needed
+          on_new_config = function(config)
+            config.settings.json.schemas = config.settings.json.schemas or {}
+            vim.tbl_deep_extend("force", config.settings.json.schemas, require("schemastore").json.schemas())
+          end,
+          settings = {
+            json = {
+              format = { enable = true },
+              validate = { enable = true },
+            },
+          },
+        },
         yamlls = {
+          -- lazy-load schemastore when needed
+          on_new_config = function(config)
+            config.settings.yaml.schemas = config.settings.yaml.schemas or {}
+            vim.tbl_deep_extend("force", config.settings.yaml.schemas, require("schemastore").yaml.schemas())
+          end,
           -- Have to add this for yamlls to understand that we support line folding
           capabilities = {
             textDocument = {
@@ -301,8 +311,6 @@ return {
               },
             },
           },
-          -- lazy-load schemastore when needed
-          on_new_config = function(new_config) new_config.settings.yaml.schemas = vim.tbl_deep_extend("force", new_config.settings.yaml.schemas or {}, require("schemastore").yaml.schemas()) end,
           settings = {
             redhat = { telemetry = { enabled = false } },
             yaml = {
@@ -455,13 +463,13 @@ return {
         end,
         eslint = function()
           local formatter = Util.lsp.formatter {
-            name = "eslint: lsp",
+            name = "lsp: eslint",
             primary = false,
             priority = 200,
             filter = "eslint",
           }
 
-          -- register the formatter with LazyVim
+          -- register the formatter with Util
           Util.format.register(formatter)
         end,
         vtsls = function(_, opts)
@@ -575,9 +583,10 @@ return {
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       ---@type lsp.ClientCapabilities
-      local capabilities = vim.tbl_deep_extend("force", opts.capabilities or {}, vim.lsp.protocol.make_client_capabilities(), has_cmp and cmp_nvim_lsp.default_capabilities() or {})
-      capabilities.textDocument.completion.completionItem.snippetSupport = true
-      capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
+      local capabilities = vim.tbl_deep_extend("force", opts.capabilities or {}, vim.lsp.protocol.make_client_capabilities(), has_cmp and cmp_nvim_lsp.default_capabilities() or {}, {
+        textDocument = { completion = { completionItem = { snippetSupport = true } } },
+        workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+      })
 
       require("lspconfig.ui.windows").default_options.border = BORDER
 
@@ -585,7 +594,7 @@ return {
       local setup = function(server)
         local server_opts = vim.tbl_deep_extend("force", {
           capabilities = vim.deepcopy(capabilities),
-          flags = { debounce_text_changes = 500 },
+          flags = { debounce_text_changes = 300 },
         }, servers[server] or {})
 
         if opts.setup[server] then
@@ -615,6 +624,15 @@ return {
       end
 
       if have_mason then mlsp.setup { ensure_installed = ensure_installed, handlers = { setup } } end
+
+      if Util.lsp.is_enabled "denols" and Util.lsp.is_enabled "vtsls" then
+        local is_deno = require("lspconfig.util").root_pattern("deno.json", "deno.jsonc")
+        Util.lsp.disable("vtsls", is_deno)
+        Util.lsp.disable("denols", function(root_dir, config)
+          if not is_deno(root_dir) then config.settings.deno.enable = false end
+          return false
+        end)
+      end
     end,
   },
 }

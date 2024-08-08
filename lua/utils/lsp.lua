@@ -182,15 +182,15 @@ function M.disable(server, cond)
   end)
 end
 
----@param opts? SimpleFormatter| {filter?: (string|lsp.Client.filter)}
+---@param opts? LazyFormatter| {filter?: (string|lsp.Client.filter)}
 function M.formatter(opts)
   opts = opts or {}
   local filter = opts.filter or {}
   filter = type(filter) == "string" and { name = filter } or filter
   ---@cast filter lsp.Client.filter
-  ---@type SimpleFormatter
+  ---@type LazyFormatter
   local ret = {
-    name = "LSP",
+    name = "lsp",
     primary = true,
     priority = 1,
     format = function(buf) M.format(Util.merge({}, filter, { bufnr = buf })) end,
@@ -202,7 +202,7 @@ function M.formatter(opts)
       return vim.tbl_map(function(client) return client.name end, ret)
     end,
   }
-  return Util.merge(ret, opts) --[[@as SimpleFormatter]]
+  return Util.merge(ret, opts) --[[@as LazyFormatter]]
 end
 
 ---@alias lsp.Client.format {timeout_ms?: number, format_options?: table} | lsp.Client.filter

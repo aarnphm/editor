@@ -26,12 +26,15 @@ return {
           MiniFilesBorder = { bg = "none" },
           MiniFilesNormal = { bg = "none" },
           --- glance.nvim
-          GlanceWinBarTitle = { fg = "rose", bg = "iris", blend = 10 },
-          GlanceWinBarFilepath = { fg = "subtle", bg = "surface" },
-          GlanceWinBarFilename = { fg = "love", bg = "surface" },
+          GlanceWinBarTitle = { fg = "rose", bg = "overlay" },
+          GlanceWinBarFilepath = { fg = "subtle" },
+          GlanceWinBarFilename = { fg = "love" },
           GlancePreviewNormal = { bg = "surface" },
           GlanceListNormal = { bg = "overlay" },
           GlancePreviewMatch = { fg = "love" },
+          GlanceBorderTop = { bg = "none", blend = 0 },
+          GlanceListBorderBottom = { bg = "none", blend = 0 },
+          GlancePreviewBorderBottom = { bg = "none", blend = 0 },
           --- headlines.nvim
           Headline1 = { bg = "surface" },
           Headline2 = { bg = "gold" },

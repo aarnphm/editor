@@ -11,6 +11,7 @@
 ---@field toggle simple.util.toggle
 ---@field cmp simple.util.cmp
 ---@field mini simple.util.mini
+---@field pick simple.util.pick
 ---@field treesitter simple.util.treesitter
 local M = {}
 
@@ -30,7 +31,7 @@ function M.setup()
   vim.treesitter.language.register("markdown", "vimwiki")
 end
 
-function M.is_win() return vim.uv.os_uname().sysname:find "Windows" ~= nil end
+M.is_win = function() return vim.uv.os_uname().sysname:find "Windows" ~= nil end
 
 ---@param plugin string
 ---@return boolean

@@ -19,7 +19,7 @@ M.get = function()
       { "gR", Util.lsp.buffer.references, desc = "lsp: show references", has = "definition", nowait = true },
       { "gd", Util.lsp.buffer.definitions, desc = "lsp: peek definition", has = "definition" },
       { "gI", Util.lsp.buffer.implementations, desc = "lsp: implementation" },
-      { "gh", Util.telescope "lsp_references", desc = "lsp: references", has = "references" },
+      { "gh", Util.pick "lsp_references", desc = "lsp: references", has = "references" },
       { "<c-k>", vim.lsp.buf.signature_help, mode = "i", desc = "lsp: signature help", has = "signatureHelp" },
       { "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: code action", mode = { "n", "v" }, has = "codeAction" },
       { "<leader>cc", vim.lsp.codelens.run, desc = "lsp: run codelens", mode = { "n", "v" }, has = "codeLens" },

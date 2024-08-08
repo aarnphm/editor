@@ -1,6 +1,7 @@
 ---@class simple.util.root
 ---@overload fun(): string
 local M = setmetatable({}, {
+  ---@param m simple.util.root
   __call = function(m) return m.get() end,
 })
 
@@ -13,7 +14,7 @@ local M = setmetatable({}, {
 ---@alias SimpleRootSpec string|string[]|SimpleRootFn
 
 ---@type SimpleRootSpec[]
-M.spec = { "lsp", { ".git", "lua" }, "cwd" }
+M.spec = { "lsp", vim.list_extend({ ".git", "lua" }, vim.g.additional_path_root_spec or {}), "cwd" }
 
 M.detectors = {}
 

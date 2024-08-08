@@ -1,62 +1,5 @@
 return {
   {
-    "stevearc/conform.nvim",
-    dependencies = { "mason.nvim" },
-    lazy = true,
-    cmd = "ConformInfo",
-    init = function()
-      -- install conform formatter on VeryLazy
-      Util.on_very_lazy(function()
-        Util.format.register {
-          name = "conform.nvim",
-          priority = 100,
-          primary = true,
-          format = function(buf)
-            local plugin = require("lazy.core.config").plugins["conform.nvim"]
-            local opts = require("lazy.core.plugin").values(plugin, "opts", false)
-            require("conform").format(Util.merge(opts.format, { bufnr = buf }))
-          end,
-          sources = function(buf)
-            local ret = require("conform").list_formatters(buf)
-            ---@param v conform.FormatterInfo
-            return vim.tbl_map(function(v) return v.name end, ret)
-          end,
-        }
-      end)
-    end,
-    opts = {
-      format = { timeout_ms = 3000, async = false, quiet = false, lsp_fallback = true },
-      formatters_by_ft = {
-        lua = { "stylua" },
-        toml = { "taplo" },
-        proto = { { "buf", "protolint" } },
-        zsh = { "beautysh" },
-        python = { "ruff_fix" },
-        sh = { "shfmt" },
-        markdown = { "prettier" },
-        go = { "goimports", "gofumpt" },
-        ["javascript"] = { "prettier" },
-        ["javascriptreact"] = { "prettier" },
-        ["typescript"] = { "prettier" },
-        ["typescriptreact"] = { "prettier" },
-        ["css"] = { "prettier" },
-        ["scss"] = { "prettier" },
-        ["less"] = { "prettier" },
-        ["html"] = { "prettier" },
-        ["json"] = { "prettier" },
-        ["jsonc"] = { "prettier" },
-        ["yaml"] = { "prettier" },
-      },
-      ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
-      formatters = {
-        injected = { options = { ignore_errors = true } },
-        shfmt = { prepend_args = { "-i", "2", "-ci" } },
-        beautysh = { prepend_args = { "-i", "2" } },
-      },
-    },
-    config = function(_, opts) require("conform").setup(opts) end,
-  },
-  {
     "supermaven-inc/supermaven-nvim",
     event = "LazyFile",
     opts = {
@@ -68,6 +11,7 @@ return {
         ministarter = true,
         nofile = true,
         startup = true,
+        Trouble = true,
       },
       disable_inline_completion = true,
       log_level = "warn",
@@ -113,6 +57,30 @@ return {
       }
 
       local select_opts = { behavior = cmp.SelectBehavior.Select }
+
+      local forward_cmpl = function(fallback)
+        local col = vim.fn.col "." - 1
+
+        if cmp.visible() then
+          cmp.select_next_item(select_opts)
+        elseif vim.snippet.active { direction = 1 } then
+          vim.schedule(function() vim.snippet.jump(1) end)
+        elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
+          fallback()
+        else
+          cmp.complete()
+        end
+      end
+      local backward_cmpl = function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item(select_opts)
+        elseif vim.snippet.active { direction = -1 } then
+          vim.schedule(function() vim.snippet.jump(-1) end)
+        else
+          fallback()
+        end
+      end
+
       ---@type cmp.ConfigSchema
       return vim.tbl_deep_extend("force", defaults, {
         completion = { completeopt = "menu,menuone,noinsert,noselect" },
@@ -170,28 +138,8 @@ return {
           ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            local col = vim.fn.col "." - 1
-
-            if cmp.visible() then
-              cmp.select_next_item(select_opts)
-            elseif vim.snippet.active { direction = 1 } then
-              vim.schedule(function() vim.snippet.jump(1) end)
-            elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
-              fallback()
-            else
-              cmp.complete()
-            end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item(select_opts)
-            elseif vim.snippet.active { direction = -1 } then
-              vim.schedule(function() vim.snippet.jump(-1) end)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
+          ["<Tab>"] = cmp.mapping(forward_cmpl, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(backward_cmpl, { "i", "s" }),
         },
         sources = cmp.config.sources {
           { name = "path", priority = 250 },
