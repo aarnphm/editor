@@ -436,15 +436,13 @@ return {
           end)
         end,
         eslint = function()
-          local formatter = Util.lsp.formatter {
+          -- register the formatter
+          Util.format.register(Util.lsp.formatter {
             name = "lsp: eslint",
             primary = false,
             priority = 200,
             filter = "eslint",
-          }
-
-          -- register the formatter with Util
-          Util.format.register(formatter)
+          })
         end,
         vtsls = function(_, opts)
           Util.lsp.on_attach(function(client, _)
@@ -590,7 +588,7 @@ return {
       require("lspconfig.ui.windows").default_options.border = BORDER
 
       ---@param server string
-      local setup = function(server)
+      local server_setup = function(server)
         local server_opts = vim.tbl_deep_extend("force", {
           capabilities = vim.deepcopy(capabilities),
           flags = { debounce_text_changes = 300 },
@@ -605,9 +603,9 @@ return {
       end
 
       -- get all the servers that are available through mason-lspconfig
-      local have_mason, mlsp = pcall(require, "mason-lspconfig")
+      local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
       local all_mslp_servers = {}
-      if have_mason then all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
+      if have_mlsp then all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
 
       local ensure_installed = {} ---@type string[]
       for server, server_opts in pairs(servers) do
@@ -615,14 +613,14 @@ return {
           server_opts = server_opts == true and {} or server_opts
           -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
           if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
-            setup(server)
+            server_setup(server)
           else
             ensure_installed[#ensure_installed + 1] = server
           end
         end
       end
 
-      if have_mason then mlsp.setup { ensure_installed = ensure_installed, handlers = { setup } } end
+      if have_mlsp then mlsp.setup { ensure_installed = ensure_installed, handlers = { server_setup } } end
 
       if Util.lsp.is_enabled "denols" and Util.lsp.is_enabled "vtsls" then
         local is_deno = require("lspconfig.util").root_pattern("deno.json", "deno.jsonc")

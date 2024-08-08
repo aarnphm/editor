@@ -14,6 +14,24 @@ return {
           -- `condition` is another LazyVim extension that allows you to dynamically enable/disable linters based on the context.
           condition = function(ctx) return vim.fs.find({ "selene.toml" }, { path = ctx.filename, upward = true })[1] end,
         },
+        eslint = {
+          condition = function(ctx)
+            return vim.fs.find({
+              ".eslintrc",
+              ".eslintrc.js",
+              ".eslintrc.cjs",
+              ".eslintrc.yaml",
+              ".eslintrc.yml",
+              ".eslintrc.json",
+              "eslint.config.js",
+              "eslint.config.mjs",
+              "eslint.config.cjs",
+              "eslint.config.ts",
+              "eslint.config.mts",
+              "eslint.config.cts",
+            }, { path = ctx.filename, upward = true })[1]
+          end,
+        },
         ruff = {
           condition = function(ctx) return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1] end,
         },

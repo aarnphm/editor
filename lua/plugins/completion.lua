@@ -143,7 +143,7 @@ return {
           },
         },
         enabled = function()
-          local disabled = { gitcommit = true, TelescopePrompt = true, help = true }
+          local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true }
           return not disabled[vim.bo.filetype]
         end,
         mapping = cmp.mapping.preset.insert {

@@ -120,7 +120,7 @@ end
 M.cache = {}
 
 function M.setup()
-  vim.api.nvim_create_user_command("Root", function() Util.root.info() end, { desc = "Util roots for the current buffer" })
+  vim.api.nvim_create_user_command("RootInfo", function() Util.root.info() end, { desc = "Util roots for the current buffer" })
 
   -- FIX: doesn't properly clear cache in neo-tree `set_root` (which should happen presumably on `DirChanged`),
   -- probably because the event is triggered in the neo-tree buffer, therefore add `BufEnter`

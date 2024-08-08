@@ -10,15 +10,19 @@ local diagnostic_goto = function(next, severity)
 end
 
 -- Easily hit escape in terminal mode.
-map("t", "<esc><esc>", "<c-\\><c-n>")
 -- Open a terminal at the bottom of the screen with a fixed height.
-map("n", ",st", function()
-  vim.cmd.new()
-  vim.cmd.wincmd "J"
-  vim.api.nvim_win_set_height(0, 12)
-  vim.wo.winfixheight = true
-  vim.cmd.term()
-end, { desc = "terminal: open new buffer" })
+local lazyterm = function() Util.terminal(nil, { cwd = Util.root() }) end
+map("n", "<LocalLeader>st", function() Util.terminal() end, { desc = "terminal: open (cwd)" })
+map("n", "<C-/>", lazyterm, { desc = "terminal: open (root)" })
+map("n", "<C-_>", lazyterm, { desc = "which_key_ignore" })
+map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
+map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })
+map("t", "<C-w>j", "<cmd>wincmd j<cr>", { desc = "terminal: go to lower window" })
+map("t", "<C-w>k", "<cmd>wincmd k<cr>", { desc = "terminal: go to upper window" })
+map("t", "<C-w>l", "<cmd>wincmd l<cr>", { desc = "terminal: go to right window" })
+map("t", "<C-/>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "lsp: Next diagnostic" })
 map("n", "[d", diagnostic_goto(false), { desc = "lsp: Prev diagnostic" })
@@ -47,10 +51,6 @@ map("n", "<C-h>", "<C-w>h", { desc = "window: Focus left", silent = true, norema
 map("n", "<C-l>", "<C-w>l", { desc = "window: Focus right", silent = true, noremap = true })
 map("n", "<C-j>", "<C-w>j", { desc = "window: Focus down", silent = true, noremap = true })
 map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up", silent = true, noremap = true })
-map("t", "<C-w>h", "<cmd>wincmd h<CR>", { desc = "window: Focus left", silent = true, noremap = true })
-map("t", "<C-w>l", "<cmd>wincmd l<CR>", { desc = "window: Focus right", silent = true, noremap = true })
-map("t", "<C-w>j", "<cmd>wincmd j<CR>", { desc = "window: Focus down", silent = true, noremap = true })
-map("t", "<C-w>k", "<cmd>wincmd k<CR>", { desc = "window: Focus up", silent = true, noremap = true })
 map("n", "<LocalLeader>|", "<C-w>|", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
@@ -71,12 +71,12 @@ map("n", "<LocalLeader>-", string.format("<cmd>resize -%s<cr>", 10), { noremap =
 map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", 10), { noremap = false, desc = "windows: resize up 10px" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
-map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "Next search result" })
-map("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
-map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
-map("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "Prev search result" })
-map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
-map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "search: next" })
+map("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "search: next" })
+map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "search: next" })
+map("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "search: prev" })
+map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "search: prev" })
+map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "search: prev" })
 
 -- Add undo break-points
 map("i", ",", ",<c-g>u")

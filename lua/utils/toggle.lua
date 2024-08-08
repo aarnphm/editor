@@ -17,6 +17,7 @@ M.setup = function()
   M.map("<leader>uc", M("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
   M.map("<leader>uf", M.format())
   M.map("<leader>uF", M.format(true))
+  M.map("<leader>wm", M.maximize)
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
 

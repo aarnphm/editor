@@ -12,6 +12,7 @@
 ---@field cmp simple.util.cmp
 ---@field mini simple.util.mini
 ---@field pick simple.util.pick
+---@field terminal simple.util.terminal
 ---@field treesitter simple.util.treesitter
 local M = {}
 
