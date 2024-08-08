@@ -38,6 +38,9 @@ then
   return {}
 end
 
+local has_make = function() return vim.fn.executable "make" == 1 end
+local has_cmake = function() return vim.fn.executable "cmake" == 1 end
+
 return {
   {
     "nvim-telescope/telescope.nvim",
@@ -46,7 +49,6 @@ return {
     version = false,
     dependencies = {
       "s1n7ax/nvim-window-picker",
-      { "folke/trouble.nvim", version = false, opts = {}, cmd = "Trouble" },
       {
         "nvim-telescope/telescope-live-grep-args.nvim",
         config = function()
@@ -58,8 +60,8 @@ return {
       },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = vim.fn.executable "make" == 1 and "make" or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
-        enabled = vim.fn.executable "cmake" == 1,
+        build = has_make() and "make" or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        enabled = has_make() or has_cmake(),
         config = function(plugin)
           Util.on_load("telescope.nvim", function()
             local ok, err = pcall(require("telescope").load_extension, "fzf")
@@ -94,7 +96,7 @@ return {
         silent = true,
       },
       {
-        "<leader>b",
+        "<LocalLeader>b",
         Util.pick("buffers", {
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,

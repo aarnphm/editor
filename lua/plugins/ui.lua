@@ -22,13 +22,9 @@ return {
   {
     "utilyre/barbecue.nvim",
     version = false,
+    event = "LazyFile",
     dependencies = { "SmiteshP/nvim-navic" },
-    opts = {
-      show_modified = true,
-      symbols = {
-        ellipsis = "...",
-      },
-    },
+    opts = { show_modified = true, symbols = { ellipsis = "..." } },
   },
   {
     "folke/noice.nvim",
@@ -38,9 +34,14 @@ return {
         bottom_search = true,
         command_palette = false,
         long_message_to_split = true,
+        lsp_doc_border = false,
       },
-      notify = { enabled = false },
       cmdline = { view = "cmdline" },
+      views = {
+        split = { position = "right", size = "30%" },
+        popup = { border = { style = BORDER } },
+        confirm = { border = { style = BORDER } },
+      },
       routes = {
         {
           filter = {
@@ -60,7 +61,7 @@ return {
             kind = "progress",
             cond = function(message)
               local client = vim.tbl_get(message.opts, "progress", "client")
-              return client == "lua_ls"
+              return client == "nil_ls"
             end,
           },
           opts = { skip = true },
@@ -105,7 +106,7 @@ return {
         delay_syntax = 80,
         border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
         show_title = false,
-        should_preview_cb = function(bufnr, qwinid)
+        should_preview_cb = function(bufnr, _)
           local ret = true
           local bufname = vim.api.nvim_buf_get_name(bufnr)
           local fsize = vim.fn.getfsize(bufname)

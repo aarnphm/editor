@@ -109,24 +109,21 @@ function M.format(opts)
     end
   end
 
-  if not done and opts and opts.force then Util.warn("No formatter available", { title = "Simple" }) end
+  if not done and opts and opts.force then Util.warn("No formatter available", { title = "LazyVim" }) end
 end
 
 M.setup = function()
   -- Autoformat autocmd
   vim.api.nvim_create_autocmd("BufWritePre", {
-    group = vim.api.nvim_create_augroup("SimpleFormat", {}),
+    group = augroup "format",
     callback = function(event) M.format { buf = event.buf } end,
   })
 
   -- Manual format
-  vim.api.nvim_create_user_command("Format", function() M.format { force = true } end, { desc = "Format selection or buffer" })
+  vim.api.nvim_create_user_command("Format", function() M.format { force = true } end, { desc = "format: selection or buffer" })
 
   -- Format info
-  vim.api.nvim_create_user_command("FormatInfo", function() M.info() end, { desc = "Show info about the formatters for the current buffer" })
-
-  vim.api.nvim_create_user_command("FormatDisable", function() M.toggle() end, { desc = "Toggle Format" })
-  vim.api.nvim_create_user_command("FormatEnable", function() M.toggle(true) end, { desc = "Disable format" })
+  vim.api.nvim_create_user_command("FormatInfo", function() M.info() end, { desc = "format: info of formatters for the current buffer" })
 end
 
 return M

@@ -31,17 +31,10 @@ return {
           GlanceWinBarFilename = { fg = "love" },
           GlancePreviewNormal = { bg = "surface" },
           GlanceListNormal = { bg = "overlay" },
-          GlancePreviewMatch = { fg = "love" },
+          -- GlancePreviewMatch = { fg = "love" },
           GlanceBorderTop = { bg = "none", blend = 0 },
           GlanceListBorderBottom = { bg = "none", blend = 0 },
           GlancePreviewBorderBottom = { bg = "none", blend = 0 },
-          --- headlines.nvim
-          Headline1 = { bg = "surface" },
-          Headline2 = { bg = "gold" },
-          Headline3 = { bg = "rose" },
-          Headline4 = { bg = "pine" },
-          Headline5 = { bg = "foam" },
-          Headline6 = { bg = "iris" },
         },
       }
 

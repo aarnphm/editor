@@ -1,24 +1,5 @@
 return {
   {
-    "norcalli/nvim-colorizer.lua",
-    event = "LspAttach",
-    opts = {
-      filetypes = { "*" },
-      user_default_options = {
-        names = false, -- "Name" codes like Blue
-        RRGGBBAA = true, -- #RRGGBBAA hex codes
-        rgb_fn = true, -- CSS rgb() and rgba() functions
-        hsl_fn = true, -- CSS hsl() and hsla() functions
-        css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-        css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-        sass = { enable = true, parsers = { "css" } },
-        tailwind = true,
-        mode = "background",
-      },
-    },
-    config = function(_, opts) require("colorizer").setup(opts) end,
-  },
-  {
     "williamboman/mason.nvim",
     cmd = "Mason",
     build = ":MasonUpdate",
@@ -80,21 +61,6 @@ return {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
-      {
-        "folke/lazydev.nvim",
-        ft = "lua",
-        cmd = "LazyDev",
-        opts = {
-          dependencies = {
-            -- Manage libuv types with lazy. Plugin will never be loaded
-            { "Bilal2453/luvit-meta", lazy = true },
-          },
-          library = {
-            { path = "luvit-meta/library", words = { "vim%.uv" } },
-            { path = "lazy.nvim", words = { "Util" } },
-          },
-        },
-      },
       { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
     },
     ---@class PluginLspOptions
@@ -282,6 +248,14 @@ return {
               },
             },
           },
+        },
+        tailwindcss = {
+          -- exclude a filetype from the default_config
+          filetypes_exclude = { "markdown" },
+          -- add additional filetypes to the default_config
+          filetypes_include = {},
+          -- to fully override the default_config, change the below
+          -- filetypes = {}
         },
         jsonls = {
           -- lazy-load schemastore when needed
@@ -521,6 +495,31 @@ return {
           end, "vtsls")
           -- copy typescript settings to javascript
           opts.settings.javascript = vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
+        end,
+        tailwindcss = function(_, opts)
+          local tw = require "lspconfig.server_configurations.tailwindcss"
+          opts.filetypes = opts.filetypes or {}
+
+          -- Add default filetypes
+          vim.list_extend(opts.filetypes, tw.default_config.filetypes)
+
+          -- Remove excluded filetypes
+          --- @param ft string
+          opts.filetypes = vim.tbl_filter(function(ft) return not vim.tbl_contains(opts.filetypes_exclude or {}, ft) end, opts.filetypes)
+
+          -- Additional settings for Phoenix projects
+          opts.settings = {
+            tailwindCSS = {
+              includeLanguages = {
+                elixir = "html-eex",
+                eelixir = "html-eex",
+                heex = "html-eex",
+              },
+            },
+          }
+
+          -- Add additional filetypes
+          vim.list_extend(opts.filetypes, opts.filetypes_include or {})
         end,
         gopls = function()
           -- workaround for gopls not supporting semanticTokensProvider

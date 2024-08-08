@@ -1,5 +1,4 @@
 return {
-  { "tpope/vim-fugitive", keys = { { "<leader>gs", "<cmd>vertical Git<CR>", { desc = "git: fugitive" } } } },
   -- setup mini.diff
   {
     "echasnovski/mini.diff",

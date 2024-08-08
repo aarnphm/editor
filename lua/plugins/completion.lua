@@ -26,7 +26,6 @@ return {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
       "onsails/lspkind.nvim",
-      "hrsh7th/cmp-emoji",
       {
         "garymjr/nvim-snippets",
         opts = {
@@ -34,6 +33,21 @@ return {
           ignored_filetypes = { "git" },
         },
         dependencies = { "rafamadriz/friendly-snippets" },
+      },
+      {
+        "folke/lazydev.nvim",
+        ft = "lua",
+        cmd = "LazyDev",
+        opts = {
+          dependencies = {
+            -- Manage libuv types with lazy. Plugin will never be loaded
+            { "Bilal2453/luvit-meta", lazy = true },
+          },
+          library = {
+            { path = "luvit-meta/library", words = { "vim%.uv" } },
+            { path = "lazy.nvim", words = { "Util" } },
+          },
+        },
       },
     },
     ---@return cmp.ConfigSchema
@@ -83,7 +97,8 @@ return {
 
       ---@type cmp.ConfigSchema
       return vim.tbl_deep_extend("force", defaults, {
-        completion = { completeopt = "menu,menuone,noinsert,noselect" },
+        auto_brackets = { "python" },
+        completion = { completeopt = "menu,menuone,noinsert" },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
@@ -128,7 +143,7 @@ return {
           },
         },
         enabled = function()
-          local disabled = { gitcommit = true, TelescopePrompt = true }
+          local disabled = { gitcommit = true, TelescopePrompt = true, help = true }
           return not disabled[vim.bo.filetype]
         end,
         mapping = cmp.mapping.preset.insert {
@@ -145,9 +160,8 @@ return {
           { name = "path", priority = 250 },
           { name = "nvim_lsp", priority = 200, keyword_length = 3, max_item_count = 350 },
           { name = "snippets", keyword_length = 2, priority = 100 },
-          { name = "buffer", keyword_length = 3 },
+          { name = "buffer", keyword_length = 3, priority = 400 },
           { name = "supermaven" },
-          { name = "emoji" },
           { name = "lazydev", group_index = 0 },
         },
       })

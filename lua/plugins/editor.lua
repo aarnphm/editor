@@ -141,6 +141,109 @@ return {
         beautysh = { prepend_args = { "-i", "2" } },
       },
     },
-    config = function(_, opts) require("conform").setup(opts) end,
+    config = function(_, opts)
+      require("conform").setup(opts)
+
+      Util.toggle.map("<leader>uf", Util.toggle.format())
+      Util.toggle.map("<leader>uF", Util.toggle.format(true))
+    end,
+  },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts_extend = { "spec" },
+    opts = {
+      spec = {
+        {
+          mode = { "n", "v" },
+          { "<leader><tab>", group = "tabs" },
+          { "<leader>c", group = "code" },
+          { "<leader>f", group = "file/find" },
+          { "<leader>g", group = "git" },
+          { "<leader>gh", group = "hunks" },
+          { "<leader>q", group = "quit/session" },
+          { "<leader>s", group = "search" },
+          { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+          { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+          { "[", group = "prev" },
+          { "]", group = "next" },
+          { "g", group = "goto" },
+          { "gs", group = "surround" },
+          { "z", group = "fold" },
+          {
+            "<leader>b",
+            group = "buffer",
+            expand = function() return require("which-key.extras").expand.buf() end,
+          },
+          {
+            "<leader>w",
+            group = "windows",
+            proxy = "<c-w>",
+            expand = function() return require("which-key.extras").expand.win() end,
+          },
+          -- better descriptions
+          { "gx", desc = "Open with system app" },
+          { "<BS>", desc = "Decrement Selection", mode = "x" },
+          { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
+        },
+      },
+    },
+    keys = {
+      {
+        "<leader>?",
+        function() require("which-key").show { global = false } end,
+        desc = "which-key: buffer keymaps",
+      },
+      {
+        "<c-w><space>",
+        function() require("which-key").show { keys = "<c-w>", loop = true } end,
+        desc = "which-key: window hydra mode",
+      },
+    },
+    config = function(_, opts) require("which-key").setup(opts) end,
+  },
+  {
+    "folke/trouble.nvim",
+    version = false,
+    opts = {
+      modes = {
+        lsp = {
+          win = { type = "split", position = "right" },
+        },
+      },
+    },
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "trouble: diagnostics" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "trouble: symbols" },
+      { "<leader>cS", "<cmd>Trouble lsp toggle<cr", desc = "trouble: lsp references/definitions/..." },
+      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "trouble: location list" },
+      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "trouble: quickfix list" },
+      {
+        "[q",
+        function()
+          if require("trouble").is_open() then
+            require("trouble").prev { skip_groups = true, jump = true }
+          else
+            local ok, err = pcall(vim.cmd.cprev)
+            if not ok then vim.notify(err, vim.log.levels.ERROR) end
+          end
+        end,
+        desc = "trouble: previous item",
+      },
+      {
+        "]q",
+        function()
+          if require("trouble").is_open() then
+            require("trouble").next { skip_groups = true, jump = true }
+          else
+            local ok, err = pcall(vim.cmd.cnext)
+            if not ok then vim.notify(err, vim.log.levels.ERROR) end
+          end
+        end,
+        desc = "trouble: next item",
+      },
+    },
+    cmd = "Trouble",
   },
 }
