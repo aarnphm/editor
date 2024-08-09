@@ -79,6 +79,22 @@ return {
       },
     },
     keys = {
+      {
+        "<C-\\>",
+        Util.pick("keymaps", {
+          lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
+          layout_strategy = "vertical",
+          previewer = false,
+          layout_config = {
+            width = 0.6,
+            height = 0.6,
+            prompt_position = "top",
+          },
+        }),
+        desc = "telescope: keymaps",
+        noremap = true,
+        silent = true,
+      },
       { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
       { "<LocalLeader>f", Util.pick "oldfiles", desc = "telescope: recent files" },
       { "<Leader>/", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
@@ -96,6 +112,7 @@ return {
       end
       local find_files_with_hidden = function()
         local action_state = require "telescope.actions.state"
+        local action_set = require "telescope.actions.set"
         local line = action_state.get_current_line()
         Util.pick("find_files", { hidden = true, default_text = line })()
       end
@@ -114,8 +131,7 @@ return {
         end
       end
 
-      ---@class TelescopeOptions
-      local opts = {
+      return {
         defaults = {
           prompt_prefix = "󰄾 ",
           selection_caret = " ",
@@ -148,7 +164,7 @@ return {
           mappings = {
             i = {
               ["<C-a>"] = { "<esc>0i", type = "command" },
-              ["<Esc>"] = function(...) return actions.close(...) end,
+              ["<Esc>"] = actions.close,
               ["<C-t>"] = open_with_trouble,
               ["<a-i>"] = find_files_no_ignore,
               ["<a-h>"] = find_files_with_hidden,
@@ -164,26 +180,7 @@ return {
             },
           },
         },
-        pickers = {
-          find_files = {
-            find_command = find_command,
-            hidden = true,
-          },
-          live_grep = {
-            additional_args = function() return { "--hidden" } end,
-            glob_pattern = { "!.git" },
-            on_input_filter_cb = function(prompt)
-              -- AND operator for live_grep like how fzf handles spaces with wildcards in rg
-              return { prompt = prompt:gsub("%s", ".*") }
-            end,
-            attach_mappings = function(_)
-              require("telescope.actions.set").select:enhance {
-                post = function() vim.cmd ":normal! zx" end,
-              }
-              return true
-            end,
-          },
-        },
+        pickers = { find_files = { find_command = find_command, hidden = true } },
         extensions = {
           live_grep_args = {
             auto_quoting = false,
@@ -197,8 +194,6 @@ return {
           },
         },
       }
-
-      return opts
     end,
   },
 }

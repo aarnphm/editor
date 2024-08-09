@@ -20,9 +20,6 @@ return {
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
-          --- telescope.nvim
-          TelescopeNormal = { bg = "none" },
-          TelescopeBorder = { bg = "none" },
           --- mini.files
           MiniFilesBorder = { bg = "none" },
           MiniFilesNormal = { bg = "none" },

@@ -233,3 +233,4 @@ end
 hi("MiniFilesBorder", { link = "Normal" })
 hi("MiniFilesNormal", { link = "Normal" })
 hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
+hi("CmpGhostText", { link = "Comment", default = true })
