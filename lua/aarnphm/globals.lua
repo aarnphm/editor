@@ -177,8 +177,8 @@ _G.statusline = {
   end,
   location = function(args)
     local icon = args.icon or "♥"
-    if H.is_truncated(args.trunc_width) then return '%l:%-2{virtcol("$") - 1}' .. (" %s"):format(icon) end
-    return '%l:%-2{virtcol("$") - 1}:%2v' .. (" %s"):format(icon)
+    if H.is_truncated(args.trunc_width) then return "%l:%v" end
+    return "%l:%v" .. (" %s"):format(icon)
   end,
   mode = function(args)
     local mi = H.modes[vim.fn.mode()]
