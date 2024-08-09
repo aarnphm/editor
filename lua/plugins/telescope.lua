@@ -79,37 +79,9 @@ return {
       },
     },
     keys = {
-      {
-        "<C-S-p>",
-        Util.pick("keymaps", {
-          lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-          layout_strategy = "vertical",
-          previewer = false,
-          layout_config = {
-            width = 0.6,
-            height = 0.6,
-            prompt_position = "top",
-          },
-        }),
-        desc = "telescope: keymaps",
-        noremap = true,
-        silent = true,
-      },
-      {
-        "<LocalLeader>b",
-        Util.pick("buffers", {
-          layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
-          show_all_buffers = true,
-          previewer = false,
-          cwd = require("plenary.job"):new({ command = "git", args = { "rev-parse", "--show-toplevel" } }):sync()[1],
-        }),
-        desc = "telescope: manage buffers",
-      },
       { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
-      { "<LocalLeader>f", Util.pick "files", desc = "telescope: find files (git)" },
-      { "<leader>F", Util.pick "oldfiles", desc = "telescope: recent files" },
-      { "<LocalLeader>w", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
-      { "<Leader>/", Util.pick "live_grep", desc = "telescope: grep string" },
+      { "<LocalLeader>f", Util.pick "oldfiles", desc = "telescope: recent files" },
+      { "<Leader>/", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
       { "<Leader>w", function() require("telescope").extensions.live_grep_args.live_grep_args() end, desc = "telescope: grep word" },
     },
     opts = function()

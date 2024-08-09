@@ -1,6 +1,7 @@
 return {
   {
     "supermaven-inc/supermaven-nvim",
+    lazy = true,
     event = "LazyFile",
     opts = {
       ignore_filetypes = {
@@ -13,6 +14,7 @@ return {
         Trouble = true,
       },
       log_level = "warn",
+      disable_inline_completion = true,
     },
   },
   {
@@ -68,14 +70,11 @@ return {
 
       local forward_cmpl = function(fallback)
         local col = vim.fn.col "." - 1
-        local suggestion = require "supermaven-nvim.completion_preview"
 
         if cmp.visible() then
           cmp.select_next_item(select_opts)
         elseif vim.snippet.active { direction = 1 } then
           vim.schedule(function() vim.snippet.jump(1) end)
-        elseif suggestion.has_suggestion() then
-          suggestion.on_accept_suggestion()
         elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
           fallback()
         else
@@ -83,14 +82,10 @@ return {
         end
       end
       local backward_cmpl = function(fallback)
-        local suggestion = require "supermaven-nvim.completion_preview"
-
         if cmp.visible() then
           cmp.select_prev_item(select_opts)
         elseif vim.snippet.active { direction = -1 } then
           vim.schedule(function() vim.snippet.jump(-1) end)
-        elseif suggestion.has_suggestion() then
-          suggestion.on_accept_suggestion()
         else
           fallback()
         end
@@ -107,16 +102,16 @@ return {
           expandable_indicator = true,
           format = require("lspkind").cmp_format {
             mode = "symbol",
-            max_width = 20,
+            max_width = 10,
             symbol_map = {
               Supermaven = "",
             },
           },
         },
         experimental = {
-          ghost_text = {
+          ghost_text = vim.g.ghost_text and {
             hl_group = "CmpGhostText",
-          },
+          } or false,
         },
         window = { completion = windows, documentation = windows },
         sorting = {
@@ -161,6 +156,7 @@ return {
         },
         sources = cmp.config.sources {
           { name = "path", priority = 200 },
+          { name = "supermaven" },
           { name = "nvim_lsp", priority = 400, keyword_length = 3, max_item_count = 200 },
           { name = "snippets", keyword_length = 2, priority = 300 },
           { name = "buffer", priority = 100 },

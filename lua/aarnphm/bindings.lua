@@ -13,14 +13,16 @@ end
 -- Open a terminal at the bottom of the screen with a fixed height.
 local lazyterm = function() Util.terminal(nil, { cwd = Util.root() }) end
 map("n", "<C-p>", lazyterm, { desc = "terminal: open (root)" })
-map("n", "<C-_>", lazyterm, { desc = "which_key_ignore" })
+map("n", "<M-[>", lazyterm, { desc = "terminal: open (root)" })
+map("n", "<M-]>", lazyterm, { desc = "terminal: open (root)" })
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
 map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })
 map("t", "<C-w>j", "<cmd>wincmd j<cr>", { desc = "terminal: go to lower window" })
 map("t", "<C-w>k", "<cmd>wincmd k<cr>", { desc = "terminal: go to upper window" })
 map("t", "<C-w>l", "<cmd>wincmd l<cr>", { desc = "terminal: go to right window" })
 map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
-map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
 
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "lsp: Next diagnostic" })

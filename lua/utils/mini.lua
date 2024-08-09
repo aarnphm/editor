@@ -120,6 +120,7 @@ function M.pairs(opts)
   })
   local pairs = require "mini.pairs"
   pairs.setup(opts)
+
   local open = pairs.open
   pairs.open = function(pair, neigh_pattern)
     if vim.fn.getcmdline() ~= "" then return open(pair, neigh_pattern) end

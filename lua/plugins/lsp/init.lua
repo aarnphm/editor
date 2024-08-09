@@ -435,14 +435,31 @@ return {
             if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
           end)
         end,
-        eslint = function()
-          -- register the formatter
+        eslint = function(server, opts)
+          -- register the formatter with Util
           Util.format.register(Util.lsp.formatter {
             name = "lsp: eslint",
             primary = false,
             priority = 200,
             filter = "eslint",
           })
+
+          opts.autostart = #vim.fs.find({
+            ".eslintrc",
+            ".eslintrc.js",
+            ".eslintrc.cjs",
+            ".eslintrc.yaml",
+            ".eslintrc.yml",
+            ".eslintrc.json",
+            "eslint.config.js",
+            "eslint.config.mjs",
+            "eslint.config.cjs",
+            "eslint.config.ts",
+            "eslint.config.mts",
+            "eslint.config.cts",
+          }, { path = vim.api.nvim_buf_get_name(0), upward = true }) > 0
+          require("lspconfig")[server].setup(opts)
+          return true
         end,
         vtsls = function(_, opts)
           Util.lsp.on_attach(function(client, _)

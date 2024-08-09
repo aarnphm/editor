@@ -650,7 +650,7 @@ return {
         ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
         [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
         [".node-version"] = { glyph = "", hl = "MiniIconsGreen" },
-        [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
+        [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
         [".yarnrc.yml"] = { glyph = "", hl = "MiniIconsBlue" },
         ["eslint.config.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
         ["package.json"] = { glyph = "", hl = "MiniIconsGreen" },

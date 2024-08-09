@@ -122,6 +122,7 @@ g.use_glance = true
 g.use_agent = true
 g.inline_diagnostics = true
 g.picker = "telescope"
+g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 
