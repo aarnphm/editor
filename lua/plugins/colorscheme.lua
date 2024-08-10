@@ -37,7 +37,9 @@ return {
       }
 
       -- get background, if it is light, change the IblScope to rose
-      if vim.api.nvim_get_option_value("background", {}) == "light" then opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { fg = "rose" } }) end
+      if vim.api.nvim_get_option_value("background", {}) == "light" then
+        opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { fg = "rose" } })
+      end
       return opts
     end,
   },

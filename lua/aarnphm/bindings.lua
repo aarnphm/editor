@@ -3,27 +3,32 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
-local diagnostic_goto = function(next, severity)
-  local pos = next and 1 or -1
-  severity = severity and vim.diagnostic.severity[severity] or nil
-  return function() vim.diagnostic.jump { severity = severity, count = pos } end
-end
-
 -- Easily hit escape in terminal mode.
 -- Open a terminal at the bottom of the screen with a fixed height.
+local ENV = {
+  FZF_DEFAULT_OPTS = vim.o.background == "light"
+      and "--color=fg:#797593,bg:#faf4ed,hl:#d7827e --color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e --color=border:#dfdad9,header:#286983,gutter:#faf4ed --color=spinner:#ea9d34,info:#56949f --color=pointer:#907aa9,marker:#b4637a,prompt:#797593"
+    or "--color=fg:#908caa,bg:#191724,hl:#ebbcba --color=fg+:#e0def4,bg+:#26233a,hl+:#ebbcba --color=border:#403d52,header:#31748f,gutter:#191724 --color=spinner:#f6c177,info:#9ccfd8 --color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa",
+}
 local lazyterm = function()
   Util.terminal(nil, {
     cwd = Util.root(),
-    env = {
-      FZF_DEFAULT_OPTS = vim.o.background == "light"
-          and "--color=fg:#797593,bg:#faf4ed,hl:#d7827e --color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e --color=border:#dfdad9,header:#286983,gutter:#faf4ed --color=spinner:#ea9d34,info:#56949f --color=pointer:#907aa9,marker:#b4637a,prompt:#797593"
-        or "--color=fg:#908caa,bg:#191724,hl:#ebbcba --color=fg+:#e0def4,bg+:#26233a,hl+:#ebbcba --color=border:#403d52,header:#31748f,gutter:#191724 --color=spinner:#f6c177,info:#9ccfd8 --color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa",
-    },
+    env = ENV,
   })
 end
 map("n", "<C-p>", lazyterm, { desc = "terminal: open (root)" })
 map("n", "<M-[>", lazyterm, { desc = "terminal: open (root)" })
-map("n", "<M-]>", lazyterm, { desc = "terminal: open (root)" })
+map(
+  "n",
+  "<M-]>",
+  function()
+    Util.terminal(
+      { "npx", "quartz", "build", "--bundleInfo", "--concurrency", "4", "--serve", "--verbose" },
+      { cwd = Util.root(), env = ENV, interactive = true, esc_esc = true }
+    )
+  end,
+  { desc = "terminal: serve quartz" }
+)
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
 map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })
 map("t", "<C-w>j", "<cmd>wincmd j<cr>", { desc = "terminal: go to lower window" })
@@ -32,15 +37,6 @@ map("t", "<C-w>l", "<cmd>wincmd l<cr>", { desc = "terminal: go to right window" 
 map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
-
-map("n", "<leader>d", vim.diagnostic.open_float, { desc = "lsp: show line diagnostics" })
-map("n", "]d", diagnostic_goto(true), { desc = "lsp: Next diagnostic" })
-map("n", "[d", diagnostic_goto(false), { desc = "lsp: Prev diagnostic" })
-map("n", "]e", diagnostic_goto(true, vim.diagnostic.severity.E), { desc = "lsp: next error" })
-map("n", "[e", diagnostic_goto(false, vim.diagnostic.severity.E), { desc = "lsp: prev error" })
-map("n", "]w", diagnostic_goto(true, vim.diagnostic.severity.W), { desc = "lsp: next warning" })
-map("n", "[w", diagnostic_goto(false, vim.diagnostic.severity.W), { desc = "lsp: prev warning" })
-map({ "n", "v" }, "<leader><leader>f", function() Util.format { force = true } end, { desc = "style: format buffer" })
 map("i", "jj", "<Esc>", { desc = "normal: escape" })
 map("i", "jk", "<Esc>", { desc = "normal: escape" })
 
@@ -75,10 +71,30 @@ map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" }
 map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
 map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
 map("n", "<LocalLeader>l", "<cmd>set list! list?<cr>", { silent = false, desc = "misc: toggle invisible characters" })
-map("n", "<LocalLeader>]", string.format("<cmd>vertical resize -%s<cr>", 10), { noremap = false, desc = "windows: resize right 10px" })
-map("n", "<LocalLeader>[", string.format("<cmd>vertical resize +%s<cr>", 10), { noremap = false, desc = "windows: resize left 10px" })
-map("n", "<LocalLeader>-", string.format("<cmd>resize -%s<cr>", 10), { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>+", string.format("<cmd>resize +%s<cr>", 10), { noremap = false, desc = "windows: resize up 10px" })
+map(
+  "n",
+  "<LocalLeader>]",
+  string.format("<cmd>vertical resize -%s<cr>", 10),
+  { noremap = false, desc = "windows: resize right 10px" }
+)
+map(
+  "n",
+  "<LocalLeader>[",
+  string.format("<cmd>vertical resize +%s<cr>", 10),
+  { noremap = false, desc = "windows: resize left 10px" }
+)
+map(
+  "n",
+  "<LocalLeader>-",
+  string.format("<cmd>resize -%s<cr>", 10),
+  { noremap = false, desc = "windows: resize down 10px" }
+)
+map(
+  "n",
+  "<LocalLeader>+",
+  string.format("<cmd>resize +%s<cr>", 10),
+  { noremap = false, desc = "windows: resize up 10px" }
+)
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "search: next" })

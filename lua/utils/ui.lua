@@ -13,7 +13,13 @@ function M.get_signs(buf, lnum)
   local signs = {}
 
   -- Get extmark signs
-  local extmarks = vim.api.nvim_buf_get_extmarks(buf, -1, { lnum - 1, 0 }, { lnum - 1, -1 }, { details = true, type = "sign" })
+  local extmarks = vim.api.nvim_buf_get_extmarks(
+    buf,
+    -1,
+    { lnum - 1, 0 },
+    { lnum - 1, -1 },
+    { details = true, type = "sign" }
+  )
   for _, extmark in pairs(extmarks) do
     signs[#signs + 1] = {
       name = extmark[4].sign_hl_group or extmark[4].sign_name or "",
@@ -36,7 +42,9 @@ function M.get_mark(buf, lnum)
   local marks = vim.fn.getmarklist(buf)
   vim.list_extend(marks, vim.fn.getmarklist())
   for _, mark in ipairs(marks) do
-    if mark.pos[1] == buf and mark.pos[2] == lnum and mark.mark:match "[a-zA-Z]" then return { text = mark.mark:sub(2), texthl = "DiagnosticHint" } end
+    if mark.pos[1] == buf and mark.pos[2] == lnum and mark.mark:match "[a-zA-Z]" then
+      return { text = mark.mark:sub(2), texthl = "DiagnosticHint" }
+    end
   end
 end
 
@@ -53,7 +61,9 @@ end
 function M.foldtext()
   local ok = pcall(vim.treesitter.get_parser, vim.api.nvim_get_current_buf())
   local ret = ok and vim.treesitter.foldtext and vim.treesitter.foldtext()
-  if not ret or type(ret) == "string" then ret = { { vim.api.nvim_buf_get_lines(0, vim.v.lnum - 1, vim.v.lnum, false)[1], {} } } end
+  if not ret or type(ret) == "string" then
+    ret = { { vim.api.nvim_buf_get_lines(0, vim.v.lnum - 1, vim.v.lnum, false)[1], {} } }
+  end
 
   table.insert(ret, { (" 󰁂 %d"):format(vim.v.foldend - vim.v.foldstart) })
 
@@ -91,7 +101,11 @@ function M.statuscolumn()
     vim.api.nvim_win_call(win, function()
       if vim.fn.foldclosed(vim.v.lnum) >= 0 then
         fold = { text = vim.opt.fillchars:get().foldclose or "", texthl = githl or "Folded" }
-      elseif show_open_folds and not Util.ui.skip_foldexpr[buf] and tostring(vim.treesitter.foldexpr(vim.v.lnum)):sub(1, 1) == ">" then -- fold start
+      elseif
+        show_open_folds
+        and not Util.ui.skip_foldexpr[buf]
+        and tostring(vim.treesitter.foldexpr(vim.v.lnum)):sub(1, 1) == ">"
+      then -- fold start
         fold = { text = vim.opt.fillchars:get().foldopen or "", texthl = githl }
       end
     end)

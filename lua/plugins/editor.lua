@@ -61,6 +61,39 @@ return {
       { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "todo: filter (todo/fix/fixme)" },
     },
   },
+  -- yank/paste
+  {
+    "gbprod/yanky.nvim",
+    event = "LazyFile",
+    opts = {
+      highlight = { timer = 150 },
+    },
+    keys = {
+      {
+        "<leader>p",
+        function() require("telescope").extensions.yank_history.yank_history {} end,
+        mode = { "n", "x" },
+        desc = "Open Yank History",
+      },
+      { "y", "<Plug>(YankyYank)", mode = { "n", "x" }, desc = "yank: text" },
+      { "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "yank: put after cursor" },
+      { "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "yank: put before cursor" },
+      { "gp", "<Plug>(YankyGPutAfter)", mode = { "n", "x" }, desc = "yank: put after selection" },
+      { "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "yank: put before selection" },
+      { "[y", "<Plug>(YankyCycleForward)", desc = "yank: cycle forward" },
+      { "]y", "<Plug>(YankyCycleBackward)", desc = "yank: cycle backward" },
+      { "]p", "<Plug>(YankyPutIndentAfterLinewise)", desc = "yank: put indent after linewise" },
+      { "[p", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "yank: put indent before linewise" },
+      { "]P", "<Plug>(YankyPutIndentAfterLinewise)", desc = "yank: put indent after linewise" },
+      { "[P", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "yank: put indent before linewise" },
+      { ">p", "<Plug>(YankyPutIndentAfterShiftRight)", desc = "yank: put indent and shift right" },
+      { "<p", "<Plug>(YankyPutIndentAfterShiftLeft)", desc = "yank: put indent and shift left" },
+      { ">P", "<Plug>(YankyPutIndentBeforeShiftRight)", desc = "yank: put indent and shift right" },
+      { "<P", "<Plug>(YankyPutIndentBeforeShiftLeft)", desc = "yank: put indent and shift left" },
+      { "=p", "<Plug>(YankyPutAfterFilter)", desc = "yank: put after applying a filter" },
+      { "=P", "<Plug>(YankyPutBeforeFilter)", desc = "yank: put before applying a filter" },
+    },
+  },
   {
     "stevearc/conform.nvim",
     dependencies = { "mason.nvim" },
@@ -157,7 +190,7 @@ return {
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "trouble: diagnostics" },
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
       { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "trouble: symbols" },
-      { "<leader>cS", "<cmd>Trouble lsp toggle<cr", desc = "trouble: lsp references/definitions/..." },
+      { "<leader>cS", "<cmd>Trouble lsp toggle<cr>", desc = "trouble: lsp references/definitions/..." },
       { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "trouble: location list" },
       { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "trouble: quickfix list" },
       {

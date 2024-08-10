@@ -3,11 +3,17 @@ return {
     "mfussenegger/nvim-lint",
     version = false,
     event = "LazyFile",
-    ---@alias LintOptions table<string,table>
+    ---@class PluginLintOptions
     opts = {
       -- Event to trigger linters
       events = { "BufWritePost", "BufReadPost", "InsertLeave" },
-      linters_by_ft = { lua = { "selene" }, dockerfile = { "hadolint" }, python = { "ruff" }, typescript = { "eslint" }, markdown = { "markdownlint" } },
+      linters_by_ft = {
+        lua = { "selene" },
+        dockerfile = { "hadolint" },
+        python = { "ruff" },
+        typescript = { "eslint" },
+        markdown = { "markdownlint" },
+      },
       ---@type table<string,table>
       linters = {
         selene = {
@@ -33,10 +39,13 @@ return {
           end,
         },
         ruff = {
-          condition = function(ctx) return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1] end,
+          condition = function(ctx)
+            return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
+          end,
         },
       },
     },
+    ---@param opts PluginLintOptions
     config = function(_, opts)
       local lint = require "lint"
       for name, linter in pairs(opts.linters) do
@@ -85,7 +94,7 @@ return {
         ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
         names = vim.tbl_filter(function(name)
           local linter = lint.linters[name]
-          if not linter then Util.warn("Linter not found: " .. name, { title = "nvim-lint" }) end
+          if not linter then Util.warn("linter: not found " .. name, { title = "nvim-lint" }) end
           return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
         end, names)
 

@@ -55,7 +55,9 @@ end
 
 ---@param opts TSConfig
 function M.setup(opts)
-  local map = function(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, desc = desc }) end
+  local map = function(mode, lhs, rhs, desc)
+    vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, desc = desc })
+  end
 
   map({ "n", "v", "o", "i" }, "<A-o>", M.goto_parent_node, "treesitter: goto parent node")
   map({ "n", "v", "o", "i" }, "<A-o>", M.goto_child_node, "treesitter: goto child node")

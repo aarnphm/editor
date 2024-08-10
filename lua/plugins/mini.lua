@@ -570,7 +570,9 @@ return {
     event = "LazyFile",
     opts = {
       options = {
-        custom_commentstring = function() return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring end,
+        custom_commentstring = function()
+          return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
+        end,
       },
     },
   },
@@ -588,7 +590,9 @@ return {
         [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
       }, "\n")
       local pad = string.rep(" ", 12)
-      local new_section = function(name, action, section) return { name = name, action = action, section = pad .. section } end
+      local new_section = function(name, action, section)
+        return { name = name, action = action, section = pad .. section }
+      end
 
       local starter = require "mini.starter"
       --stylua: ignore
@@ -766,8 +770,10 @@ return {
         active = function()
           local mode, mode_hl = statusline.mode { trunc_width = 75 }
           local git = statusline.git { trunc_width = 40 }
+          local diff = statusline.diff { trunc_width = 75 }
           local diagnostics = statusline.diagnostic { trunc_width = 75 }
-          local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+          local lint = statusline.lint { trunc_width = 40 }
+          local lsp = statusline.lsp { trunc_width = 75 }
           local fileinfo = statusline.fileinfo { trunc_width = 90 }
           local location = statusline.location { trunc_width = 90 }
 
@@ -776,10 +782,9 @@ return {
           -- sections, etc.)
           return MiniStatusline.combine_groups {
             { hl = mode_hl, strings = { mode } },
-            { hl = "MiniStatuslineDevinfo", strings = { git, lsp } },
+            { hl = "MiniStatuslineDevinfo", strings = { git, diff, lsp, lint } },
             "%=", -- End left alignment
-            { hl = "MiniStatuslineDevinfo", strings = { diagnostics } },
-            { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+            { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
             { hl = mode_hl, strings = { location } },
           }
         end,

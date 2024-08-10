@@ -42,11 +42,25 @@ return {
       zindex = 50,
       theme = { enable = true },
       hooks = {
-        before_open = function(results, open, _, method)
+        before_open = function(results, open, jump, method)
+          local uri = vim.uri_from_bufnr(0)
           if #results == 0 then
-            Util.warn("This method is not supported by any of the servers registered for the current buffer", { title = "Glance" })
-          elseif #results == 1 and method == "references" then
-            Util.info("The identifier under cursor is the only one found", { title = "Glance" })
+            Util.warn(
+              "This method is not supported by any of the servers registered for the current buffer",
+              { title = "Glance" }
+            )
+          elseif #results == 1 then
+            if method == "references" then
+              Util.info("The identifier under cursor is the only one found", { title = "Glance" })
+            end
+
+            local target_uri = results[1].uri or results[1].targetUri
+
+            if target_uri == uri then
+              jump(results[1])
+            else
+              open(results)
+            end
           else
             open(results)
           end
@@ -61,31 +75,36 @@ return {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
-      { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml", "yml" } },
+      { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml" } },
     },
     ---@class PluginLspOptions
     opts = {
       -- options for vim.diagnostic.config()
-      ---@type vim.diagnostic.Opts
       diagnostics = {
-        severity_sort = true,
-        underline = false,
-        update_in_insert = true,
-        virtual_text = false,
-        float = {
-          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-          focusable = false,
-          focus = false,
-          format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-          source = "if_many",
-          border = BORDER,
+        server = {
+          vtsls = true,
         },
-        signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = "✖",
-            [vim.diagnostic.severity.WARN] = "▲",
-            [vim.diagnostic.severity.HINT] = "⚑",
-            [vim.diagnostic.severity.INFO] = "●",
+        ---@type vim.diagnostic.Opts
+        config = {
+          severity_sort = true,
+          underline = false,
+          update_in_insert = true,
+          virtual_text = false,
+          float = {
+            close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+            focusable = false,
+            focus = false,
+            format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
+            source = "if_many",
+            border = BORDER,
+          },
+          signs = {
+            text = {
+              [vim.diagnostic.severity.ERROR] = "✖",
+              [vim.diagnostic.severity.WARN] = "▲",
+              [vim.diagnostic.severity.HINT] = "⚑",
+              [vim.diagnostic.severity.INFO] = "●",
+            },
           },
         },
       },
@@ -509,7 +528,8 @@ return {
             end
           end, "vtsls")
           -- copy typescript settings to javascript
-          opts.settings.javascript = vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
+          opts.settings.javascript =
+            vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
         end,
         tailwindcss = function(_, opts)
           local tw = require "lspconfig.server_configurations.tailwindcss"
@@ -520,7 +540,10 @@ return {
 
           -- Remove excluded filetypes
           --- @param ft string
-          opts.filetypes = vim.tbl_filter(function(ft) return not vim.tbl_contains(opts.filetypes_exclude or {}, ft) end, opts.filetypes)
+          opts.filetypes = vim.tbl_filter(
+            function(ft) return not vim.tbl_contains(opts.filetypes_exclude or {}, ft) end,
+            opts.filetypes
+          )
 
           -- Additional settings for Phoenix projects
           opts.settings = {
@@ -566,8 +589,12 @@ return {
 
       -- inlay hints
       if opts.inlay_hints.enabled then
-        Util.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
-          if vim.api.nvim_buf_is_valid(buffer) and vim.bo[buffer].buftype == "" and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype) then
+        Util.lsp.on_supports_method("textDocument/inlayHint", function(_, buffer)
+          if
+            vim.api.nvim_buf_is_valid(buffer)
+            and vim.bo[buffer].buftype == ""
+            and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
+          then
             vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
           end
         end)
@@ -575,7 +602,7 @@ return {
 
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
-        Util.lsp.on_supports_method("textDocument/codeLens", function(client, buffer)
+        Util.lsp.on_supports_method("textDocument/codeLens", function(_, buffer)
           vim.lsp.codelens.refresh()
           vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
             buffer = buffer,
@@ -584,23 +611,38 @@ return {
         end)
       end
 
-      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
+      vim.diagnostic.config(vim.deepcopy(opts.diagnostics.config))
 
-      if vim.g.inline_diagnostics then
-        vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.handlers["textDocument/publishDiagnostics"], {
-          signs = { min = "Error" },
-          virtual_text = { spacing = 2, min = "Error" },
-          underline = false,
-        })
-      end
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(ev)
+          ---@type vim.lsp.Client[]
+          local client = Util.lsp.get_clients { bufnr = ev.buf, method = "textDocument/publishDiagnostics" }
+          for _, c in pairs(client) do
+            if opts.diagnostics.server[c.name] == true and vim.g.inline_diagnostics then
+              vim.lsp.handlers["textDocument/publishDiagnostics"] =
+                vim.lsp.with(vim.lsp.handlers["textDocument/publishDiagnostics"], {
+                  signs = { min = "Error" },
+                  virtual_text = { spacing = 2, min = "Error" },
+                  underline = false,
+                })
+            end
+          end
+        end,
+      })
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       ---@type lsp.ClientCapabilities
-      local capabilities = vim.tbl_deep_extend("force", opts.capabilities or {}, vim.lsp.protocol.make_client_capabilities(), has_cmp and cmp_nvim_lsp.default_capabilities() or {}, {
-        textDocument = { completion = { completionItem = { snippetSupport = true } } },
-        workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
-      })
+      local capabilities = vim.tbl_deep_extend(
+        "force",
+        opts.capabilities or {},
+        vim.lsp.protocol.make_client_capabilities(),
+        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+        {
+          textDocument = { completion = { completionItem = { snippetSupport = true } } },
+          workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+        }
+      )
 
       require("lspconfig.ui.windows").default_options.border = BORDER
 
@@ -622,7 +664,9 @@ return {
       -- get all the servers that are available through mason-lspconfig
       local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
       local all_mslp_servers = {}
-      if have_mlsp then all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package) end
+      if have_mlsp then
+        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+      end
 
       local ensure_installed = {} ---@type string[]
       for server, server_opts in pairs(servers) do

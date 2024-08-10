@@ -17,7 +17,7 @@ M.setup = function()
   M.map("<leader>uc", M("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
   M.map("<leader>uf", M.format())
   M.map("<leader>uF", M.format(true))
-  M.map("<leader>wm", M.maximize)
+  M.map("<leader>um", M.maximize)
   M.map("<leader>ud", M.diagnostics)
   M.map("<leader>ua", M.agent)
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
@@ -51,13 +51,17 @@ function M.wk(lhs, toggle)
   if not Util.has "which-key.nvim" then return end
   local function safe_get()
     local ok, enabled = pcall(toggle.get)
-    if not ok then Util.error({ "Failed to get toggle state for **" .. toggle.name .. "**:\n", enabled }, { once = true }) end
+    if not ok then
+      Util.error({ "Failed to get toggle state for **" .. toggle.name .. "**:\n", enabled }, { once = true })
+    end
     return enabled
   end
   require("which-key").add {
     {
       lhs,
-      icon = function() return safe_get() and { icon = " ", color = "green" } or { icon = " ", color = "yellow" } end,
+      icon = function()
+        return safe_get() and { icon = " ", color = "green" } or { icon = " ", color = "yellow" }
+      end,
       desc = function() return (safe_get() and "disable " or "enable ") .. toggle.name end,
     },
   }

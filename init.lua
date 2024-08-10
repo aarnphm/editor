@@ -3,17 +3,7 @@ require "aarnphm.options"
 require "aarnphm.bindings"
 
 -- NOTE: Loading shada is slow, so we load it manually after UIEnter
-local shada = vim.o.shada
 local autocmd = vim.api.nvim_create_autocmd
-
-vim.o.shada = ""
-autocmd("User", {
-  pattern = "VeryLazy",
-  callback = function()
-    vim.o.shada = shada
-    pcall(vim.api.nvim_exec2, "rshada", {})
-  end,
-})
 
 -- close some filetypes with <q>
 autocmd("FileType", {
@@ -78,7 +68,10 @@ autocmd("BufReadPost", {
     if mark[1] > 0 and mark[1] <= lcount then pcall(vim.api.nvim_win_set_cursor, 0, mark) end
   end,
 })
-autocmd("BufWritePre", { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" })
+autocmd(
+  "BufWritePre",
+  { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" }
+)
 -- wrap and check for spell in text filetypes
 autocmd("FileType", {
   group = augroup "wrap_spell",
@@ -175,7 +168,14 @@ vim.api.nvim_create_autocmd("TermOpen", {
 vim.filetype.add {
   pattern = {
     [".*"] = {
-      function(path, buf) return vim.bo[buf] and vim.bo[buf].filetype ~= "bigfile" and path and vim.fn.getfsize(path) > vim.g.bigfile_size and "bigfile" or nil end,
+      function(path, buf)
+        return vim.bo[buf]
+            and vim.bo[buf].filetype ~= "bigfile"
+            and path
+            and vim.fn.getfsize(path) > vim.g.bigfile_size
+            and "bigfile"
+          or nil
+      end,
     },
   },
 }
@@ -192,14 +192,16 @@ if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-if not vim.uv.fs_stat(lazypath) then vim.fn.system {
-  "git",
-  "clone",
-  "--filter=blob:none",
-  "--single-branch",
-  "https://github.com/folke/lazy.nvim.git",
-  lazypath,
-} end
+if not vim.uv.fs_stat(lazypath) then
+  vim.fn.system {
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "--single-branch",
+    "https://github.com/folke/lazy.nvim.git",
+    lazypath,
+  }
+end
 vim.opt.runtimepath:prepend(lazypath)
 
 Util.setup()

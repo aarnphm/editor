@@ -60,7 +60,8 @@ return {
       },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = has_make() and "make" or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+        build = has_make() and "make"
+          or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
         enabled = has_make() or has_cmake(),
         config = function(plugin)
           Util.on_load("telescope.nvim", function()
@@ -69,7 +70,11 @@ return {
               local lib = plugin.dir .. "/build/libfzf." .. (Util.is_win() and "dll" or "so")
               if not vim.uv.fs_stat(lib) then
                 Util.warn "`telescope-fzf-native.nvim` not built. Rebuilding..."
-                require("lazy").build({ plugins = { plugin }, show = false }):wait(function() Util.info "Rebuilding `telescope-fzf-native.nvim` done.\nPlease restart Neovim." end)
+                require("lazy")
+                  .build({ plugins = { plugin }, show = false })
+                  :wait(
+                    function() Util.info "Rebuilding `telescope-fzf-native.nvim` done.\nPlease restart Neovim." end
+                  )
               else
                 Util.error("Failed to load `telescope-fzf-native.nvim`:\n" .. err)
               end
@@ -95,10 +100,24 @@ return {
         noremap = true,
         silent = true,
       },
+      {
+        "<C-S-\\>",
+        Util.pick("buffers", {
+          layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
+          show_all_buffers = true,
+          previewer = false,
+          cwd = require("plenary.job"):new({ command = "git", args = { "rev-parse", "--show-toplevel" } }):sync()[1],
+        }),
+        desc = "telescope: Manage buffers",
+      },
       { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
       { "<LocalLeader>f", Util.pick "oldfiles", desc = "telescope: recent files" },
       { "<Leader>/", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
-      { "<Leader>w", function() require("telescope").extensions.live_grep_args.live_grep_args() end, desc = "telescope: grep word" },
+      {
+        "<Leader>w",
+        function() require("telescope").extensions.live_grep_args.live_grep_args() end,
+        desc = "telescope: grep word",
+      },
     },
     opts = function()
       local actions = require "telescope.actions"

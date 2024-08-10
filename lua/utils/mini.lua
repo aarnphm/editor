@@ -13,7 +13,9 @@ function M.ai_indent(ai_type)
   local indents = {} ---@type {line: number, indent: number, text: string}[]
 
   for l, line in ipairs(lines) do
-    if not line:find "^%s*$" then indents[#indents + 1] = { line = l, indent = #line:gsub("\t", spaces):match "^%s*", text = line } end
+    if not line:find "^%s*$" then
+      indents[#indents + 1] = { line = l, indent = #line:gsub("\t", spaces):match "^%s*", text = line }
+    end
   end
 
   local ret = {} ---@type (Mini.ai.region | {indent: number})[]
@@ -129,7 +131,9 @@ function M.pairs(opts)
     local cursor = vim.api.nvim_win_get_cursor(0)
     local next = line:sub(cursor[2] + 1, cursor[2] + 1)
     local before = line:sub(1, cursor[2])
-    if opts.markdown and o == "`" and vim.bo.filetype == "markdown" and before:match "^%s*``" then return "`\n```" .. vim.api.nvim_replace_termcodes("<up>", true, true, true) end
+    if opts.markdown and o == "`" and vim.bo.filetype == "markdown" and before:match "^%s*``" then
+      return "`\n```" .. vim.api.nvim_replace_termcodes("<up>", true, true, true)
+    end
     if opts.skip_next and next ~= "" and next:match(opts.skip_next) then return o end
     if opts.skip_ts and #opts.skip_ts > 0 then
       local ok, captures = pcall(vim.treesitter.get_captures_at_pos, 0, cursor[1] - 1, math.max(cursor[2] - 1, 0))

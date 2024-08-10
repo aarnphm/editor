@@ -14,41 +14,6 @@ _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):for
 -- statusline and simple
 local fmt = string.format
 
--- NOTE: git
-local concat_hunks = function(hunks)
-  return vim.tbl_isempty(hunks) and "" or table.concat({
-    fmt("+%d", hunks[1]),
-    fmt("~%d", hunks[2]),
-    fmt("-%d", hunks[3]),
-  }, " ")
-end
-
-local get_hunks = function()
-  local hunks = {}
-  if vim.g.loaded_gitgutter then
-    hunks = vim.fn.GitGutterGetHunkSummary()
-  elseif vim.b.gitsigns_status_dict then
-    hunks = {
-      vim.b.gitsigns_status_dict.added,
-      vim.b.gitsigns_status_dict.changed,
-      vim.b.gitsigns_status_dict.removed,
-    }
-  end
-  return concat_hunks(hunks)
-end
-
-local get_branch = function(icon)
-  local branch = ""
-  if vim.b.gitsigns_head ~= nil then
-    branch = vim.b.gitsigns_head
-  elseif vim.g.loaded_fugitive then
-    branch = vim.fn.FugitiveHead()
-  elseif vim.g.loaded_gitbranch then
-    branch = vim.fn["gitbranch#name"]()
-  end
-  return branch ~= "" and fmt("(%s %s)", icon, branch) or ""
-end
-
 local H = {}
 
 -- For more information see ":h buftype"
@@ -112,16 +77,43 @@ H.modes = setmetatable({
   __index = function() return { long = "UNKNOWN", short = "U", hl = "%#MiniStatuslineModeOther#" } end,
 })
 
+-- LSP ------------------------------------------------------------------------
+H.get_attached_lsp = function() return H.attached_lsp[vim.api.nvim_get_current_buf()] or "" end
+
+H.compute_attached_lsp = function(buf_id) return string.rep("+", vim.tbl_count(H.get_buf_lsp_clients(buf_id))) end
+
+H.get_buf_lsp_clients = function(buf_id) return Util.lsp.get_clients { bufnr = buf_id } end
+
 -- diagnostic levels
 
-local diagnostic_levels = {
-  { id = vim.diagnostic.severity.ERROR, sign = "E" },
-  { id = vim.diagnostic.severity.WARN, sign = "W" },
-  { id = vim.diagnostic.severity.INFO, sign = "I" },
-  { id = vim.diagnostic.severity.HINT, sign = "H" },
+-- Showed diagnostic levels
+H.diagnostic_levels = {
+  { name = "ERROR", sign = "E" },
+  { name = "WARN", sign = "W" },
+  { name = "INFO", sign = "I" },
+  { name = "HINT", sign = "H" },
 }
 
-H.get_diagnostic_count = function(id) return #vim.diagnostic.get(0, { severity = id }) end
+-- String representation of attached LSP clients per buffer id
+H.attached_lsp = {}
+
+H.diagnostic_get_count = function()
+  local res = {}
+  for _, d in ipairs(vim.diagnostic.get(0)) do
+    res[d.severity] = (res[d.severity] or 0) + 1
+  end
+  return res
+end
+
+vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
+  pattern = "*",
+  group = augroup "lsp_statusline",
+  callback = vim.schedule_wrap(function(data)
+    H.attached_lsp[data.buf] = H.compute_attached_lsp(data.buf)
+    vim.cmd "redrawstatus"
+  end),
+  desc = "lsp: track statusline",
+})
 
 ---@class SimpleStatuslineArgs
 ---@field icon string|nil
@@ -132,31 +124,53 @@ H.get_diagnostic_count = function(id) return #vim.diagnostic.get(0, { severity =
 ---@type table<string, fun(args: SimpleStatuslineArgs): string | fun(args: SimpleStatuslineArgs): [string, string]>
 _G.statusline = {
   git = function(args)
-    if H.isnt_normal_buffer() then return "" end
-    local icon = args.icon or ""
-    local head = get_branch(icon)
-    local hunks = get_hunks()
+    if H.isnt_normal_buffer() or H.is_truncated(args.trunc_width) then return "" end
 
-    if hunks == concat_hunks { 0, 0, 0 } and head == "" then hunks = "" end
-    if hunks ~= "" and head ~= "" then head = head .. " " end
-    return fmt("%s", table.concat { head, hunks })
+    local icon = args.icon or ""
+    local summary = vim.b.minigit_summary_string or vim.b.gitsigns_head
+    if summary == nil then return "" end
+
+    return "(" .. icon .. " " .. (summary == "" and "-" or summary) .. ")"
+  end,
+  diff = function(args)
+    if H.isnt_normal_buffer() or H.is_truncated(args.trunc_width) then return "" end
+    local summary = vim.b.minidiff_summary_string or vim.b.gitsigns_status
+    if summary == nil then return "" end
+
+    local icon = args.icon or ""
+    return icon .. " " .. (summary == "" and "-" or summary)
+  end,
+  lint = function(args)
+    local linters = require("lint").get_running()
+    if #linters == 0 then return "󰦕" end
+    return "󱉶 [" .. table.concat(linters, "|") .. "]"
+  end,
+  lsp = function(args)
+    if H.is_truncated(args.trunc_width) then return "" end
+
+    local attached = H.get_attached_lsp()
+
+    if attached == "" then return "" end
+
+    local icon = args.icon or "󰰎"
+    return icon .. " " .. attached
   end,
   diagnostic = function(args)
-    local hasnt_attached_client = next(Util.lsp.get_clients {}) == nil
-    local dont_show_lsp = H.is_truncated(args.trunc_width) or H.isnt_normal_buffer() or hasnt_attached_client
-    if dont_show_lsp then return "" end
+    if H.is_truncated(args.trunc_width) or not vim.diagnostic.is_enabled { bufnr = 0 } then return "" end
 
+    local count = H.diagnostic_get_count()
+    local severity, t = vim.diagnostic.severity, {}
     -- construct diagnostic info
     local t = {}
-    for _, level in ipairs(diagnostic_levels) do
-      local n = H.get_diagnostic_count(level.id)
+    for _, level in ipairs(H.diagnostic_levels) do
+      local n = count[severity[level.name]] or 0
       -- Add level info only if diagnostic is present
       if n > 0 then table.insert(t, fmt("%s:%s", level.sign, n)) end
     end
 
     local icon = args.icon or ""
     if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
-    return fmt("[%s %s]", icon, table.concat(t, " |"))
+    return fmt("[%s %s]", icon, table.concat(t, "|"))
   end,
   fileinfo = function(args)
     local filetype = vim.bo.filetype
@@ -182,6 +196,6 @@ _G.statusline = {
   end,
   mode = function(args)
     local mi = H.modes[vim.fn.mode()]
-    return H.is_truncated(args.trunc_width) and mi.short or mi.long, mi.hl
+    return mi.short, mi.hl
   end,
 }

@@ -13,7 +13,10 @@ function M.get_clients(opts)
     ret = vim.lsp.get_active_clients(opts)
     if opts and opts.method then
       ---@param client vim.lsp.Client
-      ret = vim.tbl_filter(function(client) return client.supports_method(opts.method, { bufnr = opts.bufnr }) end, ret)
+      ret = vim.tbl_filter(
+        function(client) return client.supports_method(opts.method, { bufnr = opts.bufnr }) end,
+        ret
+      )
     end
   end
   return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
@@ -177,10 +180,15 @@ function M.disable(server, cond)
   local util = require "lspconfig.util"
   local def = M.get_config(server)
   ---@diagnostic disable-next-line: undefined-field
-  def.document_config.on_new_config = util.add_hook_before(def.document_config.on_new_config, function(config, root_dir)
-    if cond(root_dir, config) then config.enabled = false end
-  end)
+  def.document_config.on_new_config = util.add_hook_before(
+    def.document_config.on_new_config,
+    function(config, root_dir)
+      if cond(root_dir, config) then config.enabled = false end
+    end
+  )
 end
+
+function M.test() end
 
 ---@param opts? LazyFormatter| {filter?: (string|lsp.Client.filter)}
 function M.formatter(opts)
@@ -197,7 +205,13 @@ function M.formatter(opts)
     sources = function(buf)
       local clients = M.get_clients(Util.merge({}, filter, { bufnr = buf }))
       ---@param client vim.lsp.Client
-      local ret = vim.tbl_filter(function(client) return client.supports_method "textDocument/formatting" or client.supports_method "textDocument/rangeFormatting" end, clients)
+      local ret = vim.tbl_filter(
+        function(client)
+          return client.supports_method "textDocument/formatting"
+            or client.supports_method "textDocument/rangeFormatting"
+        end,
+        clients
+      )
       ---@param client vim.lsp.Client
       return vim.tbl_map(function(client) return client.name end, ret)
     end,
@@ -209,7 +223,13 @@ end
 
 ---@param opts? lsp.Client.format
 function M.format(opts)
-  opts = vim.tbl_deep_extend("force", {}, opts or {}, Util.opts("nvim-lspconfig").format or {}, Util.opts("conform.nvim").format or {})
+  opts = vim.tbl_deep_extend(
+    "force",
+    {},
+    opts or {},
+    Util.opts("nvim-lspconfig").format or {},
+    Util.opts("conform.nvim").format or {}
+  )
   local ok, conform = pcall(require, "conform")
   -- use conform for formatting with LSP when available,
   -- since it has better format diffing
@@ -264,7 +284,9 @@ function M.words.get()
       to = { extmark[4].end_row + 1, extmark[4].end_col },
     }
     ret[#ret + 1] = w
-    if cursor[1] >= w.from[1] and cursor[1] <= w.to[1] and cursor[2] >= w.from[2] and cursor[2] <= w.to[2] then current = #ret end
+    if cursor[1] >= w.from[1] and cursor[1] <= w.to[1] and cursor[2] >= w.from[2] and cursor[2] <= w.to[2] then
+      current = #ret
+    end
   end
   return ret, current
 end

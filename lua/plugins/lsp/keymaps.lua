@@ -7,6 +7,12 @@ M._keys = nil
 ---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string|string[], cond?:fun():boolean}
 ---@alias LazyKeysLsp LazyKeys|{has?:string|string[], cond?:fun():boolean}
 
+local diagnostic_goto = function(next, severity)
+  local pos = next and 1 or -1
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function() vim.diagnostic.jump { severity = severity, count = pos } end
+end
+
 M.get = function()
   if not M._keys then
     M._keys = {
@@ -19,18 +25,66 @@ M.get = function()
       { "gR", Util.lsp.buffer.references, desc = "lsp: show references", has = "definition", nowait = true },
       { "gd", Util.lsp.buffer.definitions, desc = "lsp: peek definition", has = "definition" },
       { "gI", Util.lsp.buffer.implementations, desc = "lsp: implementation" },
-      { "gh", Util.pick "lsp_references", desc = "lsp: references", has = "references" },
-      { "<c-k>", vim.lsp.buf.signature_help, mode = "i", desc = "lsp: signature help", has = "signatureHelp" },
+      { "<C-k>", vim.lsp.buf.signature_help, mode = "i", desc = "lsp: signature help", has = "signatureHelp" },
+      { "<leader>d", vim.diagnostic.open_float, desc = "lsp: show line diagnostics" },
+      { "]d", diagnostic_goto(true), desc = "lsp: Next diagnostic" },
+      { "[d", diagnostic_goto(false), desc = "lsp: Next diagnostic" },
+      { "]e", diagnostic_goto(true, vim.diagnostic.severity.E), desc = "lsp: next error" },
+      { "[e", diagnostic_goto(false, vim.diagnostic.severity.E), desc = "lsp: prev error" },
+      { "]w", diagnostic_goto(true, vim.diagnostic.severity.W), desc = "lsp: next warning" },
+      { "[w", diagnostic_goto(false, vim.diagnostic.severity.W), desc = "lsp: prev warning" },
       { "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: code action", mode = { "n", "v" }, has = "codeAction" },
       { "<leader>cc", vim.lsp.codelens.run, desc = "lsp: run codelens", mode = { "n", "v" }, has = "codeLens" },
-      { "<leader>cC", vim.lsp.codelens.refresh, desc = "lsp: refresh & display codelens", mode = { "n" }, has = "codeLens" },
-      { "<leader>cR", Util.lsp.rename_file, desc = "lsp: rename file", mode = { "n" }, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
+      {
+        "<leader><leader>f",
+        function() Util.format { force = true } end,
+        mode = { "n", "v" },
+        desc = "style: format buffer",
+      },
+      {
+        "<leader>cC",
+        vim.lsp.codelens.refresh,
+        desc = "lsp: refresh & display codelens",
+        mode = { "n" },
+        has = "codeLens",
+      },
+      {
+        "<leader>cR",
+        Util.lsp.rename_file,
+        desc = "lsp: rename file",
+        mode = { "n" },
+        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+      },
       { "<leader>cr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
       { "<leader>cA", Util.lsp.action.source, desc = "lsp: source action", has = "codeAction" },
-      { "]]", function() Util.lsp.words.jump(vim.v.count1) end, has = "documentHighlight", desc = "lsp: next reference", cond = function() return Util.lsp.words.enabled end },
-      { "[[", function() Util.lsp.words.jump(-vim.v.count1) end, has = "documentHighlight", desc = "lsp: prev reference", cond = function() return Util.lsp.words.enabled end },
-      { "<a-n>", function() Util.lsp.words.jump(vim.v.count1, true) end, has = "documentHighlight", desc = "lsp: next reference", cond = function() return Util.lsp.words.enabled end },
-      { "<a-p>", function() Util.lsp.words.jump(-vim.v.count1, true) end, has = "documentHighlight", desc = "lsp: prev reference", cond = function() return Util.lsp.words.enabled end },
+      {
+        "]]",
+        function() Util.lsp.words.jump(vim.v.count1) end,
+        has = "documentHighlight",
+        desc = "lsp: next reference",
+        cond = function() return Util.lsp.words.enabled end,
+      },
+      {
+        "[[",
+        function() Util.lsp.words.jump(-vim.v.count1) end,
+        has = "documentHighlight",
+        desc = "lsp: prev reference",
+        cond = function() return Util.lsp.words.enabled end,
+      },
+      {
+        "<a-n>",
+        function() Util.lsp.words.jump(vim.v.count1, true) end,
+        has = "documentHighlight",
+        desc = "lsp: next reference",
+        cond = function() return Util.lsp.words.enabled end,
+      },
+      {
+        "<a-p>",
+        function() Util.lsp.words.jump(-vim.v.count1, true) end,
+        has = "documentHighlight",
+        desc = "lsp: prev reference",
+        cond = function() return Util.lsp.words.enabled end,
+      },
     }
   end
   return M._keys

@@ -1,5 +1,3 @@
-local vault = vim.fn.expand "~" .. "/workspace/garden/content"
-
 return {
   -- Markdown preview
   {
@@ -58,8 +56,8 @@ return {
     lazy = true,
     version = false,
     event = {
-      "BufReadPre " .. vault .. "/**.md",
-      "BufNewFile " .. vault .. "/**.md",
+      "BufReadPre " .. vim.g.vault .. "/**.md",
+      "BufNewFile " .. vim.g.vault .. "/**.md",
     },
     keys = {
       {
@@ -115,7 +113,9 @@ return {
         local out = { id = note.id, aliases = note.aliases, tags = note.tags }
         -- `note.metadata` contains any manually added fields in the frontmatter.
         -- So here we just make sure those fields are kept in the frontmatter.
-        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then out = vim.tbl_deep_extend("force", out, note.metadata) end
+        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+          out = vim.tbl_deep_extend("force", out, note.metadata)
+        end
         if out.title == nil then out.title = note.id end
         if out.date == nil then out.date = os.date "%Y-%m-%d" end
         -- check if the length of out.aliases is 0, if so, remove it from the frontmatter
@@ -134,7 +134,9 @@ return {
     dependencies = {
       {
         "L3MON4D3/LuaSnip",
-        build = (not jit.os:find "Windows") and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp" or nil,
+        build = (not jit.os:find "Windows")
+            and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+          or nil,
         opts = function()
           return {
             history = true,
