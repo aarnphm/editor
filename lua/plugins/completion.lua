@@ -62,15 +62,50 @@ return {
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = { "python" },
         preselect = cmp.PreselectMode.None,
-        completion = { completeopt = "menu,menuone,noinsert" },
+        completion = { completeopt = "menu,menuone,noinsert,noselect" },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
           expandable_indicator = true,
           format = require("lspkind").cmp_format {
-            mode = "symbol",
-            max_width = 10,
-            symbol_map = { Supermaven = "" },
+            mode = "symbol_text",
+            max_width = function() return math.floor(0.45 * vim.o.columns) end,
+            ellipsis_char = "…",
+            show_labelDetails = true,
+            symbol_map = {
+              Supermaven = "",
+              Array = "󰅪",
+              Boolean = "⊨",
+              Class = "󰌗",
+              Key = "󰌆",
+              Namespace = "󰅪",
+              Null = "NULL",
+              Number = "#",
+              Object = "󰀚",
+              Package = "󰏗",
+              Property = "",
+              Reference = "",
+              String = "󰀬",
+              TypeParameter = "󰊄",
+              Unit = "",
+            },
+            before = function(entry, vim_item)
+              local types = require "cmp.types"
+              local widths = {
+                abbr = vim.g.cmp and vim.g.cmp.widths.abbr or 40,
+                menu = vim.g.cmp and vim.g.cmp.widths.menu or 30,
+              }
+
+              for key, width in pairs(widths) do
+                if vim_item[key] and vim.fn.strdisplaywidth(vim_item[key]) > width then
+                  vim_item[key] = vim.fn.strcharpart(vim_item[key], 0, width - 1) .. "…"
+                end
+              end
+
+              if entry.source.name == "nvim_lsp" then vim_item.dup = 0 end
+
+              return vim_item
+            end,
           },
         },
         experimental = {
@@ -92,11 +127,6 @@ return {
                 end
                 return diff < 0
               end,
-              compare.sort_text,
-              compare.score,
-              compare.recently_used,
-              compare.locality,
-              compare.kind,
               -- copied from cmp-under
               ---@type cmp.ComparatorFunction
               function(entry1, entry2)
@@ -110,6 +140,8 @@ return {
                   return true
                 end
               end,
+              compare.kind,
+              compare.sort_text,
               compare.length,
               compare.order,
             },
@@ -130,14 +162,20 @@ return {
           ["<Tab>"] = cmp.mapping(function(fallback)
             local col = vim.fn.col "." - 1
 
+            local has_words_before = function()
+              local line, col = table.unpack(vim.api.nvim_win_get_cursor(0))
+              return col ~= 0
+                and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
+            end
+
             if cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif vim.snippet.active { direction = 1 } then
               vim.schedule(function() vim.snippet.jump(1) end)
-            elseif col == 0 or vim.fn.getline("."):sub(col, col):match "%s" then
-              fallback()
-            else
+            elseif has_words_before() then
               cmp.complete()
+            else
+              fallback()
             end
           end, { "i", "s" }),
           ["<S-Tab>"] = cmp.mapping(function(fallback)

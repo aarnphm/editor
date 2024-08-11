@@ -84,9 +84,12 @@ return {
     dependencies = { "nvim-lua/plenary.nvim", "nvim-cmp", "telescope.nvim" },
     ---@type obsidian.config.ClientOpts
     opts = {
-      workspaces = { { name = "garden", path = vault, overrides = { notes_subdir = "thoughts" } } },
+      workspaces = { { name = "garden", path = vim.g.vault, overrides = { notes_subdir = "thoughts" } } },
       open_app_foreground = true,
       log_level = vim.log.levels.INFO,
+      open_notes_in = "vsplit",
+      completion = { min_chars = 4 },
+      picker = { name = "telescope.nvim" },
       follow_url_func = function(url) vim.ui.open(url) end,
       wiki_link_func = function(opts)
         local path = opts.path
@@ -107,7 +110,6 @@ return {
       disable_frontmatter = false,
       templates = { subdir = "templates" },
       ui = { enable = false, external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" } },
-      ---@type fun(note: obsidian.Note): table<string, string>
       note_frontmatter_func = function(note)
         if note.path.filename:match "tags" then return note.metadata end
         local out = { id = note.id, aliases = note.aliases, tags = note.tags }
@@ -123,6 +125,7 @@ return {
         return out
       end,
       note_id_func = function(title) return title end,
+      markdown_link_func = function(opts) return require("obsidian.util").markdown_link(opts) end,
     },
     config = function(_, opts) require("obsidian").setup(opts) end,
   },

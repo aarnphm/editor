@@ -589,7 +589,7 @@ return {
         [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
         [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
       }, "\n")
-      local pad = string.rep(" ", 12)
+      local pad = string.rep(" ", 15)
       local new_section = function(name, action, section)
         return { name = name, action = action, section = pad .. section }
       end
@@ -637,12 +637,16 @@ return {
           starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
           -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
           if vim.bo[ev.buf].filetype == "ministarter" then
-            pcall(starter.refresh)
-            vim.b[ev.buf].ministatusline_disable = true
             vim.o.laststatus = 0
+            vim.b[ev.buf].ministatusline_disable = true
+            pcall(starter.refresh)
           end
         end,
       })
+
+      vim.api.nvim_create_user_command("Starter", function()
+        if _G.MiniStarter ~= nil then MiniStarter.open() end
+      end, { desc = "starter: open" })
     end,
   },
   {
@@ -773,7 +777,7 @@ return {
           local diff = statusline.diff { trunc_width = 75 }
           local diagnostics = statusline.diagnostic { trunc_width = 75 }
           local lint = statusline.lint { trunc_width = 40 }
-          local lsp = statusline.lsp { trunc_width = 75 }
+          local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
           local fileinfo = statusline.fileinfo { trunc_width = 90 }
           local location = statusline.location { trunc_width = 90 }
 

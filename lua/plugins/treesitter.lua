@@ -8,7 +8,7 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    event = "VeryLazy",
+    event = "LazyFile",
     opts = function()
       local tsc = require "treesitter-context"
 
@@ -104,7 +104,6 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     event = "VeryLazy",
-    enabled = true,
     config = function()
       -- If treesitter is already loaded, we need to run config again for textobjects
       if Util.is_loaded "nvim-treesitter" then

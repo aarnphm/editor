@@ -77,13 +77,6 @@ H.modes = setmetatable({
   __index = function() return { long = "UNKNOWN", short = "U", hl = "%#MiniStatuslineModeOther#" } end,
 })
 
--- LSP ------------------------------------------------------------------------
-H.get_attached_lsp = function() return H.attached_lsp[vim.api.nvim_get_current_buf()] or "" end
-
-H.compute_attached_lsp = function(buf_id) return string.rep("+", vim.tbl_count(H.get_buf_lsp_clients(buf_id))) end
-
-H.get_buf_lsp_clients = function(buf_id) return Util.lsp.get_clients { bufnr = buf_id } end
-
 -- diagnostic levels
 
 -- Showed diagnostic levels
@@ -94,9 +87,6 @@ H.diagnostic_levels = {
   { name = "HINT", sign = "H" },
 }
 
--- String representation of attached LSP clients per buffer id
-H.attached_lsp = {}
-
 H.diagnostic_get_count = function()
   local res = {}
   for _, d in ipairs(vim.diagnostic.get(0)) do
@@ -104,16 +94,6 @@ H.diagnostic_get_count = function()
   end
   return res
 end
-
-vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
-  pattern = "*",
-  group = augroup "lsp_statusline",
-  callback = vim.schedule_wrap(function(data)
-    H.attached_lsp[data.buf] = H.compute_attached_lsp(data.buf)
-    vim.cmd "redrawstatus"
-  end),
-  desc = "lsp: track statusline",
-})
 
 ---@class SimpleStatuslineArgs
 ---@field icon string|nil
@@ -141,19 +121,17 @@ _G.statusline = {
     return icon .. " " .. (summary == "" and "-" or summary)
   end,
   lint = function(args)
-    local linters = require("lint").get_running()
-    if #linters == 0 then return "󰦕" end
+    local ok, lint = pcall(require, "lint")
+    if not ok then return "" end
+    if H.isnt_normal_buffer() then return "" end
+
+    local linters = lint.get_running()
+    local names = lint._resolve_linter_by_ft(vim.bo.filetype)
+
+    if H.is_truncated(args.trunc_width) then return #linters == 0 and "󰦕" or "󱉶" end
+
+    if #linters == 0 then return "󰦕 [" .. table.concat(names, "|") .. "]" end
     return "󱉶 [" .. table.concat(linters, "|") .. "]"
-  end,
-  lsp = function(args)
-    if H.is_truncated(args.trunc_width) then return "" end
-
-    local attached = H.get_attached_lsp()
-
-    if attached == "" then return "" end
-
-    local icon = args.icon or "󰰎"
-    return icon .. " " .. attached
   end,
   diagnostic = function(args)
     if H.is_truncated(args.trunc_width) or not vim.diagnostic.is_enabled { bufnr = 0 } then return "" end
@@ -196,6 +174,6 @@ _G.statusline = {
   end,
   mode = function(args)
     local mi = H.modes[vim.fn.mode()]
-    return mi.short, mi.hl
+    return H.is_truncated(args.trunc_width) and mi.short or mi.long, mi.hl
   end,
 }

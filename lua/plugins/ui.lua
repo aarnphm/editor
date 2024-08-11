@@ -24,11 +24,11 @@ return {
     version = false,
     event = "LazyFile",
     dependencies = { "SmiteshP/nvim-navic" },
-    opts = { show_modified = true, symbols = { ellipsis = "..." } },
+    opts = { show_modified = true, symbols = { ellipsis = "…" } },
   },
   {
     "folke/noice.nvim",
-    event = "VeryLazy",
+    event = "LazyFile",
     opts = {
       presets = {
         bottom_search = true,

@@ -11,7 +11,7 @@ return {
         lua = { "selene" },
         dockerfile = { "hadolint" },
         python = { "ruff" },
-        typescript = { "eslint" },
+        typescript = { "eslint", "oxlint" },
         markdown = { "markdownlint" },
       },
       ---@type table<string,table>

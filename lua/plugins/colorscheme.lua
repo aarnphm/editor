@@ -29,7 +29,6 @@ return {
           GlanceWinBarFilename = { fg = "love" },
           GlancePreviewNormal = { bg = "surface" },
           GlanceListNormal = { bg = "overlay" },
-          -- GlancePreviewMatch = { fg = "love" },
           GlanceBorderTop = { bg = "none", blend = 0 },
           GlanceListBorderBottom = { bg = "none", blend = 0 },
           GlancePreviewBorderBottom = { bg = "none", blend = 0 },

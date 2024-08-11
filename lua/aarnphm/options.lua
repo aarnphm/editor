@@ -44,7 +44,7 @@ o.pumblend = 0 -- make completion window transparent
 opt.shortmess:append { W = true, c = true, C = true }
 o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 o.completeopt = "menu,menuone,noselect"
-o.formatoptions = "jcroqlnt" -- NOTE: "1jcroql"
+o.formatoptions = "1jcroql" -- NOTE: "1jcroql"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
@@ -60,7 +60,7 @@ o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 o.inccommand = "split"
-o.background = "light" -- "dark"
+o.background = "dark" -- "dark"
 
 -- fold with nvim-ufo
 o.foldenable = true
@@ -74,6 +74,11 @@ opt.fillchars = {
   eob = " ",
   vert = "│",
   horiz = "─",
+  horizdown = "┬",
+  horizup = "┴",
+  verthoriz = "┼",
+  vertleft = "┤",
+  vertright = "├",
 }
 o.smoothscroll = true
 o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
@@ -91,7 +96,7 @@ o.shiftround = true
 
 -- UI config
 o.showmode = false -- This is set with mini.statusline
-o.cmdheight = 1
+o.cmdheight = 0
 o.showcmd = false
 o.showbreak = "↳  "
 o.sidescrolloff = 5
@@ -126,5 +131,6 @@ g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
+g.cmp = { widths = { abbr = 50, menu = 50 } }
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

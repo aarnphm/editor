@@ -327,7 +327,14 @@ return {
                 version = "LuaJIT",
                 special = { reload = "require" },
               },
-              workspace = { checkThirdParty = false },
+              workspace = {
+                library = {
+                  vim.fn.expand "$VIMRUNTIME/lua",
+                  vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
+                  vim.fn.stdpath "data" .. "/lazy/lazy.nvim/lua/lazy",
+                  "${3rd}/luv/library",
+                },
+              },
               telemetry = { enable = false },
               semantic = { enable = false },
               completion = { workspaceWord = true, callSnippet = "Replace" },

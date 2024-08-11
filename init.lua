@@ -3,7 +3,25 @@ require "aarnphm.options"
 require "aarnphm.bindings"
 
 -- NOTE: Loading shada is slow, so we load it manually after UIEnter
+local shada = vim.o.shada
 local autocmd = vim.api.nvim_create_autocmd
+
+-- NOTE: local items
+local M = {
+  disable = {
+    filetypes = { "ministarter", "dashboard", "qf", "help", "grug-far", "TelescopePrompt" },
+    buftypes = { "quickfix", "prompt", "scratch" },
+  },
+}
+
+vim.o.shada = ""
+autocmd("User", {
+  pattern = "VeryLazy",
+  callback = function()
+    vim.o.shada = shada
+    pcall(vim.api.nvim_exec2, "rshada", {})
+  end,
+})
 
 -- close some filetypes with <q>
 autocmd("FileType", {
@@ -35,6 +53,7 @@ autocmd("FileType", {
     "",
   },
   callback = function(event)
+    vim.o.laststatus = 0
     vim.bo[event.buf].buflisted = false
     vim.b[event.buf].ministatusline_disable = true
     vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
@@ -112,7 +131,7 @@ autocmd({ "BufNewFile", "BufRead", "FileType" }, {
 autocmd("TextYankPost", {
   group = augroup "highlight_yank",
   pattern = "*",
-  callback = function(_) vim.highlight.on_yank { higroup = "IncSearch", timeout = 100 } end,
+  callback = function() vim.highlight.on_yank { higroup = "IncSearch" } end,
 })
 -- auto trim trailing whitespace
 autocmd("BufWritePost", {
@@ -128,12 +147,6 @@ vim.cmd [[
   augroup END
 ]]
 -- setup laststatus when entering
-local M = {
-  disable = {
-    filetypes = { "ministarter", "dashboard", "qf", "help", "grug-far", "TelescopePrompt" },
-    buftypes = { "quickfix", "prompt", "scratch" },
-  },
-}
 M.should_hide = function(bufnr)
   local filetype = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
   local buftype = vim.api.nvim_get_option_value("buftype", { buf = bufnr })
@@ -156,7 +169,7 @@ autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
   callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
 })
 -- Set local settings for terminal buffers
-vim.api.nvim_create_autocmd("TermOpen", {
+autocmd("TermOpen", {
   group = augroup "custom-term-open",
   callback = function()
     vim.opt_local.number = false
@@ -164,7 +177,46 @@ vim.api.nvim_create_autocmd("TermOpen", {
     vim.opt_local.scrolloff = 0
   end,
 })
--- add bigfile filetype
+-- highlight URL
+--- regex used for matching a valid URL/URI string
+M.url_matcher =
+  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+--- Delete the syntax matching rules for URLs/URIs if set
+---@param win integer? the window id to remove url highlighting in (default: current window)
+function M.delete_url_match(win)
+  if not win then win = vim.api.nvim_get_current_win() end
+  for _, match in ipairs(vim.fn.getmatches(win)) do
+    if match.group == "HighlightURL" then vim.fn.matchdelete(match.id, win) end
+  end
+  vim.w[win].highlighturl_enabled = false
+end
+--- Add syntax matching rules for highlighting URLs/URIs
+---@param win integer? the window id to remove url highlighting in (default: current window)
+function M.set_url_match(win)
+  if not win then win = vim.api.nvim_get_current_win() end
+  M.delete_url_match(win)
+  vim.fn.matchadd("HighlightURL", M.url_matcher, 15, -1, { window = win })
+  vim.w[win].highlighturl_enabled = true
+end
+local highlighturl_group = augroup "highlighturl"
+vim.api.nvim_set_hl(0, "HighlightURL", { default = true, underline = true })
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = highlighturl_group,
+  desc = "Set up HighlightURL hlgroup",
+  callback = function() vim.api.nvim_set_hl(0, "HighlightURL", { default = true, underline = true }) end,
+})
+autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+  group = highlighturl_group,
+  desc = "Highlight URLs",
+  callback = function(args)
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then
+        M.set_url_match(win)
+      end
+    end
+  end,
+})
+-- add bigfile filetype and disable some defaults on bigfile
 vim.filetype.add {
   pattern = {
     [".*"] = {
@@ -213,25 +265,23 @@ require("lazy").setup {
   lockfile = vim.fn.stdpath "config" .. "/lazy-lock.json",
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
-  colorscheme = { "rose-pine" },
-  ui = {
-    border = BORDER,
-    backdrop = 100,
-    wrap = false,
-  },
+  ui = { border = BORDER, backdrop = 100, wrap = false },
 }
 
 Util.toggle.setup()
 
--- vim.opt.termguicolors = true
-vim.cmd.colorscheme "rose-pine"
--- TODO: refactor this one day
+if package.loaded["rose-pine"] then
+  vim.cmd.colorscheme "rose-pine"
+else
+  vim.opt.termguicolors = true
+  vim.cmd.colorscheme "habamax"
+end
+
 local hi = function(name, opts)
   opts.default = opts.default or true
   opts.force = opts.force or true
   vim.api.nvim_set_hl(0, name, opts)
 end
--- vim.cmd.colorscheme "habamax"
 hi("MiniFilesBorder", { link = "Normal" })
 hi("MiniFilesNormal", { link = "Normal" })
 hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })

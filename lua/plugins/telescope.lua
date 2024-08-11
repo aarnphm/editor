@@ -48,11 +48,39 @@ return {
     enabled = Util.pick.want() == "telescope",
     version = false,
     dependencies = {
-      "s1n7ax/nvim-window-picker",
       {
-        "nvim-telescope/telescope-live-grep-args.nvim",
+        "jvgrootveld/telescope-zoxide",
+        enabled = vim.fn.executable "zoxide" == 1,
+        keys = {
+          {
+            "<Leader>z",
+            function() require("telescope").extensions.zoxide.list() end,
+            desc = "telescope: zoxide",
+          },
+        },
         config = function()
           Util.on_load("telescope.nvim", function()
+            local ok, err = pcall(require("telescope").load_extension, "zoxide")
+            if not ok then Util.error("Failed to load `telescope-zoxide`:\n" .. err) end
+          end)
+        end,
+      },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        keys = {
+          {
+            "<Leader>w",
+            function() require("telescope").extensions.live_grep_args.live_grep_args() end,
+            desc = "telescope: grep word",
+          },
+          {
+            "<LocalLeader>w",
+            function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor() end,
+            desc = "telescope: grep word",
+          },
+        },
+        config = function()
+          Util.on_load("telescope.nvim", function(name)
             local ok, err = pcall(require("telescope").load_extension, "live_grep_args")
             if not ok then Util.error("Failed to load `telescope-live-grep-args.nvim`:\n" .. err) end
           end)
@@ -87,6 +115,7 @@ return {
       {
         "<C-\\>",
         Util.pick("keymaps", {
+          initial_mode = "normal",
           lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
           layout_strategy = "vertical",
           previewer = false,
@@ -101,8 +130,9 @@ return {
         silent = true,
       },
       {
-        "<C-S-\\>",
+        "<LocalLeader>b",
         Util.pick("buffers", {
+          initial_mode = "normal",
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,
           previewer = false,
@@ -113,11 +143,6 @@ return {
       { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
       { "<LocalLeader>f", Util.pick "oldfiles", desc = "telescope: recent files" },
       { "<Leader>/", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
-      {
-        "<Leader>w",
-        function() require("telescope").extensions.live_grep_args.live_grep_args() end,
-        desc = "telescope: grep word",
-      },
     },
     opts = function()
       local actions = require "telescope.actions"
@@ -166,6 +191,14 @@ return {
             end
             return 0
           end,
+          vimgrep_arguments = {
+            "rg",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+          },
           layout_config = {
             horizontal = {
               size = {
