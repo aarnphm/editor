@@ -1,26 +1,4 @@
 return {
-  -- setup mini.diff
-  {
-    "echasnovski/mini.diff",
-    event = "VeryLazy",
-    keys = {
-      {
-        "<leader>go",
-        function() require("mini.diff").toggle_overlay(0) end,
-        desc = "git: toggle diff overlay",
-      },
-    },
-    opts = {
-      view = {
-        style = "sign",
-        signs = {
-          add = "▎",
-          change = "▎",
-          delete = "",
-        },
-      },
-    },
-  },
   {
     "lewis6991/gitsigns.nvim",
     event = "LazyFile",

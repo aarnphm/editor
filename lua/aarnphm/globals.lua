@@ -7,7 +7,7 @@ _G.P = function(v)
 end
 
 _G.TABWIDTH = 2
-_G.BORDER = "none"
+_G.BORDER = "single"
 
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 

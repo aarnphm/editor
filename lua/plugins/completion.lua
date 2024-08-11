@@ -20,7 +20,7 @@ return {
   {
     "hrsh7th/nvim-cmp",
     version = false,
-    event = "InsertEnter",
+    event = "LspAttach",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
@@ -62,7 +62,7 @@ return {
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = { "python" },
         preselect = cmp.PreselectMode.None,
-        completion = { completeopt = "menu,menuone,noinsert,noselect" },
+        completion = { completeopt = "menu,menuone,noinsert" },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         formatting = {
           fields = { "menu", "abbr", "kind" },
@@ -90,7 +90,6 @@ return {
               Unit = "",
             },
             before = function(entry, vim_item)
-              local types = require "cmp.types"
               local widths = {
                 abbr = vim.g.cmp and vim.g.cmp.widths.abbr or 40,
                 menu = vim.g.cmp and vim.g.cmp.widths.menu or 30,
@@ -111,42 +110,40 @@ return {
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
         },
-        sorting = vim.tbl_deep_extend("force", defaults.sorting, {
-          {
-            comparators = {
-              compare.offset,
-              compare.exact,
-              ---@type cmp.ComparatorFunction
-              function(entry1, entry2)
-                ---@type number
-                local diff
-                if entry1.completion_item.score and entry2.completion_item.score then
-                  diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
-                else
-                  diff = entry2.score - entry1.score
-                end
-                return diff < 0
-              end,
-              -- copied from cmp-under
-              ---@type cmp.ComparatorFunction
-              function(entry1, entry2)
-                local _, e1_under = entry1.completion_item.label:find "^_+"
-                local _, e2_under = entry2.completion_item.label:find "^_+"
-                e1_under = e1_under or 0
-                e2_under = e2_under or 0
-                if e1_under > e2_under then
-                  return false
-                elseif e1_under < e2_under then
-                  return true
-                end
-              end,
-              compare.kind,
-              compare.sort_text,
-              compare.length,
-              compare.order,
-            },
+        sorting = {
+          comparators = {
+            compare.offset,
+            compare.exact,
+            ---@type cmp.ComparatorFunction
+            function(entry1, entry2)
+              ---@type number
+              local diff
+              if entry1.completion_item.score and entry2.completion_item.score then
+                diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
+              else
+                diff = entry2.score - entry1.score
+              end
+              return diff < 0
+            end,
+            -- copied from cmp-under
+            ---@type cmp.ComparatorFunction
+            function(entry1, entry2)
+              local _, e1_under = entry1.completion_item.label:find "^_+"
+              local _, e2_under = entry2.completion_item.label:find "^_+"
+              e1_under = e1_under or 0
+              e2_under = e2_under or 0
+              if e1_under > e2_under then
+                return false
+              elseif e1_under < e2_under then
+                return true
+              end
+            end,
+            compare.kind,
+            compare.sort_text,
+            compare.length,
+            compare.order,
           },
-        }),
+        },
         matching = {
           disallow_fullfuzzy_matching = true,
         },
@@ -160,8 +157,6 @@ return {
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<Tab>"] = cmp.mapping(function(fallback)
-            local col = vim.fn.col "." - 1
-
             local has_words_before = function()
               local line, col = table.unpack(vim.api.nvim_win_get_cursor(0))
               return col ~= 0

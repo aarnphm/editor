@@ -131,6 +131,6 @@ g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
-g.cmp = { widths = { abbr = 50, menu = 50 } }
+g.cmp = { widths = { abbr = 30, menu = 30 } }
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

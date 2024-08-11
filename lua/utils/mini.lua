@@ -113,13 +113,16 @@ function M.ai_whichkey(opts)
   require("which-key").add(ret, { notify = false })
 end
 
----@param opts {skip_next: string, skip_ts: string[], skip_unbalanced: boolean, markdown: boolean}
+---@param opts {skip_next: string, skip_ts: string[], skip_unbalanced: boolean, markdown: boolean, filetypes: table<string, boolean>}
 function M.pairs(opts)
   Util.toggle.map("<leader>up", {
     name = "mini pairs",
     get = function() return not vim.g.minipairs_disable end,
     set = function(state) vim.g.minipairs_disable = not state end,
   })
+
+  if opts.filetypes[vim.bo.filetype] ~= false then vim.b.minipairs_disable = true end
+
   local pairs = require "mini.pairs"
   pairs.setup(opts)
 

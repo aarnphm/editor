@@ -557,6 +557,8 @@ return {
       skip_unbalanced = true,
       -- better deal with markdown code blocks
       markdown = true,
+      -- manually enable based on filetype
+      filetypes = { python = true },
     },
     config = function(_, opts) Util.mini.pairs(opts) end,
   },
@@ -573,6 +575,28 @@ return {
         custom_commentstring = function()
           return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
         end,
+      },
+    },
+  },
+  -- setup mini.diff
+  {
+    "echasnovski/mini.diff",
+    event = "LazyFile",
+    keys = {
+      {
+        "<leader>go",
+        function() require("mini.diff").toggle_overlay(0) end,
+        desc = "git: toggle diff overlay",
+      },
+    },
+    opts = {
+      view = {
+        style = "sign",
+        signs = {
+          add = "▎",
+          change = "▎",
+          delete = "",
+        },
       },
     },
   },
@@ -730,9 +754,7 @@ return {
     config = function(_, opts)
       if type(opts.tailwind) == "table" and opts.tailwind.enabled then
         -- reset hl groups when colorscheme changes
-        vim.api.nvim_create_autocmd("ColorScheme", {
-          callback = function() M.hl = {} end,
-        })
+        vim.api.nvim_create_autocmd("ColorScheme", { callback = function() M.hl = {} end })
         opts.highlighters.tailwind = {
           pattern = function()
             if not vim.tbl_contains(opts.tailwind.ft, vim.bo.filetype) then return end
