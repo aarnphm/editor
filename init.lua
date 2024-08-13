@@ -25,7 +25,7 @@ autocmd("User", {
 
 -- close some filetypes with <q>
 autocmd("FileType", {
-  group = augroup "filetype",
+  group = augroup "filetype_q",
   pattern = {
     "PlenaryTestPopup",
     "help",
@@ -66,6 +66,7 @@ autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
     if vim.o.buftype ~= "nofile" then vim.cmd "checktime" end
   end,
 })
+-- correct resized tabs
 autocmd("VimResized", {
   group = augroup "resized",
   callback = function()
@@ -107,13 +108,13 @@ autocmd("FileType", {
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 -- Fix conceallevel for json files
-autocmd({ "FileType" }, {
+autocmd("FileType", {
   group = augroup "json_conceal",
   pattern = { "json", "jsonc", "json5" },
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
-autocmd({ "BufWritePre" }, {
+autocmd("BufWritePre", {
   group = augroup "auto_create_dir",
   callback = function(event)
     if event.match:match "^%w%w+:[\\/][\\/]" then return end
@@ -208,11 +209,12 @@ vim.filetype.add {
     },
   },
 }
-autocmd({ "FileType" }, {
+autocmd("FileType", {
   group = augroup "bigfile",
   pattern = "bigfile",
   callback = function(ev)
     vim.b.minianimate_disable = true
+    P(available)
     vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
   end,
 })

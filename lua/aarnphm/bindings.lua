@@ -24,7 +24,7 @@ map(
   function()
     Util.terminal(
       { "npx", "quartz", "build", "--bundleInfo", "--concurrency", "4", "--serve", "--verbose" },
-      { cwd = Util.root.realpath(vim.g.vault), env = ENV, interactive = true, esc_esc = true }
+      { cwd = Util.root(), env = ENV, interactive = true, esc_esc = true }
     )
   end,
   { desc = "terminal: serve quartz" }

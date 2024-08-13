@@ -678,7 +678,6 @@ return {
   },
   {
     "echasnovski/mini.icons",
-    lazy = true,
     opts = {
       file = {
         [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
@@ -699,6 +698,12 @@ return {
         dotenv = { glyph = "", hl = "MiniIconsYellow" },
         gotmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
       },
+      lsp = {
+        supermaven = { glyph = "", hl = "MiniIconsOrange" },
+        namespace = { glyph = "󰅪", hl = "MiniIconsRed" },
+        null = { glyph = "NULL", hl = "MiniIconGrey" },
+        snippet = { glyph = "", hl = "MiniIconsYellow" },
+      },
     },
     specs = {
       { "nvim-tree/nvim-web-devicons", enabled = false, optional = true },
@@ -709,6 +714,7 @@ return {
         return package.loaded["nvim-web-devicons"]
       end
     end,
+    config = function(_, opts) require("mini.icons").setup(opts) end,
   },
   {
     "echasnovski/mini.hipatterns",

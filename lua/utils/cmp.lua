@@ -131,7 +131,7 @@ function M.setup(opts)
   require("cmp.utils.snippet").parse = function(input)
     local ok, ret = pcall(parse, input)
     if ok then return ret end
-    return Util.cmp.snippet_preview(input)
+    return M.snippet_preview(input)
   end
 
   local cmp = require "cmp"

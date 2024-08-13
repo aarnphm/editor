@@ -10,7 +10,7 @@ return {
       linters_by_ft = {
         lua = { "selene" },
         dockerfile = { "hadolint" },
-        python = { "ruff" },
+        python = { "ruff", "mypy" },
         typescript = { "eslint", "oxlint" },
         markdown = { "markdownlint" },
       },

@@ -4,8 +4,9 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "lua-language-server", "ruff", "stylua", "shfmt", "mypy", "gofumpt", "goimports" },
+      ensure_installed = { "stylua", "shfmt", "mypy", "gofumpt", "goimports" },
       ui = { border = BORDER },
+      max_concurrent_installers = 10,
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)
@@ -20,17 +21,12 @@ return {
           }
         end, 100)
       end)
-      local function ensure_installed()
+      mr.refresh(function()
         for _, tool in ipairs(opts.ensure_installed) do
           local p = mr.get_package(tool)
           if not p:is_installed() then p:install() end
         end
-      end
-      if mr.refresh then
-        mr.refresh(ensure_installed)
-      else
-        ensure_installed()
-      end
+      end)
     end,
   },
   {
@@ -75,7 +71,7 @@ return {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
-      { "b0o/SchemaStore.nvim", version = false, ft = { "json", "yaml" } },
+      { "b0o/SchemaStore.nvim", lazy = true, version = false, ft = { "json", "yaml" } },
     },
     ---@class PluginLspOptions
     opts = {
@@ -123,6 +119,7 @@ return {
       capabilities = {
         workspace = {
           didChangeWatchedFiles = { dynamicRegistration = false },
+          fileOperations = { didRename = true, willRename = true },
         },
         textDocument = {
           completion = {
@@ -133,6 +130,11 @@ return {
           },
         },
       },
+      -- the following list a table of preferred lsp for given filetype
+      preferences = {
+        lua = "lua_ls",
+      },
+      -- all of the server below will be installed by default
       servers = {
         bashls = {},
         marksman = {},
@@ -425,8 +427,12 @@ return {
         },
         pyright = {
           settings = {
+            pyright = {
+              disableOrganizeImports = true,
+            },
             python = {
               analysis = {
+                ignore = { "*" },
                 autoImportCompletions = true,
                 autoSearchPaths = true,
                 typeCheckingMode = "off",
@@ -642,13 +648,10 @@ return {
       ---@type lsp.ClientCapabilities
       local capabilities = vim.tbl_deep_extend(
         "force",
-        opts.capabilities or {},
+        {},
         vim.lsp.protocol.make_client_capabilities(),
         has_cmp and cmp_nvim_lsp.default_capabilities() or {},
-        {
-          textDocument = { completion = { completionItem = { snippetSupport = true } } },
-          workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
-        }
+        opts.capabilities or {}
       )
 
       require("lspconfig.ui.windows").default_options.border = BORDER
@@ -670,9 +673,9 @@ return {
 
       -- get all the servers that are available through mason-lspconfig
       local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
-      local all_mslp_servers = {}
+      local all_mlsp_servers = {}
       if have_mlsp then
-        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+        all_mlsp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
       end
 
       local ensure_installed = {} ---@type string[]
@@ -680,7 +683,7 @@ return {
         if server_opts then
           server_opts = server_opts == true and {} or server_opts
           -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-          if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+          if server_opts.mason == false or not vim.tbl_contains(all_mlsp_servers, server) then
             server_setup(server)
           else
             ensure_installed[#ensure_installed + 1] = server

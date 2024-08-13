@@ -3,6 +3,7 @@ return {
     "supermaven-inc/supermaven-nvim",
     lazy = true,
     event = "LazyFile",
+    build = ":SupermavenUsePro",
     opts = {
       ignore_filetypes = {
         gitcommit = true,
@@ -25,7 +26,7 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "onsails/lspkind.nvim",
+      "echasnovski/mini.icons",
       {
         "garymjr/nvim-snippets",
         opts = {
@@ -67,43 +68,50 @@ return {
         formatting = {
           fields = { "menu", "abbr", "kind" },
           expandable_indicator = true,
-          format = require("lspkind").cmp_format {
-            mode = "symbol_text",
-            max_width = function() return math.floor(0.45 * vim.o.columns) end,
-            ellipsis_char = "…",
-            show_labelDetails = true,
-            symbol_map = {
-              Supermaven = "",
-              Array = "󰅪",
-              Boolean = "⊨",
-              Class = "󰌗",
-              Key = "󰌆",
-              Namespace = "󰅪",
-              Null = "NULL",
-              Number = "#",
-              Object = "󰀚",
-              Package = "󰏗",
-              Property = "",
-              Reference = "",
-              String = "󰀬",
-              TypeParameter = "󰊄",
-              Unit = "",
-            },
-            before = function(entry, vim_item)
-              local widths = {
-                abbr = vim.g.cmp and vim.g.cmp.widths.abbr or 40,
-                menu = vim.g.cmp and vim.g.cmp.widths.menu or 30,
-              }
+          format = function(entry, item)
+            local icon = nil
+            local mini_icon, _, _ = require("mini.icons").get("lsp", item.kind)
+            if mini_icon then icon = mini_icon .. " " end
+            if icon then item.kind = icon .. item.kind end
 
-              for key, width in pairs(widths) do
-                if vim_item[key] and vim.fn.strdisplaywidth(vim_item[key]) > width then
-                  vim_item[key] = vim.fn.strcharpart(vim_item[key], 0, width - 1) .. "…"
-                end
+            local widths = {
+              abbr = vim.g.cmp and vim.g.cmp.widths.abbr or 40,
+              menu = vim.g.cmp and vim.g.cmp.widths.menu or 30,
+            }
+
+            for key, width in pairs(widths) do
+              if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
+                item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. "…"
               end
-
-              return vim_item
-            end,
-          },
+            end
+            return item
+          end,
+        },
+        window = {
+          completion = BORDER ~= "none" and cmp.config.window.bordered {
+            border = {
+              { "󱐋", "WarningMsg" },
+              { "─", "Comment" },
+              { "┐", "Comment" },
+              { "│", "Comment" },
+              { "┘", "Comment" },
+              { "─", "Comment" },
+              { "└", "Comment" },
+              { "│", "Comment" },
+            },
+          } or defaults.window.completion,
+          documentation = BORDER ~= "none" and cmp.config.window.bordered {
+            border = {
+              { "󰄾", "DiagnosticHint" },
+              { "─", "Comment" },
+              { "┐", "Comment" },
+              { "│", "Comment" },
+              { "┘", "Comment" },
+              { "─", "Comment" },
+              { "└", "Comment" },
+              { "│", "Comment" },
+            },
+          } or defaults.window.documentation,
         },
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
@@ -150,8 +158,12 @@ return {
           return not disabled[vim.bo.filetype]
         end,
         mapping = cmp.mapping.preset.insert {
-          ["<CR>"] = Util.cmp.confirm { select = true },
+          ["<CR>"] = Util.cmp.confirm(),
           ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
+          ["<C-CR>"] = function(fallback)
+            cmp.abort()
+            fallback()
+          end,
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<Tab>"] = cmp.mapping(function(fallback)
@@ -182,10 +194,10 @@ return {
           end, { "i", "s" }),
         },
         sources = cmp.config.sources {
-          { name = "nvim_lsp", priority = 400 },
-          { name = "path", priority = 200 },
-          { name = "supermaven" },
+          { name = "nvim_lsp", priority = 400, max_item_count = 50 },
           { name = "snippets", priority = 300 },
+          { name = "supermaven", priority = 200, group_index = 1 },
+          { name = "path", priority = 100 },
           { name = "lazydev", group_index = 0 },
           {
             name = "buffer",
@@ -196,6 +208,6 @@ return {
         },
       })
     end,
-    main = "utils.cmp",
+    main = "utils.cmp", ---@type simple.util.cmp
   },
 }
