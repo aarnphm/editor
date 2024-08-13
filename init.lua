@@ -260,7 +260,7 @@ require("lazy").setup {
   lockfile = vim.fn.stdpath "config" .. "/lazy-lock.json",
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
-  ui = { border = BORDER, backdrop = 100, wrap = false },
+  ui = { border = BORDER.get(), backdrop = 100, wrap = false },
   performance = {
     rtp = {
       disabled_plugins = {

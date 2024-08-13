@@ -79,7 +79,22 @@ return {
       -- parser_install_dir = rtp_path,
       ignore_install = { "phpdoc" },
       indent = { enable = true },
-      highlight = { enable = true },
+      highlight = {
+        enable = true,
+        disable = function(lang, bufnr)
+          local ret = false
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          local fsize = vim.fn.getfsize(bufname)
+          if fsize > vim.g.bigfile_size then
+            -- skip file size greater than 100k
+            ret = true
+          elseif bufname:match "^fugitive://" then
+            -- skip fugitive buffer
+            ret = true
+          end
+          return ret
+        end,
+      },
       textobjects = {
         move = {
           enable = true,

@@ -49,8 +49,8 @@ end
 function M.open(cmd, opts)
   opts = vim.tbl_deep_extend("force", {
     ft = "lazyterm",
-    size = { width = 0.8, height = 0.8 },
-    backdrop = Util.has "edgy.nvim" and not cmd and 100 or nil,
+    size = { width = 0.9, height = 0.9 },
+    backdrop = not cmd and 100 or nil,
   }, opts or {}, { persistent = true }) --[[@as LazyTermOpts]]
 
   local termkey = vim.inspect { cmd = cmd or "shell", cwd = opts.cwd, env = opts.env, count = vim.v.count1 }

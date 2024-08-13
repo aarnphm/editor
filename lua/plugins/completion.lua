@@ -88,30 +88,8 @@ return {
           end,
         },
         window = {
-          completion = BORDER ~= "none" and cmp.config.window.bordered {
-            border = {
-              { "󱐋", "WarningMsg" },
-              { "─", "Comment" },
-              { "┐", "Comment" },
-              { "│", "Comment" },
-              { "┘", "Comment" },
-              { "─", "Comment" },
-              { "└", "Comment" },
-              { "│", "Comment" },
-            },
-          } or defaults.window.completion,
-          documentation = BORDER ~= "none" and cmp.config.window.bordered {
-            border = {
-              { "󰄾", "DiagnosticHint" },
-              { "─", "Comment" },
-              { "┐", "Comment" },
-              { "│", "Comment" },
-              { "┘", "Comment" },
-              { "─", "Comment" },
-              { "└", "Comment" },
-              { "│", "Comment" },
-            },
-          } or defaults.window.documentation,
+          completion = cmp.config.window.bordered { border = BORDER.impl "lsp" },
+          documentation = cmp.config.window.bordered { border = BORDER.impl "docs" },
         },
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,

@@ -142,6 +142,31 @@ return {
     },
     config = function(_, opts) require("conform").setup(opts) end,
   },
+  -- outline
+  {
+    "hedyhli/outline.nvim",
+    keys = { { "<leader>cs", "<cmd>Outline<cr>", desc = "outline: toggle" } },
+    cmd = "Outline",
+    opts = function()
+      local defaults = require("outline.config").defaults
+      local opts = {
+        symbols = { icons = {} },
+        keymaps = {
+          up_and_jump = "<up>",
+          down_and_jump = "<down>",
+        },
+      }
+
+      for kind, symbol in pairs(defaults.symbols.icons) do
+        local mini_icon, hl, _ = require("mini.icons").get("lsp", kind:lower())
+        opts.symbols.icons[kind] = {
+          icon = mini_icon and mini_icon or symbol.icon,
+          hl = mini_icon and hl or symbol.hl,
+        }
+      end
+      return opts
+    end,
+  },
   -- quickfix
   {
     "folke/trouble.nvim",
@@ -156,8 +181,6 @@ return {
     keys = {
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "trouble: diagnostics" },
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
-      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "trouble: symbols" },
-      { "<leader>cS", "<cmd>Trouble lsp toggle<cr>", desc = "trouble: lsp references/definitions/..." },
       { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "trouble: location list" },
       { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "trouble: quickfix list" },
       {
@@ -198,7 +221,7 @@ return {
         win_height = 12,
         win_vheight = 12,
         delay_syntax = 80,
-        border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
+        border = BORDER.get(),
         show_title = false,
         should_preview_cb = function(bufnr, _)
           local ret = true

@@ -312,8 +312,8 @@ M.buffer = setmetatable({}, {
       }
       local ok, glance = pcall(require, "glance")
 
-      if not ok and vim.g.use_glance then Util.error "Glance not found" end
-      if vim.g.use_glance then
+      if not ok and vim.g.use.glance then Util.error "Glance not found" end
+      if vim.g.use.glance then
         glance.open(action)
       else
         vim.lsp.buf[_methods[action]]()
@@ -327,14 +327,14 @@ M.buffer.definitions = function()
 
   vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, ctx, config)
     if not result or vim.tbl_isempty(result) then
-      print "lsp: could not find definition"
+      Util.warn("lsp: could not find definition", { title = "LazyVim" })
       return
     end
 
     if vim.islist(result) then
       vim.lsp.util.jump_to_location(result[1], "utf-8")
     else
-      if vim.g.use_glance then
+      if vim.g.use.glance then
         require("glance").open "definitions"
       else
         vim.lsp.handlers["textDocument/definition"](err, result, ctx, config)

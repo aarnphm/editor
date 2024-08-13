@@ -362,25 +362,6 @@ return {
           filter_rules = {
             bo = {
               filetype = { "notify" },
-              {
-                "norcalli/nvim-colorizer.lua",
-                event = "LspAttach",
-                opts = {
-                  filetypes = { "*" },
-                  user_default_options = {
-                    names = false, -- "Name" codes like Blue
-                    RRGGBBAA = true, -- #RRGGBBAA hex codes
-                    rgb_fn = true, -- CSS rgb() and rgba() functions
-                    hsl_fn = true, -- CSS hsl() and hsla() functions
-                    css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-                    css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-                    sass = { enable = true, parsers = { "css" } },
-                    tailwind = true,
-                    mode = "background",
-                  },
-                },
-                config = function(_, opts) require("colorizer").setup(opts) end,
-              },
               buftype = { "terminal", "quickfix", "Scratch", "aerial" },
             },
           },
@@ -388,7 +369,13 @@ return {
       },
     },
     opts = {
-      windows = { preview = true, width_focus = 50, width_nofocus = 15, width_preview = 50 },
+      windows = {
+        preview = true,
+        width_focus = 30,
+        width_nofocus = 30,
+        width_preview = math.floor(0.45 * vim.o.columns),
+        max_number = 3,
+      },
       mappings = { synchronize = "<leader>" },
     },
     keys = {

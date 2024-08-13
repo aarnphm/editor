@@ -7,7 +7,69 @@ _G.P = function(v)
 end
 
 _G.TABWIDTH = 2
-_G.BORDER = "single"
+
+---@alias Mode "lsp" | "docs" | "hover"
+
+---@class SingleBorder
+---@field none string[]
+---@field single string[][]
+
+---@type SingleBorder
+local M = {
+  none = { "", "", "", "", "", "", "", "" },
+  single = {
+    simple = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+    lsp = {
+      { "󱐋", "WarningMsg" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
+    },
+    docs = {
+      { "󰄾", "DiagnosticHint" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
+    },
+    hover = {
+      { "󰀵", "MiniIconsGrey" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
+    },
+  },
+}
+
+M.none = setmetatable(M.none, {
+  __call = function(m, ...) return M.none end,
+})
+M.single = setmetatable(M.single, {
+  __call = function(m, type)
+    type = type or "lsp"
+    return M.single[type]
+  end,
+})
+
+---@param type? Mode
+---@return string[][]
+M.impl = function(type) return M[vim.g.border or "none"](type) end
+
+---@return string[][]
+M.get = function() return M["__default"] end
+
+_G.BORDER = setmetatable(M, { __index = function() return M.impl() end })
 
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 _G.hi = function(name, opts)

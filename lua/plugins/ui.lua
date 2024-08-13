@@ -3,8 +3,8 @@ return {
     "stevearc/dressing.nvim",
     lazy = true,
     opts = {
-      input = { border = BORDER, win_options = { winhighlight = "TelescopeNormal:StatusLine" } },
-      builtin = { border = BORDER },
+      input = { border = BORDER.get(), win_options = { winhighlight = "TelescopeNormal:StatusLine" } },
+      builtin = { border = BORDER.get() },
     },
     init = function()
       ---@diagnostic disable-next-line: duplicate-set-field
@@ -39,8 +39,10 @@ return {
       cmdline = { view = "cmdline" },
       views = {
         split = { size = "30%" },
-        popup = { border = { style = BORDER } },
-        confirm = { border = { style = BORDER } },
+        popup = { border = { style = BORDER.get() } },
+        confirm = { border = { style = BORDER.impl "hover" } },
+        hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
+        cmdline_popup = { border = { style = BORDER.get() } },
         mini = { timeout = 3000 },
       },
       routes = {

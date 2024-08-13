@@ -4,8 +4,20 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "stylua", "shfmt", "mypy", "gofumpt", "goimports" },
-      ui = { border = BORDER },
+      ensure_installed = {
+        "stylua",
+        "shfmt",
+        "mypy",
+        "gofumpt",
+        "goimports",
+        "taplo",
+        "beautysh",
+        "selene",
+        "hadolint",
+        "oxlint",
+        "markdownlint",
+      },
+      ui = { border = BORDER.get() },
       max_concurrent_installers = 10,
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -92,7 +104,7 @@ return {
             focus = false,
             format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
             source = "if_many",
-            border = BORDER,
+            border = BORDER.get(),
           },
           signs = {
             text = {
@@ -338,7 +350,7 @@ return {
                 },
               },
               telemetry = { enable = false },
-              semantic = { enable = false },
+              semantic = { enable = true },
               completion = { workspaceWord = true, callSnippet = "Replace" },
               hover = { expandAlias = false },
               hint = {
@@ -654,7 +666,7 @@ return {
         opts.capabilities or {}
       )
 
-      require("lspconfig.ui.windows").default_options.border = BORDER
+      require("lspconfig.ui.windows").default_options.border = BORDER.get()
 
       ---@param server string
       local server_setup = function(server)
