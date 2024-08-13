@@ -41,6 +41,7 @@ return {
         split = { size = "30%" },
         popup = { border = { style = BORDER } },
         confirm = { border = { style = BORDER } },
+        mini = { timeout = 3000 },
       },
       routes = {
         {

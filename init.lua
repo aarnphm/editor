@@ -10,7 +10,7 @@ local autocmd = vim.api.nvim_create_autocmd
 local M = {
   disable = {
     filetypes = { "ministarter", "dashboard", "qf", "help", "grug-far", "TelescopePrompt" },
-    buftypes = { "quickfix", "prompt", "scratch" },
+    buftypes = { "quickfix", "prompt", "scratch", "ministarter" },
   },
 }
 
@@ -170,7 +170,7 @@ autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
 })
 -- Set local settings for terminal buffers
 autocmd("TermOpen", {
-  group = augroup "custom-term-open",
+  group = augroup "custom_term_open",
   callback = function()
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
@@ -178,40 +178,17 @@ autocmd("TermOpen", {
   end,
 })
 -- highlight URL
---- regex used for matching a valid URL/URI string
-M.url_matcher =
-  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
---- Delete the syntax matching rules for URLs/URIs if set
----@param win integer? the window id to remove url highlighting in (default: current window)
-function M.delete_url_match(win)
-  if not win then win = vim.api.nvim_get_current_win() end
-  for _, match in ipairs(vim.fn.getmatches(win)) do
-    if match.group == "HighlightURL" then vim.fn.matchdelete(match.id, win) end
-  end
-  vim.w[win].highlighturl_enabled = false
-end
---- Add syntax matching rules for highlighting URLs/URIs
----@param win integer? the window id to remove url highlighting in (default: current window)
-function M.set_url_match(win)
-  if not win then win = vim.api.nvim_get_current_win() end
-  M.delete_url_match(win)
-  vim.fn.matchadd("HighlightURL", M.url_matcher, 15, -1, { window = win })
-  vim.w[win].highlighturl_enabled = true
-end
 local highlighturl_group = augroup "highlighturl"
-vim.api.nvim_set_hl(0, "HighlightURL", { default = true, underline = true })
-vim.api.nvim_create_autocmd("ColorScheme", {
+autocmd("ColorScheme", {
   group = highlighturl_group,
-  desc = "Set up HighlightURL hlgroup",
-  callback = function() vim.api.nvim_set_hl(0, "HighlightURL", { default = true, underline = true }) end,
+  callback = function() hi("HighlightURL", { default = true, underline = true }) end,
 })
 autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
   group = highlighturl_group,
-  desc = "Highlight URLs",
   callback = function(args)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
       if vim.api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then
-        M.set_url_match(win)
+        Util.set_url_match(win)
       end
     end
   end,
@@ -240,6 +217,22 @@ autocmd({ "FileType" }, {
   end,
 })
 
+local function get_hour() return tonumber(os.date "%H") end
+
+-- Set the background based on the hour
+local function set_background()
+  local hour = get_hour()
+  if hour >= 6 and hour < 21 then
+    vim.go.background = "light"
+  else
+    vim.go.background = "dark"
+  end
+end
+
+autocmd("VimEnter", { callback = set_background })
+
+set_background()
+
 if vim.g.vscode then return end -- NOTE: compatible block with vscode
 
 -- bootstrap logics
@@ -266,6 +259,39 @@ require("lazy").setup {
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
   ui = { border = BORDER, backdrop = 100, wrap = false },
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "2html_plugin",
+        "tohtml",
+        "getscript",
+        "getscriptPlugin",
+        "gzip",
+        "logipat",
+        "netrw",
+        "netrwPlugin",
+        "netrwSettings",
+        "netrwFileHandlers",
+        "matchit",
+        "tar",
+        "tarPlugin",
+        "rrhelper",
+        "spellfile_plugin",
+        "vimball",
+        "vimballPlugin",
+        "zip",
+        "zipPlugin",
+        "tutor",
+        "rplugin",
+        "syntax",
+        "synmenu",
+        "optwin",
+        "compiler",
+        "bugreport",
+        "ftplugin",
+      },
+    },
+  },
 }
 
 Util.toggle.setup()
@@ -277,11 +303,7 @@ else
   vim.cmd.colorscheme "habamax"
 end
 
-local hi = function(name, opts)
-  opts.default = opts.default or true
-  opts.force = opts.force or true
-  vim.api.nvim_set_hl(0, name, opts)
-end
+hi("HighlightURL", { default = true, underline = true })
 hi("MiniFilesBorder", { link = "Normal" })
 hi("MiniFilesNormal", { link = "Normal" })
 hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })

@@ -24,7 +24,7 @@ return {
         end,
       })
 
-      return { mode = "cursor", max_lines = 3 }
+      return { mode = "cursor" }
     end,
   },
   {

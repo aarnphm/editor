@@ -669,7 +669,10 @@ return {
       })
 
       vim.api.nvim_create_user_command("Starter", function()
-        if _G.MiniStarter ~= nil then MiniStarter.open() end
+        if _G.MiniStarter ~= nil then
+          MiniStarter.open()
+          vim.o.laststatus = 0
+        end
       end, { desc = "starter: open" })
     end,
   },

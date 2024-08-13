@@ -10,6 +10,11 @@ _G.TABWIDTH = 2
 _G.BORDER = "single"
 
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
+_G.hi = function(name, opts)
+  opts.default = opts.default or true
+  opts.force = opts.force or true
+  vim.api.nvim_set_hl(0, name, opts)
+end
 
 -- statusline and simple
 local fmt = string.format
@@ -40,11 +45,11 @@ end
 H.get_filesize = function()
   local size = vim.fn.getfsize(vim.fn.getreg "%")
   if size < 1024 then
-    return string.format("%dB", size)
+    return fmt("%dB", size)
   elseif size < 1048576 then
-    return string.format("%.2fKiB", size / 1024)
+    return fmt("%.2fKiB", size / 1024)
   else
-    return string.format("%.2fMiB", size / 1048576)
+    return fmt("%.2fMiB", size / 1048576)
   end
 end
 
@@ -130,7 +135,7 @@ _G.statusline = {
 
     if H.is_truncated(args.trunc_width) then return #linters == 0 and "󰦕" or "󱉶" end
 
-    if #linters == 0 then return "󰦕 [" .. table.concat(names, "|") .. "]" end
+    if #linters == 0 then return "󰦕" .. " " .. string.rep("+", vim.tbl_count(names)) end
     return "󱉶 [" .. table.concat(linters, "|") .. "]"
   end,
   diagnostic = function(args)

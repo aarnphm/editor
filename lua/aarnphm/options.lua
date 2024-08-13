@@ -60,7 +60,6 @@ o.linebreak = true
 o.jumpoptions = "stack"
 o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
 o.inccommand = "split"
-o.background = "dark" -- "dark"
 
 -- fold with nvim-ufo
 o.foldenable = true
@@ -129,7 +128,7 @@ g.inline_diagnostics = true
 g.picker = "telescope"
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
-g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
+g.laststatus = 3 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.cmp = { widths = { abbr = 30, menu = 30 } }
 

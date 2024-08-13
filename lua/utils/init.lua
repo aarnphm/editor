@@ -272,22 +272,27 @@ M.try = function(fn, opts)
   return ok and result or nil
 end
 
----@param name "autocmds" | "options" | "keymaps"
-M.load = function(name)
-  local function _load(mod)
-    if require("lazy.core.cache").find(mod)[1] then
-      Util.try(function() require(mod) end, { msg = "Failed loading " .. mod })
-    end
+--- regex used for matching a valid URL/URI string
+M.url_matcher =
+  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+
+--- Delete the syntax matching rules for URLs/URIs if set
+---@param win integer? the window id to remove url highlighting in (default: current window)
+M.delete_url_match = function(win)
+  if not win then win = vim.api.nvim_get_current_win() end
+  for _, match in ipairs(vim.fn.getmatches(win)) do
+    if match.group == "HighlightURL" then vim.fn.matchdelete(match.id, win) end
   end
-  -- always load lazyvim, then user file
-  if M.defaults[name] or name == "options" then _load("lazyvim.config." .. name) end
-  _load("config." .. name)
-  if vim.bo.filetype == "lazy" then
-    -- HACK: LazyVim may have overwritten options of the Lazy ui, so reset this here
-    vim.cmd [[do VimResized]]
-  end
-  local pattern = "LazyVim" .. name:sub(1, 1):upper() .. name:sub(2)
-  vim.api.nvim_exec_autocmds("User", { pattern = pattern, modeline = false })
+  vim.w[win].highlighturl_enabled = false
+end
+
+--- Add syntax matching rules for highlighting URLs/URIs
+---@param win integer? the window id to remove url highlighting in (default: current window)
+M.set_url_match = function(win)
+  if not win then win = vim.api.nvim_get_current_win() end
+  M.delete_url_match(win)
+  vim.fn.matchadd("HighlightURL", M.url_matcher, 15, -1, { window = win })
+  vim.w[win].highlighturl_enabled = true
 end
 
 --- XXX: Vendorred from lazy.nvim for now
