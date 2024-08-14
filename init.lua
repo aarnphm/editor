@@ -135,7 +135,19 @@ autocmd("TextYankPost", {
 -- auto trim trailing whitespace
 autocmd("BufWritePost", {
   group = augroup "trim_whitespace",
-  callback = function() require("mini.trailspace").trim() end,
+  callback = function()
+    local ok, trailspace = pcall(require, "mini.trailspace")
+    if ok then
+      trailspace.trim()
+    else
+      -- Fallback to manual trim in case mini fails to load
+      -- Save cursor position to later restore
+      local curpos = vim.api.nvim_win_get_cursor(0)
+      -- Search and replace trailing whitespace
+      vim.cmd [[keeppatterns %s/\s\+$//e]]
+      vim.api.nvim_win_set_cursor(0, curpos)
+    end
+  end,
 })
 -- toggle number on focussed window
 vim.cmd [[

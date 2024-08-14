@@ -75,55 +75,7 @@ return {
         end,
       },
     },
-    config = function(_, opts)
-      local glsp = require "glance.lsp"
-
-      local function create_handler(method)
-        return function(bufnr, params, cb)
-          local _client_request_ids, cancel_all_requests, client_request_ids
-
-          _client_request_ids, cancel_all_requests = vim.lsp.buf_request(
-            bufnr,
-            method.lsp_method,
-            params,
-            function(err, result, ctx)
-              if not client_request_ids then
-                -- do a copy of the table we don't want
-                -- to mutate the original table
-                client_request_ids = vim.tbl_deep_extend("keep", _client_request_ids, {})
-              end
-
-              -- Don't log a error when LSP method is non-standard
-              if err and not method.non_standard then
-                Util.error(
-                  ("An error happened requesting %s: %s"):format(method.label, err.message),
-                  { title = "Glance" }
-                )
-              end
-
-              if result == nil or vim.islist(result) then
-                client_request_ids[ctx.client_id] = nil
-              else
-                cancel_all_requests()
-                result = vim.islist(result) and result or { result }
-
-                return cb(result, ctx)
-              end
-
-              if vim.tbl_isempty(client_request_ids) then cb {} end
-            end
-          )
-        end
-      end
-
-      glsp.setup = function()
-        for key, method in pairs(glsp.methods) do
-          glsp.methods[key].handler = create_handler(method)
-        end
-      end
-
-      require("glance").setup(opts)
-    end,
+    config = "utils.glance",
   },
   {
     "neovim/nvim-lspconfig",

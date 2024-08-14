@@ -316,7 +316,23 @@ M.colors = {
 
 return {
   { "echasnovski/mini.align", event = "VeryLazy", opts = {} },
-  { "echasnovski/mini.trailspace", event = { "BufRead", "BufNewFile" }, opts = {} },
+  {
+    "echasnovski/mini.trailspace",
+    event = { "BufRead", "BufNewFile" },
+    opts = {},
+    config = function(_, opts)
+      local show = true
+      Util.toggle.map("<leader>us", {
+        name = "trailspace",
+        get = function() return show end,
+        set = function(state)
+          show = not show
+          require("mini.trailspace").highlight()
+        end,
+      })
+      require("mini.trailspace").setup(opts)
+    end,
+  },
   {
     "echasnovski/mini.ai",
     event = "VeryLazy",
@@ -357,20 +373,23 @@ return {
         name = "window-picker",
         lazy = true,
         opts = {
-          autoselect_one = true,
-          include_current = false,
+          hint = "floating-big-letter",
+          show_prompt = false,
           filter_rules = {
+            autoselect_one = true,
+            include_current = false,
             bo = {
               filetype = { "notify" },
               buftype = { "terminal", "quickfix", "Scratch", "aerial" },
             },
+            wo = { [1011] = {} },
           },
         },
       },
     },
     opts = {
       windows = {
-        preview = true,
+        preview = false,
         width_focus = 30,
         width_nofocus = 30,
         width_preview = math.floor(0.45 * vim.o.columns),
@@ -403,6 +422,12 @@ return {
         require("mini.files").refresh { content = { filter = new_filter } }
       end
 
+      local show_preview = false
+      local toggle_preview = function()
+        show_preview = not show_preview
+        require("mini.files").refresh { windows = { preview = show_preview } }
+      end
+
       local go_in_plus = function()
         for _ = 1, vim.v.count1 - 1 do
           MiniFiles.go_in()
@@ -415,7 +440,7 @@ return {
 
       local map_goto_windows = function(buf_id, lhs)
         local rhs = function()
-          local id = require("window-picker").pick_window()
+          local id = P(require("window-picker").pick_window())
           vim.api.nvim_win_call(MiniFiles.get_target_window(), function() MiniFiles.set_target_window(id) end)
           go_in_plus()
         end
@@ -445,6 +470,7 @@ return {
           local buf_id = args.data.buf_id
           -- Tweak left-hand side of mapping to your liking
           vim.keymap.set("n", "g.", toggle_dotfiles, { buffer = buf_id, desc = "files: toggle dotfiles" })
+          vim.keymap.set("n", "gp", toggle_preview, { buffer = buf_id, desc = "files: toggle preview" })
           map_goto_windows(buf_id, "gw")
           map_split(buf_id, "gs", "belowright horizontal")
           map_split(buf_id, "gv", "belowright vertical")

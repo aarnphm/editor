@@ -90,6 +90,13 @@ return {
         },
       },
     },
+    config = function(_, opts)
+      Util.on_load("telescope.nvim", function()
+        local ok, err = pcall(require("telescope").load_extension, "noice")
+        if not ok then Util.error("Failed to load `noice.nvim`:\n" .. err) end
+      end)
+      require("noice").setup(opts)
+    end,
   },
   { "MunifTanjim/nui.nvim", lazy = true },
   {
