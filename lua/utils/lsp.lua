@@ -37,7 +37,7 @@ end
 ---@type table<string, table<vim.lsp.Client, table<number, boolean>>>
 M._supports_method = {}
 
-function M.setup()
+function M.setup(opts)
   local register_capability = vim.lsp.handlers["client/registerCapability"]
   vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
     ---@diagnostic disable-next-line: no-unknown
@@ -61,7 +61,7 @@ function M.setup()
   M.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
 
   -- setup document highlight
-  M.words.setup()
+  M.words.setup(opts)
 end
 
 ---@param client vim.lsp.Client
@@ -246,7 +246,9 @@ M.words = {}
 M.words.enabled = false
 M.words.ns = vim.api.nvim_create_namespace "vim_lsp_references"
 
-function M.words.setup()
+function M.words.setup(opts)
+  opts = opts or {}
+  if not opts.enabled then return end
   M.words.enabled = true
   local handler = vim.lsp.handlers["textDocument/documentHighlight"]
   vim.lsp.handlers["textDocument/documentHighlight"] = function(err, result, ctx, config)
@@ -312,8 +314,8 @@ M.buffer = setmetatable({}, {
       }
       local ok, glance = pcall(require, "glance")
 
-      if not ok and vim.g.use.glance then Util.error "Glance not found" end
-      if vim.g.use.glance then
+      if not ok and vim.g.use_glance then Util.error "Glance not found" end
+      if vim.g.use_glance then
         glance.open(action)
       else
         vim.lsp.buf[_methods[action]]()
@@ -334,7 +336,7 @@ M.buffer.definitions = function()
     if vim.islist(result) then
       vim.lsp.util.jump_to_location(result[1], "utf-8")
     else
-      if vim.g.use.glance then
+      if vim.g.use_glance then
         require("glance").open "definitions"
       else
         vim.lsp.handlers["textDocument/definition"](err, result, ctx, config)

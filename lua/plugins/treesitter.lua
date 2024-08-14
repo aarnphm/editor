@@ -102,7 +102,7 @@ return {
         },
       },
     },
-    config = "utils.treesitter",
+    main = "utils.treesitter",
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",

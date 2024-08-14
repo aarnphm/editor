@@ -11,4 +11,9 @@ return {
     },
     opts = {},
   },
+  {
+    "andweeb/presence.nvim",
+    event = "LazyFile",
+    opts = { enable_line_number = true },
+  },
 }

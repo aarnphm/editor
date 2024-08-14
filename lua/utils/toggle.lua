@@ -48,6 +48,8 @@ function M.map(lhs, toggle)
   M.wk(lhs, toggle)
 end
 
+---@param lhs string
+---@param toggle simple.Toggle
 function M.wk(lhs, toggle)
   if not Util.has "which-key.nvim" then return end
   local function safe_get()
@@ -120,7 +122,7 @@ end
 
 local nu = { number = true, relativenumber = true }
 M.number = M.wrap {
-  name = "Line Numbers",
+  name = "line numbers",
   get = function() return vim.opt_local.number:get() or vim.opt_local.relativenumber:get() end,
   set = function(state)
     if state then

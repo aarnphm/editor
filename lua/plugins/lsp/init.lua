@@ -75,7 +75,7 @@ return {
         end,
       },
     },
-    config = "utils.glance",
+    main = "utils.glance",
   },
   {
     "neovim/nvim-lspconfig",
@@ -105,7 +105,7 @@ return {
             focus = false,
             format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
             source = "if_many",
-            border = BORDER.get(),
+            border = BORDER.impl "docs",
           },
           signs = {
             text = {
@@ -129,6 +129,7 @@ return {
       -- provide the code lenses.
       codelens = { enabled = false },
       -- Enable lsp cursor word highlighting
+      document_highlight = { enabled = true },
       capabilities = {
         workspace = {
           didChangeWatchedFiles = { dynamicRegistration = false },
@@ -602,7 +603,7 @@ return {
     config = function(_, opts)
       Util.format.register(Util.lsp.formatter())
 
-      Util.lsp.setup()
+      Util.lsp.setup(opts.document_highlight)
 
       -- inlay hints
       if opts.inlay_hints.enabled then

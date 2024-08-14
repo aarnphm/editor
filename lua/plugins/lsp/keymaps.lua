@@ -18,14 +18,14 @@ M.get = function()
     M._keys = {
       { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
       { "H", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
-      { "gr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
+      { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
       { "gy", vim.lsp.buf.type_definition, desc = "lsp: t[y]pe definition" },
       { "gK", vim.lsp.buf.signature_help, desc = "lsp: signature help", has = "signatureHelp" },
       { "gR", Util.lsp.buffer.references, desc = "lsp: show references", has = "definition", nowait = true },
       { "gd", Util.lsp.buffer.definitions, desc = "lsp: peek definition", has = "definition" },
       {
         "gD",
-        vim.g.use.glance and "<cmd>Glance references<cr>" or vim.lsp.buf.declaration,
+        vim.g.use_glance and "<cmd>Glance references<cr>" or vim.lsp.buf.declaration,
         desc = "lsp: peek definition",
         has = "definition",
       },
@@ -60,7 +60,6 @@ M.get = function()
         mode = { "n" },
         has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
       },
-      { "<leader>cr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
       { "<leader>cA", Util.lsp.action.source, desc = "lsp: source action", has = "codeAction" },
       {
         "]]",

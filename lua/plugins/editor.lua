@@ -14,15 +14,56 @@ return {
   },
   {
     "ggandor/leap.nvim",
-    keys = { { "gs", mode = { "n", "x", "o" }, desc = "motion: Leap from windows" } },
+    keys = {
+      { "s", mode = { "n", "x", "o" }, desc = "motion: leap forward to" },
+      { "S", mode = { "n", "x", "o" }, desc = "motion: leap backward to" },
+    },
     config = function(_, opts)
       local leap = require "leap"
       for key, val in pairs(opts) do
         leap.opts[key] = val
       end
       leap.add_default_mappings(true)
+
       vim.keymap.del({ "x", "o" }, "x")
       vim.keymap.del({ "x", "o" }, "X")
+      vim.keymap.set({ "n", "x", "o" }, "ga", function()
+        local sk = vim.deepcopy(require("leap").opts.special_keys)
+        -- The items in `special_keys` can be both strings or tables - the
+        -- shortest workaround might be the below one:
+        sk.next_target = vim.fn.flatten(vim.list_extend({ "a" }, { sk.next_target }))
+        sk.prev_target = vim.fn.flatten(vim.list_extend({ "A" }, { sk.prev_target }))
+
+        require("leap.treesitter").select { opts = { special_keys = sk } }
+      end, { desc = "motion: leap treesitter" })
+      -- Linewise.
+      vim.keymap.set(
+        { "n", "x", "o" },
+        "gA",
+        'V<cmd>lua require("leap.treesitter").select()<cr>',
+        { desc = "motion: leap treesiter (linewise)" }
+      )
+
+      -- For maximum comfort, force linewise selection in the mappings:
+      vim.keymap.set("x", "|", function()
+        -- Only force V if not already in it (otherwise it would exit Visual mode).
+        if vim.fn.mode(1) ~= "V" then vim.cmd "normal! V" end
+        Util.motion.leap_line_start()
+      end, { desc = "motion: leap line start" })
+      vim.keymap.set(
+        "o",
+        "|",
+        "V<cmd>lua Util.motion.leap_line_start()<cr>",
+        { desc = "motion: leap line start (linewise)" }
+      )
+
+      hi("LeapBackdrop", { link = "Comment" }) -- or some grey
+      hi("LeapMatch", {
+        -- For light themes, set to 'black' or similar.
+        fg = vim.go.backgorund == "dark" and "white" or "black",
+        bold = true,
+        nocombine = true,
+      })
     end,
   },
   { "tpope/vim-repeat", event = "VeryLazy" },

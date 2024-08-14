@@ -8,7 +8,7 @@ end
 
 _G.TABWIDTH = 2
 
----@alias Mode "lsp" | "docs" | "hover"
+---@alias Mode "simple" | "lsp" | "docs" | "hover" | "git"
 
 ---@class SingleBorder
 ---@field none string[]
@@ -41,6 +41,16 @@ local M = {
     },
     hover = {
       { "󰀵", "MiniIconsGrey" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
+    },
+    git = {
+      { "󰊢", "MiniIconsRed" },
       { "─", "Comment" },
       { "┐", "Comment" },
       { "│", "Comment" },

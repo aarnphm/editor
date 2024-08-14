@@ -315,7 +315,11 @@ M.colors = {
 }
 
 return {
-  { "echasnovski/mini.align", event = "VeryLazy", opts = {} },
+  {
+    "echasnovski/mini.align",
+    event = "VeryLazy",
+    opts = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
+  },
   {
     "echasnovski/mini.trailspace",
     event = { "BufRead", "BufNewFile" },
@@ -494,19 +498,20 @@ return {
     event = "VeryLazy",
     opts = {
       mappings = {
-        add = "sa", -- Add surrounding in Normal and Visual modes
-        delete = "sd", -- Delete surrounding
-        find = "sf", -- Find surrounding (to the right)
-        find_left = "sF", -- Find surrounding (to the left)
-        highlight = "sh", -- Highlight surrounding
-        replace = "sr", -- Replace surrounding
-        update_n_lines = "sn", -- Update `n_lines`
+        add = "gsa", -- Add surrounding in Normal and Visual modes
+        delete = "gsd", -- Delete surrounding
+        find = "gsf", -- Find surrounding (to the right)
+        find_left = "gsF", -- Find surrounding (to the left)
+        highlight = "gsh", -- Highlight surrounding
+        replace = "gsr", -- Replace surrounding
+        update_n_lines = "gsn", -- Update `n_lines`
       },
     },
     keys = function(_, keys)
       -- Populate the keys based on the user's options
       local opts = Util.opts "mini.surround"
       local mappings = {
+        { "gs", "", desc = "+surround" },
         { opts.mappings.add, desc = "surround: add", mode = { "n", "v" } },
         { opts.mappings.delete, desc = "surround: delete" },
         { opts.mappings.find, desc = "surround: find right" },
@@ -516,7 +521,7 @@ return {
         { opts.mappings.update_n_lines, desc = "config: update `MiniSurround.config.n_lines`" },
         {
           "<leader><leader>s",
-          ":normal saiW`<Esc>",
+          ":normal gsaiW`<Esc>",
           desc = "surround: inner word with backticks",
           noremap = true,
         },

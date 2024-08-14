@@ -15,6 +15,7 @@
 ---@field terminal lazyvim.util.terminal
 ---@field treesitter lazyvim.util.treesitter
 ---@field glance lazyvim.util.glance
+---@field motion lazyvim.util.motion
 local M = {}
 
 setmetatable(M, {

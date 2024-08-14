@@ -42,7 +42,9 @@ return {
         popup = { border = { style = BORDER.get() } },
         confirm = { border = { style = BORDER.impl "hover" } },
         hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
+        cmdline_input = { border = { style = BORDER.get() } },
         cmdline_popup = { border = { style = BORDER.get() } },
+        mini = { border = { style = BORDER.none } },
       },
       routes = {
         {
@@ -117,13 +119,15 @@ return {
     opts_extend = { "spec" },
     opts = {
       spec = {
+        { "<BS>", desc = "Decrement Selection", mode = "x" },
+        { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
         {
           mode = { "n", "v" },
           { "<leader><tab>", group = "tabs" },
           { "<leader>c", group = "code" },
           { "<leader>f", group = "file/find" },
           { "<leader>g", group = "git" },
-          { "<leader>gh", group = "hunks" },
+          { "<leader>h", group = "hunks" },
           { "<leader>q", group = "quit/session" },
           { "<leader>s", group = "search" },
           { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },

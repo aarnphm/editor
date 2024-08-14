@@ -69,14 +69,14 @@ return {
         "nvim-telescope/telescope-live-grep-args.nvim",
         keys = {
           {
-            "<Leader>w",
+            "<LocalLeader>w",
             function() require("telescope").extensions.live_grep_args.live_grep_args() end,
             desc = "telescope: grep word",
           },
           {
-            "<LocalLeader>w",
+            "<Leader>/",
             function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor() end,
-            desc = "telescope: grep word",
+            desc = "telescope: grep word (cursor)",
           },
         },
         config = function()
@@ -141,7 +141,6 @@ return {
       },
       { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
       { "<LocalLeader>f", Util.pick "oldfiles", desc = "telescope: recent files" },
-      { "<Leader>/", Util.pick("grep_string", { word_match = "-w" }), desc = "telescope: grep string (cursor)" },
     },
     opts = function()
       local actions = require "telescope.actions"
@@ -178,7 +177,7 @@ return {
         defaults = {
           prompt_prefix = "󰄾 ",
           selection_caret = " ",
-          borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+          borderchars = BORDER.impl "simple",
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
           get_selection_window = function()
