@@ -379,10 +379,9 @@ return {
             autoselect_one = true,
             include_current = false,
             bo = {
-              filetype = { "notify" },
-              buftype = { "terminal", "quickfix", "Scratch", "aerial" },
+              filetype = { "notify", "noice" },
+              buftype = { "terminal", "quickfix", "Scratch", "aerial", "noice" },
             },
-            wo = { [1011] = {} },
           },
         },
       },
@@ -440,7 +439,14 @@ return {
 
       local map_goto_windows = function(buf_id, lhs)
         local rhs = function()
-          local id = P(require("window-picker").pick_window())
+          local id = Util.try(
+            function() return require("window-picker").pick_window() end,
+            { msg = "files: failed to pick windows" }
+          )
+          if not id then
+            Util.error("failed to pick window", { title = "LazyVim" })
+            return
+          end
           vim.api.nvim_win_call(MiniFiles.get_target_window(), function() MiniFiles.set_target_window(id) end)
           go_in_plus()
         end
