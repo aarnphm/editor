@@ -1,7 +1,7 @@
----@class simple.util.root
+---@class lazyvim.util.root
 ---@overload fun(): string
 local M = setmetatable({}, {
-  ---@param m simple.util.root
+  ---@param m lazyvim.util.root
   __call = function(m) return m.get() end,
 })
 

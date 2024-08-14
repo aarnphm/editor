@@ -1,4 +1,4 @@
----@class simple.util.mini
+---@class lazyvim.util.mini
 local M = {}
 
 ---@alias Mini.ai.loc {line:number, col:number}
@@ -121,7 +121,7 @@ function M.pairs(opts)
     set = function(state) vim.g.minipairs_disable = not state end,
   })
 
-  if opts.filetypes[vim.bo.filetype] ~= false then vim.b.minipairs_disable = true end
+  if opts.filetypes[vim.bo.filetype] == true then vim.b.minipairs_disable = true end
 
   local pairs = require "mini.pairs"
   pairs.setup(opts)

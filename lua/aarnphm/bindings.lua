@@ -5,26 +5,46 @@ end
 
 -- Easily hit escape in terminal mode.
 -- Open a terminal at the bottom of the screen with a fixed height.
-local ENV = {
-  FZF_DEFAULT_OPTS = vim.api.nvim_get_option_value("background", {}) == "light"
+local function get_fzf_args()
+  return vim.api.nvim_get_option_value("background", {}) == "light"
       and "--color=fg:#797593,bg:#faf4ed,hl:#d7827e --color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e --color=border:#dfdad9,header:#286983,gutter:#faf4ed --color=spinner:#ea9d34,info:#56949f --color=pointer:#907aa9,marker:#b4637a,prompt:#797593"
-    or "--color=fg:#908caa,bg:#191724,hl:#ebbcba --color=fg+:#e0def4,bg+:#26233a,hl+:#ebbcba --color=border:#403d52,header:#31748f,gutter:#191724 --color=spinner:#f6c177,info:#9ccfd8 --color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa",
-}
-local lazyterm = function()
-  Util.terminal(nil, {
-    cwd = Util.root(),
-    env = ENV,
-  })
+    or "--color=fg:#908caa,bg:#191724,hl:#ebbcba --color=fg+:#e0def4,bg+:#26233a,hl+:#ebbcba --color=border:#403d52,header:#31748f,gutter:#191724 --color=spinner:#f6c177,info:#9ccfd8 --color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa"
 end
-map("n", "<C-p>", lazyterm, { desc = "terminal: open (root)" })
-map("n", "<M-[>", lazyterm, { desc = "terminal: open (root)" })
+map(
+  "n",
+  "<C-p>",
+  function()
+    Util.terminal(nil, {
+      cwd = Util.root(),
+      env = { FZF_DEFAULT_OPTS = get_fzf_args() },
+    })
+  end,
+  { desc = "terminal: open (root)" }
+)
+map(
+  "n",
+  "<C-S-p>",
+  function()
+    Util.terminal(nil, {
+      cwd = Util.root(),
+      env = { FZF_DEFAULT_OPTS = get_fzf_args() },
+    })
+  end,
+  { desc = "terminal: open (root)" }
+)
+map(
+  "n",
+  "<M-[>",
+  function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
+  { desc = "terminal: open (root)" }
+)
 map(
   "n",
   "<M-]>",
   function()
     Util.terminal(
       { "npx", "quartz", "build", "--bundleInfo", "--concurrency", "4", "--serve", "--verbose" },
-      { cwd = Util.root(), env = ENV, interactive = true, esc_esc = true }
+      { cwd = Util.root(), env = { FZF_DEFAULT_OPTS = get_fzf_args() }, interactive = true, esc_esc = true }
     )
   end,
   { desc = "terminal: serve quartz" }
@@ -34,6 +54,7 @@ map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" }
 map("t", "<C-w>j", "<cmd>wincmd j<cr>", { desc = "terminal: go to lower window" })
 map("t", "<C-w>k", "<cmd>wincmd k<cr>", { desc = "terminal: go to upper window" })
 map("t", "<C-w>l", "<cmd>wincmd l<cr>", { desc = "terminal: go to right window" })
+map("t", "<C-S-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })

@@ -544,8 +544,8 @@ return {
       skip_unbalanced = true,
       -- better deal with markdown code blocks
       markdown = true,
-      -- manually enable based on filetype
-      filetypes = { python = true },
+      -- manually disable based on filetype
+      filetypes = { lua = true },
     },
     config = function(_, opts) Util.mini.pairs(opts) end,
   },
@@ -668,6 +668,7 @@ return {
     opts = {
       file = {
         [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
+        [".gitignore"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
         ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
         [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
         [".node-version"] = { glyph = "", hl = "MiniIconsGreen" },

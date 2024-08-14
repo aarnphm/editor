@@ -1,4 +1,4 @@
----@class simple.util.terminal
+---@class lazyvim.util.terminal
 ---@overload fun(cmd: string|string[], opts: LazyTermOpts): LazyFloat
 local M = setmetatable({}, {
   __call = function(m, ...) return m.open(...) end,
@@ -50,6 +50,7 @@ function M.open(cmd, opts)
   opts = vim.tbl_deep_extend("force", {
     ft = "lazyterm",
     size = { width = 0.9, height = 0.9 },
+    border = BORDER.impl "hover",
     backdrop = not cmd and 100 or nil,
   }, opts or {}, { persistent = true }) --[[@as LazyTermOpts]]
 

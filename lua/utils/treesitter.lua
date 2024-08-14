@@ -1,4 +1,4 @@
----@class simple.util.treesitter
+---@class lazyvim.util.treesitter
 local M = {}
 
 function M.goto_prev_node()
@@ -60,9 +60,9 @@ function M.setup(opts)
   end
 
   map({ "n", "v", "o", "i" }, "<A-o>", M.goto_parent_node, "treesitter: goto parent node")
-  map({ "n", "v", "o", "i" }, "<A-o>", M.goto_child_node, "treesitter: goto child node")
-  map({ "n", "v", "o", "i" }, "<A-o>", M.goto_next_node, "treesitter: goto next node")
-  map({ "n", "v", "o", "i" }, "<A-o>", M.goto_prev_node, "treesitter: goto prev node")
+  map({ "n", "v", "o", "i" }, "<A-i>", M.goto_child_node, "treesitter: goto child node")
+  map({ "n", "v", "o", "i" }, "<A-n>", M.goto_next_node, "treesitter: goto next node")
+  map({ "n", "v", "o", "i" }, "<A-p>", M.goto_prev_node, "treesitter: goto prev node")
 
   require("nvim-treesitter.configs").setup(opts)
 end

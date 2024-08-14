@@ -1,4 +1,4 @@
----@class simple.util.toggle
+---@class lazyvim.util.toggle
 local M = {}
 
 ---@class simple.Toggle
@@ -11,14 +11,15 @@ local M = {}
 
 -- setup toggle keymaps
 M.setup = function()
-  M.map("<leader>ub", M("background", { values = { "dark", "light" }, name = "background" }))
   M.map("<leader>us", M("spell", { name = "spelling" }))
   M.map("<leader>uw", M("wrap", { name = "wrap" }))
   M.map("<leader>uc", M("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
   M.map("<leader>uf", M.format())
   M.map("<leader>uF", M.format(true))
+  M.map("<leader>ub", M.background)
   M.map("<leader>um", M.maximize)
   M.map("<leader>ud", M.diagnostics)
+  M.map("<leader>un", M.number)
   M.map("<leader>ua", M.agent)
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
@@ -30,9 +31,9 @@ function M.wrap(toggle)
       toggle.set(not toggle.get())
       local state = toggle.get()
       if state then
-        Util.info("enabled: " .. toggle.name, { title = "toggle" })
+        Util.info("enabled: " .. toggle.name, { title = "LazyVim" })
       else
-        Util.info("disabled: " .. toggle.name, { title = "toggle" })
+        Util.warn("disabled: " .. toggle.name, { title = "LazyVim" })
       end
       return state
     end,
@@ -143,6 +144,15 @@ M.inlay_hints = M.wrap {
   name = "inlay hints",
   get = function() return vim.lsp.inlay_hint.is_enabled { bufnr = 0 } end,
   set = function(state) vim.lsp.inlay_hint.enable(state, { bufnr = 0 }) end,
+}
+
+M.background = M.wrap {
+  name = "background",
+  get = function() return vim.go.background == "light" or vim.opt_local["background"]:get() == "light" end,
+  set = function(state)
+    vim.go.background = state and "light" or "dark"
+    vim.opt_local.background = state and "light" or "dark"
+  end,
 }
 
 ---@type {k:string, v:any}[]

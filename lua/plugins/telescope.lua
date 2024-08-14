@@ -8,7 +8,7 @@ if
     -- cwd will default to lazyvim.util.get_root
     -- for `files`, git_files or find_files will be chosen depending on .git
     ---@param builtin string
-    ---@param opts? simple.util.pick.Opts
+    ---@param opts? lazyvim.util.pick.Opts
     open = function(builtin, opts)
       opts = opts or {}
       opts.follow = opts.follow ~= false
@@ -132,7 +132,6 @@ return {
       {
         "<LocalLeader>b",
         Util.pick("buffers", {
-          initial_mode = "normal",
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,
           previewer = false,

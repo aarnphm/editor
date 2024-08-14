@@ -1,19 +1,19 @@
 ---@diagnostic disable: undefined-field
 --# selene: allow(global_usage)
 
----@class simple.util: LazyUtilCore
----@field inject simple.util.inject
----@field ui simple.util.ui
----@field format simple.util.format
----@field lsp simple.util.lsp
----@field root simple.util.root
----@field plugin simple.util.plugin
----@field toggle simple.util.toggle
----@field cmp simple.util.cmp
----@field mini simple.util.mini
----@field pick simple.util.pick
----@field terminal simple.util.terminal
----@field treesitter simple.util.treesitter
+---@class lazyvim.util: LazyUtilCore
+---@field inject lazyvim.util.inject
+---@field ui lazyvim.util.ui
+---@field format lazyvim.util.format
+---@field lsp lazyvim.util.lsp
+---@field root lazyvim.util.root
+---@field plugin lazyvim.util.plugin
+---@field toggle lazyvim.util.toggle
+---@field cmp lazyvim.util.cmp
+---@field mini lazyvim.util.mini
+---@field pick lazyvim.util.pick
+---@field terminal lazyvim.util.terminal
+---@field treesitter lazyvim.util.treesitter
 local M = {}
 
 setmetatable(M, {
@@ -115,6 +115,17 @@ end
 -- Wrapper around vim.keymap.set that will
 -- not create a keymap if a lazy key handler exists.
 -- It will also set `silent` to true by default.
+--
+---@param mode string|string[] Mode short-name, see |nvim_set_keymap()|.
+---                            Can also be list of modes to create mapping on multiple modes.
+---@param lhs string           Left-hand side |{lhs}| of the mapping.
+---@param rhs string|function  Right-hand side |{rhs}| of the mapping, can be a Lua function.
+---
+---@param opts? vim.keymap.set.Opts
+---@see |nvim_set_keymap()|
+---@see |maparg()|
+---@see |mapcheck()|
+---@see |mapset()|
 function M.safe_keymap_set(mode, lhs, rhs, opts)
   local keys = require("lazy.core.handler").handlers.keys
   ---@cast keys LazyKeysHandler
@@ -135,12 +146,26 @@ function M.safe_keymap_set(mode, lhs, rhs, opts)
   end
 end
 
----@param fn fun()
+---@param fn fun(ev?: any): any
 M.on_very_lazy = function(fn)
   vim.api.nvim_create_autocmd("User", {
     pattern = "VeryLazy",
-    callback = function() fn() end,
+    callback = function(ev) fn(ev) end,
   })
+end
+
+M.is_bigfile = function(bufnr)
+  local ret = false
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  local fsize = vim.fn.getfsize(bufname)
+  if fsize > vim.g.bigfile_size then
+    -- skip file size greater than 100k
+    ret = true
+  elseif bufname:match "^fugitive://" then
+    -- skip fugitive buffer
+    ret = true
+  end
+  return ret
 end
 
 -- delay notifications till vim.notify was replaced or after 500ms

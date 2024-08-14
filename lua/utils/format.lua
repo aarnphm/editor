@@ -1,4 +1,4 @@
----@class simple.util.format
+---@class lazyvim.util.format
 ---@overload fun(opts?: {force?:boolean})
 local M = setmetatable({}, {
   __call = function(m, ...) return m.format(...) end,

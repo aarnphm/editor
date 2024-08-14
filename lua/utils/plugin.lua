@@ -1,4 +1,4 @@
----@class simple.util.plugin
+---@class lazyvim.util.plugin
 local M = {}
 
 M.lazy_file_events = { "BufReadPost", "BufNewFile", "BufWritePre" }

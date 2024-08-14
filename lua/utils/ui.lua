@@ -1,4 +1,4 @@
----@class simple.util.ui
+---@class lazyvim.util.ui
 local M = {}
 
 ---@alias Sign {name:string, text:string, texthl:string, priority:number}

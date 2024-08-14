@@ -1,10 +1,10 @@
----@class simple.util.pick
----@overload fun(command:string, opts?:simple.util.pick.Opts): fun()
+---@class lazyvim.util.pick
+---@overload fun(command:string, opts?:lazyvim.util.pick.Opts): fun()
 local M = setmetatable({}, {
   __call = function(m, ...) return m.wrap(...) end,
 })
 
----@class simple.util.pick.Opts: table<string, any>
+---@class lazyvim.util.pick.Opts: table<string, any>
 ---@field root? boolean
 ---@field cwd? string
 ---@field buf? number
@@ -12,7 +12,7 @@ local M = setmetatable({}, {
 
 ---@class LazyPicker
 ---@field name string
----@field open fun(command:string, opts?:simple.util.pick.Opts)
+---@field open fun(command:string, opts?:lazyvim.util.pick.Opts)
 ---@field commands table<string, string>
 
 ---@type LazyPicker?
@@ -41,7 +41,7 @@ function M.want()
 end
 
 ---@param command? string
----@param opts? simple.util.pick.Opts
+---@param opts? lazyvim.util.pick.Opts
 function M.open(command, opts)
   if not M.picker then return Util.error "pick: picker not set" end
 
@@ -62,7 +62,7 @@ function M.open(command, opts)
 end
 
 ---@param command? string
----@param opts? simple.util.pick.Opts
+---@param opts? lazyvim.util.pick.Opts
 function M.wrap(command, opts)
   opts = opts or {}
   return function() Util.pick.open(command, vim.deepcopy(opts)) end

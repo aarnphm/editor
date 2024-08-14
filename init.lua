@@ -9,8 +9,8 @@ local autocmd = vim.api.nvim_create_autocmd
 -- NOTE: local items
 local M = {
   disable = {
-    filetypes = { "ministarter", "dashboard", "qf", "help", "grug-far", "TelescopePrompt" },
-    buftypes = { "quickfix", "prompt", "scratch", "ministarter" },
+    filetypes = { "ministarter", "dashboard", "help", "grug-far", "TelescopePrompt" },
+    buftypes = { "prompt", "scratch", "ministarter" },
   },
 }
 
@@ -35,7 +35,6 @@ autocmd("FileType", {
     "notify",
     "qf",
     "query",
-    "man",
     "gitsigns.blame",
     "nowrite", -- fugitive
     "fugitive",
@@ -53,7 +52,6 @@ autocmd("FileType", {
     "",
   },
   callback = function(event)
-    vim.o.laststatus = 0
     vim.bo[event.buf].buflisted = false
     vim.b[event.buf].ministatusline_disable = true
     vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
@@ -219,12 +217,19 @@ autocmd("FileType", {
   end,
 })
 
+-- add http filetype
+vim.filetype.add {
+  extension = {
+    ["http"] = "http",
+  },
+}
+
 local function get_hour() return tonumber(os.date "%H") end
 
 -- Set the background based on the hour
 local function set_background()
   local hour = get_hour()
-  if hour >= 6 and hour < 21 then
+  if hour >= 6 and hour < 19 then
     vim.go.background = "light"
   else
     vim.go.background = "dark"

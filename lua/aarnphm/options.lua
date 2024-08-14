@@ -15,9 +15,11 @@ wo.wrap = false
 wo.cursorline = true
 wo.cursorcolumn = false
 
-if not vim.env.SSH_TTY then
-  opt.clipboard = "unnamedplus" -- sync system clipboard
-end
+-- only set clipboard if not in ssh, to make sure the OSC 52
+-- integration works automatically. Requires Neovim >= 0.10.0
+opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
+opt.completeopt = "menu,menuone,noselect"
+opt.confirm = true
 
 -- Some defaults and don't question it
 o.writebackup = false -- whos needs backup btw (i do sometimes)
@@ -44,13 +46,14 @@ o.pumblend = 0 -- make completion window transparent
 opt.shortmess:append { W = true, c = true, C = true }
 o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 o.completeopt = "menu,menuone,noselect"
-o.formatoptions = "1jcroql" -- NOTE: "1jcroql"
+o.formatoptions = "1jcroqlnt" -- NOTE: "tcqj"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
 
 -- searching and grep stuff
 o.smartcase = true
+o.smartindent = true
 o.ignorecase = true
 o.infercase = true
 o.hlsearch = true
@@ -98,7 +101,7 @@ o.showmode = false -- This is set with mini.statusline
 o.cmdheight = 0
 o.showcmd = false
 o.showbreak = "↳  "
-o.sidescrolloff = 5
+o.sidescrolloff = 8
 o.splitbelow = true
 o.splitright = true
 o.timeout = true

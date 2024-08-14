@@ -1,4 +1,4 @@
----@class simple.util.cmp
+---@class lazyvim.util.cmp
 local M = {}
 
 ---@alias Placeholder {n:number, text:string}

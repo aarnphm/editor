@@ -43,7 +43,6 @@ return {
         confirm = { border = { style = BORDER.impl "hover" } },
         hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
         cmdline_popup = { border = { style = BORDER.get() } },
-        mini = { timeout = 3000 },
       },
       routes = {
         {
