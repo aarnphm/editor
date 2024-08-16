@@ -41,3 +41,4 @@ luac.out
 *.hex
 zettelkasten/*
 !zettelkasten/templates
+.avante_chat_history
