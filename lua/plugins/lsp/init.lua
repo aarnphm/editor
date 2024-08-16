@@ -42,42 +42,6 @@ return {
     end,
   },
   {
-    "dnlhc/glance.nvim",
-    cmd = "Glance",
-    opts = {
-      border = { enable = true },
-      height = 20,
-      zindex = 50,
-      theme = { enable = true },
-      hooks = {
-        before_open = function(results, open, jump, method)
-          local uri = vim.uri_from_bufnr(0)
-          if #results == 0 then
-            Util.warn(
-              "This method is not supported by any of the servers registered for the current buffer",
-              { title = "Glance" }
-            )
-          elseif #results == 1 then
-            if method == "references" then
-              Util.info("The identifier under cursor is the only one found", { title = "LazyVim" })
-            end
-
-            local target_uri = results[1].uri or results[1].targetUri
-
-            if target_uri == uri then
-              jump(results[1])
-            else
-              open(results)
-            end
-          else
-            open(results)
-          end
-        end,
-      },
-    },
-    main = "utils.glance",
-  },
-  {
     "neovim/nvim-lspconfig",
     event = "LazyFile",
     dependencies = {
@@ -144,14 +108,9 @@ return {
           },
         },
       },
-      -- the following list a table of preferred lsp for given filetype
-      preferences = {
-        lua = "lua_ls",
-      },
       -- all of the server below will be installed by default
       servers = {
         bashls = {},
-        marksman = {},
         markdown_oxide = {
           capabilities = {
             workspace = {

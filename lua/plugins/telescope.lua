@@ -113,7 +113,7 @@ return {
     },
     keys = {
       {
-        "<C-\\>",
+        "<leader>sk",
         Util.pick("keymaps", {
           initial_mode = "normal",
           lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
@@ -130,7 +130,7 @@ return {
         silent = true,
       },
       {
-        "<LocalLeader>b",
+        "<leader>sb",
         Util.pick("buffers", {
           layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
           show_all_buffers = true,
@@ -139,8 +139,8 @@ return {
         }),
         desc = "telescope: Manage buffers",
       },
-      { "<leader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
-      { "<LocalLeader>f", Util.pick "oldfiles", desc = "telescope: recent files" },
+      { "<LocalLeader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
+      { "<leader>sf", Util.pick "oldfiles", desc = "telescope: recent files" },
     },
     opts = function()
       local actions = require "telescope.actions"

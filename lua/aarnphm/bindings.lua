@@ -23,17 +23,6 @@ map(
 )
 map(
   "n",
-  "<C-S-p>",
-  function()
-    Util.terminal(nil, {
-      cwd = Util.root(),
-      env = { FZF_DEFAULT_OPTS = get_fzf_args() },
-    })
-  end,
-  { desc = "terminal: open (root)" }
-)
-map(
-  "n",
   "<M-[>",
   function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
   { desc = "terminal: open (root)" }
@@ -54,10 +43,9 @@ map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" }
 map("t", "<C-w>j", "<cmd>wincmd j<cr>", { desc = "terminal: go to lower window" })
 map("t", "<C-w>k", "<cmd>wincmd k<cr>", { desc = "terminal: go to upper window" })
 map("t", "<C-w>l", "<cmd>wincmd l<cr>", { desc = "terminal: go to right window" })
-map("t", "<C-S-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
-map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
-map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<C-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<C-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("i", "jj", "<Esc>", { desc = "normal: escape" })
 map("i", "jk", "<Esc>", { desc = "normal: escape" })
 

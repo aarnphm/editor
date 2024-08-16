@@ -172,7 +172,16 @@ return {
           end, { "i", "s" }),
         },
         sources = cmp.config.sources {
-          { name = "nvim_lsp", priority = 400, max_item_count = 50 },
+          {
+            name = "nvim_lsp",
+            priority = 400,
+            max_item_count = 50,
+            option = {
+              markdown_oxide = {
+                keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
+              },
+            },
+          },
           { name = "snippets", priority = 300, group_index = 1 },
           { name = "supermaven", priority = 200, group_index = 2 },
           { name = "path", priority = 100 },

@@ -304,27 +304,21 @@ function M.words.jump(count, cycle)
   if target then vim.api.nvim_win_set_cursor(0, target.from) end
 end
 
-M.buffer = setmetatable({}, {
+M.buf = setmetatable({}, {
   __index = function(_, action)
     return function()
+      -- add some fallbacks between lsp and vim.lsp.buf
       local _methods = {
         type_definitions = "type_definition",
         implementations = "implementation",
         references = "references",
       }
-      local ok, glance = pcall(require, "glance")
-
-      if not ok and vim.g.use_glance then Util.error "Glance not found" end
-      if vim.g.use_glance then
-        glance.open(action)
-      else
-        vim.lsp.buf[_methods[action]]()
-      end
+      vim.lsp.buf[_methods[action] or action]()
     end
   end,
 })
 
-M.buffer.definitions = function()
+M.buf.definitions = function()
   local params = vim.lsp.util.make_position_params()
 
   vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, ctx, config)
@@ -336,11 +330,7 @@ M.buffer.definitions = function()
     if vim.islist(result) then
       vim.lsp.util.jump_to_location(result[1], "utf-8")
     else
-      if vim.g.use_glance then
-        require("glance").open "definitions"
-      else
-        vim.lsp.handlers["textDocument/definition"](err, result, ctx, config)
-      end
+      vim.lsp.handlers["textDocument/definition"](err, result, ctx, config)
     end
   end)
 end

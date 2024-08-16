@@ -126,15 +126,15 @@ g.markdown_recommended_style = 0
 -- options
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
-g.use_glance = true
-g.use_agent = true
 g.inline_diagnostics = true
 g.picker = "telescope"
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
-g.laststatus = 3 -- 2: show statusline on buffer, 3: always show statusline on global
+g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.cmp = { widths = { abbr = 40, menu = 40 } }
 g.border = "single"
+g.use_agent = true
+g.override_background = "dark"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

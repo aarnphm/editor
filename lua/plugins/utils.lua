@@ -16,4 +16,25 @@ return {
     event = "LazyFile",
     opts = { enable_line_number = true },
   },
+  {
+    "yetone/avante.nvim",
+    dev = true,
+    version = false,
+    event = "VeryLazy",
+    cmd = "AvanteAsk",
+    build = "make",
+    dependencies = {
+      {
+        "grapp-dev/nui-components.nvim",
+        dependencies = {
+          "MunifTanjim/nui.nvim",
+        },
+      },
+    },
+    opts = {
+      mappings = { show_sidebar = "<leader>ua" },
+      -- provider = "openai",
+      provider = "claude",
+    },
+  },
 }

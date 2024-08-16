@@ -23,7 +23,7 @@ return {
   {
     "MeanderingProgrammer/markdown.nvim",
     opts = {
-      file_types = { "markdown", "norg", "rmd", "org", "vimwiki" },
+      file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       heading = { sign = false },
       code = {
         sign = false,
@@ -35,7 +35,7 @@ return {
         conceallevel = { rendered = 2 },
       },
     },
-    ft = { "markdown", "norg", "rmd", "org", "vimwiki" },
+    ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
     cmd = { "RenderMarkdown" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
@@ -91,22 +91,7 @@ return {
       open_app_foreground = true,
       log_level = vim.log.levels.INFO,
       open_notes_in = "vsplit",
-      completion = { min_chars = 4 },
-      picker = { name = "telescope.nvim" },
       follow_url_func = function(url) vim.ui.open(url) end,
-      wiki_link_func = function(opts)
-        local path = opts.path
-        if opts.label ~= path then
-          -- check if opts.path is a markdown file, if so, remove the extension
-          -- this is to make sure that the link is not broken when the file is renamed
-          if opts.path:match "%.md$" then path = path:sub(1, -4) end
-          -- if opts.path start with [, then remove it so that once we format the wikilink it is correct
-          if opts.path:match "^%[" then path = path:sub(2) end
-          return string.format("[[%s|%s]]", path, opts.label)
-        else
-          return string.format("[[%s]]", path)
-        end
-      end,
       new_notes_location = "notes_subdir",
       yaml_parser = "yq",
       preferred_link_style = "wiki",
@@ -128,7 +113,6 @@ return {
         return out
       end,
       note_id_func = function(title) return title end,
-      markdown_link_func = function(opts) return require("obsidian.util").markdown_link(opts) end,
     },
     config = function(_, opts) require("obsidian").setup(opts) end,
   },

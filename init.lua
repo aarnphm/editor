@@ -224,7 +224,6 @@ autocmd("FileType", {
   pattern = "bigfile",
   callback = function(ev)
     vim.b.minianimate_disable = true
-    P(available)
     vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
   end,
 })
@@ -246,6 +245,7 @@ local function set_background()
   else
     vim.go.background = "dark"
   end
+  if vim.g.override_background ~= nil then vim.go.background = vim.g.override_background end
 end
 
 autocmd("VimEnter", { callback = set_background })
@@ -278,6 +278,9 @@ require("lazy").setup {
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
   ui = { border = BORDER.get(), backdrop = 100, wrap = false },
+  dev = {
+    path = "~/workspace/neovim-plugins/",
+  },
   performance = {
     rtp = {
       disabled_plugins = {

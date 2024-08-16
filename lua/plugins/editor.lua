@@ -60,7 +60,7 @@ return {
       hi("LeapBackdrop", { link = "Comment" }) -- or some grey
       hi("LeapMatch", {
         -- For light themes, set to 'black' or similar.
-        fg = vim.go.backgorund == "dark" and "white" or "black",
+        fg = vim.go.background == "dark" and "white" or "black",
         bold = true,
         nocombine = true,
       })
@@ -147,7 +147,7 @@ return {
     lazy = true,
     init = function()
       -- install conform formatter on VeryLazy
-      Util.on_very_lazy(function(ev)
+      Util.on_very_lazy(function()
         Util.format.register {
           name = "conform.nvim",
           priority = 100,
@@ -231,6 +231,9 @@ return {
       local defaults = require("outline.config").defaults
       local opts = {
         symbols = { icons = {} },
+        outline_window = {
+          width = 15,
+        },
         keymaps = {
           up_and_jump = "<up>",
           down_and_jump = "<down>",
