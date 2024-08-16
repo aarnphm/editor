@@ -1,6 +1,3 @@
----@diagnostic disable: undefined-field
---# selene: allow(global_usage)
-
 ---@class lazyvim.util: LazyUtilCore
 ---@field inject lazyvim.util.inject
 ---@field ui lazyvim.util.ui
@@ -14,7 +11,6 @@
 ---@field pick lazyvim.util.pick
 ---@field terminal lazyvim.util.terminal
 ---@field treesitter lazyvim.util.treesitter
----@field glance lazyvim.util.glance
 ---@field motion lazyvim.util.motion
 local M = {}
 
@@ -89,6 +85,7 @@ M.merge = function(...)
 end
 
 ---@param name string
+---@return table<string, any>
 M.opts = function(name)
   local plugin = require("lazy.core.config").plugins[name]
   if not plugin then return {} end
@@ -124,10 +121,6 @@ end
 ---@param rhs string|function  Right-hand side |{rhs}| of the mapping, can be a Lua function.
 ---
 ---@param opts? vim.keymap.set.Opts
----@see |nvim_set_keymap()|
----@see |maparg()|
----@see |mapcheck()|
----@see |mapset()|
 function M.safe_keymap_set(mode, lhs, rhs, opts)
   local keys = require("lazy.core.handler").handlers.keys
   ---@cast keys LazyKeysHandler
@@ -148,7 +141,6 @@ function M.safe_keymap_set(mode, lhs, rhs, opts)
   end
 end
 
----@param fn fun(ev?: any): any
 M.on_very_lazy = function(fn)
   vim.api.nvim_create_autocmd("User", {
     pattern = "VeryLazy",
@@ -244,61 +236,6 @@ function M.get_pkg_path(pkg, path, opts)
   return ret
 end
 
--- this will return a function that calls telescope.
--- cwd will default to lazyvim.util.get_root
--- for `files`, git_files or find_files will be chosen depending on .git
-M.telescope = function(builtin, opts)
-  local params = { builtin = builtin, opts = opts }
-  return function()
-    builtin = params.builtin
-    opts = params.opts
-    opts = vim.tbl_deep_extend("force", { cwd = M.root() }, opts or {})
-    if builtin == "files" then
-      if vim.uv.fs_stat((opts.cwd or vim.uv.cwd()) .. "/.git") then
-        opts.show_untracked = true
-        builtin = "git_files"
-      else
-        builtin = "find_files"
-      end
-    end
-    if opts.cwd and opts.cwd ~= vim.uv.cwd() then
-      opts.attach_mappings = function(_, map)
-        map("i", "<a-c>", function()
-          local action_state = require "telescope.actions.state"
-          local line = action_state.get_current_line()
-          M.telescope(
-            params.builtin,
-            vim.tbl_deep_extend("force", {}, params.opts or {}, { cwd = false, default_text = line })
-          )()
-        end)
-        return true
-      end
-    end
-
-    require("telescope.builtin")[builtin](opts)
-  end
-end
-
----@param opts? string|{msg:string, on_error:fun(msg)}
-M.try = function(fn, opts)
-  opts = type(opts) == "string" and { msg = opts } or opts or {}
-  local msg = opts.msg
-  -- error handler
-  local error_handler = function(err)
-    msg = (msg and (msg .. "\n\n") or "") .. err .. M.pretty_trace()
-    if opts.on_error then
-      opts.on_error(msg)
-    else
-      vim.schedule(function() M.error(msg) end)
-    end
-    return err
-  end
-
-  ---@type boolean, any
-  local ok, result = xpcall(fn, error_handler)
-  return ok and result or nil
-end
-
 --- regex used for matching a valid URL/URI string
 M.url_matcher =
   "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
@@ -324,6 +261,7 @@ end
 
 --- XXX: Vendorred from lazy.nvim for now
 
+---@param path string
 ---@return string
 function M.norm(path)
   if path:sub(1, 1) == "~" then
@@ -342,6 +280,7 @@ function M.notify(msg, opts)
 
   opts = opts or {}
   if type(msg) == "table" then
+    ---@diagnostic disable-next-line: no-unknown
     msg = table.concat(vim.tbl_filter(function(line) return line or false end, msg), "\n")
   end
   if opts.stacktrace then msg = msg .. M.pretty_trace { level = opts.stacklevel or 2 } end

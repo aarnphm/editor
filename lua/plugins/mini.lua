@@ -1,3 +1,9 @@
+---@class MiniFilesBufferCreateData
+---@field buf_id integer
+---
+---@class MiniFilesBufferCreate: vim.api.create_autocmd.callback.args
+---@field data MiniFilesBufferCreateData
+
 -- mini.hipattern tailwind support
 local M = {}
 
@@ -317,12 +323,13 @@ M.colors = {
 return {
   {
     "echasnovski/mini.align",
-    event = "VeryLazy",
+    event = "LazyFile",
     opts = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
   },
+  { "echasnovski/mini.doc", opts = {}, ft = "lua", event = "LazyFile" },
   {
     "echasnovski/mini.trailspace",
-    event = { "BufRead", "BufNewFile" },
+    event = "LazyFile",
     opts = {},
     config = function(_, opts)
       local show = true
@@ -330,7 +337,7 @@ return {
         name = "trailspace",
         get = function() return show end,
         set = function(state)
-          show = not show
+          show = not state
           require("mini.trailspace").highlight()
         end,
       })
@@ -341,6 +348,7 @@ return {
     "echasnovski/mini.ai",
     event = "VeryLazy",
     opts = function()
+      ---@module "mini.ai"
       local ai = require "mini.ai"
       return {
         n_lines = 500,
@@ -416,7 +424,7 @@ return {
       require("mini.files").setup(opts)
 
       local show_dotfiles = true
-      local filter_show = function(fs_entry) return true end
+      local filter_show = function(_) return true end
       local filter_hide = function(fs_entry) return not vim.startswith(fs_entry.name, ".") end
 
       local toggle_dotfiles = function()
@@ -433,11 +441,11 @@ return {
 
       local go_in_plus = function()
         for _ = 1, vim.v.count1 - 1 do
-          MiniFiles.go_in()
+          MiniFiles.go_in { close_on_file = false }
         end
         local fs_entry = MiniFiles.get_fs_entry()
         local is_at_file = fs_entry ~= nil and fs_entry.fs_type == "file"
-        MiniFiles.go_in()
+        MiniFiles.go_in { close_on_file = false }
         if is_at_file then MiniFiles.close() end
       end
 
@@ -451,7 +459,8 @@ return {
             Util.error("failed to pick window", { title = "LazyVim" })
             return
           end
-          vim.api.nvim_win_call(MiniFiles.get_target_window(), function() MiniFiles.set_target_window(id) end)
+          local target_win = MiniFiles.get_target_window()
+          if target_win then vim.api.nvim_win_call(target_win, function() MiniFiles.set_target_window(id) end) end
           go_in_plus()
         end
         vim.keymap.set("n", lhs, rhs, { buffer = buf_id, desc = "files: Pick a given window" })
@@ -460,11 +469,15 @@ return {
       local map_split = function(buf_id, lhs, direction)
         local rhs = function()
           -- Make new window and set it as target
+          ---@type integer
           local new_target_window
-          vim.api.nvim_win_call(MiniFiles.get_target_window(), function()
-            vim.cmd(direction .. " split")
-            new_target_window = vim.api.nvim_get_current_win()
-          end)
+          local target_win = MiniFiles.get_target_window()
+          if target_win then
+            vim.api.nvim_win_call(target_win, function()
+              vim.cmd(direction .. " split")
+              new_target_window = vim.api.nvim_get_current_win()
+            end)
+          end
 
           MiniFiles.set_target_window(new_target_window)
           go_in_plus()
@@ -476,6 +489,7 @@ return {
 
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesBufferCreate",
+        ---@param args MiniFilesBufferCreate
         callback = function(args)
           local buf_id = args.data.buf_id
           -- Tweak left-hand side of mapping to your liking
@@ -496,6 +510,7 @@ return {
   {
     "echasnovski/mini.surround",
     event = "VeryLazy",
+    ---@class MiniSurroundOpts
     opts = {
       mappings = {
         add = "gsa", -- Add surrounding in Normal and Visual modes
@@ -509,6 +524,7 @@ return {
     },
     keys = function(_, keys)
       -- Populate the keys based on the user's options
+      ---@class MiniSurroundOpts
       local opts = Util.opts "mini.surround"
       local mappings = {
         { "gs", "", desc = "+surround" },
@@ -526,7 +542,7 @@ return {
           noremap = true,
         },
       }
-      mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings)
+      mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings) ---@param m LazyKeysSpec
       return vim.list_extend(mappings, keys)
     end,
   },
@@ -582,7 +598,7 @@ return {
       -- better deal with markdown code blocks
       markdown = true,
       -- manually disable based on filetype
-      filetypes = { lua = true },
+      filetypes = { "lua", "python" },
     },
     config = function(_, opts) Util.mini.pairs(opts) end,
   },
@@ -638,6 +654,10 @@ return {
         [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
       }, "\n")
       local pad = string.rep(" ", 15)
+
+      ---@param name string shortcuts to show on starter
+      ---@param action string | fun(...): any any callable or commands
+      ---@param section string given name under which section
       local new_section = function(name, action, section)
         return { name = name, action = action, section = pad .. section }
       end
@@ -703,21 +723,23 @@ return {
   {
     "echasnovski/mini.icons",
     opts = {
+      -- stylua: ignore
       file = {
-        [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
-        [".gitignore"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
-        ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
-        [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
-        [".node-version"] = { glyph = "", hl = "MiniIconsGreen" },
-        [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
-        [".yarnrc.yml"] = { glyph = "", hl = "MiniIconsBlue" },
-        ["eslint.config.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
-        ["package.json"] = { glyph = "", hl = "MiniIconsGreen" },
-        ["tsconfig.json"] = { glyph = "", hl = "MiniIconsAzure" },
+        [".keep"]               = { glyph = "󰊢", hl = "MiniIconsGrey" },
+        [".gitignore"]          = { glyph = "󰊢", hl = "MiniIconsGrey" },
+        ["devcontainer.json"]   = { glyph = "", hl = "MiniIconsAzure" },
+        [".eslintrc.js"]        = { glyph = "󰱺", hl = "MiniIconsYellow" },
+        [".node-version"]       = { glyph = "", hl = "MiniIconsGreen" },
+        [".prettierrc"]         = { glyph = "", hl = "MiniIconsPurple" },
+        [".yarnrc.yml"]         = { glyph = "", hl = "MiniIconsBlue" },
+        ["eslint.config.js"]    = { glyph = "󰱺", hl = "MiniIconsYellow" },
+        ["package.json"]        = { glyph = "", hl = "MiniIconsGreen" },
+        ["tsconfig.json"]       = { glyph = "", hl = "MiniIconsAzure" },
         ["tsconfig.build.json"] = { glyph = "", hl = "MiniIconsAzure" },
-        ["yarn.lock"] = { glyph = "", hl = "MiniIconsBlue" },
-        [".go-version"] = { glyph = "", hl = "MiniIconsBlue" },
-        [".rgignore"] = { glyph = "", hl = "MiniIconsYellow" },
+        ["yarn.lock"]           = { glyph = "", hl = "MiniIconsBlue" },
+        [".go-version"]         = { glyph = "", hl = "MiniIconsBlue" },
+        [".rgignore"]           = { glyph = "", hl = "MiniIconsYellow" },
+        ["*.py"]                = { glyph = "󰌠", hl = "MiniIconsYellow" },
       },
       filetype = {
         dotenv = { glyph = "", hl = "MiniIconsYellow" },
@@ -728,6 +750,10 @@ return {
         namespace = { glyph = "󰅪", hl = "MiniIconsRed" },
         null = { glyph = "NULL", hl = "MiniIconGrey" },
         snippet = { glyph = "", hl = "MiniIconsYellow" },
+        struct = { glyph = "", hl = "MiniIconsRed" },
+        event = { glyph = "", hl = "MiniIconsYellow" },
+        operator = { glyph = "", hl = "MiniIconsGrey" },
+        typeparameter = { glyph = "", hl = "MiniIconsBlue" },
       },
     },
     specs = {
@@ -803,7 +829,7 @@ return {
             local match = m.full_match
             ---@type string, number
             local color, shade = match:match "[%w-]+%-([a-z%-]+)%-(%d+)"
-            shade = tonumber(shade)
+            shade = tonumber(shade) or 0
             local bg = vim.tbl_get(M.colors, color, shade)
             if bg then
               local hl = "MiniHipatternsTailwind" .. color .. shade
@@ -828,7 +854,7 @@ return {
     opts = {
       content = {
         active = function()
-          local mode, mode_hl = statusline.mode { trunc_width = 75 }
+          local m = statusline.mode { trunc_width = 75 }
           local git = statusline.git { trunc_width = 40 }
           local diff = statusline.diff { trunc_width = 75 }
           local diagnostics = statusline.diagnostic { trunc_width = 75 }
@@ -841,11 +867,11 @@ return {
           -- correct padding with spaces between groups (accounts for 'missing'
           -- sections, etc.)
           return MiniStatusline.combine_groups {
-            { hl = mode_hl, strings = { mode } },
+            { hl = m.hl, strings = { m.md } },
             { hl = "MiniStatuslineDevinfo", strings = { git, diff, lsp, lint } },
             "%=", -- End left alignment
             { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
-            { hl = mode_hl, strings = { location } },
+            { hl = m.hl, strings = { location } },
           }
         end,
       },

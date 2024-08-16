@@ -11,6 +11,7 @@ if
     ---@param opts? lazyvim.util.pick.Opts
     open = function(builtin, opts)
       opts = opts or {}
+      ---@diagnostic disable-next-line: inject-field
       opts.follow = opts.follow ~= false
       if opts.cwd and opts.cwd ~= vim.uv.cwd() then
         ---@diagnostic disable-next-line: inject-field
@@ -80,7 +81,7 @@ return {
           },
         },
         config = function()
-          Util.on_load("telescope.nvim", function(name)
+          Util.on_load("telescope.nvim", function()
             local ok, err = pcall(require("telescope").load_extension, "live_grep_args")
             if not ok then Util.error("Failed to load `telescope-live-grep-args.nvim`:\n" .. err) end
           end)
@@ -148,14 +149,11 @@ return {
 
       local open_with_trouble = function(...) return require("trouble.sources.telescope").open(...) end
       local find_files_no_ignore = function()
-        local action_state = require "telescope.actions.state"
-        local line = action_state.get_current_line()
+        local line = require("telescope.actions.state").get_current_line()
         Util.pick("find_files", { no_ignore = true, default_text = line })()
       end
       local find_files_with_hidden = function()
-        local action_state = require "telescope.actions.state"
-        local action_set = require "telescope.actions.set"
-        local line = action_state.get_current_line()
+        local line = require("telescope.actions.state").get_current_line()
         Util.pick("find_files", { hidden = true, default_text = line })()
       end
 

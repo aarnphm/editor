@@ -107,6 +107,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     event = "VeryLazy",
+    enabled = true,
     config = function()
       -- If treesitter is already loaded, we need to run config again for textobjects
       if Util.is_loaded "nvim-treesitter" then
@@ -140,6 +141,5 @@ return {
     "windwp/nvim-ts-autotag",
     event = "LazyFile",
     opts = { opts = { enable_close = true } },
-    config = function(_, opts) require("nvim-ts-autotag").setup(opts) end,
   },
 }

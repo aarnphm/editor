@@ -1,6 +1,9 @@
---# selene: allow(global_usage)
 _G.Util = require "utils"
 
+---@generic T
+---Pretty print a value for better inspect. Under the hood it uses vim.inspect
+---@param v T any type
+---@return T
 _G.P = function(v)
   print(vim.inspect(v))
   return v
@@ -11,70 +14,76 @@ _G.TABWIDTH = 2
 ---@alias Mode "simple" | "lsp" | "docs" | "hover" | "git"
 
 ---@class SingleBorder
----@field none string[]
----@field single string[][]
+---@field none FloatBorderEdges
+---@field single FloatBorderEdgesWithHl
 
----@type SingleBorder
+---@class SingleBorder
 local M = {
   none = { "", "", "", "", "", "", "", "" },
   single = {
     simple = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
     lsp = {
       { "󱐋", "WarningMsg" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
+      { "─", "NormalFloat" },
+      { "┐", "NormalFloat" },
+      { "│", "NormalFloat" },
+      { "┘", "NormalFloat" },
+      { "─", "NormalFloat" },
+      { "└", "NormalFloat" },
+      { "│", "NormalFloat" },
     },
     docs = {
       { "󰄾", "DiagnosticHint" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
+      { "─", "NormalFloat" },
+      { "┐", "NormalFloat" },
+      { "│", "NormalFloat" },
+      { "┘", "NormalFloat" },
+      { "─", "NormalFloat" },
+      { "└", "NormalFloat" },
+      { "│", "NormalFloat" },
     },
     hover = {
       { "󰀵", "MiniIconsGrey" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
+      { "─", "NormalFloat" },
+      { "┐", "NormalFloat" },
+      { "│", "NormalFloat" },
+      { "┘", "NormalFloat" },
+      { "─", "NormalFloat" },
+      { "└", "NormalFloat" },
+      { "│", "NormalFloat" },
     },
     git = {
       { "󰊢", "MiniIconsRed" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
+      { "─", "NormalFloat" },
+      { "┐", "NormalFloat" },
+      { "│", "NormalFloat" },
+      { "┘", "NormalFloat" },
+      { "─", "NormalFloat" },
+      { "└", "NormalFloat" },
+      { "│", "NormalFloat" },
     },
   },
 }
 
 M.none = setmetatable(M.none, {
-  __call = function(m, ...) return M.none end,
+  __call = function(...) return M.none end,
 })
 M.single = setmetatable(M.single, {
-  __call = function(m, type)
-    type = type or "lsp"
-    return M.single[type]
+  __call = function(_, t, override)
+    t = t or "lsp"
+    local target = M.single[t]
+    -- Override the highlight color starting from the second item
+    for i = 2, #target do
+      if type(target[i]) == "table" then target[i][2] = override or target[i][2] end
+    end
+    return target
   end,
 })
 
----@param type? Mode
----@return string[][]
-M.impl = function(type) return M[vim.g.border or "none"](type) end
+---@param type? Mode type of border to be use
+---@param override? string override hl for given buffer
+---@return FloatBorder
+M.impl = function(type, override) return M[vim.g.border or "none"](type, override) end
 
 ---@return string[][]
 M.get = function() return M["__default"] end
@@ -105,7 +114,7 @@ H.ensure_get_icon = function()
     return
   elseif _G.MiniIcons ~= nil then
     -- Prefer 'mini.icons'
-    H.get_icon = function(filetype) return (_G.MiniIcons.get("filetype", filetype)) end
+    H.get_icon = function(filetype) return _G.MiniIcons.get("filetype", filetype) end
   else
     -- Try falling back to 'nvim-web-devicons'
     local has_devicons, devicons = pcall(require, "nvim-web-devicons")
@@ -158,15 +167,22 @@ H.modes = setmetatable({
 
 -- Showed diagnostic levels
 H.diagnostic_levels = {
-  { name = "ERROR", sign = "E" },
-  { name = "WARN", sign = "W" },
-  { name = "INFO", sign = "I" },
-  { name = "HINT", sign = "H" },
+  { name = "ERROR", sign = "✖" },
+  { name = "WARN", sign = "▲" },
+  { name = "INFO", sign = "●" },
+  { name = "HINT", sign = "⚑" },
 }
 
 H.diagnostic_get_count = function()
+  ---@type table<vim.diagnostic.Severity?, integer>
   local res = {}
-  for _, d in ipairs(vim.diagnostic.get(0)) do
+  for _, d in
+    ipairs(vim.tbl_filter(
+      ---@param d vim.Diagnostic
+      function(d) return d.severity ~= nil end,
+      vim.diagnostic.get(0)
+    ))
+  do
     res[d.severity] = (res[d.severity] or 0) + 1
   end
   return res
@@ -178,7 +194,8 @@ end
 
 -- I refuse to have a complex statusline, *proceeds to have a complex statusline* PepeLaugh (lualine is cool though.)
 -- [hunk] [branch] [modified]  --------- [diagnostic] [filetype] [line:col] [heart]
----@type table<string, fun(args: SimpleStatuslineArgs): string | fun(args: SimpleStatuslineArgs): [string, string]>
+---@alias StatuslineReturn string | table<string, any>
+---@type table<string, fun(args: SimpleStatuslineArgs): StatuslineReturn>
 _G.statusline = {
   git = function(args)
     if H.isnt_normal_buffer() or H.is_truncated(args.trunc_width) then return "" end
@@ -198,7 +215,12 @@ _G.statusline = {
     return icon .. " " .. (summary == "" and "-" or summary)
   end,
   lint = function(args)
-    local ok, lint = pcall(require, "lint")
+    ---@module "lint"
+    local lint
+    ---@type boolean
+    local ok
+
+    ok, lint = pcall(require, "lint")
     if not ok then return "" end
     if H.isnt_normal_buffer() then return "" end
 
@@ -216,16 +238,15 @@ _G.statusline = {
     local count = H.diagnostic_get_count()
     local severity, t = vim.diagnostic.severity, {}
     -- construct diagnostic info
-    local t = {}
     for _, level in ipairs(H.diagnostic_levels) do
       local n = count[severity[level.name]] or 0
       -- Add level info only if diagnostic is present
-      if n > 0 then table.insert(t, fmt("%s:%s", level.sign, n)) end
+      if n > 0 then table.insert(t, fmt("%s %s", level.sign, n)) end
     end
 
     local icon = args.icon or ""
     if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
-    return fmt("[%s %s]", icon, table.concat(t, "|"))
+    return fmt("[%s %s]", icon, table.concat(t, " "))
   end,
   fileinfo = function(args)
     local filetype = vim.bo.filetype
@@ -249,8 +270,9 @@ _G.statusline = {
     if H.is_truncated(args.trunc_width) then return "%l:%v" end
     return "%l:%v" .. (" %s"):format(icon)
   end,
+  ---@return {md:string, hl:string}
   mode = function(args)
     local mi = H.modes[vim.fn.mode()]
-    return H.is_truncated(args.trunc_width) and mi.short or mi.long, mi.hl
+    return { md = H.is_truncated(args.trunc_width) and mi.short or mi.long, hl = mi.hl }
   end,
 }

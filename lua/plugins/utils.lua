@@ -20,7 +20,6 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
-    event = "VeryLazy",
     cmd = "AvanteAsk",
     build = "make",
     dependencies = {

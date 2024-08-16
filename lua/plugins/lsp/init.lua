@@ -53,31 +53,26 @@ return {
     ---@class PluginLspOptions
     opts = {
       -- options for vim.diagnostic.config()
+      ---@type vim.diagnostic.config.Opts
       diagnostics = {
-        server = {
-          vtsls = true,
+        severity_sort = true,
+        underline = false,
+        update_in_insert = false,
+        virtual_text = false,
+        float = {
+          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+          focusable = false,
+          focus = false,
+          format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
+          source = "if_many",
+          border = BORDER.impl "docs",
         },
-        ---@type vim.diagnostic.Opts
-        config = {
-          severity_sort = true,
-          underline = false,
-          update_in_insert = true,
-          virtual_text = false,
-          float = {
-            close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-            focusable = false,
-            focus = false,
-            format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-            source = "if_many",
-            border = BORDER.impl "docs",
-          },
-          signs = {
-            text = {
-              [vim.diagnostic.severity.ERROR] = "✖",
-              [vim.diagnostic.severity.WARN] = "▲",
-              [vim.diagnostic.severity.HINT] = "⚑",
-              [vim.diagnostic.severity.INFO] = "●",
-            },
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "✖",
+            [vim.diagnostic.severity.WARN] = "▲",
+            [vim.diagnostic.severity.HINT] = "⚑",
+            [vim.diagnostic.severity.INFO] = "●",
           },
         },
       },
@@ -86,7 +81,7 @@ return {
       -- provide the inlay hints.
       inlay_hints = {
         enabled = true,
-        exclude = { "vue" },
+        exclude = { "vue", "typescriptreact", "typescript", "javascript" },
       },
       -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
@@ -111,6 +106,7 @@ return {
       -- all of the server below will be installed by default
       servers = {
         bashls = {},
+        taplo = {},
         markdown_oxide = {
           capabilities = {
             workspace = {
@@ -118,7 +114,6 @@ return {
             },
           },
         },
-        taplo = {},
         gopls = {
           settings = {
             gopls = {
@@ -377,14 +372,7 @@ return {
           settings = {
             ["nil"] = {
               formatting = {
-                command = { "nix fmt" },
-              },
-              nix = {
-                maxMemoryMB = 4092,
-                flake = {
-                  autoArchive = false,
-                  autoEvalInputs = true,
-                },
+                command = { "alejandra" },
               },
             },
           },
@@ -399,7 +387,7 @@ return {
                 ignore = { "*" },
                 autoImportCompletions = true,
                 autoSearchPaths = true,
-                typeCheckingMode = "off",
+                typeCheckingMode = "strict",
                 useLibraryCodeForTypes = true,
               },
             },
@@ -459,7 +447,7 @@ return {
         end,
         vtsls = function(_, opts)
           Util.lsp.on_attach(function(client, _)
-            client.commands["_typescript.moveToFileRefactoring"] = function(command, ctx)
+            client.commands["_typescript.moveToFileRefactoring"] = function(command, _)
               ---@type string, string, lsp.Range
               local action, uri, range = unpack(command.arguments)
 
@@ -516,8 +504,8 @@ return {
           vim.list_extend(opts.filetypes, tw.default_config.filetypes)
 
           -- Remove excluded filetypes
-          --- @param ft string
           opts.filetypes = vim.tbl_filter(
+            --- @param ft string
             function(ft) return not vim.tbl_contains(opts.filetypes_exclude or {}, ft) end,
             opts.filetypes
           )
@@ -542,6 +530,7 @@ return {
           Util.lsp.on_attach(function(client, _)
             if client.name == "gopls" then
               if not client.server_capabilities.semanticTokensProvider then
+                ---@type lsp.SemanticTokensClientCapabilities
                 local semantic = client.config.capabilities.textDocument.semanticTokens
                 client.server_capabilities.semanticTokensProvider = {
                   full = true,
@@ -588,24 +577,23 @@ return {
         end)
       end
 
-      vim.diagnostic.config(vim.deepcopy(opts.diagnostics.config))
+      vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(ev)
-          ---@type vim.lsp.Client[]
-          local client = Util.lsp.get_clients { bufnr = ev.buf, method = "textDocument/publishDiagnostics" }
-          for _, c in pairs(client) do
-            if opts.diagnostics.server[c.name] == true and vim.g.inline_diagnostics then
-              vim.lsp.handlers["textDocument/publishDiagnostics"] =
-                vim.lsp.with(vim.lsp.handlers["textDocument/publishDiagnostics"], {
-                  signs = { min = "Error" },
-                  virtual_text = { spacing = 2, min = "Error" },
-                  underline = false,
-                })
-            end
+      if vim.g.inline_diagnostics then
+        Util.lsp.on_supports_method(
+          "textDocument/publishDiagnostics",
+          function()
+            vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+              vim.lsp.handlers["textDocument/publishDiagnostics"],
+              vim.tbl_deep_extend("force", opts.diagnostics, {
+                signs = { min = "Error" },
+                virtual_text = { spacing = 2, min = "Error" },
+                underline = false,
+              })
+            )
           end
-        end,
-      })
+        )
+      end
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
@@ -618,6 +606,7 @@ return {
         opts.capabilities or {}
       )
 
+      ---@diagnostic disable-next-line: no-unknown
       require("lspconfig.ui.windows").default_options.border = BORDER.get()
 
       ---@param server string

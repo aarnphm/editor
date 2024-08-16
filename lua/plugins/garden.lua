@@ -114,7 +114,6 @@ return {
       end,
       note_id_func = function(title) return title end,
     },
-    config = function(_, opts) require("obsidian").setup(opts) end,
   },
   {
     "aarnphm/luasnip-latex-snippets.nvim",

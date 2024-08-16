@@ -2,9 +2,9 @@ require "aarnphm.globals"
 require "aarnphm.options"
 require "aarnphm.bindings"
 
--- NOTE: Loading shada is slow, so we load it manually after UIEnter
+-- PERF: Loading shada is slow, so we load it manually after UIEnter
 local shada = vim.o.shada
-local autocmd = vim.api.nvim_create_autocmd
+vim.o.shada = ""
 
 -- NOTE: local items
 local M = {
@@ -14,17 +14,8 @@ local M = {
   },
 }
 
-vim.o.shada = ""
-autocmd("User", {
-  pattern = "VeryLazy",
-  callback = function()
-    vim.o.shada = shada
-    pcall(vim.api.nvim_exec2, "rshada", {})
-  end,
-})
-
 -- close some filetypes with <q>
-autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "filetype_q",
   pattern = {
     "PlenaryTestPopup",
@@ -58,14 +49,14 @@ autocmd("FileType", {
   end,
 })
 -- Check if we need to reload the file when it changed
-autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup "checktime",
   callback = function()
     if vim.o.buftype ~= "nofile" then vim.cmd "checktime" end
   end,
 })
 -- correct resized tabs
-autocmd("VimResized", {
+vim.api.nvim_create_autocmd("VimResized", {
   group = augroup "resized",
   callback = function()
     local current = vim.fn.tabpagenr()
@@ -74,7 +65,7 @@ autocmd("VimResized", {
   end,
 })
 -- go to last loc when opening a buffer
-autocmd("BufReadPost", {
+vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup "last_loc",
   callback = function(event)
     local exclude = { "gitcommit" }
@@ -86,12 +77,12 @@ autocmd("BufReadPost", {
     if mark[1] > 0 and mark[1] <= lcount then pcall(vim.api.nvim_win_set_cursor, 0, mark) end
   end,
 })
-autocmd(
+vim.api.nvim_create_autocmd(
   "BufWritePre",
   { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" }
 )
 -- wrap and check for spell in text filetypes
-autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "wrap_spell",
   pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
   callback = function()
@@ -100,19 +91,19 @@ autocmd("FileType", {
   end,
 })
 -- make it easier to close man-files when opened inline
-autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "man_unlisted",
   pattern = { "man" },
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 -- Fix conceallevel for json files
-autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "json_conceal",
   pattern = { "json", "jsonc", "json5" },
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
-autocmd("BufWritePre", {
+vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup "auto_create_dir",
   callback = function(event)
     if event.match:match "^%w%w+:[\\/][\\/]" then return end
@@ -121,19 +112,19 @@ autocmd("BufWritePre", {
   end,
 })
 -- Set additional filetype for dockerfile
-autocmd({ "BufNewFile", "BufRead", "FileType" }, {
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead", "FileType" }, {
   group = augroup "dockerfile",
   pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
   command = "setlocal filetype=dockerfile",
 })
 -- Highlight on yank
-autocmd("TextYankPost", {
+vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup "highlight_yank",
   pattern = "*",
   callback = function() vim.highlight.on_yank { higroup = "IncSearch" } end,
 })
 -- auto trim trailing whitespace
-autocmd("BufWritePost", {
+vim.api.nvim_create_autocmd("BufWritePost", {
   group = augroup "trim_whitespace",
   callback = function()
     local ok, trailspace = pcall(require, "mini.trailspace")
@@ -174,13 +165,13 @@ M.should_hide = function(bufnr)
 
   return is_floating() or is_buftype_disabled or is_filetype_disabled
 end
-autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
   group = augroup "last_status",
   pattern = "*",
   callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
 })
 -- Set local settings for terminal buffers
-autocmd("TermOpen", {
+vim.api.nvim_create_autocmd("TermOpen", {
   group = augroup "custom_term_open",
   callback = function()
     vim.opt_local.number = false
@@ -190,11 +181,11 @@ autocmd("TermOpen", {
 })
 -- highlight URL
 local highlighturl_group = augroup "highlighturl"
-autocmd("ColorScheme", {
+vim.api.nvim_create_autocmd("ColorScheme", {
   group = highlighturl_group,
   callback = function() hi("HighlightURL", { default = true, underline = true }) end,
 })
-autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
   group = highlighturl_group,
   callback = function(args)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -219,7 +210,7 @@ vim.filetype.add {
     },
   },
 }
-autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "bigfile",
   pattern = "bigfile",
   callback = function(ev)
@@ -248,7 +239,7 @@ local function set_background()
   if vim.g.override_background ~= nil then vim.go.background = vim.g.override_background end
 end
 
-autocmd("VimEnter", { callback = set_background })
+vim.api.nvim_create_autocmd("VimEnter", { callback = set_background })
 
 set_background()
 
@@ -274,7 +265,6 @@ require("lazy").setup {
   spec = {
     { import = "plugins" },
   },
-  lockfile = vim.fn.stdpath "config" .. "/lazy-lock.json",
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
   ui = { border = BORDER.get(), backdrop = 100, wrap = false },
@@ -316,7 +306,12 @@ require("lazy").setup {
   },
 }
 
-Util.toggle.setup()
+Util.on_very_lazy(function()
+  vim.o.shada = shada
+  pcall(vim.api.nvim_exec2, "rshada", {})
+end)
+
+Util.on_very_lazy(Util.toggle.setup)
 
 if package.loaded["rose-pine"] then
   vim.cmd.colorscheme "rose-pine"
@@ -330,3 +325,11 @@ hi("MiniFilesBorder", { link = "Normal" })
 hi("MiniFilesNormal", { link = "Normal" })
 hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
 hi("CmpGhostText", { link = "Comment", default = true })
+-- leap.nvim
+hi("LeapBackdrop", { link = "Comment" }) -- or some grey
+hi("LeapMatch", {
+  -- For light themes, set to 'black' or similar.
+  fg = vim.go.background == "dark" and "white" or "black",
+  bold = true,
+  nocombine = true,
+})

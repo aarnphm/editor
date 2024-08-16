@@ -13,6 +13,7 @@ local diagnostic_goto = function(next, severity)
   return function() vim.diagnostic.jump { severity = severity, count = pos } end
 end
 
+---@return LazyKeysLsp[]
 M.get = function()
   if not M._keys then
     M._keys = {
@@ -110,6 +111,7 @@ function M.resolve(buffer)
   local Keys = require "lazy.core.handler.keys"
   if not Keys.resolve then return {} end
   local spec = M.get()
+  ---@type PluginLspOptions
   local opts = Util.opts "nvim-lspconfig"
   local clients = Util.lsp.get_clients { bufnr = buffer }
   for _, client in ipairs(clients) do
@@ -128,6 +130,7 @@ function M.on_attach(_, buffer)
     local cond = not (keys.cond == false or ((type(keys.cond) == "function") and not keys.cond()))
 
     if has and cond then
+      ---@type vim.keymap.set.LazyOpts
       local opts = Keys.opts(keys)
       opts.cond = nil
       opts.has = nil

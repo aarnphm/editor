@@ -29,10 +29,7 @@ return {
       "echasnovski/mini.icons",
       {
         "garymjr/nvim-snippets",
-        opts = {
-          friendly_snippets = true,
-          ignored_filetypes = { "git" },
-        },
+        opts = { friendly_snippets = true, ignored_filetypes = { "git", "gitcommit" } },
         dependencies = { "rafamadriz/friendly-snippets" },
       },
       {
@@ -54,25 +51,31 @@ return {
     ---@return cmp.ConfigSchema
     opts = function()
       local cmp = require "cmp"
+      local TC = require "cmp.types.cmp"
       local defaults = require "cmp.config.default"()
       local compare = require "cmp.config.compare"
 
+      ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
 
-      ---@type cmp.ConfigSchema
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = { "python" },
-        preselect = cmp.PreselectMode.None,
+        preselect = TC.PreselectMode.None,
         completion = { completeopt = "menu,menuone,noinsert" },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
+        ---@type cmp.FormattingConfig
         formatting = {
-          fields = { "menu", "abbr", "kind" },
+          fields = { TC.ItemField.Menu, TC.ItemField.Abbr, TC.ItemField.Kind },
           expandable_indicator = true,
-          format = function(entry, item)
-            local icon = nil
-            local mini_icon, _, _ = require("mini.icons").get("lsp", item.kind)
-            if mini_icon then icon = mini_icon .. " " end
-            if icon then item.kind = icon .. item.kind end
+          format = function(_, item)
+            local mini_icon = MiniIcons.get("lsp", P(item.kind) or "")
+            if vim.g.cmp_format == "symbol" then
+              item.kind = mini_icon and mini_icon .. " " or item.kind
+            elseif vim.g.cmp_format == "text_symbol" then
+              item.kind = mini_icon and mini_icon .. " " .. item.kind or item.kind
+            else
+              Util.error("cmp_format must be either 'symbol' or 'text_symbol'", { once = true, title = "LazyVim" })
+            end
 
             local widths = {
               abbr = vim.g.cmp and vim.g.cmp.widths.abbr or 40,
@@ -88,8 +91,8 @@ return {
           end,
         },
         window = {
-          completion = cmp.config.window.bordered { border = BORDER.impl "lsp" },
-          documentation = cmp.config.window.bordered { border = BORDER.impl "docs" },
+          completion = cmp.config.window.bordered { border = BORDER.impl("lsp", "Comment") },
+          documentation = cmp.config.window.bordered { border = BORDER.impl("docs", "Comment") },
         },
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
@@ -98,19 +101,9 @@ return {
           comparators = {
             compare.offset,
             compare.exact,
-            ---@type cmp.ComparatorFunction
-            function(entry1, entry2)
-              ---@type number
-              local diff
-              if entry1.completion_item.score and entry2.completion_item.score then
-                diff = (entry2.completion_item.score * entry2.score) - (entry1.completion_item.score * entry1.score)
-              else
-                diff = entry2.score - entry1.score
-              end
-              return diff < 0
-            end,
             -- copied from cmp-under
-            ---@type cmp.ComparatorFunction
+            ---@param entry1 cmp.Entry
+            ---@param entry2 cmp.Entry
             function(entry1, entry2)
               local _, e1_under = entry1.completion_item.label:find "^_+"
               local _, e2_under = entry2.completion_item.label:find "^_+"
@@ -128,22 +121,20 @@ return {
             compare.order,
           },
         },
-        matching = {
-          disallow_fullfuzzy_matching = true,
-        },
         enabled = function()
           local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true }
           return not disabled[vim.bo.filetype]
         end,
         mapping = cmp.mapping.preset.insert {
           ["<CR>"] = Util.cmp.confirm(),
-          ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = cmp.ConfirmBehavior.Replace },
+          ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = TC.ConfirmBehavior.Replace },
           ["<C-CR>"] = function(fallback)
             cmp.abort()
             fallback()
           end,
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ---@type cmp.MappingFunction
           ["<Tab>"] = cmp.mapping(function(fallback)
             local has_words_before = function()
               local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -161,6 +152,7 @@ return {
               fallback()
             end
           end, { "i", "s" }),
+          ---@type cmp.MappingFunction
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item(select_opts)
@@ -175,7 +167,7 @@ return {
           {
             name = "nvim_lsp",
             priority = 400,
-            max_item_count = 50,
+            max_item_count = 350,
             option = {
               markdown_oxide = {
                 keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
@@ -185,16 +177,17 @@ return {
           { name = "snippets", priority = 300, group_index = 1 },
           { name = "supermaven", priority = 200, group_index = 2 },
           { name = "path", priority = 100 },
-          { name = "lazydev", group_index = 0 },
           {
             name = "buffer",
+            priority = 50,
             option = {
               get_bufnrs = function() return vim.api.nvim_buf_line_count(0) < 7500 and vim.api.nvim_list_bufs() or {} end,
             },
           },
+          { name = "lazydev", group_index = 0 },
         },
       })
     end,
-    main = "utils.cmp", ---@type lazyvim.util.cmp
+    main = "utils.cmp",
   },
 }

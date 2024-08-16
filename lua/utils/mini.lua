@@ -113,7 +113,7 @@ function M.ai_whichkey(opts)
   require("which-key").add(ret, { notify = false })
 end
 
----@param opts {skip_next: string, skip_ts: string[], skip_unbalanced: boolean, markdown: boolean, filetypes: table<string, boolean>}
+---@param opts {skip_next: string, skip_ts: string[], skip_unbalanced: boolean, markdown: boolean, filetypes: string[]}
 function M.pairs(opts)
   Util.toggle.map("<leader>up", {
     name = "mini pairs",
@@ -121,12 +121,17 @@ function M.pairs(opts)
     set = function(state) vim.g.minipairs_disable = not state end,
   })
 
-  if opts.filetypes[vim.bo.filetype] == true then vim.b.minipairs_disable = true end
+  vim.api.nvim_create_autocmd("FileType", {
+    group = augroup "disable_ft_minipairs",
+    pattern = opts.filetypes,
+    callback = function(ev) vim.b[ev.buf].minipairs_disable = true end,
+  })
 
   local pairs = require "mini.pairs"
   pairs.setup(opts)
 
   local open = pairs.open
+  ---@diagnostic disable-next-line: duplicate-set-field
   pairs.open = function(pair, neigh_pattern)
     if vim.fn.getcmdline() ~= "" then return open(pair, neigh_pattern) end
     local o, c = pair:sub(1, 1), pair:sub(2, 2)

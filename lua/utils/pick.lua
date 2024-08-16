@@ -6,7 +6,7 @@ local M = setmetatable({}, {
 
 ---@class lazyvim.util.pick.Opts: table<string, any>
 ---@field root? boolean
----@field cwd? string
+---@field cwd? string | string[] | nil
 ---@field buf? number
 ---@field show_untracked? boolean
 

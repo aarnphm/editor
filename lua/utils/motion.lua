@@ -5,7 +5,7 @@ local function get_line_starts(winid, skip_range)
   local wininfo = vim.fn.getwininfo(winid)[1]
   local cur_line = vim.fn.line "."
   -- Skip lines close to the cursor.
-  local skip_range = skip_range or 2
+  skip_range = skip_range or 2
 
   -- Get targets.
   local targets = {}

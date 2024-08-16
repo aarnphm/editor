@@ -46,7 +46,7 @@ o.pumblend = 0 -- make completion window transparent
 opt.shortmess:append { W = true, c = true, C = true }
 o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 o.completeopt = "menu,menuone,noselect"
-o.formatoptions = "1jcroqlnt" -- NOTE: "tcqj"
+o.formatoptions = "1jqlnt" -- NOTE: "tqjcro"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
 o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
@@ -130,9 +130,10 @@ g.inline_diagnostics = true
 g.picker = "telescope"
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
-g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
+g.laststatus = 3 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.cmp = { widths = { abbr = 40, menu = 40 } }
+g.cmp_format = "symbol" -- "symbol" | "text_symbol"
 g.border = "single"
 g.use_agent = true
 g.override_background = "dark"

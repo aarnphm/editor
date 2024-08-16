@@ -2,9 +2,8 @@ return {
   {
     "ggandor/flit.nvim",
     opts = { labeled_modes = "nx" },
-    ---@diagnostic disable-next-line: assign-type-mismatch
     keys = function()
-      ---@type table<string, LazyKeys[]>
+      ---@type LazyKeysSpec[]
       local ret = {}
       for _, key in ipairs { "f", "F", "t", "T" } do
         ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
@@ -17,8 +16,32 @@ return {
     keys = {
       { "s", mode = { "n", "x", "o" }, desc = "motion: leap forward to" },
       { "S", mode = { "n", "x", "o" }, desc = "motion: leap backward to" },
+      -- Linewise.
+      {
+        "gA",
+        'V<cmd>lua require("leap.treesitter").select()<cr>',
+        mode = { "n", "x", "o" },
+        desc = "motion: leap treesiter (linewise)",
+      },
+      { "|", "V<cmd>lua Util.motion.leap_line_start()<cr>", mode = "o", desc = "motion: leap line start (linewise)" },
+      -- For maximum comfort, force linewise selection in the mappings:
+      {
+        "|",
+        function()
+          -- Only force V if not already in it (otherwise it would exit Visual mode).
+          if vim.fn.mode(1) ~= "V" then vim.cmd "normal! V" end
+          Util.motion.leap_line_start()
+        end,
+        mode = "x",
+        desc = "motion: leap line start",
+      },
     },
+    opts = {
+      max_highlighted_traversal_targets = 15,
+    },
+    ---@param opts LeapOpts
     config = function(_, opts)
+      ---@type Leap
       local leap = require "leap"
       for key, val in pairs(opts) do
         leap.opts[key] = val
@@ -28,7 +51,7 @@ return {
       vim.keymap.del({ "x", "o" }, "x")
       vim.keymap.del({ "x", "o" }, "X")
       vim.keymap.set({ "n", "x", "o" }, "ga", function()
-        local sk = vim.deepcopy(require("leap").opts.special_keys)
+        local sk = vim.deepcopy(require("leap").opts.special_keys) ---@type LeapSpecialKeys
         -- The items in `special_keys` can be both strings or tables - the
         -- shortest workaround might be the below one:
         sk.next_target = vim.fn.flatten(vim.list_extend({ "a" }, { sk.next_target }))
@@ -36,34 +59,6 @@ return {
 
         require("leap.treesitter").select { opts = { special_keys = sk } }
       end, { desc = "motion: leap treesitter" })
-      -- Linewise.
-      vim.keymap.set(
-        { "n", "x", "o" },
-        "gA",
-        'V<cmd>lua require("leap.treesitter").select()<cr>',
-        { desc = "motion: leap treesiter (linewise)" }
-      )
-
-      -- For maximum comfort, force linewise selection in the mappings:
-      vim.keymap.set("x", "|", function()
-        -- Only force V if not already in it (otherwise it would exit Visual mode).
-        if vim.fn.mode(1) ~= "V" then vim.cmd "normal! V" end
-        Util.motion.leap_line_start()
-      end, { desc = "motion: leap line start" })
-      vim.keymap.set(
-        "o",
-        "|",
-        "V<cmd>lua Util.motion.leap_line_start()<cr>",
-        { desc = "motion: leap line start (linewise)" }
-      )
-
-      hi("LeapBackdrop", { link = "Comment" }) -- or some grey
-      hi("LeapMatch", {
-        -- For light themes, set to 'black' or similar.
-        fg = vim.go.background == "dark" and "white" or "black",
-        bold = true,
-        nocombine = true,
-      })
     end,
   },
   { "tpope/vim-repeat", event = "VeryLazy" },
@@ -106,9 +101,7 @@ return {
   {
     "gbprod/yanky.nvim",
     event = "LazyFile",
-    opts = {
-      highlight = { timer = 150 },
-    },
+    opts = { highlight = { timer = 50 } },
     keys = {
       {
         "<leader>p",
@@ -180,7 +173,7 @@ return {
         lua = { "stylua" },
         toml = { "taplo" },
         proto = { "buf", "protolint" },
-        zsh = { "beautysh" },
+        zsh = { "beautysh", fallback = true },
         python = { "ruff_fix" },
         sh = { "shfmt" },
         markdown = { "prettier" },
@@ -216,11 +209,9 @@ return {
             typescript = "ts",
           },
         },
-        shfmt = { prepend_args = { "-i", "2", "-ci" } },
         beautysh = { prepend_args = { "-i", "2" } },
       },
     },
-    config = function(_, opts) require("conform").setup(opts) end,
   },
   -- outline
   {
@@ -230,10 +221,11 @@ return {
     opts = function()
       local defaults = require("outline.config").defaults
       local opts = {
-        symbols = { icons = {} },
-        outline_window = {
-          width = 15,
+        symbols = {
+          ---@type {string: outline.Symbol }
+          icons = {},
         },
+        outline_window = { width = 25 },
         keymaps = {
           up_and_jump = "<up>",
           down_and_jump = "<down>",
@@ -241,11 +233,11 @@ return {
       }
 
       for kind, symbol in pairs(defaults.symbols.icons) do
-        local mini_icon, hl, _ = require("mini.icons").get("lsp", kind:lower())
-        opts.symbols.icons[kind] = {
+        local mini_icon, hl, _ = MiniIcons.get("lsp", kind:lower())
+        opts.symbols.icons[kind] = vim.tbl_deep_extend("force", defaults.symbols.icons[kind], {
           icon = mini_icon and mini_icon or symbol.icon,
           hl = mini_icon and hl or symbol.hl,
-        }
+        })
       end
       return opts
     end,

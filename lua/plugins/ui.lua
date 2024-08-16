@@ -84,14 +84,6 @@ return {
         },
       },
     },
-    config = function(_, opts)
-      Util.on_load("telescope.nvim", function()
-        ---@diagnostic disable-next-line: no-unknown
-        local ok, err = pcall(require("telescope").load_extension, "noice")
-        if not ok then Util.error("Failed to load `noice.nvim`:\n" .. err) end
-      end)
-      require("noice").setup(opts)
-    end,
   },
   { "MunifTanjim/nui.nvim", lazy = true },
   {
@@ -112,8 +104,8 @@ return {
     opts_extend = { "spec" },
     opts = {
       spec = {
-        { "<BS>", desc = "Decrement Selection", mode = "x" },
-        { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
+        { "<BS>", desc = "treesitter: decrement selection", mode = "x" },
+        { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
         {
           mode = { "n", "v" },
           { "<leader><tab>", group = "tabs" },
@@ -142,9 +134,7 @@ return {
             expand = function() return require("which-key.extras").expand.win() end,
           },
           -- better descriptions
-          { "gx", desc = "Open with system app" },
-          { "<BS>", desc = "Decrement Selection", mode = "x" },
-          { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
+          { "gx", desc = "util: open with system app" },
         },
       },
     },
@@ -160,6 +150,5 @@ return {
         desc = "which-key: window hydra mode",
       },
     },
-    config = function(_, opts) require("which-key").setup(opts) end,
   },
 }
