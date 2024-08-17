@@ -302,6 +302,7 @@ return {
                   vim.fn.expand "$VIMRUNTIME/lua",
                   vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
                   vim.fn.stdpath "data" .. "/lazy/lazy.nvim/lua/lazy",
+                  vim.fn.expand "$HOME/workspace/neovim-plugins/",
                   "${3rd}/luv/library",
                 },
               },

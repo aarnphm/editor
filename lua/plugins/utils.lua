@@ -20,6 +20,7 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
+    event = "VeryLazy",
     cmd = "AvanteAsk",
     build = "make",
     dependencies = {
@@ -30,10 +31,12 @@ return {
         },
       },
     },
+    ---@type avante.Config
     opts = {
-      mappings = { show_sidebar = "<leader>ua" },
-      -- provider = "openai",
-      provider = "claude",
+      mappings = {
+        ask = "<leader>ua",
+        refresh = "<leader>ur",
+      },
     },
   },
 }

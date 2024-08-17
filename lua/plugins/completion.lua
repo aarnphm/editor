@@ -68,7 +68,7 @@ return {
           fields = { TC.ItemField.Menu, TC.ItemField.Abbr, TC.ItemField.Kind },
           expandable_indicator = true,
           format = function(_, item)
-            local mini_icon = MiniIcons.get("lsp", P(item.kind) or "")
+            local mini_icon = MiniIcons.get("lsp", item.kind or "")
             if vim.g.cmp_format == "symbol" then
               item.kind = mini_icon and mini_icon .. " " or item.kind
             elseif vim.g.cmp_format == "text_symbol" then

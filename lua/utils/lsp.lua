@@ -4,6 +4,7 @@ local M = {}
 ---@alias lsp.Client.filter {id?: number, bufnr?: number, name?: string, method?: string, filter?:fun(client: lsp.Client):boolean}
 
 ---@param opts? lsp.Client.filter
+---@return vim.lsp.Client[]
 function M.get_clients(opts)
   local ret = {} ---@type vim.lsp.Client[]
   if vim.lsp.get_clients then
@@ -22,8 +23,9 @@ function M.get_clients(opts)
   return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
 end
 
----@param on_attach fun(client:vim.lsp.Client, buffer)
+---@param on_attach fun(client:vim.lsp.Client, buffer:number)
 ---@param name? string
+---@return number Autocmd ID
 function M.on_attach(on_attach, name)
   return vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
@@ -35,6 +37,7 @@ function M.on_attach(on_attach, name)
 end
 
 ---@type table<string, table<vim.lsp.Client, table<number, boolean>>>
+---@private
 M._supports_method = {}
 
 function M.setup(opts)
@@ -114,6 +117,7 @@ function M.on_supports_method(method, fn)
   })
 end
 
+---@return nil
 function M.rename_file()
   local buf = vim.api.nvim_get_current_buf()
   local old = assert(Util.root.realpath(vim.api.nvim_buf_get_name(buf)))
@@ -187,8 +191,6 @@ function M.disable(server, cond)
     end
   )
 end
-
-function M.test() end
 
 ---@param opts? LazyFormatter| {filter?: (string|lsp.Client.filter)}
 function M.formatter(opts)
