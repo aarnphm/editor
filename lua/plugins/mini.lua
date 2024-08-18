@@ -663,7 +663,7 @@ return {
       end
 
       local starter = require "mini.starter"
-      --stylua: ignore
+      -- stylua: ignore
       local config = {
         evaluate_single = true,
         header = logo,

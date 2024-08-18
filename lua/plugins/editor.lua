@@ -23,6 +23,20 @@ return {
         mode = { "n", "x", "o" },
         desc = "motion: leap treesiter (linewise)",
       },
+      {
+        "ga",
+        function()
+          local sk = vim.deepcopy(require("leap").opts.special_keys) ---@type LeapSpecialKeys
+          -- The items in `special_keys` can be both strings or tables - the
+          -- shortest workaround might be the below one:
+          sk.next_target = vim.fn.flatten(vim.list_extend({ "a" }, { sk.next_target }))
+          sk.prev_target = vim.fn.flatten(vim.list_extend({ "A" }, { sk.prev_target }))
+
+          require("leap.treesitter").select { opts = { special_keys = sk } }
+        end,
+        mode = { "n", "x", "o" },
+        desc = "motion: leap treesitter",
+      },
       { "|", "V<cmd>lua Util.motion.leap_line_start()<cr>", mode = "o", desc = "motion: leap line start (linewise)" },
       -- For maximum comfort, force linewise selection in the mappings:
       {
@@ -50,15 +64,6 @@ return {
 
       vim.keymap.del({ "x", "o" }, "x")
       vim.keymap.del({ "x", "o" }, "X")
-      vim.keymap.set({ "n", "x", "o" }, "ga", function()
-        local sk = vim.deepcopy(require("leap").opts.special_keys) ---@type LeapSpecialKeys
-        -- The items in `special_keys` can be both strings or tables - the
-        -- shortest workaround might be the below one:
-        sk.next_target = vim.fn.flatten(vim.list_extend({ "a" }, { sk.next_target }))
-        sk.prev_target = vim.fn.flatten(vim.list_extend({ "A" }, { sk.prev_target }))
-
-        require("leap.treesitter").select { opts = { special_keys = sk } }
-      end, { desc = "motion: leap treesitter" })
     end,
   },
   { "tpope/vim-repeat", event = "VeryLazy" },

@@ -29,6 +29,7 @@ return {
   {
     "folke/noice.nvim",
     event = "LazyFile",
+    ---@type NoiceConfig
     opts = {
       presets = {
         bottom_search = true,
@@ -38,7 +39,7 @@ return {
       },
       cmdline = { view = "cmdline" },
       views = {
-        split = { size = "30%" },
+        split = { size = "20%" },
         popup = { border = { style = BORDER.get() } },
         confirm = { border = { style = BORDER.impl "hover" } },
         hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
@@ -59,7 +60,7 @@ return {
               { find = "Supermaven Free Tier" },
             },
           },
-          view = "mini",
+          opts = { skip = true },
         },
         {
           filter = {
@@ -82,6 +83,7 @@ return {
           -- override cmp documentation with Noice (needs the other options to work)
           ["cmp.entry.get_documentation"] = true,
         },
+        message = { view = "messages" },
       },
     },
   },
