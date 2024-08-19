@@ -1,5 +1,5 @@
-if
-  not Util.pick.register {
+if Util.pick.want() == "telescope" then
+  Util.pick.register {
     name = "telescope",
     commands = {
       files = "find_files",
@@ -35,8 +35,28 @@ if
       require("telescope.builtin")[builtin](opts)
     end,
   }
-then
-  return {}
+elseif Util.pick.want() == "mini.pick" then
+  Util.pick.register {
+    name = "mini.pick",
+    commands = {
+      files = "files",
+      live_grep = "grep_live",
+      oldfiles = "files",
+    },
+    -- this will return a function that calls telescope.
+    -- cwd will default to lazyvim.util.get_root
+    -- for `files`, git_files or find_files will be chosen depending on .git
+    ---@param builtin string
+    ---@param opts? lazyvim.util.pick.Opts
+    open = function(builtin, opts)
+      opts = opts or {}
+      if opts.tool ~= nil then
+        opts.source = vim.tbl_deep_extend("force", opts.source or {}, { cwd = opts.cwd })
+        opts.cwd = nil
+      end
+      require("mini.pick").builtin[builtin](opts)
+    end,
+  }
 end
 
 local has_make = function() return vim.fn.executable "make" == 1 end
@@ -44,9 +64,38 @@ local has_cmake = function() return vim.fn.executable "cmake" == 1 end
 
 return {
   {
+    "echasnovski/mini.pick",
+    cmd = "Pick",
+    version = false,
+    enabled = function() return Util.pick.want() == "mini.pick" end,
+    opts = {},
+    keys = {
+      {
+        "<LocalLeader>f",
+        Util.pick("files", { tool = "git" }),
+        desc = "mini.pick: open (git root)",
+      },
+      {
+        "<LocalLeader>.",
+        Util.pick("files", { source = { items = vim.fn.readdir "." } }),
+        desc = "mini.pick: open (current)",
+      },
+      {
+        "<LocalLeader>w",
+        Util.pick "grep_live",
+        desc = "mini.pick: grep word",
+      },
+      {
+        "<leader>b",
+        Util.pick "buffers",
+        desc = "mini.pick: grep word",
+      },
+    },
+  },
+  {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
-    enabled = Util.pick.want() == "telescope",
+    enabled = function() return Util.pick.want() == "telescope" end,
     version = false,
     dependencies = {
       {
@@ -113,33 +162,6 @@ return {
       },
     },
     keys = {
-      {
-        "<leader>sk",
-        Util.pick("keymaps", {
-          initial_mode = "normal",
-          lhs_filter = function(lhs) return not string.find(lhs, "Þ") end,
-          layout_strategy = "vertical",
-          previewer = false,
-          layout_config = {
-            width = 0.6,
-            height = 0.6,
-            prompt_position = "top",
-          },
-        }),
-        desc = "telescope: keymaps",
-        noremap = true,
-        silent = true,
-      },
-      {
-        "<leader>sb",
-        Util.pick("buffers", {
-          layout_config = { width = 0.6, height = 0.6, prompt_position = "top" },
-          show_all_buffers = true,
-          previewer = false,
-          cwd = require("plenary.job"):new({ command = "git", args = { "rev-parse", "--show-toplevel" } }):sync()[1],
-        }),
-        desc = "telescope: Manage buffers",
-      },
       { "<LocalLeader>f", Util.pick("files", { root = false }), desc = "telescope: find files" },
       { "<leader>sf", Util.pick "oldfiles", desc = "telescope: recent files" },
     },
@@ -175,7 +197,7 @@ return {
         defaults = {
           prompt_prefix = "󰄾 ",
           selection_caret = " ",
-          borderchars = BORDER.impl "simple",
+          borderchars = BORDER.single["simple"],
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
           get_selection_window = function()

@@ -50,7 +50,7 @@ function M.open(cmd, opts)
   opts = vim.tbl_deep_extend("force", {
     ft = "lazyterm",
     size = { width = 0.9, height = 0.9 },
-    border = BORDER.impl "hover",
+    border = BORDER.impl("lsp", "NormalFloat", 1),
     backdrop = not cmd and 100 or nil,
   }, opts or {}, { persistent = true }) --[[@as LazyTermOpts]]
 

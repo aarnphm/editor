@@ -42,6 +42,7 @@ return {
             { "Bilal2453/luvit-meta", lazy = true },
           },
           library = {
+            { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
             { path = "luvit-meta/library", words = { "vim%.uv" } },
             { path = "lazy.nvim", words = { "Util" } },
           },
@@ -72,14 +73,16 @@ return {
             if vim.g.cmp_format == "symbol" then
               item.kind = mini_icon and mini_icon .. " " or item.kind
             elseif vim.g.cmp_format == "text_symbol" then
-              item.kind = mini_icon and mini_icon .. " " .. item.kind or item.kind
+              item.kind = mini_icon and mini_icon .. " " .. item.kind or item.kind .. " "
+            elseif vim.g.cmp_format == "text" then
+              item.kind = item.kind
             else
               Util.error("cmp_format must be either 'symbol' or 'text_symbol'", { once = true, title = "LazyVim" })
             end
 
             local widths = {
-              abbr = vim.g.cmp and vim.g.cmp.widths.abbr or 40,
-              menu = vim.g.cmp and vim.g.cmp.widths.menu or 30,
+              abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
+              menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
             }
 
             for key, width in pairs(widths) do
@@ -89,10 +92,6 @@ return {
             end
             return item
           end,
-        },
-        window = {
-          completion = cmp.config.window.bordered { border = BORDER.impl("lsp", "Comment") },
-          documentation = cmp.config.window.bordered { border = BORDER.impl("docs", "Comment") },
         },
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
@@ -122,16 +121,17 @@ return {
           },
         },
         enabled = function()
-          local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true }
+          local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true, Avante = true }
           return not disabled[vim.bo.filetype]
         end,
         mapping = cmp.mapping.preset.insert {
-          ["<CR>"] = Util.cmp.confirm(),
+          ["<CR>"] = Util.cmp.confirm { select = true },
           ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = TC.ConfirmBehavior.Replace },
           ["<C-CR>"] = function(fallback)
             cmp.abort()
             fallback()
           end,
+          ["<C-Space>"] = cmp.mapping.complete(),
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ---@type cmp.MappingFunction
@@ -167,7 +167,6 @@ return {
           {
             name = "nvim_lsp",
             priority = 400,
-            max_item_count = 350,
             option = {
               markdown_oxide = {
                 keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
@@ -176,14 +175,8 @@ return {
           },
           { name = "snippets", priority = 300, group_index = 1 },
           { name = "supermaven", priority = 200, group_index = 2 },
-          { name = "path", priority = 100 },
-          {
-            name = "buffer",
-            priority = 50,
-            option = {
-              get_bufnrs = function() return vim.api.nvim_buf_line_count(0) < 7500 and vim.api.nvim_list_bufs() or {} end,
-            },
-          },
+          { name = "path" },
+          { name = "buffer" },
           { name = "lazydev", group_index = 0 },
         },
       })

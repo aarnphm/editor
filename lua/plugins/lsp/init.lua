@@ -17,7 +17,7 @@ return {
         "oxlint",
         "markdownlint",
       },
-      ui = { border = BORDER.get() },
+      ui = { border = BORDER.impl() },
       max_concurrent_installers = 10,
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -302,8 +302,6 @@ return {
                   vim.fn.expand "$VIMRUNTIME/lua",
                   vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
                   vim.fn.stdpath "data" .. "/lazy/lazy.nvim/lua/lazy",
-                  vim.fn.expand "$HOME/workspace/neovim-plugins/",
-                  "${3rd}/luv/library",
                 },
               },
               telemetry = { enable = false },
@@ -326,7 +324,6 @@ return {
               },
               diagnostics = {
                 disable = { "incomplete-signature-doc", "trailing-space" },
-                -- enable = false,
                 groupSeverity = {
                   strong = "Warning",
                   strict = "Warning",
@@ -580,21 +577,21 @@ return {
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      if vim.g.inline_diagnostics then
-        Util.lsp.on_supports_method(
-          "textDocument/publishDiagnostics",
-          function()
-            vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-              vim.lsp.handlers["textDocument/publishDiagnostics"],
-              vim.tbl_deep_extend("force", opts.diagnostics, {
-                signs = { min = "Error" },
-                virtual_text = { spacing = 2, min = "Error" },
-                underline = false,
-              })
-            )
-          end
-        )
-      end
+      Util.toggle.map(
+        "<leader>ui",
+        Util.toggle.wrap {
+          name = "inline_diagnostics",
+          get = function() return vim.g.inline_diagnostics end,
+          set = function(state)
+            vim.g.inline_diagnostics = state
+            vim.diagnostic.config(vim.tbl_deep_extend("force", opts.diagnostics, {
+              signs = { min = "Error" },
+              virtual_text = state and { spacing = 2, min = "Error" } or false,
+              underline = false,
+            }))
+          end,
+        }
+      )
 
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
@@ -608,7 +605,7 @@ return {
       )
 
       ---@diagnostic disable-next-line: no-unknown
-      require("lspconfig.ui.windows").default_options.border = BORDER.get()
+      require("lspconfig.ui.windows").default_options.border = BORDER.impl()
 
       ---@param server string
       local server_setup = function(server)
@@ -646,15 +643,6 @@ return {
       end
 
       if have_mlsp then mlsp.setup { ensure_installed = ensure_installed, handlers = { server_setup } } end
-
-      if Util.lsp.is_enabled "denols" and Util.lsp.is_enabled "vtsls" then
-        local is_deno = require("lspconfig.util").root_pattern("deno.json", "deno.jsonc")
-        Util.lsp.disable("vtsls", is_deno)
-        Util.lsp.disable("denols", function(root_dir, config)
-          if not is_deno(root_dir) then config.settings.deno.enable = false end
-          return false
-        end)
-      end
     end,
   },
 }

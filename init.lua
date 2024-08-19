@@ -2,10 +2,6 @@ require "aarnphm.globals"
 require "aarnphm.options"
 require "aarnphm.bindings"
 
--- PERF: Loading shada is slow, so we load it manually after UIEnter
-local shada = vim.o.shada
-vim.o.shada = ""
-
 -- NOTE: local items
 local M = {
   disable = {
@@ -30,11 +26,8 @@ vim.api.nvim_create_autocmd("FileType", {
     "nowrite", -- fugitive
     "fugitive",
     "prompt",
-    "spectre_panel",
-    "startuptime",
     "tsplayground",
     "neorepl",
-    "alpha",
     "health",
     "nofile",
     "scratch",
@@ -64,32 +57,10 @@ vim.api.nvim_create_autocmd("VimResized", {
     vim.cmd("tabnext  " .. current)
   end,
 })
--- go to last loc when opening a buffer
-vim.api.nvim_create_autocmd("BufReadPost", {
-  group = augroup "last_loc",
-  callback = function(event)
-    local exclude = { "gitcommit" }
-    local buf = event.buf
-    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].simple_last_loc then return end
-    vim.b[buf].simple_last_loc = true
-    local mark = vim.api.nvim_buf_get_mark(buf, '"')
-    local lcount = vim.api.nvim_buf_line_count(buf)
-    if mark[1] > 0 and mark[1] <= lcount then pcall(vim.api.nvim_win_set_cursor, 0, mark) end
-  end,
-})
 vim.api.nvim_create_autocmd(
   "BufWritePre",
   { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" }
 )
--- wrap and check for spell in text filetypes
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup "wrap_spell",
-  pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
-  callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.spell = true
-  end,
-})
 -- make it easier to close man-files when opened inline
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "man_unlisted",
@@ -110,12 +81,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     local file = vim.uv.fs_realpath(event.match) or event.match
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
-})
--- Set additional filetype for dockerfile
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead", "FileType" }, {
-  group = augroup "dockerfile",
-  pattern = { "*.dockerfile", "Dockerfile-*", "Dockerfile.*", "Dockerfile.template" },
-  command = "setlocal filetype=dockerfile",
 })
 -- Highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -166,7 +131,12 @@ M.should_hide = function(bufnr)
   return is_floating() or is_buftype_disabled or is_filetype_disabled
 end
 vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
-  group = augroup "last_status",
+  group = augroup "last_status_enter",
+  pattern = "*",
+  callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
+})
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
+  group = augroup "last_status_exit",
   pattern = "*",
   callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
 })
@@ -243,8 +213,6 @@ vim.api.nvim_create_autocmd("VimEnter", { callback = set_background })
 
 set_background()
 
-if vim.g.vscode then return end -- NOTE: compatible block with vscode
-
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
@@ -259,59 +227,17 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
-Util.setup()
-
-require("lazy").setup {
+Util.setup {
   spec = {
     { import = "plugins" },
   },
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
-  ui = { border = BORDER.get(), backdrop = 100, wrap = false },
+  ui = { border = "single", backdrop = 100, wrap = false },
   dev = {
     path = "~/workspace/neovim-plugins/",
   },
-  performance = {
-    rtp = {
-      disabled_plugins = {
-        "2html_plugin",
-        "tohtml",
-        "getscript",
-        "getscriptPlugin",
-        "gzip",
-        "logipat",
-        "netrw",
-        "netrwPlugin",
-        "netrwSettings",
-        "netrwFileHandlers",
-        "matchit",
-        "tar",
-        "tarPlugin",
-        "rrhelper",
-        "spellfile_plugin",
-        "vimball",
-        "vimballPlugin",
-        "zip",
-        "zipPlugin",
-        "tutor",
-        "rplugin",
-        "syntax",
-        "synmenu",
-        "optwin",
-        "compiler",
-        "bugreport",
-        "ftplugin",
-      },
-    },
-  },
 }
-
-Util.on_very_lazy(function()
-  vim.o.shada = shada
-  pcall(vim.api.nvim_exec2, "rshada", {})
-end)
-
-Util.on_very_lazy(Util.toggle.setup)
 
 if package.loaded["rose-pine"] then
   vim.cmd.colorscheme "rose-pine"

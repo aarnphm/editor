@@ -21,15 +21,18 @@ return {
   },
 
   {
-    "MeanderingProgrammer/markdown.nvim",
+    "MeanderingProgrammer/render-markdown.nvim",
     opts = {
       file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
+      render_modes = { "n", "c" },
+      max_file_size = vim.g.bigfile_size,
       heading = { sign = false },
       code = {
         sign = false,
         width = "full",
         right_pad = 1,
       },
+      pipe_table = { preset = "double" },
       latex = { enabled = false },
       win_options = {
         conceallevel = { rendered = 2 },

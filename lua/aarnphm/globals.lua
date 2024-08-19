@@ -16,6 +16,7 @@ _G.TABWIDTH = 2
 ---@class SingleBorder
 ---@field none FloatBorderEdges
 ---@field single FloatBorderEdgesWithHl
+---
 
 ---@class SingleBorder
 local M = {
@@ -24,43 +25,43 @@ local M = {
     simple = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
     lsp = {
       { "󱐋", "WarningMsg" },
-      { "─", "NormalFloat" },
-      { "┐", "NormalFloat" },
-      { "│", "NormalFloat" },
-      { "┘", "NormalFloat" },
-      { "─", "NormalFloat" },
-      { "└", "NormalFloat" },
-      { "│", "NormalFloat" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
     },
     docs = {
       { "󰄾", "DiagnosticHint" },
-      { "─", "NormalFloat" },
-      { "┐", "NormalFloat" },
-      { "│", "NormalFloat" },
-      { "┘", "NormalFloat" },
-      { "─", "NormalFloat" },
-      { "└", "NormalFloat" },
-      { "│", "NormalFloat" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
     },
     hover = {
       { "󰀵", "MiniIconsGrey" },
-      { "─", "NormalFloat" },
-      { "┐", "NormalFloat" },
-      { "│", "NormalFloat" },
-      { "┘", "NormalFloat" },
-      { "─", "NormalFloat" },
-      { "└", "NormalFloat" },
-      { "│", "NormalFloat" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
     },
     git = {
       { "󰊢", "MiniIconsRed" },
-      { "─", "NormalFloat" },
-      { "┐", "NormalFloat" },
-      { "│", "NormalFloat" },
-      { "┘", "NormalFloat" },
-      { "─", "NormalFloat" },
-      { "└", "NormalFloat" },
-      { "│", "NormalFloat" },
+      { "─", "Comment" },
+      { "┐", "Comment" },
+      { "│", "Comment" },
+      { "┘", "Comment" },
+      { "─", "Comment" },
+      { "└", "Comment" },
+      { "│", "Comment" },
     },
   },
 }
@@ -69,11 +70,11 @@ M.none = setmetatable(M.none, {
   __call = function(...) return M.none end,
 })
 M.single = setmetatable(M.single, {
-  __call = function(_, t, override)
-    t = t or "lsp"
+  __call = function(_, t, override, start)
+    t = t or "simple"
     local target = M.single[t]
     -- Override the highlight color starting from the second item
-    for i = 2, #target do
+    for i = start, #target do
       if type(target[i]) == "table" then target[i][2] = override or target[i][2] end
     end
     return target
@@ -82,11 +83,9 @@ M.single = setmetatable(M.single, {
 
 ---@param type? Mode type of border to be use
 ---@param override? string override hl for given buffer
+---@param start? integer whether to start from 1 or 2
 ---@return FloatBorder
-M.impl = function(type, override) return M[vim.g.border or "none"](type, override) end
-
----@return string[][]
-M.get = function() return M["__default"] end
+M.impl = function(type, override, start) return M[vim.g.border or "none"](type, override, start or 2) end
 
 _G.BORDER = setmetatable(M, { __index = function() return M.impl() end })
 
@@ -120,17 +119,6 @@ H.ensure_get_icon = function()
     local has_devicons, devicons = pcall(require, "nvim-web-devicons")
     if not has_devicons then return end
     H.get_icon = function() return (devicons.get_icon(vim.fn.expand "%:t", nil, { default = true })) end
-  end
-end
-
-H.get_filesize = function()
-  local size = vim.fn.getfsize(vim.fn.getreg "%")
-  if size < 1024 then
-    return fmt("%dB", size)
-  elseif size < 1048576 then
-    return fmt("%.2fKiB", size / 1024)
-  else
-    return fmt("%.2fMiB", size / 1048576)
   end
 end
 
@@ -197,23 +185,6 @@ end
 ---@alias StatuslineReturn string | table<string, any>
 ---@type table<string, fun(args: SimpleStatuslineArgs): StatuslineReturn>
 _G.statusline = {
-  git = function(args)
-    if H.isnt_normal_buffer() or H.is_truncated(args.trunc_width) then return "" end
-
-    local icon = args.icon or ""
-    local summary = vim.b.minigit_summary_string or vim.b.gitsigns_head
-    if summary == nil then return "" end
-
-    return "(" .. icon .. " " .. (summary == "" and "-" or summary) .. ")"
-  end,
-  diff = function(args)
-    if H.isnt_normal_buffer() or H.is_truncated(args.trunc_width) then return "" end
-    local summary = vim.b.minidiff_summary_string or vim.b.gitsigns_status
-    if summary == nil then return "" end
-
-    local icon = args.icon or ""
-    return icon .. " " .. (summary == "" and "-" or summary)
-  end,
   lint = function(args)
     ---@module "lint"
     local lint
@@ -261,15 +232,9 @@ _G.statusline = {
     if H.is_truncated(args.trunc_width) or vim.bo.buftype ~= "" then return filetype end
 
     -- Construct output string with extra file info
-    local format = vim.bo.fileformat
-    local size = H.get_filesize()
-    return fmt("%s [%s %s]", filetype, format, size)
+    return fmt("%s", filetype)
   end,
-  location = function(args)
-    local icon = args.icon or "♥"
-    if H.is_truncated(args.trunc_width) then return "%l:%v" end
-    return "%l:%v" .. (" %s"):format(icon)
-  end,
+  location = function(_) return "%l:%v" end,
   ---@return {md:string, hl:string}
   mode = function(args)
     local mi = H.modes[vim.fn.mode()]

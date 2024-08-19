@@ -25,12 +25,63 @@ setmetatable(M, {
   end,
 })
 
-function M.setup()
+local map = function(mode, lhs, rhs, opts)
+  opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
+
+-- Easily hit escape in terminal mode.
+-- Open a terminal at the bottom of the screen with a fixed height.
+local function get_fzf_args()
+  return vim.api.nvim_get_option_value("background", {}) == "light"
+      and "--color=fg:#797593,bg:#faf4ed,hl:#d7827e --color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e --color=border:#dfdad9,header:#286983,gutter:#faf4ed --color=spinner:#ea9d34,info:#56949f --color=pointer:#907aa9,marker:#b4637a,prompt:#797593"
+    or "--color=fg:#908caa,bg:#191724,hl:#ebbcba --color=fg+:#e0def4,bg+:#26233a,hl+:#ebbcba --color=border:#403d52,header:#31748f,gutter:#191724 --color=spinner:#f6c177,info:#9ccfd8 --color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa"
+end
+
+---@param opts LazyConfig
+function M.setup(opts)
   M.plugin.setup()
   M.root.setup()
-  M.format.setup()
 
-  vim.treesitter.language.register("markdown", "vimwiki")
+  require("lazy").setup(opts)
+
+  M.on_very_lazy(M.format.setup)
+  M.on_very_lazy(M.toggle.setup)
+
+  map(
+    "n",
+    "<C-p>",
+    function()
+      M.terminal(nil, {
+        cwd = M.root(),
+        env = { FZF_DEFAULT_OPTS = get_fzf_args() },
+      })
+    end,
+    { desc = "terminal: open (root)" }
+  )
+  map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
+  map(
+    "n",
+    "<M-[>",
+    function() M.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
+    { desc = "terminal: open (root)" }
+  )
+  map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
+  map(
+    "n",
+    "<M-]>",
+    function()
+      M.terminal(
+        { "npx", "quartz", "build", "--bundleInfo", "--concurrency", "4", "--serve", "--verbose" },
+        { cwd = M.root(), env = { FZF_DEFAULT_OPTS = get_fzf_args() }, interactive = true, esc_esc = true }
+      )
+    end,
+    { desc = "terminal: serve quartz" }
+  )
+  map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
+  map("n", "<C-x>", function(buf) M.ui.bufremove(buf) end, { desc = "buffer: delete" })
+
+  return M
 end
 
 M.is_win = function() return vim.uv.os_uname().sysname:find "Windows" ~= nil end

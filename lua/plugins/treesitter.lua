@@ -24,7 +24,7 @@ return {
         end,
       })
 
-      return { mode = "cursor" }
+      return { mode = "cursor", enable = false }
     end,
   },
   {
@@ -33,6 +33,10 @@ return {
     build = ":TSUpdate",
     event = { "LazyFile", "VeryLazy" },
     lazy = vim.fn.argc(-1) == 0,
+    keys = {
+      { "<c-space>", desc = "Increment Selection" },
+      { "<bs>", desc = "Decrement Selection", mode = "x" },
+    },
     init = function(plugin)
       -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
       -- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which

@@ -585,7 +585,7 @@ return {
   },
   {
     "echasnovski/mini.pairs",
-    event = "VeryLazy",
+    event = "LazyFile",
     opts = {
       modes = { insert = true, command = true, terminal = false },
       -- skip autopair when next character is one of these
@@ -642,7 +642,7 @@ return {
   },
   {
     "echasnovski/mini.starter",
-    version = false, -- wait till new 0.7.0 release to put it back on semver
+    version = false,
     event = "VimEnter",
     opts = function()
       local logo = table.concat({
@@ -850,28 +850,30 @@ return {
   },
   {
     "echasnovski/mini.statusline",
-    event = "LazyFile",
+    event = "VeryLazy",
     opts = {
       content = {
         active = function()
           local m = statusline.mode { trunc_width = 75 }
-          local git = statusline.git { trunc_width = 40 }
-          local diff = statusline.diff { trunc_width = 75 }
           local diagnostics = statusline.diagnostic { trunc_width = 75 }
           local lint = statusline.lint { trunc_width = 40 }
+          local filename = MiniStatusline.section_filename { trunc_width = 140 }
           local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
           local fileinfo = statusline.fileinfo { trunc_width = 90 }
           local location = statusline.location { trunc_width = 90 }
+          local search = MiniStatusline.section_searchcount { trunc_width = 75 }
 
           -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
           -- correct padding with spaces between groups (accounts for 'missing'
           -- sections, etc.)
           return MiniStatusline.combine_groups {
             { hl = m.hl, strings = { m.md } },
-            { hl = "MiniStatuslineDevinfo", strings = { git, diff, lsp, lint } },
+            { hl = "MiniStatuslineDevinfo", strings = { lsp, lint } },
+            "%<", -- Mark general truncate point
+            { hl = "MiniStatuslineFilename", strings = { filename } },
             "%=", -- End left alignment
             { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
-            { hl = m.hl, strings = { location } },
+            { hl = m.hl, strings = { search, location } },
           }
         end,
       },

@@ -106,7 +106,7 @@ o.splitbelow = true
 o.splitright = true
 o.timeout = true
 o.timeoutlen = 300
-o.updatetime = 250
+o.updatetime = 200
 o.virtualedit = "block"
 o.whichwrap = "h,l,<,>,[,],~"
 
@@ -126,16 +126,16 @@ g.markdown_recommended_style = 0
 -- options
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
-g.inline_diagnostics = true
-g.picker = "telescope"
+g.inline_diagnostics = false
+g.picker = "mini.pick"
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
-g.cmp = { widths = { abbr = 40, menu = 40 } }
-g.cmp_format = "symbol" -- "symbol" | "text_symbol"
-g.border = "single"
+g.cmp_widths = { abbr = 30, menu = 30 }
+g.cmp_format = "symbol" -- "symbol" | "text_symbol" | "text"
+g.border = "none"
 g.use_agent = true
-g.override_background = "dark"
+g.override_background = os.getenv "XDG_SYSTEM_THEME" or "dark"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

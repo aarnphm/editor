@@ -66,10 +66,7 @@ function M.info(buf)
     end
   end
   if not have then lines[#lines + 1] = "\n***No formatters available for this buffer.***" end
-  Util[enabled and "info" or "warn"](
-    table.concat(lines, "\n"),
-    { title = "LazyFormat (" .. (enabled and "enabled" or "disabled") .. ")\n" }
-  )
+  Util[enabled and "info" or "warn"](table.concat(lines, "\n"))
 end
 
 ---@param buf? number
@@ -98,7 +95,6 @@ function M.enable(enable, buf)
     vim.g.autoformat = enable
     vim.b.autoformat = nil
   end
-  M.info()
 end
 
 ---@param opts? {force?:boolean, buf?:number}

@@ -3,8 +3,8 @@ return {
     "stevearc/dressing.nvim",
     lazy = true,
     opts = {
-      input = { border = BORDER.get(), win_options = { winhighlight = "TelescopeNormal:StatusLine" } },
-      builtin = { border = BORDER.get() },
+      input = { border = vim.g.border or "single" },
+      builtin = { border = vim.g.border or "single" },
     },
     init = function()
       ---@diagnostic disable-next-line: duplicate-set-field
@@ -20,15 +20,12 @@ return {
     end,
   },
   {
-    "utilyre/barbecue.nvim",
-    version = false,
-    event = "LazyFile",
-    dependencies = { "SmiteshP/nvim-navic" },
-    opts = { show_modified = true, symbols = { ellipsis = "…" } },
-  },
-  {
     "folke/noice.nvim",
     event = "LazyFile",
+    enabled = true,
+    depdendencies = {
+      { "MunifTanjim/nui.nvim", lazy = true },
+    },
     ---@type NoiceConfig
     opts = {
       presets = {
@@ -40,11 +37,11 @@ return {
       cmdline = { view = "cmdline" },
       views = {
         split = { size = "20%" },
-        popup = { border = { style = BORDER.get() } },
+        popup = { border = { style = BORDER.impl() } },
         confirm = { border = { style = BORDER.impl "hover" } },
         hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
-        cmdline_input = { border = { style = BORDER.get() } },
-        cmdline_popup = { border = { style = BORDER.get() } },
+        cmdline_input = { border = { style = BORDER.impl() } },
+        cmdline_popup = { border = { style = BORDER.impl() } },
         mini = { border = { style = BORDER.none } },
       },
       routes = {
@@ -58,6 +55,7 @@ return {
               { find = "%d+L, %d+B" },
               { find = "Starting Supermaven" },
               { find = "Supermaven Free Tier" },
+              { find = "Supermaven Pro Tier" },
             },
           },
           opts = { skip = true },
@@ -87,7 +85,6 @@ return {
       },
     },
   },
-  { "MunifTanjim/nui.nvim", lazy = true },
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
@@ -139,6 +136,7 @@ return {
           { "gx", desc = "util: open with system app" },
         },
       },
+      disable = { ft = { "minifiles" } },
     },
     keys = {
       {
