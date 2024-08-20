@@ -580,7 +580,7 @@ return {
       Util.toggle.map(
         "<leader>ui",
         Util.toggle.wrap {
-          name = "inline_diagnostics",
+          name = "inline diagnostics",
           get = function() return vim.g.inline_diagnostics end,
           set = function(state)
             vim.g.inline_diagnostics = state

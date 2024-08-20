@@ -2,15 +2,7 @@ require "aarnphm.globals"
 require "aarnphm.options"
 require "aarnphm.bindings"
 
--- NOTE: local items
-local M = {
-  disable = {
-    filetypes = { "ministarter", "dashboard", "help", "grug-far", "TelescopePrompt" },
-    buftypes = { "prompt", "scratch", "ministarter" },
-  },
-}
-
--- close some filetypes with <q>
+---close some filetypes with <q>
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "filetype_q",
   pattern = {
@@ -23,7 +15,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "qf",
     "query",
     "gitsigns.blame",
-    "nowrite", -- fugitive
+    "nowrite", ---fugitive
     "fugitive",
     "prompt",
     "tsplayground",
@@ -41,14 +33,14 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
   end,
 })
--- Check if we need to reload the file when it changed
+---Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup "checktime",
   callback = function()
     if vim.o.buftype ~= "nofile" then vim.cmd "checktime" end
   end,
 })
--- correct resized tabs
+---correct resized tabs
 vim.api.nvim_create_autocmd("VimResized", {
   group = augroup "resized",
   callback = function()
@@ -61,19 +53,19 @@ vim.api.nvim_create_autocmd(
   "BufWritePre",
   { group = augroup "tempfile", pattern = { "/tmp/*", "*.tmp", "*.bak" }, command = "setlocal noundofile" }
 )
--- make it easier to close man-files when opened inline
+---make it easier to close man-files when opened inline
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "man_unlisted",
   pattern = { "man" },
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
--- Fix conceallevel for json files
+---Fix conceallevel for json files
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "json_conceal",
   pattern = { "json", "jsonc", "json5" },
   callback = function() vim.opt_local.conceallevel = 0 end,
 })
--- Auto create dir when saving a file, in case some intermediate directory does not exist
+---Auto create dir when saving a file, in case some intermediate directory does not exist
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup "auto_create_dir",
   callback = function(event)
@@ -82,13 +74,13 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
--- Highlight on yank
+---Highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup "highlight_yank",
   pattern = "*",
   callback = function() vim.highlight.on_yank { higroup = "IncSearch" } end,
 })
--- auto trim trailing whitespace
+---auto trim trailing whitespace
 vim.api.nvim_create_autocmd("BufWritePost", {
   group = augroup "trim_whitespace",
   callback = function()
@@ -96,16 +88,16 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     if ok then
       trailspace.trim()
     else
-      -- Fallback to manual trim in case mini fails to load
-      -- Save cursor position to later restore
+      ---Fallback to manual trim in case mini fails to load
+      ---Save cursor position to later restore
       local curpos = vim.api.nvim_win_get_cursor(0)
-      -- Search and replace trailing whitespace
+      ---Search and replace trailing whitespace
       vim.cmd [[keeppatterns %s/\s\+$//e]]
       vim.api.nvim_win_set_cursor(0, curpos)
     end
   end,
 })
--- toggle number on focussed window
+---toggle number on focussed window
 vim.cmd [[
   augroup simple_numbertoggle
     autocmd!
@@ -113,34 +105,7 @@ vim.cmd [[
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
   augroup END
 ]]
--- setup laststatus when entering
-M.should_hide = function(bufnr)
-  local filetype = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
-  local buftype = vim.api.nvim_get_option_value("buftype", { buf = bufnr })
-  local is_filetype_disabled = vim.tbl_contains(M.disable.filetypes, filetype)
-  local is_buftype_disabled = vim.tbl_contains(M.disable.buftypes, buftype)
-
-  local function is_floating()
-    local winids = vim.fn.win_findbuf(bufnr)
-    for _, winid in ipairs(winids) do
-      if vim.api.nvim_win_get_config(winid).relative ~= "" then return true end
-    end
-    return false
-  end
-
-  return is_floating() or is_buftype_disabled or is_filetype_disabled
-end
-vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
-  group = augroup "last_status_enter",
-  pattern = "*",
-  callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
-})
-vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
-  group = augroup "last_status_exit",
-  pattern = "*",
-  callback = function(ev) vim.o.laststatus = M.should_hide(ev.buf) and 0 or vim.g.laststatus end,
-})
--- Set local settings for terminal buffers
+---Set local settings for terminal buffers
 vim.api.nvim_create_autocmd("TermOpen", {
   group = augroup "custom_term_open",
   callback = function()
@@ -149,7 +114,7 @@ vim.api.nvim_create_autocmd("TermOpen", {
     vim.opt_local.scrolloff = 0
   end,
 })
--- highlight URL
+---highlight URL
 local highlighturl_group = augroup "highlighturl"
 vim.api.nvim_create_autocmd("ColorScheme", {
   group = highlighturl_group,
@@ -165,7 +130,7 @@ vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, 
     end
   end,
 })
--- add bigfile filetype and disable some defaults on bigfile
+---add bigfile filetype and disable some defaults on bigfile
 vim.filetype.add {
   pattern = {
     [".*"] = {
@@ -188,17 +153,30 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
   end,
 })
-
--- add http filetype
+---add http filetype
 vim.filetype.add {
   extension = {
     ["http"] = "http",
   },
 }
+---dotenv and tsconfig
+vim.filetype.add {
+  extension = {
+    env = "dotenv",
+  },
+  filename = {
+    [".env"] = "dotenv",
+    ["env"] = "dotenv",
+  },
+  pattern = {
+    ["[jt]sconfig.*.json"] = "jsonc",
+    ["%.env%.[%w_.-]+"] = "dotenv",
+  },
+}
 
 local function get_hour() return tonumber(os.date "%H") end
 
--- Set the background based on the hour
+---Set the background based on the hour
 local function set_background()
   local hour = get_hour()
   if hour >= 6 and hour < 19 then
@@ -213,7 +191,7 @@ vim.api.nvim_create_autocmd("VimEnter", { callback = set_background })
 
 set_background()
 
--- bootstrap logics
+---bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
@@ -249,12 +227,11 @@ end
 hi("HighlightURL", { default = true, underline = true })
 hi("MiniFilesBorder", { link = "Normal" })
 hi("MiniFilesNormal", { link = "Normal" })
-hi("VertSplit", { fg = "NONE", bg = "NONE", bold = false })
 hi("CmpGhostText", { link = "Comment", default = true })
--- leap.nvim
-hi("LeapBackdrop", { link = "Comment" }) -- or some grey
+---leap.nvim
+hi("LeapBackdrop", { link = "Comment" }) ---or some grey
 hi("LeapMatch", {
-  -- For light themes, set to 'black' or similar.
+  ---For light themes, set to 'black' or similar.
   fg = vim.go.background == "dark" and "white" or "black",
   bold = true,
   nocombine = true,

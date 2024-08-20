@@ -19,6 +19,43 @@ return {
     },
   },
   {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    lazy = true,
+    version = false,
+    build = ":Copilot auth",
+    keys = {
+      {
+        "<C-k>",
+        function()
+          return Util.is_loaded "copilot.lua" and require("copilot.suggestion").toggle_auto_trigger() or "<C-k>"
+        end,
+        expr = true,
+        silent = true,
+        mode = "i",
+      },
+    },
+    opts = {
+      cmp = { enabled = false, method = "getCompletionsCycling" },
+      panel = { enabled = false },
+      suggestion = { enabled = false, auto_trigger = false },
+      filetypes = {
+        markdown = true,
+        help = false,
+        hgcommit = false,
+        gitcommit = false,
+        svn = false,
+        cvs = false,
+        TelescopePrompt = false,
+        big_file_disabled_ft = false,
+        neogitCommitMessage = false,
+      },
+    },
+    init = function()
+      package.preload["copilot.lua"] = function() return {} end
+    end,
+  },
+  {
     "hrsh7th/nvim-cmp",
     version = false,
     event = "LspAttach",

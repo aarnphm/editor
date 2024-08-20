@@ -410,12 +410,12 @@ return {
     },
     keys = {
       {
-        "<LocalLeader>/",
+        "<Leader>/",
         function() require("mini.files").open(vim.api.nvim_buf_get_name(0), true) end,
         desc = "mini.files: open (directory of current file)",
       },
       {
-        "<LocalLeader>.",
+        "<Leader>.",
         function() require("mini.files").open(Util.root.git(), true) end,
         desc = "mini.files: open (working root)",
       },
@@ -663,18 +663,17 @@ return {
       end
 
       local starter = require "mini.starter"
-      -- stylua: ignore
       local config = {
         evaluate_single = true,
         header = logo,
         items = {
-          new_section("Files",      Util.pick('files'),          "Telescope"),
-          new_section("Recents",    Util.pick("oldfiles"),       "Telescope"),
-          new_section("Text",       Util.pick("live_grep"),      "Telescope"),
-          new_section("Lazy",       "Lazy",                      "Config"),
-          new_section("Config",     Util.pick.config_files(),    "Config"),
-          new_section("New",        "ene | startinsert",         "Builtin"),
-          new_section("Quit",       "qa",                        "Builtin"),
+          new_section("Files", Util.pick "files", "Picker"),
+          new_section("Recents", Util.pick "oldfiles", "Picker"),
+          new_section("Text", Util.pick "live_grep", "Picker"),
+          new_section("Config", Util.pick.config_files(), "Config"),
+          new_section("Lazy", "Lazy", "Config"),
+          new_section("New", "ene | startinsert", "Builtin"),
+          new_section("Quit", "qa", "Builtin"),
         },
         content_hooks = {
           starter.gen_hook.adding_bullet(pad .. "░ ", false),

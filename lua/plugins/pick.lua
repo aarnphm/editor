@@ -41,7 +41,6 @@ elseif Util.pick.want() == "mini.pick" then
     commands = {
       files = "files",
       live_grep = "grep_live",
-      oldfiles = "files",
     },
     -- this will return a function that calls telescope.
     -- cwd will default to lazyvim.util.get_root
@@ -49,12 +48,17 @@ elseif Util.pick.want() == "mini.pick" then
     ---@param builtin string
     ---@param opts? lazyvim.util.pick.Opts
     open = function(builtin, opts)
+      local extras = require "mini.extra"
       opts = opts or {}
       if opts.tool ~= nil then
         opts.source = vim.tbl_deep_extend("force", opts.source or {}, { cwd = opts.cwd })
         opts.cwd = nil
       end
-      require("mini.pick").builtin[builtin](opts)
+      if extras.pickers[builtin] then
+        extras.pickers[builtin](opts)
+      else
+        require("mini.pick").builtin[builtin](opts)
+      end
     end,
   }
 end
@@ -67,8 +71,14 @@ return {
     "echasnovski/mini.pick",
     cmd = "Pick",
     version = false,
+    dependencies = {
+      { "echasnovski/mini.extra", opts = {} },
+    },
     enabled = function() return Util.pick.want() == "mini.pick" end,
-    opts = {},
+    opts = {
+      options = { use_cache = true },
+      window = { prompt_prefix = "󰄾 " },
+    },
     keys = {
       {
         "<LocalLeader>f",
@@ -77,17 +87,17 @@ return {
       },
       {
         "<LocalLeader>.",
-        Util.pick("files", { source = { items = vim.fn.readdir "." } }),
-        desc = "mini.pick: open (current)",
+        Util.pick "oldfiles",
+        desc = "mini.pick: oldfiles",
       },
       {
         "<LocalLeader>w",
-        Util.pick "grep_live",
+        Util.pick "live_grep",
         desc = "mini.pick: grep word",
       },
       {
-        "<leader>b",
-        Util.pick "buffers",
+        "<LocalLeader>/",
+        '<CMD>:Pick grep pattern="<cword>"<CR>',
         desc = "mini.pick: grep word",
       },
     },

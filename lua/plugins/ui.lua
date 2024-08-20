@@ -23,9 +23,7 @@ return {
     "folke/noice.nvim",
     event = "LazyFile",
     enabled = true,
-    depdendencies = {
-      { "MunifTanjim/nui.nvim", lazy = true },
-    },
+    depdendencies = { { "MunifTanjim/nui.nvim", lazy = true } },
     ---@type NoiceConfig
     opts = {
       presets = {

@@ -9,9 +9,8 @@ local M = {}
 ---@class simple.Toggle.wrap: simple.Toggle
 ---@operator call:boolean
 
--- setup toggle keymaps
+---setup toggle keymaps
 M.setup = function()
-  M.map("<leader>us", M("spell", { name = "spelling" }))
   M.map("<leader>uw", M("wrap", { name = "wrap" }))
   M.map("<leader>uc", M("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
   M.map("<leader>uf", M.format())
@@ -71,15 +70,18 @@ function M.wk(lhs, toggle)
 end
 
 M.agent = M.wrap {
-  name = "code agent",
-  get = function() return vim.g.use_agent end,
+  name = "inline code agent",
+  get = function() return vim.g.enable_agent_inlay end,
   set = function(state)
     local ok, agent = pcall(require, "supermaven-nvim.api")
     if not ok then Util.error("Failed to load agent", { once = true }) end
-    agent.toggle()
 
-    if state == nil then state = true end
-    vim.g.use_agent = state
+    local completion_preview = require "supermaven-nvim.completion_preview"
+
+    if agent.is_running() then agent.stop() end
+    completion_preview.disable_inline_completion = not state
+    vim.g.enable_agent_inlay = state
+    agent.start()
   end,
 }
 
@@ -160,7 +162,7 @@ M.background = M.wrap {
 ---@type {k:string, v:any}[]
 M._maximized = nil
 M.maximize = M.wrap {
-  name = "Maximize",
+  name = "maximize",
   get = function() return M._maximized ~= nil end,
   set = function(state)
     if state then

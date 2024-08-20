@@ -29,7 +29,7 @@ o.signcolumn = "yes" -- always show sign column
 o.undofile = true -- set undofile to infinite undo
 o.breakindent = true -- enable break indent
 o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
-o.pumheight = 15 -- larger completion windows
+o.pumheight = 10 -- larger completion windows
 o.expandtab = true -- convert spaces to tabs
 o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
 o.number = true -- number is good for nav
@@ -108,6 +108,7 @@ o.timeout = true
 o.timeoutlen = 300
 o.updatetime = 200
 o.virtualedit = "block"
+o.laststatus = 2
 o.whichwrap = "h,l,<,>,[,],~"
 
 -- last but def not least, wildmenu
@@ -130,12 +131,11 @@ g.inline_diagnostics = false
 g.picker = "mini.pick"
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
-g.laststatus = 2 -- 2: show statusline on buffer, 3: always show statusline on global
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.cmp_widths = { abbr = 30, menu = 30 }
 g.cmp_format = "symbol" -- "symbol" | "text_symbol" | "text"
-g.border = "none"
-g.use_agent = true
+g.border = "single"
+g.enable_agent_inlay = false
 g.override_background = os.getenv "XDG_SYSTEM_THEME" or "dark"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
