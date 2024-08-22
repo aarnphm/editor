@@ -16,6 +16,7 @@ return {
       },
       log_level = "warn",
       disable_inline_completion = true,
+      disable_keymaps = true,
     },
   },
   {
@@ -105,7 +106,7 @@ return {
         formatting = {
           fields = { TC.ItemField.Menu, TC.ItemField.Abbr, TC.ItemField.Kind },
           expandable_indicator = true,
-          format = function(_, item)
+          format = function(entry, item)
             local mini_icon = MiniIcons.get("lsp", item.kind or "")
             if vim.g.cmp_format == "symbol" then
               item.kind = mini_icon and mini_icon .. " " or item.kind
@@ -116,6 +117,16 @@ return {
             else
               Util.error("cmp_format must be either 'symbol' or 'text_symbol'", { once = true, title = "LazyVim" })
             end
+
+---Source
+            item.menu = ({
+              supermaven = "[MVN]",
+              nvim_lsp = "[LSP]",
+              nvim_lua = "[LUA]",
+              snippets = "[SNP]",
+              buffer = "[BUF]",
+              path = "[DIR]",
+            })[entry.source.name]
 
             local widths = {
               abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
@@ -132,6 +143,10 @@ return {
         },
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
+        },
+        window = {
+          completion = cmp.config.window.bordered { border = BORDER.impl("lsp", "Comment") },
+          documentation = cmp.config.window.bordered { border = BORDER.impl("docs", "Comment") },
         },
         sorting = {
           comparators = {
@@ -179,10 +194,14 @@ return {
                 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
             end
 
+            local supermaven = require "supermaven-nvim.completion_preview"
+
             if cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif vim.snippet.active { direction = 1 } then
               vim.schedule(function() vim.snippet.jump(1) end)
+            elseif vim.g.enable_agent_inlay and supermaven.has_suggestion() then
+              supermaven.on_accept_suggestion()
             elseif has_words_before() then
               cmp.complete()
             else

@@ -13,18 +13,6 @@ end
 
 map(
   "n",
-  "<C-p>",
-  function()
-    Util.terminal(nil, {
-      cwd = Util.root(),
-      env = { FZF_DEFAULT_OPTS = get_fzf_args() },
-    })
-  end,
-  { desc = "terminal: open (root)" }
-)
-map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
-map(
-  "n",
   "<M-[>",
   function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
   { desc = "terminal: open (root)" }

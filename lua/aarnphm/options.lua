@@ -106,9 +106,9 @@ o.splitbelow = true
 o.splitright = true
 o.timeout = true
 o.timeoutlen = 300
-o.updatetime = 200
+o.updatetime = 250
 o.virtualedit = "block"
-o.laststatus = 2
+o.laststatus = 3
 o.whichwrap = "h,l,<,>,[,],~"
 
 -- last but def not least, wildmenu

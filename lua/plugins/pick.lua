@@ -86,7 +86,7 @@ return {
         desc = "mini.pick: open (git root)",
       },
       {
-        "<LocalLeader>.",
+        "<Leader>f",
         Util.pick "oldfiles",
         desc = "mini.pick: oldfiles",
       },
@@ -96,7 +96,7 @@ return {
         desc = "mini.pick: grep word",
       },
       {
-        "<LocalLeader>/",
+        "<Leader>/",
         '<CMD>:Pick grep pattern="<cword>"<CR>',
         desc = "mini.pick: grep word",
       },
@@ -207,9 +207,7 @@ return {
         defaults = {
           prompt_prefix = "󰄾 ",
           selection_caret = " ",
-          borderchars = BORDER.single["simple"],
-          -- open files in the first window that is an actual file.
-          -- use the current window if no other window is available.
+          borderchars = vim.g.border,
           get_selection_window = function()
             local wins = vim.api.nvim_list_wins()
             table.insert(wins, 1, vim.api.nvim_get_current_win())

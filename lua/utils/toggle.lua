@@ -16,10 +16,10 @@ M.setup = function()
   M.map("<leader>uf", M.format())
   M.map("<leader>uF", M.format(true))
   M.map("<leader>ub", M.background)
-  M.map("<leader>um", M.maximize)
+  M.map("<leader>uM", M.maximize)
   M.map("<leader>ud", M.diagnostics)
   M.map("<leader>un", M.number)
-  M.map("<leader>us", M.agent)
+  M.map("<leader>um", M.agent)
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
 

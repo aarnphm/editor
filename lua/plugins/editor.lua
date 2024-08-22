@@ -67,10 +67,38 @@ return {
     end,
   },
   { "tpope/vim-repeat", lazy = false },
+  {
+    "Bekaboo/dropbar.nvim",
+    version = false,
+    dependencies = {
+      "nvim-telescope/telescope-fzf-native.nvim",
+    },
+    ---@type dropbar_configs_t
+    opts = {
+      general = {
+        enable = function(buf, win, _)
+          return vim.api.nvim_buf_is_valid(buf)
+            and vim.api.nvim_win_is_valid(win)
+            and vim.wo[win].winbar == ""
+            and vim.fn.win_gettype(win) == ""
+            and vim.bo[buf].ft ~= "help"
+            and vim.bo[buf].ft ~= "Avante"
+            and ((pcall(vim.treesitter.get_parser, buf)) and true or false)
+        end,
+      },
+    },
+    config = function(_, opts)
+      vim.keymap.set("n", "<leader>B", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
+      require("dropbar").setup(opts)
+    end,
+  },
   -- search/replace in multiple files
   {
     "MagicDuck/grug-far.nvim",
-    opts = { headerMaxWidth = 80 },
+    opts = {
+      headerMaxWidth = 50,
+      windowCreationCommand = "botright vsplit",
+    },
     cmd = "GrugFar",
     keys = {
       {
@@ -87,6 +115,18 @@ return {
         end,
         mode = { "n", "v" },
         desc = "search: open and replace",
+      },
+      {
+        "<leader>sw",
+        function()
+          local grug = require "grug-far"
+          grug.grug_far {
+            transient = true,
+            prefills = { search = vim.fn.expand "<cword>" },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (cursor word)",
       },
     },
   },
@@ -261,7 +301,7 @@ return {
         auto_preview = true,
         win_height = 12,
         win_vheight = 12,
-        border = BORDER.impl(),
+        border = vim.g.border,
         show_title = true,
         should_preview_cb = function(bufnr, _) return not Util.is_bigfile(bufnr) end,
       },

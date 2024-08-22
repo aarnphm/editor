@@ -410,12 +410,12 @@ return {
     },
     keys = {
       {
-        "<Leader>/",
+        "<LocalLeader>/",
         function() require("mini.files").open(vim.api.nvim_buf_get_name(0), true) end,
         desc = "mini.files: open (directory of current file)",
       },
       {
-        "<Leader>.",
+        "<LocalLeader>.",
         function() require("mini.files").open(Util.root.git(), true) end,
         desc = "mini.files: open (working root)",
       },
@@ -564,6 +564,7 @@ return {
           "git",
           "aerial",
           "dropbar",
+          "dropbar_menu",
           "gitcommit",
           "help",
           "json",
@@ -704,7 +705,6 @@ return {
           starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
           -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
           if vim.bo[ev.buf].filetype == "ministarter" then
-            vim.o.laststatus = 0
             vim.b[ev.buf].ministatusline_disable = true
             pcall(starter.refresh)
           end
@@ -712,10 +712,7 @@ return {
       })
 
       vim.api.nvim_create_user_command("Starter", function()
-        if _G.MiniStarter ~= nil then
-          MiniStarter.open()
-          vim.o.laststatus = 0
-        end
+        if _G.MiniStarter ~= nil then MiniStarter.open() end
       end, { desc = "starter: open" })
     end,
   },
@@ -851,8 +848,11 @@ return {
     "echasnovski/mini.statusline",
     event = "VeryLazy",
     opts = {
+      set_vim_settings = false,
       content = {
         active = function()
+          local statusline = make_statusline()
+
           local m = statusline.mode { trunc_width = 75 }
           local diagnostics = statusline.diagnostic { trunc_width = 75 }
           local lint = statusline.lint { trunc_width = 40 }
