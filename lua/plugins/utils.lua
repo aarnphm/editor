@@ -12,23 +12,6 @@ return {
     opts = {},
   },
   {
-    "rafcamlet/nvim-luapad",
-    ft = "lua",
-    cmd = "Luapad",
-    keys = {
-      {
-        "<leader>tp",
-        function()
-          require("luapad").init()
-          require("luapad").toggle { Lazy = function() return _G.Util end }
-        end,
-        mode = { "n", "x", "o" },
-        desc = "scratch: open a lua pad",
-      },
-    },
-    opts = {},
-  },
-  {
     "andweeb/presence.nvim",
     event = "LazyFile",
     opts = { enable_line_number = true },
@@ -48,7 +31,7 @@ return {
     ---@type avante.Config
     opts = {
       debug = false,
-      provider = "copilot", -- "groq"
+      provider = "claude", -- "groq"
       mappings = {
         ask = "<leader>ua",
         refresh = "<leader>ur",
