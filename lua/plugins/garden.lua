@@ -87,7 +87,7 @@ return {
         desc = "obsidian: open",
       },
     },
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-cmp", "telescope.nvim" },
+    dependencies = { "nvim-lua/plenary.nvim", "mini.nvim", "nvim-cmp" },
     ---@type obsidian.config.ClientOpts
     opts = {
       workspaces = { { name = "garden", path = vim.g.vault, overrides = { notes_subdir = "thoughts" } } },
@@ -116,6 +116,7 @@ return {
         return out
       end,
       note_id_func = function(title) return title end,
+      picker = { name = "mini.pick" },
     },
   },
   {

@@ -4,6 +4,32 @@
 ---@class MiniFilesBufferCreate: vim.api.create_autocmd.callback.args
 ---@field data MiniFilesBufferCreateData
 
+Util.pick.register {
+  name = "mini.pick",
+  commands = {
+    files = "files",
+    live_grep = "grep_live",
+  },
+  -- this will return a function that calls telescope.
+  -- cwd will default to lazyvim.util.get_root
+  -- for `files`, git_files or find_files will be chosen depending on .git
+  ---@param builtin string
+  ---@param opts? lazyvim.util.pick.Opts
+  open = function(builtin, opts)
+    local extras = require "mini.extra"
+    opts = opts or {}
+    if opts.tool ~= nil then
+      opts.source = vim.tbl_deep_extend("force", opts.source or {}, { cwd = opts.cwd })
+      opts.cwd = nil
+    end
+    if extras.pickers[builtin] then
+      extras.pickers[builtin](opts)
+    else
+      require("mini.pick").builtin[builtin](opts)
+    end
+  end,
+}
+
 -- mini.hipattern tailwind support
 local M = {}
 
@@ -322,65 +348,11 @@ M.colors = {
 
 return {
   {
-    "echasnovski/mini.align",
-    event = "LazyFile",
-    opts = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
-  },
-  { "echasnovski/mini.doc", opts = {}, ft = "lua", event = "LazyFile" },
-  { "echasnovski/mini.extra", opts = {}, event = "LazyFile" },
-  {
-    "echasnovski/mini.trailspace",
-    event = "LazyFile",
-    opts = {},
-    config = function(_, opts)
-      local show = true
-      Util.toggle.map("<leader>us", {
-        name = "trailspace",
-        get = function() return show end,
-        set = function(state)
-          show = not state
-          require("mini.trailspace").highlight()
-        end,
-      })
-      require("mini.trailspace").setup(opts)
-    end,
-  },
-  {
-    "echasnovski/mini.ai",
-    event = "LazyFile",
-    opts = function()
-      ---@module "mini.ai"
-      local ai = require "mini.ai"
-      return {
-        n_lines = 500,
-        custom_textobjects = {
-          o = ai.gen_spec.treesitter { -- code block
-            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
-          },
-          f = ai.gen_spec.treesitter { a = "@function.outer", i = "@function.inner" }, -- function
-          c = ai.gen_spec.treesitter { a = "@class.outer", i = "@class.inner" }, -- class
-          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" }, -- tags
-          d = { "%f[%d]%d+" }, -- digits
-          e = { -- Word with case
-            { "%u[%l%d]+%f[^%l%d]", "%f[%S][%l%d]+%f[^%l%d]", "%f[%P][%l%d]+%f[^%l%d]", "^[%l%d]+%f[^%l%d]" },
-            "^().*()$",
-          },
-          i = Util.mini.ai_indent, -- indent
-          g = Util.mini.ai_buffer, -- buffer
-          u = ai.gen_spec.function_call(), -- u for "Usage"
-          U = ai.gen_spec.function_call { name_pattern = "[%w_]" }, -- without dot in function name
-        },
-      }
-    end,
-    config = function(_, opts)
-      require("mini.ai").setup(opts)
-      Util.on_load("which-key.nvim", function() Util.mini.ai_whichkey(opts) end)
-    end,
-  },
-  {
-    "echasnovski/mini.files",
+    "echasnovski/mini.nvim",
+    version = false,
+    event = "VeryLazy",
     dependencies = {
+      { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
       {
         "s1n7ax/nvim-window-picker",
         name = "window-picker",
@@ -399,31 +371,297 @@ return {
         },
       },
     },
+    -- joined opts for all mini plugins
+    ---@class MiniOpts
     opts = {
-      windows = {
-        preview = false,
-        width_focus = 30,
-        width_nofocus = 30,
-        width_preview = math.floor(0.45 * vim.o.columns),
-        max_number = 3,
+      align = {
+        { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
       },
-      mappings = { synchronize = "<leader>" },
-    },
-    keys = {
-      {
-        "<LocalLeader>/",
-        function() require("mini.files").open(vim.api.nvim_buf_get_name(0), true) end,
-        desc = "mini.files: open (directory of current file)",
+      pick = {
+        options = { use_cache = true },
+        window = { prompt_prefix = "󰄾 " },
       },
-      {
-        "<LocalLeader>.",
-        function() require("mini.files").open(Util.root.git(), true) end,
-        desc = "mini.files: open (working root)",
+      comment = {
+        options = {
+          custom_commentstring = function()
+            return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
+          end,
+        },
       },
-    },
-    config = function(_, opts)
-      require("mini.files").setup(opts)
+      files = {
+        windows = {
+          preview = false,
+          width_focus = 30,
+          width_nofocus = 30,
+          width_preview = math.floor(0.45 * vim.o.columns),
+          max_number = 3,
+        },
+        mappings = { synchronize = "<leader>" },
+      },
+      ---@class MiniSurroundOpts
+      surround = {
+        mappings = {
+          add = "gsa", -- Add surrounding in Normal and Visual modes
+          delete = "gsd", -- Delete surrounding
+          find = "gsf", -- Find surrounding (to the right)
+          find_left = "gsF", -- Find surrounding (to the left)
+          highlight = "gsh", -- Highlight surrounding
+          replace = "gsr", -- Replace surrounding
+          update_n_lines = "gsn", -- Update `n_lines`
+        },
+      },
+      pairs = {
+        modes = { insert = true, command = true, terminal = false },
+        -- skip autopair when next character is one of these
+        skip_next = [=[[%w%%%'%[%"%.%`%$]]=],
+        -- skip autopair when the cursor is inside these treesitter nodes
+        skip_ts = { "string" },
+        -- skip autopair when next character is closing pair
+        -- and there are more closing pairs than opening pairs
+        skip_unbalanced = true,
+        -- better deal with markdown code blocks
+        markdown = true,
+        -- manually disable based on filetype
+        filetypes = { "lua", "python" },
+      },
+      diff = {
+        view = {
+          style = "sign",
+          signs = {
+            add = "▎",
+            change = "▎",
+            delete = "",
+          },
+        },
+      },
+      icons = {
+        file = {
+          [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
+          [".gitignore"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
+          ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
+          [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
+          [".node-version"] = { glyph = "", hl = "MiniIconsGreen" },
+          [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
+          [".yarnrc.yml"] = { glyph = "", hl = "MiniIconsBlue" },
+          ["eslint.config.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
+          ["package.json"] = { glyph = "", hl = "MiniIconsGreen" },
+          ["tsconfig.json"] = { glyph = "", hl = "MiniIconsAzure" },
+          ["tsconfig.build.json"] = { glyph = "", hl = "MiniIconsAzure" },
+          ["yarn.lock"] = { glyph = "", hl = "MiniIconsBlue" },
+          [".go-version"] = { glyph = "", hl = "MiniIconsBlue" },
+          [".rgignore"] = { glyph = "", hl = "MiniIconsYellow" },
+          ["*.py"] = { glyph = "󰌠", hl = "MiniIconsYellow" },
+        },
+        filetype = {
+          dotenv = { glyph = "", hl = "MiniIconsYellow" },
+          gotmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
+        },
+        lsp = {
+          supermaven = { glyph = "", hl = "MiniIconsOrange" },
+          namespace = { glyph = "󰅪", hl = "MiniIconsRed" },
+          null = { glyph = "NULL", hl = "MiniIconGrey" },
+          snippet = { glyph = "", hl = "MiniIconsYellow" },
+          struct = { glyph = "", hl = "MiniIconsRed" },
+          event = { glyph = "", hl = "MiniIconsYellow" },
+          operator = { glyph = "", hl = "MiniIconsGrey" },
+          typeparameter = { glyph = "", hl = "MiniIconsBlue" },
+        },
+      },
+      statusline = {
+        set_vim_settings = false,
+        content = {
+          active = function()
+            local statusline = make_statusline()
 
+            local m = statusline.mode { trunc_width = 75 }
+            local diagnostics = statusline.diagnostic { trunc_width = 75 }
+            local lint = statusline.lint { trunc_width = 50 }
+            local filename = MiniStatusline.section_filename { trunc_width = 140 }
+            local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+            local fileinfo = statusline.fileinfo { trunc_width = 90 }
+            local location = statusline.location { trunc_width = 90 }
+            local search = MiniStatusline.section_searchcount { trunc_width = 75 }
+
+            -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
+            -- correct padding with spaces between groups (accounts for 'missing'
+            -- sections, etc.)
+            return MiniStatusline.combine_groups {
+              { hl = m.hl, strings = { m.md } },
+              { hl = "MiniStatuslineDevinfo", strings = { lsp, lint } },
+              "%<", -- Mark general truncate point
+              { hl = "MiniStatuslineFilename", strings = { filename } },
+              "%=", -- End left alignment
+              { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
+              { hl = m.hl, strings = { search, location } },
+            }
+          end,
+        },
+      },
+      hipatterns = function()
+        local hi = require "mini.hipatterns"
+        return {
+          -- custom LazyVim option to enable the tailwind integration
+          tailwind = {
+            enabled = true,
+            ft = {
+              "astro",
+              "css",
+              "heex",
+              "html",
+              "html-eex",
+              "javascript",
+              "javascriptreact",
+              "rust",
+              "svelte",
+              "typescript",
+              "typescriptreact",
+              "vue",
+            },
+            -- full: the whole css class will be highlighted
+            -- compact: only the color will be highlighted
+            style = "full",
+          },
+          highlighters = {
+            hex_color = hi.gen_highlighter.hex_color { priority = 2000 },
+            shorthand = {
+              pattern = "()#%x%x%x()%f[^%x%w]",
+              group = function(_, _, data)
+                ---@type string
+                local match = data.full_match
+                local r, g, b = match:sub(2, 2), match:sub(3, 3), match:sub(4, 4)
+                local hex_color = "#" .. r .. r .. g .. g .. b .. b
+
+                return MiniHipatterns.compute_hex_color_group(hex_color, "bg")
+              end,
+              extmark_opts = { priority = 2000 },
+            },
+          },
+        }
+      end,
+      ai = function()
+        ---@module "mini.ai"
+        local ai = require "mini.ai"
+        return {
+          n_lines = 500,
+          custom_textobjects = {
+            o = ai.gen_spec.treesitter { -- code block
+              a = { "@block.outer", "@conditional.outer", "@loop.outer" },
+              i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+            },
+            f = ai.gen_spec.treesitter { a = "@function.outer", i = "@function.inner" }, -- function
+            c = ai.gen_spec.treesitter { a = "@class.outer", i = "@class.inner" }, -- class
+            t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" }, -- tags
+            d = { "%f[%d]%d+" }, -- digits
+            e = { -- Word with case
+              { "%u[%l%d]+%f[^%l%d]", "%f[%S][%l%d]+%f[^%l%d]", "%f[%P][%l%d]+%f[^%l%d]", "^[%l%d]+%f[^%l%d]" },
+              "^().*()$",
+            },
+            i = Util.mini.ai_indent, -- indent
+            g = Util.mini.ai_buffer, -- buffer
+            u = ai.gen_spec.function_call(), -- u for "Usage"
+            U = ai.gen_spec.function_call { name_pattern = "[%w_]" }, -- without dot in function name
+          },
+        }
+      end,
+    },
+    specs = { { "nvim-tree/nvim-web-devicons", enabled = false, optional = true } },
+    keys = function(_, keys)
+      keys = vim.list_extend({
+        -- mini.pick
+        {
+          "<LocalLeader>f",
+          Util.pick("files", { tool = "git" }),
+          desc = "mini.pick: open (git root)",
+        },
+        {
+          "<Leader>f",
+          Util.pick "oldfiles",
+          desc = "mini.pick: oldfiles",
+        },
+        {
+          "<LocalLeader>w",
+          Util.pick "live_grep",
+          desc = "mini.pick: grep word",
+        },
+        {
+          "<Leader>/",
+          '<CMD>:Pick grep pattern="<cword>"<CR>',
+          desc = "mini.pick: grep word",
+        },
+        -- mini.files
+        {
+          "<LocalLeader>/",
+          function() require("mini.files").open(vim.api.nvim_buf_get_name(0), true) end,
+          desc = "mini.files: open (directory of current file)",
+        },
+        {
+          "<LocalLeader>.",
+          function() require("mini.files").open(Util.root.git(), true) end,
+          desc = "mini.files: open (working root)",
+        },
+        -- mini.comment
+        { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "comment: visual line" },
+        { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "comment: visual line" },
+        -- mini.diff
+        {
+          "<leader>go",
+          function() require("mini.diff").toggle_overlay(0) end,
+          desc = "git: toggle diff overlay",
+        },
+      }, keys)
+
+      -- Populate the keys based on the user's options
+      ---@type MiniOpts
+      local opts = Util.opts "mini.nvim"
+      local mappings = {
+        { "gs", "", desc = "+surround" },
+        { opts.surround.mappings.add, desc = "surround: add", mode = { "n", "v" } },
+        { opts.surround.mappings.delete, desc = "surround: delete" },
+        { opts.surround.mappings.find, desc = "surround: find right" },
+        { opts.surround.mappings.find_left, desc = "surround: find left" },
+        { opts.surround.mappings.highlight, desc = "surround: highlight" },
+        { opts.surround.mappings.replace, desc = "surround: Replace" },
+        { opts.surround.mappings.update_n_lines, desc = "config: update `MiniSurround.config.n_lines`" },
+        {
+          "<leader><leader>s",
+          ":normal gsaiW`<Esc>",
+          desc = "surround: inner word with backticks",
+          noremap = true,
+        },
+      }
+      mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings) ---@param m LazyKeysSpec
+
+      return vim.list_extend(mappings, keys)
+    end,
+    init = function()
+      package.preload["nvim-web-devicons"] = function()
+        require("mini.icons").mock_nvim_web_devicons()
+        return package.loaded["nvim-web-devicons"]
+      end
+    end,
+    ---@param opts MiniOpts
+    config = function(_, opts)
+      require("mini.extra").setup {}
+      require("mini.surround").setup {}
+
+      require("mini.pick").setup(opts.pick)
+      require("mini.icons").setup(opts.icons)
+      require("mini.align").setup(opts.align)
+      require("mini.files").setup(opts.files)
+      require("mini.statusline").setup(opts.statusline)
+      require("mini.comment").setup(opts.comment)
+      require("mini.diff").setup(opts.diff)
+
+      -- mini.pairs
+      Util.mini.pairs(opts.pairs)
+
+      -- mini.ai
+      Util.mini.ai(opts.ai)
+
+      -- mini.trailspace
+      Util.mini.trailspace {}
+
+      -- mini.files
       local show_dotfiles = true
       local filter_show = function(_) return true end
       local filter_hide = function(fs_entry) return not vim.startswith(fs_entry.name, ".") end
@@ -506,103 +744,44 @@ return {
         pattern = "MiniFilesActionRename",
         callback = function(ev) Util.lsp.on_rename(ev.data.from, ev.data.to) end,
       })
+
+      -- mini.hipatterns
+      local hipatterns = opts.hipatterns()
+      if type(hipatterns.tailwind) == "table" and hipatterns.tailwind.enabled then
+        -- reset hl groups when colorscheme changes
+        vim.api.nvim_create_autocmd("ColorScheme", { callback = function() M.hl = {} end })
+        hipatterns.highlighters.tailwind = {
+          pattern = function()
+            if not vim.tbl_contains(hipatterns.tailwind.ft, vim.bo.filetype) then return end
+            if hipatterns.tailwind.style == "full" then
+              return "%f[%w:-]()[%w:-]+%-[a-z%-]+%-%d+()%f[^%w:-]"
+            elseif hipatterns.tailwind.style == "compact" then
+              return "%f[%w:-][%w:-]+%-()[a-z%-]+%-%d+()%f[^%w:-]"
+            end
+          end,
+          group = function(_, _, m)
+            ---@type string
+            local match = m.full_match
+            ---@type string, number
+            local color, shade = match:match "[%w-]+%-([a-z%-]+)%-(%d+)"
+            shade = tonumber(shade) or 0
+            local bg = vim.tbl_get(M.colors, color, shade)
+            if bg then
+              local hl = "MiniHipatternsTailwind" .. color .. shade
+              if not M.hl[hl] then
+                M.hl[hl] = true
+                local bg_shade = shade == 500 and 950 or shade < 500 and 900 or 100
+                local fg = vim.tbl_get(M.colors, color, bg_shade)
+                vim.api.nvim_set_hl(0, hl, { bg = "#" .. bg, fg = "#" .. fg })
+              end
+              return hl
+            end
+          end,
+          extmark_opts = { priority = 2000 },
+        }
+      end
+      require("mini.hipatterns").setup(hipatterns)
     end,
-  },
-  {
-    "echasnovski/mini.surround",
-    event = "LazyFile",
-    ---@class MiniSurroundOpts
-    opts = {
-      mappings = {
-        add = "gsa", -- Add surrounding in Normal and Visual modes
-        delete = "gsd", -- Delete surrounding
-        find = "gsf", -- Find surrounding (to the right)
-        find_left = "gsF", -- Find surrounding (to the left)
-        highlight = "gsh", -- Highlight surrounding
-        replace = "gsr", -- Replace surrounding
-        update_n_lines = "gsn", -- Update `n_lines`
-      },
-    },
-    keys = function(_, keys)
-      -- Populate the keys based on the user's options
-      ---@class MiniSurroundOpts
-      local opts = Util.opts "mini.surround"
-      local mappings = {
-        { "gs", "", desc = "+surround" },
-        { opts.mappings.add, desc = "surround: add", mode = { "n", "v" } },
-        { opts.mappings.delete, desc = "surround: delete" },
-        { opts.mappings.find, desc = "surround: find right" },
-        { opts.mappings.find_left, desc = "surround: find left" },
-        { opts.mappings.highlight, desc = "surround: highlight" },
-        { opts.mappings.replace, desc = "surround: Replace" },
-        { opts.mappings.update_n_lines, desc = "config: update `MiniSurround.config.n_lines`" },
-        {
-          "<leader><leader>s",
-          ":normal gsaiW`<Esc>",
-          desc = "surround: inner word with backticks",
-          noremap = true,
-        },
-      }
-      mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings) ---@param m LazyKeysSpec
-      return vim.list_extend(mappings, keys)
-    end,
-  },
-  {
-    "echasnovski/mini.pairs",
-    event = "LazyFile",
-    opts = {
-      modes = { insert = true, command = true, terminal = false },
-      -- skip autopair when next character is one of these
-      skip_next = [=[[%w%%%'%[%"%.%`%$]]=],
-      -- skip autopair when the cursor is inside these treesitter nodes
-      skip_ts = { "string" },
-      -- skip autopair when next character is closing pair
-      -- and there are more closing pairs than opening pairs
-      skip_unbalanced = true,
-      -- better deal with markdown code blocks
-      markdown = true,
-      -- manually disable based on filetype
-      filetypes = { "lua", "python" },
-    },
-    config = function(_, opts) Util.mini.pairs(opts) end,
-  },
-  {
-    "echasnovski/mini.comment",
-    dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
-    keys = {
-      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "comment: visual line" },
-      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "comment: visual line" },
-    },
-    event = "LazyFile",
-    opts = {
-      options = {
-        custom_commentstring = function()
-          return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
-        end,
-      },
-    },
-  },
-  -- setup mini.diff
-  {
-    "echasnovski/mini.diff",
-    event = "LazyFile",
-    keys = {
-      {
-        "<leader>go",
-        function() require("mini.diff").toggle_overlay(0) end,
-        desc = "git: toggle diff overlay",
-      },
-    },
-    opts = {
-      view = {
-        style = "sign",
-        signs = {
-          add = "▎",
-          change = "▎",
-          delete = "",
-        },
-      },
-    },
   },
   {
     "echasnovski/mini.starter",
@@ -671,167 +850,5 @@ return {
         end,
       })
     end,
-  },
-  {
-    "echasnovski/mini.icons",
-    opts = {
-      -- stylua: ignore
-      file = {
-        [".keep"]               = { glyph = "󰊢", hl = "MiniIconsGrey" },
-        [".gitignore"]          = { glyph = "󰊢", hl = "MiniIconsGrey" },
-        ["devcontainer.json"]   = { glyph = "", hl = "MiniIconsAzure" },
-        [".eslintrc.js"]        = { glyph = "󰱺", hl = "MiniIconsYellow" },
-        [".node-version"]       = { glyph = "", hl = "MiniIconsGreen" },
-        [".prettierrc"]         = { glyph = "", hl = "MiniIconsPurple" },
-        [".yarnrc.yml"]         = { glyph = "", hl = "MiniIconsBlue" },
-        ["eslint.config.js"]    = { glyph = "󰱺", hl = "MiniIconsYellow" },
-        ["package.json"]        = { glyph = "", hl = "MiniIconsGreen" },
-        ["tsconfig.json"]       = { glyph = "", hl = "MiniIconsAzure" },
-        ["tsconfig.build.json"] = { glyph = "", hl = "MiniIconsAzure" },
-        ["yarn.lock"]           = { glyph = "", hl = "MiniIconsBlue" },
-        [".go-version"]         = { glyph = "", hl = "MiniIconsBlue" },
-        [".rgignore"]           = { glyph = "", hl = "MiniIconsYellow" },
-        ["*.py"]                = { glyph = "󰌠", hl = "MiniIconsYellow" },
-      },
-      filetype = {
-        dotenv = { glyph = "", hl = "MiniIconsYellow" },
-        gotmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
-      },
-      lsp = {
-        supermaven = { glyph = "", hl = "MiniIconsOrange" },
-        namespace = { glyph = "󰅪", hl = "MiniIconsRed" },
-        null = { glyph = "NULL", hl = "MiniIconGrey" },
-        snippet = { glyph = "", hl = "MiniIconsYellow" },
-        struct = { glyph = "", hl = "MiniIconsRed" },
-        event = { glyph = "", hl = "MiniIconsYellow" },
-        operator = { glyph = "", hl = "MiniIconsGrey" },
-        typeparameter = { glyph = "", hl = "MiniIconsBlue" },
-      },
-    },
-    specs = {
-      { "nvim-tree/nvim-web-devicons", enabled = false, optional = true },
-    },
-    init = function()
-      package.preload["nvim-web-devicons"] = function()
-        require("mini.icons").mock_nvim_web_devicons()
-        return package.loaded["nvim-web-devicons"]
-      end
-    end,
-    config = function(_, opts) require("mini.icons").setup(opts) end,
-  },
-  {
-    "echasnovski/mini.hipatterns",
-    event = "LazyFile",
-    opts = function()
-      local hi = require "mini.hipatterns"
-      return {
-        -- custom LazyVim option to enable the tailwind integration
-        tailwind = {
-          enabled = true,
-          ft = {
-            "astro",
-            "css",
-            "heex",
-            "html",
-            "html-eex",
-            "javascript",
-            "javascriptreact",
-            "rust",
-            "svelte",
-            "typescript",
-            "typescriptreact",
-            "vue",
-          },
-          -- full: the whole css class will be highlighted
-          -- compact: only the color will be highlighted
-          style = "full",
-        },
-        highlighters = {
-          hex_color = hi.gen_highlighter.hex_color { priority = 2000 },
-          shorthand = {
-            pattern = "()#%x%x%x()%f[^%x%w]",
-            group = function(_, _, data)
-              ---@type string
-              local match = data.full_match
-              local r, g, b = match:sub(2, 2), match:sub(3, 3), match:sub(4, 4)
-              local hex_color = "#" .. r .. r .. g .. g .. b .. b
-
-              return MiniHipatterns.compute_hex_color_group(hex_color, "bg")
-            end,
-            extmark_opts = { priority = 2000 },
-          },
-        },
-      }
-    end,
-    config = function(_, opts)
-      if type(opts.tailwind) == "table" and opts.tailwind.enabled then
-        -- reset hl groups when colorscheme changes
-        vim.api.nvim_create_autocmd("ColorScheme", { callback = function() M.hl = {} end })
-        opts.highlighters.tailwind = {
-          pattern = function()
-            if not vim.tbl_contains(opts.tailwind.ft, vim.bo.filetype) then return end
-            if opts.tailwind.style == "full" then
-              return "%f[%w:-]()[%w:-]+%-[a-z%-]+%-%d+()%f[^%w:-]"
-            elseif opts.tailwind.style == "compact" then
-              return "%f[%w:-][%w:-]+%-()[a-z%-]+%-%d+()%f[^%w:-]"
-            end
-          end,
-          group = function(_, _, m)
-            ---@type string
-            local match = m.full_match
-            ---@type string, number
-            local color, shade = match:match "[%w-]+%-([a-z%-]+)%-(%d+)"
-            shade = tonumber(shade) or 0
-            local bg = vim.tbl_get(M.colors, color, shade)
-            if bg then
-              local hl = "MiniHipatternsTailwind" .. color .. shade
-              if not M.hl[hl] then
-                M.hl[hl] = true
-                local bg_shade = shade == 500 and 950 or shade < 500 and 900 or 100
-                local fg = vim.tbl_get(M.colors, color, bg_shade)
-                vim.api.nvim_set_hl(0, hl, { bg = "#" .. bg, fg = "#" .. fg })
-              end
-              return hl
-            end
-          end,
-          extmark_opts = { priority = 2000 },
-        }
-      end
-      require("mini.hipatterns").setup(opts)
-    end,
-  },
-  {
-    "echasnovski/mini.statusline",
-    event = "VeryLazy",
-    opts = {
-      set_vim_settings = false,
-      content = {
-        active = function()
-          local statusline = make_statusline()
-
-          local m = statusline.mode { trunc_width = 75 }
-          local diagnostics = statusline.diagnostic { trunc_width = 75 }
-          local lint = statusline.lint { trunc_width = 50 }
-          local filename = MiniStatusline.section_filename { trunc_width = 140 }
-          local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
-          local fileinfo = statusline.fileinfo { trunc_width = 90 }
-          local location = statusline.location { trunc_width = 90 }
-          local search = MiniStatusline.section_searchcount { trunc_width = 75 }
-
-          -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
-          -- correct padding with spaces between groups (accounts for 'missing'
-          -- sections, etc.)
-          return MiniStatusline.combine_groups {
-            { hl = m.hl, strings = { m.md } },
-            { hl = "MiniStatuslineDevinfo", strings = { lsp, lint } },
-            "%<", -- Mark general truncate point
-            { hl = "MiniStatuslineFilename", strings = { filename } },
-            "%=", -- End left alignment
-            { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
-            { hl = m.hl, strings = { search, location } },
-          }
-        end,
-      },
-    },
   },
 }

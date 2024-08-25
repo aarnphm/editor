@@ -120,6 +120,9 @@ o.virtualedit = "block"
 o.laststatus = 3
 o.whichwrap = "h,l,<,>,[,],~"
 
+-- For neovide
+o.guifont = "BerkeleyMono Nerd Font Mono:h16"
+
 -- last but def not least, wildmenu
 o.wildchar = 9
 o.wildignorecase = true
@@ -137,7 +140,7 @@ g.markdown_recommended_style = 0
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
 g.inline_diagnostics = false
-g.picker = "mini.pick"
+g.picker = "mini.pick" -- mini.pick | telescope
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
@@ -147,5 +150,13 @@ g.border = "single"
 g.enable_agent_inlay = false
 g.enable_ui = true
 g.override_background = os.getenv "XDG_SYSTEM_THEME" or "dark"
+
+if vim.g.neovide then
+  vim.g.neovide_no_idle = true
+  vim.g.neovide_refresh_rate = 120
+  vim.g.neovide_cursor_animation_length = 0.03
+  vim.g.neovide_cursor_trail_length = 0.05
+  vim.g.neovide_input_macos_option_key_is_meta = "only_left"
+end
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

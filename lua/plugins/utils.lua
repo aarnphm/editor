@@ -57,9 +57,6 @@ return {
           align = "left", -- left, center, right for title
           rounded = false,
         },
-        prompt = {
-          prefix = "➜ ",
-        },
       },
       vendors = {
         ---@type AvanteProvider

@@ -113,6 +113,27 @@ function M.ai_whichkey(opts)
   require("which-key").add(ret, { notify = false })
 end
 
+---@param opts table
+function M.trailspace(opts)
+  local show_trailspace = true
+  Util.toggle.map("<leader>us", {
+    name = "show trailspace",
+    get = function() return show_trailspace end,
+    set = function(state)
+      show_trailspace = not state
+      require("mini.trailspace").highlight()
+    end,
+  })
+
+  require("mini.trailspace").setup(opts)
+end
+
+---@param opts (fun(): table) | table
+function M.ai(opts)
+  local config = type(opts) == "function" and opts() or opts
+  require("mini.ai").setup(config)
+end
+
 ---@param opts {skip_next: string, skip_ts: string[], skip_unbalanced: boolean, markdown: boolean, filetypes: string[]}
 function M.pairs(opts)
   Util.toggle.map("<leader>up", {
@@ -156,6 +177,8 @@ function M.pairs(opts)
     end
     return open(pair, neigh_pattern)
   end
+
+  Util.on_load("which-key.nvim", function() M.ai_whichkey(opts) end)
 end
 
 return M

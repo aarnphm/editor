@@ -24,7 +24,15 @@ o.grepformat = "%f:%l:%c:%m"
 o.grepprg = "rg --vimgrep" -- also its 2023 use rg
 o.jumpoptions = "stack"
 o.list = true
-o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
+opt.listchars = {
+  tab = "»·",
+  lead = "·",
+  leadmultispace = "»···",
+  nbsp = "+",
+  trail = "·",
+  extends = "→",
+  precedes = "←",
+}
 o.inccommand = "split"
 o.foldenable = true
 o.conceallevel = 2
@@ -59,7 +67,7 @@ wo.sidescrolloff = 8
 wo.wrap = false
 wo.cursorcolumn = false
 
-o.cmdheight = 0
+o.cmdheight = 1
 o.showcmd = false
 o.timeout = true
 o.timeoutlen = 300
@@ -209,18 +217,6 @@ require("lazy").setup {
           return vim.ui.input(...)
         end
       end,
-    },
-    {
-      "lukas-reineke/indent-blankline.nvim",
-      main = "ibl",
-      event = "VeryLazy",
-      opts = {
-        indent = {
-          char = "│",
-          tab_char = "│",
-        },
-        scope = { enabled = false },
-      },
     },
     {
       "echasnovski/mini.nvim",
@@ -398,80 +394,12 @@ require("lazy").setup {
         require("mini.basics").setup { mappings = { option_toggle_prefix = "<leader>u", windows = true } }
         require("mini.pick").setup { window = { prompt_prefix = "󰄾 " } }
 
+        require("mini.extra").setup {}
         require("mini.hipatterns").setup {}
         require("mini.bufremove").setup {}
         require("mini.statusline").setup {}
-        require("mini.completion").setup {}
         require("mini.trailspace").setup {}
         require("mini.bracketed").setup {}
-      end,
-    },
-    {
-      "echasnovski/mini.starter",
-      version = false,
-      event = "VimEnter",
-      opts = function()
-        local pad = string.rep(" ", 15)
-
-        ---@param name string shortcuts to show on starter
-        ---@param action string | fun(...): any any callable or commands
-        ---@param section string given name under which section
-        local new_section = function(name, action, section)
-          return { name = name, action = action, section = pad .. section }
-        end
-
-        local starter = require "mini.starter"
-        local config = {
-          evaluate_single = true,
-          header = table.concat({
-            [[                                  __]],
-            [[     ___     ___    ___   __  __ /\_\    ___ ___]],
-            [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
-            [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
-            [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
-            [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
-          }, "\n"),
-          items = {
-            new_section("Files", function() require("mini.pick").builtin.files() end, "Telescope"),
-            new_section("Lazy", "Lazy", "Config"),
-            new_section("New", "ene | startinsert", "Builtin"),
-            new_section("Quit", "qa", "Builtin"),
-          },
-          content_hooks = {
-            starter.gen_hook.adding_bullet(pad .. "░ ", false),
-            starter.gen_hook.aligning("center", "center"),
-          },
-        }
-        return config
-      end,
-      config = function(_, config)
-        -- close Lazy and re-open when starter is ready
-        if vim.o.filetype == "lazy" then
-          vim.cmd.close()
-          vim.api.nvim_create_autocmd("User", {
-            pattern = "MiniStarterOpened",
-            callback = function() require("lazy").show() end,
-          })
-        end
-
-        local starter = require "mini.starter"
-        starter.setup(config)
-
-        vim.api.nvim_create_autocmd("User", {
-          pattern = "LazyVimStarted",
-          callback = function(ev)
-            local stats = require("lazy").stats()
-            local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-            local pad_footer = string.rep(" ", 8)
-            starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
-            -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
-            if vim.bo[ev.buf].filetype == "ministarter" then
-              vim.o.laststatus = 0
-              vim.b[ev.buf].ministatusline_disable = true
-              pcall(starter.refresh)
-            end
-          end,
-        })
       end,
     },
     {
@@ -484,44 +412,7 @@ require("lazy").setup {
         { "<c-space>", desc = "Increment Selection" },
         { "<bs>", desc = "Decrement Selection", mode = "x" },
       },
-      init = function(plugin)
-        -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
-        -- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which
-        -- no longer trigger the **nvim-treeitter** module to be loaded in time.
-        -- Luckily, the only thins that those plugins need are the custom queries, which we make available
-        -- during startup.
-        require("lazy.core.loader").add_to_rtp(plugin)
-        require "nvim-treesitter.query_predicates"
-        -- vim.opt.runtimepath:prepend(rtp_path)
-      end,
       opts = {
-        ensure_installed = {
-          "bash",
-          "diff",
-          "go",
-          "gitcommit",
-          "gitignore",
-          "javascript",
-          "jsdoc",
-          "json",
-          "jsonc",
-          "lua",
-          "luadoc",
-          "luap",
-          "markdown",
-          "markdown_inline",
-          "printf",
-          "python",
-          "query",
-          "regex",
-          "toml",
-          "tsx",
-          "typescript",
-          "vim",
-          "vimdoc",
-          "xml",
-          "yaml",
-        },
         auto_install = false,
         indent = { enable = true },
         highlight = { enable = true },
@@ -599,9 +490,56 @@ require("lazy").setup {
       },
     },
     {
-      "andweeb/presence.nvim",
-      event = "VeryLazy",
-      opts = { enable_line_number = true },
+      "hrsh7th/nvim-cmp",
+      version = false,
+      event = "InsertEnter",
+      dependencies = {
+        "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-buffer",
+        "FelipeLema/cmp-async-path",
+        "echasnovski/mini.icons",
+        {
+          "garymjr/nvim-snippets",
+          opts = { friendly_snippets = true, ignored_filetypes = { "git", "gitcommit" } },
+          dependencies = { "rafamadriz/friendly-snippets" },
+        },
+        {
+          "supermaven-inc/supermaven-nvim",
+          lazy = true,
+          event = "VeryLazy",
+          build = ":SupermavenUsePro",
+          opts = {
+            ignore_filetypes = {
+              gitcommit = true,
+              hgcommit = true,
+              TelescopePrompt = true,
+              ministarter = true,
+              nofile = true,
+              startup = true,
+              Trouble = true,
+            },
+            log_level = "warn",
+            disable_inline_completion = true,
+            disable_keymaps = true,
+          },
+        },
+        {
+          "folke/lazydev.nvim",
+          ft = "lua",
+          cmd = "LazyDev",
+          dependencies = {
+            -- Manage libuv types with lazy. Plugin will never be loaded
+            { "Bilal2453/luvit-meta", lazy = true },
+          },
+          opts = {
+            library = {
+              { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
+              { path = "luvit-meta/library", words = { "vim%.uv" } },
+              { path = "lazy.nvim", words = { "Util" } },
+            },
+          },
+        },
+      },
     },
   },
   change_detection = { notify = false },
@@ -657,7 +595,7 @@ vim.diagnostic.config {
     focus = false,
     format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
     source = "if_many",
-    border = "single",
+    border = "none",
   },
   signs = {
     text = {
@@ -669,20 +607,163 @@ vim.diagnostic.config {
   },
 }
 
-local capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), {
-  workspace = {
-    didChangeWatchedFiles = { dynamicRegistration = false },
-    fileOperations = { didRename = true, willRename = true },
+local cmp = require "cmp"
+local TC = require "cmp.types.cmp"
+local defaults = require "cmp.config.default"()
+
+local M = {}
+M.CREATE_UNDO = vim.api.nvim_replace_termcodes("<c-G>u", true, true, true)
+M.create_undo = function()
+  if vim.api.nvim_get_mode().mode == "i" then vim.api.nvim_feedkeys(M.CREATE_UNDO, "n", false) end
+end
+
+---@type cmp.SelectOption
+local select_opts = { behavior = cmp.SelectBehavior.Select }
+
+local opts = vim.tbl_deep_extend("force", defaults, {
+  preselect = TC.PreselectMode.None,
+  ---@type cmp.CompletionConfig
+  completion = { completeopt = "menu,menuone,noinsert" },
+  ---@type cmp.SnippetConfig
+  snippet = { expand = function(item) return vim.snippet.expand(item.body) end },
+  ---@type cmp.FormattingConfig
+  formatting = {
+    fields = { TC.ItemField.Menu, TC.ItemField.Abbr, TC.ItemField.Kind },
+    expandable_indicator = true,
+    format = function(entry, item)
+      ---@type string
+      local mini_icon = MiniIcons.get("lsp", item.kind or "")
+      item.kind = mini_icon and mini_icon .. " " or item.kind
+      item.menu = ({
+        supermaven = "[MVN]",
+        nvim_lsp = "[LSP]",
+        nvim_lua = "[LUA]",
+        snippets = "[SNP]",
+        buffer = "[BUF]",
+        async_path = "[DIR]",
+        latex_symbols = "[LTX]",
+      })[entry.source.name]
+
+      ---@type table<"abbr"|"menu", integer>
+      local widths = { abbr = 30, menu = 30 }
+
+      for key, width in pairs(widths) do
+        if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
+          item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. "…"
+        end
+      end
+      return item
+    end,
   },
-  textDocument = {
-    completion = {
-      snippetSupport = true,
-      resolveSupport = {
-        properties = { "documentation", "detail", "additionalTextEdits" },
+  experimental = { ghost_text = false },
+  enabled = function()
+    local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true, Avante = true }
+    return not disabled[vim.bo.filetype]
+  end,
+  mapping = cmp.mapping.preset.insert {
+    ["<CR>"] = cmp.mapping(function(fallback)
+      if cmp.core.view:visible() or vim.fn.pumvisible() == 1 then
+        M.create_undo()
+        if cmp.confirm {
+          select = true,
+          behavior = cmp.ConfirmBehavior.Insert,
+        } then
+          return
+        end
+      end
+      return fallback()
+    end, { "i", "s" }),
+    ["<S-CR>"] = cmp.mapping(function(fallback)
+      if cmp.core.view:visible() or vim.fn.pumvisible() == 1 then
+        M.create_undo()
+        if cmp.confirm {
+          select = true,
+          behavior = cmp.ConfirmBehavior.Replace,
+        } then
+          return
+        end
+      end
+      return fallback()
+    end, { "i", "s" }),
+    ["<C-CR>"] = function(fallback)
+      cmp.abort()
+      fallback()
+    end,
+    ["<C-Space>"] = cmp.mapping.complete(),
+    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    ---@type cmp.MappingFunction
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      local has_words_before = function()
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
+      end
+
+      local supermaven = require "supermaven-nvim.completion_preview"
+
+      if cmp.visible() then
+        cmp.select_next_item(select_opts)
+      elseif vim.snippet.active { direction = 1 } then
+        vim.schedule(function() vim.snippet.jump(1) end)
+      elseif vim.g.enable_agent_inlay and supermaven.has_suggestion() then
+        supermaven.on_accept_suggestion()
+      elseif has_words_before() then
+        cmp.complete()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+    ---@type cmp.MappingFunction
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item(select_opts)
+      elseif vim.snippet.active { direction = -1 } then
+        vim.schedule(function() vim.snippet.jump(-1) end)
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+  },
+  sources = cmp.config.sources {
+    {
+      name = "nvim_lsp",
+      option = {
+        markdown_oxide = {
+          keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
+        },
       },
     },
+    { name = "snippets", group_index = 1 },
+    { name = "supermaven", group_index = 2 },
+    { name = "async_path" },
+    { name = "buffer" },
+    { name = "lazydev", group_index = 0 },
   },
 })
+
+cmp.setup(opts)
+
+local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+local capabilities = vim.tbl_deep_extend(
+  "force",
+  {},
+  vim.lsp.protocol.make_client_capabilities(),
+  has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+  {
+    workspace = {
+      didChangeWatchedFiles = { dynamicRegistration = false },
+      fileOperations = { didRename = true, willRename = true },
+    },
+    textDocument = {
+      completion = {
+        snippetSupport = true,
+        resolveSupport = {
+          properties = { "documentation", "detail", "additionalTextEdits" },
+        },
+      },
+    },
+  }
+)
 
 require("lspconfig").ruff.setup {
   capabilities = capabilities,

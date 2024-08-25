@@ -64,7 +64,6 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "FelipeLema/cmp-async-path",
-      "echasnovski/mini.icons",
       {
         "garymjr/nvim-snippets",
         opts = { friendly_snippets = true, ignored_filetypes = { "git", "gitcommit" } },
@@ -82,7 +81,6 @@ return {
           library = {
             { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
             { path = "luvit-meta/library", words = { "vim%.uv" } },
-            { path = "lazy.nvim", words = { "Util" } },
           },
         },
       },
@@ -92,7 +90,6 @@ return {
       local cmp = require "cmp"
       local TC = require "cmp.types.cmp"
       local defaults = require "cmp.config.default"()
-      local compare = require "cmp.config.compare"
 
       ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
@@ -144,34 +141,6 @@ return {
         },
         experimental = {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
-        },
-        window = {
-          completion = cmp.config.window.bordered { border = BORDER.none },
-          documentation = cmp.config.window.bordered { border = BORDER.none },
-        },
-        sorting = {
-          comparators = {
-            compare.offset,
-            compare.exact,
-            -- copied from cmp-under
-            ---@param entry1 cmp.Entry
-            ---@param entry2 cmp.Entry
-            function(entry1, entry2)
-              local _, e1_under = entry1.completion_item.label:find "^_+"
-              local _, e2_under = entry2.completion_item.label:find "^_+"
-              e1_under = e1_under or 0
-              e2_under = e2_under or 0
-              if e1_under > e2_under then
-                return false
-              elseif e1_under < e2_under then
-                return true
-              end
-            end,
-            compare.kind,
-            compare.sort_text,
-            compare.length,
-            compare.order,
-          },
         },
         enabled = function()
           local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true, Avante = true }

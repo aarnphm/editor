@@ -1,3 +1,4 @@
+---@type lazyvim.util
 _G.Util = require "utils"
 
 ---@generic T
