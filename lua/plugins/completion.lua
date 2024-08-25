@@ -59,11 +59,11 @@ return {
   {
     "hrsh7th/nvim-cmp",
     version = false,
-    event = "LspAttach",
+    event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
+      "FelipeLema/cmp-async-path",
       "echasnovski/mini.icons",
       {
         "garymjr/nvim-snippets",
@@ -74,11 +74,11 @@ return {
         "folke/lazydev.nvim",
         ft = "lua",
         cmd = "LazyDev",
+        dependencies = {
+          -- Manage libuv types with lazy. Plugin will never be loaded
+          { "Bilal2453/luvit-meta", lazy = true },
+        },
         opts = {
-          dependencies = {
-            -- Manage libuv types with lazy. Plugin will never be loaded
-            { "Bilal2453/luvit-meta", lazy = true },
-          },
           library = {
             { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
             { path = "luvit-meta/library", words = { "vim%.uv" } },
@@ -107,6 +107,7 @@ return {
           fields = { TC.ItemField.Menu, TC.ItemField.Abbr, TC.ItemField.Kind },
           expandable_indicator = true,
           format = function(entry, item)
+            ---@type string
             local mini_icon = MiniIcons.get("lsp", item.kind or "")
             if vim.g.cmp_format == "symbol" then
               item.kind = mini_icon and mini_icon .. " " or item.kind
@@ -117,17 +118,17 @@ return {
             else
               Util.error("cmp_format must be either 'symbol' or 'text_symbol'", { once = true, title = "LazyVim" })
             end
-
----Source
             item.menu = ({
               supermaven = "[MVN]",
               nvim_lsp = "[LSP]",
               nvim_lua = "[LUA]",
               snippets = "[SNP]",
               buffer = "[BUF]",
-              path = "[DIR]",
+              async_path = "[DIR]",
+              latex_symbols = "[LTX]",
             })[entry.source.name]
 
+            ---@type table<"abbr"|"menu", integer>
             local widths = {
               abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
               menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
@@ -145,8 +146,8 @@ return {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
         },
         window = {
-          completion = cmp.config.window.bordered { border = BORDER.impl("lsp", "Comment") },
-          documentation = cmp.config.window.bordered { border = BORDER.impl("docs", "Comment") },
+          completion = cmp.config.window.bordered { border = BORDER.none },
+          documentation = cmp.config.window.bordered { border = BORDER.none },
         },
         sorting = {
           comparators = {
@@ -222,16 +223,15 @@ return {
         sources = cmp.config.sources {
           {
             name = "nvim_lsp",
-            priority = 400,
             option = {
               markdown_oxide = {
                 keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
               },
             },
           },
-          { name = "snippets", priority = 300, group_index = 1 },
-          { name = "supermaven", priority = 200, group_index = 2 },
-          { name = "path" },
+          { name = "snippets", group_index = 1 },
+          { name = "supermaven", group_index = 2 },
+          { name = "async_path" },
           { name = "buffer" },
           { name = "lazydev", group_index = 0 },
         },

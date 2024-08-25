@@ -19,9 +19,9 @@ return {
     },
     config = function() vim.cmd [[do FileType]] end,
   },
-
   {
     "MeanderingProgrammer/render-markdown.nvim",
+    enabled = true,
     opts = {
       file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       render_modes = { "n", "c" },

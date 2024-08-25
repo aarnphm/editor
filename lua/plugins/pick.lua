@@ -71,9 +71,6 @@ return {
     "echasnovski/mini.pick",
     cmd = "Pick",
     version = false,
-    dependencies = {
-      { "echasnovski/mini.extra", opts = {} },
-    },
     enabled = function() return Util.pick.want() == "mini.pick" end,
     opts = {
       options = { use_cache = true },

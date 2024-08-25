@@ -204,9 +204,10 @@ _G.make_statusline = function()
       ---@type boolean
       local ok
 
+      if H.isnt_normal_buffer() then return "" end
+
       ok, lint = pcall(require, "lint")
       if not ok then return "" end
-      if H.isnt_normal_buffer() then return "" end
 
       local linters = lint.get_running()
       local names = lint._resolve_linter_by_ft(vim.bo.filetype)
@@ -251,7 +252,7 @@ _G.make_statusline = function()
     ---@return {md:string, hl:string}
     mode = function(args)
       local mi = H.modes[vim.fn.mode()]
-      return { md = H.is_truncated(args.trunc_width) and mi.short or mi.long, hl = mi.hl }
+      return { md = mi.short, hl = mi.hl }
     end,
   }
 end

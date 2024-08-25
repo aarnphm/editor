@@ -327,6 +327,7 @@ return {
     opts = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
   },
   { "echasnovski/mini.doc", opts = {}, ft = "lua", event = "LazyFile" },
+  { "echasnovski/mini.extra", opts = {}, event = "LazyFile" },
   {
     "echasnovski/mini.trailspace",
     event = "LazyFile",
@@ -346,7 +347,7 @@ return {
   },
   {
     "echasnovski/mini.ai",
-    event = "VeryLazy",
+    event = "LazyFile",
     opts = function()
       ---@module "mini.ai"
       local ai = require "mini.ai"
@@ -509,7 +510,7 @@ return {
   },
   {
     "echasnovski/mini.surround",
-    event = "VeryLazy",
+    event = "LazyFile",
     ---@class MiniSurroundOpts
     opts = {
       mappings = {
@@ -544,44 +545,6 @@ return {
       }
       mappings = vim.tbl_filter(function(m) return m[1] and #m[1] > 0 end, mappings) ---@param m LazyKeysSpec
       return vim.list_extend(mappings, keys)
-    end,
-  },
-  {
-    "echasnovski/mini.indentscope",
-    version = false, -- wait till new 0.7.0 release to put it back on semver
-    enabled = true,
-    event = "LazyFile",
-    opts = {
-      symbol = "│",
-      options = { try_as_border = true },
-    },
-    init = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = {
-          "", -- for all buffers without a file type
-          "alpha",
-          "fugitive",
-          "git",
-          "aerial",
-          "dropbar",
-          "dropbar_menu",
-          "gitcommit",
-          "help",
-          "json",
-          "log",
-          "markdown",
-          "neo-tree",
-          "Outline",
-          "startify",
-          "TelescopePrompt",
-          "txt",
-          "undotree",
-          "vimwiki",
-          "vista",
-          "lazyterm",
-        },
-        callback = function() vim.b.miniindentscope_disable = true end,
-      })
     end,
   },
   {
@@ -704,16 +667,9 @@ return {
           local pad_footer = string.rep(" ", 8)
           starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
           -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
-          if vim.bo[ev.buf].filetype == "ministarter" then
-            vim.b[ev.buf].ministatusline_disable = true
-            pcall(starter.refresh)
-          end
+          if vim.bo[ev.buf].filetype == "ministarter" then pcall(starter.refresh) end
         end,
       })
-
-      vim.api.nvim_create_user_command("Starter", function()
-        if _G.MiniStarter ~= nil then MiniStarter.open() end
-      end, { desc = "starter: open" })
     end,
   },
   {
@@ -855,7 +811,7 @@ return {
 
           local m = statusline.mode { trunc_width = 75 }
           local diagnostics = statusline.diagnostic { trunc_width = 75 }
-          local lint = statusline.lint { trunc_width = 40 }
+          local lint = statusline.lint { trunc_width = 50 }
           local filename = MiniStatusline.section_filename { trunc_width = 140 }
           local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
           local fileinfo = statusline.fileinfo { trunc_width = 90 }
@@ -877,6 +833,5 @@ return {
         end,
       },
     },
-    config = function(_, opts) require("mini.statusline").setup(opts) end,
   },
 }

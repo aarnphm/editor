@@ -1,12 +1,12 @@
 ---@class lazyvim.util.toggle
 local M = {}
 
----@class simple.Toggle
+---@class lazyvim.Toggle
 ---@field name string
 ---@field get fun():boolean
 ---@field set fun(state:boolean)
 
----@class simple.Toggle.wrap: simple.Toggle
+---@class lazyvim.Toggle.wrap: lazyvim.Toggle
 ---@operator call:boolean
 
 ---setup toggle keymaps
@@ -23,7 +23,7 @@ M.setup = function()
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
 
----@param toggle simple.Toggle
+---@param toggle lazyvim.Toggle
 function M.wrap(toggle)
   return setmetatable(toggle, {
     __call = function()
@@ -36,11 +36,11 @@ function M.wrap(toggle)
       end
       return state
     end,
-  }) --[[@as simple.Toggle.wrap]]
+  }) --[[@as lazyvim.Toggle.wrap]]
 end
 
 ---@param lhs string
----@param toggle simple.Toggle
+---@param toggle lazyvim.Toggle
 function M.map(lhs, toggle)
   local t = M.wrap(toggle)
   Util.safe_keymap_set("n", lhs, function() t() end, { desc = "toggle: " .. toggle.name })
@@ -48,7 +48,7 @@ function M.map(lhs, toggle)
 end
 
 ---@param lhs string
----@param toggle simple.Toggle
+---@param toggle lazyvim.Toggle
 function M.wk(lhs, toggle)
   if not Util.has "which-key.nvim" then return end
   local function safe_get()

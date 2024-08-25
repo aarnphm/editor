@@ -22,7 +22,7 @@ return {
   {
     "folke/noice.nvim",
     event = "LazyFile",
-    enabled = true,
+    enabled = function() return vim.g.enable_ui end,
     depdendencies = { { "MunifTanjim/nui.nvim", lazy = true } },
     ---@type NoiceConfig
     opts = {
@@ -84,58 +84,53 @@ return {
     },
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
-    main = "ibl",
-    event = "LazyFile",
-    opts = {
-      indent = {
-        char = "│",
-        tab_char = "│",
-      },
-      scope = { enabled = false },
-    },
-  },
-  {
     "folke/which-key.nvim",
-    event = "VeryLazy",
+    event = "LazyFile",
     opts_extend = { "spec" },
-    opts = {
-      spec = {
-        { "<BS>", desc = "treesitter: decrement selection", mode = "x" },
-        { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
-        {
-          mode = { "n", "v" },
-          { "<leader><tab>", group = "tabs" },
-          { "<leader>c", group = "code" },
-          { "<leader>f", group = "file/find" },
-          { "<leader>g", group = "git" },
-          { "<leader>h", group = "hunks" },
-          { "<leader>q", group = "quit/session" },
-          { "<leader>s", group = "search" },
-          { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
-          { "<leader>x", group = "dignostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
-          { "[", group = "prev" },
-          { "]", group = "next" },
-          { "g", group = "goto" },
-          { "gs", group = "surround" },
-          { "z", group = "fold" },
-          {
-            "<leader>b",
-            group = "buffer",
-            expand = function() return require("which-key.extras").expand.buf() end,
-          },
-          {
-            "<leader>w",
-            group = "windows",
-            proxy = "<c-w>",
-            expand = function() return require("which-key.extras").expand.win() end,
-          },
-          -- better descriptions
-          { "gx", desc = "util: open with system app" },
+    opts = function()
+      local max_width = vim.o.columns
+      return {
+        ---@type wk.Win.opts
+        win = {
+          width = math.floor(0.572 * max_width),
         },
-      },
-      disable = { ft = { "minifiles" } },
-    },
+        spec = {
+          { "<BS>", desc = "treesitter: decrement selection", mode = "x" },
+          { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
+          {
+            mode = { "n", "v" },
+            { "<leader><tab>", group = "tabs" },
+            { "<leader>c", group = "code" },
+            { "<leader>f", group = "file/find" },
+            { "<leader>g", group = "git" },
+            { "<leader>h", group = "hunks" },
+            { "<leader>q", group = "quit/session" },
+            { "<leader>s", group = "search" },
+            { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+            { "<leader>x", group = "dignostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+            { "[", group = "prev" },
+            { "]", group = "next" },
+            { "g", group = "goto" },
+            { "gs", group = "surround" },
+            { "z", group = "fold" },
+            {
+              "<leader>b",
+              group = "buffer",
+              expand = function() return require("which-key.extras").expand.buf() end,
+            },
+            {
+              "<leader>w",
+              group = "windows",
+              proxy = "<c-w>",
+              expand = function() return require("which-key.extras").expand.win() end,
+            },
+            -- better descriptions
+            { "gx", desc = "util: open with system app" },
+          },
+        },
+        disable = { ft = { "minifiles" } },
+      }
+    end,
     keys = {
       {
         "<leader>?",

@@ -5,15 +5,6 @@
 vim.g = {}
 
 _G.Util = require "utils"
-_G.MiniIcons = require "mini.icons"
-
----@alias MiniIconItem [string, string, boolean]
----@alias MiniIconCategory "default" | "directory" | "extension" | "file" | "filetype" | "lsp" | "os"
----
----@overload fun(category: MiniIconCategory, name: string|nil): MiniIconItem
-function _G.MiniIcons.get(category, name) end
----@overload fun(category: "lsp", name: string): string
-function _G.MiniIcons.get(category, name) end
 
 ---@class vim.api.create_autocmd.callback.args
 ---@field id number

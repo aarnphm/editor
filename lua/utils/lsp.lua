@@ -1,7 +1,7 @@
 ---@class lazyvim.util.lsp
 local M = {}
 
----@alias lsp.Client.filter {id?: number, bufnr?: number, name?: string, method?: string, filter?:fun(client: lsp.Client):boolean}
+---@alias lsp.Client.filter {id?: number, bufnr?: number, name?: string, method?: string, filter?:fun(client: vim.lsp.Client):boolean}
 
 ---@param opts? lsp.Client.filter
 ---@return vim.lsp.Client[]
@@ -13,8 +13,8 @@ function M.get_clients(opts)
     ---@diagnostic disable-next-line: deprecated
     ret = vim.lsp.get_active_clients(opts)
     if opts and opts.method then
-      ---@param client vim.lsp.Client
       ret = vim.tbl_filter(
+        ---@param client vim.lsp.Client
         function(client) return client.supports_method(opts.method, { bufnr = opts.bufnr }) end,
         ret
       )

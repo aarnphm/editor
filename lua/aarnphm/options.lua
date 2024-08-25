@@ -61,7 +61,16 @@ o.grepformat = "%f:%l:%c:%m"
 o.grepprg = "rg --vimgrep" -- also its 2023 use rg
 o.linebreak = true
 o.jumpoptions = "stack"
-o.listchars = "tab:»·,nbsp:+,trail:·,extends:→,precedes:←"
+o.list = true
+opt.listchars = {
+  tab = "»·",
+  lead = "·",
+  leadmultispace = "»···",
+  nbsp = "+",
+  trail = "·",
+  extends = "→",
+  precedes = "←",
+}
 o.inccommand = "split"
 
 -- fold with nvim-ufo
@@ -136,6 +145,7 @@ g.cmp_widths = { abbr = 30, menu = 30 }
 g.cmp_format = "symbol" -- "symbol" | "text_symbol" | "text"
 g.border = "single"
 g.enable_agent_inlay = false
+g.enable_ui = true
 g.override_background = os.getenv "XDG_SYSTEM_THEME" or "dark"
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

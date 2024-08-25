@@ -20,7 +20,7 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
-    cmd = "AvanteAsk",
+    cmd = { "AvanteAsk", "AvanteSwitchProvider", "AvanteRefresh" },
     build = "make",
     keys = {
       { "<leader>ua", "<cmd>:AvanteAsk<CR>", desc = "avante: ask", mode = { "n", "v" } },
@@ -31,10 +31,25 @@ return {
     ---@type avante.Config
     opts = {
       debug = false,
-      provider = "claude", -- "groq"
+      provider = "claude",
+      claude = {
+        api_key_name = "cmd:bw get notes anthropic-api-key",
+      },
+      openai = {
+        api_key_name = "cmd:bw get notes oai-api-key",
+      },
+      behaviour = { auto_set_highlight_group = false },
       mappings = {
         ask = "<leader>ua",
         refresh = "<leader>ur",
+        submit = {
+          normal = "<CR>",
+          insert = "<C-CR>",
+        },
+        toggle = {
+          debug = "<LocalLeader>ud",
+          hint = "<LocalLeader>uh",
+        },
       },
       windows = {
         width = 30,
@@ -51,8 +66,7 @@ return {
         perplexity = {
           endpoint = "https://api.perplexity.ai/chat/completions",
           model = "llama-3.1-sonar-large-128k-online",
-          api_key_name = "PPLX_API_KEY",
-          --- this function below will be used to parse in cURL arguments.
+          api_key_name = "cmd:bw get notes perplexity-api-key",
           parse_curl_args = function(opts, code_opts)
             return {
               url = opts.endpoint,
@@ -71,6 +85,58 @@ return {
             }
           end,
           -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
+          parse_response_data = function(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+          end,
+        },
+        ---@type AvanteProvider
+        groq = {
+          endpoint = "https://api.groq.com/openai/v1/chat/completions",
+          model = "llama-3.1-70b-versatile",
+          api_key_name = "GROQ_API_KEY",
+          parse_curl_args = function(opts, code_opts)
+            return {
+              url = opts.endpoint,
+              headers = {
+                ["Accept"] = "application/json",
+                ["Content-Type"] = "application/json",
+                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
+              },
+              body = {
+                model = opts.model,
+                messages = require("avante.providers").openai.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                temperature = 0,
+                max_tokens = 4096,
+                stream = true, -- this will be set by default.
+              },
+            }
+          end,
+          parse_response_data = function(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+          end,
+        },
+        ---@type AvanteProvider
+        deepseek = {
+          endpoint = "https://api.deepseek.com/chat/completions",
+          model = "deepseek-coder",
+          api_key_name = "DEEPSEEK_API_KEY",
+          parse_curl_args = function(opts, code_opts)
+            return {
+              url = opts.endpoint,
+              headers = {
+                ["Accept"] = "application/json",
+                ["Content-Type"] = "application/json",
+                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
+              },
+              body = {
+                model = opts.model,
+                messages = require("avante.providers").openai.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                temperature = 0,
+                max_tokens = 4096,
+                stream = true, -- this will be set by default.
+              },
+            }
+          end,
           parse_response_data = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,

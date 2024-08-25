@@ -12,7 +12,6 @@
 ---@field terminal lazyvim.util.terminal
 ---@field treesitter lazyvim.util.treesitter
 ---@field motion lazyvim.util.motion
----@field mapping lazyvim.util.mappings
 local M = {}
 
 setmetatable(M, {
@@ -30,10 +29,7 @@ setmetatable(M, {
 function M.setup(opts)
   M.plugin.setup()
   M.root.setup()
-  M.on_very_lazy(function()
-    M.toggle.setup()
-    M.format.setup()
-  end)
+  M.on_very_lazy(M.format.setup)
 
   require("lazy").setup(opts)
 

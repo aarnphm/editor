@@ -225,8 +225,6 @@ else
 end
 
 hi("HighlightURL", { default = true, underline = true })
-hi("MiniFilesBorder", { link = "Normal" })
-hi("MiniFilesNormal", { link = "Normal" })
 hi("CmpGhostText", { link = "Comment", default = true })
 ---leap.nvim
 hi("LeapBackdrop", { link = "Comment" }) ---or some grey

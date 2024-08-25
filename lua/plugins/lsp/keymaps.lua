@@ -130,8 +130,8 @@ function M.on_attach(_, buffer)
     local cond = not (keys.cond == false or ((type(keys.cond) == "function") and not keys.cond()))
 
     if has and cond then
-      ---@type vim.keymap.set.LazyOpts
       local opts = Keys.opts(keys)
+      ---@cast opts vim.keymap.set.LazyOpts
       opts.cond = nil
       opts.has = nil
       opts.silent = opts.silent ~= false

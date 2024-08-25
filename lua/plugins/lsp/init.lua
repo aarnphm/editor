@@ -65,7 +65,7 @@ return {
           focus = false,
           format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
           source = "if_many",
-          border = BORDER.impl "docs",
+          border = BORDER.none,
         },
         signs = {
           text = {
@@ -297,13 +297,6 @@ return {
                 version = "LuaJIT",
                 special = { reload = "require" },
               },
-              workspace = {
-                library = {
-                  vim.fn.expand "$VIMRUNTIME/lua",
-                  vim.fn.expand "$VIMRUNTIME/lua/vim/lsp",
-                  vim.fn.stdpath "data" .. "/lazy/lazy.nvim/lua/lazy",
-                },
-              },
               telemetry = { enable = false },
               semantic = { enable = true },
               completion = { workspaceWord = true, callSnippet = "Replace" },
@@ -444,9 +437,9 @@ return {
           return true
         end,
         vtsls = function(_, opts)
-          Util.lsp.on_attach(function(client, _)
+          Util.lsp.on_attach(function(client, bufnr)
             client.commands["_typescript.moveToFileRefactoring"] = function(command, _)
-              ---@type string, string, lsp.Range
+              ---@type lsp.LSPAny, lsp.LSPAny, lsp.LSPAny
               local action, uri, range = unpack(command.arguments)
 
               local function move(newf)
@@ -456,7 +449,9 @@ return {
                 })
               end
 
+              ---@cast uri string
               local fname = vim.uri_to_fname(uri)
+              ---@cast range lsp.Range
               client.request("workspace/executeCommand", {
                 command = "typescript.tsserverRequest",
                 arguments = {
@@ -487,7 +482,7 @@ return {
                     move(f)
                   end
                 end)
-              end)
+              end, bufnr)
             end
           end, "vtsls")
           -- copy typescript settings to javascript
@@ -548,6 +543,7 @@ return {
     ---@param opts PluginLspOptions
     config = function(_, opts)
       Util.format.register(Util.lsp.formatter())
+      Util.toggle.setup()
 
       Util.lsp.setup(opts.document_highlight)
 
