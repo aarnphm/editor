@@ -11,6 +11,7 @@ end
 
 local enable_ui = true
 
+-- window opts
 wo.scrolloff = 8
 wo.sidescrolloff = 8
 wo.wrap = false
@@ -22,6 +23,7 @@ wo.cursorcolumn = false
 opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
 opt.completeopt = "menu,menuone,noselect"
 opt.confirm = true
+opt.winminwidth = 5 -- Minimum window width
 
 -- Some defaults and don't question it
 o.writebackup = false -- whos needs backup btw (i do sometimes)
@@ -131,6 +133,7 @@ o.wildchar = 9
 o.wildignorecase = true
 o.wildmode = "longest:full,full"
 opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
+opt.wildmode = "longest:full,full" -- Command-line completion mode
 
 -- map leader to <Space> and localeader to +
 g.mapleader = " "

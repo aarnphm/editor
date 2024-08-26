@@ -43,6 +43,15 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
   end,
 })
+---correct resized tabs
+vim.api.nvim_create_autocmd("VimResized", {
+  group = augroup "resized",
+  callback = function()
+    local current = vim.fn.tabpagenr()
+    vim.cmd "tabdo wincmd ="
+    vim.cmd("tabnext  " .. current)
+  end,
+})
 -- Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup "checktime",

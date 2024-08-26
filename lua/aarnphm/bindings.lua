@@ -86,6 +86,10 @@ map("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "search: prev"
 map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "search: prev" })
 map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "search: prev" })
 
+-- highlights under cursor
+map("n", "<leader>ui", vim.show_pos, { desc = "inspect: position" })
+map("n", "<leader>uI", "<cmd>InspectTree<cr>", { desc = "inspect: tree" })
+
 -- Add undo break-points
 map("i", ",", ",<c-g>u")
 map("i", ".", ".<c-g>u")
