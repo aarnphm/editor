@@ -66,7 +66,6 @@ return {
       vim.keymap.del({ "x", "o" }, "X")
     end,
   },
-  { "tpope/vim-repeat", lazy = false },
   {
     "Bekaboo/dropbar.nvim",
     version = false,
@@ -249,49 +248,6 @@ return {
       return opts
     end,
   },
-  -- quickfix
-  {
-    "folke/trouble.nvim",
-    version = false,
-    opts = {
-      modes = {
-        lsp = {
-          win = { type = "split", position = "right" },
-        },
-      },
-    },
-    keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "trouble: diagnostics" },
-      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
-      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "trouble: location list" },
-      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "trouble: quickfix list" },
-      {
-        "[q",
-        function()
-          if require("trouble").is_open() then
-            require("trouble").prev { skip_groups = true, jump = true }
-          else
-            local ok, err = pcall(vim.cmd.cprev)
-            if not ok then vim.notify(err, vim.log.levels.ERROR) end
-          end
-        end,
-        desc = "trouble: previous item",
-      },
-      {
-        "]q",
-        function()
-          if require("trouble").is_open() then
-            require("trouble").next { skip_groups = true, jump = true }
-          else
-            local ok, err = pcall(vim.cmd.cnext)
-            if not ok then vim.notify(err, vim.log.levels.ERROR) end
-          end
-        end,
-        desc = "trouble: next item",
-      },
-    },
-    cmd = "Trouble",
-  },
   {
     "kevinhwang91/nvim-bqf",
     ft = "qf",
@@ -327,14 +283,26 @@ return {
     event = "LazyFile",
     keys = {
       {
-        "<leader>q",
-        function() require("quicker").toggle() end,
+        "<leader>xx",
+        function()
+          if #vim.fn.getqflist() > 0 then
+            require("quicker").toggle()
+          else
+            Util.warn("Quickfix list is empty", { title = "LazyVim" })
+          end
+        end,
         mode = { "n", "v" },
         desc = "qf: toggle quickfix",
       },
       {
-        "<leader>l",
-        function() require("quicker").toggle { loclist = true } end,
+        "<leader>xl",
+        function()
+          if #vim.fn.getloclist(vim.api.nvim_get_current_win()) > 0 then
+            require("quicker").toggle { loclist = true }
+          else
+            Util.warn("Location list is empty", { title = "LazyVim" })
+          end
+        end,
         mode = { "n", "v" },
         desc = "qf: toggle loclist",
       },

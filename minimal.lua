@@ -108,7 +108,10 @@ vim.api.nvim_create_autocmd("FileType", {
     "vista",
     "lazyterm",
   },
-  callback = function() vim.b.miniindentscope_disable = true end,
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
+  end,
 })
 
 -- bootstrap logics

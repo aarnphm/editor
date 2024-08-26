@@ -12,6 +12,7 @@ local M = {}
 ---setup toggle keymaps
 M.setup = function()
   M.map("<leader>uw", M("wrap", { name = "wrap" }))
+  M.map("<leader>ul", M("list", { name = "list" }))
   M.map("<leader>uc", M("conceallevel", { values = { 0, vim.o.conceallevel > 0 and vim.o.conceallevel or 2 } }))
   M.map("<leader>uf", M.format())
   M.map("<leader>uF", M.format(true))

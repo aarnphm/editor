@@ -20,8 +20,21 @@ return {
     end,
   },
   {
-    "folke/noice.nvim",
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    enabled = false,
     event = "LazyFile",
+    opts = {
+      indent = {
+        char = "│",
+        tab_char = "│",
+      },
+      scope = { enabled = false },
+    },
+  },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
     enabled = function() return vim.g.enable_ui end,
     depdendencies = { { "MunifTanjim/nui.nvim", lazy = true } },
     ---@type NoiceConfig
@@ -34,12 +47,12 @@ return {
       },
       cmdline = { view = "cmdline" },
       views = {
-        split = { size = "20%" },
-        popup = { border = { style = BORDER.impl() } },
+        split = { size = "15%" },
+        popup = { border = { style = BORDER.impl "docs" } },
         confirm = { border = { style = BORDER.impl "hover" } },
         hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
-        cmdline_input = { border = { style = BORDER.impl() } },
-        cmdline_popup = { border = { style = BORDER.impl() } },
+        cmdline_input = { border = { style = BORDER.none } },
+        cmdline_popup = { border = { style = BORDER.none } },
         mini = { border = { style = BORDER.none } },
       },
       routes = {
@@ -92,7 +105,7 @@ return {
       return {
         ---@type wk.Win.opts
         win = {
-          width = math.floor(0.572 * max_width),
+          width = math.floor(0.614 * max_width),
         },
         spec = {
           { "<BS>", desc = "treesitter: decrement selection", mode = "x" },

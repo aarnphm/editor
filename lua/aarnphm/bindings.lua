@@ -13,11 +13,11 @@ end
 
 map(
   "n",
-  "<M-[>",
+  "<C-p>",
   function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
   { desc = "terminal: open (root)" }
 )
-map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map(
   "n",
   "<M-]>",
@@ -31,6 +31,7 @@ map(
 )
 map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
+map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
 
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
 map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })
@@ -45,6 +46,10 @@ map("n", "<leader><leader>a", "<CMD>normal za<CR>", { desc = "edit: Toggle code 
 map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
 map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
 map("n", "J", "mzJ`z", { desc = "edit: Join next line" })
+map("n", "<leader><leader>l", ":lua ", { noremap = true, silent = true, desc = "cmdline: enter lua command" })
+map("n", "<leader><leader>lP", ":lua P(", { noremap = true, silent = true, desc = "cmdline: enter lua command" })
+map("n", "<LocalLeader>g", ":grep ", { noremap = false, desc = "edit: grep pattern" })
+map("n", "<LocalLeader>l", ":lgrep ", { noremap = false, desc = "edit: grep pattern (window)" })
 map("n", "\\", ":let @/=''<CR>:noh<CR>", { silent = true, desc = "window: Clean highlight" })
 map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
 map("n", ";;", ";", { silent = false, desc = "normal: Enter Ex mode" })
@@ -60,21 +65,18 @@ map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up", silent = true, noremap 
 map("n", "<LocalLeader>|", "<C-w>|", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
-map("n", "<Leader>qq", "<cmd>wqa<cr>", { desc = "editor: write quit all" })
-map("n", "]b", "<cmd>bnext<cr>", { desc = "buffer: next" })
-map("n", "[b", "<cmd>bprevious<cr>", { desc = "buffer: previous" })
+map("n", "<Leader>qq", "<cmd>wqa!<cr>", { desc = "editor: write quit all" })
 map("n", "<Leader>`", "<cmd>e #<cr>", { desc = "buffer: switch to other buffer" })
-map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
 map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
 map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
 map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
 map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
 map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
-map("n", "<LocalLeader>l", "<cmd>set list! list?<cr>", { silent = false, desc = "misc: toggle invisible characters" })
 map("n", "<LocalLeader>]", "<cmd>vertical resize -10<cr>", { noremap = false, desc = "windows: resize right 10px" })
 map("n", "<LocalLeader>[", "<cmd>vertical resize +10<cr>", { noremap = false, desc = "windows: resize left 10px" })
 map("n", "<LocalLeader>-", "<cmd>resize -10<cr>", { noremap = false, desc = "windows: resize down 10px" })
 map("n", "<LocalLeader>+", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
+map("n", "<leader><leader>b", "<cmd>wincmd =<cr>", { noremap = true, silent = true, desc = "windows: balance" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "search: next" })

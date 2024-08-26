@@ -98,6 +98,16 @@ return {
         auto_brackets = { "python" },
         preselect = TC.PreselectMode.None,
         completion = { completeopt = "menu,menuone,noinsert" },
+        ---@type cmp.WindowConfig
+        window = {
+          documentation = {
+            max_height = 20,
+            max_width = 40,
+            border = { "", "", "", " ", "", "", "", "" },
+            winhighlight = "FloatBorder:NormalFloat",
+            winblend = vim.o.pumblend,
+          },
+        },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         ---@type cmp.FormattingConfig
         formatting = {
@@ -106,15 +116,7 @@ return {
           format = function(entry, item)
             ---@type string
             local mini_icon = MiniIcons.get("lsp", item.kind or "")
-            if vim.g.cmp_format == "symbol" then
-              item.kind = mini_icon and mini_icon .. " " or item.kind
-            elseif vim.g.cmp_format == "text_symbol" then
-              item.kind = mini_icon and mini_icon .. " " .. item.kind or item.kind .. " "
-            elseif vim.g.cmp_format == "text" then
-              item.kind = item.kind
-            else
-              Util.error("cmp_format must be either 'symbol' or 'text_symbol'", { once = true, title = "LazyVim" })
-            end
+            item.kind = mini_icon and mini_icon .. " " or item.kind
             item.menu = ({
               supermaven = "[MVN]",
               nvim_lsp = "[LSP]",
@@ -126,10 +128,7 @@ return {
             })[entry.source.name]
 
             ---@type table<"abbr"|"menu", integer>
-            local widths = {
-              abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
-              menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
-            }
+            local widths = { abbr = 20, menu = 10 }
 
             for key, width in pairs(widths) do
               if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
@@ -143,12 +142,23 @@ return {
           ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
         },
         enabled = function()
-          local disabled = { gitcommit = true, TelescopePrompt = true, help = true, minifiles = true, Avante = true }
-          return not disabled[vim.bo.filetype]
+          local disabled_filetype = {
+            gitcommit = true,
+            TelescopePrompt = true,
+            help = true,
+            minifiles = true,
+            Avante = true,
+          }
+
+          local disabled = not disabled_filetype[vim.bo.filetype]
+          disabled = disabled or (vim.api.nvim_get_option_value("buftype", { buf = 0 }) == "prompt")
+          disabled = disabled or (vim.fn.reg_recording() ~= "")
+          disabled = disabled or (vim.fn.reg_executing() ~= "")
+          return disabled
         end,
         mapping = cmp.mapping.preset.insert {
-          ["<CR>"] = Util.cmp.confirm { select = true },
-          ["<S-CR>"] = Util.cmp.confirm { select = true, behavior = TC.ConfirmBehavior.Replace },
+          ["<CR>"] = Util.cmp.confirm(),
+          ["<S-CR>"] = Util.cmp.confirm { behavior = TC.ConfirmBehavior.Replace },
           ["<C-CR>"] = function(fallback)
             cmp.abort()
             fallback()

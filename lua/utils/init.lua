@@ -25,13 +25,25 @@ setmetatable(M, {
   end,
 })
 
+M.did_setup = false
+
 ---@param opts LazyConfig
 function M.setup(opts)
-  M.plugin.setup()
-  M.root.setup()
-  M.on_very_lazy(M.format.setup)
+  if not M.did_setup then
+    M.did_setup = true
+    M.plugin.setup()
+    M.root.setup()
+    M.on_very_lazy(M.format.setup)
 
-  require("lazy").setup(opts)
+    require("lazy").setup(opts)
+
+    if package.loaded["rose-pine"] then
+      vim.cmd.colorscheme "rose-pine"
+    else
+      vim.opt.termguicolors = true
+      vim.cmd.colorscheme "habamax"
+    end
+  end
 
   return M
 end

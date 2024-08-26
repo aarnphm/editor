@@ -1,4 +1,4 @@
-local o, opt, g, wo = vim.o, vim.opt, vim.g, vim.wo
+local o, opt, g, wo, go = vim.o, vim.opt, vim.g, vim.wo, vim.go
 
 if vim.uv.os_uname().sysname == "Darwin" then
   g.clipboard = {
@@ -8,6 +8,8 @@ if vim.uv.os_uname().sysname == "Darwin" then
     cache_enabled = 0,
   }
 end
+
+local enable_ui = true
 
 wo.scrolloff = 8
 wo.sidescrolloff = 8
@@ -107,7 +109,7 @@ o.shiftround = true
 
 -- UI config
 o.showmode = false -- This is set with mini.statusline
-o.cmdheight = 0
+o.cmdheight = enable_ui and 0 or 1
 o.showcmd = false
 o.showbreak = "↳  "
 o.sidescrolloff = 8
@@ -119,6 +121,7 @@ o.updatetime = 250
 o.virtualedit = "block"
 o.laststatus = 3
 o.whichwrap = "h,l,<,>,[,],~"
+go.background = os.getenv "XDG_SYSTEM_THEME" or "dark"
 
 -- For neovide
 o.guifont = "BerkeleyMono Nerd Font Mono:h16"
@@ -144,12 +147,9 @@ g.picker = "mini.pick" -- mini.pick | telescope
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
-g.cmp_widths = { abbr = 30, menu = 30 }
-g.cmp_format = "symbol" -- "symbol" | "text_symbol" | "text"
 g.border = "single"
 g.enable_agent_inlay = false
-g.enable_ui = true
-g.override_background = os.getenv "XDG_SYSTEM_THEME" or "dark"
+g.enable_ui = enable_ui
 
 if vim.g.neovide then
   vim.g.neovide_no_idle = true
