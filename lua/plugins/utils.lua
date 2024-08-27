@@ -11,20 +11,18 @@ return {
     },
     opts = {},
   },
-  {
-    "andweeb/presence.nvim",
-    event = "LazyFile",
-    opts = { enable_line_number = true },
-  },
+  --- discord rich presence
+  { "andweeb/presence.nvim", event = "LazyFile", opts = { enable_line_number = true } },
   {
     "yetone/avante.nvim",
     dev = true,
     version = false,
-    cmd = { "AvanteAsk", "AvanteSwitchProvider", "AvanteRefresh" },
+    cmd = { "AvanteAsk", "AvanteSwitchProvider", "AvanteRefresh", "AvanteEdit" },
     build = "make",
     keys = {
       { "<leader>ua", "<cmd>:AvanteAsk<CR>", desc = "avante: ask", mode = { "n", "v" } },
       { "<leader>ur", "<cmd>:AvanteRefresh<CR>", desc = "avante: refresh" },
+      { "<leader>ue", "<cmd>:AvanteEdit<CR>", desc = "avante: ask", mode = { "n", "v" } },
     },
     specs = { { "zbirenbaum/copilot.lua", enabled = false, optional = true } },
     dependencies = { "nui.nvim" },
@@ -38,9 +36,13 @@ return {
       openai = {
         api_key_name = "cmd:bw get notes oai-api-key",
       },
-      behaviour = { auto_set_highlight_group = false },
+      behaviour = {
+        auto_set_highlight_group = false,
+        support_paste_from_clipboard = true,
+      },
       mappings = {
         ask = "<leader>ua",
+        edit = "<leader>ue",
         refresh = "<leader>ur",
         submit = {
           normal = "<CR>",
@@ -57,6 +59,8 @@ return {
           align = "left", -- left, center, right for title
           rounded = false,
         },
+        input = { prefix = "➜ " },
+        edit = { border = vim.g.border },
       },
       vendors = {
         ---@type AvanteProvider

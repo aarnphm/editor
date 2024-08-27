@@ -588,7 +588,7 @@ return {
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
       Util.toggle.map(
-        "<leader>ue",
+        "<leader>uD",
         Util.toggle.wrap {
           name = "inline diagnostics",
           get = function() return vim.g.inline_diagnostics end,

@@ -1,4 +1,5 @@
 return {
+  { "NeogitOrg/neogit", cmd = { "Neogit" }, opts = {} },
   {
     "lewis6991/gitsigns.nvim",
     event = "LazyFile",

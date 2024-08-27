@@ -1,4 +1,8 @@
 return {
+  { "AstroNvim/astrotheme", priority = 1000, opts = {}, enabled = false },
+  { "folke/tokyonight.nvim", priority = 1000, opts = {}, enabled = true },
+  { "navarasu/onedark.nvim", priority = 1000, opts = {}, enabled = true },
+  { "rmehri01/onenord.nvim", priority = 1000, opts = {}, enabled = false },
   {
     "rose-pine/neovim",
     name = "rose-pine",

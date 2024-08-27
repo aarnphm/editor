@@ -52,9 +52,6 @@ return {
         neogitCommitMessage = false,
       },
     },
-    init = function()
-      package.preload["copilot.lua"] = function() return {} end
-    end,
   },
   {
     "hrsh7th/nvim-cmp",
