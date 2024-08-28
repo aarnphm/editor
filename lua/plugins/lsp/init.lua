@@ -414,6 +414,13 @@ return {
             end
           end, "ruff")
         end,
+        pyright = function()
+          Util.lsp.on_attach(function(client, _)
+            if client.name == "pyright" then
+              client.server_capabilities.hoverProvider = false -- NOTE: disable doc hover since I don't really need it.
+            end
+          end, "pyright")
+        end,
         taplo = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "taplo" then client.server_capabilities.documentFormattingProvider = false end
