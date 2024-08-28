@@ -382,22 +382,22 @@ return {
             },
           },
         },
-        pyright = {
-          settings = {
-            pyright = {
-              disableOrganizeImports = true,
-            },
-            python = {
-              analysis = {
-                ignore = { "*" },
-                autoImportCompletions = true,
-                autoSearchPaths = true,
-                typeCheckingMode = "strict",
-                useLibraryCodeForTypes = true,
-              },
-            },
-          },
-        },
+        -- pyright = {
+        --   settings = {
+        --     pyright = {
+        --       disableOrganizeImports = true,
+        --     },
+        --     python = {
+        --       analysis = {
+        --         ignore = { "*" },
+        --         autoImportCompletions = true,
+        --         autoSearchPaths = true,
+        --         typeCheckingMode = "strict",
+        --         useLibraryCodeForTypes = true,
+        --       },
+        --     },
+        --   },
+        -- },
         eslint = {
           settings = {
             -- helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
@@ -414,13 +414,13 @@ return {
             end
           end, "ruff")
         end,
-        pyright = function()
-          Util.lsp.on_attach(function(client, _)
-            if client.name == "pyright" then
-              client.server_capabilities.hoverProvider = false -- NOTE: disable doc hover since I don't really need it.
-            end
-          end, "pyright")
-        end,
+        -- pyright = function()
+        --   Util.lsp.on_attach(function(client, _)
+        --     if client.name == "pyright" then
+        --       client.server_capabilities.hoverProvider = false -- NOTE: disable doc hover since I don't really need it.
+        --     end
+        --   end, "pyright")
+        -- end,
         taplo = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "taplo" then client.server_capabilities.documentFormattingProvider = false end
