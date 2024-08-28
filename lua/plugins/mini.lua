@@ -75,7 +75,7 @@ return {
       align = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
       pick = { options = { use_cache = true }, window = { prompt_prefix = "󰄾 " } },
       bracketed = { window = { suffix = "" }, treesitter = { suffix = "" } },
-      -- indentscope = { symbol = "│", options = { try_as_border = true } },
+      indentscope = { symbol = "│", options = { try_as_border = true } },
       comment = {
         options = {
           custom_commentstring = function()

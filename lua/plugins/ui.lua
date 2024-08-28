@@ -51,8 +51,8 @@ return {
         popup = { border = { style = BORDER.impl "docs" } },
         confirm = { border = { style = BORDER.impl "hover" } },
         hover = { border = { style = BORDER.impl "docs" }, position = { row = 2, col = 2 } },
-        cmdline_input = { border = { style = BORDER.none } },
-        cmdline_popup = { border = { style = BORDER.none } },
+        cmdline_input = { border = { style = BORDER.impl "simple" } },
+        cmdline_popup = { border = { style = BORDER.impl "simple" } },
         mini = { border = { style = BORDER.none } },
       },
       routes = {

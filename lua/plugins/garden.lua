@@ -58,6 +58,17 @@ return {
     end,
   },
   {
+    "OXY2DEV/markview.nvim",
+    enabled = false,
+    lazy = false,
+    ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
+    opts = {
+      filetypes = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
+      buf_ignore = {},
+      max_length = 99999,
+    },
+  },
+  {
     "epwalsh/obsidian.nvim",
     lazy = true,
     version = false,

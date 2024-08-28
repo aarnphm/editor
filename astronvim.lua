@@ -35,7 +35,6 @@ require("lazy").setup {
         { "<leader>ua", "<cmd>:AvanteAsk<CR>", desc = "avante: ask", mode = { "n", "v" } },
         { "<leader>ur", "<cmd>:AvanteRefresh<CR>", desc = "avante: refresh" },
       },
-      specs = { { "zbirenbaum/copilot.lua", enabled = false, optional = true } },
       dependencies = { "nui.nvim" },
       ---@type avante.Config
       opts = {

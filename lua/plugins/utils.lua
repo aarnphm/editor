@@ -14,6 +14,20 @@ return {
   --- discord rich presence
   { "andweeb/presence.nvim", event = "LazyFile", opts = { enable_line_number = true } },
   {
+    -- support for image pasting
+    "HakonHarnes/img-clip.nvim",
+    event = "VeryLazy",
+    opts = {
+      default = {
+        embed_image_as_base64 = false,
+        prompt_for_file_name = false,
+        drag_and_drop = {
+          insert_mode = true,
+        },
+      },
+    },
+  },
+  {
     "yetone/avante.nvim",
     dev = true,
     version = false,
@@ -21,10 +35,9 @@ return {
     build = "make",
     keys = {
       { "<leader>ua", "<cmd>:AvanteAsk<CR>", desc = "avante: ask", mode = { "n", "v" } },
-      { "<leader>ur", "<cmd>:AvanteRefresh<CR>", desc = "avante: refresh" },
+      { "<leader>ur", "<cmd>:AvanteRefresh<CR>", desc = "avante: refresh", mode = { "n", "v" } },
       { "<leader>ue", "<cmd>:AvanteEdit<CR>", desc = "avante: ask", mode = { "n", "v" } },
     },
-    specs = { { "zbirenbaum/copilot.lua", enabled = false, optional = true } },
     dependencies = { "nui.nvim" },
     ---@type avante.Config
     opts = {
@@ -78,7 +91,7 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").openai.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
                 temperature = 0,
                 max_tokens = 8192,
                 stream = true, -- this will be set by default.
@@ -87,7 +100,7 @@ return {
           end,
           -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
           parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+            require("avante.providers").azure.parse_response(data_stream, event_state, opts)
           end,
         },
         ---@type AvanteProvider
@@ -105,7 +118,7 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").openai.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
                 temperature = 0,
                 max_tokens = 4096,
                 stream = true, -- this will be set by default.
@@ -113,7 +126,7 @@ return {
             }
           end,
           parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+            require("avante.providers").azure.parse_response(data_stream, event_state, opts)
           end,
         },
         ---@type AvanteProvider
@@ -131,7 +144,7 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").openai.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
                 temperature = 0,
                 max_tokens = 4096,
                 stream = true, -- this will be set by default.
@@ -139,7 +152,7 @@ return {
             }
           end,
           parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+            require("avante.providers").azure.parse_response(data_stream, event_state, opts)
           end,
         },
         ---@type AvanteProvider
@@ -164,6 +177,30 @@ return {
             }
           end,
           -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
+          parse_response_data = function(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+          end,
+        },
+        ---@type AvanteProvider
+        ollama = {
+          ["local"] = true,
+          endpoint = "127.0.0.1:11434/v1",
+          model = "codegemma",
+          parse_curl_args = function(opts, code_opts)
+            return {
+              url = opts.endpoint .. "/chat/completions",
+              headers = {
+                ["Accept"] = "application/json",
+                ["Content-Type"] = "application/json",
+              },
+              body = {
+                model = opts.model,
+                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                max_tokens = 2048,
+                stream = true,
+              },
+            }
+          end,
           parse_response_data = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
