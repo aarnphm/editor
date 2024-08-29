@@ -99,6 +99,7 @@ return {
   {
     "folke/which-key.nvim",
     event = "LazyFile",
+    lazy = true,
     opts_extend = { "spec" },
     opts = function()
       local max_width = vim.o.columns
@@ -112,6 +113,7 @@ return {
           { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
           {
             mode = { "n", "v" },
+            { "<leader>a", group = "avante", icon = { icon = " ", color = "cyan" } },
             { "<leader><tab>", group = "tabs" },
             { "<leader>c", group = "code" },
             { "<leader>f", group = "file/find" },

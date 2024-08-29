@@ -180,7 +180,6 @@ return {
         toml = { "taplo" },
         proto = { "buf", "protolint" },
         zsh = { "beautysh", fallback = true },
-        python = { "ruff_fix" },
         sh = { "shfmt" },
         markdown = { "prettier" },
         go = { "goimports", "gofumpt" },

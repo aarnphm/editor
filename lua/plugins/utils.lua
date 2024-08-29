@@ -17,6 +17,16 @@ return {
     -- support for image pasting
     "HakonHarnes/img-clip.nvim",
     event = "VeryLazy",
+    keys = {
+      {
+        "<leader>ip",
+        function()
+          return vim.bo.filetype == "AvanteInput" and require("avante.clipboard").paste_image()
+            or require("img-clip").paste_image()
+        end,
+        desc = "clip: paste image",
+      },
+    },
     opts = {
       default = {
         embed_image_as_base64 = false,
@@ -31,13 +41,7 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
-    cmd = { "AvanteAsk", "AvanteSwitchProvider", "AvanteRefresh", "AvanteEdit" },
-    build = "make",
-    keys = {
-      { "<leader>ua", "<cmd>:AvanteAsk<CR>", desc = "avante: ask", mode = { "n", "v" } },
-      { "<leader>ur", "<cmd>:AvanteRefresh<CR>", desc = "avante: refresh", mode = { "n", "v" } },
-      { "<leader>ue", "<cmd>:AvanteEdit<CR>", desc = "avante: ask", mode = { "n", "v" } },
-    },
+    event = "VeryLazy",
     dependencies = { "nui.nvim" },
     ---@type avante.Config
     opts = {
@@ -54,17 +58,7 @@ return {
         support_paste_from_clipboard = true,
       },
       mappings = {
-        ask = "<leader>ua",
-        edit = "<leader>ue",
-        refresh = "<leader>ur",
-        submit = {
-          normal = "<CR>",
-          insert = "<C-CR>",
-        },
-        toggle = {
-          debug = "<LocalLeader>ud",
-          hint = "<LocalLeader>uh",
-        },
+        submit = { normal = "<CR>", insert = "<C-CR>" },
       },
       windows = {
         width = 30,
@@ -91,7 +85,10 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = { -- you can make your own message, but this is very advanced
+                  { role = "system", content = code_opts.system_prompt },
+                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
+                },
                 temperature = 0,
                 max_tokens = 8192,
                 stream = true, -- this will be set by default.
@@ -100,7 +97,7 @@ return {
           end,
           -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
           parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").azure.parse_response(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
         ---@type AvanteProvider
@@ -118,7 +115,10 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = { -- you can make your own message, but this is very advanced
+                  { role = "system", content = code_opts.system_prompt },
+                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
+                },
                 temperature = 0,
                 max_tokens = 4096,
                 stream = true, -- this will be set by default.
@@ -126,7 +126,7 @@ return {
             }
           end,
           parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").azure.parse_response(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
         ---@type AvanteProvider
@@ -144,7 +144,10 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = { -- you can make your own message, but this is very advanced
+                  { role = "system", content = code_opts.system_prompt },
+                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
+                },
                 temperature = 0,
                 max_tokens = 4096,
                 stream = true, -- this will be set by default.
@@ -152,7 +155,7 @@ return {
             }
           end,
           parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").azure.parse_response(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
         ---@type AvanteProvider
@@ -170,7 +173,10 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").openai.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = { -- you can make your own message, but this is very advanced
+                  { role = "system", content = code_opts.system_prompt },
+                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
+                },
                 max_tokens = 1024,
                 stream = true,
               },
@@ -195,7 +201,10 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = require("avante.providers").azure.parse_message(code_opts), -- you can make your own message, but this is very advanced
+                messages = { -- you can make your own message, but this is very advanced
+                  { role = "system", content = code_opts.system_prompt },
+                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
+                },
                 max_tokens = 2048,
                 stream = true,
               },
