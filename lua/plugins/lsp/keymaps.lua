@@ -71,14 +71,14 @@ M.get = function()
         cond = function() return Util.lsp.words.enabled end,
       },
       {
-        "<a-n>",
+        "<C-n>",
         function() Util.lsp.words.jump(vim.v.count1, true) end,
         has = "documentHighlight",
         desc = "lsp: next reference",
         cond = function() return Util.lsp.words.enabled end,
       },
       {
-        "<a-p>",
+        "<C-p>",
         function() Util.lsp.words.jump(-vim.v.count1, true) end,
         has = "documentHighlight",
         desc = "lsp: prev reference",

@@ -20,19 +20,6 @@ return {
     end,
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
-    main = "ibl",
-    enabled = false,
-    event = "LazyFile",
-    opts = {
-      indent = {
-        char = "│",
-        tab_char = "│",
-      },
-      scope = { enabled = false },
-    },
-  },
-  {
     "folke/noice.nvim",
     event = "VeryLazy",
     enabled = function() return vim.g.enable_ui end,

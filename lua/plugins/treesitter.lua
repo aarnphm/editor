@@ -23,8 +23,7 @@ return {
           end
         end,
       })
-
-      return { mode = "cursor", enable = false }
+      return { mode = "cursor", enable = true, max_lines = 3 }
     end,
   },
   {

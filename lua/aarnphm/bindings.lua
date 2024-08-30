@@ -13,11 +13,11 @@ end
 
 map(
   "n",
-  "<C-p>",
+  "<M-p>",
   function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
   { desc = "terminal: open (root)" }
 )
-map("t", "<C-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<M-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map(
   "n",
   "<M-]>",
@@ -32,6 +32,7 @@ map(
 map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
+map("i", "<C-BS>", "<C-W>", { desc = "insert: delete word" })
 
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
 map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })

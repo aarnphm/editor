@@ -43,6 +43,9 @@ return {
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },
+          --- indentmini.nvim
+          IndentLine = { fg = "highlight_low" },
+          IndentLineCurrent = { fg = "subtle" },
         },
       }
 
