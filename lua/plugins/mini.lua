@@ -48,7 +48,6 @@ return {
         version = false,
         opts = { progress = { display = { render_limit = 3 } } },
       },
-      { "nvimdev/indentmini.nvim", version = false, opts = {} },
       {
         "s1n7ax/nvim-window-picker",
         name = "window-picker",

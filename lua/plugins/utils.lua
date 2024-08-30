@@ -35,6 +35,7 @@ return {
       provider = "claude",
       claude = {
         api_key_name = "cmd:bw get notes anthropic-api-key",
+        max_tokens = 8192,
       },
       openai = {
         api_key_name = "cmd:bw get notes oai-api-key",
