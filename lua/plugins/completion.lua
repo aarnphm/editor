@@ -33,6 +33,16 @@ return {
         dependencies = { "rafamadriz/friendly-snippets" },
       },
       {
+        "Saecki/crates.nvim",
+        lazy = true,
+        event = { "BufRead Cargo.toml" },
+        opts = {
+          completion = {
+            cmp = { enabled = true },
+          },
+        },
+      },
+      {
         "folke/lazydev.nvim",
         ft = "lua",
         cmd = "LazyDev",
@@ -47,6 +57,69 @@ return {
           },
         },
       },
+      {
+        "mrcjkb/rustaceanvim",
+        version = false, -- Recommended
+        ft = { "rust" },
+        lazy = true,
+        opts = {
+          server = {
+            cmd = function()
+              local mr = require "mason-registry"
+              local ra_binary = mr.is_installed "rust-analyzer"
+                  -- This may need to be tweaked, depending on the operating system.
+                  and mr.get_package("rust-analyzer"):get_install_path() .. "/rust-analyzer"
+                or "rust-analyzer"
+              return { ra_binary } -- You can add args to the list, such as '--log-file'
+            end,
+            on_attach = function(_, bufnr)
+              vim.keymap.set(
+                "n",
+                "<leader>cR",
+                function() vim.cmd.RustLsp "codeAction" end,
+                { desc = "Code Action", buffer = bufnr }
+              )
+              vim.keymap.set(
+                "n",
+                "<leader>dr",
+                function() vim.cmd.RustLsp "debuggables" end,
+                { desc = "Rust Debuggables", buffer = bufnr }
+              )
+            end,
+            default_settings = {
+              -- rust-analyzer language server configuration
+              ["rust-analyzer"] = {
+                cargo = {
+                  allFeatures = true,
+                  loadOutDirsFromCheck = true,
+                  buildScripts = {
+                    enable = true,
+                  },
+                },
+                -- Add clippy lints for Rust.
+                checkOnSave = true,
+                procMacro = {
+                  enable = true,
+                  ignored = {
+                    ["async-trait"] = { "async_trait" },
+                    ["napi-derive"] = { "napi" },
+                    ["async-recursion"] = { "async_recursion" },
+                  },
+                },
+              },
+            },
+          },
+        },
+        config = function(_, opts)
+          vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+          if vim.fn.executable "rust-analyzer" == 0 then
+            Util.error(
+              "**rust-analyzer** not found in PATH, please install it.\nhttps://rust-analyzer.github.io/",
+              { title = "rustaceanvim" }
+            )
+          end
+        end,
+      },
     },
     ---@return cmp.ConfigSchema
     opts = function()
@@ -56,6 +129,26 @@ return {
 
       ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
+
+      local sources = {
+        {
+          name = "nvim_lsp",
+          option = {
+            markdown_oxide = {
+              keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
+            },
+          },
+        },
+        { name = "snippets", group_index = 1 },
+        { name = "supermaven", group_index = 2 },
+        { name = "async_path" },
+        { name = "buffer" },
+        { name = "lazydev", group_index = 0 },
+      }
+      -- check if buffer is a toml file and filename is Cargo.toml
+      if vim.bo.filetype == "toml" and vim.fn.expand "%:t" == "Cargo.toml" then
+        sources[#sources + 1] = { name = "crates" }
+      end
 
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = { "python" },
@@ -162,21 +255,7 @@ return {
             end
           end, { "i", "s" }),
         },
-        sources = cmp.config.sources {
-          {
-            name = "nvim_lsp",
-            option = {
-              markdown_oxide = {
-                keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
-              },
-            },
-          },
-          { name = "snippets", group_index = 1 },
-          { name = "supermaven", group_index = 2 },
-          { name = "async_path" },
-          { name = "buffer" },
-          { name = "lazydev", group_index = 0 },
-        },
+        sources = cmp.config.sources(sources),
       })
     end,
     main = "utils.cmp",

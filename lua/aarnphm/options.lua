@@ -15,7 +15,7 @@ local enable_ui = true
 wo.scrolloff = 8
 wo.sidescrolloff = 8
 wo.wrap = false
-wo.cursorline = false
+wo.cursorline = true
 wo.cursorcolumn = false
 
 -- only set clipboard if not in ssh, to make sure the OSC 52

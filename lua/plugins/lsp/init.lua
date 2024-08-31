@@ -16,6 +16,7 @@ return {
         "hadolint",
         "oxlint",
         "markdownlint",
+        "rust-analyzer",
       },
       ui = { border = BORDER.impl() },
       max_concurrent_installers = 10,
@@ -117,7 +118,21 @@ return {
       -- all of the server below will be installed by default
       servers = {
         bashls = {},
-        taplo = {},
+        taplo = {
+          keys = {
+            {
+              "K",
+              function()
+                if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
+                  require("crates").show_popup()
+                else
+                  vim.lsp.buf.hover()
+                end
+              end,
+              desc = "crates: show documentation",
+            },
+          },
+        },
         markdown_oxide = {
           capabilities = {
             workspace = {
@@ -406,6 +421,7 @@ return {
         },
       },
       setup = {
+        rust_analyzer = function() return true end,
         ruff = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "ruff" then
@@ -413,11 +429,6 @@ return {
               client.server_capabilities.documentFormattingProvider = false -- NOTE: disable ruff formatting because I don't like deterministic formatter  in python
             end
           end, "ruff")
-        end,
-        taplo = function()
-          Util.lsp.on_attach(function(client, _)
-            if client.name == "taplo" then client.server_capabilities.documentFormattingProvider = false end
-          end)
         end,
         yamlls = function()
           Util.lsp.on_attach(function(client, _)

@@ -27,6 +27,7 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
+    build = true,
     event = "VeryLazy",
     dependencies = { "nui.nvim" },
     ---@type avante.Config
@@ -39,6 +40,14 @@ return {
       },
       openai = {
         api_key_name = "cmd:bw get notes oai-api-key",
+        model = "gpt-4o-2024-08-06",
+      },
+      cohere = {
+        model = "command-r-plus-08-2024",
+        api_key_name = "cmd:bw get notes cohere-api-key",
+      },
+      gemini = {
+        api_key_name = "cmd:bw get notes gemini-api-key",
       },
       behaviour = {
         auto_set_highlight_group = false,
@@ -193,6 +202,35 @@ return {
                   { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
                 },
                 max_tokens = 2048,
+                stream = true,
+              },
+            }
+          end,
+          parse_response_data = function(data_stream, event_state, opts)
+            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
+          end,
+        },
+        ---@type AvanteProvider
+        mistral = {
+          endpoint = "https://api.mistral.ai/v1/chat/completions",
+          model = "mistral-7b-v0.1",
+          api_key_name = "MISTRAL_API_KEY",
+          parse_curl_args = function(opts, code_opts)
+            return {
+              url = opts.endpoint,
+              headers = {
+                ["Accept"] = "application/json",
+                ["Content-Type"] = "application/json",
+                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
+              },
+              body = {
+                model = opts.model,
+                messages = {
+                  { role = "system", content = code_opts.system_prompt },
+                  { role = "user", content = table.concat(code_opts.user_prompts, "\n\n") },
+                },
+                temperature = 0,
+                max_tokens = 4096,
                 stream = true,
               },
             }
