@@ -50,6 +50,68 @@ return {
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
       { "b0o/SchemaStore.nvim", lazy = true, version = false, ft = { "json", "yaml" } },
+      {
+        "mrcjkb/rustaceanvim",
+        version = false, -- Recommended
+        ft = { "rust" },
+        opts = {
+          server = {
+            cmd = function()
+              local mr = require "mason-registry"
+              local ra_binary = mr.is_installed "rust-analyzer"
+                  -- This may need to be tweaked, depending on the operating system.
+                  and mr.get_package("rust-analyzer"):get_install_path() .. "/rust-analyzer"
+                or "rust-analyzer"
+              return { ra_binary } -- You can add args to the list, such as '--log-file'
+            end,
+            on_attach = function(_, bufnr)
+              vim.keymap.set(
+                "n",
+                "<leader>cR",
+                function() vim.cmd.RustLsp "codeAction" end,
+                { desc = "Code Action", buffer = bufnr }
+              )
+              vim.keymap.set(
+                "n",
+                "<leader>dr",
+                function() vim.cmd.RustLsp "debuggables" end,
+                { desc = "Rust Debuggables", buffer = bufnr }
+              )
+            end,
+            default_settings = {
+              -- rust-analyzer language server configuration
+              ["rust-analyzer"] = {
+                cargo = {
+                  allFeatures = true,
+                  loadOutDirsFromCheck = true,
+                  buildScripts = {
+                    enable = true,
+                  },
+                },
+                -- Add clippy lints for Rust.
+                checkOnSave = true,
+                procMacro = {
+                  enable = true,
+                  ignored = {
+                    ["async-trait"] = { "async_trait" },
+                    ["napi-derive"] = { "napi" },
+                    ["async-recursion"] = { "async_recursion" },
+                  },
+                },
+              },
+            },
+          },
+        },
+        config = function(_, opts)
+          vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+          if vim.fn.executable "rust-analyzer" == 0 then
+            Util.error(
+              "**rust-analyzer** not found in PATH, please install it.\nhttps://rust-analyzer.github.io/",
+              { title = "rustaceanvim" }
+            )
+          end
+        end,
+      },
     },
     ---@class PluginLspOptions
     opts = {
@@ -421,7 +483,6 @@ return {
         },
       },
       setup = {
-        rust_analyzer = function() return true end,
         ruff = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "ruff" then

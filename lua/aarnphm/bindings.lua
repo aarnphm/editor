@@ -13,11 +13,11 @@ end
 
 map(
   "n",
-  "<M-p>",
+  "<M-[>",
   function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
   { desc = "terminal: open (root)" }
 )
-map("t", "<M-p>", "<cmd>close<cr>", { desc = "terminal: hide" })
+map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
 map(
   "n",
   "<M-]>",
@@ -30,6 +30,15 @@ map(
   { desc = "terminal: serve quartz" }
 )
 map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
+-- Open a terminal at the bottom of the screen with a fixed height.
+map("n", ",st", function()
+  vim.cmd.new()
+  vim.cmd.wincmd "J"
+  vim.api.nvim_win_set_height(0, 12)
+  vim.wo.winfixheight = true
+  vim.cmd.term()
+end)
+
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
 map("i", "<C-BS>", "<C-W>", { desc = "insert: delete word" })

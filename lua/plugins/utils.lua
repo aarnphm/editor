@@ -27,12 +27,12 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
-    build = true,
+    build = ":AvanteBuild",
     event = "VeryLazy",
     dependencies = { "nui.nvim" },
     ---@type avante.Config
     opts = {
-      debug = false,
+      debug = true,
       provider = "claude",
       claude = {
         api_key_name = "cmd:bw get notes anthropic-api-key",
@@ -57,6 +57,7 @@ return {
         submit = { normal = "<CR>", insert = "<C-CR>" },
       },
       windows = {
+        position = "left",
         width = 30,
         sidebar_header = {
           align = "left", -- left, center, right for title
