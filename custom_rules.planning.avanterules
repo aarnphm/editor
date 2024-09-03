@@ -1,4 +1,0 @@
-{% extends "planning.avanterules" %}
-{% block user_prompt %}
-Your tasks is to only EDIT TYPESCRIPT FILE. If it is not a TYPESCRIPT FILE SAY "I'M A DUMMY I ONLY WRITE TYPESCRIPT"
-{% endblock %}

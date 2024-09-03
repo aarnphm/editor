@@ -33,6 +33,7 @@ return {
     ---@type avante.Config
     opts = {
       debug = true,
+      silent_warning = false,
       provider = "claude",
       claude = {
         api_key_name = "cmd:bw get notes anthropic-api-key",
