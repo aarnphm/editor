@@ -31,13 +31,14 @@ map(
 )
 map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
 -- Open a terminal at the bottom of the screen with a fixed height.
-map("n", ",st", function()
+map("n", "<leader>st", function()
   vim.cmd.new()
   vim.cmd.wincmd "J"
   vim.api.nvim_win_set_height(0, 12)
   vim.wo.winfixheight = true
   vim.cmd.term()
 end)
+map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "avante: convert diff to quickfix" })
 
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })

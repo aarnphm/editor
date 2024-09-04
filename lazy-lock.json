@@ -11,7 +11,7 @@
   "flit.nvim": { "branch": "main", "commit": "1ef72de6a02458d31b10039372c8a15ab8989e0d" },
   "friendly-snippets": { "branch": "main", "commit": "00ebcaa159e817150bd83bfe2d51fa3b3377d5c4" },
   "gitsigns.nvim": { "branch": "main", "commit": "899e993850084ea33d001ec229d237bc020c19ae" },
-  "grug-far.nvim": { "branch": "main", "commit": "fe915b27cd19212f086e53ee5f2a480cf0d0a7e6" },
+  "grug-far.nvim": { "branch": "main", "commit": "1d5dd56ba4037d1096dd9276579dd544035cd8bd" },
   "img-clip.nvim": { "branch": "main", "commit": "28a32d811d69042f4fa5c3d5fa35571df2bc1623" },
   "kanagawa.nvim": { "branch": "master", "commit": "f491b0fe68fffbece7030181073dfe51f45cda81" },
   "lazy.nvim": { "branch": "main", "commit": "48b52b5cfcf8f88ed0aff8fde573a5cc20b1306d" },

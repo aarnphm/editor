@@ -142,6 +142,8 @@ vim.filetype.add {
   extension = {
     ["http"] = "http",
     env = "dotenv",
+    h = "c",
+    ["j2"] = "jinja",
   },
   filename = {
     [".env"] = "dotenv",

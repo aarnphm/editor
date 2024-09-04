@@ -42,6 +42,7 @@ return {
           },
         },
       },
+      { "avante.nvim" },
       {
         "folke/lazydev.nvim",
         ft = "lua",
@@ -63,6 +64,8 @@ return {
       local cmp = require "cmp"
       local TC = require "cmp.types.cmp"
       local defaults = require "cmp.config.default"()
+
+      local AvanteSuggestion = require("avante.api").get_suggestion()
 
       ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
@@ -169,7 +172,9 @@ return {
 
             local supermaven = require "supermaven-nvim.completion_preview"
 
-            if cmp.visible() then
+            if AvanteSuggestion ~= nil and AvanteSuggestion:is_visible() then
+              AvanteSuggestion:next()
+            elseif cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif vim.snippet.active { direction = 1 } then
               vim.schedule(function() vim.snippet.jump(1) end)
@@ -183,7 +188,9 @@ return {
           end, { "i", "s" }),
           ---@type cmp.MappingFunction
           ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
+            if AvanteSuggestion ~= nil and AvanteSuggestion:is_visible() then
+              AvanteSuggestion:prev()
+            elseif cmp.visible() then
               cmp.select_prev_item(select_opts)
             elseif vim.snippet.active { direction = -1 } then
               vim.schedule(function() vim.snippet.jump(-1) end)

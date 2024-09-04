@@ -32,11 +32,11 @@ return {
     dependencies = { "nui.nvim" },
     ---@type avante.Config
     opts = {
-      debug = true,
+      debug = false,
       silent_warning = false,
       provider = "claude",
       claude = {
-        api_key_name = "cmd:bw get notes anthropic-api-key",
+        api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
         max_tokens = 8192,
       },
       openai = {
@@ -51,11 +51,17 @@ return {
         api_key_name = "cmd:bw get notes gemini-api-key",
       },
       behaviour = {
-        auto_set_highlight_group = false,
+        auto_suggestions = false, -- Experimental stage
         support_paste_from_clipboard = true,
       },
       mappings = {
         submit = { normal = "<CR>", insert = "<C-CR>" },
+        suggestion = {
+          accept = "<M-j>",
+          next = "<M-l>",
+          prev = "<M-h>",
+          dismiss = "<C-k>",
+        },
       },
       windows = {
         position = "left",

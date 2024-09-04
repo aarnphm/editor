@@ -110,6 +110,15 @@ _G.hi = function(name, opts)
   vim.api.nvim_set_hl(0, name, opts)
 end
 
+_G.convert_avante_diff_to_qf = function()
+  require("avante.diff").conflicts_to_qf_items(function(items)
+    if #items > 0 then
+      vim.fn.setqflist(items, "r")
+      vim.cmd "copen"
+    end
+  end)
+end
+
 -- statusline and simple
 local fmt = string.format
 
