@@ -51,19 +51,44 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       { "b0o/SchemaStore.nvim", lazy = true, version = false, ft = { "json", "yaml" } },
       {
+        "p00f/clangd_extensions.nvim",
+        lazy = true,
+        version = false,
+        ft = { "c", "cpp", "objc", "objcpp", "cuda", "proto", "hpp" },
+        config = function() end,
+        opts = {
+          inlay_hints = {
+            inline = false,
+          },
+          ast = {
+            --These require codicons (https://github.com/microsoft/vscode-codicons)
+            role_icons = {
+              type = "",
+              declaration = "",
+              expression = "",
+              specifier = "",
+              statement = "",
+              ["template argument"] = "",
+            },
+            kind_icons = {
+              Compound = "",
+              Recovery = "",
+              TranslationUnit = "",
+              PackExpansion = "",
+              TemplateTypeParm = "",
+              TemplateTemplateParm = "",
+              TemplateParamObject = "",
+            },
+          },
+        },
+      },
+      {
         "mrcjkb/rustaceanvim",
         version = false, -- Recommended
         ft = { "rust" },
+        lazy = false,
         opts = {
           server = {
-            cmd = function()
-              local mr = require "mason-registry"
-              local ra_binary = mr.is_installed "rust-analyzer"
-                  -- This may need to be tweaked, depending on the operating system.
-                  and mr.get_package("rust-analyzer"):get_install_path() .. "/rust-analyzer"
-                or "rust-analyzer"
-              return { ra_binary } -- You can add args to the list, such as '--log-file'
-            end,
             on_attach = function(_, bufnr)
               vim.keymap.set(
                 "n",
@@ -481,8 +506,49 @@ return {
             workingDirectories = { mode = "auto" },
           },
         },
+        clangd = {
+          keys = {
+            { "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>", desc = "clangd: switch source/header" },
+          },
+          root_dir = function(fname)
+            return require("lspconfig.util").root_pattern(
+              "Makefile",
+              "configure.ac",
+              "configure.in",
+              "config.h.in",
+              "meson.build",
+              "meson_options.txt",
+              "build.ninja"
+            )(fname) or require("lspconfig.util").root_pattern(
+              "compile_commands.json",
+              "compile_flags.txt"
+            )(fname) or require("lspconfig.util").find_git_ancestor(fname)
+          end,
+          capabilities = {
+            offsetEncoding = { "utf-16" },
+          },
+          cmd = {
+            "clangd",
+            "--background-index",
+            "--clang-tidy",
+            "--header-insertion=iwyu",
+            "--completion-style=detailed",
+            "--function-arg-placeholders",
+            "--fallback-style=llvm",
+          },
+          init_options = {
+            usePlaceholders = true,
+            completeUnimported = true,
+            clangdFileStatus = true,
+          },
+        },
       },
       setup = {
+        clangd = function(_, opts)
+          local clangd_ext_opts = Util.opts "clangd_extensions.nvim"
+          require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_ext_opts or {}, { server = opts }))
+          return false
+        end,
         ruff = function()
           Util.lsp.on_attach(function(client, _)
             if client.name == "ruff" then

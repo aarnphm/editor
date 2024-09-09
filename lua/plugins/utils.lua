@@ -30,10 +30,14 @@ return {
     build = ":AvanteBuild",
     event = "VeryLazy",
     dependencies = { "nui.nvim" },
+    keys = {
+      { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "avante: open" },
+      { "<leader>ac", "<cmd>AvanteChat<CR>", desc = "avante: chat" },
+      { "<leader>al", "<cmd>AvanteAsk position=left<CR>", desc = "avante: open on right panel" },
+    },
     ---@type avante.Config
     opts = {
       debug = false,
-      silent_warning = false,
       provider = "claude",
       claude = {
         api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
@@ -60,12 +64,10 @@ return {
           accept = "<M-j>",
           next = "<M-l>",
           prev = "<M-h>",
-          dismiss = "<C-k>",
+          dismiss = "<M-k>",
         },
       },
       windows = {
-        position = "left",
-        width = 30,
         sidebar_header = {
           align = "left", -- left, center, right for title
           rounded = false,

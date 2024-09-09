@@ -42,7 +42,7 @@ map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "ava
 
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
-map("i", "<C-BS>", "<C-W>", { desc = "insert: delete word" })
+map("i", "<D-BS>", "<C-W>", { desc = "insert: delete word" })
 
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
 map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })

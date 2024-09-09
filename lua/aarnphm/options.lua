@@ -9,8 +9,6 @@ if vim.uv.os_uname().sysname == "Darwin" then
   }
 end
 
-local enable_ui = true
-
 -- window opts
 wo.scrolloff = 8
 wo.sidescrolloff = 8
@@ -28,7 +26,6 @@ opt.winminwidth = 5 -- Minimum window width
 -- Some defaults and don't question it
 o.writebackup = false -- whos needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
-o.guicursor = "" -- no gui cursor
 o.signcolumn = "yes" -- always show sign column
 o.undofile = true -- set undofile to infinite undo
 o.breakindent = true -- enable break indent
@@ -111,7 +108,6 @@ o.shiftround = true
 
 -- UI config
 o.showmode = false -- This is set with mini.statusline
-o.cmdheight = enable_ui and 0 or 1
 o.showcmd = false
 o.showbreak = "↳  "
 o.sidescrolloff = 8
@@ -152,7 +148,11 @@ g.additional_path_root_spec = { "content" }
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.border = "single"
 g.enable_agent_inlay = false
-g.enable_ui = enable_ui
+g.enable_ui = true
+g.block_cursor = false
+
+o.cmdheight = g.enable_ui and 0 or 1
+o.guicursor = g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block
 
 if vim.g.neovide then
   vim.g.neovide_no_idle = true

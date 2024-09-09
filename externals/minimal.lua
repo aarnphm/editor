@@ -77,7 +77,7 @@ o.updatetime = 200
 o.wildchar = 9
 o.wildignorecase = true
 o.wildmode = "longest:full,full"
-opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
+opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "Cargo.lock", "lazy-lock.json" }
 
 -- map leader to <Space> and localeader to +
 g.mapleader = " "
