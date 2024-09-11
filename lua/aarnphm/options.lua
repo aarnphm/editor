@@ -147,6 +147,8 @@ g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.border = "single"
+---@type "markview" | "render-markdown"
+g.markdown_render_backend = "render-markdown"
 g.enable_agent_inlay = false
 g.enable_ui = true
 g.block_cursor = false

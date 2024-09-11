@@ -21,7 +21,7 @@ return {
   },
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    enabled = true,
+    enabled = function() return vim.g.markdown_render_backend == "render-markdown" end,
     opts = {
       file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       render_modes = { "n", "c" },
@@ -59,13 +59,12 @@ return {
   },
   {
     "OXY2DEV/markview.nvim",
-    enabled = false,
+    enabled = function() return vim.g.markdown_render_backend == "markview" end,
     lazy = false,
     ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
     opts = {
       filetypes = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       buf_ignore = {},
-      max_length = 99999,
     },
   },
   {
@@ -105,6 +104,7 @@ return {
       open_app_foreground = true,
       log_level = vim.log.levels.INFO,
       open_notes_in = "vsplit",
+      completion = { nvim_cmp = false },
       follow_url_func = function(url) vim.ui.open(url) end,
       new_notes_location = "notes_subdir",
       yaml_parser = "yq",

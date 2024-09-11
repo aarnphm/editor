@@ -16,7 +16,6 @@ return {
         "hadolint",
         "oxlint",
         "markdownlint",
-        "rust-analyzer",
       },
       ui = { border = BORDER.impl() },
       max_concurrent_installers = 10,
@@ -85,7 +84,6 @@ return {
       {
         "mrcjkb/rustaceanvim",
         version = false, -- Recommended
-        ft = { "rust" },
         lazy = false,
         opts = {
           server = {
