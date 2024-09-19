@@ -94,7 +94,7 @@ opt.fillchars = {
 }
 o.smoothscroll = true
 o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
-o.foldmethod = "expr"
+o.foldmethod = "indent"
 o.foldtext = "v:lua.require'utils'.ui.foldtext()"
 o.foldlevel = 99
 o.foldlevelstart = 99

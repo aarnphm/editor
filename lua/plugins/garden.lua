@@ -1,3 +1,5 @@
+local capstone_vault = vim.fn.expand "~" .. "/workspace/capstone/docs/content"
+
 return {
   -- Markdown preview
   {
@@ -74,6 +76,8 @@ return {
     event = {
       "BufReadPre " .. vim.g.vault .. "/**.md",
       "BufNewFile " .. vim.g.vault .. "/**.md",
+      "BufReadPre " .. capstone_vault .. "/**.md",
+      "BufNewFile " .. capstone_vault .. "/**.md",
     },
     keys = {
       {
@@ -100,7 +104,10 @@ return {
     dependencies = { "nvim-lua/plenary.nvim", "mini.nvim", "nvim-cmp" },
     ---@type obsidian.config.ClientOpts
     opts = {
-      workspaces = { { name = "garden", path = vim.g.vault, overrides = { notes_subdir = "thoughts" } } },
+      workspaces = {
+        { name = "garden", path = vim.g.vault, overrides = { notes_subdir = "thoughts" } },
+        { name = "capstone", path = capstone_vault, overrides = { templates = {} } },
+      },
       open_app_foreground = true,
       log_level = vim.log.levels.INFO,
       open_notes_in = "vsplit",
