@@ -79,10 +79,35 @@ return {
       textobjects = {
         move = {
           enable = true,
-          goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
+          goto_next_start = {
+            ["]f"] = "@function.outer",
+            ["]c"] = "@class.outer",
+            ["]b"] = { query = "@code_cell.inner", desc = "next code block" },
+          },
           goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
-          goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
+          goto_previous_start = {
+            ["[f"] = "@function.outer",
+            ["[c"] = "@class.outer",
+            ["[b"] = { query = "@code_cell.inner", desc = "previous code block" },
+          },
           goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+        },
+        select = {
+          enable = true,
+          lookahead = true,
+          keymaps = {
+            ["ib"] = { query = "@code_cell.inner", desc = "in block" },
+            ["ab"] = { query = "@code_cell.outer", desc = "around block" },
+          },
+        },
+        swap = {
+          enable = true,
+          swap_next = {
+            ["<leader>sbl"] = "@code_cell.outer",
+          },
+          swap_previous = {
+            ["<leader>sbh"] = "@code_cell.outer",
+          },
         },
       },
       incremental_selection = {

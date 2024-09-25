@@ -494,6 +494,9 @@ return {
                 autoSearchPaths = true,
                 typeCheckingMode = "strict",
                 useLibraryCodeForTypes = true,
+                diagnosticSeverityOverrides = {
+                  reportUnusedExpression = "none",
+                },
               },
             },
           },
