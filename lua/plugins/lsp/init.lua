@@ -540,6 +540,7 @@ return {
             "--completion-style=detailed",
             "--function-arg-placeholders",
             "--fallback-style=llvm",
+            "--cuda-gpu-arch=sm_86",
           },
           init_options = {
             usePlaceholders = true,
