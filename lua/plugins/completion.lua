@@ -2,6 +2,7 @@ return {
   {
     "supermaven-inc/supermaven-nvim",
     lazy = true,
+    enabled = false,
     event = "LazyFile",
     build = ":SupermavenUsePro",
     opts = {
@@ -17,6 +18,19 @@ return {
       log_level = "warn",
       disable_inline_completion = true,
       disable_keymaps = true,
+    },
+  },
+  {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    build = ":Copilot auth",
+    opts = {
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+      filetypes = {
+        markdown = true,
+        help = true,
+      },
     },
   },
   {
@@ -42,7 +56,18 @@ return {
           },
         },
       },
-      { "avante.nvim" },
+      {
+        "zbirenbaum/copilot-cmp",
+        dependencies = "copilot.lua",
+        opts = {},
+        config = function(_, opts)
+          local copilot_cmp = require "copilot_cmp"
+          copilot_cmp.setup(opts)
+          -- attach cmp source whenever copilot attaches
+          -- fixes lazy-loading issues with the copilot cmp source
+          Util.lsp.on_attach(function(_) copilot_cmp._on_insert_enter {} end, "copilot")
+        end,
+      },
       {
         "folke/lazydev.nvim",
         ft = "lua",
@@ -50,11 +75,13 @@ return {
         dependencies = {
           -- Manage libuv types with lazy. Plugin will never be loaded
           { "Bilal2453/luvit-meta", lazy = true },
+          { "justinsgithub/wezterm-types", lazy = true },
         },
         opts = {
           library = {
             { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
             { path = "luvit-meta/library", words = { "vim%.uv" } },
+            { path = "wezterm-types", mods = { "wezterm" } },
           },
         },
       },
@@ -80,7 +107,12 @@ return {
           },
         },
         { name = "snippets", group_index = 1 },
-        { name = "supermaven", group_index = 2 },
+        -- { name = "supermaven", group_index = 2 },
+        {
+          name = "copilot",
+          group_index = 1,
+          priority = 100,
+        },
         { name = "async_path" },
         { name = "buffer" },
         { name = "lazydev", group_index = 0 },
@@ -115,6 +147,7 @@ return {
             item.kind = mini_icon and mini_icon .. " " or item.kind
             item.menu = ({
               supermaven = "[MVN]",
+              copilot = "[CPL]",
               nvim_lsp = "[LSP]",
               nvim_lua = "[LUA]",
               snippets = "[SNP]",
@@ -170,7 +203,7 @@ return {
                 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
             end
 
-            local supermaven = require "supermaven-nvim.completion_preview"
+            local ok, supermaven = pcall(require, "supermaven-nvim.completion_preview")
 
             if AvanteSuggestion ~= nil and AvanteSuggestion:is_visible() then
               AvanteSuggestion:next()
@@ -178,7 +211,7 @@ return {
               cmp.select_next_item(select_opts)
             elseif vim.snippet.active { direction = 1 } then
               vim.schedule(function() vim.snippet.jump(1) end)
-            elseif vim.g.enable_agent_inlay and supermaven.has_suggestion() then
+            elseif vim.g.enable_agent_inlay and ok and supermaven.has_suggestion() then
               supermaven.on_accept_suggestion()
             elseif has_words_before() then
               cmp.complete()

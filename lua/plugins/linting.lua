@@ -13,6 +13,7 @@ return {
         python = { "ruff", "mypy" },
         typescript = { "eslint", "oxlint" },
         markdown = { "markdownlint" },
+        ["*"] = { "typos" },
       },
       ---@type table<string,table>
       linters = {

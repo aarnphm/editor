@@ -8,6 +8,7 @@ return {
         "stylua",
         "shfmt",
         "mypy",
+        "typos",
         "gofumpt",
         "goimports",
         "taplo",
@@ -83,8 +84,9 @@ return {
       },
       {
         "mrcjkb/rustaceanvim",
-        version = false, -- Recommended
+        version = vim.fn.has "nvim-0.10.0" == 0 and "^4" or false,
         lazy = false,
+        ft = { "rust" },
         opts = {
           server = {
             on_attach = function(_, bufnr)
@@ -263,6 +265,8 @@ return {
             },
           },
         },
+        tsserver = { enabled = false },
+        ts_ls = { enabled = false },
         vtsls = {
           filetypes = {
             "javascript",
@@ -589,6 +593,8 @@ return {
           require("lspconfig")[server].setup(opts)
           return true
         end,
+        tsserver = function() return true end,
+        ts_ls = function() return true end,
         vtsls = function(_, opts)
           Util.lsp.on_attach(function(client, bufnr)
             client.commands["_typescript.moveToFileRefactoring"] = function(command, _)
@@ -643,7 +649,7 @@ return {
             vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
         end,
         tailwindcss = function(_, opts)
-          local tw = require "lspconfig.server_configurations.tailwindcss"
+          local tw = Util.lsp.get_raw_config "tailwindcss"
           opts.filetypes = opts.filetypes or {}
 
           -- Add default filetypes

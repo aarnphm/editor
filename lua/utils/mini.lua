@@ -397,7 +397,7 @@ function M.files(opts)
         Util.error("failed to pick window", { title = "LazyVim" })
         return
       end
-      local target_win = MiniFiles.get_target_window()
+      local target_win = MiniFiles.get_explorer_state().target_window
       if target_win then vim.api.nvim_win_call(target_win, function() MiniFiles.set_target_window(id) end) end
       go_in_plus()
     end
@@ -409,7 +409,7 @@ function M.files(opts)
       -- Make new window and set it as target
       ---@type integer
       local new_target_window
-      local target_win = MiniFiles.get_target_window()
+      local target_win = MiniFiles.get_explorer_state().target_window
       if target_win then
         vim.api.nvim_win_call(target_win, function()
           vim.cmd(direction .. " split")

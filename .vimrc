@@ -54,7 +54,7 @@ let g:is_termguicolors = has('termguicolors') && !g:is_gui && $COLORTERM isnot# 
 let g:netrw_liststyle=3
 
 " Minimal
-set background=dark
+set background=light
 colorscheme rosepine  " rosepine_dawn rosepine_moon
 
 set number relativenumber

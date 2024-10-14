@@ -152,6 +152,7 @@ return {
         },
         lsp = {
           supermaven = { glyph = "", hl = "MiniIconsOrange" },
+          copilot = { glyph = "", hl = "MiniIconsOrange" },
           namespace = { glyph = "󰅪", hl = "MiniIconsRed" },
           null = { glyph = "NULL", hl = "MiniIconGrey" },
           snippet = { glyph = "", hl = "MiniIconsYellow" },

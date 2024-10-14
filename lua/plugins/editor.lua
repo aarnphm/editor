@@ -67,6 +67,46 @@ return {
     end,
   },
   {
+    "folke/trouble.nvim",
+    cmd = { "Trouble" },
+    opts = {
+      modes = {
+        lsp = {
+          win = { position = "right" },
+        },
+      },
+    },
+    keys = {
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
+      { "<leader>cS", "<cmd>Trouble lsp toggle<cr>", desc = "trouble: lsp references/definitions/..." },
+      { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", desc = "trouble: quickfix list" },
+      {
+        "[q",
+        function()
+          if require("trouble").is_open() then
+            require("trouble").prev { skip_groups = true, jump = true }
+          else
+            local ok, err = pcall(vim.cmd.cprev)
+            if not ok then vim.notify(err, vim.log.levels.ERROR) end
+          end
+        end,
+        desc = "trouble: previous item",
+      },
+      {
+        "]q",
+        function()
+          if require("trouble").is_open() then
+            require("trouble").next { skip_groups = true, jump = true }
+          else
+            local ok, err = pcall(vim.cmd.cnext)
+            if not ok then vim.notify(err, vim.log.levels.ERROR) end
+          end
+        end,
+        desc = "trouble: next item",
+      },
+    },
+  },
+  {
     "Bekaboo/dropbar.nvim",
     version = false,
     event = "LazyFile",
@@ -82,8 +122,6 @@ return {
             and vim.wo[win].winbar == ""
             and vim.fn.win_gettype(win) == ""
             and vim.bo[buf].ft ~= "help"
-            and vim.bo[buf].ft ~= "Avante"
-            and ((pcall(vim.treesitter.get_parser, buf)) and true or false)
         end,
       },
     },
@@ -106,7 +144,7 @@ return {
         function()
           local grug = require "grug-far"
           local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
-          grug.grug_far {
+          grug.open {
             transient = true,
             prefills = {
               filesFilter = ext and ext ~= "" and "*." .. ext or nil,
@@ -120,7 +158,7 @@ return {
         "<leader>sw",
         function()
           local grug = require "grug-far"
-          grug.grug_far {
+          grug.open {
             transient = true,
             prefills = { search = vim.fn.expand "<cword>" },
           }

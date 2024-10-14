@@ -29,21 +29,24 @@ return {
       force_ft = "markdown",
     },
   },
+  { "jmbuhr/otter.nvim", ft = { "markdown", "quarto", "norg" } },
   {
     "quarto-dev/quarto-nvim",
     lazy = true,
     dependencies = {
-      "jmbuhr/otter.nvim",
-      "nvim-treesitter/nvim-treesitter",
+      "nvim-cmp",
+      "nvim-lspconfig",
+      "otter.nvim",
+      "nvim-treesitter",
     },
-    ft = { "quarto", "markdown" },
+    ft = { "quarto", "markdown", "norg" },
     opts = {
       debug = false,
       closePreviewOnExit = true,
       lspFeatures = {
         enabled = true,
         chunks = "curly",
-        languages = { "r", "python", "rust", "bash", "html" },
+        languages = { "lua", "python", "rust", "bash" },
         diagnostics = { enabled = true, triggers = { "BufWritePost" } },
         completion = { enabled = true },
       },
@@ -54,7 +57,12 @@ return {
         references = "gr",
         format = "<Leader><Leader>f",
       },
-      codeRunner = { enabled = true, default_method = "molten", never_run = { "yaml" } },
+      codeRunner = {
+        enabled = true,
+        default_method = "molten",
+        never_run = { "yaml" },
+        ft_runners = { bash = "slime" },
+      },
     },
     keys = {
       { "<Leader>r", "", desc = "+Quarto" },
@@ -294,7 +302,17 @@ return {
       templates = { subdir = "templates" },
       ui = { enable = false, external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" } },
       note_frontmatter_func = function(note)
-        return out_functor(note, function(note) return { id = note.id, aliases = note.aliases, tags = note.tags } end)
+        return out_functor(
+          note,
+          function(n)
+            return {
+              id = n.id,
+              aliases = n.aliases,
+              tags = n.tags,
+              modified = os.date "%Y-%m-%d",
+            }
+          end
+        )
       end,
       note_id_func = function(title) return title end,
       picker = { name = "mini.pick" },
