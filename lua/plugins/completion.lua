@@ -2,7 +2,7 @@ return {
   {
     "supermaven-inc/supermaven-nvim",
     lazy = true,
-    enabled = false,
+    enabled = true,
     event = "LazyFile",
     build = ":SupermavenUsePro",
     opts = {
@@ -22,6 +22,7 @@ return {
   },
   {
     "zbirenbaum/copilot.lua",
+    enabled = false,
     cmd = "Copilot",
     build = ":Copilot auth",
     opts = {
@@ -56,18 +57,18 @@ return {
           },
         },
       },
-      {
-        "zbirenbaum/copilot-cmp",
-        dependencies = "copilot.lua",
-        opts = {},
-        config = function(_, opts)
-          local copilot_cmp = require "copilot_cmp"
-          copilot_cmp.setup(opts)
-          -- attach cmp source whenever copilot attaches
-          -- fixes lazy-loading issues with the copilot cmp source
-          Util.lsp.on_attach(function(_) copilot_cmp._on_insert_enter {} end, "copilot")
-        end,
-      },
+      -- {
+      --   "zbirenbaum/copilot-cmp",
+      --   dependencies = "copilot.lua",
+      --   opts = {},
+      --   config = function(_, opts)
+      --     local copilot_cmp = require "copilot_cmp"
+      --     copilot_cmp.setup(opts)
+      --     -- attach cmp source whenever copilot attaches
+      --     -- fixes lazy-loading issues with the copilot cmp source
+      --     Util.lsp.on_attach(function(_) copilot_cmp._on_insert_enter {} end, "copilot")
+      --   end,
+      -- },
       {
         "folke/lazydev.nvim",
         ft = "lua",
@@ -107,12 +108,12 @@ return {
           },
         },
         { name = "snippets", group_index = 1 },
-        -- { name = "supermaven", group_index = 2 },
-        {
-          name = "copilot",
-          group_index = 1,
-          priority = 100,
-        },
+        { name = "supermaven", group_index = 2 },
+        -- {
+        --   name = "copilot",
+        --   group_index = 1,
+        --   priority = 100,
+        -- },
         { name = "async_path" },
         { name = "buffer" },
         { name = "lazydev", group_index = 0 },
