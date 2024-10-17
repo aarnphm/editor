@@ -145,6 +145,7 @@ g.inline_diagnostics = false
 g.picker = "mini.pick" -- mini.pick | telescope
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
+g.root_lsp_ignore = { "copilot" }
 g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.border = "single"
 ---@type "markview" | "render-markdown"
