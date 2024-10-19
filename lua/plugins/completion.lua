@@ -44,7 +44,11 @@ return {
       "FelipeLema/cmp-async-path",
       {
         "garymjr/nvim-snippets",
-        opts = { friendly_snippets = true, ignored_filetypes = { "git", "gitcommit" } },
+        opts = {
+          friendly_snippets = true,
+          ignored_filetypes = { "git", "gitcommit" },
+          markdown = { "latex" },
+        },
         dependencies = { "rafamadriz/friendly-snippets" },
       },
       {
