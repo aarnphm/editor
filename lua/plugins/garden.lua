@@ -23,11 +23,153 @@ return {
   -- Jupyter notebook stuff
   {
     "GCBallesteros/jupytext.nvim",
-    ft = { "ipynb" },
     opts = {
       style = "markdown",
       output_extension = "md",
       force_ft = "markdown",
+    },
+  },
+  { "jmbuhr/otter.nvim", ft = { "markdown", "quarto", "norg" } },
+  {
+    "quarto-dev/quarto-nvim",
+    lazy = true,
+    dependencies = {
+      "nvim-cmp",
+      "nvim-lspconfig",
+      "otter.nvim",
+      "nvim-treesitter",
+    },
+    ft = { "quarto", "markdown", "norg" },
+    opts = {
+      debug = false,
+      closePreviewOnExit = true,
+      lspFeatures = {
+        enabled = true,
+        chunks = "curly",
+        languages = { "lua", "python", "rust", "bash" },
+        diagnostics = { enabled = true, triggers = { "BufWritePost" } },
+        completion = { enabled = true },
+      },
+      keymap = {
+        hover = "H",
+        definition = "gd",
+        rename = "<LocalLeader>rn",
+        references = "gr",
+        format = "<Leader><Leader>f",
+      },
+      codeRunner = {
+        enabled = true,
+        default_method = "molten",
+        never_run = { "yaml" },
+        ft_runners = { bash = "slime" },
+      },
+    },
+    keys = {
+      { "<Leader>r", "", desc = "+Quarto" },
+      { "<Leader>rc", function() require("quarto.runner").run_cell() end, desc = "quarto: run cell", silent = true },
+      {
+        "<Leader>ra",
+        function() require("quarto.runner").run_above() end,
+        desc = "quarto: run cell and above",
+        silent = true,
+      },
+      {
+        "<Leader>rA",
+        function() require("quarto.runner").run_all() end,
+        desc = "quarto: run all cells",
+        silent = true,
+      },
+      { "<Leader>rl", function() require("quarto.runner").run_line() end, desc = "quarto: run line", silent = true },
+      {
+        "<Leader>r",
+        mode = "v",
+        function() require("quarto.runner").run_range() end,
+        desc = "quarto: run visual range",
+        silent = true,
+      },
+      {
+        "<localleader>RA",
+        function() require("quarto.runner").run_all(true) end,
+        desc = "quarto: run all cells of all languages",
+        silent = true,
+      },
+    },
+  },
+  {
+    "benlubas/molten-nvim",
+    version = false,
+    build = ":UpdateRemotePlugins",
+    ft = { "markdown" },
+    dependencies = { "quarto-nvim" },
+    cmd = { "MoltenInfo", "MoltenInit" },
+    init = function()
+      -- I find auto open annoying, keep in mind setting this option will require setting
+      -- a keybind for `:noautocmd MoltenEnterOutput` to open the output again
+      vim.g.molten_auto_open_output = false
+
+      -- this guide will be using image.nvim
+      -- Don't forget to setup and install the plugin if you want to view image outputs
+      vim.g.molten_image_provider = "image.nvim"
+
+      -- optional, I like wrapping. works for virt text and the output window
+      vim.g.molten_wrap_output = true
+
+      -- Output as virtual text. Allows outputs to always be shown, works with images, but can
+      -- be buggy with longer images
+      vim.g.molten_virt_text_output = true
+
+      -- this will make it so the output shows up below the \`\`\` cell delimiter
+      vim.g.molten_virt_lines_off_by_1 = true
+    end,
+    keys = {
+      {
+        "<leader>m",
+        "",
+        desc = "+Molten",
+      },
+      {
+        "<leader>me",
+        ":MoltenEvaluateOperator<CR>",
+        desc = "molten: evaluate operator",
+        silent = true,
+      },
+      {
+        "<leader>mr",
+        ":MoltenReevaluateCell<CR>",
+        desc = "molten: re-eval cell",
+        silent = true,
+      },
+      {
+        "<leader>md",
+        ":MoltenDelete<CR>",
+        desc = "molten: delete cell",
+        silent = true,
+      },
+      {
+        "<leader>mx",
+        ":MoltenOpenInBrowser<CR>",
+        desc = "molten: open in browser",
+        silent = true,
+      },
+      {
+        "<leader>mh",
+        ":MoltenHideOutput<CR>",
+        desc = "molten: hide output windows",
+        silent = true,
+      },
+      {
+        "<leader>mr",
+        mode = { "v" },
+        "<C-u>MoltenEvaluateVisual<CR>gv",
+        desc = "molten: execute visual selection",
+        silent = true,
+      },
+      {
+        "<leader>mo",
+        ":noautocmd MoltenEnterOutput<CR>",
+        desc = "molten: open output window",
+        silent = true,
+      },
     },
   },
   -- Markdown preview
