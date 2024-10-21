@@ -29,7 +29,7 @@ return {
       force_ft = "markdown",
     },
   },
-  { "jmbuhr/otter.nvim", ft = { "markdown", "quarto", "norg" } },
+  { "jmbuhr/otter.nvim", dependencies = { "nvim-treesitter" }, ft = { "markdown", "quarto", "norg" } },
   {
     "quarto-dev/quarto-nvim",
     lazy = true,
@@ -95,13 +95,51 @@ return {
       },
     },
   },
+  { "benlubas/image-save.nvim", cmd = "SaveImage" },
+  {
+    "3rd/image.nvim",
+    -- enabled = false,
+    -- dependencies = { "https://github.com/leafo/magick" },
+    ft = { "markdown", "norg" },
+    config = function()
+      local image = require "image"
+
+      ---@diagnostic disable-next-line: missing-fields
+      image.setup {
+        backend = "kitty", -- ueberzug
+        integrations = {
+          markdown = {
+            enabled = true,
+            clear_in_insert_mode = false,
+            download_remote_images = false,
+            only_render_image_at_cursor = false,
+            filetypes = { "markdown", "quarto" }, -- markdown extensions (ie. quarto) can go here
+          },
+          neorg = {
+            enabled = false,
+            clear_in_insert_mode = false,
+            download_remote_images = false,
+            only_render_image_at_cursor = false,
+            filetypes = { "norg" },
+          },
+        },
+        max_width = 100,
+        max_height = 8,
+        max_height_window_percentage = math.huge,
+        max_width_window_percentage = math.huge,
+        window_overlap_clear_enabled = true, -- toggles images when windows are overlapped
+        editor_only_render_when_focused = true, -- auto show/hide images when the editor gains/looses focus
+        tmux_show_only_in_active_window = true, -- auto show/hide images in the correct Tmux window (needs visual-activity off)
+        window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "fidget", "" },
+      }
+    end,
+  },
   {
     "benlubas/molten-nvim",
     version = false,
     build = ":UpdateRemotePlugins",
     ft = { "markdown" },
-    dependencies = { "quarto-nvim" },
-    cmd = { "MoltenInfo", "MoltenInit" },
+    dependencies = { "image.nvim" },
     init = function()
       -- I find auto open annoying, keep in mind setting this option will require setting
       -- a keybind for `:noautocmd MoltenEnterOutput` to open the output again
@@ -120,8 +158,25 @@ return {
 
       -- this will make it so the output shows up below the \`\`\` cell delimiter
       vim.g.molten_virt_lines_off_by_1 = true
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MoltenInitPost",
+        callback = function() require("quarto").activate() end,
+      })
     end,
     keys = {
+      -- kernels
+      {
+        "<LocalLeader>m",
+        "",
+        desc = "+Molten",
+      },
+      {
+        "<LocalLeader>mi",
+        ":MoltenInit<CR>",
+        desc = "molten: init",
+      },
+      -- general
       {
         "<leader>m",
         "",
@@ -149,6 +204,18 @@ return {
         "<leader>mx",
         ":MoltenOpenInBrowser<CR>",
         desc = "molten: open in browser",
+        silent = true,
+      },
+      {
+        "<leader>mp",
+        ":MoltenPrev<CR>",
+        desc = "molten: next",
+        silent = true,
+      },
+      {
+        "<leader>mn",
+        ":MoltenNext<CR>",
+        desc = "molten: next",
         silent = true,
       },
       {

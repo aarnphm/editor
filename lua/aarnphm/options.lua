@@ -165,4 +165,7 @@ if vim.g.neovide then
   vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 end
 
+local venv = os.getenv "VIRTUAL_ENV"
+if venv ~= nil then vim.g.python3_host_prog = venv .. "/bin/python3" end
+
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
