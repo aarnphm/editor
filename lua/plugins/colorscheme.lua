@@ -1,11 +1,12 @@
 return {
   { "AstroNvim/astrotheme", priority = 1000, opts = {}, enabled = false },
-  { "folke/tokyonight.nvim", priority = 1000, opts = {}, enabled = true },
-  { "navarasu/onedark.nvim", priority = 1000, opts = {}, enabled = true },
+  { "folke/tokyonight.nvim", priority = 1000, opts = {}, enabled = false },
+  { "navarasu/onedark.nvim", priority = 1000, opts = {}, enabled = false },
   { "rmehri01/onenord.nvim", priority = 1000, opts = {}, enabled = false },
   {
     "rebelot/kanagawa.nvim",
     priority = 1000,
+    enabled = false,
     build = ":KanagawaCompile",
     ---@type KanagawaConfig
     opts = {
@@ -23,7 +24,6 @@ return {
       theme = "dragon",
       background = { dark = "dragon", light = "lotus" },
     },
-    enabled = true,
   },
   {
     "rose-pine/neovim",

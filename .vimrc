@@ -226,7 +226,6 @@ nnoremap <LocalLeader>vs :vsplit<CR>
 nnoremap <LocalLeader>hs :split<CR>
 nnoremap <silent><nowait> <space>l :bNext<cr>
 nnoremap <silent><nowait> <space>h :bprevious<cr>
-nnoremap <silent><nowait> <C-x> :Bclose<CR>
 vmap J :m '>+1<cr>gv=gv<CR>
 vmap K :m '<-2<cr>gv=gv<CR>
 

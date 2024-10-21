@@ -24,7 +24,7 @@ opt.confirm = true
 opt.winminwidth = 5 -- Minimum window width
 
 -- Some defaults and don't question it
-o.writebackup = false -- whos needs backup btw (i do sometimes)
+o.writebackup = false -- whose needs backup btw (i do sometimes)
 o.autowrite = true -- sometimes I forget to save
 o.signcolumn = "yes" -- always show sign column
 o.undofile = true -- set undofile to infinite undo
@@ -152,7 +152,7 @@ g.border = "single"
 g.markdown_render_backend = "render-markdown"
 g.enable_agent_inlay = false
 g.enable_ui = true
-g.block_cursor = false
+g.block_cursor = true
 
 o.cmdheight = g.enable_ui and 0 or 1
 o.guicursor = g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block

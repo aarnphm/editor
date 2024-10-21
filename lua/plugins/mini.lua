@@ -3,6 +3,10 @@
 ---
 ---@class MiniFilesBufferCreate: vim.api.create_autocmd.callback.args
 ---@field data MiniFilesBufferCreateData
+---
+---@class MiniPickOpts: lazyvim.util.pick.Opts
+---@field tool? string
+---@field source? table<['cwd'] | string, any>
 
 Util.pick.register {
   name = "mini.pick",
@@ -14,7 +18,7 @@ Util.pick.register {
   -- cwd will default to lazyvim.util.get_root
   -- for `files`, git_files or find_files will be chosen depending on .git
   ---@param builtin string
-  ---@param opts? lazyvim.util.pick.Opts
+  ---@param opts? MiniPickOpts
   open = function(builtin, opts)
     local extras = require "mini.extra"
     opts = opts or {}
@@ -331,15 +335,7 @@ return {
     version = false,
     event = "VimEnter",
     opts = function()
-      local logo = table.concat({
-        [[                                  __]],
-        [[     ___     ___    ___   __  __ /\_\    ___ ___]],
-        [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
-        [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
-        [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
-        [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
-      }, "\n")
-      local pad = string.rep(" ", 15)
+      local pad = string.rep(" ", 20)
 
       ---@param name string shortcuts to show on starter
       ---@param action string | fun(...): any any callable or commands
@@ -351,11 +347,18 @@ return {
       local starter = require "mini.starter"
       local config = {
         evaluate_single = true,
-        header = logo,
+        header = table.concat({
+          [[                                  __]],
+          [[     ___     ___    ___   __  __ /\_\    ___ ___]],
+          [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
+          [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
+          [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
+          [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
+        }, "\n"),
         items = {
           new_section("Files", Util.pick "files", "Picker"),
           new_section("Recents", Util.pick "oldfiles", "Picker"),
-          new_section("Text", Util.pick "live_grep", "Picker"),
+          new_section("Word", Util.pick "live_grep", "Picker"),
           new_section("Config", Util.pick.config_files(), "Config"),
           new_section("Lazy", "Lazy", "Config"),
           new_section("New", "ene | startinsert", "Builtin"),
