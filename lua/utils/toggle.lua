@@ -20,7 +20,6 @@ M.setup = function()
   M.map("<leader>uM", M.maximize)
   M.map("<leader>ud", M.diagnostics)
   M.map("<leader>un", M.number)
-  M.map("<leader>um", M.agent)
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
 
@@ -69,22 +68,6 @@ function M.wk(lhs, toggle)
     },
   }
 end
-
-M.agent = M.wrap {
-  name = "inline code agent",
-  get = function() return vim.g.enable_agent_inlay end,
-  set = function(state)
-    local ok, agent = pcall(require, "supermaven-nvim.api")
-    if not ok then Util.error("Failed to load agent", { once = true }) end
-
-    local completion_preview = require "supermaven-nvim.completion_preview"
-
-    if agent.is_running() then agent.stop() end
-    completion_preview.disable_inline_completion = not state
-    vim.g.enable_agent_inlay = state
-    agent.start()
-  end,
-}
 
 M.treesitter = M.wrap {
   name = "treesitter: highlight",

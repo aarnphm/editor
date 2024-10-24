@@ -1,5 +1,4 @@
 return {
-  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
   {
     "nvim-treesitter/playground",
     lazy = true,

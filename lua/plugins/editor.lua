@@ -11,6 +11,7 @@ return {
       return ret
     end,
   },
+  { "folke/ts-comments.nvim", event = "VeryLazy", opts = {} },
   {
     "ggandor/leap.nvim",
     keys = {

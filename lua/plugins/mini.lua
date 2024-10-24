@@ -41,12 +41,6 @@ return {
     event = "VeryLazy",
     dependencies = {
       {
-        "JoosepAlviste/nvim-ts-context-commentstring",
-        version = false,
-        lazy = true,
-        opts = { enable_autocmd = false },
-      },
-      {
         "j-hui/fidget.nvim",
         enabled = function() return not vim.g.enable_ui end,
         version = false,
@@ -79,13 +73,6 @@ return {
       align = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
       pick = { options = { use_cache = true }, window = { prompt_prefix = "󰄾 " } },
       bracketed = { window = { suffix = "" }, treesitter = { suffix = "" } },
-      comment = {
-        options = {
-          custom_commentstring = function()
-            return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
-          end,
-        },
-      },
       files = {
         windows = {
           preview = false,
@@ -303,9 +290,6 @@ return {
         function() require("mini.files").open(Util.root.git(), true) end,
         desc = "mini.files: open (working root)",
       },
-      -- mini.comment
-      { "<Leader>v", "gcc", remap = true, silent = true, mode = "n", desc = "comment: visual line" },
-      { "<Leader>v", "gc", remap = true, silent = true, mode = "x", desc = "comment: visual line" },
       -- mini.diff
       {
         "<leader>go",

@@ -136,10 +136,15 @@ function M.setup(opts)
 
   local cmp = require "cmp"
   cmp.setup(opts)
+
   cmp.event:on("confirm_done", function(event)
-    if vim.tbl_contains(opts.auto_brackets or {}, vim.bo.filetype) then Util.cmp.auto_brackets(event.entry) end
+    if vim.tbl_contains(opts.auto_brackets or {}, vim.bo.filetype) then M.auto_brackets(event.entry) end
   end)
-  cmp.event:on("menu_opened", function(event) Util.cmp.add_missing_snippet_docs(event.window) end)
+  cmp.event:on("menu_opened", function(event)
+    vim.b.copilot_suggestion_hidden = true
+    M.add_missing_snippet_docs(event.window)
+  end)
+  cmp.event:on("menu_closed", function() vim.b.copilot_suggestion_hidden = false end)
 end
 
 return M

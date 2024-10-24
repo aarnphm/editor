@@ -44,6 +44,8 @@ map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: de
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
 map("i", "<D-BS>", "<C-W>", { desc = "insert: delete word" })
 
+map("n", "<Leader>v", "gcc", { desc = "comment: visual line", remap = true, silent = true })
+map("x", "<Leader>v", "gc", { desc = "comment: visual line", remap = true, silent = true })
 map("t", "<esc><esc>", "<c-\\><c-n>", { desc = "terminal: enter normal mode" })
 map("t", "<C-w>h", "<cmd>wincmd h<cr>", { desc = "terminal: go to left window" })
 map("t", "<C-w>j", "<cmd>wincmd j<cr>", { desc = "terminal: go to lower window" })

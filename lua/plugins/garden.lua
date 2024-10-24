@@ -161,7 +161,10 @@ return {
 
       vim.api.nvim_create_autocmd("User", {
         pattern = "MoltenInitPost",
-        callback = function() require("quarto").activate() end,
+        callback = function()
+          require("quarto").activate()
+          require("otter").activate()
+        end,
       })
     end,
     keys = {

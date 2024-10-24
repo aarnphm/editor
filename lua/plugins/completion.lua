@@ -26,11 +26,25 @@ return {
     cmd = "Copilot",
     build = ":Copilot auth",
     opts = {
-      suggestion = { enabled = false },
       panel = { enabled = false },
+      suggestion = {
+        enabled = true,
+        keymap = {
+          accept = "<C-CR>",
+          accept_word = false,
+          accept_line = false,
+          next = "<C-]>",
+          prev = "<C-[>",
+          dismiss = "<M-BS>",
+        },
+      },
       filetypes = {
         markdown = true,
-        help = true,
+        help = false,
+        sh = function()
+          if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env.*") then return false end
+          return true
+        end,
       },
     },
   },
@@ -42,10 +56,15 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "FelipeLema/cmp-async-path",
+      "otter.nvim",
       {
         "garymjr/nvim-snippets",
-        opts = { friendly_snippets = true, ignored_filetypes = { "git", "gitcommit" } },
-        dependencies = { "rafamadriz/friendly-snippets" },
+        opts = {
+          friendly_snippets = true,
+          ignored_filetypes = { "git", "gitcommit" },
+          extended_filetypes = { markdown = { "latex" } },
+        },
+        dependencies = "rafamadriz/friendly-snippets",
       },
       {
         "Saecki/crates.nvim",
@@ -57,18 +76,6 @@ return {
           },
         },
       },
-      -- {
-      --   "zbirenbaum/copilot-cmp",
-      --   dependencies = "copilot.lua",
-      --   opts = {},
-      --   config = function(_, opts)
-      --     local copilot_cmp = require "copilot_cmp"
-      --     copilot_cmp.setup(opts)
-      --     -- attach cmp source whenever copilot attaches
-      --     -- fixes lazy-loading issues with the copilot cmp source
-      --     Util.lsp.on_attach(function(_) copilot_cmp._on_insert_enter {} end, "copilot")
-      --   end,
-      -- },
       {
         "folke/lazydev.nvim",
         ft = "lua",
@@ -109,11 +116,6 @@ return {
         },
         { name = "snippets", group_index = 1 },
         { name = "supermaven", group_index = 2 },
-        -- {
-        --   name = "copilot",
-        --   group_index = 1,
-        --   priority = 100,
-        -- },
         { name = "async_path" },
         { name = "buffer" },
         { name = "lazydev", group_index = 0 },
@@ -204,16 +206,12 @@ return {
                 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
             end
 
-            local ok, supermaven = pcall(require, "supermaven-nvim.completion_preview")
-
             if AvanteSuggestion ~= nil and AvanteSuggestion:is_visible() then
               AvanteSuggestion:next()
             elseif cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif vim.snippet.active { direction = 1 } then
               vim.schedule(function() vim.snippet.jump(1) end)
-            elseif vim.g.enable_agent_inlay and ok and supermaven.has_suggestion() then
-              supermaven.on_accept_suggestion()
             elseif has_words_before() then
               cmp.complete()
             else
