@@ -103,6 +103,7 @@ return {
       local sources = {
         {
           name = "nvim_lsp",
+          keyword_length = 3,
           priority = 1000,
           option = {
             markdown_oxide = {
@@ -123,9 +124,10 @@ return {
       end
 
       return vim.tbl_deep_extend("force", defaults, {
+        auto_brackets = {},
         preselect = TC.PreselectMode.None,
         completion = {
-          autocomplete = vim.g.enable_autocomplete,
+          autocomplete = vim.g.enable_autocomplete and { TC.TriggerEvent.TextChanged } or false,
           completeopt = "menu,menuone,noinsert",
         },
         ---@type cmp.WindowConfig
