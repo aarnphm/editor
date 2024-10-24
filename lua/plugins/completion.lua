@@ -22,7 +22,6 @@ return {
   },
   {
     "zbirenbaum/copilot.lua",
-    enabled = false,
     cmd = "Copilot",
     build = ":Copilot auth",
     opts = {
@@ -30,17 +29,17 @@ return {
       suggestion = {
         enabled = true,
         keymap = {
-          accept = "<C-CR>",
+          accept = "<D-CR>",
           accept_word = false,
           accept_line = false,
-          next = "<C-]>",
-          prev = "<C-[>",
-          dismiss = "<M-BS>",
+          next = "<D-]>",
+          prev = "<D-[>",
+          dismiss = "<D-BS>",
         },
       },
       filetypes = {
         markdown = true,
-        help = false,
+        help = true,
         sh = function()
           if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env.*") then return false end
           return true
@@ -56,6 +55,7 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "FelipeLema/cmp-async-path",
+      "kdheepak/cmp-latex-symbols",
       "otter.nvim",
       {
         "garymjr/nvim-snippets",
@@ -69,12 +69,8 @@ return {
       {
         "Saecki/crates.nvim",
         lazy = true,
-        event = { "BufRead Cargo.toml" },
-        opts = {
-          completion = {
-            cmp = { enabled = true },
-          },
-        },
+        event = "BufRead Cargo.toml",
+        opts = { completion = { cmp = { enabled = true } } },
       },
       {
         "folke/lazydev.nvim",
@@ -100,24 +96,24 @@ return {
       local TC = require "cmp.types.cmp"
       local defaults = require "cmp.config.default"()
 
-      local AvanteSuggestion = require("avante.api").get_suggestion()
-
       ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
 
       local sources = {
         {
           name = "nvim_lsp",
+          priority = 1000,
           option = {
             markdown_oxide = {
               keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
             },
           },
         },
-        { name = "snippets", group_index = 1 },
+        { name = "snippets", priority = 500, group_index = 1 },
+        { name = "buffer", priority = 250, group_index = 1 },
+        { name = "async_path", group_index = 1 },
+        { name = "latex_symbols", option = { strategy = 0 } },
         { name = "supermaven", group_index = 2 },
-        { name = "async_path" },
-        { name = "buffer" },
         { name = "lazydev", group_index = 0 },
       }
       -- check if buffer is a toml file and filename is Cargo.toml
@@ -128,7 +124,10 @@ return {
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = { "python" },
         preselect = TC.PreselectMode.None,
-        completion = { completeopt = "menu,menuone,noinsert" },
+        completion = {
+          autocomplete = vim.g.enable_autocomplete,
+          completeopt = "menu,menuone,noinsert",
+        },
         ---@type cmp.WindowConfig
         window = {
           documentation = {
@@ -201,28 +200,23 @@ return {
           ---@type cmp.MappingFunction
           ["<Tab>"] = cmp.mapping(function(fallback)
             local has_words_before = function()
-              local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-              return col ~= 0
-                and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match "%s" == nil
+              local col = vim.fn.col "." - 1
+              return col == 0 or vim.fn.getline("."):sub(col, col):match "%s"
             end
 
-            if AvanteSuggestion ~= nil and AvanteSuggestion:is_visible() then
-              AvanteSuggestion:next()
-            elseif cmp.visible() then
+            if cmp.visible() then
               cmp.select_next_item(select_opts)
             elseif vim.snippet.active { direction = 1 } then
               vim.schedule(function() vim.snippet.jump(1) end)
             elseif has_words_before() then
-              cmp.complete()
-            else
               fallback()
+            else
+              cmp.complete()
             end
           end, { "i", "s" }),
           ---@type cmp.MappingFunction
           ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if AvanteSuggestion ~= nil and AvanteSuggestion:is_visible() then
-              AvanteSuggestion:prev()
-            elseif cmp.visible() then
+            if cmp.visible() then
               cmp.select_prev_item(select_opts)
             elseif vim.snippet.active { direction = -1 } then
               vim.schedule(function() vim.snippet.jump(-1) end)

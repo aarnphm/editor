@@ -142,7 +142,7 @@ g.markdown_recommended_style = 0
 g.autoformat = true
 g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
 g.inline_diagnostics = false
-g.picker = "mini.pick" -- mini.pick | telescope
+g.picker = "mini.pick" -- mini.pick
 g.ghost_text = false
 g.additional_path_root_spec = { "content" }
 g.root_lsp_ignore = { "copilot" }
@@ -150,8 +150,8 @@ g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 g.border = "single"
 ---@type "markview" | "render-markdown"
 g.markdown_render_backend = "render-markdown"
-g.enable_agent_inlay = false
 g.enable_ui = true
+g.enable_autocomplete = false
 g.block_cursor = true
 
 o.cmdheight = g.enable_ui and 0 or 1

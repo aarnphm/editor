@@ -116,8 +116,21 @@ vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, 
   end,
 })
 -- add bigfile filetype and disable some defaults on bigfile
+-- add http, dotenv, tsconfig
 vim.filetype.add {
+  extension = {
+    ["http"] = "http",
+    env = "dotenv",
+    h = "c",
+    ["j2"] = "jinja",
+  },
+  filename = {
+    [".env"] = "dotenv",
+    ["env"] = "dotenv",
+  },
   pattern = {
+    ["[jt]sconfig.*.json"] = "jsonc",
+    ["%.env%.[%w_.-]+"] = "dotenv",
     [".*"] = {
       function(path, buf)
         return vim.bo[buf]
@@ -137,23 +150,6 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
   end,
 })
--- add http, dotenv, tsconfig
-vim.filetype.add {
-  extension = {
-    ["http"] = "http",
-    env = "dotenv",
-    h = "c",
-    ["j2"] = "jinja",
-  },
-  filename = {
-    [".env"] = "dotenv",
-    ["env"] = "dotenv",
-  },
-  pattern = {
-    ["[jt]sconfig.*.json"] = "jsonc",
-    ["%.env%.[%w_.-]+"] = "dotenv",
-  },
-}
 
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -174,7 +170,5 @@ Util.setup {
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },
   ui = { border = vim.g.border, backdrop = 100, wrap = false },
-  dev = {
-    path = "~/workspace/neovim-plugins/",
-  },
+  dev = { path = "~/workspace/neovim-plugins/" },
 }

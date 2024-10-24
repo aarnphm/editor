@@ -64,6 +64,8 @@ function M.setup(opts)
   map({ "n", "v", "o", "i" }, "<A-n>", M.goto_next_node, "treesitter: goto next node")
   map({ "n", "v", "o", "i" }, "<A-p>", M.goto_prev_node, "treesitter: goto prev node")
 
+  if type(opts.ensure_installed) == "table" then opts.ensure_installed = Util.dedup(opts.ensure_installed) end
+
   require("nvim-treesitter.configs").setup(opts)
 end
 
