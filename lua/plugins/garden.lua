@@ -342,7 +342,6 @@ return {
   {
     "OXY2DEV/markview.nvim",
     enabled = function() return vim.g.markdown_render_backend == "markview" end,
-    lazy = false,
     ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
     opts = {
       filetypes = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },

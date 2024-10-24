@@ -14,6 +14,7 @@ return {
         nofile = true,
         startup = true,
         Trouble = true,
+        Avante = true,
       },
       log_level = "warn",
       disable_inline_completion = true,
