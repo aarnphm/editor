@@ -23,6 +23,7 @@ return {
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
+    event = "InsertEnter",
     build = ":Copilot auth",
     opts = {
       panel = { enabled = false },
@@ -122,7 +123,6 @@ return {
       end
 
       return vim.tbl_deep_extend("force", defaults, {
-        auto_brackets = { "python" },
         preselect = TC.PreselectMode.None,
         completion = {
           autocomplete = vim.g.enable_autocomplete,

@@ -151,7 +151,7 @@ g.border = "single"
 ---@type "markview" | "render-markdown"
 g.markdown_render_backend = "render-markdown"
 g.enable_ui = true
-g.enable_autocomplete = false
+g.enable_autocomplete = true
 g.block_cursor = true
 
 o.cmdheight = g.enable_ui and 0 or 1

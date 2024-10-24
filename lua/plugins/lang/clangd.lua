@@ -1,7 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "cpp" } },
+    opts = { ensure_installed = { "c", "cpp", "cuda", "make" } },
   },
   {
     "p00f/clangd_extensions.nvim",
