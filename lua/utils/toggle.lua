@@ -20,6 +20,21 @@ M.setup = function()
   M.map("<leader>uM", M.maximize)
   M.map("<leader>ud", M.diagnostics)
   M.map("<leader>un", M.number)
+  M.map(
+    "<leader>um",
+    M.wrap {
+      name = "markdown render",
+      get = function() return require("render-markdown.state").enabled end,
+      set = function(enabled)
+        local m = require "render-markdown"
+        if enabled then
+          m.enable()
+        else
+          m.disable()
+        end
+      end,
+    }
+  )
   if vim.lsp.inlay_hint then M.map("<leader>uh", M.inlay_hints) end
 end
 

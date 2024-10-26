@@ -28,17 +28,7 @@ return {
     build = ":Copilot auth",
     opts = {
       panel = { enabled = false },
-      suggestion = {
-        enabled = true,
-        keymap = {
-          accept = "<D-CR>",
-          accept_word = false,
-          accept_line = false,
-          next = "<D-]>",
-          prev = "<D-[>",
-          dismiss = "<D-BS>",
-        },
-      },
+      suggestion = { enabled = true },
       filetypes = {
         markdown = true,
         help = true,

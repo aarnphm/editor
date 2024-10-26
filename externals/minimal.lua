@@ -141,7 +141,7 @@ require("lazy").setup {
       opts = {
         variant = "auto",
         dark_variant = "main",
-        styles = { italic = false },
+        styles = { italic = true },
         highlight_groups = { StatusLine = { fg = "rose", bg = "overlay", blend = 0 } },
       },
     },

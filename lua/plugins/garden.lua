@@ -305,6 +305,7 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = function() return vim.g.markdown_render_backend == "render-markdown" end,
     opts = {
+      enabled = vim.g.enable_render,
       file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       render_modes = { "n", "c" },
       max_file_size = vim.g.bigfile_size,
@@ -321,23 +322,7 @@ return {
       },
     },
     ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
-    cmd = { "RenderMarkdown" },
-    config = function(_, opts)
-      require("render-markdown").setup(opts)
-
-      Util.toggle.map("<leader>um", {
-        name = "markdown render",
-        get = function() return require("render-markdown.state").enabled end,
-        set = function(enabled)
-          local m = require "render-markdown"
-          if enabled then
-            m.enable()
-          else
-            m.disable()
-          end
-        end,
-      })
-    end,
+    cmd = "RenderMarkdown",
   },
   {
     "OXY2DEV/markview.nvim",

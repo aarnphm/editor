@@ -74,9 +74,7 @@ opt.listchars = {
 }
 o.inccommand = "split"
 
--- fold with nvim-ufo
 o.foldenable = true
-o.conceallevel = 2
 opt.fillchars = {
   foldopen = "",
   foldclose = "",
@@ -151,11 +149,13 @@ g.border = "single"
 ---@type "markview" | "render-markdown"
 g.markdown_render_backend = "render-markdown"
 g.enable_ui = true
+g.enable_render = false
 g.enable_autocomplete = true
 g.block_cursor = true
 
 o.cmdheight = g.enable_ui and 0 or 1
 o.guicursor = g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block
+o.conceallevel = g.enable_render and 2 or 0
 
 if vim.g.neovide then
   vim.g.neovide_no_idle = true

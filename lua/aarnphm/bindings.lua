@@ -3,33 +3,6 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
--- Easily hit escape in terminal mode.
--- Open a terminal at the bottom of the screen with a fixed height.
-local function get_fzf_args()
-  return vim.api.nvim_get_option_value("background", {}) == "light"
-      and "--color=fg:#797593,bg:#faf4ed,hl:#d7827e --color=fg+:#575279,bg+:#f2e9e1,hl+:#d7827e --color=border:#dfdad9,header:#286983,gutter:#faf4ed --color=spinner:#ea9d34,info:#56949f --color=pointer:#907aa9,marker:#b4637a,prompt:#797593"
-    or "--color=fg:#908caa,bg:#191724,hl:#ebbcba --color=fg+:#e0def4,bg+:#26233a,hl+:#ebbcba --color=border:#403d52,header:#31748f,gutter:#191724 --color=spinner:#f6c177,info:#9ccfd8 --color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa"
-end
-
-map(
-  "n",
-  "<M-[>",
-  function() Util.terminal(nil, { env = { FZF_DEFAULT_OPTS = get_fzf_args() } }) end,
-  { desc = "terminal: open (root)" }
-)
-map("t", "<M-[>", "<cmd>close<cr>", { desc = "terminal: hide" })
-map(
-  "n",
-  "<M-]>",
-  function()
-    Util.terminal(
-      { "npx", "quartz", "build", "--bundleInfo", "--concurrency", "4", "--serve", "--verbose" },
-      { cwd = Util.root(), env = { FZF_DEFAULT_OPTS = get_fzf_args() }, interactive = true, esc_esc = true }
-    )
-  end,
-  { desc = "terminal: serve quartz" }
-)
-map("t", "<M-]>", "<cmd>close<cr>", { desc = "terminal: hide" })
 -- Open a terminal at the bottom of the screen with a fixed height.
 map("n", "<leader>st", function()
   vim.cmd.new()
@@ -42,7 +15,7 @@ map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "ava
 
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
-map("i", "<D-BS>", "<C-W>", { desc = "insert: delete word" })
+map("i", "<M-BS>", "<C-W>", { desc = "insert: delete word", remap = false })
 
 map("n", "<Leader>v", "gcc", { desc = "comment: visual line", remap = true, silent = true })
 map("x", "<Leader>v", "gc", { desc = "comment: visual line", remap = true, silent = true })
