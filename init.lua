@@ -25,7 +25,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "notify",
     "qf",
     "query",
-    "gitsigns.blame",
+    "gitsigns-blame",
     "nowrite", ---fugitive
     "fugitive",
     "prompt",
@@ -40,16 +40,34 @@ vim.api.nvim_create_autocmd("FileType", {
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
-    vim.api.nvim_buf_set_keymap(event.buf, "n", "q", "<cmd>close<cr>", { silent = true })
+    vim.schedule(function()
+      vim.keymap.set("n", "q", function()
+        vim.cmd "close"
+        pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
+      end, {
+        buffer = event.buf,
+        silent = true,
+        desc = "buffer: delete",
+      })
+    end)
   end,
 })
----correct resized tabs
+-- correct resized tabs
 vim.api.nvim_create_autocmd("VimResized", {
   group = augroup "resized",
   callback = function()
     local current = vim.fn.tabpagenr()
     vim.cmd "tabdo wincmd ="
     vim.cmd("tabnext  " .. current)
+  end,
+})
+-- filetype stuff
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup "wrap_spell",
+  pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.spell = true
   end,
 })
 -- Check if we need to reload the file when it changed
