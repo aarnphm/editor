@@ -306,7 +306,6 @@ return {
     enabled = function() return vim.g.markdown_render_backend == "render-markdown" end,
     opts = {
       enabled = vim.g.enable_render,
-      file_types = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       render_modes = { "n", "c" },
       max_file_size = vim.g.bigfile_size,
       heading = { sign = false },
