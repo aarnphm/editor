@@ -3,6 +3,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "c", "cpp", "cuda", "make" } },
   },
+  { "mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
   {
     "p00f/clangd_extensions.nvim",
     lazy = true,

@@ -356,4 +356,27 @@ function M.debug(msg, opts)
   end
 end
 
+--- Override the default title for notifications.
+for _, level in ipairs { "info", "warn", "error" } do
+  ---@diagnostic disable-next-line: no-unknown
+  M[level] = function(msg, opts)
+    opts = opts or {}
+    opts.title = opts.title or "editor"
+    return Util[level](msg, opts)
+  end
+end
+
+local cache = {} ---@type table<(fun()), table<string, any>>
+---@generic T: fun()
+---@param fn T
+---@return T
+function M.memoize(fn)
+  return function(...)
+    local key = vim.inspect { ... }
+    cache[fn] = cache[fn] or {}
+    if cache[fn][key] == nil then cache[fn][key] = fn(...) end
+    return cache[fn][key]
+  end
+end
+
 return M

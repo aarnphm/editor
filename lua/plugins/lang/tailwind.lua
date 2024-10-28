@@ -315,10 +315,7 @@ M.colors = {
 }
 
 M.plugin = {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "css", "scss" } },
-  },
+  { "nvim-treesitter/nvim-treesitter", opts = { ensure_installed = { "css", "scss" } } },
   {
     "neovim/nvim-lspconfig",
     opts = {

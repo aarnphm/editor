@@ -10,7 +10,6 @@ return {
       linters_by_ft = {
         lua = { "selene" },
         dockerfile = { "hadolint" },
-        python = { "ruff", "mypy" },
         typescript = { "eslint", "oxlint" },
         markdown = { "markdownlint" },
         ["*"] = { "typos" },
@@ -37,11 +36,6 @@ return {
               "eslint.config.mts",
               "eslint.config.cts",
             }, { path = ctx.filename, upward = true })[1]
-          end,
-        },
-        ruff = {
-          condition = function(ctx)
-            return vim.fs.find({ "pyproject.toml", "ruff.toml", ".ruff.toml" }, { path = ctx.filename, upward = true })[1]
           end,
         },
       },

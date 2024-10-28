@@ -11,7 +11,6 @@
 --      { name = "dev", url = "Replace with your database connection URL." },
 --      { name = "staging", url = "Replace with your database connection URL." },
 --    }
-
 -- or
 -- Create a `.lazy.lua` file in your project and set your connections like this:
 -- ```lua
@@ -19,9 +18,7 @@
 --
 --    return {}
 -- ```
-
 -- Alternatively, you can also use other methods to inject your environment variables.
-
 -- Finally, please make sure to add `.lazy.lua` to your `.gitignore` file to protect your secrets.
 
 local sql_ft = { "sql", "mysql", "plsql", "ddl" }
@@ -84,10 +81,7 @@ return {
     opts = { ensure_installed = { "sql" } },
   },
   -- Linters & formatters
-  {
-    "williamboman/mason.nvim",
-    opts = { ensure_installed = { "sqlfluff" } },
-  },
+  { "williamboman/mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
   {
     "mfussenegger/nvim-lint",
     optional = true,

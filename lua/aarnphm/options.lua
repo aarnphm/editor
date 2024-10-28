@@ -9,6 +9,60 @@ if vim.uv.os_uname().sysname == "Darwin" then
   }
 end
 
+-- map leader to <Space> and localeader to +
+g.mapleader = " "
+g.maplocalleader = ","
+-- Fix markdown indentation settings
+g.markdown_recommended_style = 0
+-- autoformat on save
+g.autoformat = true
+-- enable inline diagnostics
+g.inline_diagnostics = false
+-- whether to enable ghost text for completions
+g.ghost_text = false
+-- boxy or none
+g.enable_ui = true
+-- whether to render markdown
+g.enable_render = false
+-- whether to enable autocomplete (if disabled, then manual trigger with <C-Space>)
+g.enable_autocomplete = true
+-- whether to set cursor in insert mode to be block or lines
+g.block_cursor = true
+-- configure whether prettier will requires configuration. If true, then prettier won't be run for compatible files if configuration is missing
+g.prettier_needs_config = false
+-- file limit size (1.5 MB). NOTE: mini.animate will also be disabled.
+g.bigfile_size = 1024 * 1024 * 1.5
+-- additional path root spec to determine for LSP root
+g.additional_path_root_spec = { "content" }
+-- ignore lsp for certain root
+g.root_lsp_ignore = { "copilot" }
+-- set pickers (can support telescope.nvim or mini.pick)
+---@type "mini.pick" | "telescope"
+g.picker = "mini.pick"
+-- default obsidian vault path
+g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
+-- whether we set border for floating UI.
+g.border = "single"
+-- markdown render backend
+---@type "markview" | "render-markdown"
+g.markdown_render_backend = "render-markdown"
+-- additional plugins to be used.
+g.extra_plugins = {
+  -- lang
+  "plugins.lang.go",
+  "plugins.lang.sql",
+  "plugins.lang.nix",
+  "plugins.lang.rust",
+  "plugins.lang.yaml",
+  "plugins.lang.json",
+  "plugins.lang.clangd",
+  "plugins.lang.python",
+  "plugins.lang.tailwind",
+  "plugins.lang.typescript",
+  -- formatters
+  "plugins.formatters.prettier",
+}
+
 -- window opts
 wo.scrolloff = 8
 wo.sidescrolloff = 8
@@ -129,41 +183,17 @@ o.wildmode = "longest:full,full"
 opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
 opt.wildmode = "longest:full,full" -- Command-line completion mode
 
--- map leader to <Space> and localeader to +
-g.mapleader = " "
-g.maplocalleader = ","
-
--- Fix markdown indentation settings
-g.markdown_recommended_style = 0
-
--- options
-g.autoformat = true
-g.bigfile_size = 1024 * 1024 * 1.5 -- 1.5 MB mini.animate will also be disabled.
-g.inline_diagnostics = false
-g.picker = "mini.pick" -- mini.pick
-g.ghost_text = false
-g.additional_path_root_spec = { "content" }
-g.root_lsp_ignore = { "copilot" }
-g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
-g.border = "single"
----@type "markview" | "render-markdown"
-g.markdown_render_backend = "render-markdown"
-g.enable_ui = true
-g.enable_render = false
-g.enable_autocomplete = true
-g.block_cursor = true
-
 o.cmdheight = g.enable_ui and 0 or 1
 o.guicursor = g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block
 o.conceallevel = g.enable_render and 2 or 0
 
-if vim.g.neovide then
-  vim.g.neovide_show_border = true
-  vim.g.neovide_no_idle = true
-  vim.g.neovide_padding_top = 5
-  vim.g.neovide_cursor_animation_length = 0.08
-  vim.g.neovide_cursor_trail_length = 0.05
-  vim.g.neovide_input_macos_option_key_is_meta = "only_left"
+if g.neovide then
+  g.neovide_show_border = true
+  g.neovide_no_idle = true
+  g.neovide_padding_top = 5
+  g.neovide_cursor_animation_length = 0.08
+  g.neovide_cursor_trail_length = 0.05
+  g.neovide_input_macos_option_key_is_meta = "only_left"
 
   -- shortcuts
   vim.keymap.set("n", "<D-s>", ":w<CR>") -- Save
@@ -177,7 +207,8 @@ if vim.g.neovide then
   vim.api.nvim_set_keymap("n", "<D-t>", ":enew<CR>", { noremap = true, silent = true })
 end
 
+-- respect local venv instead of nix setup
 local venv = os.getenv "VIRTUAL_ENV"
-if venv ~= nil then vim.g.python3_host_prog = venv .. "/bin/python3" end
+if venv ~= nil then g.python3_host_prog = venv .. "/bin/python3" end
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })

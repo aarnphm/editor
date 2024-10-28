@@ -4,20 +4,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = {
-        "stylua",
-        "shfmt",
-        "mypy",
-        "typos",
-        "gofumpt",
-        "goimports",
-        "taplo",
-        "beautysh",
-        "selene",
-        "hadolint",
-        "oxlint",
-        "markdownlint",
-      },
+      ensure_installed = { "stylua", "shfmt", "typos", "beautysh", "selene", "hadolint", "oxlint", "markdownlint" },
       ui = { border = BORDER.impl() },
       max_concurrent_installers = 10,
     },
@@ -49,62 +36,6 @@ return {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
-      { "b0o/SchemaStore.nvim", lazy = true, version = false, ft = { "json", "yaml" } },
-      {
-        "mrcjkb/rustaceanvim",
-        version = vim.fn.has "nvim-0.10.0" == 0 and "^4" or false,
-        lazy = false,
-        ft = { "rust" },
-        opts = {
-          server = {
-            on_attach = function(_, bufnr)
-              vim.keymap.set(
-                "n",
-                "<leader>cR",
-                function() vim.cmd.RustLsp "codeAction" end,
-                { desc = "Code Action", buffer = bufnr }
-              )
-              vim.keymap.set(
-                "n",
-                "<leader>dr",
-                function() vim.cmd.RustLsp "debuggables" end,
-                { desc = "Rust Debuggables", buffer = bufnr }
-              )
-            end,
-            default_settings = {
-              -- rust-analyzer language server configuration
-              ["rust-analyzer"] = {
-                cargo = {
-                  allFeatures = true,
-                  loadOutDirsFromCheck = true,
-                  buildScripts = {
-                    enable = true,
-                  },
-                },
-                -- Add clippy lints for Rust.
-                checkOnSave = true,
-                procMacro = {
-                  enable = true,
-                  ignored = {
-                    ["async-trait"] = { "async_trait" },
-                    ["napi-derive"] = { "napi" },
-                    ["async-recursion"] = { "async_recursion" },
-                  },
-                },
-              },
-            },
-          },
-        },
-        config = function(_, opts)
-          vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
-          if vim.fn.executable "rust-analyzer" == 0 then
-            Util.error(
-              "**rust-analyzer** not found in PATH, please install it.\nhttps://rust-analyzer.github.io/",
-              { title = "rustaceanvim" }
-            )
-          end
-        end,
-      },
     },
     ---@class PluginLspOptions
     opts = {
@@ -173,107 +104,10 @@ return {
       -- all of the server below will be installed by default
       servers = {
         bashls = {},
-        taplo = {
-          keys = {
-            {
-              "K",
-              function()
-                if vim.fn.expand "%:t" == "Cargo.toml" and require("crates").popup_available() then
-                  require("crates").show_popup()
-                else
-                  vim.lsp.buf.hover()
-                end
-              end,
-              desc = "crates: show documentation",
-            },
-          },
-        },
         markdown_oxide = {
           capabilities = {
             workspace = {
               didChangeWatchedFiles = { dynamicRegistration = true },
-            },
-          },
-        },
-        gopls = {
-          settings = {
-            gopls = {
-              gofumpt = true,
-              codelenses = {
-                gc_details = false,
-                generate = true,
-                regenerate_cgo = true,
-                run_govulncheck = true,
-                test = true,
-                tidy = true,
-                upgrade_dependency = true,
-                vendor = true,
-              },
-              hints = {
-                assignVariableTypes = true,
-                compositeLiteralFields = true,
-                compositeLiteralTypes = true,
-                constantValues = true,
-                functionTypeParameters = true,
-                parameterNames = true,
-                rangeVariableTypes = true,
-              },
-              analyses = {
-                fieldalignment = true,
-                nilness = true,
-                unusedparams = true,
-                unusedwrite = true,
-                useany = true,
-              },
-              usePlaceholders = true,
-              completeUnimported = true,
-              staticcheck = true,
-              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
-              semanticTokens = true,
-            },
-          },
-        },
-        jsonls = {
-          -- lazy-load schemastore when needed
-          on_new_config = function(config)
-            config.settings.json.schemas = config.settings.json.schemas or {}
-            vim.tbl_deep_extend("force", config.settings.json.schemas, require("schemastore").json.schemas())
-          end,
-          settings = {
-            json = {
-              format = { enable = true },
-              validate = { enable = true },
-            },
-          },
-        },
-        yamlls = {
-          -- lazy-load schemastore when needed
-          on_new_config = function(config)
-            config.settings.yaml.schemas = config.settings.yaml.schemas or {}
-            vim.tbl_deep_extend("force", config.settings.yaml.schemas, require("schemastore").yaml.schemas())
-          end,
-          -- Have to add this for yamlls to understand that we support line folding
-          capabilities = {
-            textDocument = {
-              foldingRange = {
-                dynamicRegistration = false,
-                lineFoldingOnly = true,
-              },
-            },
-          },
-          settings = {
-            redhat = { telemetry = { enabled = false } },
-            yaml = {
-              keyOrdering = false,
-              format = { enable = true, singleQuote = true, bracketSpacing = false, printWidth = 120 },
-              validate = true,
-              schemaStore = {
-                -- Must disable built-in schemaStore support to use
-                -- schemas from SchemaStore.nvim plugin
-                enable = false,
-                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-                url = "",
-              },
             },
           },
         },
@@ -335,18 +169,6 @@ return {
             },
           },
         },
-        nil_ls = {
-          settings = {
-            ["nil"] = {
-              formatting = {
-                command = { "alejandra" },
-              },
-              nix = {
-                flake = { autoArchive = true },
-              },
-            },
-          },
-        },
         eslint = {
           settings = {
             -- helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
@@ -355,11 +177,6 @@ return {
         },
       },
       setup = {
-        yamlls = function()
-          Util.lsp.on_attach(function(client, _)
-            if client.name == "yamlls" then client.server_capabilities.documentFormattingProvider = true end
-          end)
-        end,
         eslint = function(server, opts)
           -- register the formatter with Util
           Util.format.register(Util.lsp.formatter {
@@ -385,27 +202,6 @@ return {
           }, { path = vim.api.nvim_buf_get_name(0), upward = true }) > 0
           require("lspconfig")[server].setup(opts)
           return true
-        end,
-        gopls = function()
-          -- workaround for gopls not supporting semanticTokensProvider
-          -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
-          Util.lsp.on_attach(function(client, _)
-            if client.name == "gopls" then
-              if not client.server_capabilities.semanticTokensProvider then
-                ---@type lsp.SemanticTokensClientCapabilities
-                local semantic = client.config.capabilities.textDocument.semanticTokens
-                client.server_capabilities.semanticTokensProvider = {
-                  full = true,
-                  legend = {
-                    tokenTypes = semantic.tokenTypes,
-                    tokenModifiers = semantic.tokenModifiers,
-                  },
-                  range = true,
-                }
-              end
-            end
-          end)
-          -- end workaround
         end,
       },
     },

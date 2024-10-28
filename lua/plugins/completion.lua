@@ -75,12 +75,6 @@ return {
         dependencies = "rafamadriz/friendly-snippets",
       },
       {
-        "Saecki/crates.nvim",
-        lazy = true,
-        event = "BufRead Cargo.toml",
-        opts = { completion = { cmp = { enabled = true } } },
-      },
-      {
         "folke/lazydev.nvim",
         ft = "lua",
         cmd = "LazyDev",
@@ -106,29 +100,6 @@ return {
 
       ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
-
-      local sources = {
-        {
-          name = "nvim_lsp",
-          keyword_length = 3,
-          priority = 1000,
-          option = {
-            markdown_oxide = {
-              keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
-            },
-          },
-        },
-        { name = "snippets", priority = 500, group_index = 1 },
-        { name = "buffer", priority = 250, group_index = 1 },
-        { name = "async_path", group_index = 1 },
-        { name = "latex_symbols", option = { strategy = 0 } },
-        { name = "supermaven", group_index = 2 },
-        { name = "lazydev", group_index = 0 },
-      }
-      -- check if buffer is a toml file and filename is Cargo.toml
-      if vim.bo.filetype == "toml" and vim.fn.expand "%:t" == "Cargo.toml" then
-        sources[#sources + 1] = { name = "crates" }
-      end
 
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = {},
@@ -232,7 +203,24 @@ return {
             end
           end, { "i", "s" }),
         },
-        sources = cmp.config.sources(sources),
+        sources = cmp.config.sources {
+          {
+            name = "nvim_lsp",
+            keyword_length = 3,
+            priority = 1000,
+            option = {
+              markdown_oxide = {
+                keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
+              },
+            },
+          },
+          { name = "snippets", priority = 500, group_index = 1 },
+          { name = "buffer", priority = 250, group_index = 1 },
+          { name = "async_path", group_index = 1 },
+          { name = "latex_symbols", option = { strategy = 0 } },
+          { name = "supermaven", group_index = 2 },
+          { name = "lazydev", group_index = 0 },
+        },
       })
     end,
     main = "utils.cmp",
