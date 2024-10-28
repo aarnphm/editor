@@ -26,16 +26,32 @@ return {
     cmd = "Copilot",
     event = "InsertEnter",
     build = ":Copilot auth",
+    ---@type copilot_config
     opts = {
       panel = { enabled = false },
-      suggestion = { enabled = true },
+      suggestion = {
+        enabled = true,
+        auto_trigger = true,
+        debounce = 75,
+        keymap = {
+          accept = "<M-CR>",
+          next = "<M-]>",
+          prev = "<M-[>",
+        },
+      },
       filetypes = {
         markdown = true,
-        help = true,
         sh = function()
           if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env.*") then return false end
           return true
         end,
+      },
+      server_opts_overrides = {
+        settings = {
+          advanced = {
+            inlineSuggestCount = 3,
+          },
+        },
       },
     },
   },
@@ -152,7 +168,7 @@ return {
             })[entry.source.name]
 
             ---@type table<"abbr"|"menu", integer>
-            local widths = { abbr = 20, menu = 10 }
+            local widths = { abbr = 20, menu = 20 }
 
             for key, width in pairs(widths) do
               if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
@@ -162,9 +178,7 @@ return {
             return item
           end,
         },
-        experimental = {
-          ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false,
-        },
+        experimental = { ghost_text = vim.g.ghost_text and { hl_group = "CmpGhostText" } or false },
         enabled = function()
           local disabled_filetype = {
             gitcommit = true,

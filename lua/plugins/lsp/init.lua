@@ -233,14 +233,6 @@ return {
             },
           },
         },
-        tailwindcss = {
-          -- exclude a filetype from the default_config
-          filetypes_exclude = { "markdown" },
-          -- add additional filetypes to the default_config
-          filetypes_include = {},
-          -- to fully override the default_config, change the below
-          -- filetypes = {}
-        },
         jsonls = {
           -- lazy-load schemastore when needed
           on_new_config = function(config)
@@ -393,34 +385,6 @@ return {
           }, { path = vim.api.nvim_buf_get_name(0), upward = true }) > 0
           require("lspconfig")[server].setup(opts)
           return true
-        end,
-        tailwindcss = function(_, opts)
-          local tw = Util.lsp.get_raw_config "tailwindcss"
-          opts.filetypes = opts.filetypes or {}
-
-          -- Add default filetypes
-          vim.list_extend(opts.filetypes, tw.default_config.filetypes)
-
-          -- Remove excluded filetypes
-          opts.filetypes = vim.tbl_filter(
-            --- @param ft string
-            function(ft) return not vim.tbl_contains(opts.filetypes_exclude or {}, ft) end,
-            opts.filetypes
-          )
-
-          -- Additional settings for Phoenix projects
-          opts.settings = {
-            tailwindCSS = {
-              includeLanguages = {
-                elixir = "html-eex",
-                eelixir = "html-eex",
-                heex = "html-eex",
-              },
-            },
-          }
-
-          -- Add additional filetypes
-          vim.list_extend(opts.filetypes, opts.filetypes_include or {})
         end,
         gopls = function()
           -- workaround for gopls not supporting semanticTokensProvider

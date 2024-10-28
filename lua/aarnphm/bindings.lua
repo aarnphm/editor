@@ -7,10 +7,13 @@ end
 map("n", "<leader>st", function()
   vim.cmd.new()
   vim.cmd.wincmd "J"
-  vim.api.nvim_win_set_height(0, 12)
+  vim.api.nvim_win_set_height(0, 15)
   vim.wo.winfixheight = true
   vim.cmd.term()
+  vim.cmd.startinsert()
 end)
+map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
+map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "avante: convert diff to quickfix" })
 
 map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })

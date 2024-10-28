@@ -470,7 +470,7 @@ return {
     version = false,
     build = ":AvanteBuild",
     event = "VeryLazy",
-    dependencies = { "nui.nvim" },
+    dependencies = "nui.nvim",
     keys = {
       { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "avante: open" },
       { "<leader>ac", "<cmd>AvanteChat<CR>", desc = "avante: chat" },

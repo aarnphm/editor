@@ -158,11 +158,23 @@ o.guicursor = g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor2
 o.conceallevel = g.enable_render and 2 or 0
 
 if vim.g.neovide then
+  vim.g.neovide_show_border = true
   vim.g.neovide_no_idle = true
-  vim.g.neovide_refresh_rate = 120
-  vim.g.neovide_cursor_animation_length = 0.03
+  vim.g.neovide_padding_top = 5
+  vim.g.neovide_cursor_animation_length = 0.08
   vim.g.neovide_cursor_trail_length = 0.05
   vim.g.neovide_input_macos_option_key_is_meta = "only_left"
+
+  -- shortcuts
+  vim.keymap.set("n", "<D-s>", ":w<CR>") -- Save
+  vim.keymap.set("v", "<D-c>", '"+y') -- Copy
+  vim.keymap.set("n", "<D-v>", '"+P') -- Paste normal mode
+  vim.api.nvim_set_keymap("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("t", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("v", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("n", "<D-w>", ":q<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("n", "<D-t>", ":enew<CR>", { noremap = true, silent = true })
 end
 
 local venv = os.getenv "VIRTUAL_ENV"
