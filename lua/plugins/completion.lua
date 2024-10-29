@@ -2,7 +2,7 @@ return {
   {
     "supermaven-inc/supermaven-nvim",
     lazy = true,
-    enabled = true,
+    enabled = function() return vim.g.agent_backend == "supermaven" end,
     event = "LazyFile",
     build = ":SupermavenUsePro",
     opts = {
@@ -26,6 +26,7 @@ return {
     cmd = "Copilot",
     event = "InsertEnter",
     build = ":Copilot auth",
+    enabled = function() return vim.g.agent_backend == "copilot" end,
     ---@type copilot_config
     opts = {
       panel = { enabled = false },
@@ -101,6 +102,35 @@ return {
       ---@type cmp.SelectOption
       local select_opts = { behavior = cmp.SelectBehavior.Select }
 
+      local sources = {
+        {
+          name = "nvim_lsp",
+          option = {
+            markdown_oxide = {
+              keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
+            },
+          },
+        },
+        { name = "snippets", group_index = 1 },
+        { name = "buffer", group_index = 1 },
+        { name = "async_path", group_index = 1 },
+        { name = "latex_symbols", group_index = 2, option = { strategy = 0 } },
+        { name = "lazydev", group_index = 0 },
+      }
+
+      if Util.has "supermaven-nvim" then
+        table.insert(sources, {
+          name = "supermaven",
+          group_index = 2,
+          entry_filter = function(_, ctx)
+            local entries = ctx.visible_entries
+            if not entries then return false end
+            -- Only show supermaven entries if there are other visible entries
+            return #entries > 0
+          end,
+        })
+      end
+
       return vim.tbl_deep_extend("force", defaults, {
         auto_brackets = {},
         preselect = TC.PreselectMode.None,
@@ -111,13 +141,14 @@ return {
         ---@type cmp.WindowConfig
         window = {
           documentation = {
-            max_height = 20,
+            max_height = 40,
             max_width = 40,
             border = { "", "", "", " ", "", "", "", "" },
             winhighlight = "FloatBorder:NormalFloat",
             winblend = vim.o.pumblend,
           },
         },
+        view = { entries = { name = "custom", selection_order = "near_cursor" } },
         snippet = { expand = function(item) return Util.cmp.expand(item.body) end },
         ---@type cmp.FormattingConfig
         formatting = {
@@ -139,7 +170,7 @@ return {
             })[entry.source.name]
 
             ---@type table<"abbr"|"menu", integer>
-            local widths = { abbr = 20, menu = 20 }
+            local widths = { abbr = 20, menu = 40 }
 
             for key, width in pairs(widths) do
               if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
@@ -156,7 +187,6 @@ return {
             TelescopePrompt = true,
             help = true,
             minifiles = true,
-            Avante = true,
           }
 
           local disabled = not disabled_filetype[vim.bo.filetype]
@@ -203,24 +233,7 @@ return {
             end
           end, { "i", "s" }),
         },
-        sources = cmp.config.sources {
-          {
-            name = "nvim_lsp",
-            keyword_length = 3,
-            priority = 1000,
-            option = {
-              markdown_oxide = {
-                keyword_pattern = [[\(\k\| \|\/\|#\)\+]],
-              },
-            },
-          },
-          { name = "snippets", priority = 500, group_index = 1 },
-          { name = "buffer", priority = 250, group_index = 1 },
-          { name = "async_path", group_index = 1 },
-          { name = "latex_symbols", option = { strategy = 0 } },
-          { name = "supermaven", group_index = 2 },
-          { name = "lazydev", group_index = 0 },
-        },
+        sources = cmp.config.sources(sources),
       })
     end,
     main = "utils.cmp",

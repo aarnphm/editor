@@ -1,0 +1,51 @@
+{
+  "Create new latex aligned": {
+    "prefix": "bali",
+    "body": ["\\begin{aligned}", "$0", "\\end{aligned}"],
+    "description": "Create new aligned"
+  },
+  "Create new pseudocode": {
+    "prefix": "pseudo",
+    "body": [
+      "```pseudo",
+      "\\begin{algorithm}",
+      "\\caption{$0}",
+      "\\begin{algorithmic}",
+      "$1",
+      "\\end{algorithmic}",
+      "\\end{algorithm}",
+      "```"
+    ],
+    "description": "Create new pseudocode"
+  },
+  "because clause": {
+    "prefix": "bc",
+    "body": ["\\because $0"],
+    "description": "because clause"
+  },
+  "sum over": {
+    "prefix": "sm",
+    "body": ["\\sum_{${1:i}=${2:1}}^{${3:n}} $0"],
+    "description": "sum over"
+  },
+  "implies": {
+    "prefix": "impl",
+    "body": ["\\implies $0"],
+    "description": "implies"
+  },
+  "vertical dots": {
+    "prefix": "vdots",
+    "body": ["\\vdots"],
+    "description": "vertical dots"
+  },
+  "diagonal dots": {
+    "prefix": "ddots",
+    "body": ["\\ddots"],
+    "description": "diagnostic dots"
+  },
+  "horizontal dots": {
+    "prefix": "hdots",
+    "body": ["\\cdots"],
+    "description": "horizontal dots"
+  }
+}

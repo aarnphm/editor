@@ -20,6 +20,9 @@ g.autoformat = true
 g.inline_diagnostics = false
 -- whether to enable ghost text for completions
 g.ghost_text = false
+-- backend for autocomplete
+---@type "copilot" | "supermaven"
+g.agent_backend = "copilot"
 -- boxy or none
 g.enable_ui = true
 -- whether to render markdown
