@@ -1,5 +1,5 @@
 return {
-  { "NeogitOrg/neogit", cmd = { "Neogit" }, opts = {} },
+  { "tpope/vim-fugitive", cmd = { "G", "Git" } },
   {
     "lewis6991/gitsigns.nvim",
     event = "LazyFile",

@@ -4,9 +4,9 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "stylua", "shfmt", "typos", "beautysh", "selene", "hadolint", "oxlint", "markdownlint" },
+      ensure_installed = { "stylua", "shfmt", "typos", "beautysh", "selene", "hadolint", "ast-grep" },
       ui = { border = BORDER.impl() },
-      max_concurrent_installers = 10,
+      max_concurrent_installers = 15,
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
     config = function(_, opts)
@@ -45,7 +45,7 @@ return {
         severity_sort = true,
         underline = false,
         update_in_insert = false,
-        virtual_text = false,
+        virtual_text = vim.g.inline_diagnostics and { spacing = 2, min = "Error" } or false,
         float = {
           close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
           focusable = false,
@@ -104,13 +104,6 @@ return {
       -- all of the server below will be installed by default
       servers = {
         bashls = {},
-        markdown_oxide = {
-          capabilities = {
-            workspace = {
-              didChangeWatchedFiles = { dynamicRegistration = true },
-            },
-          },
-        },
         lua_ls = {
           settings = {
             Lua = {
@@ -238,22 +231,6 @@ return {
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      Util.toggle.map(
-        "<leader>uD",
-        Util.toggle.wrap {
-          name = "inline diagnostics",
-          get = function() return vim.g.inline_diagnostics end,
-          set = function(state)
-            vim.g.inline_diagnostics = state
-            vim.diagnostic.config(vim.tbl_deep_extend("force", opts.diagnostics, {
-              signs = { min = "Error" },
-              virtual_text = state and { spacing = 2, min = "Error" } or false,
-              underline = false,
-            }))
-          end,
-        }
-      )
-
       local servers = opts.servers
       local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       ---@type lsp.ClientCapabilities
@@ -264,9 +241,6 @@ return {
         has_cmp and cmp_nvim_lsp.default_capabilities() or {},
         opts.capabilities or {}
       )
-
-      ---@diagnostic disable-next-line: no-unknown
-      require("lspconfig.ui.windows").default_options.border = BORDER.impl()
 
       ---@param server string
       local server_setup = function(server)

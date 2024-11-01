@@ -63,12 +63,9 @@ vim.api.nvim_create_autocmd("VimResized", {
 })
 -- filetype stuff
 vim.api.nvim_create_autocmd("FileType", {
-  group = augroup "wrap_spell",
+  group = augroup "spell",
   pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
-  callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.spell = true
-  end,
+  callback = function() vim.opt_local.spell = true end,
 })
 -- Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {

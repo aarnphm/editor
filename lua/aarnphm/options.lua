@@ -60,6 +60,7 @@ g.extra_plugins = {
   "plugins.lang.json",
   "plugins.lang.clangd",
   "plugins.lang.python",
+  "plugins.lang.markdown",
   "plugins.lang.tailwind",
   "plugins.lang.typescript",
   -- formatters
@@ -87,7 +88,7 @@ o.signcolumn = "yes" -- always show sign column
 o.undofile = true -- set undofile to infinite undo
 o.breakindent = true -- enable break indent
 o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
-o.pumheight = 10 -- larger completion windows
+o.pumheight = 20 -- larger completion windows
 o.expandtab = true -- convert spaces to tabs
 o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
 o.number = true -- number is good for nav
@@ -99,7 +100,7 @@ o.showtabline = 0
 o.statuscolumn = [[%!v:lua.require'utils'.ui.statuscolumn()]]
 -- Window blending configuration
 o.winblend = 0
-o.pumblend = 0 -- make completion window transparent
+o.pumblend = 20 -- make completion window transparent
 
 opt.shortmess:append { W = true, c = true, C = true }
 o.formatexpr = "v:lua.require'utils'.format.formatexpr()"

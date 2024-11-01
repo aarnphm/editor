@@ -1,5 +1,6 @@
 return {
   { "b0o/SchemaStore.nvim", lazy = true, version = false },
+  { "nvim-treesitter", opts = { ensure_installed = { "yaml" } } },
   {
     "neovim/nvim-lspconfig",
     opts = {

@@ -1,5 +1,3 @@
-vim.g.prettier_needs_config = false
-
 ---@alias ConformCtx {buf: number, filename: string, dirname: string}
 local M = {}
 
