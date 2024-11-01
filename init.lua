@@ -36,6 +36,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "scratch",
     "starter",
     "trouble",
+    "lazyterm",
     "",
   },
   callback = function(event)

@@ -3,15 +3,40 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+vim.api.nvim_create_user_command("Quartz", function(opts)
+  local state = { cwd = nil, height = 15, cmd = { "npx", "quartz", "build", "--serve", "--verbose", "--bundleInfo" } }
+  for _, arg in ipairs(opts.fargs) do
+    local value = arg:match "cwd=([^%s]+)"
+    if value then
+      state.cwd = value
+    else
+      table.insert(state.cmd, arg)
+    end
+  end
+  if state.cwd == nil then state.cwd = Util.root() end
+  Util.terminal.bottom(state.cmd, { height = state.height, cwd = state.cwd })
+end, {
+  desc = "quartz: start server",
+  nargs = "*",
+  complete = function(_, _, _)
+    local candidates = {} ---@type string[]
+    vim.list_extend(
+      candidates,
+      ---@param x string
+      vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
+    )
+    return candidates
+  end,
+})
+
 -- Open a terminal at the bottom of the screen with a fixed height.
-map("n", "<leader>st", function()
-  vim.cmd.new()
-  vim.cmd.wincmd "J"
-  vim.api.nvim_win_set_height(0, 15)
-  vim.wo.winfixheight = true
-  vim.cmd.term()
-  vim.cmd.startinsert()
-end)
+map(
+  "n",
+  "<leader>st",
+  function() Util.terminal.bottom(nil, { startinsert = true }) end,
+  { desc = "terminal: attach new process" }
+)
+map("n", "<leader>sq", function() vim.cmd.Quartz() end, { desc = "terminal: attach new quartz" })
 map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "avante: convert diff to quickfix" })
@@ -85,33 +110,3 @@ map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
 
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
-
-vim.api.nvim_create_user_command("Quartz", function(opts)
-  local state = { cwd = nil, height = 15, cmd = { "npx", "quartz", "build", "--serve", "--verbose", "--bundleInfo" } }
-  for _, arg in ipairs(opts.fargs) do
-    local value = arg:match "cwd=([^%s]+)"
-    if value then
-      state.cwd = value
-    else
-      table.insert(state.cmd, arg)
-    end
-  end
-  if state.cwd == nil then state.cwd = Util.root() end
-  vim.cmd.new()
-  vim.cmd.wincmd "J"
-  vim.api.nvim_win_set_height(0, state.height)
-  vim.wo.winfixheight = true
-  vim.fn.termopen(state.cmd, { persistent = true, cwd = state.cwd, height = state.height })
-end, {
-  desc = "quartz: start server",
-  nargs = "*",
-  complete = function(_, _, _)
-    local candidates = {} ---@type string[]
-    vim.list_extend(
-      candidates,
-      ---@param x string
-      vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
-    )
-    return candidates
-  end,
-})

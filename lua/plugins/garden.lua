@@ -1,4 +1,5 @@
 local capstone_vault = vim.fn.expand "~" .. "/workspace/capstone/docs/content"
+local garden_vault = vim.fn.expand "~" .. "/workspace/garden/content"
 
 ---@param note obsidian.Note
 ---@param tbl function(note: obsidian.Note): table<string, any>
@@ -172,38 +173,47 @@ return {
     lazy = true,
     version = false,
     event = {
-      "BufReadPre " .. vim.g.vault .. "/**.md",
-      "BufNewFile " .. vim.g.vault .. "/**.md",
+      "BufReadPre " .. garden_vault .. "/**.md",
+      "BufNewFile " .. garden_vault .. "/**.md",
       "BufReadPre " .. capstone_vault .. "/**.md",
       "BufNewFile " .. capstone_vault .. "/**.md",
     },
     keys = {
       {
-        "<LocalLeader>n",
-        ":ObsidianTemplate ",
-        desc = "obsidian: new notes",
-      },
-      {
-        "<LocalLeader>o",
+        "<Leader>o",
         "<cmd>ObsidianOpen<cr>",
         desc = "obsidian: open",
       },
       {
-        "<Leader>ss",
-        "<cmd>ObsidianSearch<cr>",
-        desc = "obsidian: open",
+        "<Leader>on",
+        ":ObsidianTemplate ",
+        desc = "obsidian: new notes",
       },
       {
-        "<Leader>ll",
+        "<Leader>os",
+        "<cmd>ObsidianSearch<cr>",
+        desc = "obsidian: search",
+      },
+      {
+        "<Leader>ob",
         "<cmd>ObsidianBacklinks<cr>",
-        desc = "obsidian: open",
+        desc = "obsidian: backlinks",
       },
     },
     dependencies = { "nvim-lua/plenary.nvim", "mini.nvim", "nvim-cmp" },
     ---@type obsidian.config.ClientOpts
     opts = {
       workspaces = {
-        { name = "garden", path = vim.g.vault, overrides = { notes_subdir = "thoughts" } },
+        {
+          name = "garden",
+          path = garden_vault,
+          overrides = {
+            notes_subdir = "thoughts",
+            attachments = {
+              img_folder = "thoughts/images",
+            },
+          },
+        },
         {
           name = "capstone",
           path = capstone_vault,

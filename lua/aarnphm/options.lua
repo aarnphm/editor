@@ -42,8 +42,6 @@ g.root_lsp_ignore = { "copilot" }
 -- set pickers (can support telescope.nvim or mini.pick)
 ---@type "mini.pick" | "telescope"
 g.picker = "mini.pick"
--- default obsidian vault path
-g.vault = vim.fn.expand "~" .. "/workspace/garden/content"
 -- whether we set border for floating UI.
 g.border = "single"
 -- markdown render backend
