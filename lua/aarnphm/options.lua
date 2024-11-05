@@ -23,6 +23,9 @@ g.ghost_text = false
 -- backend for autocomplete
 ---@type "copilot" | "supermaven"
 g.agent_backend = "copilot"
+-- completion backend
+---@type "nvim-cmp" | "blink.cmp"
+g.completion_backend = "blink.cmp"
 -- boxy or none
 g.enable_ui = true
 -- whether to render markdown

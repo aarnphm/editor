@@ -57,41 +57,107 @@ return {
     },
   },
   {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    cmd = "LazyDev",
+    dependencies = {
+      -- Manage libuv types with lazy. Plugin will never be loaded
+      { "Bilal2453/luvit-meta", lazy = true },
+      { "justinsgithub/wezterm-types", lazy = true },
+    },
+    opts = {
+      library = {
+        { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
+        { path = "luvit-meta/library", words = { "vim%.uv" } },
+        { path = "wezterm-types", mods = { "wezterm" } },
+      },
+    },
+  },
+  {
+    "garymjr/nvim-snippets",
+    event = "InsertEnter",
+    opts = {
+      friendly_snippets = true,
+      create_autocmd = vim.g.completion_backend == "blink.cmp",
+      ignored_filetypes = { "git", "gitcommit" },
+      extended_filetypes = { markdown = { "latex" } },
+      create_cmp_source = vim.g.completion_backend == "nvim-cmp",
+    },
+    dependencies = "rafamadriz/friendly-snippets",
+  },
+  {
+    "saghen/blink.cmp",
+    version = false,
+    build = "cargo build --release",
+    enabled = function() return vim.g.completion_backend == "blink.cmp" end,
+    opts_extend = { "sources.completion.enabled_providers" },
+    dependencies = {
+      "rafamadriz/friendly-snippets",
+      -- add blink.compat to dependencies
+      -- { "saghen/blink.compat", opts = {} },
+    },
+    event = "InsertEnter",
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      fuzzy = {
+        prebuilt_binaries = { download = false, force_version = "v0.5.1" },
+      },
+      highlight = {
+        -- sets the fallback highlight groups to nvim-cmp's highlight groups
+        -- useful for when your theme doesn't support blink.cmp
+        -- will be removed in a future release, assuming themes add support
+        use_nvim_cmp_as_default = true,
+      },
+      -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+      -- adjusts spacing to ensure icons are aligned
+      nerd_font_variant = "mono",
+      windows = {
+        autocomplete = {
+          draw = "reversed",
+          winblend = vim.o.winblend,
+        },
+        documentation = {
+          auto_show = true,
+        },
+        ghost_text = {
+          enabled = true,
+        },
+      },
+      -- experimental auto-brackets support
+      accept = { auto_brackets = { enabled = true } },
+      -- experimental signature help support
+      trigger = { signature_help = { enabled = false } },
+      sources = {
+        completion = {
+          -- remember to enable your providers here
+          enabled_providers = { "lsp", "snippets", "path", "buffer", "lazydev" },
+        },
+        providers = {
+          lsp = {
+            -- dont show LuaLS require statements when lazydev has items
+            fallback_for = { "lazydev" },
+          },
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+          },
+        },
+      },
+      keymap = { preset = "enter" },
+    },
+  },
+  {
     "hrsh7th/nvim-cmp",
     version = false,
     event = "InsertEnter",
+    enabled = function() return vim.g.completion_backend == "nvim-cmp" end,
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "FelipeLema/cmp-async-path",
       "kdheepak/cmp-latex-symbols",
       "otter.nvim",
-      {
-        "garymjr/nvim-snippets",
-        opts = {
-          friendly_snippets = true,
-          ignored_filetypes = { "git", "gitcommit" },
-          extended_filetypes = { markdown = { "latex" } },
-        },
-        dependencies = "rafamadriz/friendly-snippets",
-      },
-      {
-        "folke/lazydev.nvim",
-        ft = "lua",
-        cmd = "LazyDev",
-        dependencies = {
-          -- Manage libuv types with lazy. Plugin will never be loaded
-          { "Bilal2453/luvit-meta", lazy = true },
-          { "justinsgithub/wezterm-types", lazy = true },
-        },
-        opts = {
-          library = {
-            { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
-            { path = "luvit-meta/library", words = { "vim%.uv" } },
-            { path = "wezterm-types", mods = { "wezterm" } },
-          },
-        },
-      },
     },
     ---@return cmp.ConfigSchema
     opts = function()

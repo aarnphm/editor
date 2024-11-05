@@ -80,6 +80,7 @@ return {
   },
   {
     "nvim-cmp",
+    enabled = function() return vim.g.completion_backend == "nvim-cmp" end,
     opts = function(_, opts)
       opts.auto_brackets = opts.auto_brackets or {}
       table.insert(opts.auto_brackets, "python")

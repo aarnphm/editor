@@ -200,7 +200,7 @@ return {
         desc = "obsidian: backlinks",
       },
     },
-    dependencies = { "nvim-lua/plenary.nvim", "mini.nvim", "nvim-cmp" },
+    dependencies = { "nvim-lua/plenary.nvim", "mini.nvim" },
     ---@type obsidian.config.ClientOpts
     opts = {
       workspaces = {
@@ -283,7 +283,7 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
-    build = ":AvanteBuild",
+    build = "make",
     event = "VeryLazy",
     dependencies = "nui.nvim",
     keys = {

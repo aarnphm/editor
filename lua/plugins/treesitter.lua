@@ -8,22 +8,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-context",
     event = "LazyFile",
-    opts = function()
-      local tsc = require "treesitter-context"
-
-      Util.toggle.map("<leader>ut", {
-        name = "treesitter context",
-        get = tsc.enabled,
-        set = function(state)
-          if state then
-            tsc.enable()
-          else
-            tsc.disable()
-          end
-        end,
-      })
-      return { mode = "cursor", enable = true, max_lines = 3 }
-    end,
+    opts = { mode = "cursor", enable = true, max_lines = 3 },
   },
   {
     "nvim-treesitter/nvim-treesitter",

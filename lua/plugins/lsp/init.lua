@@ -35,7 +35,6 @@ return {
     dependencies = {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
     },
     ---@class PluginLspOptions
     opts = {
@@ -201,7 +200,6 @@ return {
     ---@param opts PluginLspOptions
     config = function(_, opts)
       Util.format.register(Util.lsp.formatter())
-      Util.toggle.setup()
 
       Util.lsp.setup(opts.document_highlight)
 
@@ -232,13 +230,14 @@ return {
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
       local servers = opts.servers
-      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+      local has_blink, blink = pcall(require, "blink.cmp")
       ---@type lsp.ClientCapabilities
       local capabilities = vim.tbl_deep_extend(
         "force",
         {},
         vim.lsp.protocol.make_client_capabilities(),
-        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+        Util.has "cmp-nvim-lsp" and require("cmp_nvim_lsp").default_capabilities() or {},
+        Util.has "blink.cmp" and require("blink.cmp").get_lsp_capabilities() or {},
         opts.capabilities or {}
       )
 

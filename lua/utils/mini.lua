@@ -91,31 +91,8 @@ function M.files(opts)
   require("mini.files").setup(opts)
 end
 
----@param opts? table
-function M.trailspace(opts)
-  opts = opts or {}
-
-  local show_trailspace = true
-  Util.toggle.map("<leader>us", {
-    name = "show trailspace",
-    get = function() return show_trailspace end,
-    set = function(state)
-      show_trailspace = not state
-      require("mini.trailspace").highlight()
-    end,
-  })
-
-  require("mini.trailspace").setup(opts)
-end
-
 ---@param opts {skip_next: string, skip_ts: string[], skip_unbalanced: boolean, markdown: boolean, filetypes: string[], mappings?: table<string, any>}
 function M.pairs(opts)
-  Util.toggle.map("<leader>up", {
-    name = "mini pairs",
-    get = function() return not vim.g.minipairs_disable end,
-    set = function(state) vim.g.minipairs_disable = not state end,
-  })
-
   vim.api.nvim_create_autocmd("FileType", {
     group = augroup "disable_ft_minipairs",
     pattern = opts.filetypes,

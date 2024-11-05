@@ -5,7 +5,6 @@
 ---@field lsp lazyvim.util.lsp
 ---@field root lazyvim.util.root
 ---@field plugin lazyvim.util.plugin
----@field toggle lazyvim.util.toggle
 ---@field cmp lazyvim.util.cmp
 ---@field mini lazyvim.util.mini
 ---@field pick lazyvim.util.pick
@@ -32,10 +31,13 @@ function M.setup(opts)
   if not M.did_setup then
     M.did_setup = true
     M.plugin.setup()
-    M.root.setup()
-    M.on_very_lazy(M.format.setup)
 
     require("lazy").setup(opts)
+
+    M.on_very_lazy(function()
+      M.root.setup()
+      M.format.setup()
+    end)
 
     if package.loaded["rose-pine"] then
       vim.cmd.colorscheme "rose-pine"
