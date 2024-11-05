@@ -324,12 +324,14 @@ return {
         },
       },
       windows = {
+        position = "smart",
         sidebar_header = {
           align = "left", -- left, center, right for title
           rounded = false,
         },
         input = { prefix = "➜ " },
         edit = { border = vim.g.border },
+        ask = { start_insert = false, border = vim.g.border },
       },
       vendors = {
         ---@type AvanteProvider

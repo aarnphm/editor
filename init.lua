@@ -53,6 +53,12 @@ vim.api.nvim_create_autocmd("FileType", {
     end)
   end,
 })
+-- disable miniindenscope on some filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup "disable_miniindent",
+  pattern = { "help", "ministarter" },
+  callback = function(evt) vim.b.miniindentscope_disable = true end,
+})
 -- correct resized tabs
 vim.api.nvim_create_autocmd("VimResized", {
   group = augroup "resized",
@@ -163,6 +169,7 @@ vim.api.nvim_create_autocmd("FileType", {
   group = augroup "bigfile",
   pattern = "bigfile",
   callback = function(ev)
+    vim.b.minianimate_disable = true
     vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
   end,
 })

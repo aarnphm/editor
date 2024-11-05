@@ -46,6 +46,7 @@ return {
           --- indentmini.nvim
           IndentLine = { fg = "highlight_low" },
           IndentLineCurrent = { fg = "subtle" },
+          MiniIndentscopeSymbol = { fg = "rose", bg = "NONE" },
         },
       }
 

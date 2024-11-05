@@ -23,7 +23,7 @@ return {
     "folke/noice.nvim",
     event = "VeryLazy",
     enabled = function() return vim.g.enable_ui end,
-    depdendencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+    dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
     ---@type NoiceConfig
     opts = {
       presets = {

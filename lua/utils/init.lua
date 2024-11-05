@@ -33,7 +33,6 @@ function M.setup(opts)
     M.did_setup = true
     M.plugin.setup()
     M.root.setup()
-    M.terminal.setup()
     M.on_very_lazy(M.format.setup)
 
     require("lazy").setup(opts)
