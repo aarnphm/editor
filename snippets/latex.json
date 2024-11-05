@@ -18,6 +18,11 @@
     ],
     "description": "Create new pseudocode"
   },
+  "Vectors": {
+    "prefix": "vec",
+    "body": ["\\langle $0 \\rangle"],
+    "description": "Vectors"
+  },
   "because clause": {
     "prefix": "bc",
     "body": ["\\because $0"],

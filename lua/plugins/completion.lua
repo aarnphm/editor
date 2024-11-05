@@ -35,7 +35,7 @@ return {
         auto_trigger = true,
         debounce = 75,
         keymap = {
-          accept = "<M-CR>",
+          accept = false,
           next = "<M-]>",
           prev = "<M-[>",
         },
@@ -74,18 +74,6 @@ return {
     },
   },
   {
-    "garymjr/nvim-snippets",
-    event = "InsertEnter",
-    opts = {
-      friendly_snippets = true,
-      create_autocmd = vim.g.completion_backend == "blink.cmp",
-      ignored_filetypes = { "git", "gitcommit" },
-      extended_filetypes = { markdown = { "latex" } },
-      create_cmp_source = vim.g.completion_backend == "nvim-cmp",
-    },
-    dependencies = "rafamadriz/friendly-snippets",
-  },
-  {
     "saghen/blink.cmp",
     version = false,
     build = "cargo build --release",
@@ -113,16 +101,9 @@ return {
       -- adjusts spacing to ensure icons are aligned
       nerd_font_variant = "mono",
       windows = {
-        autocomplete = {
-          draw = "reversed",
-          winblend = vim.o.winblend,
-        },
-        documentation = {
-          auto_show = true,
-        },
-        ghost_text = {
-          enabled = true,
-        },
+        autocomplete = { draw = "reversed", winblend = vim.o.winblend },
+        documentation = { auto_show = true },
+        ghost_text = { enabled = false },
       },
       -- experimental auto-brackets support
       accept = { auto_brackets = { enabled = true } },
@@ -142,9 +123,41 @@ return {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
           },
+          snippets = {
+            opts = {
+              ignored_filetypes = { "git", "gitcommit" },
+              extended_filetypes = { markdown = { "latex" } },
+            },
+          },
         },
       },
-      keymap = { preset = "enter" },
+      keymap = {
+        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide", "fallback" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<C-p>"] = { "select_prev", "fallback" },
+        ["<C-n>"] = { "select_next", "fallback" },
+        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+        ["<Tab>"] = {
+          function(cmp)
+            if cmp.is_in_snippet() then
+              return cmp.accept()
+            elseif require("copilot.suggestion").is_visible() then
+              Util.create_undo()
+              require("copilot.suggestion").accept()
+              return true
+            else
+              return cmp.select_and_accept()
+            end
+          end,
+          "snippet_forward",
+          "fallback",
+        },
+        ["<S-Tab>"] = { "snippet_backward", "fallback" },
+      },
+      documentation = { max_width = 30 },
+      signature_help = { max_width = 30 },
     },
   },
   {
