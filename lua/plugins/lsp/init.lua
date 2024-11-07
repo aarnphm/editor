@@ -4,7 +4,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = { "stylua", "shfmt", "typos", "beautysh", "selene", "hadolint", "ast-grep" },
+      ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep" },
       ui = { border = BORDER.impl() },
       max_concurrent_installers = 15,
     },
@@ -34,7 +34,7 @@ return {
     event = "LazyFile",
     dependencies = {
       "mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
+      { "williamboman/mason-lspconfig.nvim", config = function() end },
     },
     ---@class PluginLspOptions
     opts = {

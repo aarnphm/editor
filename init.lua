@@ -94,7 +94,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup "highlight_yank",
   pattern = "*",
-  callback = function() (vim.hl or vim.highlight).on_yank { higroup = "IncSearch" } end,
+  callback = function() vim.hl.on_yank { higroup = "IncSearch" } end,
 })
 -- auto trim trailing whitespace
 vim.api.nvim_create_autocmd("BufWritePost", {

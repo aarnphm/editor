@@ -37,15 +37,6 @@ return {
             },
           },
         },
-        ruff_lsp = {
-          keys = {
-            {
-              "<leader>co",
-              Util.lsp.action["source.organizeImports"],
-              desc = "Organize Imports",
-            },
-          },
-        },
         pyright = {
           settings = {
             pyright = {

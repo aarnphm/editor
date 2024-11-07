@@ -360,7 +360,7 @@ return {
             }
           end,
           -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
-          parse_response_data = function(data_stream, event_state, opts)
+          parse_response = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
@@ -389,7 +389,7 @@ return {
               },
             }
           end,
-          parse_response_data = function(data_stream, event_state, opts)
+          parse_response = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
@@ -418,7 +418,7 @@ return {
               },
             }
           end,
-          parse_response_data = function(data_stream, event_state, opts)
+          parse_response = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
@@ -447,7 +447,7 @@ return {
             }
           end,
           -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
-          parse_response_data = function(data_stream, event_state, opts)
+          parse_response = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
@@ -474,7 +474,7 @@ return {
               },
             }
           end,
-          parse_response_data = function(data_stream, event_state, opts)
+          parse_response = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },
@@ -503,7 +503,7 @@ return {
               },
             }
           end,
-          parse_response_data = function(data_stream, event_state, opts)
+          parse_response = function(data_stream, event_state, opts)
             require("avante.providers").openai.parse_response(data_stream, event_state, opts)
           end,
         },

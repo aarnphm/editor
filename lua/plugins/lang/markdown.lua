@@ -2,7 +2,7 @@ return {
   { "nvim-treesitter", opts = { ensure_installed = { "markdown", "markdown_inline" } } },
   { "jmbuhr/otter.nvim", dependencies = { "nvim-treesitter" }, ft = { "markdown", "quarto", "norg" } },
   -- LSP stuff
-  { "mason.nvim", opts = { ensure_installed = { "markdownlint" } } },
+  { "mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
   {
     "nvim-lspconfig",
     opts = {

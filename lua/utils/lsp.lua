@@ -338,7 +338,7 @@ M.buf.definitions = function()
     end
 
     if vim.islist(result) then
-      vim.lsp.util.jump_to_location(result[1], "utf-8")
+      vim.lsp.util.show_document(result[1], "utf-8", { focus = true })
     else
       vim.lsp.handlers["textDocument/definition"](err, result, ctx, config)
     end

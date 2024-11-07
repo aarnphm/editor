@@ -1,7 +1,7 @@
 -- local LSP keys setup
 local M = {}
 
----@type LazyKeysLspSpec[]|nil
+---@type LazyKeysLspSpec[] | vim.NIL
 M._keys = nil
 
 ---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string|string[], cond?:fun():boolean}
