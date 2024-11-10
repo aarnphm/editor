@@ -32,10 +32,10 @@ return {
       panel = { enabled = false },
       suggestion = {
         enabled = true,
-        auto_trigger = true,
+        auto_trigger = false,
         debounce = 75,
         keymap = {
-          accept = false,
+          accept = "<M-CR>",
           next = "<M-]>",
           prev = "<M-[>",
         },
@@ -94,9 +94,21 @@ return {
       kind_icons = { Copilot = "" },
       nerd_font_variant = "mono", -- "normal" | "mono"
       windows = {
-        autocomplete = { winblend = vim.o.winblend },
-        documentation = { auto_show = true },
-        ghost_text = { enabled = false },
+        autocomplete = {
+          winblend = vim.o.winblend,
+          draw = {
+            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
+            padding = 0,
+            gap = 1,
+            components = {
+              label_description = { width = { max = 20 }, text = function(ctx) return ctx.label_description or "" end },
+            },
+          },
+          selection = "auto_insert",
+        },
+        documentation = { auto_show = true, max_width = 30 },
+        signature_help = { max_width = 30 },
+        ghost_text = { enabled = vim.g.ghost_text },
       },
       -- experimental auto-brackets support
       accept = { auto_brackets = { enabled = false } },
@@ -124,37 +136,8 @@ return {
           },
         },
       },
-      keymap = {
-        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
-        ["<C-e>"] = { "hide", "fallback" },
-        ["<CR>"] = { "accept", "fallback" },
-        ["<C-p>"] = { "select_prev", "fallback" },
-        ["<C-n>"] = { "select_next", "fallback" },
-        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
-        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
-        ["<Tab>"] = {
-          ---@type blink.cmp.KeymapCommand
-          function(cmp)
-            ---@module 'blink.cmp'
-            local cmp = _cmp
-
-            if cmp.is_in_snippet() then
-              return cmp.accept()
-            elseif require("copilot.suggestion").is_visible() then
-              Util.create_undo()
-              require("copilot.suggestion").accept()
-              return true
-            else
-              return cmp.select_and_accept()
-            end
-          end,
-          "snippet_forward",
-          "fallback",
-        },
-        ["<S-Tab>"] = { "snippet_backward", "fallback" },
-      },
-      documentation = { max_width = 30 },
-      signature_help = { max_width = 30 },
+      -- two-stage completion with copilot
+      keymap = "super-tab",
     },
   },
   {
