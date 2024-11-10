@@ -139,4 +139,16 @@ M.setup = function()
   )
 end
 
+---@param buf? boolean
+function M.snacks_toggle(buf)
+  return Snacks.toggle {
+    name = "Auto Format (" .. (buf and "Buffer" or "Global") .. ")",
+    get = function()
+      if not buf then return vim.g.autoformat == nil or vim.g.autoformat end
+      return Util.format.enabled()
+    end,
+    set = function(state) Util.format.enable(state, buf) end,
+  }
+end
+
 return M

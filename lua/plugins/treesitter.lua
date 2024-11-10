@@ -41,7 +41,7 @@ return {
       -- parser_install_dir = rtp_path,
       ignore_install = { "phpdoc" },
       indent = { enable = true },
-      highlight = { enable = true, disable = function(_, bufnr) return Util.is_bigfile(bufnr) end },
+      highlight = { enable = true },
       textobjects = {
         move = {
           enable = true,

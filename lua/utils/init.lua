@@ -28,23 +28,35 @@ M.did_setup = false
 
 ---@param opts LazyConfig
 function M.setup(opts)
-  if not M.did_setup then
-    M.did_setup = true
-    M.plugin.setup()
+  M.plugin.setup()
 
-    require("lazy").setup(opts)
+  require("lazy").setup(opts)
 
-    M.on_very_lazy(function()
-      M.root.setup()
-      M.format.setup()
-    end)
+  M.on_very_lazy(function()
+    M.root.setup()
+    M.format.setup()
 
-    if package.loaded["rose-pine"] then
-      vim.cmd.colorscheme "rose-pine"
-    else
-      vim.opt.termguicolors = true
-      vim.cmd.colorscheme "habamax"
-    end
+    Util.format.snacks_toggle():map "<leader>uf"
+    Util.format.snacks_toggle(true):map "<leader>uF"
+    Snacks.toggle.option("spell", { name = "Spelling" }):map "<leader>us"
+    Snacks.toggle.option("wrap", { name = "Wrap" }):map "<leader>uw"
+    Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map "<leader>uL"
+    Snacks.toggle.diagnostics():map "<leader>ud"
+    Snacks.toggle.line_number():map "<leader>ul"
+    Snacks.toggle
+      .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
+      :map "<leader>uc"
+    Snacks.toggle.treesitter():map "<leader>uT"
+    Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map "<leader>ub"
+    if vim.lsp.inlay_hint then Snacks.toggle.inlay_hints():map "<leader>uh" end
+    Util.ui.maximize():map "<leader>wm"
+  end)
+
+  if package.loaded["rose-pine"] then
+    vim.cmd.colorscheme "rose-pine"
+  else
+    vim.opt.termguicolors = true
+    vim.cmd.colorscheme "habamax"
   end
 
   return M
@@ -163,20 +175,6 @@ M.on_very_lazy = function(fn)
     pattern = "VeryLazy",
     callback = function(ev) fn(ev) end,
   })
-end
-
-M.is_bigfile = function(bufnr)
-  local ret = false
-  local bufname = vim.api.nvim_buf_get_name(bufnr)
-  local fsize = vim.fn.getfsize(bufname)
-  if fsize > vim.g.bigfile_size then
-    -- skip file size greater than 100k
-    ret = true
-  elseif bufname:match "^fugitive://" then
-    -- skip fugitive buffer
-    ret = true
-  end
-  return ret
 end
 
 -- delay notifications till vim.notify was replaced or after 500ms

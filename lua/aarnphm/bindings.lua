@@ -4,22 +4,54 @@ local map = function(mode, lhs, rhs, opts)
 end
 
 vim.api.nvim_create_user_command("Quartz", function(opts)
-  local state = { cwd = nil, height = 15, cmd = { "npx", "quartz", "build", "--serve", "--verbose", "--bundleInfo" } }
+  local state = {
+    cwd = nil,
+    height = 15,
+    background = false,
+    cmd = { "npx", "quartz", "build", "--serve", "--verbose", "--bundleInfo" },
+  }
   for _, arg in ipairs(opts.fargs) do
-    local value = arg:match "cwd=([^%s]+)"
-    if value then
-      state.cwd = value
+    if arg == "bg" then
+      state.background = true
     else
-      table.insert(state.cmd, arg)
+      local value = arg:match "cwd=([^%s]+)"
+      if value then
+        state.cwd = value
+      else
+        table.insert(state.cmd, arg)
+      end
     end
   end
   if state.cwd == nil then state.cwd = Util.root() end
-  Util.terminal.bottom(state.cmd, { height = state.height, cwd = state.cwd })
+  if state.background then
+    local job_id = vim.fn.jobstart(state.cmd, {
+      cwd = state.cwd,
+      on_exit = function(_, code)
+        if code == 0 then
+          Util.info "Quartz can be accessed at http://localhost:8080"
+        else
+          Util.error("Quartz process exited with code " .. code)
+        end
+      end,
+      on_stderr = function(_, data)
+        if data and #data > 0 then vim.schedule(function() Util.error(table.concat(data, "\n")) end) end
+      end,
+    })
+
+    if job_id <= 0 then
+      Util.error "Failed to start Quartz process"
+    else
+      Util.info "Quartz process started in background"
+    end
+  else
+    Util.terminal.bottom(state.cmd, { height = state.height, cwd = state.cwd })
+  end
 end, {
   desc = "quartz: start server",
   nargs = "*",
   complete = function(_, _, _)
     local candidates = {} ---@type string[]
+    vim.list_extend(candidates, { "bg" })
     vim.list_extend(
       candidates,
       ---@param x string
@@ -41,7 +73,7 @@ map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "avante: convert diff to quickfix" })
 
-map("n", "<C-x>", function(buf) Util.ui.bufremove(buf) end, { desc = "buffer: delete" })
+map("n", "<C-x>", function() Snacks.bufdelete() end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
 map("i", "<M-BS>", "<C-W>", { desc = "insert: delete word", remap = false })
 

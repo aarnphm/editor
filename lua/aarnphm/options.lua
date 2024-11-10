@@ -36,8 +36,6 @@ g.enable_autocomplete = true
 g.block_cursor = true
 -- configure whether prettier will requires configuration. If true, then prettier won't be run for compatible files if configuration is missing
 g.prettier_needs_config = false
--- file limit size (1.5 MB). NOTE: mini.animate will also be disabled.
-g.bigfile_size = 1024 * 1024 * 1.5
 -- additional path root spec to determine for LSP root
 g.additional_path_root_spec = { "content" }
 -- ignore lsp for certain root
@@ -98,7 +96,6 @@ o.autowrite = true
 o.undofile = true -- better than swapfile
 o.undolevels = 9999 -- infinite undo
 o.showtabline = 0
-o.statuscolumn = [[%!v:lua.require'utils'.ui.statuscolumn()]]
 -- Window blending configuration
 o.winblend = 0
 o.pumblend = 20 -- make completion window transparent

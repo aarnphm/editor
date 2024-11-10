@@ -1,63 +1,6 @@
 ---@class lazyvim.util.ui
 local M = {}
 
----@alias Sign {name:string, text:string, texthl:string, priority:number}
-
--- Returns a list of regular and extmark signs sorted by priority (low to high)
----@return Sign[]
----@param buf number
----@param lnum number
-function M.get_signs(buf, lnum)
-  -- Get regular signs
-  ---@type Sign[]
-  local signs = {}
-
-  -- Get extmark signs
-  local extmarks = vim.api.nvim_buf_get_extmarks(
-    buf,
-    -1,
-    { lnum - 1, 0 },
-    { lnum - 1, -1 },
-    { details = true, type = "sign" }
-  )
-  for _, extmark in pairs(extmarks) do
-    signs[#signs + 1] = {
-      name = extmark[4].sign_hl_group or extmark[4].sign_name or "",
-      text = extmark[4].sign_text,
-      texthl = extmark[4].sign_hl_group,
-      priority = extmark[4].priority,
-    }
-  end
-
-  -- Sort by priority
-  table.sort(signs, function(a, b) return (a.priority or 0) < (b.priority or 0) end)
-
-  return signs
-end
-
----@return Sign?
----@param buf number
----@param lnum number
-function M.get_mark(buf, lnum)
-  local marks = vim.fn.getmarklist(buf)
-  vim.list_extend(marks, vim.fn.getmarklist())
-  for _, mark in ipairs(marks) do
-    if mark.pos[1] == buf and mark.pos[2] == lnum and mark.mark:match "[a-zA-Z]" then
-      return { text = mark.mark:sub(2), texthl = "DiagnosticHint" }
-    end
-  end
-end
-
----@param sign? Sign
----@param len? number
-function M.icon(sign, len)
-  sign = sign or {}
-  len = len or 2
-  local text = vim.fn.strcharpart(sign.text or "", 0, len) ---@type string
-  text = text .. string.rep(" ", len - vim.fn.strchars(text))
-  return sign.texthl and ("%#" .. sign.texthl .. "#" .. text .. "%*") or text
-end
-
 function M.foldtext()
   local ok, parser = pcall(vim.treesitter.get_parser, vim.api.nvim_get_current_buf(), "")
   local ret = ok and vim.treesitter.foldtext and vim.treesitter.foldtext()
@@ -69,63 +12,6 @@ function M.foldtext()
 
   if not vim.treesitter.foldtext then return table.concat(vim.tbl_map(function(line) return line[1] end, ret), " ") end
   return ret
-end
-
-function M.statuscolumn()
-  local win = vim.g.statusline_winid
-  local buf = vim.api.nvim_win_get_buf(win)
-  local is_file = vim.bo[buf].buftype == ""
-  local show_signs = vim.wo[win].signcolumn ~= "no"
-
-  local components = { "", "", "" } -- left, middle, right
-
-  -- show open folds sign
-  local show_open_folds = true
-  -- highlight fold sign with gitsign color
-  local use_githl = true
-
-  if show_signs then
-    local signs = M.get_signs(buf, vim.v.lnum)
-
-    ---@type Sign?,Sign?,Sign?
-    local left, right, fold, githl
-    for _, s in ipairs(signs) do
-      if s.name and (s.name:find "GitSign" or s.name:find "MiniDiffSign") then
-        right = s
-        if use_githl then githl = s["texthl"] end
-      else
-        left = s
-      end
-    end
-
-    vim.api.nvim_win_call(win, function()
-      if vim.fn.foldclosed(vim.v.lnum) >= 0 then
-        fold = { text = vim.opt.fillchars:get().foldclose or "", texthl = githl or "Folded" }
-      elseif
-        show_open_folds
-        and not Util.ui.skip_foldexpr[buf]
-        and tostring(vim.treesitter.foldexpr(vim.v.lnum)):sub(1, 1) == ">"
-      then -- fold start
-        fold = { text = vim.opt.fillchars:get().foldopen or "", texthl = githl }
-      end
-    end)
-    -- Left: mark or non-git sign
-    components[1] = M.icon(M.get_mark(buf, vim.v.lnum) or left)
-    -- Right: fold icon or git sign (only if file)
-    components[3] = is_file and M.icon(fold or right) or ""
-  end
-
-  -- Numbers in Neovim are weird
-  -- They show when either number or relativenumber is true
-  local is_num = vim.wo[win].number
-  local is_relnum = vim.wo[win].relativenumber
-  if (is_num or is_relnum) and vim.v.virtnum == 0 then
-    components[2] = "%=%l " -- right align
-  end
-
-  if vim.v.virtnum ~= 0 then components[2] = "%= " end
-
-  return table.concat(components, "")
 end
 
 ---@return {fg?:string}?
@@ -160,6 +46,9 @@ local skip_check = assert(vim.uv.new_check())
 function M.foldexpr()
   local buf = vim.api.nvim_get_current_buf()
 
+  -- no highlight, no foldexpr
+  if not vim.b[buf].ts_highlight then return "0" end
+
   -- still in the same tick and no parser
   if M.skip_foldexpr[buf] then return "0" end
 
@@ -184,41 +73,41 @@ function M.foldexpr()
   return "0"
 end
 
----@param buf number?
-function M.bufremove(buf)
-  buf = buf or 0
-  buf = buf == 0 and vim.api.nvim_get_current_buf() or buf
-
-  if vim.bo.modified then
-    local choice = vim.fn.confirm(("Save changes to %q?"):format(vim.fn.bufname()), "&Yes\n&No\n&Cancel")
-    if choice == 0 or choice == 3 then -- 0 for <Esc>/<C-c> and 3 for Cancel
-      return
-    end
-    if choice == 1 then -- Yes
-      vim.cmd.write()
-    end
-  end
-
-  for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-    vim.api.nvim_win_call(win, function()
-      if not vim.api.nvim_win_is_valid(win) or vim.api.nvim_win_get_buf(win) ~= buf then return end
-      -- Try using alternate buffer
-      local alt = vim.fn.bufnr "#"
-      if alt ~= buf and vim.fn.buflisted(alt) == 1 then
-        vim.api.nvim_win_set_buf(win, alt)
-        return
+function M.maximize()
+  ---@type {k:string, v:any}[]?
+  local maximized = nil
+  return Snacks.toggle {
+    name = "Maximize",
+    get = function() return maximized ~= nil end,
+    set = function(state)
+      if state then
+        maximized = {}
+        local function set(k, v)
+          table.insert(maximized, 1, { k = k, v = vim.o[k] })
+          vim.o[k] = v
+        end
+        set("winwidth", 999)
+        set("winheight", 999)
+        set("winminwidth", 10)
+        set("winminheight", 4)
+        vim.cmd "wincmd ="
+        -- `QuitPre` seems to be executed even if we quit a normal window, so we don't want that
+        -- `VimLeavePre` might be another consideration? Not sure about differences between the 2
+        vim.api.nvim_create_autocmd("ExitPre", {
+          once = true,
+          group = vim.api.nvim_create_augroup("lazyvim_restore_max_exit_pre", { clear = true }),
+          desc = "Restore width/height when close Neovim while maximized",
+          callback = function() M.maximize.set(false) end,
+        })
+      else
+        for _, opt in ipairs(maximized) do
+          vim.o[opt.k] = opt.v
+        end
+        maximized = nil
+        vim.cmd "wincmd ="
       end
-
-      -- Try using previous buffer
-      local has_previous = pcall(vim.cmd, "bprevious")
-      if has_previous and buf ~= vim.api.nvim_win_get_buf(win) then return end
-
-      -- Create new listed buffer
-      local new_buf = vim.api.nvim_create_buf(true, false)
-      vim.api.nvim_win_set_buf(win, new_buf)
-    end)
-  end
-  if vim.api.nvim_buf_is_valid(buf) then pcall(vim.cmd, "bdelete! " .. buf) end
+    end,
+  }
 end
 
 return M

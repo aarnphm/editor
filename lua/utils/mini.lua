@@ -85,7 +85,7 @@ function M.files(opts)
 
   vim.api.nvim_create_autocmd("User", {
     pattern = "MiniFilesActionRename",
-    callback = function(ev) Util.lsp.on_rename(ev.data.from, ev.data.to) end,
+    callback = function(ev) Snacks.rename.on_rename_file(ev.data.from, ev.data.to) end,
   })
 
   require("mini.files").setup(opts)
@@ -98,6 +98,11 @@ function M.pairs(opts)
     pattern = opts.filetypes,
     callback = function(ev) vim.b[ev.buf].minipairs_disable = true end,
   })
+  Snacks.toggle({
+    name = "Mini Pairs",
+    get = function() return not vim.g.minipairs_disable end,
+    set = function(state) vim.g.minipairs_disable = not state end,
+  }):map "<leader>up"
 
   local P = require "mini.pairs"
   P.setup(opts)

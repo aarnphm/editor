@@ -17,8 +17,8 @@ end
 M.get = function()
   if not M._keys then
     M._keys = {
-      { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
-      { "H", vim.lsp.buf.signature_help, desc = "lsp: Signature help", has = "signatureHelp" },
+      { "K", function() vim.lsp.buf.hover() end, desc = "lsp: Hover" },
+      { "H", function() vim.lsp.buf.signature_help() end, desc = "lsp: Signature help", has = "signatureHelp" },
       { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
       { "gy", vim.lsp.buf.type_definition, desc = "lsp: t[y]pe definition" },
       { "gD", vim.lsp.buf.declaration, desc = "lsp: peek declaration", has = "declaration" },
@@ -50,7 +50,7 @@ M.get = function()
       },
       {
         "<leader>cR",
-        Util.lsp.rename_file,
+        function() Snacks.rename.rename_file() end,
         desc = "lsp: rename file",
         mode = { "n" },
         has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
@@ -58,31 +58,31 @@ M.get = function()
       { "<leader>cA", Util.lsp.action.source, desc = "lsp: source action", has = "codeAction" },
       {
         "]]",
-        function() Util.lsp.words.jump(vim.v.count1) end,
+        function() Snacks.words.jump(vim.v.count1) end,
         has = "documentHighlight",
-        desc = "lsp: next reference",
-        cond = function() return Util.lsp.words.enabled end,
+        desc = "Next Reference",
+        cond = function() return Snacks.words.is_enabled() end,
       },
       {
         "[[",
-        function() Util.lsp.words.jump(-vim.v.count1) end,
+        function() Snacks.words.jump(-vim.v.count1) end,
         has = "documentHighlight",
-        desc = "lsp: prev reference",
-        cond = function() return Util.lsp.words.enabled end,
+        desc = "Prev Reference",
+        cond = function() return Snacks.words.is_enabled() end,
       },
       {
         "<C-n>",
-        function() Util.lsp.words.jump(vim.v.count1, true) end,
+        function() Snacks.words.jump(vim.v.count1, true) end,
         has = "documentHighlight",
-        desc = "lsp: next reference",
-        cond = function() return Util.lsp.words.enabled end,
+        desc = "Next Reference",
+        cond = function() return Snacks.words.is_enabled() end,
       },
       {
         "<C-p>",
-        function() Util.lsp.words.jump(-vim.v.count1, true) end,
+        function() Snacks.words.jump(-vim.v.count1, true) end,
         has = "documentHighlight",
-        desc = "lsp: prev reference",
-        cond = function() return Util.lsp.words.enabled end,
+        desc = "Prev Reference",
+        cond = function() return Snacks.words.is_enabled() end,
       },
     }
   end

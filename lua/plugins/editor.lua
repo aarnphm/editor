@@ -285,7 +285,7 @@ return {
         win_vheight = 12,
         border = vim.g.border,
         show_title = true,
-        should_preview_cb = function(bufnr, _) return not Util.is_bigfile(bufnr) end,
+        should_preview_cb = function(bufnr, _) return vim.bo[bufnr].minianimate_disable == true end,
       },
       -- make `drop` and `tab drop` to become preferred
       func_map = {

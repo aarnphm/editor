@@ -70,6 +70,7 @@ return {
         { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
         { path = "luvit-meta/library", words = { "vim%.uv" } },
         { path = "wezterm-types", mods = { "wezterm" } },
+        { path = "snacks.nvim", words = { "Snacks" } },
       },
     },
   },
@@ -78,31 +79,27 @@ return {
     version = false,
     build = "cargo build --release",
     enabled = function() return vim.g.completion_backend == "blink.cmp" end,
-    opts_extend = { "sources.completion.enabled_providers" },
     dependencies = {
       "rafamadriz/friendly-snippets",
       -- add blink.compat to dependencies
       -- { "saghen/blink.compat", opts = {} },
     },
     event = "InsertEnter",
+    opts_extend = { "sources.completion.enabled_providers" },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
       fuzzy = { prebuilt_binaries = { download = false, force_version = "v0.5.1" } },
-      highlight = {
-        use_nvim_cmp_as_default = true,
-      },
-      kind_icons = {
-        Copilot = "",
-      },
+      highlight = { use_nvim_cmp_as_default = true },
+      kind_icons = { Copilot = "" },
       nerd_font_variant = "mono", -- "normal" | "mono"
       windows = {
-        autocomplete = { draw = "reversed", winblend = vim.o.winblend },
+        autocomplete = { winblend = vim.o.winblend },
         documentation = { auto_show = true },
         ghost_text = { enabled = false },
       },
       -- experimental auto-brackets support
-      accept = { auto_brackets = { enabled = true } },
+      accept = { auto_brackets = { enabled = false } },
       -- experimental signature help support
       trigger = { signature_help = { enabled = false } },
       sources = {
@@ -137,7 +134,7 @@ return {
         ["<C-f>"] = { "scroll_documentation_down", "fallback" },
         ["<Tab>"] = {
           ---@type blink.cmp.KeymapCommand
-          function(_cmp)
+          function(cmp)
             ---@module 'blink.cmp'
             local cmp = _cmp
 

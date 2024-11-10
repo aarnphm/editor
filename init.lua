@@ -24,6 +24,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "man",
     "notify",
     "qf",
+    "snacks_win",
     "query",
     "gitsigns-blame",
     "nowrite", ---fugitive
@@ -56,7 +57,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- disable miniindenscope on some filetypes
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "disable_miniindent",
-  pattern = { "help", "ministarter" },
+  pattern = { "help", "ministarter", "snacks_notif", "snacks_terminal", "snacks_win" },
   callback = function(evt) vim.b.miniindentscope_disable = true end,
 })
 -- correct resized tabs
@@ -153,27 +154,8 @@ vim.filetype.add {
   pattern = {
     ["[jt]sconfig.*.json"] = "jsonc",
     ["%.env%.[%w_.-]+"] = "dotenv",
-    [".*"] = {
-      function(path, buf)
-        return vim.bo[buf]
-            and vim.bo[buf].filetype ~= "bigfile"
-            and path
-            and vim.fn.getfsize(path) > vim.g.bigfile_size
-            and "bigfile"
-          or nil
-      end,
-    },
   },
 }
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup "bigfile",
-  pattern = "bigfile",
-  callback = function(ev)
-    vim.b.minianimate_disable = true
-    vim.schedule(function() vim.bo[ev.buf].syntax = vim.filetype.match { buf = ev.buf } or "" end)
-  end,
-})
-
 -- bootstrap logics
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then

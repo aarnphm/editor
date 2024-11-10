@@ -119,10 +119,7 @@ return {
           },
         },
       },
-      indentscope = {
-        symbol = "│",
-        options = { try_as_border = true },
-      },
+      indentscope = { symbol = "│", options = { try_as_border = true } },
       icons = {
         file = {
           [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
