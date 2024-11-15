@@ -104,7 +104,7 @@ return {
               label_description = { width = { max = 20 }, text = function(ctx) return ctx.label_description or "" end },
             },
           },
-          selection = "auto_insert",
+          selection = "manual",
         },
         documentation = { auto_show = true, max_width = 30 },
         signature_help = { max_width = 30 },
@@ -136,8 +136,28 @@ return {
           },
         },
       },
-      -- two-stage completion with copilot
-      keymap = "super-tab",
+      keymap = {
+        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide", "fallback" },
+        ["<CR>"] = { "select_and_accept", "fallback" },
+        ["<C-p>"] = { "select_prev", "fallback" },
+        ["<C-n>"] = { "select_next", "fallback" },
+        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+        ["<Tab>"] = {
+          ---@type blink.cmp.KeymapCommand
+          function(cmp)
+            if cmp.is_in_snippet() then
+              return cmp.accept()
+            else
+              return cmp.select_and_accept()
+            end
+          end,
+          "snippet_forward",
+          "fallback",
+        },
+        ["<S-Tab>"] = { "snippet_backward", "fallback" },
+      },
     },
   },
   {

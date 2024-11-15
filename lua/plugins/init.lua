@@ -20,8 +20,11 @@ return {
       ---@type snacks.Config
       return {
         toggle = { map = Util.safe_keymap_set },
+        bigfile = { enabled = true },
         notifier = { enabled = false },
-        quickfile = { enabled = false },
+        quickfile = { enabled = true },
+        statuscolumn = { enabled = true },
+        words = { enabled = true },
         terminal = {
           win = {
             keys = {
