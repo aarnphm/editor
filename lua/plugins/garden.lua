@@ -296,19 +296,19 @@ return {
       debug = false,
       provider = "claude",
       claude = {
-        api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
+        -- api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
         max_tokens = 8192,
       },
       openai = {
-        api_key_name = "cmd:bw get notes oai-api-key",
+        -- api_key_name = "cmd:bw get notes oai-api-key",
         model = "gpt-4o-2024-08-06",
       },
       cohere = {
         model = "command-r-plus-08-2024",
-        api_key_name = "cmd:bw get notes cohere-api-key",
+        -- api_key_name = "cmd:bw get notes cohere-api-key",
       },
       gemini = {
-        api_key_name = "cmd:bw get notes gemini-api-key",
+        -- api_key_name = "cmd:bw get notes gemini-api-key",
       },
       behaviour = {
         auto_suggestions = false, -- Experimental stage
@@ -424,7 +424,6 @@ return {
         },
         ---@type AvanteProvider
         codestral = {
-          ["local"] = true,
           endpoint = "",
           model = "mistralai/Codestral-22B-v0.1",
           api_key_name = "BENTOCLOUD_API_KEY",
@@ -453,7 +452,6 @@ return {
         },
         ---@type AvanteProvider
         ollama = {
-          ["local"] = true,
           endpoint = "127.0.0.1:11434/v1",
           model = "codegemma",
           parse_curl_args = function(opts, code_opts)

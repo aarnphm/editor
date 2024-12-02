@@ -89,31 +89,28 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
-      fuzzy = { prebuilt_binaries = { download = false, force_version = "v0.5.1" } },
-      highlight = { use_nvim_cmp_as_default = true },
-      kind_icons = { Copilot = "" },
-      nerd_font_variant = "mono", -- "normal" | "mono"
-      windows = {
-        autocomplete = {
-          winblend = vim.o.winblend,
+      fuzzy = { prebuilt_binaries = { download = false, force_version = "v0.6.2" } },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        kind_icons = { Copilot = "" },
+        nerd_font_variant = "mono", -- "normal" | "mono"
+      },
+      signature = { enabled = false, max_width = 30 },
+      ghost_text = { enabled = vim.g.ghost_text },
+      completion = {
+        menu = {
           draw = {
             columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
             padding = 0,
             gap = 1,
             components = {
-              label_description = { width = { max = 20 }, text = function(ctx) return ctx.label_description or "" end },
+              label_description = { width = { max = 40 }, text = function(ctx) return ctx.label_description or "" end },
             },
           },
-          selection = "manual",
         },
-        documentation = { auto_show = true, max_width = 30 },
-        signature_help = { max_width = 30 },
-        ghost_text = { enabled = vim.g.ghost_text },
       },
       -- experimental auto-brackets support
       accept = { auto_brackets = { enabled = false } },
-      -- experimental signature help support
-      trigger = { signature_help = { enabled = false } },
       sources = {
         completion = {
           -- remember to enable your providers here
@@ -144,18 +141,7 @@ return {
         ["<C-n>"] = { "select_next", "fallback" },
         ["<C-b>"] = { "scroll_documentation_up", "fallback" },
         ["<C-f>"] = { "scroll_documentation_down", "fallback" },
-        ["<Tab>"] = {
-          ---@type blink.cmp.KeymapCommand
-          function(cmp)
-            if cmp.is_in_snippet() then
-              return cmp.accept()
-            else
-              return cmp.select_and_accept()
-            end
-          end,
-          "snippet_forward",
-          "fallback",
-        },
+        ["<Tab>"] = { "snippet_forward", "fallback" },
         ["<S-Tab>"] = { "snippet_backward", "fallback" },
       },
     },

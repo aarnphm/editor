@@ -42,6 +42,10 @@ return {
       ignore_install = { "phpdoc" },
       indent = { enable = true },
       highlight = { enable = true },
+      injections = {
+        enable = true,
+        languages = { manim = "python" },
+      },
       textobjects = {
         move = {
           enable = true,
