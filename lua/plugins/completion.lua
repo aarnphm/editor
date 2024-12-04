@@ -100,12 +100,9 @@ return {
       completion = {
         menu = {
           draw = {
-            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
+            columns = { { "kind_icon" }, { "label" }, { "kind" } },
             padding = 0,
             gap = 1,
-            components = {
-              label_description = { width = { max = 40 }, text = function(ctx) return ctx.label_description or "" end },
-            },
           },
         },
       },
