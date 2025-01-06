@@ -23,7 +23,6 @@ vim.api.nvim_create_autocmd("FileType", {
     "lspinfo",
     "man",
     "notify",
-    "qf",
     "snacks_win",
     "query",
     "gitsigns-blame",

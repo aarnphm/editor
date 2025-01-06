@@ -99,7 +99,7 @@ function M.pairs(opts)
     callback = function(ev) vim.b[ev.buf].minipairs_disable = true end,
   })
   Snacks.toggle({
-    name = "Mini Pairs",
+    name = "mini pairs",
     get = function() return not vim.g.minipairs_disable end,
     set = function(state) vim.g.minipairs_disable = not state end,
   }):map "<leader>up"

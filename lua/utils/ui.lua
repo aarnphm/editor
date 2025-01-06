@@ -31,7 +31,7 @@ function M.maximize()
   ---@type {k:string, v:any}[]?
   local maximized = nil
   return Snacks.toggle {
-    name = "Maximize",
+    name = "maximize",
     get = function() return maximized ~= nil end,
     set = function(state)
       if state then

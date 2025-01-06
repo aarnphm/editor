@@ -107,29 +107,6 @@ return {
       },
     },
   },
-  {
-    "Bekaboo/dropbar.nvim",
-    version = false,
-    event = "LazyFile",
-    dependencies = "nvim-telescope/telescope-fzf-native.nvim",
-    ---@type dropbar_configs_t
-    opts = {
-      bar = {
-        enable = function(buf, win, _)
-          return vim.api.nvim_buf_is_valid(buf)
-            and vim.api.nvim_win_is_valid(win)
-            and vim.wo[win].winbar == ""
-            and vim.fn.win_gettype(win) == ""
-            and vim.bo[buf].ft ~= "help"
-            and ((pcall(vim.treesitter.get_parser, buf)) and true or false)
-        end,
-      },
-    },
-    config = function(_, opts)
-      vim.keymap.set("n", "<leader>B", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
-      require("dropbar").setup(opts)
-    end,
-  },
   -- search/replace in multiple files
   {
     "MagicDuck/grug-far.nvim",
@@ -285,7 +262,6 @@ return {
         win_vheight = 12,
         border = vim.g.border,
         show_title = true,
-        should_preview_cb = function(bufnr, _) return vim.bo[bufnr].minianimate_disable == true end,
       },
       -- make `drop` and `tab drop` to become preferred
       func_map = {

@@ -85,7 +85,7 @@ return {
       -- { "saghen/blink.compat", opts = {} },
     },
     event = "InsertEnter",
-    opts_extend = { "sources.completion.enabled_providers" },
+    opts_extend = { "sources.completion.enabled_providers", "sources.compat", "sources.default" },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -95,32 +95,42 @@ return {
         kind_icons = { Copilot = "" },
         nerd_font_variant = "mono", -- "normal" | "mono"
       },
-      signature = { enabled = false, max_width = 30 },
-      ghost_text = { enabled = vim.g.ghost_text },
+      snippets = {
+        expand = function(snippet) return Util.cmp.expand(snippet) end,
+      },
+      signature = { enabled = false },
       completion = {
         menu = {
           draw = {
+            treesitter = { "lsp" },
             columns = { { "kind_icon" }, { "label" }, { "kind" } },
             padding = 0,
             gap = 1,
           },
         },
-      },
-      -- experimental auto-brackets support
-      accept = { auto_brackets = { enabled = false } },
-      sources = {
-        completion = {
-          -- remember to enable your providers here
-          enabled_providers = { "lsp", "snippets", "path", "buffer", "lazydev" },
-        },
-        providers = {
-          lsp = {
-            -- dont show LuaLS require statements when lazydev has items
-            fallback_for = { "lazydev" },
+        accept = {
+          -- experimental auto-brackets support
+          auto_brackets = {
+            enabled = false,
           },
+        },
+        documentation = {
+          auto_show = false,
+          auto_show_delay_ms = 200,
+        },
+        ghost_text = { enabled = vim.g.ghost_text },
+      },
+      sources = {
+        -- adding any nvim-cmp sources here will enable them
+        -- with blink.compat
+        compat = {},
+        default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+        cmdline = {},
+        providers = {
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
+            score_offset = 100,
           },
           snippets = {
             opts = {
@@ -138,10 +148,56 @@ return {
         ["<C-n>"] = { "select_next", "fallback" },
         ["<C-b>"] = { "scroll_documentation_up", "fallback" },
         ["<C-f>"] = { "scroll_documentation_down", "fallback" },
-        ["<Tab>"] = { "snippet_forward", "fallback" },
+        ["<Tab>"] = { Util.cmp.map { "snippet_forward", "ai_accept" }, "fallback" },
         ["<S-Tab>"] = { "snippet_backward", "fallback" },
       },
     },
+    ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
+    config = function(_, opts)
+      -- setup compat sources
+      local enabled = opts.sources.default
+      for _, source in ipairs(opts.sources.compat or {}) do
+        opts.sources.providers[source] = vim.tbl_deep_extend(
+          "force",
+          { name = source, module = "blink.compat.source" },
+          opts.sources.providers[source] or {}
+        )
+        if type(enabled) == "table" and not vim.tbl_contains(enabled, source) then table.insert(enabled, source) end
+      end
+
+      -- Unset custom prop to pass blink.cmp validation
+      opts.sources.compat = nil
+
+      -- check if we need to override symbol kinds
+      for _, provider in pairs(opts.sources.providers or {}) do
+        ---@cast provider blink.cmp.SourceProviderConfig|{kind?:string}
+        if provider.kind then
+          local CompletionItemKind = require("blink.cmp.types").CompletionItemKind
+          local kind_idx = #CompletionItemKind + 1
+
+          CompletionItemKind[kind_idx] = provider.kind
+          ---@diagnostic disable-next-line: no-unknown
+          CompletionItemKind[provider.kind] = kind_idx
+
+          ---@type fun(ctx: blink.cmp.Context, items: blink.cmp.CompletionItem[]): blink.cmp.CompletionItem[]
+          local transform_items = provider.transform_items
+          ---@param ctx blink.cmp.Context
+          ---@param items blink.cmp.CompletionItem[]
+          provider.transform_items = function(ctx, items)
+            items = transform_items and transform_items(ctx, items) or items
+            for _, item in ipairs(items) do
+              item.kind = kind_idx or item.kind
+            end
+            return items
+          end
+
+          -- Unset custom prop to pass blink.cmp validation
+          provider.kind = nil
+        end
+      end
+
+      require("blink.cmp").setup(opts)
+    end,
   },
   {
     "hrsh7th/nvim-cmp",

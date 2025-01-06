@@ -38,16 +38,16 @@ function M.setup(opts)
 
     Util.format.snacks_toggle():map "<leader>uf"
     Util.format.snacks_toggle(true):map "<leader>uF"
-    Snacks.toggle.option("spell", { name = "Spelling" }):map "<leader>us"
-    Snacks.toggle.option("wrap", { name = "Wrap" }):map "<leader>uw"
-    Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map "<leader>uL"
+    Snacks.toggle.option("spell", { name = "spelling" }):map "<leader>us"
+    Snacks.toggle.option("wrap", { name = "wrap" }):map "<leader>uw"
+    Snacks.toggle.option("relativenumber", { name = "relative number" }):map "<leader>uL"
     Snacks.toggle.line_number():map "<leader>ul"
     Snacks.toggle.diagnostics():map "<leader>ud"
     Snacks.toggle
       .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
       :map "<leader>uc"
     Snacks.toggle.treesitter():map "<leader>uT"
-    Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map "<leader>ub"
+    Snacks.toggle.option("background", { off = "light", on = "dark", name = "dark background" }):map "<leader>ub"
     if vim.lsp.inlay_hint then Snacks.toggle.inlay_hints():map "<leader>uh" end
     Util.ui.maximize():map "<leader>wm"
   end)
