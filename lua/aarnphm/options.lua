@@ -171,7 +171,7 @@ o.timeout = true
 o.timeoutlen = 300
 o.updatetime = 250
 o.virtualedit = "block"
-o.laststatus = 3
+o.laststatus = 2 -- set local statusline for more context information
 o.whichwrap = "h,l,<,>,[,],~"
 go.background = os.getenv "XDG_SYSTEM_THEME" or "dark"
 
