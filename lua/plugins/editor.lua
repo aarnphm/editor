@@ -251,6 +251,30 @@ return {
     end,
   },
   {
+    "Bekaboo/dropbar.nvim",
+    version = false,
+    event = "LazyFile",
+    dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
+    ---@type dropbar_configs_t
+    opts = {
+      general = {
+        enable = function(buf, win, _)
+          return vim.api.nvim_buf_is_valid(buf)
+            and vim.api.nvim_win_is_valid(win)
+            and vim.wo[win].winbar == ""
+            and vim.fn.win_gettype(win) == ""
+            and vim.bo[buf].ft ~= "help"
+            and vim.bo[buf].ft ~= "Avante"
+            and ((pcall(vim.treesitter.get_parser, buf)) and true or false)
+        end,
+      },
+    },
+    config = function(_, opts)
+      vim.keymap.set("n", "<leader>B", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
+      require("dropbar").setup(opts)
+    end,
+  },
+  {
     "kevinhwang91/nvim-bqf",
     ft = "qf",
     opts = {

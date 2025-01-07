@@ -57,7 +57,7 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "disable_miniindent",
   pattern = { "help", "ministarter", "snacks_notif", "snacks_terminal", "snacks_win" },
-  callback = function(evt) vim.b.miniindentscope_disable = true end,
+  callback = function() vim.b.miniindentscope_disable = true end,
 })
 -- correct resized tabs
 vim.api.nvim_create_autocmd("VimResized", {

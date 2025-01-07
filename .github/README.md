@@ -14,7 +14,8 @@ Startup time: 12ms (with vim-startuptime and lazy.nvim)
 If you wish to try out something more structural,
 try out [nvimdots](https://github.com/ayamir/nvimdots) or [lazyvim](https://github.com/lazyvim/lazyvim)
 
-> [!note] Rust
+> [!note]
+>
 > For rustaceanvim, setup `rust-analyzer` separately with nix (via dix)
 
 This is largely build on top of some structural hierarchy of previous LazyVim versions.
