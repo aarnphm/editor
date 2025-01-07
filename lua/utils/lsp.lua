@@ -213,7 +213,7 @@ M.buf = setmetatable({}, {
 })
 
 M.buf.definitions = function()
-  local params = vim.lsp.util.make_position_params()
+  local params = vim.lsp.util.make_position_params(vim.api.nvim_get_current_win(), "utf-8")
 
   vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, ctx, config)
     if not result or vim.tbl_isempty(result) then

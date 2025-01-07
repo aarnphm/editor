@@ -257,7 +257,7 @@ return {
     dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
     ---@type dropbar_configs_t
     opts = {
-      general = {
+      bar = {
         enable = function(buf, win, _)
           return vim.api.nvim_buf_is_valid(buf)
             and vim.api.nvim_win_is_valid(win)

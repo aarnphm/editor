@@ -51,7 +51,7 @@ return {
             {
               "gD",
               function()
-                local params = vim.lsp.util.make_position_params()
+                local params = vim.lsp.util.make_position_params(vim.api.nvim_get_current_win(), "utf-8")
                 Util.lsp.execute {
                   command = "typescript.goToSourceDefinition",
                   arguments = { params.textDocument.uri, params.position },
