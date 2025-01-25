@@ -25,6 +25,7 @@ return {
       background = { dark = "dragon", light = "lotus" },
     },
   },
+  { "kepano/flexoki-neovim", name = "flexoki", priority = 1000 },
   {
     "rose-pine/neovim",
     name = "rose-pine",

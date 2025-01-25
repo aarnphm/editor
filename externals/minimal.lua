@@ -145,6 +145,7 @@ require("lazy").setup {
         highlight_groups = { StatusLine = { fg = "rose", bg = "overlay", blend = 0 } },
       },
     },
+    { "kepano/flexoki-neovim", name = "flexoki", priority = 1000 },
     {
       "ggandor/flit.nvim",
       opts = { labeled_modes = "nx" },

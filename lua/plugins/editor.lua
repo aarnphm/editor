@@ -265,7 +265,6 @@ return {
             and vim.fn.win_gettype(win) == ""
             and vim.bo[buf].ft ~= "help"
             and vim.bo[buf].ft ~= "Avante"
-            and ((pcall(vim.treesitter.get_parser, buf)) and true or false)
         end,
       },
     },

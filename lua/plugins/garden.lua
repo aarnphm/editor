@@ -17,7 +17,10 @@ local out_functor = function(note, tbl)
   if out.date == nil then out.date = os.date "%Y-%m-%d" end
   -- check if the length of out.aliases is 0, if so, remove it from the frontmatter
   if #out.aliases == 0 then out.aliases = nil end
-  out.modified = os.date "%Y-%m-%d %H:%M:%S GMT-05:00" -- Toronto timezone
+  if out.modified == nil or vim.b.changedtick ~= vim.b.last_changedtick then
+    out.modified = os.date "%Y-%m-%d %H:%M:%S GMT-05:00" -- Toronto timezone
+    vim.b.last_changedtick = vim.b.changedtick
+  end
   -- modify to always keep up-to-date with the filename. i.e: /workspace/posts/corporate personhood.md -> id: corporate personhood
   parts = vim.split(note.path.filename, "/")
   out.id = parts[#parts]:gsub("%.md$", "")
@@ -320,6 +323,9 @@ return {
       behaviour = {
         auto_suggestions = false, -- Experimental stage
         support_paste_from_clipboard = true,
+      },
+      file_selector = {
+        provider = "mini.pick",
       },
       mappings = {
         submit = { normal = "<CR>", insert = "<C-CR>" },

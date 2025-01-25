@@ -69,7 +69,7 @@ g.extra_plugins = {
 -- window opts
 wo.scrolloff = 8
 wo.sidescrolloff = 8
-wo.wrap = false
+wo.wrap = true -- need to wrap chungus
 wo.cursorline = true
 wo.cursorcolumn = false
 
