@@ -18,7 +18,12 @@ local out_functor = function(note, tbl)
   -- check if the length of out.aliases is 0, if so, remove it from the frontmatter
   if #out.aliases == 0 then out.aliases = nil end
   if out.modified == nil or vim.b.changedtick ~= vim.b.last_changedtick then
-    out.modified = os.date "%Y-%m-%d %H:%M:%S GMT-05:00" -- Toronto timezone
+    local raw_offset = os.date "%z" -- e.g. "+0530"
+    local sign = raw_offset:sub(1, 1) -- "+" or "-"
+    local hour_part = raw_offset:sub(2, 3) -- "05"
+    local min_part = raw_offset:sub(4, 5) -- "30"
+    local tz_colon = string.format("%s%s:%s", sign, hour_part, min_part)
+    out.modified = string.format("%s GMT%s", os.date "%Y-%m-%d %H:%M:%S", tz_colon)
     vim.b.last_changedtick = vim.b.changedtick
   end
   -- modify to always keep up-to-date with the filename. i.e: /workspace/posts/corporate personhood.md -> id: corporate personhood

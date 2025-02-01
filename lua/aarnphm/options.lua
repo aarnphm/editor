@@ -69,7 +69,7 @@ g.extra_plugins = {
 -- window opts
 wo.scrolloff = 8
 wo.sidescrolloff = 8
-wo.wrap = true -- need to wrap chungus
+wo.wrap = false -- need to wrap chungus
 wo.cursorline = true
 wo.cursorcolumn = false
 
@@ -168,7 +168,7 @@ o.sidescrolloff = 8
 o.splitbelow = true
 o.splitright = true
 o.timeout = true
-o.timeoutlen = 300
+o.timeoutlen = vim.g.vscode and 1000 or 300
 o.updatetime = 250
 o.virtualedit = "block"
 o.laststatus = 3 -- set local statusline for more context information
