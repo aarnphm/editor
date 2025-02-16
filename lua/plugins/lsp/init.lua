@@ -230,7 +230,6 @@ return {
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
       local servers = opts.servers
-      local has_blink, blink = pcall(require, "blink.cmp")
       ---@type lsp.ClientCapabilities
       local capabilities = vim.tbl_deep_extend(
         "force",

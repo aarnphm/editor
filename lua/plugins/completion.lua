@@ -111,24 +111,19 @@ return {
             gap = 1,
           },
         },
-        accept = {
-          -- experimental auto-brackets support
-          auto_brackets = {
-            enabled = false,
-          },
-        },
+        accept = { auto_brackets = { enabled = false } },
         documentation = {
           auto_show = false,
           auto_show_delay_ms = 200,
         },
         ghost_text = { enabled = vim.g.ghost_text },
       },
+      cmdline = { enabled = false, sources = {} },
       sources = {
         -- adding any nvim-cmp sources here will enable them
         -- with blink.compat
         compat = {},
         default = { "lsp", "path", "snippets", "buffer", "lazydev" },
-        cmdline = {},
         providers = {
           lazydev = {
             name = "LazyDev",

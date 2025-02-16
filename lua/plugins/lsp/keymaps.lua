@@ -17,6 +17,7 @@ end
 M.get = function()
   if not M._keys then
     M._keys = {
+      { "<leader>cl", function() Snacks.picker.lsp_config() end, desc = "lsp: info" },
       { "K", function() vim.lsp.buf.hover() end, desc = "lsp: Hover" },
       { "gr", function() vim.lsp.buf.rename() end, desc = "lsp: rename", has = "rename" },
       { "gy", function() vim.lsp.buf.type_definition() end, desc = "lsp: t[y]pe definition" },

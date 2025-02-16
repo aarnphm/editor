@@ -342,7 +342,8 @@ return {
         },
       },
       windows = {
-        position = "smart",
+        position = "right",
+        height = 4,
         sidebar_header = {
           align = "left", -- left, center, right for title
           rounded = false,
