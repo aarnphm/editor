@@ -52,8 +52,8 @@ function M.setup(opts)
     Util.ui.maximize():map "<leader>wm"
   end)
 
-  if package.loaded["flexoki"] then
-    vim.cmd.colorscheme(string.format("flexoki-%s", vim.go.background))
+  if M.has "flexoki" then
+    vim.cmd.colorscheme "flexoki"
   elseif package.loaded["rose-pine"] then
     vim.cmd.colorscheme "rose-pine"
   else
@@ -293,7 +293,9 @@ end
 ---@param msg string|string[]
 ---@param opts? LazyNotifyOpts
 function M.notify(msg, opts)
-  if vim.in_fast_event() then return vim.schedule(function() M.notify(msg, opts) end) end
+  if vim.in_fast_event() then
+    return vim.schedule(function() M.notify(msg, opts) end)
+  end
 
   opts = opts or {}
   if type(msg) == "table" then
