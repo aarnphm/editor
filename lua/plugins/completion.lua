@@ -77,7 +77,7 @@ return {
   {
     "saghen/blink.cmp",
     version = false,
-    build = "cargo build --release",
+    build = "nix run .#build-plugin",
     enabled = function() return vim.g.completion_backend == "blink.cmp" end,
     dependencies = {
       "rafamadriz/friendly-snippets",
