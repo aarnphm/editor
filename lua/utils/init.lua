@@ -52,10 +52,10 @@ function M.setup(opts)
     Util.ui.maximize():map "<leader>wm"
   end)
 
-  if M.has "flexoki" then
-    vim.cmd.colorscheme "flexoki"
-  elseif package.loaded["rose-pine"] then
+  if package.loaded["rose-pine"] then
     vim.cmd.colorscheme "rose-pine"
+  elseif M.has "flexoki" then
+    vim.cmd.colorscheme "flexoki"
   else
     vim.opt.termguicolors = true
     vim.cmd.colorscheme "habamax"
