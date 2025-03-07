@@ -292,14 +292,14 @@ return {
   },
   {
     "yetone/avante.nvim",
-    -- dev = true,
+    dev = true,
     version = false,
     build = "make",
     event = "VeryLazy",
     dependencies = "nui.nvim",
     keys = {
       { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "avante: open" },
-      { "<leader>ac", "<cmd>AvanteChat<CR>", desc = "avante: chat" },
+      { "<leader>aC", "<cmd>AvanteChat<CR>", desc = "avante: chat" },
       { "<leader>al", "<cmd>AvanteAsk position=left<CR>", desc = "avante: open on right panel" },
     },
     ---@type avante.Config
@@ -349,7 +349,7 @@ return {
           rounded = false,
         },
         input = { prefix = "➜ " },
-        edit = { border = vim.g.border },
+        edit = { border = vim.g.border, start_insert = false },
         ask = { start_insert = false, border = vim.g.border },
       },
       vendors = {
