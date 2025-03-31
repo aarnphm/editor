@@ -89,7 +89,7 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
-      fuzzy = { prebuilt_binaries = { download = false, force_version = "v0.6.2" } },
+      fuzzy = { implementation = "prefer_rust" },
       appearance = {
         use_nvim_cmp_as_default = true,
         kind_icons = { Copilot = "" },

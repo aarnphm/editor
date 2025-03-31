@@ -38,6 +38,14 @@ return {
             }, { path = ctx.filename, upward = true })[1]
           end,
         },
+        markdownlint = {
+          condition = function(ctx)
+            return vim.fs.find(
+              { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" },
+              { path = ctx.filename, upward = true }
+            )[1]
+          end,
+        },
       },
     },
     ---@param opts PluginLintOptions

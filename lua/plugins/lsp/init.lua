@@ -5,7 +5,7 @@ return {
     build = ":MasonUpdate",
     opts = {
       ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep" },
-      ui = { border = BORDER.impl() },
+      ui = { border = BORDER.impl(), backdrop = 100 },
       max_concurrent_installers = 15,
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
