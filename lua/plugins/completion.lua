@@ -81,6 +81,7 @@ return {
     enabled = function() return vim.g.completion_backend == "blink.cmp" end,
     dependencies = {
       "rafamadriz/friendly-snippets",
+      "Kaiser-Yang/blink-cmp-avante",
       -- add blink.compat to dependencies
       -- { "saghen/blink.compat", opts = {} },
     },
@@ -123,7 +124,7 @@ return {
         -- adding any nvim-cmp sources here will enable them
         -- with blink.compat
         compat = {},
-        default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+        default = { "lsp", "path", "snippets", "buffer", "lazydev", "avante" },
         providers = {
           lazydev = {
             name = "LazyDev",
@@ -135,6 +136,10 @@ return {
               ignored_filetypes = { "git", "gitcommit" },
               extended_filetypes = { markdown = { "latex" } },
             },
+          },
+          avante = {
+            module = "blink-cmp-avante",
+            name = "Avante",
           },
         },
       },

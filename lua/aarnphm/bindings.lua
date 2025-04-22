@@ -8,7 +8,7 @@ vim.api.nvim_create_user_command("Quartz", function(opts)
     cwd = nil,
     height = 15,
     background = false,
-    cmd = { "npx", "quartz", "build", "--serve", "--verbose", "--bundleInfo" },
+    cmd = { "pnpm", "exec", "quartz/bootstrap-cli.mjs", "build", "--serve", "--verbose", "--bundleInfo" },
   }
   for _, arg in ipairs(opts.fargs) do
     if arg == "bg" then
