@@ -11,8 +11,7 @@ return {
         lua = { "selene" },
         dockerfile = { "hadolint" },
         typescript = { "eslint", "oxlint" },
-        markdown = { "markdownlint" },
-        ["*"] = { "typos" },
+        markdown = { "markdownlint", "typos" },
       },
       ---@type table<string,table>
       linters = {

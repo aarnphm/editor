@@ -17,14 +17,13 @@ return {
     priority = 1000,
     lazy = false,
     opts = function()
-      ---@type snacks.Config
       return {
         toggle = { map = Util.safe_keymap_set },
         bigfile = { enabled = true },
         notifier = { enabled = false },
         quickfile = { enabled = true },
         statuscolumn = { enabled = true },
-        words = { enabled = true },
+        words = { enabled = false },
         terminal = {
           win = {
             keys = {
