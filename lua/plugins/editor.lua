@@ -183,15 +183,12 @@ return {
         desc = "format: injected langs",
       },
     },
+    ---@type conform.setupOpts
     opts = {
-      default_format_opts = {
-        timeout_ms = 3000,
-        async = false, -- not recommended to change
-        quiet = false, -- not recommended to change
-        lsp_format = "fallback", -- not recommended to change
-      },
+      default_format_opts = { timeout_ms = 3000 },
       formatters_by_ft = {
         lua = { "stylua" },
+        python = { "ruff_fix", "ruff_format", "ruff_organize_import" },
         toml = { "taplo" },
         proto = { "buf", "protolint" },
         zsh = { "beautysh", fallback = true },

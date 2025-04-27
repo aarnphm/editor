@@ -118,7 +118,7 @@ return {
                 enable = true,
                 setType = false,
                 paramType = true,
-                paramName = "Disable",
+                paramName = false,
                 semicolon = "Disable",
                 arrayIndex = "Disable",
               },

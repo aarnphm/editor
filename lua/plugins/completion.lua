@@ -71,6 +71,7 @@ return {
         { path = "luvit-meta/library", words = { "vim%.uv" } },
         { path = "wezterm-types", mods = { "wezterm" } },
         { path = "snacks.nvim", words = { "Snacks" } },
+        { path = "conform.nvim", words = { "conform" } },
       },
     },
   },
@@ -82,8 +83,6 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "Kaiser-Yang/blink-cmp-avante",
-      -- add blink.compat to dependencies
-      -- { "saghen/blink.compat", opts = {} },
     },
     event = "InsertEnter",
     opts_extend = { "sources.completion.enabled_providers", "sources.compat", "sources.default" },
@@ -121,8 +120,6 @@ return {
       },
       cmdline = { enabled = false, sources = {} },
       sources = {
-        -- adding any nvim-cmp sources here will enable them
-        -- with blink.compat
         compat = {},
         default = { "lsp", "path", "snippets", "buffer", "lazydev", "avante" },
         providers = {

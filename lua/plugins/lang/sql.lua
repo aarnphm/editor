@@ -95,6 +95,7 @@ return {
   {
     "stevearc/conform.nvim",
     optional = true,
+    ---@param opts conform.setupOpts
     opts = function(_, opts)
       opts.formatters.sqlfluff = {
         args = { "format", "--dialect=ansi", "-" },

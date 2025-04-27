@@ -8,7 +8,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-context",
     event = "LazyFile",
-    opts = { mode = "cursor", enable = true, max_lines = 3 },
+    opts = { mode = "cursor", enable = true, max_lines = 5 },
   },
   {
     "nvim-treesitter/nvim-treesitter",
