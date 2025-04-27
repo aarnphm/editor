@@ -3,7 +3,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "ninja", "rst" } },
   },
-  { "mason.nvim", opts = { ensure_installed = { "ruff", "pyright", "ruff-lsp", "mypy" } } },
+  { "mason.nvim", opts = { ensure_installed = { "ruff", "pyright", "mypy" } } },
   {
     "nvim-lint",
     opts = {
@@ -21,6 +21,12 @@ return {
         },
       },
     },
+  },
+  {
+    "stevearc/conform.nvim",
+    opts = { formatters_by_ft = {
+      python = { "ruff_fix", "ruff_format", "ruff_organize_import" },
+    } },
   },
   {
     "neovim/nvim-lspconfig",
@@ -50,18 +56,6 @@ return {
           settings = {
             pyright = {
               disableOrganizeImports = true,
-            },
-            python = {
-              analysis = {
-                ignore = { "*" },
-                autoImportCompletions = true,
-                autoSearchPaths = true,
-                typeCheckingMode = "strict",
-                useLibraryCodeForTypes = true,
-                diagnosticSeverityOverrides = {
-                  reportUnusedExpression = "none",
-                },
-              },
             },
           },
         },

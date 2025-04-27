@@ -188,7 +188,6 @@ return {
       default_format_opts = { timeout_ms = 3000 },
       formatters_by_ft = {
         lua = { "stylua" },
-        python = { "ruff_fix", "ruff_format", "ruff_organize_import" },
         toml = { "taplo" },
         proto = { "buf", "protolint" },
         zsh = { "beautysh", fallback = true },
