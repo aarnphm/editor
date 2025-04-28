@@ -34,153 +34,6 @@ end
 
 return {
   {
-    "benlubas/molten-nvim",
-    version = false,
-    build = ":UpdateRemotePlugins",
-    ft = { "markdown" },
-    dependencies = "image.nvim",
-    init = function()
-      -- I find auto open annoying, keep in mind setting this option will require setting
-      -- a keybind for `:noautocmd MoltenEnterOutput` to open the output again
-      vim.g.molten_auto_open_output = false
-
-      -- this guide will be using image.nvim
-      -- Don't forget to setup and install the plugin if you want to view image outputs
-      vim.g.molten_image_provider = "image.nvim"
-
-      -- optional, I like wrapping. works for virt text and the output window
-      vim.g.molten_wrap_output = true
-
-      -- Output as virtual text. Allows outputs to always be shown, works with images, but can
-      -- be buggy with longer images
-      vim.g.molten_virt_text_output = true
-
-      -- this will make it so the output shows up below the \`\`\` cell delimiter
-      vim.g.molten_virt_lines_off_by_1 = true
-
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "MoltenInitPost",
-        callback = function()
-          require("quarto").activate()
-          require("otter").activate()
-        end,
-      })
-
-      -- automatically import output chunks from a jupyter notebook
-      -- tries to find a kernel that matches the kernel in the jupyter notebook
-      -- falls back to a kernel that matches the name of the active venv (if any)
-      local imb = function(e) -- init molten buffer
-        vim.schedule(function()
-          local kernels = vim.fn.MoltenAvailableKernels()
-          local try_kernel_name = function()
-            local metadata = vim.json.decode(io.open(e.file, "r"):read "a")["metadata"]
-            return metadata.kernelspec.name
-          end
-          local ok, kernel_name = pcall(try_kernel_name)
-          if not ok or not vim.tbl_contains(kernels, kernel_name) then
-            kernel_name = nil
-            local venv = os.getenv "VIRTUAL_ENV" or os.getenv "CONDA_PREFIX"
-            if venv ~= nil then kernel_name = string.match(venv, "/.+/(.+)") end
-          end
-          if kernel_name ~= nil and vim.tbl_contains(kernels, kernel_name) then
-            vim.cmd(("MoltenInit %s"):format(kernel_name))
-          else
-            vim.cmd "MoltenInit"
-          end
-          vim.cmd "MoltenImportOutput"
-        end)
-      end
-
-      -- automatically import output chunks from a jupyter notebook
-      vim.api.nvim_create_autocmd("BufAdd", {
-        pattern = { "*.ipynb" },
-        callback = imb,
-      })
-
-      -- we have to do this as well so that we catch files opened like nvim ./hi.ipynb
-      vim.api.nvim_create_autocmd("BufEnter", {
-        pattern = { "*.ipynb" },
-        callback = function(e)
-          if vim.api.nvim_get_vvar "vim_did_enter" ~= 1 then imb(e) end
-        end,
-      })
-    end,
-    keys = {
-      -- kernels
-      {
-        "<LocalLeader>m",
-        "",
-        desc = "+Molten",
-      },
-      {
-        "<LocalLeader>mi",
-        ":MoltenInit<CR>",
-        desc = "molten: init",
-      },
-      -- general
-      {
-        "<leader>m",
-        "",
-        desc = "+Molten",
-      },
-      {
-        "<leader>me",
-        ":MoltenEvaluateOperator<CR>",
-        desc = "molten: evaluate operator",
-        silent = true,
-      },
-      {
-        "<leader>mr",
-        ":MoltenReevaluateCell<CR>",
-        desc = "molten: re-eval cell",
-        silent = true,
-      },
-      {
-        "<leader>md",
-        ":MoltenDelete<CR>",
-        desc = "molten: delete cell",
-        silent = true,
-      },
-      {
-        "<leader>mx",
-        ":MoltenOpenInBrowser<CR>",
-        desc = "molten: open in browser",
-        silent = true,
-      },
-      {
-        "<leader>mp",
-        ":MoltenPrev<CR>",
-        desc = "molten: next",
-        silent = true,
-      },
-      {
-        "<leader>mn",
-        ":MoltenNext<CR>",
-        desc = "molten: next",
-        silent = true,
-      },
-      {
-        "<leader>mh",
-        ":MoltenHideOutput<CR>",
-        desc = "molten: hide output windows",
-        silent = true,
-      },
-      {
-        "<leader>mr",
-        mode = { "v" },
-        "<C-u>MoltenEvaluateVisual<CR>gv",
-        desc = "molten: execute visual selection",
-        silent = true,
-      },
-      {
-        "<leader>mo",
-        ":noautocmd MoltenEnterOutput<CR>",
-        desc = "molten: open output window",
-        silent = true,
-      },
-    },
-  },
-  {
     "epwalsh/obsidian.nvim",
     lazy = true,
     version = false,
@@ -292,9 +145,9 @@ return {
   },
   {
     "yetone/avante.nvim",
-    dev = false,
+    dev = true,
     version = false,
-    build = "make",
+    build = "nix run .#plugin",
     event = "VeryLazy",
     dependencies = "nui.nvim",
     keys = {
@@ -306,13 +159,13 @@ return {
     opts = {
       debug = false,
       provider = "claude", -- tbh we can switch to copilot
+      cursor_applying_provider = "claude",
+      memory_summary_provider = "claude",
       claude = {
         -- api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
-        max_tokens = 8192,
       },
       copilot = {
-        model = "claude-3.5-sonnet",
-        max_tokens = 8192,
+        model = "claude-3.7-sonnet",
       },
       openai = {
         -- api_key_name = "cmd:bw get notes oai-api-key",
@@ -325,13 +178,20 @@ return {
       gemini = {
         -- api_key_name = "cmd:bw get notes gemini-api-key",
       },
+      rag_service = {
+        enabled = vim.g.avante_rag,
+        runner = "nix",
+        llm_model = "o4-mini",
+        embed_model = "text-embedding-3-small",
+      },
       behaviour = {
         auto_suggestions = false, -- Experimental stage
         support_paste_from_clipboard = true,
+        auto_suggestions_respect_ignore = true,
+        enable_cursor_planning_mode = true,
+        enable_claude_text_editor_tool_mode = true,
       },
-      file_selector = {
-        provider = "mini.pick",
-      },
+      file_selector = { provider = "mini.pick" },
       mappings = {
         submit = { normal = "<CR>", insert = "<C-CR>" },
         suggestion = {

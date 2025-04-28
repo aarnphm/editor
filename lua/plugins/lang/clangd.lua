@@ -87,9 +87,4 @@ return {
       },
     },
   },
-  {
-    "nvim-cmp",
-    enabled = function() return vim.g.completion_backend == "nvim-cmp" end,
-    opts = function(_, opts) table.insert(opts.sorting.comparators, 1, require "clangd_extensions.cmp_scores") end,
-  },
 }

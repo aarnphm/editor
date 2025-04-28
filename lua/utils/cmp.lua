@@ -67,69 +67,11 @@ function M.snippet_fix(snippet)
   end)
 end
 
----@param entry cmp.Entry
-function M.auto_brackets(entry)
-  local cmp = require "cmp"
-  local Kind = cmp.lsp.CompletionItemKind
-  local item = entry:get_completion_item()
-  if vim.tbl_contains({ Kind.Function, Kind.Method }, item.kind) then
-    local cursor = vim.api.nvim_win_get_cursor(0)
-    local prev_char = vim.api.nvim_buf_get_text(0, cursor[1] - 1, cursor[2], cursor[1] - 1, cursor[2] + 1, {})[1]
-    if prev_char ~= "(" and prev_char ~= ")" then
-      local keys = vim.api.nvim_replace_termcodes("()<left>", false, false, true)
-      vim.api.nvim_feedkeys(keys, "i", true)
-    end
-  end
-end
-
--- This function adds missing documentation to snippets.
--- The documentation is a preview of the snippet.
----@param window cmp.CustomEntriesView|cmp.NativeEntriesView
-function M.add_missing_snippet_docs(window)
-  local cmp = require "cmp"
-  local Kind = cmp.lsp.CompletionItemKind
-  local entries = window:get_entries()
-  for _, entry in ipairs(entries) do
-    if entry:get_kind() == Kind.Snippet then
-      local item = entry:get_completion_item()
-      if not item.documentation and item.insertText then
-        item.documentation = {
-          kind = cmp.lsp.MarkupKind.Markdown,
-          value = string.format("```%s\n%s\n```", vim.bo.filetype, M.snippet_preview(item.insertText)),
-        }
-      end
-    end
-  end
-end
-
 function M.visible()
   ---@module 'blink.cmp'
   local blink = package.loaded["blink.cmp"]
   if blink then return blink.windows and blink.windows.autocomplete.win:is_open() end
-  ---@module 'cmp'
-  local cmp = package.loaded["cmp"]
-  if cmp then return cmp.core.view:visible() end
   return false
-end
-
--- This is a better implementation of `cmp.confirm`:
---  * check if the completion menu is visible without waiting for running sources
---  * create an undo point before confirming
--- This function is both faster and more reliable.
----@param opts? {select: boolean, behavior: cmp.ConfirmBehavior}
-function M.confirm(opts)
-  local cmp = require "cmp"
-  opts = vim.tbl_extend("force", {
-    select = true,
-    behavior = cmp.ConfirmBehavior.Insert,
-  }, opts or {})
-  return function(fallback)
-    if cmp.core.view:visible() or vim.fn.pumvisible() == 1 then
-      Util.create_undo()
-      if cmp.confirm(opts) then return end
-    end
-    return fallback()
-  end
 end
 
 function M.expand(snippet)
@@ -159,32 +101,6 @@ function M.expand(snippet)
 
   -- Restore top-level session when needed
   if session then vim.snippet._session = session end
-end
-
----@param opts cmp.ConfigSchema | {auto_brackets?: string[]}
-function M.setup(opts)
-  for _, source in ipairs(opts.sources) do
-    source.group_index = source.group_index or 1
-  end
-
-  local parse = require("cmp.utils.snippet").parse
-  require("cmp.utils.snippet").parse = function(input)
-    local ok, ret = pcall(parse, input)
-    if ok then return ret end
-    return M.snippet_preview(input)
-  end
-
-  local cmp = require "cmp"
-  cmp.setup(opts)
-
-  cmp.event:on("confirm_done", function(event)
-    if vim.tbl_contains(opts.auto_brackets or {}, vim.bo.filetype) then M.auto_brackets(event.entry) end
-  end)
-  cmp.event:on("menu_opened", function(event)
-    vim.b.copilot_suggestion_hidden = true
-    M.add_missing_snippet_docs(event.window)
-  end)
-  cmp.event:on("menu_closed", function() vim.b.copilot_suggestion_hidden = false end)
 end
 
 return M

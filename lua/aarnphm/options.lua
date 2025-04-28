@@ -23,9 +23,6 @@ g.ghost_text = false
 -- backend for autocomplete
 ---@type "copilot" | "supermaven"
 g.agent_backend = "copilot"
--- completion backend
----@type "nvim-cmp" | "blink.cmp"
-g.completion_backend = "blink.cmp"
 -- boxy or none
 g.enable_ui = true
 -- whether to render markdown
@@ -59,12 +56,15 @@ g.extra_plugins = {
   "plugins.lang.json",
   "plugins.lang.clangd",
   "plugins.lang.python",
+  "plugins.lang.zig",
   "plugins.lang.markdown",
   "plugins.lang.tailwind",
   "plugins.lang.typescript",
   -- formatters
   "plugins.formatters.prettier",
 }
+-- whether to enable RAG for avante
+g.avante_rag = false
 
 -- window opts
 wo.scrolloff = 8

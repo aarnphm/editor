@@ -43,22 +43,7 @@ return {
             },
           },
         },
-        ruff = {
-          keys = {
-            {
-              "<leader>co",
-              Util.lsp.action["source.organizeImports"],
-              desc = "Organize Imports",
-            },
-          },
-        },
-        pyright = {
-          settings = {
-            pyright = {
-              disableOrganizeImports = true,
-            },
-          },
-        },
+        pyright = {},
       },
       setup = {
         ruff = function()
@@ -71,13 +56,5 @@ return {
         end,
       },
     },
-  },
-  {
-    "nvim-cmp",
-    enabled = function() return vim.g.completion_backend == "nvim-cmp" end,
-    opts = function(_, opts)
-      opts.auto_brackets = opts.auto_brackets or {}
-      table.insert(opts.auto_brackets, "python")
-    end,
   },
 }
