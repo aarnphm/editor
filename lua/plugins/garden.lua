@@ -144,6 +144,19 @@ return {
     },
   },
   {
+    "aarnphm/surf.nvim",
+    dev = true,
+    version = false,
+    build = "nix run .#plugin",
+    event = "VeryLazy",
+    dependencies = {
+      "plenary.nvim",
+      "blink.cmp",
+      "folke/snacks.nvim",
+    },
+    opts = {},
+  },
+  {
     "yetone/avante.nvim",
     dev = true,
     version = false,

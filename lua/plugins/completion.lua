@@ -68,6 +68,7 @@ return {
     opts = {
       library = {
         { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
+        { path = "~/workspace/neovim-plugins/surf.nvim/lua", words = { "surf" } },
         { path = "luvit-meta/library", words = { "vim%.uv" } },
         { path = "wezterm-types", mods = { "wezterm" } },
         { path = "snacks.nvim", words = { "Snacks" } },
