@@ -40,7 +40,7 @@
   "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" },
   "plenary.nvim": { "branch": "master", "commit": "857c5ac632080dba10aae49dba902ce3abf91b35" },
   "quicker.nvim": { "branch": "master", "commit": "1798be71cdcb15fb84fa8054148a56e17fd391dc" },
-  "render-markdown.nvim": { "branch": "main", "commit": "7f81e9dcc15504c044f20df39d28a590cd5c6ca5" },
+  "render-markdown.nvim": { "branch": "main", "commit": "bd5657594bf1a96b04f900c87e8d74226a54d832" },
   "rose-pine": { "branch": "main", "commit": "96ff3993a67356ee85d1cdab9be652cdc1c5d1ac" },
   "rustaceanvim": { "branch": "master", "commit": "3f2b7a94b7fa3c0f301dfa9644c94b543000efc2" },
   "snacks.nvim": { "branch": "main", "commit": "bc0630e43be5699bb94dadc302c0d21615421d93" },
