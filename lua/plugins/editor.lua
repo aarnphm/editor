@@ -214,6 +214,7 @@ return {
           },
         },
         beautysh = { prepend_args = { "-i", "2" } },
+        taplo = { prepend_args = { "-c", "align_entries=false" } },
       },
     },
   },
