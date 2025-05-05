@@ -25,7 +25,6 @@ return {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
-    build = ":Copilot auth",
     enabled = function() return vim.g.agent_backend == "copilot" end,
     ---@type copilot_config
     opts = {

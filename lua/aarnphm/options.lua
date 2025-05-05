@@ -41,7 +41,7 @@ g.root_lsp_ignore = { "copilot" }
 ---@type "mini.pick" | "telescope"
 g.picker = "mini.pick"
 -- whether we set border for floating UI.
-g.border = "single"
+g.border = g.neovide and "none" or "single"
 -- markdown render backend
 ---@type "markview" | "render-markdown"
 g.markdown_render_backend = "render-markdown"
