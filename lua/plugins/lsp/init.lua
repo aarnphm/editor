@@ -259,7 +259,7 @@ return {
       local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
       local all_mlsp_servers = {}
       if have_mlsp then
-        all_mlsp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+        all_mlsp_servers = vim.tbl_keys(require("mason-lspconfig.mappings").get_all().lspconfig_to_package)
       end
 
       local ensure_installed = {} ---@type string[]
