@@ -1,4 +1,5 @@
 return {
+  { "folke/ts-comments.nvim", event = "VeryLazy", opts = {} },
   {
     "ggandor/flit.nvim",
     opts = { labeled_modes = "nx" },
@@ -11,7 +12,6 @@ return {
       return ret
     end,
   },
-  { "folke/ts-comments.nvim", event = "VeryLazy", opts = {} },
   {
     "ggandor/leap.nvim",
     keys = {
@@ -70,42 +70,7 @@ return {
   {
     "folke/trouble.nvim",
     cmd = { "Trouble" },
-    opts = {
-      modes = {
-        lsp = {
-          win = { position = "right" },
-        },
-      },
-    },
-    keys = {
-      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
-      { "<leader>cS", "<cmd>Trouble lsp toggle<cr>", desc = "trouble: lsp references/definitions/..." },
-      { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", desc = "trouble: quickfix list" },
-      {
-        "[q",
-        function()
-          if require("trouble").is_open() then
-            require("trouble").prev { skip_groups = true, jump = true }
-          else
-            local ok, err = pcall(vim.cmd.cprev)
-            if not ok then vim.notify(err, vim.log.levels.ERROR) end
-          end
-        end,
-        desc = "trouble: previous item",
-      },
-      {
-        "]q",
-        function()
-          if require("trouble").is_open() then
-            require("trouble").next { skip_groups = true, jump = true }
-          else
-            local ok, err = pcall(vim.cmd.cnext)
-            if not ok then vim.notify(err, vim.log.levels.ERROR) end
-          end
-        end,
-        desc = "trouble: next item",
-      },
-    },
+    opts = { modes = { lsp = { win = { position = "right" } } } },
   },
   -- search/replace in multiple files
   {
@@ -217,35 +182,6 @@ return {
         taplo = { prepend_args = { "-c", "align_entries=false" } },
       },
     },
-  },
-  -- outline
-  {
-    "hedyhli/outline.nvim",
-    keys = { { "<leader>cs", "<cmd>Outline<cr>", desc = "outline: toggle" } },
-    cmd = "Outline",
-    opts = function()
-      local defaults = require("outline.config").defaults
-      local opts = {
-        symbols = {
-          ---@type {string: outline.Symbol }
-          icons = {},
-        },
-        outline_window = { width = 25 },
-        keymaps = {
-          up_and_jump = "<up>",
-          down_and_jump = "<down>",
-        },
-      }
-
-      for kind, symbol in pairs(defaults.symbols.icons) do
-        local mini_icon, hl, _ = MiniIcons.get("lsp", kind:lower())
-        opts.symbols.icons[kind] = vim.tbl_deep_extend("force", defaults.symbols.icons[kind], {
-          icon = mini_icon and mini_icon or symbol.icon,
-          hl = mini_icon and hl or symbol.hl,
-        })
-      end
-      return opts
-    end,
   },
   {
     "Bekaboo/dropbar.nvim",

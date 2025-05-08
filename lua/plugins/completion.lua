@@ -1,31 +1,8 @@
 return {
   {
-    "supermaven-inc/supermaven-nvim",
-    lazy = true,
-    enabled = function() return vim.g.agent_backend == "supermaven" end,
-    event = "LazyFile",
-    build = ":SupermavenUsePro",
-    opts = {
-      ignore_filetypes = {
-        gitcommit = true,
-        hgcommit = true,
-        TelescopePrompt = true,
-        ministarter = true,
-        nofile = true,
-        startup = true,
-        Trouble = true,
-        Avante = true,
-      },
-      log_level = "warn",
-      disable_inline_completion = true,
-      disable_keymaps = true,
-    },
-  },
-  {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
-    enabled = function() return vim.g.agent_backend == "copilot" end,
     ---@type copilot_config
     opts = {
       panel = { enabled = false },
@@ -59,17 +36,11 @@ return {
     "folke/lazydev.nvim",
     ft = "lua",
     cmd = "LazyDev",
-    dependencies = {
-      -- Manage libuv types with lazy. Plugin will never be loaded
-      { "Bilal2453/luvit-meta", lazy = true },
-      { "justinsgithub/wezterm-types", lazy = true },
-    },
     opts = {
       library = {
         { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
         { path = "~/workspace/neovim-plugins/surf.nvim/lua", words = { "surf" } },
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
-        { path = "wezterm-types", mods = { "wezterm" } },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
         { path = "snacks.nvim", words = { "Snacks" } },
         { path = "conform.nvim", words = { "conform" } },
       },
@@ -82,6 +53,7 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "Kaiser-Yang/blink-cmp-avante",
+      { "saghen/blink.compat", opts = {}, version = false },
     },
     event = "InsertEnter",
     opts_extend = { "sources.completion.enabled_providers", "sources.compat", "sources.default" },
@@ -117,7 +89,7 @@ return {
         },
         ghost_text = { enabled = vim.g.ghost_text },
       },
-      cmdline = { enabled = false, sources = {} },
+      cmdline = { enabled = false },
       sources = {
         compat = {},
         default = { "lsp", "path", "snippets", "buffer", "lazydev", "avante" },
@@ -143,8 +115,8 @@ return {
         ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
         ["<C-e>"] = { "hide", "fallback" },
         ["<CR>"] = { "select_and_accept", "fallback" },
-        ["<C-p>"] = { "select_prev", "fallback" },
-        ["<C-n>"] = { "select_next", "fallback" },
+        ["<C-p>"] = { "select_prev", "fallback_to_mappings" },
+        ["<C-n>"] = { "select_next", "fallback_to_mappings" },
         ["<C-b>"] = { "scroll_documentation_up", "fallback" },
         ["<C-f>"] = { "scroll_documentation_down", "fallback" },
         ["<Tab>"] = { Util.cmp.map { "snippet_forward", "ai_accept" }, "fallback" },

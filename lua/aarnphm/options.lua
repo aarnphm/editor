@@ -20,9 +20,6 @@ g.autoformat = true
 g.inline_diagnostics = false
 -- whether to enable ghost text for completions
 g.ghost_text = false
--- backend for autocomplete
----@type "copilot" | "supermaven"
-g.agent_backend = "copilot"
 -- boxy or none
 g.enable_ui = true
 -- whether to render markdown
@@ -41,7 +38,7 @@ g.root_lsp_ignore = { "copilot" }
 ---@type "mini.pick" | "telescope"
 g.picker = "mini.pick"
 -- whether we set border for floating UI.
-g.border = g.neovide and "none" or "single"
+g.border = "single"
 -- markdown render backend
 ---@type "markview" | "render-markdown"
 g.markdown_render_backend = "render-markdown"
@@ -49,7 +46,6 @@ g.markdown_render_backend = "render-markdown"
 g.extra_plugins = {
   -- lang
   "plugins.lang.go",
-  "plugins.lang.sql",
   "plugins.lang.nix",
   "plugins.lang.rust",
   "plugins.lang.yaml",
@@ -106,7 +102,7 @@ o.completeopt = "menu,menuone,noselect"
 o.formatoptions = "1jqlnt" -- NOTE: "tqjcro"
 
 o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
-o.sessionoptions = "buffers,curdir,help,tabpages,winsize" -- session options
+opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
 
 -- searching and grep stuff
 o.smartcase = true
