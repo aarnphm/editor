@@ -25,11 +25,17 @@ return {
       background = { dark = "dragon", light = "lotus" },
     },
   },
-  { "nuvic/flexoki-nvim", name = "flexoki", priority = 1000 },
+  {
+    "nuvic/flexoki-nvim",
+    name = "flexoki",
+    priority = 1000,
+    config = function() vim.cmd "colorscheme flexoki" end,
+  },
   {
     "rose-pine/neovim",
     name = "rose-pine",
     priority = 1000,
+    enabled = false,
     opts = function()
       local palette = require "rose-pine.palette"
       local opts = {

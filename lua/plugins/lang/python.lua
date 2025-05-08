@@ -3,7 +3,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "ninja", "rst" } },
   },
-  { "mason.nvim", opts = { ensure_installed = { "ruff", "pyright", "mypy" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "ruff", "pyright", "mypy" } } },
   {
     "nvim-lint",
     opts = {

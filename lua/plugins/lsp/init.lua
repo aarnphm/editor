@@ -1,8 +1,9 @@
 return {
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     cmd = "Mason",
     build = ":MasonUpdate",
+    version = "^1.0.0",
     opts = {
       ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep" },
       ui = { border = BORDER.impl(), backdrop = 100 },
@@ -33,8 +34,8 @@ return {
     "neovim/nvim-lspconfig",
     event = "LazyFile",
     dependencies = {
-      "mason.nvim",
-      { "williamboman/mason-lspconfig.nvim", config = function() end },
+      "mason-org/mason.nvim",
+      { "mason-org/mason-lspconfig.nvim", version = "^1.0.0", config = function() end },
     },
     ---@class PluginLspOptions
     opts = {
@@ -101,6 +102,7 @@ return {
         },
       },
       -- all of the server below will be installed by default
+      ---@type table<string, vim.lsp.Config>
       servers = {
         bashls = {},
         lua_ls = {
@@ -200,7 +202,6 @@ return {
     ---@param opts PluginLspOptions
     config = function(_, opts)
       Util.format.register(Util.lsp.formatter())
-
       Util.lsp.setup(opts.document_highlight)
 
       -- inlay hints
@@ -235,7 +236,6 @@ return {
         "force",
         {},
         vim.lsp.protocol.make_client_capabilities(),
-        Util.has "cmp-nvim-lsp" and require("cmp_nvim_lsp").default_capabilities() or {},
         Util.has "blink.cmp" and require("blink.cmp").get_lsp_capabilities() or {},
         opts.capabilities or {}
       )
@@ -259,8 +259,7 @@ return {
       local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
       local all_mlsp_servers = {}
       if have_mlsp then
-        all_maps = require("mason-lspconfig.mappings").get_mason_map()
-        all_mlsp_servers = vim.tbl_keys(all_maps.lspconfig_to_package)
+        all_mlsp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
       end
 
       local ensure_installed = {} ---@type string[]

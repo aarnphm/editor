@@ -81,7 +81,7 @@ return {
     opts = { ensure_installed = { "sql" } },
   },
   -- Linters & formatters
-  { "williamboman/mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
   {
     "mfussenegger/nvim-lint",
     optional = true,

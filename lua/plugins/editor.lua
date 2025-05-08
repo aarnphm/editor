@@ -122,7 +122,6 @@ return {
   },
   {
     "stevearc/conform.nvim",
-    dependencies = { "mason.nvim" },
     lazy = true,
     init = function()
       -- install conform formatter on VeryLazy
