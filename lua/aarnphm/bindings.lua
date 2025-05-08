@@ -110,7 +110,7 @@ map("n", "<C-j>", "<C-w>j", { desc = "window: Focus down", silent = true, norema
 map("n", "<C-k>", "<C-w>k", { desc = "window: Focus up", silent = true, noremap = true })
 map("n", "<LocalLeader>|", "<C-w>|", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
-map("n", "<LocalLeader>=", "<C-w>=", { desc = "window: Equal size" })
+map("n", "<LocalLeader>0", "<C-w>=", { desc = "window: Equal size" })
 map("n", "<Leader>qq", "<cmd>wqa!<cr>", { desc = "editor: write quit all" })
 map("n", "<Leader>`", "<cmd>e #<cr>", { desc = "buffer: switch to other buffer" })
 map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
@@ -121,7 +121,7 @@ map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory t
 map("n", "<LocalLeader>]", "<cmd>vertical resize -10<cr>", { noremap = false, desc = "windows: resize right 10px" })
 map("n", "<LocalLeader>[", "<cmd>vertical resize +10<cr>", { noremap = false, desc = "windows: resize left 10px" })
 map("n", "<LocalLeader>-", "<cmd>resize -10<cr>", { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>+", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
+map("n", "<LocalLeader>=", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
 map("n", "<leader><leader>b", "<cmd>wincmd =<cr>", { noremap = true, silent = true, desc = "windows: balance" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
