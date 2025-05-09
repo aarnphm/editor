@@ -206,35 +206,6 @@ return {
     end,
   },
   {
-    "kevinhwang91/nvim-bqf",
-    ft = "qf",
-    opts = {
-      auto_enable = true,
-      auto_resize_height = true, -- highly recommended enable
-      preview = {
-        auto_preview = true,
-        win_height = 12,
-        win_vheight = 12,
-        border = vim.g.border,
-        show_title = true,
-      },
-      -- make `drop` and `tab drop` to become preferred
-      func_map = {
-        drop = "o",
-        openc = "O",
-        split = "<C-s>",
-        tabdrop = "<C-t>",
-        ptogglemode = "z,",
-      },
-      filter = {
-        fzf = {
-          action_for = { ["ctrl-s"] = "split", ["ctrl-t"] = "tab drop" },
-          extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
-        },
-      },
-    },
-  },
-  {
     "stevearc/quicker.nvim",
     event = "LazyFile",
     keys = {

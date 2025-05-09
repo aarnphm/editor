@@ -147,6 +147,7 @@ return {
     "aarnphm/surf.nvim",
     dev = true,
     version = false,
+    enabled = false,
     build = "nix run .#plugin",
     event = "VeryLazy",
     dependencies = {

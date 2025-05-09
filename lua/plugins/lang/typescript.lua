@@ -50,7 +50,6 @@ return {
                 Util.lsp.execute {
                   command = "typescript.goToSourceDefinition",
                   arguments = { params.textDocument.uri, params.position },
-                  open = true,
                 }
               end,
               desc = "lsp: goto source definition",
@@ -61,7 +60,6 @@ return {
                 Util.lsp.execute {
                   command = "typescript.findAllFileReferences",
                   arguments = { vim.uri_from_bufnr(0) },
-                  open = true,
                 }
               end,
               desc = "lsp: file references",
