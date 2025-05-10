@@ -7,19 +7,7 @@ local M = {}
 ---@return vim.lsp.Client[]
 function M.get_clients(opts)
   local ret = {} ---@type vim.lsp.Client[]
-  if vim.lsp.get_clients then
-    ret = vim.lsp.get_clients(opts)
-  else
-    ---@diagnostic disable-next-line: deprecated
-    ret = vim.lsp.get_active_clients(opts)
-    if opts and opts.method then
-      ret = vim.tbl_filter(
-        ---@param client vim.lsp.Client
-        function(client) return client:supports_method(opts.method, opts.bufnr) end,
-        ret
-      )
-    end
-  end
+  ret = vim.lsp.get_clients(opts)
   return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
 end
 
@@ -36,11 +24,11 @@ function M.on_attach(on_attach, name)
   })
 end
 
----@type table<string, table<vim.lsp.Client, table<number, boolean>>>
 ---@private
+---@type table<string, table<vim.lsp.Client, table<number, boolean>>>
 M._supports_method = {}
 
-function M.setup(opts)
+function M.setup()
   local register_capability = vim.lsp.handlers["client/registerCapability"]
   vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
     ---@diagnostic disable-next-line: no-unknown
@@ -65,6 +53,7 @@ function M.setup(opts)
 end
 
 ---@param client vim.lsp.Client
+---@param buffer integer
 function M._check_methods(client, buffer)
   -- don't trigger on invalid buffers
   if not vim.api.nvim_buf_is_valid(buffer) then return end
@@ -114,7 +103,7 @@ function M.on_supports_method(method, fn)
   })
 end
 
----@return _.lspconfig.options
+---@return lspconfig.Config
 function M.get_config(server)
   local configs = require "lspconfig.configs"
   return rawget(configs, server)

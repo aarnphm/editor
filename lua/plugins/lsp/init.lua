@@ -202,7 +202,7 @@ return {
     ---@param opts PluginLspOptions
     config = function(_, opts)
       Util.format.register(Util.lsp.formatter())
-      Util.lsp.setup(opts.document_highlight)
+      Util.lsp.setup()
 
       -- inlay hints
       if opts.inlay_hints.enabled then
