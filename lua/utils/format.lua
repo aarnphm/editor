@@ -130,13 +130,6 @@ M.setup = function()
     function() M.format { force = true } end,
     { desc = "format: selection or buffer" }
   )
-
-  -- Format info
-  vim.api.nvim_create_user_command(
-    "FormatInfo",
-    function() M.info() end,
-    { desc = "format: info of formatters for the current buffer" }
-  )
 end
 
 ---@param buf? boolean

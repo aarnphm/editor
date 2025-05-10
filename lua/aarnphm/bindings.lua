@@ -3,64 +3,6 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
-vim.api.nvim_create_user_command("Quartz", function(opts)
-  local state = {
-    cwd = nil,
-    height = 15,
-    background = false,
-    cmd = { "pnpm", "exec", "quartz/bootstrap-cli.mjs", "build", "--serve", "--verbose", "--bundleInfo" },
-  }
-  for _, arg in ipairs(opts.fargs) do
-    if arg == "bg" then
-      state.background = true
-    else
-      local value = arg:match "cwd=([^%s]+)"
-      if value then
-        state.cwd = value
-      else
-        table.insert(state.cmd, arg)
-      end
-    end
-  end
-  if state.cwd == nil then state.cwd = Util.root() end
-  if state.background then
-    local job_id = vim.fn.jobstart(state.cmd, {
-      cwd = state.cwd,
-      on_exit = function(_, code)
-        if code == 0 then
-          Util.info "Quartz can be accessed at http://localhost:8080"
-        else
-          Util.error("Quartz process exited with code " .. code)
-        end
-      end,
-      on_stderr = function(_, data)
-        if data and #data > 0 then vim.schedule(function() Util.error(table.concat(data, "\n")) end) end
-      end,
-    })
-
-    if job_id <= 0 then
-      Util.error "Failed to start Quartz process"
-    else
-      Util.info "Quartz process started in background"
-    end
-  else
-    Util.terminal.bottom(state.cmd, { height = state.height, cwd = state.cwd })
-  end
-end, {
-  desc = "quartz: start server",
-  nargs = "*",
-  complete = function(_, _, _)
-    local candidates = {} ---@type string[]
-    vim.list_extend(candidates, { "bg" })
-    vim.list_extend(
-      candidates,
-      ---@param x string
-      vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
-    )
-    return candidates
-  end,
-})
-
 -- Open a terminal at the bottom of the screen with a fixed height.
 map(
   "n",
@@ -121,7 +63,7 @@ map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory t
 map("n", "<LocalLeader>]", "<cmd>vertical resize -10<cr>", { noremap = false, desc = "windows: resize right 10px" })
 map("n", "<LocalLeader>[", "<cmd>vertical resize +10<cr>", { noremap = false, desc = "windows: resize left 10px" })
 map("n", "<LocalLeader>-", "<cmd>resize -10<cr>", { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>=", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
+map("n", "<LocalLeader>+", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
 map("n", "<leader><leader>b", "<cmd>wincmd =<cr>", { noremap = true, silent = true, desc = "windows: balance" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n

@@ -53,6 +53,7 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "Kaiser-Yang/blink-cmp-avante",
+      "moyiz/blink-emoji.nvim",
       { "saghen/blink.compat", opts = {}, version = false },
     },
     event = "InsertEnter",
@@ -83,16 +84,19 @@ return {
           },
         },
         accept = { auto_brackets = { enabled = false } },
-        documentation = {
-          auto_show = false,
-          auto_show_delay_ms = 200,
-        },
+        documentation = { auto_show = false, auto_show_delay_ms = 200 },
         ghost_text = { enabled = vim.g.ghost_text },
+        trigger = { show_in_snippet = false },
+        list = {
+          selection = {
+            preselect = function(ctx) return not require("blink.cmp").snippet_active { direction = 1 } end,
+          },
+        },
       },
       cmdline = { enabled = false },
       sources = {
         compat = {},
-        default = { "lsp", "path", "snippets", "buffer", "lazydev", "avante" },
+        default = { "lsp", "path", "snippets", "buffer", "lazydev", "emoji", "avante" },
         providers = {
           lazydev = {
             name = "LazyDev",
@@ -105,6 +109,13 @@ return {
               extended_filetypes = { markdown = { "latex" } },
             },
           },
+          emoji = {
+            module = "blink-emoji",
+            name = "Emoji",
+            score_offset = 15,
+            opts = { insert = true },
+            should_show_items = function() return vim.tbl_contains({ "gitcommit", "markdown" }, vim.o.filetype) end,
+          },
           avante = {
             module = "blink-cmp-avante",
             name = "Avante",
@@ -112,15 +123,19 @@ return {
         },
       },
       keymap = {
-        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
-        ["<C-e>"] = { "hide", "fallback" },
+        preset = "super-tab",
         ["<CR>"] = { "select_and_accept", "fallback" },
-        ["<C-p>"] = { "select_prev", "fallback_to_mappings" },
-        ["<C-n>"] = { "select_next", "fallback_to_mappings" },
-        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
-        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
-        ["<Tab>"] = { Util.cmp.map { "snippet_forward", "ai_accept" }, "fallback" },
-        ["<S-Tab>"] = { "snippet_backward", "fallback" },
+        ["<Tab>"] = {
+          function(cmp)
+            if cmp.snippet_active() then
+              return cmp.accept()
+            else
+              return cmp.select_and_accept()
+            end
+          end,
+          Util.cmp.map { "snippet_forward", "ai_accept" },
+          "fallback",
+        },
       },
     },
     ---@param opts blink.cmp.Config | { sources: { compat: string[] } }

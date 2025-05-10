@@ -33,7 +33,6 @@ function M.setup(opts)
   require("lazy").setup(opts)
 
   M.on_very_lazy(function()
-    M.root.setup()
     M.format.setup()
 
     Util.format.snacks_toggle():map "<leader>uf"

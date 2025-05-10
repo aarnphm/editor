@@ -1,30 +1,4 @@
 return {
-  { "AstroNvim/astrotheme", priority = 1000, opts = {}, enabled = false },
-  { "folke/tokyonight.nvim", priority = 1000, opts = {}, enabled = false },
-  { "navarasu/onedark.nvim", priority = 1000, opts = {}, enabled = false },
-  { "rmehri01/onenord.nvim", priority = 1000, opts = {}, enabled = false },
-  {
-    "rebelot/kanagawa.nvim",
-    priority = 1000,
-    enabled = false,
-    build = ":KanagawaCompile",
-    ---@type KanagawaConfig
-    opts = {
-      ---@param color KanagawaColorsSpec
-      overrides = function(color)
-        return {
-          AvanteTitle = { fg = color.palette.sumiInk3, bg = color.palette.waveRed },
-          AvanteReversedTitle = { fg = color.palette.waveRed },
-          AvanteSubtitle = { fg = color.palette.sumiInk3, bg = color.palette.springBlue },
-          AvanteReversedSubtitle = { fg = color.palette.springBlue },
-          AvanteThirdTitle = { fg = color.palette.sumiInk4, bg = color.palette.springGreen },
-          AvanteReversedThirdTitle = { fg = color.palette.springGreen },
-        }
-      end,
-      theme = "dragon",
-      background = { dark = "dragon", light = "lotus" },
-    },
-  },
   {
     "nuvic/flexoki-nvim",
     name = "flexoki",
