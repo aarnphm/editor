@@ -1,9 +1,7 @@
-<div style="text-align: center;">
+<div align="center">
 <h1>editor</h1>
 
-<div style="font-style: italic;">
 fast. minimalist. choose 2
-</div>
 
 </div>
 
