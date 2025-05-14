@@ -1,8 +1,8 @@
 return {
-  { "nvim-treesitter/nvim-treesitter", opts = { ensure_installed = { "nix" } } },
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "nil" } } },
+  { "nvim-treesitter", opts = { ensure_installed = { "nix" } } },
+  { "mason.nvim", opts = { ensure_installed = { "nil" } } },
   {
-    "neovim/nvim-lspconfig",
+    "nvim-lspconfig",
     opts = {
       servers = {
         nil_ls = {
@@ -16,8 +16,5 @@ return {
       },
     },
   },
-  {
-    "stevearc/conform.nvim",
-    opts = { formatters_by_ft = { nix = { "alejandra" } } },
-  },
+  { "conform.nvim", opts = { formatters_by_ft = { nix = { "alejandra" } } } },
 }

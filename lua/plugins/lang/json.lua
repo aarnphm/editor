@@ -1,13 +1,9 @@
 return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "json5", "json", "jsonc", "jsonnet" } },
-  },
+  { "nvim-treesitter", opts = { ensure_installed = { "json5", "json", "jsonc", "jsonnet" } } },
   -- yaml schema support
   { "b0o/SchemaStore.nvim", lazy = true, version = false },
-  -- correctly setup lspconfig
   {
-    "neovim/nvim-lspconfig",
+    "nvim-lspconfig",
     opts = {
       -- make sure mason installs the server
       servers = {

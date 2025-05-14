@@ -1,9 +1,6 @@
 return {
-  {
-    "nvim-treesitter",
-    opts = { ensure_installed = { "go", "gomod", "gowork", "gosum" } },
-  },
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt" } } },
+  { "nvim-treesitter", opts = { ensure_installed = { "go", "gomod", "gowork", "gosum" } } },
+  { "mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt" } } },
   {
     "nvim-lspconfig",
     opts = {

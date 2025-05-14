@@ -47,6 +47,7 @@ g.extra_plugins = {
   -- lang
   "plugins.lang.go",
   "plugins.lang.nix",
+  "plugins.lang.git",
   "plugins.lang.rust",
   "plugins.lang.yaml",
   "plugins.lang.json",
@@ -58,6 +59,8 @@ g.extra_plugins = {
   "plugins.lang.typescript",
   -- formatters
   "plugins.formatters.prettier",
+  -- linters
+  "plugins.linters.eslint",
 }
 -- whether to enable RAG for avante
 g.avante_rag = false

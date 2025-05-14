@@ -1,11 +1,11 @@
 return {
   { "nvim-treesitter", opts = { ensure_installed = { "markdown", "markdown_inline" } } },
-  -- LSP stuff
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
+  { "mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
   {
     "nvim-lspconfig",
     opts = {
       servers = {
+        typos_lsp = {},
         markdown_oxide = {
           capabilities = {
             workspace = {

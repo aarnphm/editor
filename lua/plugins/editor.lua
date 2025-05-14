@@ -67,11 +67,6 @@ return {
       vim.keymap.del({ "x", "o" }, "X")
     end,
   },
-  {
-    "folke/trouble.nvim",
-    cmd = { "Trouble" },
-    opts = { modes = { lsp = { win = { position = "right" } } } },
-  },
   -- search/replace in multiple files
   {
     "MagicDuck/grug-far.nvim",

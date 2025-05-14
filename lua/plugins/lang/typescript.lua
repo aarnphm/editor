@@ -1,8 +1,8 @@
 return {
   { "nvim-treesitter", opts = { ensure_installed = { "javascript", "jsdoc", "tsx", "typescript" } } },
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "oxlint" } } },
+  { "mason.nvim", opts = { ensure_installed = { "oxlint" } } },
   {
-    "neovim/nvim-lspconfig",
+    "nvim-lspconfig",
     opts = {
       servers = {
         vtsls = {

@@ -14,6 +14,7 @@ local supported = {
   "markdown",
   "markdown.mdx",
   "scss",
+  "sass",
   "typescript",
   "typescriptreact",
   "vue",
@@ -46,10 +47,9 @@ M.has_config = Util.memoize(M.has_config)
 M.has_parser = Util.memoize(M.has_parser)
 
 return {
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "prettier" } } },
-  -- conform
+  { "mason.nvim", opts = { ensure_installed = { "prettier" } } },
   {
-    "stevearc/conform.nvim",
+    "conform.nvim",
     ---@param opts conform.setupOpts
     opts = function(_, opts)
       opts.formatters_by_ft = opts.formatters_by_ft or {}

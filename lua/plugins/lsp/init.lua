@@ -38,6 +38,7 @@ return {
       "mason-org/mason-lspconfig.nvim",
     },
     ---@class PluginLspOptions
+    ---@field setup table<string, fun(server: string, opts: table<string, any>): boolean>
     opts = {
       -- options for vim.diagnostic.config()
       ---@type vim.diagnostic.config.Opts
@@ -102,7 +103,7 @@ return {
         },
       },
       -- all of the server below will be installed by default
-      ---@type table<string, vim.lsp.Config>
+      ---@type table<string, vim.lsp.Config | table | boolean>
       servers = {
         bashls = {},
         lua_ls = {
@@ -163,40 +164,6 @@ return {
             },
           },
         },
-        eslint = {
-          settings = {
-            -- helps eslint find the eslintrc when it's placed in a subfolder instead of the cwd root
-            workingDirectories = { mode = "auto" },
-          },
-        },
-      },
-      setup = {
-        eslint = function(server, opts)
-          -- register the formatter with Util
-          Util.format.register(Util.lsp.formatter {
-            name = "lsp: eslint",
-            primary = false,
-            priority = 200,
-            filter = "eslint",
-          })
-
-          opts.autostart = #vim.fs.find({
-            ".eslintrc",
-            ".eslintrc.js",
-            ".eslintrc.cjs",
-            ".eslintrc.yaml",
-            ".eslintrc.yml",
-            ".eslintrc.json",
-            "eslint.config.js",
-            "eslint.config.mjs",
-            "eslint.config.cjs",
-            "eslint.config.ts",
-            "eslint.config.mts",
-            "eslint.config.cts",
-          }, { path = vim.api.nvim_buf_get_name(0), upward = true }) > 0
-          require("lspconfig")[server].setup(opts)
-          return true
-        end,
       },
     },
     ---@param opts PluginLspOptions
@@ -242,10 +209,13 @@ return {
 
       -- get all the servers that are available through mason-lspconfig
       local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
-      local all_mslp_servers = vim.tbl_keys(require("mason-lspconfig").get_mappings().lspconfig_to_package)
+      local all_mslp_servers = {}
+      if have_mlsp then
+        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings").get_mason_map().lspconfig_to_package)
+      end
 
       ---@param server string
-      local server_setup = function(server)
+      local function configure(server)
         local server_opts = vim.tbl_deep_extend("force", {
           capabilities = vim.deepcopy(capabilities),
           flags = { debounce_text_changes = 300 },
@@ -278,7 +248,7 @@ return {
           server_opts = server_opts == true and {} or server_opts
           if server_opts.enabled ~= false then
             -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-            if server_setup(server) then
+            if configure(server) then
               exclude_automatic_enable[#exclude_automatic_enable + 1] = server
             else
               ensure_installed[#ensure_installed + 1] = server

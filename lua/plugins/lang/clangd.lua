@@ -1,9 +1,6 @@
 return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "c", "cpp", "cuda", "make" } },
-  },
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
+  { "nvim-treesitter", opts = { ensure_installed = { "c", "cpp", "cuda", "make", "objc", "proto" } } },
+  { "mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
   {
     "p00f/clangd_extensions.nvim",
     lazy = true,
@@ -11,9 +8,7 @@ return {
     ft = { "c", "cpp", "objc", "objcpp", "cuda", "proto", "hpp" },
     config = function() end,
     opts = {
-      inlay_hints = {
-        inline = false,
-      },
+      inlay_hints = { inline = false },
       ast = {
         --These require codicons (https://github.com/microsoft/vscode-codicons)
         role_icons = {
@@ -29,35 +24,33 @@ return {
           Recovery = "",
           TranslationUnit = "",
           PackExpansion = "",
-          TemplateTypeParm = "",
-          TemplateTemplateParm = "",
+          TemplateTypeParam = "",
+          TemplateTemplateParam = "",
           TemplateParamObject = "",
         },
       },
     },
   },
   {
-    "neovim/nvim-lspconfig",
+    "nvim-lspconfig",
     opts = {
       servers = {
         clangd = {
           keys = {
             { "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>", desc = "clangd: switch source/header" },
           },
-          root_dir = function(fname)
-            return require("lspconfig.util").root_pattern(
-              "Makefile",
-              "configure.ac",
-              "configure.in",
-              "config.h.in",
-              "meson.build",
-              "meson_options.txt",
-              "build.ninja"
-            )(fname) or require("lspconfig.util").root_pattern(
-              "compile_commands.json",
-              "compile_flags.txt"
-            )(fname) or require("lspconfig.util").find_git_ancestor(fname)
-          end,
+          root_markers = {
+            ".git",
+            "Makefile",
+            "configure.ac",
+            "configure.in",
+            "config.h.in",
+            "meson.build",
+            "meson_options.txt",
+            "build.ninja",
+            "compile_commands.json",
+            "compile_flags.txt",
+          },
           capabilities = {
             offsetEncoding = { "utf-16" },
           },
@@ -82,7 +75,7 @@ return {
         clangd = function(_, opts)
           local clangd_ext_opts = Util.opts "clangd_extensions.nvim"
           require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_ext_opts or {}, { server = opts }))
-          return false
+          return true
         end,
       },
     },

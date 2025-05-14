@@ -17,10 +17,6 @@ return {
     },
   },
   {
-    "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "rust", "ron", "toml" } },
-  },
-  {
     "mrcjkb/rustaceanvim",
     version = vim.fn.has "nvim-0.10.0" == 0 and "^4" or false,
     lazy = false,
@@ -75,12 +71,6 @@ return {
       end
     end,
   },
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        rust_analyzer = { enabled = false },
-      },
-    },
-  },
+  { "nvim-treesitter", opts = { ensure_installed = { "rust", "ron", "toml" } } },
+  { "nvim-lspconfig", opts = { servers = { taplo = {}, rust_analyzer = { enabled = false } } } },
 }

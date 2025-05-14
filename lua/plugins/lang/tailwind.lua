@@ -315,9 +315,9 @@ M.colors = {
 }
 
 M.plugin = {
-  { "nvim-treesitter/nvim-treesitter", opts = { ensure_installed = { "css", "scss" } } },
+  { "nvim-treesitter", opts = { ensure_installed = { "css", "scss" } } },
   {
-    "neovim/nvim-lspconfig",
+    "nvim-lspconfig",
     opts = {
       servers = {
         tailwindcss = {
@@ -357,6 +357,7 @@ M.plugin = {
 
           -- Add additional filetypes
           vim.list_extend(opts.filetypes, opts.filetypes_include or {})
+          return true
         end,
       },
     },
