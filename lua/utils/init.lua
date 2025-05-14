@@ -13,10 +13,11 @@
 ---@field motion lazyvim.util.motion
 local M = {}
 
+local LazyUtil = require "lazy.core.util"
+
 setmetatable(M, {
   __index = function(t, k)
-    local ok, lazyutil = pcall(require, "lazy.core.util")
-    if ok and lazyutil[k] then return lazyutil[k] end
+    if LazyUtil[k] then return LazyUtil[k] end
 
     ---@diagnostic disable-next-line: no-unknown
     t[k] = require("utils." .. k)
@@ -28,6 +29,8 @@ M.did_setup = false
 
 ---@param opts LazyConfig
 function M.setup(opts)
+  _G.Util = M
+
   M.plugin.setup()
 
   require("lazy").setup(opts)
@@ -222,27 +225,6 @@ function M.create_undo()
   if vim.api.nvim_get_mode().mode == "i" then vim.api.nvim_feedkeys(M.CREATE_UNDO, "n", false) end
 end
 
---- Gets a path to a package in the Mason registry.
---- Prefer this to `get_package`, since the package might not always be
---- available yet and trigger errors.
----@param pkg string
----@param path? string
----@param opts? { warn?: boolean }
-function M.get_pkg_path(pkg, path, opts)
-  pcall(require, "mason") -- make sure Mason is loaded. Will fail when generating docs
-  local root = vim.env.MASON or (vim.fn.stdpath "data" .. "/mason")
-  opts = opts or {}
-  opts.warn = opts.warn == nil and true or opts.warn
-  path = path or ""
-  local ret = root .. "/packages/" .. pkg .. "/" .. path
-  if opts.warn and not vim.uv.fs_stat(ret) and not require("lazy.core.config").headless() then
-    M.warn(
-      ("Mason package path not found for **%s**:\n- `%s`\nYou may need to force update the package."):format(pkg, path)
-    )
-  end
-  return ret
-end
-
 --- regex used for matching a valid URL/URI string
 M.url_matcher =
   "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
@@ -280,83 +262,12 @@ function M.norm(path)
   return path:sub(-1) == "/" and path:sub(1, -2) or path
 end
 
----@param msg string|string[]
----@param opts? LazyNotifyOpts
-function M.notify(msg, opts)
-  if vim.in_fast_event() then
-    return vim.schedule(function() M.notify(msg, opts) end)
-  end
-
-  opts = opts or {}
-  if type(msg) == "table" then
-    ---@diagnostic disable-next-line: no-unknown
-    msg = table.concat(vim.tbl_filter(function(line) return line or false end, msg), "\n")
-  end
-  if opts.stacktrace then msg = msg .. M.pretty_trace { level = opts.stacklevel or 2 } end
-  local lang = opts.lang or "markdown"
-  local n = opts.once and vim.notify_once or vim.notify
-  n(msg, opts.level or vim.log.levels.INFO, {
-    on_open = function(win)
-      local ok = pcall(function() vim.treesitter.language.add "markdown" end)
-      if not ok then pcall(require, "nvim-treesitter") end
-      vim.wo[win].conceallevel = 3
-      vim.wo[win].concealcursor = ""
-      vim.wo[win].spell = false
-      local buf = vim.api.nvim_win_get_buf(win)
-      if not pcall(vim.treesitter.start, buf, lang) then
-        vim.bo[buf].filetype = lang
-        vim.bo[buf].syntax = lang
-      end
-    end,
-    title = opts.title or "lazy.nvim",
-  })
-end
-
----@param msg string|string[]
----@param opts? LazyNotifyOpts
-function M.error(msg, opts)
-  opts = opts or {}
-  opts.level = vim.log.levels.ERROR
-  M.notify(msg, opts)
-end
-
----@param msg string|string[]
----@param opts? LazyNotifyOpts
-function M.info(msg, opts)
-  opts = opts or {}
-  opts.level = vim.log.levels.INFO
-  M.notify(msg, opts)
-end
-
----@param msg string|string[]
----@param opts? LazyNotifyOpts
-function M.warn(msg, opts)
-  opts = opts or {}
-  opts.level = vim.log.levels.WARN
-  M.notify(msg, opts)
-end
-
----@param msg string|table
----@param opts? LazyNotifyOpts
-function M.debug(msg, opts)
-  if not require("lazy.core.config").options.debug then return end
-  opts = opts or {}
-  if opts.title then opts.title = "lazy.nvim: " .. opts.title end
-  if type(msg) == "string" then
-    M.notify(msg, opts)
-  else
-    opts.lang = "lua"
-    M.notify(vim.inspect(msg), opts)
-  end
-end
-
 --- Override the default title for notifications.
 for _, level in ipairs { "info", "warn", "error" } do
-  ---@diagnostic disable-next-line: no-unknown
   M[level] = function(msg, opts)
     opts = opts or {}
     opts.title = opts.title or "editor"
-    return Util[level](msg, opts)
+    return LazyUtil[level](msg, opts)
   end
 end
 

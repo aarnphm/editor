@@ -235,7 +235,7 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
-Util.setup {
+require("utils").setup {
   spec = { { import = "plugins" } },
   change_detection = { notify = false },
   checker = { enabled = true, frequency = 3600 * 24, notify = false },

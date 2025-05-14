@@ -54,18 +54,16 @@ return {
       "rafamadriz/friendly-snippets",
       "Kaiser-Yang/blink-cmp-avante",
       "moyiz/blink-emoji.nvim",
-      { "saghen/blink.compat", opts = {}, version = false },
     },
     event = "InsertEnter",
-    opts_extend = { "sources.completion.enabled_providers", "sources.compat", "sources.default" },
+    opts_extend = { "sources.completion.enabled_providers", "sources.default" },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
       fuzzy = { implementation = "prefer_rust" },
       appearance = {
-        use_nvim_cmp_as_default = true,
         kind_icons = { Copilot = "" },
-        nerd_font_variant = "mono", -- "normal" | "mono"
+        nerd_font_variant = "normal", -- "normal" | "mono"
       },
       snippets = {
         expand = function(snippet) return Util.cmp.expand(snippet) end,
@@ -89,13 +87,12 @@ return {
         trigger = { show_in_snippet = false },
         list = {
           selection = {
-            preselect = function(ctx) return not require("blink.cmp").snippet_active { direction = 1 } end,
+            preselect = function() return not require("blink.cmp").snippet_active { direction = 1 } end,
           },
         },
       },
       cmdline = { enabled = false },
       sources = {
-        compat = {},
         default = { "lsp", "path", "snippets", "buffer", "lazydev", "emoji", "avante" },
         providers = {
           lazydev = {
@@ -138,22 +135,8 @@ return {
         },
       },
     },
-    ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
+    ---@param opts blink.cmp.Config
     config = function(_, opts)
-      -- setup compat sources
-      local enabled = opts.sources.default
-      for _, source in ipairs(opts.sources.compat or {}) do
-        opts.sources.providers[source] = vim.tbl_deep_extend(
-          "force",
-          { name = source, module = "blink.compat.source" },
-          opts.sources.providers[source] or {}
-        )
-        if type(enabled) == "table" and not vim.tbl_contains(enabled, source) then table.insert(enabled, source) end
-      end
-
-      -- Unset custom prop to pass blink.cmp validation
-      opts.sources.compat = nil
-
       -- check if we need to override symbol kinds
       for _, provider in pairs(opts.sources.providers or {}) do
         ---@cast provider blink.cmp.SourceProviderConfig|{kind?:string}

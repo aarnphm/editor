@@ -1,6 +1,3 @@
----@type lazyvim.util
-_G.Util = require "utils"
-
 ---@generic T
 ---Pretty print a value for better inspect. Under the hood it uses vim.inspect
 ---@param v T any type
