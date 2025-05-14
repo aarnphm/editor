@@ -36,7 +36,7 @@ end
 
 function M.want()
   vim.g.picker = vim.g.picker or "auto"
-  if vim.g.picker == "auto" then return "telescope" end
+  if vim.g.picker == "auto" then return "mini.pick" end
   return vim.g.picker
 end
 

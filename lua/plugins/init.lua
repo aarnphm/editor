@@ -19,7 +19,6 @@ return {
         quickfile = { enabled = true },
         statuscolumn = { enabled = true },
         words = { enabled = true },
-        indent = { scope = { enabled = false } },
       }
     end,
     init = function()
