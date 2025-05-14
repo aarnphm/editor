@@ -271,6 +271,31 @@ return {
         require("mini.icons").mock_nvim_web_devicons()
         return package.loaded["nvim-web-devicons"]
       end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "Trouble",
+          "alpha",
+          "dashboard",
+          "fzf",
+          "help",
+          "lazy",
+          "mason",
+          "neo-tree",
+          "notify",
+          "snacks_dashboard",
+          "snacks_notif",
+          "snacks_terminal",
+          "snacks_win",
+          "toggleterm",
+          "trouble",
+        },
+        callback = function() vim.b.miniindentscope_disable = true end,
+      })
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "SnacksDashboardOpened",
+        callback = function(data) vim.b[data.buf].miniindentscope_disable = true end,
+      })
     end,
     ---@param opts MiniOpts
     config = function(_, opts)

@@ -7,11 +7,11 @@ function M.goto_prev_node()
   if not node then return end
   local dest_node = ts_utils.get_previous_node(node, true, true)
   if not dest_node then
-    local cur_node = node:parent()
+    local cur_node = node:parent() ---@as TSNode
     while cur_node do
       dest_node = ts_utils.get_previous_node(cur_node, false, false)
       if dest_node then break end
-      cur_node = cur_node:parent()
+      cur_node = cur_node:parent() ---@as TSNode
     end
   end
   if not dest_node then return end
