@@ -191,11 +191,7 @@ return {
       windows = {
         position = "right",
         height = 4,
-        sidebar_header = {
-          enabled = false,
-          align = "left", -- left, center, right for title
-          rounded = false,
-        },
+        sidebar_header = { align = "left", rounded = false },
         input = { prefix = "➜ ", height = 3 },
         edit = { border = BORDER.none },
         ask = { border = BORDER.none },

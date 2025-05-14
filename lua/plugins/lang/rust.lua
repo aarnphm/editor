@@ -71,6 +71,5 @@ return {
       end
     end,
   },
-  { "nvim-treesitter", opts = { ensure_installed = { "rust", "ron", "toml" } } },
   { "nvim-lspconfig", opts = { servers = { taplo = {}, rust_analyzer = { enabled = false } } } },
 }

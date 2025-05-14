@@ -1,5 +1,4 @@
 return {
-  { "nvim-treesitter", opts = { ensure_installed = { "ninja", "rst", "python" } } },
   { "mason.nvim", opts = { ensure_installed = { "ruff", "basedpyright", "mypy" } } },
   {
     "nvim-lint",

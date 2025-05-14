@@ -1,5 +1,4 @@
 return {
-  { "nvim-treesitter", opts = { ensure_installed = { "javascript", "jsdoc", "tsx", "typescript" } } },
   { "mason.nvim", opts = { ensure_installed = { "oxlint" } } },
   { "nvim-lint", opts = { linters_by_ft = { typescript = { "eslint", "oxlint" } } } },
   {

@@ -1,5 +1,4 @@
 return {
-  { "nvim-treesitter", opts = { ensure_installed = { "markdown", "markdown_inline" } } },
   { "mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
   {
     "nvim-lint",

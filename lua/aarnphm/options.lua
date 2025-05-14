@@ -47,7 +47,6 @@ g.extra_plugins = {
   -- lang
   "plugins.lang.go",
   "plugins.lang.nix",
-  "plugins.lang.git",
   "plugins.lang.rust",
   "plugins.lang.yaml",
   "plugins.lang.json",

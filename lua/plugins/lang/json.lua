@@ -1,5 +1,4 @@
 return {
-  { "nvim-treesitter", opts = { ensure_installed = { "json5", "json", "jsonc", "jsonnet" } } },
   -- yaml schema support
   { "b0o/SchemaStore.nvim", lazy = true, version = false },
   {

@@ -1,5 +1,4 @@
 return {
-  { "nvim-treesitter", opts = { ensure_installed = { "c", "cpp", "cuda", "make", "objc", "proto" } } },
   { "mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
   {
     "p00f/clangd_extensions.nvim",

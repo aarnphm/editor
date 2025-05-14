@@ -1,5 +1,4 @@
 return {
-  { "nvim-treesitter", opts = { ensure_installed = { "nix" } } },
   { "mason.nvim", opts = { ensure_installed = { "nil" } } },
   {
     "nvim-lspconfig",

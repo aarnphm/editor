@@ -73,18 +73,9 @@ return {
       vim.g.db_ui_execute_on_save = false
     end,
   },
-
-  -- Treesitter
+  { "mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
   {
-    "nvim-treesitter/nvim-treesitter",
-    optional = true,
-    opts = { ensure_installed = { "sql" } },
-  },
-  -- Linters & formatters
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
-  {
-    "mfussenegger/nvim-lint",
-    optional = true,
+    "nvim-lint",
     opts = function(_, opts)
       for _, ft in ipairs(sql_ft) do
         opts.linters_by_ft[ft] = opts.linters_by_ft[ft] or {}
@@ -93,8 +84,7 @@ return {
     end,
   },
   {
-    "stevearc/conform.nvim",
-    optional = true,
+    "conform.nvim",
     ---@param opts conform.setupOpts
     opts = function(_, opts)
       opts.formatters.sqlfluff = {
