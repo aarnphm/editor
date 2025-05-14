@@ -206,7 +206,7 @@ M.buf.definitions = function()
 
   vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, ctx, config)
     if not result or vim.tbl_isempty(result) then
-      Util.warn("lsp: could not find definition", { title = "LazyVim" })
+      Util.warn "lsp: could not find definition"
       return
     end
 

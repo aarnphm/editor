@@ -1,4 +1,3 @@
-local capstone_vault = vim.fn.expand "~" .. "/workspace/capstone/docs/content"
 local garden_vault = vim.fn.expand "~" .. "/workspace/garden/content"
 
 ---@param note obsidian.Note
@@ -40,8 +39,6 @@ return {
     event = {
       "BufReadPre " .. garden_vault .. "/**.md",
       "BufNewFile " .. garden_vault .. "/**.md",
-      "BufReadPre " .. capstone_vault .. "/**.md",
-      "BufNewFile " .. capstone_vault .. "/**.md",
     },
     keys = {
       {
@@ -65,7 +62,7 @@ return {
         desc = "obsidian: backlinks",
       },
     },
-    dependencies = { "nvim-lua/plenary.nvim", "mini.nvim" },
+    dependencies = { "plenary.nvim", "mini.nvim" },
     ---@type obsidian.config.ClientOpts
     opts = {
       workspaces = {
@@ -77,18 +74,6 @@ return {
             attachments = {
               img_folder = "thoughts/images",
             },
-          },
-        },
-        {
-          name = "capstone",
-          path = capstone_vault,
-          overrides = {
-            note_frontmatter_func = function(note)
-              return out_functor(
-                note,
-                function(note) return { id = note.id, aliases = note.aliases, tags = note.tags, author = "" } end
-              )
-            end,
           },
         },
       },
@@ -104,16 +89,7 @@ return {
       templates = { subdir = "templates" },
       ui = { enable = false, external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" } },
       note_frontmatter_func = function(note)
-        return out_functor(
-          note,
-          function(n)
-            return {
-              id = n.id,
-              aliases = n.aliases,
-              tags = n.tags,
-            }
-          end
-        )
+        return out_functor(note, function(n) return { id = n.id, aliases = n.aliases, tags = n.tags } end)
       end,
       note_id_func = function(title) return title end,
       picker = { name = "mini.pick" },
@@ -150,11 +126,7 @@ return {
     enabled = false,
     build = "nix run .#plugin",
     event = "VeryLazy",
-    dependencies = {
-      "plenary.nvim",
-      "blink.cmp",
-      "folke/snacks.nvim",
-    },
+    dependencies = { "plenary.nvim", "blink.cmp", "snacks.nvim" },
     opts = {},
   },
   {
@@ -163,7 +135,7 @@ return {
     version = false,
     build = "nix run .#plugin",
     event = "VeryLazy",
-    dependencies = "nui.nvim",
+    dependencies = { "nui.nvim" },
     keys = {
       { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "avante: open" },
       { "<leader>aC", "<cmd>AvanteChat<CR>", desc = "avante: chat" },
@@ -200,12 +172,10 @@ return {
       },
       behaviour = {
         auto_suggestions = false, -- Experimental stage
-        support_paste_from_clipboard = true,
+        support_paste_from_clipboard = false,
         auto_suggestions_respect_ignore = true,
-        enable_cursor_planning_mode = true,
-        enable_claude_text_editor_tool_mode = true,
       },
-      file_selector = { provider = "mini.pick" },
+      selector = { provider = "mini.pick" },
       mappings = {
         submit = { normal = "<CR>", insert = "<C-CR>" },
         suggestion = {
@@ -214,17 +184,21 @@ return {
           prev = "<M-h>",
           dismiss = "<M-k>",
         },
+        sidebar = {
+          close_from_input = { normal = "<Esc>", insert = "<C-d>" },
+        },
       },
       windows = {
         position = "right",
         height = 4,
         sidebar_header = {
+          enabled = false,
           align = "left", -- left, center, right for title
           rounded = false,
         },
-        input = { prefix = "➜ " },
-        edit = { border = vim.g.border, start_insert = false },
-        ask = { start_insert = false, border = vim.g.border },
+        input = { prefix = "➜ ", height = 3 },
+        edit = { border = BORDER.none },
+        ask = { border = BORDER.none },
       },
       vendors = {
         ---@type AvanteProvider

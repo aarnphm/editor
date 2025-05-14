@@ -7,12 +7,7 @@ return {
     opts = {
       -- Event to trigger linters
       events = { "BufWritePost", "BufReadPost", "InsertLeave" },
-      linters_by_ft = {
-        lua = { "selene" },
-        dockerfile = { "hadolint" },
-        typescript = { "eslint", "oxlint" },
-        markdown = { "markdownlint", "typos" },
-      },
+      linters_by_ft = { lua = { "selene" }, dockerfile = { "hadolint" } },
       ---@type table<string,table>
       linters = {
         selene = {
@@ -35,14 +30,6 @@ return {
               "eslint.config.mts",
               "eslint.config.cts",
             }, { path = ctx.filename, upward = true })[1]
-          end,
-        },
-        markdownlint = {
-          condition = function(ctx)
-            return vim.fs.find(
-              { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" },
-              { path = ctx.filename, upward = true }
-            )[1]
           end,
         },
       },

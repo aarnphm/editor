@@ -24,7 +24,7 @@ return {
     "nvim-lspconfig",
     opts = {
       servers = {
-        basedpyright = { enabled = false },
+        basedpyright = { enable = false },
         ty = { mason = false },
         ruff = {
           cmd_env = { RUFF_TRACE = "messages" },

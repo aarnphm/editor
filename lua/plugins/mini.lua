@@ -118,6 +118,15 @@ return {
             delete = "",
           },
         },
+        mappings = {
+          apply = "",
+          reset = "",
+          textobject = "",
+          goto_first = "",
+          goto_prev = "",
+          goto_next = "",
+          goto_last = "",
+        },
       },
       indentscope = { symbol = "│", options = { try_as_border = true } },
       icons = {

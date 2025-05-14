@@ -38,7 +38,7 @@ function M.files(opts)
         { msg = "files: failed to pick windows" }
       )
       if not id then
-        Util.error("failed to pick window", { title = "LazyVim" })
+        Util.error "failed to pick window"
         return
       end
       local target_win = MiniFiles.get_explorer_state().target_window

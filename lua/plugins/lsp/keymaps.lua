@@ -17,21 +17,15 @@ end
 M.get = function()
   if not M._keys then
     M._keys = {
-      { "<leader>cl", function() Snacks.picker.lsp_config() end, desc = "lsp: info" },
-      { "K", function() vim.lsp.buf.hover() end, desc = "lsp: Hover" },
-      { "gr", function() vim.lsp.buf.rename() end, desc = "lsp: rename", has = "rename" },
-      { "gy", function() vim.lsp.buf.type_definition() end, desc = "lsp: t[y]pe definition" },
-      { "gD", function() vim.lsp.buf.declaration() end, desc = "lsp: peek declaration", has = "declaration" },
+      { "<leader>cl", Snacks.picker.lsp_config, desc = "lsp: info" },
+      { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
+      { "<C-k>", vim.lsp.buf.signature_help, mode = "i", desc = "lsp: signature help", has = "signatureHelp" },
+      { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
+      { "gy", vim.lsp.buf.type_definition, desc = "lsp: t[y]pe definition" },
+      { "gD", vim.lsp.buf.declaration, desc = "lsp: peek declaration", has = "declaration" },
       { "gR", Util.lsp.buf.references, desc = "lsp: show references", has = "definition", nowait = true },
       { "gd", Util.lsp.buf.definitions, desc = "lsp: peek definition", has = "definition" },
       { "gI", Util.lsp.buf.implementations, desc = "lsp: implementation" },
-      {
-        "<C-k>",
-        function() vim.lsp.buf.signature_help() end,
-        mode = "i",
-        desc = "lsp: signature help",
-        has = "signatureHelp",
-      },
       { "<leader>d", function() vim.diagnostic.open_float() end, desc = "lsp: show line diagnostics" },
       { "]d", diagnostic_goto(true), desc = "lsp: Next diagnostic" },
       { "[d", diagnostic_goto(false), desc = "lsp: Next diagnostic" },

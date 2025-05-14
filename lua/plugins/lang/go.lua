@@ -1,6 +1,8 @@
 return {
   { "nvim-treesitter", opts = { ensure_installed = { "go", "gomod", "gowork", "gosum" } } },
-  { "mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt" } } },
+  { "mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt", "golangci-lint" } } },
+  { "nvim-lint", opts = { linters_by_ft = { go = { "golangcilint" } } } },
+  { "conform.nvim", opts = { formatters_by_ft = { go = { "goimports", "gofumpt" } } } },
   {
     "nvim-lspconfig",
     opts = {

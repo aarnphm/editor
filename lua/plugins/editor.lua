@@ -151,7 +151,6 @@ return {
         proto = { "buf", "protolint" },
         zsh = { "beautysh", fallback = true },
         sh = { "shfmt" },
-        go = { "goimports", "gofumpt" },
       },
       ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
       formatters = {
@@ -195,10 +194,6 @@ return {
         end,
       },
     },
-    config = function(_, opts)
-      vim.keymap.set("n", "<leader>B", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
-      require("dropbar").setup(opts)
-    end,
   },
   {
     "stevearc/quicker.nvim",
@@ -210,7 +205,7 @@ return {
           if #vim.fn.getqflist() > 0 then
             require("quicker").toggle()
           else
-            Util.warn("Quickfix list is empty", { title = "LazyVim" })
+            Util.warn "Quickfix list is empty"
           end
         end,
         mode = { "n", "v" },
@@ -222,7 +217,7 @@ return {
           if #vim.fn.getloclist(vim.api.nvim_get_current_win()) > 0 then
             require("quicker").toggle { loclist = true }
           else
-            Util.warn("Location list is empty", { title = "LazyVim" })
+            Util.warn "Location list is empty"
           end
         end,
         mode = { "n", "v" },

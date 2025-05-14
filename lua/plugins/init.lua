@@ -1,12 +1,3 @@
--- Terminal Mappings
----@param dir string
-local function term_nav(dir)
-  ---@param self snacks.terminal
-  return function(self)
-    return self:is_floating() and "<c-" .. dir .. ">" or vim.schedule(function() vim.cmd.wincmd(dir) end)
-  end
-end
-
 return {
   "nvim-lua/plenary.nvim",
   { "tpope/vim-repeat", lazy = false },
@@ -16,25 +7,29 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
+    ---@return snacks.Config
     opts = function()
       return {
         toggle = { map = Util.safe_keymap_set },
         bigfile = { enabled = true },
         notifier = { enabled = false },
+        input = { enabled = true },
+        image = { enabled = true },
+        rename = { enabled = true },
         quickfile = { enabled = true },
         statuscolumn = { enabled = true },
-        words = { enabled = false },
-        terminal = {
-          win = {
-            keys = {
-              nav_h = { "<C-h>", term_nav "h", desc = "window: left", expr = true, mode = "t" },
-              nav_j = { "<C-j>", term_nav "j", desc = "window: down", expr = true, mode = "t" },
-              nav_k = { "<C-k>", term_nav "k", desc = "window: up", expr = true, mode = "t" },
-              nav_l = { "<C-l>", term_nav "l", desc = "window: right", expr = true, mode = "t" },
-            },
-          },
-        },
+        words = { enabled = true },
       }
+    end,
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        callback = function()
+          -- Setup some globals for debugging (lazy-loaded)
+          _G.dd = function(...) Snacks.debug.inspect(...) end
+          _G.bt = function() Snacks.debug.backtrace() end
+        end,
+      })
     end,
   },
 }

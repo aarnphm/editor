@@ -2,6 +2,22 @@ return {
   { "nvim-treesitter", opts = { ensure_installed = { "markdown", "markdown_inline" } } },
   { "mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
   {
+    "nvim-lint",
+    opts = {
+      linters_by_ft = { markdown = { "markdownlint", "typos" } },
+      linters = {
+        markdownlint = {
+          condition = function(ctx)
+            return vim.fs.find(
+              { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" },
+              { path = ctx.filename, upward = true }
+            )[1]
+          end,
+        },
+      },
+    },
+  },
+  {
     "nvim-lspconfig",
     opts = {
       servers = {
