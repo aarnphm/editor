@@ -1,5 +1,3 @@
-local o, opt, g, wo, go, api, fmt = vim.o, vim.opt, vim.g, vim.wo, vim.go, vim.api, string.format
-
 local H = {}
 
 -- For more information see ":h buftype"
@@ -25,16 +23,16 @@ end
 
 H.is_truncated = function(trunc_width)
   -- Use -1 to default to 'not truncated'
-  local cur_width = vim.o.laststatus == 3 and vim.o.columns or api.nvim_win_get_width(0)
+  local cur_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
   return cur_width < (trunc_width or -1)
 end
 
 H.concat_hunks = function(hunks)
   return vim.tbl_isempty(hunks) and ""
     or table.concat({
-      fmt("+%d", hunks[1]),
-      fmt("~%d", hunks[2]),
-      fmt("-%d", hunks[3]),
+      string.format("+%d", hunks[1]),
+      string.format("~%d", hunks[2]),
+      string.format("-%d", hunks[3]),
     }, " ")
 end
 
@@ -61,21 +59,21 @@ H.get_branch = function(icon)
   elseif vim.g.loaded_gitbranch then
     branch = vim.fn["gitbranch#name"]()
   end
-  return branch ~= "" and fmt("(%s %s)", icon, branch) or ""
+  return branch ~= "" and string.format("(%s %s)", icon, branch) or ""
 end
 
 -- Custom `^V` and `^S` symbols to make this file appropriate for copy-paste
 -- (otherwise those symbols are not displayed).
-local CTRL_S = api.nvim_replace_termcodes("<C-S>", true, true, true)
-local CTRL_V = api.nvim_replace_termcodes("<C-V>", true, true, true)
 H.modes = setmetatable({
   ["n"] = { long = "NORMAL", short = "N", hl = "MiniStatuslineModeNormal" },
   ["v"] = { long = "VISUAL", short = "V", hl = "MiniStatuslineModeVisual" },
   ["V"] = { long = "V-LINE", short = "V-L", hl = "MiniStatuslineModeVisual" },
-  [CTRL_V] = { long = "V-BLOCK", short = "V-B", hl = "MiniStatuslineModeVisual" },
+  -- equiv to vim.api.nvim_replace_termcodes("<C-V>", true, true, true)
+  ["\22"] = { long = "V-BLOCK", short = "V-B", hl = "MiniStatuslineModeVisual" },
   ["s"] = { long = "SELECT", short = "S", hl = "MiniStatuslineModeVisual" },
   ["S"] = { long = "S-LINE", short = "S-L", hl = "MiniStatuslineModeVisual" },
-  [CTRL_S] = { long = "S-BLOCK", short = "S-B", hl = "MiniStatuslineModeVisual" },
+  -- equiv to vim.api.nvim_replace_termcodes("<C-S>", true, true, true)
+  ["\19"] = { long = "S-BLOCK", short = "S-B", hl = "MiniStatuslineModeVisual" },
   ["i"] = { long = "INSERT", short = "I", hl = "MiniStatuslineModeInsert" },
   ["R"] = { long = "REPLACE", short = "R", hl = "MiniStatuslineModeReplace" },
   ["c"] = { long = "COMMAND", short = "C", hl = "MiniStatuslineModeCommand" },
@@ -215,11 +213,11 @@ M.impl = function(type, override, start) return M[vim.g.border or "none"](type, 
 
 _G.BORDER = setmetatable(M, { __index = function() return M.impl() end })
 
-_G.augroup = function(name) return api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
+_G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 _G.hi = function(name, opts)
   opts.default = opts.default or true
   opts.force = opts.force or true
-  api.nvim_set_hl(0, name, opts)
+  vim.api.nvim_set_hl(0, name, opts)
 end
 
 _G.convert_avante_diff_to_qf = function()
@@ -268,12 +266,12 @@ _G.make_statusline = function()
       for _, level in ipairs(H.diagnostic_levels) do
         local n = count[severity[level.name]] or 0
         -- Add level info only if diagnostic is present
-        if n > 0 then table.insert(t, fmt("%s %s", level.sign, n)) end
+        if n > 0 then table.insert(t, string.format("%s %s", level.sign, n)) end
       end
 
       local icon = args.icon or ""
       if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
-      return fmt("[%s %s]", icon, table.concat(t, " "))
+      return string.format("[%s %s]", icon, table.concat(t, " "))
     end,
     fileinfo = function(args)
       local filetype = vim.bo.filetype
@@ -288,7 +286,7 @@ _G.make_statusline = function()
       if H.is_truncated(args.trunc_width) or vim.bo.buftype ~= "" then return filetype end
 
       -- Construct output string with extra file info
-      return fmt("%s", filetype)
+      return string.format("%s", filetype)
     end,
     location = function(args)
       -- '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
@@ -308,14 +306,14 @@ _G.make_statusline = function()
 
       if hunks == H.concat_hunks { 0, 0, 0 } and head == "" then hunks = "" end
       if hunks ~= "" and head ~= "" then head = head .. " " end
-      return fmt("%s", table.concat { head, hunks })
+      return string.format("%s", table.concat { head, hunks })
     end,
   }
 end
 --#endregion
 --#region options
 if vim.uv.os_uname().sysname == "Darwin" then
-  g.clipboard = {
+  vim.g.clipboard = {
     name = "macOS-clipboard",
     copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
     paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
@@ -324,40 +322,38 @@ if vim.uv.os_uname().sysname == "Darwin" then
 end
 
 -- map leader to <Space> and localeader to +
-g.mapleader = " "
-g.maplocalleader = ","
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 -- Fix markdown indentation settings
-g.markdown_recommended_style = 0
+vim.g.markdown_recommended_style = 0
 -- autoformat on save
-g.autoformat = true
+vim.g.autoformat = true
 -- enable inline diagnostics
-g.inline_diagnostics = false
+vim.g.inline_diagnostics = false
 -- whether to enable ghost text for completions
-g.ghost_text = false
--- boxy or none
-g.enable_ui = true
--- whether to render markdown
-g.enable_render = false
+vim.g.ghost_text = false
+-- whether to render markdown, essentially changing toe conceallevel here
+vim.g.enable_render = false
 -- whether to enable autocomplete (if disabled, then manual trigger with <C-Space>)
-g.enable_autocomplete = true
+vim.g.enable_autocomplete = true
 -- whether to set cursor in insert mode to be block or lines
-g.block_cursor = true
+vim.g.block_cursor = true
 -- configure whether prettier will requires configuration. If true, then prettier won't be run for compatible files if configuration is missing
-g.prettier_needs_config = false
+vim.g.prettier_needs_config = false
 -- additional path root spec to determine for LSP root
-g.additional_path_root_spec = { "content" }
+vim.g.additional_path_root_spec = { "content" }
 -- ignore lsp for certain root
-g.root_lsp_ignore = { "copilot" }
+vim.g.root_lsp_ignore = { "copilot" }
 -- set pickers (can support telescope.nvim or mini.pick)
 ---@type "mini.pick" | "telescope"
-g.picker = "mini.pick"
+vim.g.picker = "mini.pick"
 -- whether we set border for floating UI.
-g.border = "none"
+vim.g.border = "none"
 -- markdown render backend
 ---@type "markview" | "render-markdown"
-g.markdown_render_backend = "render-markdown"
+vim.g.markdown_render_backend = "render-markdown"
 -- additional plugins to be used.
-g.extra_plugins = {
+vim.g.extra_plugins = {
   -- lang
   "plugins.lang.go",
   "plugins.lang.nix",
@@ -376,62 +372,62 @@ g.extra_plugins = {
   "plugins.linters.eslint",
 }
 -- whether to enable RAG for avante
-g.avante_rag = false
+vim.g.avante_rag = false
 
 -- window opts
-wo.scrolloff = 8
-wo.sidescrolloff = 8
-wo.wrap = false -- need to wrap chungus
-wo.cursorline = true
-wo.cursorcolumn = false
+vim.wo.scrolloff = 8
+vim.wo.sidescrolloff = 8
+vim.wo.wrap = false -- need to wrap chungus
+vim.wo.cursorline = true
+vim.wo.cursorcolumn = false
 
 -- only set clipboard if not in ssh, to make sure the OSC 52
 -- integration works automatically. Requires Neovim >= 0.10.0
-opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
-opt.completeopt = "menu,menuone,noselect"
-opt.confirm = true
-opt.winminwidth = 5 -- Minimum window width
+vim.opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
+vim.opt.completeopt = "menu,menuone,noselect"
+vim.opt.confirm = true
+vim.opt.winminwidth = 5 -- Minimum window width
 
 -- Some defaults and don't question it
-o.writebackup = false -- whose needs backup btw (i do sometimes)
-o.autowrite = true -- sometimes I forget to save
-o.signcolumn = "yes" -- always show sign column
-o.undofile = true -- set undofile to infinite undo
-o.breakindent = true -- enable break indent
-o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
-o.pumheight = 20 -- larger completion windows
-o.expandtab = true -- convert spaces to tabs
-o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
-o.number = true -- number is good for nav
-o.swapfile = false -- I don't like swap files personally, found undofile to be better
-o.autowrite = true
-o.undofile = true -- better than swapfile
-o.undolevels = 9999 -- infinite undo
-o.showtabline = 0
+vim.o.writebackup = false -- whose needs backup btw (i do sometimes)
+vim.o.autowrite = true -- sometimes I forget to save
+vim.o.signcolumn = "yes" -- always show sign column
+vim.o.undofile = true -- set undofile to infinite undo
+vim.o.breakindent = true -- enable break indent
+vim.o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
+vim.o.pumheight = 20 -- larger completion windows
+vim.o.expandtab = true -- convert spaces to tabs
+vim.o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
+vim.o.number = true -- number is good for nav
+vim.o.swapfile = false -- I don't like swap files personally, found undofile to be better
+vim.o.autowrite = true
+vim.o.undofile = true -- better than swapfile
+vim.o.undolevels = 9999 -- infinite undo
+vim.o.showtabline = 0
 -- Window blending configuration
-o.winblend = 0
-o.pumblend = 20 -- make completion window transparent
+vim.o.winblend = 0
+vim.o.pumblend = 20 -- make completion window transparent
 
-opt.shortmess:append { W = true, c = true, C = true }
-o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
-o.completeopt = "menu,menuone,noselect"
-o.formatoptions = "1jqlnt" -- NOTE: "tqjcro"
+vim.opt.shortmess:append { W = true, c = true, C = true }
+vim.o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
+vim.o.completeopt = "menu,menuone,noselect"
+vim.o.formatoptions = "1jqlnt" -- NOTE: "tqjcro"
 
-o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
-opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
+vim.o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
+vim.opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
 
 -- searching and grep stuff
-o.smartcase = true
-o.smartindent = true
-o.ignorecase = true
-o.infercase = true
-o.hlsearch = true
-o.grepformat = "%f:%l:%c:%m"
-o.grepprg = "rg --vimgrep" -- also its 2023 use rg
-o.linebreak = true
-o.jumpoptions = "stack"
-o.list = true
-opt.listchars = {
+vim.o.smartcase = true
+vim.o.smartindent = true
+vim.o.ignorecase = true
+vim.o.infercase = true
+vim.o.hlsearch = true
+vim.o.grepformat = "%f:%l:%c:%m"
+vim.o.grepprg = "rg --vimgrep" -- also its 2023 use rg
+vim.o.linebreak = true
+vim.o.jumpoptions = "stack"
+vim.o.list = true
+vim.opt.listchars = {
   tab = "»·",
   lead = "·",
   leadmultispace = "»···",
@@ -440,10 +436,9 @@ opt.listchars = {
   extends = "→",
   precedes = "←",
 }
-o.inccommand = "split"
-
-o.foldenable = true
-opt.fillchars = {
+vim.o.inccommand = "split"
+vim.o.foldenable = true
+vim.opt.fillchars = {
   foldopen = "",
   foldclose = "",
   fold = " ",
@@ -458,72 +453,72 @@ opt.fillchars = {
   vertleft = "┤",
   vertright = "├",
 }
-o.smoothscroll = true
-o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
-o.foldmethod = "indent"
-o.foldtext = "v:lua.require'utils'.ui.foldtext()"
-o.foldlevel = 99
-o.foldlevelstart = 99
-o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
+vim.o.smoothscroll = true
+vim.o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
+vim.o.foldmethod = "indent"
+vim.o.foldtext = "v:lua.require'utils'.ui.foldtext()"
+vim.o.foldlevel = 99
+vim.o.foldlevelstart = 99
+vim.o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
 
 -- Spaces and tabs config
-o.tabstop = TABWIDTH
-o.softtabstop = TABWIDTH
-o.shiftwidth = TABWIDTH
-o.shiftround = true
+vim.o.tabstop = TABWIDTH
+vim.o.softtabstop = TABWIDTH
+vim.o.shiftwidth = TABWIDTH
+vim.o.shiftround = true
 
 -- UI config
-o.showmode = false -- This is set with mini.statusline
-o.showcmd = false
-o.showbreak = "↳  "
-o.sidescrolloff = 8
-o.splitbelow = true
-o.splitright = true
-o.timeout = true
-o.timeoutlen = vim.g.vscode and 1000 or 300
-o.updatetime = 250
-o.virtualedit = "block"
-o.laststatus = 3 -- set local statusline for more context information
-o.whichwrap = "h,l,<,>,[,],~"
-go.background = os.getenv "XDG_SYSTEM_THEME" or "dark"
+vim.o.showmode = false -- This is set with mini.statusline
+vim.o.showcmd = false
+vim.o.showbreak = "↳  "
+vim.o.sidescrolloff = 8
+vim.o.splitbelow = true
+vim.o.splitright = true
+vim.o.timeout = true
+vim.o.timeoutlen = vim.g.vscode and 1000 or 300
+vim.o.updatetime = 250
+vim.o.virtualedit = "block"
+vim.o.laststatus = 3 -- set local statusline for more context information
+vim.o.whichwrap = "h,l,<,>,[,],~"
+vim.go.background = os.getenv "XDG_SYSTEM_THEME" or "dark"
 
 -- For neovide
-o.guifont = "BerkeleyMono Nerd Font Mono:h16"
+vim.o.guifont = "BerkeleyMono Nerd Font Mono:h16"
 
 -- last but def not least, wildmenu
-o.wildchar = 9
-o.wildignorecase = true
-o.wildmode = "longest:full,full"
-opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
-opt.wildmode = "longest:full,full" -- Command-line completion mode
+vim.o.wildchar = 9
+vim.o.wildignorecase = true
+vim.o.wildmode = "longest:full,full"
+vim.opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
+vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
 
-o.cmdheight = g.enable_ui and 0 or 1
-o.guicursor = g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block
-o.conceallevel = g.enable_render and 2 or 0
+vim.o.cmdheight = 1
+vim.o.guicursor = vim.g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block
+vim.o.conceallevel = vim.g.enable_render and 2 or 0
 
-if g.neovide then
-  g.neovide_show_border = true
-  g.neovide_no_idle = true
-  g.neovide_padding_top = 5
-  g.neovide_cursor_animation_length = 0.08
-  g.neovide_cursor_trail_length = 0.05
-  g.neovide_input_macos_option_key_is_meta = "only_left"
+if vim.g.neovide then
+  vim.g.neovide_show_border = true
+  vim.g.neovide_no_idle = true
+  vim.g.neovide_padding_top = 5
+  vim.g.neovide_cursor_animation_length = 0.08
+  vim.g.neovide_cursor_trail_length = 0.05
+  vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 
   -- shortcuts
   vim.keymap.set("n", "<D-s>", ":w<CR>") -- Save
   vim.keymap.set("v", "<D-c>", '"+y') -- Copy
   vim.keymap.set("n", "<D-v>", '"+P') -- Paste normal mode
-  api.nvim_set_keymap("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
-  api.nvim_set_keymap("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
-  api.nvim_set_keymap("t", "<D-v>", "<C-R>+", { noremap = true, silent = true })
-  api.nvim_set_keymap("v", "<D-v>", "<C-R>+", { noremap = true, silent = true })
-  api.nvim_set_keymap("n", "<D-w>", ":q<CR>", { noremap = true, silent = true })
-  api.nvim_set_keymap("n", "<D-t>", ":enew<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("t", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("v", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("n", "<D-w>", ":q<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("n", "<D-t>", ":enew<CR>", { noremap = true, silent = true })
 end
 
 -- respect local venv instead of nix setup
 local venv = os.getenv "VIRTUAL_ENV"
-if venv ~= nil then g.python3_host_prog = venv .. "/bin/python3" end
+if venv ~= nil then vim.g.python3_host_prog = venv .. "/bin/python3" end
 
 vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
 --#endregion
@@ -628,7 +623,7 @@ hi("LeapMatch", {
 })
 
 -- close some filetypes with <q> and make it unlisted by buf
-api.nvim_create_autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "filetype_q",
   pattern = {
     "PlenaryTestPopup",
@@ -652,7 +647,7 @@ api.nvim_create_autocmd("FileType", {
     vim.schedule(function()
       vim.keymap.set("n", "q", function()
         vim.cmd "close"
-        pcall(api.nvim_buf_delete, event.buf, { force = true })
+        pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
       end, {
         buffer = event.buf,
         silent = true,
@@ -662,26 +657,26 @@ api.nvim_create_autocmd("FileType", {
   end,
 })
 -- go to last loc when opening a buffer
-api.nvim_create_autocmd("BufReadPost", {
+vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup "last_loc",
   callback = function(event)
     local exclude = { "gitcommit" }
     local buf = event.buf
     if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].simple_last_loc then return end
     vim.b[buf].simple_last_loc = true
-    local mark = api.nvim_buf_get_mark(buf, '"')
-    local lcount = api.nvim_buf_line_count(buf)
-    if mark[1] > 0 and mark[1] <= lcount then pcall(api.nvim_win_set_cursor, 0, mark) end
+    local mark = vim.api.nvim_buf_get_mark(buf, '"')
+    local lcount = vim.api.nvim_buf_line_count(buf)
+    if mark[1] > 0 and mark[1] <= lcount then pcall(vim.api.nvim_win_set_cursor, 0, mark) end
   end,
 })
 -- make it easier to close man-files when opened inline
-api.nvim_create_autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "man_unlisted",
   pattern = { "man" },
   callback = function(event) vim.bo[event.buf].buflisted = false end,
 })
 -- correct resized tabs
-api.nvim_create_autocmd("VimResized", {
+vim.api.nvim_create_autocmd("VimResized", {
   group = augroup "resized",
   callback = function()
     local current = vim.fn.tabpagenr()
@@ -690,20 +685,20 @@ api.nvim_create_autocmd("VimResized", {
   end,
 })
 -- filetype stuff
-api.nvim_create_autocmd("FileType", {
+vim.api.nvim_create_autocmd("FileType", {
   group = augroup "spell",
   pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
   callback = function() vim.opt_local.spell = true end,
 })
 -- Check if we need to reload the file when it changed
-api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup "checktime",
   callback = function()
     if vim.o.buftype ~= "nofile" then vim.cmd "checktime" end
   end,
 })
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
-api.nvim_create_autocmd("BufWritePre", {
+vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup "auto_create_dir",
   callback = function(event)
     if event.match:match "^%w%w+:[\\/][\\/]" then return end
@@ -712,31 +707,31 @@ api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 -- Highlight on yank
-api.nvim_create_autocmd("TextYankPost", {
+vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup "highlight_yank",
   pattern = "*",
   callback = function() vim.hl.on_yank { higroup = "IncSearch" } end,
 })
 -- auto trim trailing whitespace
-api.nvim_create_autocmd("BufWritePost", {
+vim.api.nvim_create_autocmd("BufWritePost", {
   group = augroup "trim_whitespace",
   callback = function()
     -- basically the same as mini.trailspace
-    local curpos = api.nvim_win_get_cursor(0)
+    local curpos = vim.api.nvim_win_get_cursor(0)
     ---Search and replace trailing whitespace
     vim.cmd [[keeppatterns %s/\s\+$//e]]
-    api.nvim_win_set_cursor(0, curpos)
+    vim.api.nvim_win_set_cursor(0, curpos)
   end,
 })
 -- toggle number on focussed window
 local numtoggle = augroup "numtoggle"
-api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
   group = numtoggle,
   callback = function()
     if vim.wo.number and vim.fn.mode() ~= "i" then vim.wo.relativenumber = true end
   end,
 })
-api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
   group = numtoggle,
   callback = function()
     if vim.wo.number then vim.wo.relativenumber = false end
@@ -744,15 +739,17 @@ api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, 
 })
 -- highlight URL
 local highlighturl_group = augroup "highlighturl"
-api.nvim_create_autocmd("ColorScheme", {
+vim.api.nvim_create_autocmd("ColorScheme", {
   group = highlighturl_group,
   callback = function() hi("HighlightURL", { default = true, underline = true }) end,
 })
-api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
   group = highlighturl_group,
   callback = function(args)
-    for _, win in ipairs(api.nvim_list_wins()) do
-      if api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then Util.set_url_match(win) end
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then
+        Util.set_url_match(win)
+      end
     end
   end,
 })
@@ -775,7 +772,7 @@ vim.filetype.add {
   },
 }
 
-api.nvim_create_user_command("Quartz", function(opts)
+vim.api.nvim_create_user_command("Quartz", function(opts)
   local state = {
     cwd = nil,
     height = 15,

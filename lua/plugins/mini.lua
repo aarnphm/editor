@@ -41,12 +41,6 @@ return {
     event = "VeryLazy",
     dependencies = {
       {
-        "j-hui/fidget.nvim",
-        enabled = function() return not vim.g.enable_ui end,
-        version = false,
-        opts = { progress = { display = { render_limit = 3 } } },
-      },
-      {
         "s1n7ax/nvim-window-picker",
         name = "window-picker",
         lazy = true,
@@ -68,8 +62,6 @@ return {
     ---@class MiniOpts
     opts = {
       extra = {},
-      trailspace = {},
-      doc = {},
       align = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
       pick = { options = { use_cache = true }, window = { prompt_prefix = "󰄾 " } },
       bracketed = { window = { suffix = "" }, treesitter = { suffix = "" } },

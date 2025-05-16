@@ -11,7 +11,7 @@ return {
     opts = function()
       return {
         toggle = { map = Util.safe_keymap_set },
-        bigfile = { enabled = true },
+        bigfile = { enabled = true, size = 1.5 * 1024 * 1024 },
         notifier = { enabled = false },
         input = { enabled = true },
         image = { enabled = true },

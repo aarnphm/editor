@@ -12,9 +12,9 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows
+    version = false,
     build = ":TSUpdate",
-    event = { "VeryLazy", "LazyFile" },
+    event = "LazyFile",
     lazy = vim.fn.argc(-1) == 0,
     keys = {
       { "<c-space>", desc = "Increment Selection" },
@@ -39,13 +39,19 @@ return {
             ["]c"] = "@class.outer",
             ["]b"] = { query = "@code_cell.inner", desc = "next code block" },
           },
-          goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
+          goto_next_end = {
+            ["]F"] = "@function.outer",
+            ["]C"] = "@class.outer",
+          },
           goto_previous_start = {
             ["[f"] = "@function.outer",
             ["[c"] = "@class.outer",
             ["[b"] = { query = "@code_cell.inner", desc = "previous code block" },
           },
-          goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+          goto_previous_end = {
+            ["[F"] = "@function.outer",
+            ["[C"] = "@class.outer",
+          },
         },
         select = {
           enable = true,

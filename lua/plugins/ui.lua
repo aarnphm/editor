@@ -2,17 +2,17 @@ return {
   {
     "folke/noice.nvim",
     event = "VeryLazy",
-    enabled = function() return vim.g.enable_ui end,
     dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
     ---@type NoiceConfig
     opts = {
       presets = {
-        bottom_search = true,
+        bottom_search = false,
         command_palette = false,
         long_message_to_split = true,
         lsp_doc_border = false,
       },
       cmdline = { view = "cmdline" },
+      messages = { view = "mini", view_history = "mini" },
       views = {
         split = { size = "15%" },
         popup = { disable = true, border = { style = BORDER.impl "simple" } },
@@ -49,17 +49,6 @@ return {
           },
           opts = { skip = true },
         },
-      },
-      lsp = {
-        override = {
-          -- override the default lsp markdown formatter with Noice
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          -- override the lsp markdown formatter with Noice
-          ["vim.lsp.util.stylize_markdown"] = true,
-          -- override cmp documentation with Noice (needs the other options to work)
-          ["cmp.entry.get_documentation"] = true,
-        },
-        message = { view = "messages" },
       },
     },
   },

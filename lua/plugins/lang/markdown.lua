@@ -53,22 +53,24 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = function() return vim.g.markdown_render_backend == "render-markdown" end,
-    opts = {
-      enabled = vim.g.enable_render,
-      render_modes = { "n", "c" },
-      max_file_size = vim.g.bigfile_size,
-      heading = { sign = false },
-      code = {
-        sign = false,
-        width = "full",
-        right_pad = 1,
-      },
-      pipe_table = { preset = "double" },
-      latex = { enabled = false },
-      win_options = {
-        conceallevel = { rendered = 2 },
-      },
-    },
+    opts = function()
+      return {
+        enabled = vim.g.enable_render,
+        render_modes = { "n", "c" },
+        max_file_size = Snacks.config.bigfile.size,
+        heading = { sign = false },
+        code = {
+          sign = false,
+          width = "full",
+          right_pad = 1,
+        },
+        pipe_table = { preset = "double" },
+        latex = { enabled = false },
+        win_options = {
+          conceallevel = { rendered = 2 },
+        },
+      }
+    end,
     ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
     cmd = "RenderMarkdown",
     config = function(_, opts)
