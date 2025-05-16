@@ -70,6 +70,7 @@ return {
       extra = {},
       trailspace = {},
       doc = {},
+      git = {},
       align = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
       pick = { options = { use_cache = true }, window = { prompt_prefix = "󰄾 " } },
       bracketed = { window = { suffix = "" }, treesitter = { suffix = "" } },
@@ -172,6 +173,7 @@ return {
             local m = statusline.mode { trunc_width = 75 }
             local diagnostics = statusline.diagnostic { trunc_width = 75 }
             local lint = statusline.lint { trunc_width = 50 }
+            local git = MiniStatusline.section_git { trunc_width = 40 }
             local filename = MiniStatusline.section_filename { trunc_width = 140 }
             local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
             local fileinfo = statusline.fileinfo { trunc_width = 90 }
@@ -183,7 +185,7 @@ return {
             -- sections, etc.)
             return MiniStatusline.combine_groups {
               { hl = m.hl, strings = { m.md } },
-              { hl = "MiniStatuslineDevinfo", strings = { lsp, lint } },
+              { hl = "MiniStatuslineDevinfo", strings = { git, lsp, lint } },
               "%<", -- Mark general truncate point
               { hl = "MiniStatuslineFilename", strings = { filename } },
               "%=", -- End left alignment
