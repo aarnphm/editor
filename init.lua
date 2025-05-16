@@ -29,6 +29,41 @@ H.is_truncated = function(trunc_width)
   return cur_width < (trunc_width or -1)
 end
 
+H.concat_hunks = function(hunks)
+  return vim.tbl_isempty(hunks) and ""
+    or table.concat({
+      fmt("+%d", hunks[1]),
+      fmt("~%d", hunks[2]),
+      fmt("-%d", hunks[3]),
+    }, " ")
+end
+
+H.get_hunks = function()
+  local hunks = {}
+  if vim.g.loaded_gitgutter then
+    hunks = vim.fn.GitGutterGetHunkSummary()
+  elseif vim.b.gitsigns_status_dict then
+    hunks = {
+      vim.b.gitsigns_status_dict.added,
+      vim.b.gitsigns_status_dict.changed,
+      vim.b.gitsigns_status_dict.removed,
+    }
+  end
+  return H.concat_hunks(hunks)
+end
+
+H.get_branch = function(icon)
+  local branch = ""
+  if vim.b.gitsigns_head ~= nil then
+    branch = vim.b.gitsigns_head
+  elseif vim.g.loaded_fugitive then
+    branch = vim.fn.FugitiveHead()
+  elseif vim.g.loaded_gitbranch then
+    branch = vim.fn["gitbranch#name"]()
+  end
+  return branch ~= "" and fmt("(%s %s)", icon, branch) or ""
+end
+
 -- Custom `^V` and `^S` symbols to make this file appropriate for copy-paste
 -- (otherwise those symbols are not displayed).
 local CTRL_S = api.nvim_replace_termcodes("<C-S>", true, true, true)
@@ -255,11 +290,25 @@ _G.make_statusline = function()
       -- Construct output string with extra file info
       return fmt("%s", filetype)
     end,
-    location = function(_) return "%l:%v" end,
+    location = function(args)
+      -- '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
+      local icon = args.icon or "♥"
+      return "%l:%2v" .. (" %s"):format(icon)
+    end,
     ---@return {md:string, hl:string}
-    mode = function(args)
+    mode = function()
       local mi = H.modes[vim.fn.mode()]
       return { md = mi.short, hl = mi.hl }
+    end,
+    git = function(args)
+      if H.isnt_normal_buffer() then return "" end
+      local icon = args.icon or ""
+      local head = H.get_branch(icon)
+      local hunks = H.get_hunks()
+
+      if hunks == H.concat_hunks { 0, 0, 0 } and head == "" then hunks = "" end
+      if hunks ~= "" and head ~= "" then head = head .. " " end
+      return fmt("%s", table.concat { head, hunks })
     end,
   }
 end

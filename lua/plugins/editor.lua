@@ -194,6 +194,10 @@ return {
         end,
       },
     },
+    config = function(_, opts)
+      vim.keymap.set("n", "<leader>;", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
+      require("dropbar").setup(opts)
+    end,
   },
   {
     "stevearc/quicker.nvim",
