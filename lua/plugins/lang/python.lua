@@ -1,5 +1,5 @@
 return {
-  { "mason.nvim", opts = { ensure_installed = { "ruff", "basedpyright", "mypy" } } },
+  { "mason.nvim", opts = { ensure_installed = { "ruff", "pyright", "mypy" } } },
   {
     "nvim-lint",
     opts = {
@@ -23,7 +23,7 @@ return {
     "nvim-lspconfig",
     opts = {
       servers = {
-        basedpyright = { enable = false },
+        pyright = {},
         ty = { mason = false },
         ruff = {
           cmd_env = { RUFF_TRACE = "messages" },
