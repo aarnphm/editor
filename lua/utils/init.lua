@@ -4,7 +4,6 @@
 ---@field format lazyvim.util.format
 ---@field lsp lazyvim.util.lsp
 ---@field root lazyvim.util.root
----@field plugin lazyvim.util.plugin
 ---@field cmp lazyvim.util.cmp
 ---@field mini lazyvim.util.mini
 ---@field pick lazyvim.util.pick
@@ -14,6 +13,7 @@
 local M = {}
 
 local LazyUtil = require "lazy.core.util"
+local LazyEvent = require "lazy.core.handler.event"
 
 setmetatable(M, {
   __index = function(t, k)
@@ -31,7 +31,8 @@ M.did_setup = false
 function M.setup(opts)
   _G.Util = M
 
-  M.plugin.setup()
+  LazyEvent.mappings.LazyFile = { id = "LazyFile", event = { "BufReadPost", "BufNewFile", "BufWritePre" } }
+  LazyEvent.mappings["User LazyFile"] = LazyEvent.mappings.LazyFile
 
   require("lazy").setup(opts)
 

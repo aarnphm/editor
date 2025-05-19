@@ -95,30 +95,6 @@ return {
       picker = { name = "mini.pick" },
     },
   },
-  -- support for image pasting
-  {
-    "HakonHarnes/img-clip.nvim",
-    event = "VeryLazy",
-    keys = {
-      {
-        "<leader>ip",
-        function()
-          return vim.bo.filetype == "AvanteInput" and require("avante.clipboard").paste_image()
-            or require("img-clip").paste_image()
-        end,
-        desc = "clip: paste image",
-      },
-    },
-    opts = {
-      default = {
-        embed_image_as_base64 = false,
-        prompt_for_file_name = false,
-        drag_and_drop = {
-          insert_mode = true,
-        },
-      },
-    },
-  },
   {
     "aarnphm/surf.nvim",
     dev = true,
@@ -134,8 +110,34 @@ return {
     dev = true,
     version = false,
     build = "nix run .#plugin",
-    event = "VeryLazy",
-    dependencies = { "nui.nvim" },
+    event = "LazyFile",
+    dependencies = {
+      "nui.nvim",
+      -- support for image pasting
+      {
+        "HakonHarnes/img-clip.nvim",
+        event = "LazyFile",
+        keys = {
+          {
+            "<leader>ip",
+            function()
+              return vim.bo.filetype == "AvanteInput" and require("avante.clipboard").paste_image()
+                or require("img-clip").paste_image()
+            end,
+            desc = "clip: paste image",
+          },
+        },
+        opts = {
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+          },
+        },
+      },
+    },
     keys = {
       { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "avante: open" },
       { "<leader>aC", "<cmd>AvanteChat<CR>", desc = "avante: chat" },

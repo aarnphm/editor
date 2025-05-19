@@ -1,5 +1,5 @@
 return {
-  { "folke/ts-comments.nvim", event = "VeryLazy", opts = {} },
+  { "folke/ts-comments.nvim", event = "LazyFile", opts = {} },
   {
     "ggandor/flit.nvim",
     opts = { labeled_modes = "nx" },

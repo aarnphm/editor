@@ -1,8 +1,8 @@
 return {
   {
     "folke/noice.nvim",
-    event = "VeryLazy",
-    dependencies = { { "MunifTanjim/nui.nvim", lazy = true } },
+    event = "LazyFile",
+    dependencies = { "nui.nvim" },
     ---@type NoiceConfig
     opts = {
       presets = {

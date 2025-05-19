@@ -38,7 +38,7 @@ return {
   {
     "echasnovski/mini.nvim",
     version = false,
-    event = "VeryLazy",
+    event = "LazyFile",
     -- joined opts for all mini plugins
     ---@class MiniOpts
     opts = {
