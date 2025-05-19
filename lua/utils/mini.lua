@@ -31,23 +31,6 @@ function M.files(opts)
     if is_at_file then MiniFiles.close() end
   end
 
-  local map_goto_windows = function(buf_id, lhs)
-    local rhs = function()
-      local id = Util.try(
-        function() return require("window-picker").pick_window() end,
-        { msg = "files: failed to pick windows" }
-      )
-      if not id then
-        Util.error "failed to pick window"
-        return
-      end
-      local target_win = MiniFiles.get_explorer_state().target_window
-      if target_win then vim.api.nvim_win_call(target_win, function() MiniFiles.set_target_window(id) end) end
-      go_in_plus()
-    end
-    vim.keymap.set("n", lhs, rhs, { buffer = buf_id, desc = "files: Pick a given window" })
-  end
-
   local map_split = function(buf_id, lhs, direction)
     local rhs = function()
       -- Make new window and set it as target
@@ -77,7 +60,6 @@ function M.files(opts)
       -- Tweak left-hand side of mapping to your liking
       vim.keymap.set("n", "g.", toggle_dotfiles, { buffer = buf_id, desc = "files: toggle dotfiles" })
       vim.keymap.set("n", "gp", toggle_preview, { buffer = buf_id, desc = "files: toggle preview" })
-      map_goto_windows(buf_id, "gw")
       map_split(buf_id, "gs", "belowright horizontal")
       map_split(buf_id, "gv", "belowright vertical")
     end,

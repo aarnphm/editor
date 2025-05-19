@@ -39,25 +39,6 @@ return {
     "echasnovski/mini.nvim",
     version = false,
     event = "VeryLazy",
-    dependencies = {
-      {
-        "s1n7ax/nvim-window-picker",
-        name = "window-picker",
-        lazy = true,
-        opts = {
-          hint = "floating-big-letter",
-          show_prompt = false,
-          filter_rules = {
-            autoselect_one = true,
-            include_current = false,
-            bo = {
-              filetype = { "notify", "noice" },
-              buftype = { "terminal", "quickfix", "Scratch", "aerial", "noice" },
-            },
-          },
-        },
-      },
-    },
     -- joined opts for all mini plugins
     ---@class MiniOpts
     opts = {
