@@ -101,6 +101,38 @@ return {
           goto_last = "",
         },
       },
+      statusline = {
+        enabled = false,
+        set_vim_settings = false,
+        content = {
+          active = function()
+            local statusline = Util.statusline.generate()
+
+            local m = statusline.mode { trunc_width = 75 }
+            local diagnostics = statusline.diagnostic { trunc_width = 75 }
+            local lint = statusline.lint { trunc_width = 50 }
+            local git = statusline.git { trunc_width = 50 }
+            local filename = MiniStatusline.section_filename { trunc_width = 140 }
+            local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+            local fileinfo = statusline.fileinfo { trunc_width = 90 }
+            local location = statusline.location { trunc_width = 90 }
+            local search = MiniStatusline.section_searchcount { trunc_width = 75 }
+
+            -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
+            -- correct padding with spaces between groups (accounts for 'missing'
+            -- sections, etc.)
+            return MiniStatusline.combine_groups {
+              { hl = m.hl, strings = { m.md } },
+              { hl = "MiniStatuslineDevinfo", strings = { git, lsp, lint } },
+              "%<", -- Mark general truncate point
+              { hl = "MiniStatuslineFilename", strings = { filename } },
+              "%=", -- End left alignment
+              { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
+              { hl = m.hl, strings = { search, location } },
+            }
+          end,
+        },
+      },
       indentscope = { symbol = "│", options = { try_as_border = true } },
       icons = {
         file = {
@@ -134,37 +166,6 @@ return {
           event = { glyph = "", hl = "MiniIconsYellow" },
           operator = { glyph = "", hl = "MiniIconsGrey" },
           typeparameter = { glyph = "", hl = "MiniIconsBlue" },
-        },
-      },
-      statusline = {
-        set_vim_settings = false,
-        content = {
-          active = function()
-            local statusline = make_statusline()
-
-            local m = statusline.mode { trunc_width = 75 }
-            local diagnostics = statusline.diagnostic { trunc_width = 75 }
-            local lint = statusline.lint { trunc_width = 50 }
-            local git = statusline.git { trunc_width = 50 }
-            local filename = MiniStatusline.section_filename { trunc_width = 140 }
-            local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
-            local fileinfo = statusline.fileinfo { trunc_width = 90 }
-            local location = statusline.location { trunc_width = 90 }
-            local search = MiniStatusline.section_searchcount { trunc_width = 75 }
-
-            -- Usage of `MiniStatusline.combine_groups()` ensures highlighting and
-            -- correct padding with spaces between groups (accounts for 'missing'
-            -- sections, etc.)
-            return MiniStatusline.combine_groups {
-              { hl = m.hl, strings = { m.md } },
-              { hl = "MiniStatuslineDevinfo", strings = { git, lsp, lint } },
-              "%<", -- Mark general truncate point
-              { hl = "MiniStatuslineFilename", strings = { filename } },
-              "%=", -- End left alignment
-              { hl = "MiniStatuslineDevinfo", strings = { diagnostics, fileinfo } },
-              { hl = m.hl, strings = { search, location } },
-            }
-          end,
         },
       },
       ai = function()
@@ -275,6 +276,8 @@ return {
     config = function(_, opts)
       vim.iter(opts):each(function(module, _opts)
         local config = type(_opts) == "function" and _opts() or _opts
+        if config.enabled == false then return end
+        config.enabled = nil
         if Util.mini[module] ~= nil then
           Util.mini[module](config)
         else
@@ -286,6 +289,7 @@ return {
   {
     "echasnovski/mini.starter",
     version = false,
+    enabled = false,
     event = "VimEnter",
     opts = function()
       local pad = string.rep(" ", 20)

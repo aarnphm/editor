@@ -14,13 +14,13 @@ Plugins ecosystem:
 - vim-motion with leap.nvim and flit.nvim
 
 ```prolog
-Startuptime: 40.56ms
+Startuptime: 37.49ms
 
 Based on the actual CPU time of the Neovim process till UIEnter.
 This is more accurate than `nvim --startuptime`.
-  LazyStart 16.82ms
-  LazyDone  34.78ms (+17.96ms)
-  UIEnter   40.56ms (+5.78ms)
+  LazyStart 17.83ms
+  LazyDone  33.49ms (+15.66ms)
+  UIEnter   37.49ms (+4ms)
 ```
 
 If you wish to try out something more structural, try out [nvimdots](https://github.com/ayamir/nvimdots) or [lazyvim](https://github.com/lazyvim/lazyvim)

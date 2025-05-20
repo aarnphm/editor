@@ -3,6 +3,7 @@ return {
     "folke/noice.nvim",
     event = "LazyFile",
     dependencies = { "nui.nvim" },
+    enabled = false,
     ---@type NoiceConfig
     opts = {
       presets = {

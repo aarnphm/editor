@@ -7,9 +7,10 @@
 ---@field cmp lazyvim.util.cmp
 ---@field mini lazyvim.util.mini
 ---@field pick lazyvim.util.pick
+---@field motion lazyvim.util.motion
 ---@field terminal lazyvim.util.terminal
 ---@field treesitter lazyvim.util.treesitter
----@field motion lazyvim.util.motion
+---@field statusline lazyvim.util.statusline
 local M = {}
 
 local LazyUtil = require "lazy.core.util"

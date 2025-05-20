@@ -116,9 +116,4 @@ return {
       end
     end,
   },
-  {
-    "windwp/nvim-ts-autotag",
-    event = "LazyFile",
-    opts = { opts = { enable_close = true } },
-  },
 }

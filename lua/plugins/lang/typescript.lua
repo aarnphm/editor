@@ -153,4 +153,9 @@ return {
       },
     },
   },
+  {
+    "windwp/nvim-ts-autotag",
+    ft = { "ts", "tsx", "js", "jsx" },
+    opts = { opts = { enable_close = true } },
+  },
 }

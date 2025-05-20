@@ -63,20 +63,7 @@ return {
       snippets = { expand = function(snippet) return Util.cmp.expand(snippet) end },
       signature = { enabled = false },
       completion = {
-        menu = {
-          draw = {
-            treesitter = { "lsp" },
-            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
-            components = {
-              label_description = { width = { max = 40 }, text = function(ctx) return ctx.label_description or "" end },
-            },
-            padding = 0,
-            gap = 1,
-          },
-        },
         accept = { auto_brackets = { enabled = false } },
-        documentation = { auto_show = false, auto_show_delay_ms = 200 },
-        ghost_text = { enabled = vim.g.ghost_text },
         trigger = { show_in_snippet = false },
         list = {
           selection = {
@@ -86,7 +73,10 @@ return {
       },
       cmdline = { enabled = false },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "lazydev", "emoji" },
+        default = { "lsp", "path", "snippets", "buffer", "emoji" },
+        per_filetype = {
+          lua = { inherit_defaults = true, "lazydev" },
+        },
         providers = {
           lazydev = {
             name = "LazyDev",
@@ -124,37 +114,5 @@ return {
         },
       },
     },
-    ---@param opts blink.cmp.Config
-    config = function(_, opts)
-      -- check if we need to override symbol kinds
-      for _, provider in pairs(opts.sources.providers or {}) do
-        ---@cast provider blink.cmp.SourceProviderConfig|{kind?:string}
-        if provider.kind then
-          local CompletionItemKind = require("blink.cmp.types").CompletionItemKind
-          local kind_idx = #CompletionItemKind + 1
-
-          CompletionItemKind[kind_idx] = provider.kind
-          ---@diagnostic disable-next-line: no-unknown
-          CompletionItemKind[provider.kind] = kind_idx
-
-          ---@type fun(ctx: blink.cmp.Context, items: blink.cmp.CompletionItem[]): blink.cmp.CompletionItem[]
-          local transform_items = provider.transform_items
-          ---@param ctx blink.cmp.Context
-          ---@param items blink.cmp.CompletionItem[]
-          provider.transform_items = function(ctx, items)
-            items = transform_items and transform_items(ctx, items) or items
-            for _, item in ipairs(items) do
-              item.kind = kind_idx or item.kind
-            end
-            return items
-          end
-
-          -- Unset custom prop to pass blink.cmp validation
-          provider.kind = nil
-        end
-      end
-
-      require("blink.cmp").setup(opts)
-    end,
   },
 }
