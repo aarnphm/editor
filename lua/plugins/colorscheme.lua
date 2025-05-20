@@ -3,7 +3,24 @@ return {
     "nuvic/flexoki-nvim",
     name = "flexoki",
     priority = 1000,
-    config = function() vim.cmd "colorscheme flexoki" end,
+    config = function()
+      local palette = require "flexoki.palette"
+      require("flexoki").setup {
+        highlight_groups = {
+          StatusLine = { fg = palette.red_two, bg = palette.overlay },
+          StatusLineNC = { bg = palette.overlay },
+          AvanteTitle = { fg = palette.highlight_high, bg = palette.red_two },
+          AvanteReversedTitle = { fg = palette.red_two },
+          AvanteSubtitle = { fg = palette.highlight_med, bg = palette.cyan_two },
+          AvanteReversedSubtitle = { fg = palette.cyan_two },
+          AvanteThirdTitle = { fg = palette.highlight_med, bg = palette.purple_two },
+          AvanteReversedThirdTitle = { fg = palette.purple_two },
+          AvanteConflictCurrent = { fg = palette.highlight_high, bg = palette.red_two },
+          AvanteConflictIncoming = { fg = palette.highlight_high, bg = palette.green_two },
+        },
+      }
+      vim.cmd "colorscheme flexoki"
+    end,
   },
   {
     "rose-pine/neovim",
@@ -36,6 +53,10 @@ return {
         opts.highlight_groups = vim.tbl_extend("force", opts.highlight_groups, { IblScope = { fg = palette.rose } })
       end
       return opts
+    end,
+    config = function(_, opts)
+      require("rose-pine").setup(opts)
+      vim.cmd "colorscheme rose-pine"
     end,
   },
 }

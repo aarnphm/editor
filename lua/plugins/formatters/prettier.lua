@@ -59,9 +59,8 @@ return {
 
       opts.formatters = opts.formatters or {}
       opts.formatters.prettier = {
-        condition = function(_, ctx)
-          return M.has_parser(ctx) and (vim.g.prettier_needs_config ~= true or M.has_config(ctx))
-        end,
+        -- configure whether prettier will requires configuration. If true, then prettier won't be run for compatible files if configuration is missing
+        condition = function(_, ctx) return M.has_parser(ctx) and M.has_config(ctx) end,
       }
     end,
   },

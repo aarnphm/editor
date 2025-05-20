@@ -114,7 +114,7 @@ function M.format(opts)
     end
   end
 
-  if not done and opts and opts.force then Util.warn("format: no formatter available", { title = "Simple" }) end
+  if not done and opts and opts.force then Util.warn("format: no formatter available", { title = "editor" }) end
 end
 
 M.setup = function()
@@ -130,6 +130,7 @@ M.setup = function()
     function() M.format { force = true } end,
     { desc = "format: selection or buffer" }
   )
+  vim.api.nvim_create_user_command("FormatInfo", function() M.info() end, { desc = "format: info" })
 end
 
 ---@param buf? boolean

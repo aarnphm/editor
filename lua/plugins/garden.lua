@@ -109,6 +109,7 @@ return {
     "yetone/avante.nvim",
     dev = true,
     version = false,
+    enabled = false,
     build = "nix run .#plugin",
     event = "LazyFile",
     dependencies = {
@@ -146,8 +147,8 @@ return {
     ---@type avante.Config
     opts = {
       debug = false,
-      provider = "claude", -- tbh we can switch to copilot
-      cursor_applying_provider = "claude",
+      provider = "openai", -- tbh we can switch to copilot
+      cursor_applying_provider = "claude-haiku",
       memory_summary_provider = "claude",
       claude = {
         -- api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
@@ -157,7 +158,7 @@ return {
       },
       openai = {
         -- api_key_name = "cmd:bw get notes oai-api-key",
-        model = "gpt-4o-2024-08-06",
+        model = "o3-mini",
       },
       cohere = {
         model = "command-r-plus-08-2024",
@@ -176,19 +177,12 @@ return {
         auto_suggestions = false, -- Experimental stage
         support_paste_from_clipboard = false,
         auto_suggestions_respect_ignore = true,
+        auto_focus_on_diff_view = true,
       },
-      selector = { provider = "mini.pick" },
+      selector = { provider = "mini_pick" },
       mappings = {
         submit = { normal = "<CR>", insert = "<C-CR>" },
-        suggestion = {
-          accept = "<M-j>",
-          next = "<M-l>",
-          prev = "<M-h>",
-          dismiss = "<M-k>",
-        },
-        sidebar = {
-          close_from_input = { normal = "<Esc>", insert = "<C-d>" },
-        },
+        sidebar = { close_from_input = { normal = "<Esc>", insert = "<C-d>" } },
       },
       windows = {
         position = "right",

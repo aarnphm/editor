@@ -334,19 +334,10 @@ vim.g.inline_diagnostics = false
 vim.g.ghost_text = false
 -- whether to render markdown, essentially changing toe conceallevel here
 vim.g.enable_render = false
--- whether to enable autocomplete (if disabled, then manual trigger with <C-Space>)
-vim.g.enable_autocomplete = true
--- whether to set cursor in insert mode to be block or lines
-vim.g.block_cursor = true
--- configure whether prettier will requires configuration. If true, then prettier won't be run for compatible files if configuration is missing
-vim.g.prettier_needs_config = false
 -- additional path root spec to determine for LSP root
 vim.g.additional_path_root_spec = { "content" }
 -- ignore lsp for certain root
 vim.g.root_lsp_ignore = { "copilot" }
--- set pickers (can support telescope.nvim or mini.pick)
----@type "mini.pick" | "telescope"
-vim.g.picker = "mini.pick"
 -- whether we set border for floating UI.
 vim.g.border = "none"
 -- markdown render backend
@@ -406,14 +397,14 @@ vim.o.undolevels = 9999 -- infinite undo
 vim.o.showtabline = 0
 -- Window blending configuration
 vim.o.winblend = 0
-vim.o.pumblend = 20 -- make completion window transparent
+vim.o.pumblend = 0 -- make completion window transparent
 
 vim.opt.shortmess:append { W = true, c = true, C = true }
 vim.o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 vim.o.completeopt = "menu,menuone,noselect"
-vim.o.formatoptions = "1jqlnt" -- NOTE: "tqjcro"
+vim.o.formatoptions = "tcqjro1ln"
 
-vim.o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience" -- better diff
+vim.o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience"
 vim.opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
 
 -- searching and grep stuff
@@ -423,7 +414,7 @@ vim.o.ignorecase = true
 vim.o.infercase = true
 vim.o.hlsearch = true
 vim.o.grepformat = "%f:%l:%c:%m"
-vim.o.grepprg = "rg --vimgrep" -- also its 2023 use rg
+vim.o.grepprg = "rg --vimgrep"
 vim.o.linebreak = true
 vim.o.jumpoptions = "stack"
 vim.o.list = true
@@ -493,7 +484,7 @@ vim.opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.
 vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
 
 vim.o.cmdheight = 1
-vim.o.guicursor = vim.g.block_cursor and "" or "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor to be block
+vim.o.guicursor = "" -- "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20" -- make cursor line on insert
 vim.o.conceallevel = vim.g.enable_render and 2 or 0
 
 if vim.g.neovide then

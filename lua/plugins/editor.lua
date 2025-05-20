@@ -180,6 +180,7 @@ return {
     "Bekaboo/dropbar.nvim",
     version = false,
     event = "LazyFile",
+    enabled = false,
     dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
     ---@type dropbar_configs_t
     opts = {

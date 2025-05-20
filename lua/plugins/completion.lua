@@ -52,22 +52,15 @@ return {
     build = "nix run .#build-plugin",
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "Kaiser-Yang/blink-cmp-avante",
       "moyiz/blink-emoji.nvim",
     },
     event = "InsertEnter",
     opts_extend = { "sources.completion.enabled_providers", "sources.default" },
-    ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
       fuzzy = { implementation = "prefer_rust" },
-      appearance = {
-        kind_icons = { Copilot = "" },
-        nerd_font_variant = "normal", -- "normal" | "mono"
-      },
-      snippets = {
-        expand = function(snippet) return Util.cmp.expand(snippet) end,
-      },
+      appearance = { kind_icons = { Copilot = "" } },
+      snippets = { expand = function(snippet) return Util.cmp.expand(snippet) end },
       signature = { enabled = false },
       completion = {
         menu = {
@@ -93,7 +86,7 @@ return {
       },
       cmdline = { enabled = false },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "lazydev", "emoji", "avante" },
+        default = { "lsp", "path", "snippets", "buffer", "lazydev", "emoji" },
         providers = {
           lazydev = {
             name = "LazyDev",
@@ -112,10 +105,6 @@ return {
             score_offset = 15,
             opts = { insert = true },
             should_show_items = function() return vim.tbl_contains({ "gitcommit", "markdown" }, vim.o.filetype) end,
-          },
-          avante = {
-            module = "blink-cmp-avante",
-            name = "Avante",
           },
         },
       },
