@@ -8,14 +8,13 @@ _G.P = function(v)
   return v
 end
 
-_G.TABWIDTH = 2
+local TABWIDTH = 2
 
 ---@alias Mode "simple" | "lsp" | "docs" | "hover" | "git"
 
 ---@class SingleBorder
 ---@field none FloatBorderEdges
 ---@field single FloatBorderEdgesWithHl
----
 
 ---@class SingleBorder
 local M = {
@@ -441,6 +440,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "spectre_panel",
     "startuptime",
     "tsplayground",
+    "fugitive",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false

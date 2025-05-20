@@ -5,7 +5,7 @@ return {
     build = ":MasonUpdate",
     version = false,
     opts = {
-      ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep" },
+      ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep", "typos" },
       ui = { border = BORDER.impl(), backdrop = 100 },
       max_concurrent_installers = 15,
     },
@@ -33,10 +33,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile", "BufWritePre" },
-    dependencies = {
-      "mason-org/mason.nvim",
-      "mason-org/mason-lspconfig.nvim",
-    },
+    dependencies = { "mason.nvim", "mason-lspconfig.nvim" },
     ---@class PluginLspOptions
     ---@field setup table<string, fun(server: string, opts: table<string, any>): boolean>
     opts = {
