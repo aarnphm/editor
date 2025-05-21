@@ -170,7 +170,7 @@ o.stl = table.concat({
   "[%{%luaeval('Util.STL.mode {trunc_width = 75}').md %}]",
   "%{%luaeval('Util.STL.git {trunc_width = 120}')%}",
   "%{%luaeval('Util.STL.lint {trunc_width = 120}')%}",
-  "%F%m%r",
+  "%{%luaeval('Util.STL.filename {trunc_width = 40}')%}",
   "%=",
   "%{%luaeval('Util.STL.diagnostic {trunc_width = 90}')%}",
   "%{%luaeval('Util.STL.fileinfo {trunc_width = 90}')%}",

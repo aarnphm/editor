@@ -157,6 +157,18 @@ M.generate = function()
       if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
       return string.format("[%s %s]", icon, table.concat(t, " "))
     end,
+    filename = function(args)
+      if vim.bo.buftype == "terminal" then
+        return "%t"
+      elseif H.is_truncated(args.trunc_width) then
+        -- File name with 'truncate', 'modified', 'readonly' flags
+        -- Use relative path if truncated
+        return "%f%m%r"
+      else
+        -- Use fullpath if not truncated
+        return "%F%m%r"
+      end
+    end,
     fileinfo = function(args)
       local filetype = vim.bo.filetype
       -- Don't show anything if can't detect file type or not inside a "normal buffer"
