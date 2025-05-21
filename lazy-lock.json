@@ -18,7 +18,6 @@
   "leap.nvim": { "branch": "main", "commit": "189102b07cdd24de3bd7132e57da8c9614c385fc" },
   "luasnip-latex-snippets.nvim": { "branch": "main", "commit": "daccc4f7bd432bfc7df492bcfd6b3b5af5aef86f" },
   "markdown-preview.nvim": { "branch": "master", "commit": "a923f5fc5ba36a3b17e289dc35dc17f66d0548ee" },
-  "mason-lspconfig.nvim": { "branch": "main", "commit": "ce0e87c0be12e7c48296a7513e90430e3eac7f24" },
   "mason.nvim": { "branch": "main", "commit": "9eaedb864cdadc29c6eb7d761a6c0d8aee26c91b" },
   "mini.hipatterns": { "branch": "main", "commit": "e5083df391171dc9d8172645606f8496d9443374" },
   "mini.nvim": { "branch": "main", "commit": "94cae4660a8b2d95dbbd56e1fbc6fcfa2716d152" },
