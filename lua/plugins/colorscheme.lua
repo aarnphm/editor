@@ -7,7 +7,7 @@ return {
       local palette = require "flexoki.palette"
       require("flexoki").setup {
         highlight_groups = {
-          StatusLine = { fg = palette.red_two, bg = palette.overlay },
+          StatusLine = { fg = palette.orange_two, bg = palette.overlay },
           StatusLineNC = { bg = palette.overlay },
           AvanteTitle = { fg = palette.highlight_high, bg = palette.red_two },
           AvanteReversedTitle = { fg = palette.red_two },

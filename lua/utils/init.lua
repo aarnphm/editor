@@ -26,6 +26,8 @@ setmetatable(M, {
   end,
 })
 
+M.STL = M.statusline.generate()
+
 M.did_setup = false
 
 ---@param opts LazyConfig

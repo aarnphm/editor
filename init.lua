@@ -43,17 +43,36 @@ if vim.uv.os_uname().sysname == "Darwin" then
   }
 end
 
--- map leader to <Space> and localeader to +
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-vim.g.mapleader = " "
-vim.g.maplocalleader = ","
+local g = vim.g
+g.loaded_gzip = 1
+g.loaded_zip = 1
+g.loaded_zipPlugin = 1
+g.loaded_tar = 1
+g.loaded_tarPlugin = 1
+
+g.loaded_getscript = 1
+g.loaded_getscriptPlugin = 1
+g.loaded_vimball = 1
+g.loaded_vimballPlugin = 1
+g.loaded_2html_plugin = 1
+
+g.loaded_matchit = 1
+g.loaded_matchparen = 1
+g.loaded_logiPat = 1
+g.loaded_rrhelper = 1
+
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1
+g.loaded_netrwSettings = 1
+
+g.mapleader = " "
+g.maplocalleader = ","
 -- Fix markdown indentation settings
-vim.g.markdown_recommended_style = 0
+g.markdown_recommended_style = 0
 -- autoformat on save
-vim.g.autoformat = true
+g.autoformat = true
 -- additional plugins to be used.
-vim.g.extra_plugins = {
+g.extra_plugins = {
   -- lang
   "plugins.lang.go",
   "plugins.lang.nix",
@@ -72,140 +91,103 @@ vim.g.extra_plugins = {
   "plugins.linters.eslint",
 }
 
-vim.wo.scrolloff = 16
-vim.wo.sidescrolloff = 16
-vim.wo.wrap = false
-vim.wo.cursorline = true
-vim.wo.cursorcolumn = false
+local wo = vim.wo
+wo.scrolloff = 2
+wo.sidescrolloff = 5
+wo.wrap = false
+wo.cursorline = true
+wo.cursorcolumn = false
 
--- only set clipboard if not in ssh, to make sure the OSC 52
--- integration works automatically. Requires Neovim >= 0.10.0
-vim.opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
-vim.opt.confirm = true
-vim.opt.winminwidth = 3
-vim.opt.termguicolors = true
+local o = vim.o
+o.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
+o.confirm = true
+o.winminwidth = 3
+o.termguicolors = true
 
--- Some defaults and don't question it
-vim.o.writebackup = false -- whose needs backup btw (i do sometimes)
-vim.o.autowrite = true -- sometimes I forget to save
-vim.o.signcolumn = "yes" -- always show sign column
-vim.o.undofile = true -- set undofile to infinite undo
-vim.o.breakindent = true -- enable break indent
-vim.o.breakindentopt = "shift:2,min:20" -- wrap two spaces, with min of 20 text width
-vim.o.pumheight = 20 -- larger completion windows
-vim.o.expandtab = true -- convert spaces to tabs
-vim.o.mouse = "a" -- ugh who needs mouse (accept on SSH maybe)
-vim.o.number = true -- number is good for nav
-vim.o.swapfile = false -- I don't like swap files personally, found undofile to be better
-vim.o.autowrite = true
-vim.o.undofile = true -- better than swapfile
-vim.o.undolevels = 9999 -- infinite undo
-vim.o.showtabline = 0
--- Window blending configuration
-vim.o.winblend = 0
-vim.o.pumblend = 0 -- make completion window transparent
+o.writebackup = false
+o.autowrite = true
+o.undofile = true
+o.breakindent = true
+o.breakindentopt = "shift:2,min:20"
+o.pumheight = 20
+o.expandtab = true
+o.mouse = "a"
+o.number = true
+o.swapfile = false
+o.autowrite = true
+o.undofile = true
+o.undolevels = 9999
+o.showtabline = 0
+o.smoothscroll = true
 
-vim.opt.shortmess:append { W = true, c = true, C = true }
-vim.o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
-vim.opt.completeopt = "menu,menuone,noselect,preview"
-vim.o.formatoptions = "tcqjro1ln"
+o.shortmess = "aoOTIcF"
+o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
+o.cot = "menu,menuone,noinsert,fuzzy,popup"
+o.cia = "kind,abbr,menu"
+o.formatoptions = "tcqjron"
+o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience"
 
-vim.o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience"
-vim.opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
+o.smartcase = true
+o.smartindent = true
+o.ignorecase = true
+o.infercase = true
+o.hlsearch = true
 
--- searching and grep stuff
-vim.o.smartcase = true
-vim.o.smartindent = true
-vim.o.ignorecase = true
-vim.o.infercase = true
-vim.o.hlsearch = true
-vim.o.grepformat = "%f:%l:%c:%m"
-vim.o.grepprg = "rg --vimgrep"
-vim.o.linebreak = true
-vim.o.jumpoptions = "stack"
-vim.o.list = true
-vim.opt.listchars = {
-  tab = "»·",
-  lead = "·",
-  leadmultispace = "»···",
-  nbsp = "+",
-  trail = "·",
-  extends = "→",
-  precedes = "←",
-}
-vim.o.inccommand = "split"
-vim.o.foldenable = true
-vim.opt.fillchars = {
-  foldopen = "",
-  foldclose = "",
-  fold = " ",
-  foldsep = " ",
-  diff = "╱",
-  eob = " ",
-  vert = "│",
-  horiz = "─",
-  horizdown = "┬",
-  horizup = "┴",
-  verthoriz = "┼",
-  vertleft = "┤",
-  vertright = "├",
-}
-vim.o.smoothscroll = true
-vim.o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
-vim.o.foldmethod = "indent"
-vim.o.foldtext = "v:lua.require'utils'.ui.foldtext()"
-vim.o.foldlevel = 99
-vim.o.foldlevelstart = 99
-vim.o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
+o.linebreak = true
+o.jumpoptions = "stack"
+o.list = true
+o.listchars = "tab:»·,lead:·,leadmultispace:»···,nbsp:+,trail:·,extends:→,precedes:←"
+o.inccommand = "split"
+o.foldenable = true
+o.fcs =
+  "foldopen:,foldclose:,fold: ,trunc:…,foldsep: ,diff:╱,eob: ,vert:│,horiz:─,horizdown:┬,horizup:┴,verthoriz:┼,vertleft:┤,vertright:├"
 
--- Spaces and tabs config
-vim.o.tabstop = TABWIDTH
-vim.o.softtabstop = TABWIDTH
-vim.o.shiftwidth = TABWIDTH
-vim.o.shiftround = true
+o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
+o.foldmethod = "indent"
+o.foldtext = "v:lua.require'utils'.ui.foldtext()"
+o.foldlevel = 99
+o.foldlevelstart = 99
+o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
+
+o.tabstop = TABWIDTH
+o.softtabstop = TABWIDTH
+o.shiftwidth = TABWIDTH
+o.shiftround = true
 
 -- UI config
-vim.o.showmode = true
-vim.o.showcmd = true
-vim.o.showbreak = "↳  "
-vim.o.sidescrolloff = 8
-vim.o.splitbelow = true
-vim.o.splitright = true
-vim.o.timeout = true
-vim.o.timeoutlen = vim.g.vscode and 1000 or 300
-vim.o.updatetime = 250
-vim.o.virtualedit = "block"
-vim.o.laststatus = 3
-vim.o.whichwrap = "h,l,<,>,[,],~"
+o.showmode = false
+o.showcmd = true
+o.showbreak = "↳  "
+o.splitbelow = true
+o.splitright = true
+o.timeout = true
+o.timeoutlen = vim.g.vscode and 1000 or 300
+o.updatetime = 250
+o.virtualedit = "block"
+
+o.ls = 3
+o.stl = table.concat({
+  "[%{%luaeval('Util.STL.mode {trunc_width = 75}').md %}]",
+  "%{%luaeval('Util.STL.git {trunc_width = 120}')%}",
+  "%{%luaeval('Util.STL.lint {trunc_width = 120}')%}",
+  "%F%m%r",
+  "%=",
+  "%{%luaeval('Util.STL.diagnostic {trunc_width = 90}')%}",
+  "%{%luaeval('Util.STL.fileinfo {trunc_width = 90}')%}",
+  "%{%luaeval('Util.STL.location {trunc_width = 90}')%}",
+}, " ")
+o.whichwrap = "b,s,<,>,[,],~"
+o.guifont = "BerkeleyMono Nerd Font Mono:h16"
+o.cmdheight = 1
+o.guicursor = "" -- "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
+o.conceallevel = 0
 
 local background = os.getenv "XDG_SYSTEM_THEME"
 vim.go.background = background ~= nil and background or "dark"
 
--- For neovide
-vim.o.guifont = "BerkeleyMono Nerd Font Mono:h16"
-
--- last but def not least, wildmenu
-vim.o.wildchar = 9
-vim.o.wildignorecase = true
-vim.o.wildmode = "longest:full,full"
-vim.opt.wildignore = {
-  "__pycache__",
-  "*.o",
-  "*~",
-  "*.pyc",
-  "*pycache*",
-  "Cargo.lock",
-  "lazy-lock.json",
-  ".ruff_cache",
-  ".venv",
-  "venv",
-  "uv.lock",
-}
-vim.opt.wildmode = "longest:full,full,noselect"
-
-vim.o.cmdheight = 1
-vim.o.guicursor = "" -- "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
-vim.o.conceallevel = 0
+o.wildchar = 9
+o.wildignorecase = true
+o.wildmode = "longest:full,full"
 
 if vim.g.neovide then
   vim.g.neovide_show_border = true

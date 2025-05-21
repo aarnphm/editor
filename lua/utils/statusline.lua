@@ -175,7 +175,7 @@ M.generate = function()
     location = function(args)
       -- '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
       local icon = args.icon or "♥"
-      return "%l:%2v" .. (" %s"):format(icon)
+      return "%-5.(%l:%c%V%) %P" .. (" %s"):format(icon)
     end,
     ---@return {md:string, hl:string}
     mode = function()
