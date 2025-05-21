@@ -5,7 +5,7 @@ return {
     build = ":MasonUpdate",
     version = false,
     opts = {
-      ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep", "typos" },
+      ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep", "typos", "cbfmt" },
       ui = { backdrop = 100 },
       max_concurrent_installers = 15,
     },
