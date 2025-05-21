@@ -10,96 +10,6 @@ end
 
 local TABWIDTH = 2
 
----@alias Mode "simple" | "lsp" | "docs" | "hover" | "git"
-
----@class SingleBorder
----@field none FloatBorderEdges
----@field single FloatBorderEdgesWithHl
-
----@class SingleBorder
-local M = {
-  none = { "", "", "", "", "", "", "", "" },
-  single = {
-    simple = {
-      { "┌", "Comment" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
-    },
-    lsp = {
-      { "󱐋", "WarningMsg" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
-    },
-    docs = {
-      { "󰄾", "DiagnosticHint" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
-    },
-    hover = {
-      { "󰀵", "MiniIconsGrey" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
-    },
-    git = {
-      { "󰊢", "MiniIconsRed" },
-      { "─", "Comment" },
-      { "┐", "Comment" },
-      { "│", "Comment" },
-      { "┘", "Comment" },
-      { "─", "Comment" },
-      { "└", "Comment" },
-      { "│", "Comment" },
-    },
-  },
-}
-
-M.none = setmetatable(M.none, {
-  __call = function(...) return M.none end,
-})
-M.single = setmetatable(M.single, {
-  __call = function(_, t, override, start)
-    t = t or "lsp"
-    local target = M.single[t]
-    if target == nil then
-      Util.warn("Given border type `" .. t .. "` not found, falling back to none.")
-      return M.none
-    end
-    -- Override the highlight color starting from the second item
-    for i = start, #target do
-      if type(target[i]) == "table" then target[i][2] = override or target[i][2] end
-    end
-    return target
-  end,
-})
-
----@param type? Mode type of border to be use
----@param override? string override hl for given buffer
----@param start? integer whether to start from 1 or 2
----@return FloatBorder
-M.impl = function(type, override, start) return M[vim.g.border or "none"](type, override, start or 2) end
-
-_G.BORDER = setmetatable(M, { __index = function() return M.impl() end })
-
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 _G.hi = function(name, opts)
   opts.default = opts.default or true
@@ -146,11 +56,6 @@ vim.g.enable_render = false
 vim.g.additional_path_root_spec = { "content" }
 -- ignore lsp for certain root
 vim.g.root_lsp_ignore = { "copilot" }
--- whether we set border for floating UI.
-vim.g.border = "none"
--- markdown render backend
----@type "markview" | "render-markdown"
-vim.g.markdown_render_backend = "render-markdown"
 -- additional plugins to be used.
 vim.g.extra_plugins = {
   -- lang

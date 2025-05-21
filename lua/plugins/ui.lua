@@ -16,12 +16,9 @@ return {
       messages = { view = "mini", view_history = "mini" },
       views = {
         split = { size = "15%" },
-        popup = { disable = true, border = { style = BORDER.impl "simple" } },
-        confirm = { disable = true, border = { style = BORDER.impl "simple" } },
-        hover = { border = { style = BORDER.impl "simple" }, position = { row = 2, col = 2 } },
-        cmdline_input = { border = { style = BORDER.impl "simple" } },
-        cmdline_popup = { border = { style = BORDER.impl "simple" } },
-        mini = { border = { style = BORDER.none } },
+        popup = { disable = true },
+        confirm = { disable = true },
+        hover = { position = { row = 2, col = 2 } },
       },
       routes = {
         {

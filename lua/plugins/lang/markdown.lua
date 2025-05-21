@@ -1,3 +1,7 @@
+-- markdown render backend
+---@type "markview" | "render-markdown"
+local markdown_render_backend = "render-markdown"
+
 return {
   { "mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
   {
@@ -52,7 +56,7 @@ return {
   },
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    enabled = function() return vim.g.markdown_render_backend == "render-markdown" end,
+    enabled = function() return vim.g.markdown_render_backend == "render-markdown" and false end,
     opts = function()
       return {
         enabled = vim.g.enable_render,
@@ -91,7 +95,7 @@ return {
   },
   {
     "OXY2DEV/markview.nvim",
-    enabled = function() return vim.g.markdown_render_backend == "markview" end,
+    enabled = function() return vim.g.markdown_render_backend == "markview" and false end,
     ft = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
     opts = {
       filetypes = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },

@@ -6,7 +6,7 @@ return {
     version = false,
     opts = {
       ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep", "typos" },
-      ui = { border = BORDER.impl(), backdrop = 100 },
+      ui = { backdrop = 100 },
       max_concurrent_installers = 15,
     },
     ---@param opts MasonSettings | {ensure_installed: string[]}
@@ -50,7 +50,6 @@ return {
           focus = false,
           format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
           source = "if_many",
-          border = BORDER.none,
         },
         signs = {
           text = {
@@ -66,7 +65,7 @@ return {
       -- provide the inlay hints.
       inlay_hints = {
         enabled = true,
-        exclude = { "vue", "typescriptreact", "typescript", "javascript" },
+        exclude = { "vue", "typescriptreact", "typescript", "javascript", "python" },
       },
       -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to

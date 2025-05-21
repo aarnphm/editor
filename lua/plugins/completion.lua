@@ -63,7 +63,20 @@ return {
       snippets = { expand = function(snippet) return Util.cmp.expand(snippet) end },
       signature = { enabled = false },
       completion = {
+        menu = {
+          draw = {
+            treesitter = { "lsp" },
+            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 } },
+            components = {
+              label_description = { width = { max = 40 }, text = function(ctx) return ctx.label_description or "" end },
+            },
+            padding = 0,
+            gap = 1,
+          },
+        },
         accept = { auto_brackets = { enabled = false } },
+        documentation = { auto_show = false, auto_show_delay_ms = 200 },
+        ghost_text = { enabled = vim.g.ghost_text },
         trigger = { show_in_snippet = false },
         list = {
           selection = {

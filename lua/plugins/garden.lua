@@ -189,8 +189,6 @@ return {
         height = 4,
         sidebar_header = { align = "left", rounded = false },
         input = { prefix = "➜ ", height = 3 },
-        edit = { border = BORDER.none },
-        ask = { border = BORDER.none },
       },
       vendors = {
         ---@type AvanteProvider

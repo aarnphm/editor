@@ -59,9 +59,6 @@ return {
       { "<leader>ugw", ":Gitsigns toggle_word_diff<CR>", mode = { "n", "v" }, desc = "git: toggle word diff" },
       { "ih", ":<C-U>Gitsigns select_hunk<CR>", mode = { "o", "x" }, desc = "git: select hunk" },
     },
-    opts = {
-      numhl = true,
-      preview_config = { border = BORDER.impl("git", "NormalFloat", 1) },
-    },
+    opts = { numhl = true },
   },
 }

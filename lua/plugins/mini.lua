@@ -1,9 +1,9 @@
 ---@class MiniFilesBufferCreateData
 ---@field buf_id integer
----
+
 ---@class MiniFilesBufferCreate: vim.api.create_autocmd.callback.args
 ---@field data MiniFilesBufferCreateData
----
+
 ---@class MiniPickOpts: lazyvim.util.pick.Opts
 ---@field tool? string
 ---@field source? table<['cwd'] | string, any>
@@ -39,8 +39,10 @@ return {
     "echasnovski/mini.nvim",
     version = false,
     event = "LazyFile",
-    -- joined opts for all mini plugins
-    ---@class MiniOpts
+    --joined opts for all mini plugins
+    ---@class MiniPluginOpts
+    ---@field enabled? boolean
+    ---@class MiniOpts: table<string, MiniPluginOpts>
     opts = {
       extra = {},
       align = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
@@ -199,12 +201,12 @@ return {
     keys = {
       -- mini.pick
       {
-        "<LocalLeader>f",
+        "<Leader>f",
         Util.pick("files", { tool = "git" }),
         desc = "mini.pick: open (git root)",
       },
       {
-        "<Leader>f",
+        "<LocalLeader>f",
         Util.pick "oldfiles",
         desc = "mini.pick: oldfiles",
       },
@@ -212,11 +214,6 @@ return {
         "<LocalLeader>w",
         Util.pick "live_grep",
         desc = "mini.pick: grep word",
-      },
-      {
-        "<LocalLeader>x",
-        Util.pick "diagnostic",
-        desc = "mini.pick: diagnostics",
       },
       {
         "<Leader>/",
@@ -236,7 +233,7 @@ return {
       },
       -- mini.diff
       {
-        "<leader>go",
+        "<leader>g",
         function() require("mini.diff").toggle_overlay(0) end,
         desc = "git: toggle diff overlay",
       },
@@ -275,7 +272,7 @@ return {
     ---@param opts MiniOpts
     config = function(_, opts)
       vim.iter(opts):each(function(module, _opts)
-        local config = type(_opts) == "function" and _opts() or _opts
+        local config = type(_opts) == "function" and _opts() or _opts --[[@as MiniPluginOpts]]
         if config.enabled == false then return end
         config.enabled = nil
         if Util.mini[module] ~= nil then
