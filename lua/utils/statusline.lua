@@ -138,7 +138,7 @@ M.generate = function()
 
       if H.is_truncated(args.trunc_width) then return #linters == 0 and "󰦕" or "󱉶" end
 
-      if #linters == 0 then return "󰦕" .. " " .. string.rep("+", vim.tbl_count(names)) end
+      if #linters == 0 then return "[" .. "󰦕" .. " " .. string.rep("+", vim.tbl_count(names)) .. "]" end
       return "󱉶 [" .. table.concat(linters, "|") .. "]"
     end,
     diagnostic = function(args)
