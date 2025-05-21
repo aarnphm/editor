@@ -66,7 +66,7 @@ return {
         menu = {
           draw = {
             treesitter = { "lsp" },
-            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 } },
+            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
             components = {
               label_description = { width = { max = 40 }, text = function(ctx) return ctx.label_description or "" end },
             },
