@@ -298,7 +298,7 @@ map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory t
 map("n", "<LocalLeader>]", "<cmd>vertical resize -10<cr>", { noremap = false, desc = "windows: resize right 10px" })
 map("n", "<LocalLeader>[", "<cmd>vertical resize +10<cr>", { noremap = false, desc = "windows: resize left 10px" })
 map("n", "<LocalLeader>-", "<cmd>resize -10<cr>", { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>+", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
+map("n", "<LocalLeader>=", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
 map("n", "<leader><leader>b", "<cmd>wincmd =<cr>", { noremap = true, silent = true, desc = "windows: balance" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
