@@ -315,6 +315,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "startuptime",
     "tsplayground",
     "fugitive",
+    "fugitiveblame",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
