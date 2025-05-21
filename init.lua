@@ -239,6 +239,12 @@ map(
   function() Util.terminal.bottom(nil, { startinsert = true }) end,
   { desc = "terminal: attach new process" }
 )
+map(
+  "n",
+  "<LocalLeader>st",
+  function() Util.terminal.side(nil, { startinsert = true }) end,
+  { desc = "terminal: attach new process" }
+)
 map("n", "<leader>sq", function() vim.cmd.Quartz() end, { desc = "terminal: attach new quartz" })
 map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })

@@ -144,4 +144,66 @@ function M.bottom(cmd, opts)
   end
 end
 
+---@param cmd? string[]|string
+---@param opts? {width?: number, persistent?: boolean, startinsert?: boolean, side?: "left" | "right"}
+function M.side(cmd, opts)
+  opts = vim.tbl_deep_extend("force", { width = 80, persistent = true, startinsert = false, side = "right" }, opts or {})
+  cmd = cmd or { vim.o.shell }
+
+  if opts.side == "left" then
+    vim.cmd "vnew"
+    vim.cmd.wincmd "H"
+  else
+    vim.cmd "vnew"
+    vim.cmd.wincmd "L"
+  end
+
+  -- winopts
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_width(0, opts.width)
+  vim.wo.winfixwidth = true
+
+  -- bufopts
+  local buf = vim.api.nvim_get_current_buf()
+  vim.b[buf].lazyterm_cmd = cmd
+  vim.b[buf].filetype = "lazyterm"
+  vim.b[buf].buftype = "nofile"
+  vim.bo[buf].modifiable = false
+
+  -- mappings
+  vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
+  vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
+  vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
+  vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
+  vim.keymap.set("n", "gf", function()
+    local f = vim.fn.findfile(vim.fn.expand "<cfile>")
+    if f ~= "" then
+      vim.cmd "close"
+      vim.cmd("e " .. f)
+    end
+  end, { buffer = buf })
+
+  -- autocmd
+  vim.api.nvim_create_autocmd("TermClose", {
+    once = true,
+    buffer = buf,
+    callback = function()
+      vim.schedule(function()
+        if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
+        if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_delete(buf, { force = true }) end
+        vim.cmd.redraw()
+      end)
+      vim.cmd.checktime()
+    end,
+  })
+
+  vim.fn.termopen(cmd, opts)
+  if opts.startinsert then
+    vim.cmd "noh"
+    vim.cmd.startinsert()
+  else
+    vim.cmd "normal! G"
+  end
+end
+
 return M
