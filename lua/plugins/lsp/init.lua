@@ -110,6 +110,7 @@ return {
                 version = "LuaJIT",
                 special = { reload = "require" },
               },
+              library = { vim.env.VIMRUNTIME },
               telemetry = { enable = false },
               semantic = { enable = true },
               completion = { workspaceWord = true, callSnippet = "Replace" },
