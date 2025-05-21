@@ -1,5 +1,5 @@
 return {
-  { "tpope/vim-fugitive", cmd = { "G", "Git" } },
+  "tpope/vim-fugitive",
   {
     "lewis6991/gitsigns.nvim",
     event = "LazyFile",
@@ -55,10 +55,15 @@ return {
       { "<leader>hS", ":Gitsigns stage_buffer<CR>", desc = "git: stage buffer" },
       { "<leader>hs", ":Gitsigns stage_hunk<CR>", mode = { "n", "v" }, desc = "git: stage hunk" },
       { "<leader>hr", ":Gitsigns reset_hunk<CR>", mode = { "n", "v" }, desc = "git: reset hunk" },
-      { "<leader>ugl", ":Gitsigns toggle_linehl<CR>", mode = { "n", "v" }, desc = "git: toggle linehl" },
-      { "<leader>ugw", ":Gitsigns toggle_word_diff<CR>", mode = { "n", "v" }, desc = "git: toggle word diff" },
+      { "<leader>hh", ":Gitsigns setqflist<CR>", mode = { "n", "v" }, desc = "git: set qflist" },
       { "ih", ":<C-U>Gitsigns select_hunk<CR>", mode = { "o", "x" }, desc = "git: select hunk" },
     },
-    opts = { numhl = true },
+    ---@type Gitsigns.Config
+    opts = {
+      numhl = true,
+      attach_to_untracked = true,
+      _new_sign_calc = true,
+      _refresh_staged_on_update = true,
+    },
   },
 }

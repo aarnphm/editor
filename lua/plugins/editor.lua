@@ -1,3 +1,4 @@
+local func = require "vim.func"
 return {
   { "folke/ts-comments.nvim", event = "LazyFile", opts = {} },
   {
@@ -180,7 +181,6 @@ return {
     "Bekaboo/dropbar.nvim",
     version = false,
     event = "LazyFile",
-    enabled = false,
     dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
     ---@type dropbar_configs_t
     opts = {
@@ -192,6 +192,14 @@ return {
             and vim.fn.win_gettype(win) == ""
             and vim.bo[buf].ft ~= "help"
             and vim.bo[buf].ft ~= "Avante"
+            and vim.bo[buf].buftype ~= "terminal"
+        end,
+        hover = false,
+        sources = function(buf, _)
+          local sources = require "dropbar.sources"
+          local utils = require "dropbar.utils"
+          if vim.bo[buf].ft == "markdown" then return { sources.markdown } end
+          return { utils.source.fallback { sources.lsp, sources.treesitter } }
         end,
       },
     },

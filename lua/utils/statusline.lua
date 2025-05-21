@@ -62,7 +62,7 @@ H.get_branch = function(icon)
   elseif vim.g.loaded_gitbranch then
     branch = vim.fn["gitbranch#name"]()
   end
-  return branch ~= "" and string.format("(%s %s)", icon, branch) or ""
+  return string.format("%s %s", icon, branch)
 end
 
 -- Custom `^V` and `^S` symbols to make this file appropriate for copy-paste
@@ -202,7 +202,7 @@ M.generate = function()
 
       if hunks == H.concat_hunks { 0, 0, 0 } and head == "" then hunks = "" end
       if hunks ~= "" and head ~= "" then head = head .. " " end
-      return string.format("%s", table.concat { head, hunks })
+      return string.format("[%s]", table.concat { head, hunks })
     end,
   }
 end
