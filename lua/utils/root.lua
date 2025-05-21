@@ -12,8 +12,13 @@ local M = setmetatable({}, {
 
 ---@alias LazyRootSpec string|string[]|LazyRootFn
 
+-- additional path root spec to determine for LSP root
+M.additional_path_root_spec = { "content" }
+-- ignore lsp for certain root
+M.root_lsp_ignore = { "copilot" }
+
 ---@type LazyRootSpec[]
-M.spec = { "lsp", vim.list_extend({ ".git", "lua" }, vim.g.additional_path_root_spec or {}), "cwd" }
+M.spec = { "lsp", vim.list_extend({ ".git", "lua" }, M.additional_path_root_spec or {}), "cwd" }
 
 M.detectors = {}
 
@@ -25,7 +30,7 @@ function M.detectors.lsp(buf)
   local roots = {} ---@type string[]
   local clients = vim.tbl_filter(
     ---@param client vim.lsp.Client
-    function(client) return not vim.tbl_contains(vim.g.root_lsp_ignore or {}, client.name) end,
+    function(client) return not vim.tbl_contains(M.root_lsp_ignore or {}, client.name) end,
     Util.lsp.get_clients { bufnr = buf }
   )
 

@@ -43,7 +43,8 @@ return {
         severity_sort = true,
         underline = false,
         update_in_insert = false,
-        virtual_text = vim.g.inline_diagnostics and { spacing = 2, min = "Error" } or false,
+        -- enable virtual text with { spacing = 2, min = "Error" }
+        virtual_text = false,
         float = {
           close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
           focusable = false,

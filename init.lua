@@ -1,4 +1,3 @@
---#region globals
 ---@generic T
 ---Pretty print a value for better inspect. Under the hood it uses vim.inspect
 ---@param v T any type
@@ -26,8 +25,15 @@ _G.convert_avante_diff_to_qf = function()
   end)
 end
 
---#endregion
---#region options
+---@param mode string|string[]
+---@param lhs string
+---@param rhs string|(fun(...): any)
+---@param opts? vim.keymap.set.LazyOpts
+local map = function(mode, lhs, rhs, opts)
+  opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
+
 if vim.uv.os_uname().sysname == "Darwin" then
   vim.g.clipboard = {
     name = "macOS-clipboard",
@@ -46,16 +52,6 @@ vim.g.maplocalleader = ","
 vim.g.markdown_recommended_style = 0
 -- autoformat on save
 vim.g.autoformat = true
--- enable inline diagnostics
-vim.g.inline_diagnostics = false
--- whether to enable ghost text for completions
-vim.g.ghost_text = false
--- whether to render markdown, essentially changing toe conceallevel here
-vim.g.enable_render = false
--- additional path root spec to determine for LSP root
-vim.g.additional_path_root_spec = { "content" }
--- ignore lsp for certain root
-vim.g.root_lsp_ignore = { "copilot" }
 -- additional plugins to be used.
 vim.g.extra_plugins = {
   -- lang
@@ -75,22 +71,18 @@ vim.g.extra_plugins = {
   -- linters
   "plugins.linters.eslint",
 }
--- whether to enable RAG for avante
-vim.g.avante_rag = false
 
--- window opts
-vim.wo.scrolloff = 8
-vim.wo.sidescrolloff = 8
-vim.wo.wrap = false -- need to wrap chungus
+vim.wo.scrolloff = 16
+vim.wo.sidescrolloff = 16
+vim.wo.wrap = false
 vim.wo.cursorline = true
 vim.wo.cursorcolumn = false
 
 -- only set clipboard if not in ssh, to make sure the OSC 52
 -- integration works automatically. Requires Neovim >= 0.10.0
 vim.opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
-vim.opt.completeopt = "menu,menuone,noselect"
 vim.opt.confirm = true
-vim.opt.winminwidth = 3 -- Minimum window width
+vim.opt.winminwidth = 3
 vim.opt.termguicolors = true
 
 -- Some defaults and don't question it
@@ -115,7 +107,7 @@ vim.o.pumblend = 0 -- make completion window transparent
 
 vim.opt.shortmess:append { W = true, c = true, C = true }
 vim.o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
-vim.o.completeopt = "menu,menuone,noselect"
+vim.opt.completeopt = "menu,menuone,noselect,preview"
 vim.o.formatoptions = "tcqjro1ln"
 
 vim.o.diffopt = "filler,iwhite,internal,linematch:60,algorithm:patience"
@@ -185,7 +177,9 @@ vim.o.updatetime = 250
 vim.o.virtualedit = "block"
 vim.o.laststatus = 3
 vim.o.whichwrap = "h,l,<,>,[,],~"
-vim.go.background = os.getenv "XDG_SYSTEM_THEME" or "dark"
+
+local background = os.getenv "XDG_SYSTEM_THEME"
+vim.go.background = background ~= nil and background or "dark"
 
 -- For neovide
 vim.o.guifont = "BerkeleyMono Nerd Font Mono:h16"
@@ -194,12 +188,24 @@ vim.o.guifont = "BerkeleyMono Nerd Font Mono:h16"
 vim.o.wildchar = 9
 vim.o.wildignorecase = true
 vim.o.wildmode = "longest:full,full"
-vim.opt.wildignore = { "__pycache__", "*.o", "*~", "*.pyc", "*pycache*", "Cargo.lock", "lazy-lock.json" }
-vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
+vim.opt.wildignore = {
+  "__pycache__",
+  "*.o",
+  "*~",
+  "*.pyc",
+  "*pycache*",
+  "Cargo.lock",
+  "lazy-lock.json",
+  ".ruff_cache",
+  ".venv",
+  "venv",
+  "uv.lock",
+}
+vim.opt.wildmode = "longest:full,full,noselect"
 
 vim.o.cmdheight = 1
 vim.o.guicursor = "" -- "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
-vim.o.conceallevel = vim.g.enable_render and 2 or 0
+vim.o.conceallevel = 0
 
 if vim.g.neovide then
   vim.g.neovide_show_border = true
@@ -220,18 +226,7 @@ if vim.g.neovide then
   vim.api.nvim_set_keymap("n", "<D-w>", ":q<CR>", { noremap = true, silent = true })
 end
 
--- respect local venv instead of nix setup
-local venv = os.getenv "VIRTUAL_ENV"
-if venv ~= nil then vim.g.python3_host_prog = venv .. "/bin/python3" end
-
-vim.keymap.set({ "n", "x" }, " ", "", { noremap = true })
---#endregion
---#region bindings
-local map = function(mode, lhs, rhs, opts)
-  opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
-  vim.keymap.set(mode, lhs, rhs, opts)
-end
-
+map({ "n", "x" }, " ", "", { noremap = true })
 -- Open a terminal at the bottom of the screen with a fixed height.
 map(
   "n",
@@ -263,8 +258,6 @@ map("t", "<C-w>k", "<cmd>wincmd k<cr>", { desc = "terminal: go to upper window" 
 map("t", "<C-w>l", "<cmd>wincmd l<cr>", { desc = "terminal: go to right window" })
 map("i", "jj", "<Esc>", { desc = "normal: escape" })
 map("i", "jk", "<Esc>", { desc = "normal: escape" })
-
--- NOTE: normal mode
 map("n", "<leader><leader>a", "<CMD>normal za<CR>", { desc = "edit: Toggle code fold" })
 map("n", "Y", "y$", { desc = "edit: Yank text to EOL" })
 map("n", "D", "d$", { desc = "edit: Delete text to EOL" })
@@ -290,7 +283,6 @@ map("n", "<LocalLeader>-", "<C-w>_", { desc = "window: Maxout width" })
 map("n", "<LocalLeader>0", "<C-w>=", { desc = "window: Equal size" })
 map("n", "<Leader>qq", "<cmd>wqa!<cr>", { desc = "editor: write quit all" })
 map("n", "<Leader>`", "<cmd>e #<cr>", { desc = "buffer: switch to other buffer" })
-map("n", "<Leader>n", "<cmd>enew<cr>", { desc = "buffer: new" })
 map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
 map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
 map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
@@ -300,7 +292,6 @@ map("n", "<LocalLeader>[", "<cmd>vertical resize +10<cr>", { noremap = false, de
 map("n", "<LocalLeader>-", "<cmd>resize -10<cr>", { noremap = false, desc = "windows: resize down 10px" })
 map("n", "<LocalLeader>=", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
 map("n", "<leader><leader>b", "<cmd>wincmd =<cr>", { noremap = true, silent = true, desc = "windows: balance" })
-
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "search: next" })
 map("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "search: next" })
@@ -308,29 +299,19 @@ map("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "search: next" })
 map("n", "N", "'nN'[v:searchforward].'zv'", { expr = true, desc = "search: prev" })
 map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "search: prev" })
 map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "search: prev" })
-
 -- highlights under cursor
 map("n", "<leader>ui", vim.show_pos, { desc = "inspect: position" })
 map("n", "<leader>uI", "<cmd>InspectTree<cr>", { desc = "inspect: tree" })
-
 -- Add undo break-points
 map("i", ",", ",<c-g>u")
 map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
-
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
---#endregion
 
 hi("HighlightURL", { default = true, underline = true })
 hi("CmpGhostText", { link = "Comment", default = true })
--- leap.nvim
-hi("LeapBackdrop", { link = "Comment" }) ---or some grey
-hi("LeapMatch", {
-  ---For light themes, set to 'black' or similar.
-  fg = vim.go.background == "dark" and "white" or "black",
-  bold = true,
-  nocombine = true,
-})
+hi("LeapBackdrop", { link = "Comment" })
+hi("LeapMatch", { fg = vim.go.background == "dark" and "white" or "black", bold = true, nocombine = true })
 
 -- close some filetypes with <q> and make it unlisted by buf
 vim.api.nvim_create_autocmd("FileType", {

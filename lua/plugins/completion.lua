@@ -76,7 +76,6 @@ return {
         },
         accept = { auto_brackets = { enabled = false } },
         documentation = { auto_show = false, auto_show_delay_ms = 200 },
-        ghost_text = { enabled = vim.g.ghost_text },
         trigger = { show_in_snippet = false },
         list = {
           selection = {

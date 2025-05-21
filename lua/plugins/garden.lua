@@ -168,7 +168,7 @@ return {
         -- api_key_name = "cmd:bw get notes gemini-api-key",
       },
       rag_service = {
-        enabled = vim.g.avante_rag,
+        enabled = true,
         runner = "nix",
         llm_model = "o4-mini",
         embed_model = "text-embedding-3-small",

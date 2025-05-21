@@ -59,7 +59,6 @@ return {
     enabled = function() return vim.g.markdown_render_backend == "render-markdown" and false end,
     opts = function()
       return {
-        enabled = vim.g.enable_render,
         render_modes = { "n", "c" },
         max_file_size = Snacks.config.bigfile.size,
         heading = { sign = false },
