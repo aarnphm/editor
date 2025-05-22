@@ -9,14 +9,16 @@ return {
         highlight_groups = {
           StatusLine = { fg = palette.orange_two, bg = palette.overlay },
           StatusLineNC = { bg = palette.overlay },
-          AvanteTitle = { fg = palette.highlight_high, bg = palette.red_two },
+          Winbar = { bg = palette.base },
+          WinbarNC = { bg = palette.base },
+          AvanteTitle = { bg = palette.red_two },
           AvanteReversedTitle = { fg = palette.red_two },
           AvanteSubtitle = { fg = palette.highlight_med, bg = palette.cyan_two },
           AvanteReversedSubtitle = { fg = palette.cyan_two },
           AvanteThirdTitle = { fg = palette.highlight_med, bg = palette.purple_two },
           AvanteReversedThirdTitle = { fg = palette.purple_two },
-          AvanteConflictCurrent = { fg = palette.highlight_high, bg = palette.red_two },
-          AvanteConflictIncoming = { fg = palette.highlight_high, bg = palette.green_two },
+          AvanteConflictCurrent = { bg = palette.red_two },
+          AvanteConflictIncoming = { bg = palette.green_two },
         },
       }
       vim.cmd "colorscheme flexoki"

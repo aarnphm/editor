@@ -113,7 +113,7 @@ return {
     build = "nix run .#plugin",
     event = "LazyFile",
     dependencies = {
-      "nui.nvim",
+      "MunifTanjim/nui.nvim",
       -- support for image pasting
       {
         "HakonHarnes/img-clip.nvim",

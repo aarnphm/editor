@@ -157,7 +157,7 @@ M.generate = function()
       end
 
       local icon = args.icon or ""
-      if vim.tbl_count(t) == 0 then return ("%s -"):format(icon) end
+      if vim.tbl_count(t) == 0 then return ("[%s]"):format(icon) end
       return string.format("[%s %s]", icon, table.concat(t, " "))
     end,
     filename = function(args)
