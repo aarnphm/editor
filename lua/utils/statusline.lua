@@ -98,20 +98,13 @@ H.diagnostic_levels = {
   { name = "HINT", sign = "⚑" },
 }
 
-H.diagnostic_get_count = function()
-  ---@type table<vim.diagnostic.Severity?, integer>
-  local res = {}
-  for _, d in
-    ipairs(vim.tbl_filter(
-      ---@param d vim.Diagnostic
-      function(d) return d.severity ~= nil end,
-      vim.diagnostic.get(0)
-    ))
-  do
-    res[d.severity] = (res[d.severity] or 0) + 1
-  end
-  return res
-end
+H.diagnostic_is_disabled = function() return not vim.diagnostic.is_enabled { bufnr = 0 } end
+
+H.diagnostic_get_count = function(buf_id) return vim.diagnostic.count(buf_id) end
+
+-- Diagnostic counts per buffer id
+---@type table<integer, table<string, integer>>
+H.diagnostic_counts = {}
 
 ---@class SimpleStatuslineArgs
 ---@field icon string|nil
@@ -147,7 +140,9 @@ M.generate = function()
     diagnostic = function(args)
       if H.is_truncated(args.trunc_width) or not vim.diagnostic.is_enabled { bufnr = 0 } then return "" end
 
-      local count = H.diagnostic_get_count()
+      local count = H.diagnostic_counts[vim.api.nvim_get_current_buf()]
+      if count == nil or H.diagnostic_is_disabled() then return "" end
+
       local severity, t = vim.diagnostic.severity, {}
       -- construct diagnostic info
       for _, level in ipairs(H.diagnostic_levels) do
@@ -187,10 +182,10 @@ M.generate = function()
       -- Construct output string with extra file info
       return string.format("%s", filetype)
     end,
-    location = function(args)
+    location = function()
       -- '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
-      local icon = args.icon or "♥"
-      return "%-5.(%l:%c%V%) %P" .. (" %s"):format(icon)
+      -- local icon = args.icon or "♥"
+      return "%-5.(%l:%c%V%) %P"
     end,
     ---@return {md:string, hl:string}
     mode = function()
@@ -208,6 +203,21 @@ M.generate = function()
       return string.format("[%s]", table.concat { head, hunks })
     end,
   }
+end
+
+M.setup = function()
+  local au = function(event, pattern, callback, desc)
+    vim.api.nvim_create_autocmd(
+      event,
+      { group = augroup "statusline", pattern = pattern, callback = callback, desc = desc }
+    )
+  end
+
+  local track_diagnostics = vim.schedule_wrap(function(data)
+    H.diagnostic_counts[data.buf] = vim.api.nvim_buf_is_valid(data.buf) and H.diagnostic_get_count(data.buf) or nil
+    vim.cmd "redrawstatus"
+  end)
+  au("DiagnosticChanged", "*", track_diagnostics, "Track diagnostics")
 end
 
 return M

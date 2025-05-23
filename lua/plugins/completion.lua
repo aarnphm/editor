@@ -32,20 +32,20 @@ return {
       },
     },
   },
-  -- {
-  --   "folke/lazydev.nvim",
-  --   ft = "lua",
-  --   cmd = "LazyDev",
-  --   opts = {
-  --     library = {
-  --       { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
-  --       { path = "~/workspace/neovim-plugins/surf.nvim/lua", words = { "surf" } },
-  --       { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-  --       { path = "snacks.nvim", words = { "Snacks" } },
-  --       { path = "conform.nvim", words = { "conform" } },
-  --     },
-  --   },
-  -- },
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    cmd = "LazyDev",
+    opts = {
+      library = {
+        { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
+        { path = "~/workspace/neovim-plugins/surf.nvim/lua", words = { "surf" } },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        { path = "snacks.nvim", words = { "Snacks" } },
+        { path = "conform.nvim", words = { "conform" } },
+      },
+    },
+  },
   {
     "saghen/blink.cmp",
     version = false,
@@ -86,15 +86,15 @@ return {
       cmdline = { enabled = false },
       sources = {
         default = { "lsp", "path", "snippets", "buffer", "emoji" },
-        -- per_filetype = {
-        --   lua = { inherit_defaults = true, "lazydev" },
-        -- },
+        per_filetype = {
+          lua = { inherit_defaults = true, "lazydev" },
+        },
         providers = {
-          -- lazydev = {
-          --   name = "LazyDev",
-          --   module = "lazydev.integrations.blink",
-          --   score_offset = 100,
-          -- },
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            score_offset = 100,
+          },
           snippets = {
             opts = {
               ignored_filetypes = { "git", "gitcommit" },

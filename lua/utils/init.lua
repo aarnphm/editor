@@ -11,6 +11,7 @@
 ---@field terminal lazyvim.util.terminal
 ---@field treesitter lazyvim.util.treesitter
 ---@field statusline lazyvim.util.statusline
+---@field words lazyvim.util.words
 local M = {}
 
 local LazyUtil = require "lazy.core.util"
@@ -41,6 +42,7 @@ function M.setup(opts)
 
   M.on_very_lazy(function()
     M.format.setup()
+    M.statusline.setup()
 
     Util.format.snacks_toggle():map "<leader>uf"
     Util.format.snacks_toggle(true):map "<leader>uF"

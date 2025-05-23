@@ -3,12 +3,14 @@ return {
     "nuvic/flexoki-nvim",
     name = "flexoki",
     priority = 1000,
-    config = function()
+    ---@return Options
+    opts = function()
       local palette = require "flexoki.palette"
-      require("flexoki").setup {
+      return {
         highlight_groups = {
           StatusLine = { fg = palette.orange_two, bg = palette.overlay },
           StatusLineNC = { bg = palette.overlay },
+          QuickFixLine = { bg = palette.highlight_high },
           Winbar = { bg = palette.base },
           WinbarNC = { bg = palette.base },
           AvanteTitle = { bg = palette.red_two },
@@ -21,6 +23,9 @@ return {
           AvanteConflictIncoming = { bg = palette.green_two },
         },
       }
+    end,
+    config = function(_, opts)
+      require("flexoki").setup(opts)
       vim.cmd "colorscheme flexoki"
     end,
   },
@@ -38,8 +43,8 @@ return {
         highlight_groups = {
           StatusLine = { fg = "rose", bg = "overlay", blend = 0 },
           QuickFixLine = { bg = "highlight_high" },
-          WinBar = { fg = "subtle", bg = "none", blend = 0 },
-          WinBarNC = { fg = "subtle", bg = "none" },
+          -- WinBar = { fg = "subtle", bg = "none", blend = 0 },
+          -- WinBarNC = { fg = "subtle", bg = "none" },
           --- nvim-window-picker.nvim
           WindowPickerStatusLine = { fg = "rose", bg = "iris", blend = 10 },
           WindowPickerStatusLineNC = { fg = "subtle", bg = "surface" },

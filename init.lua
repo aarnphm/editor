@@ -171,13 +171,13 @@ o.ls = 3
 o.stl = table.concat({
   "[%{%luaeval('Util.STL.mode {trunc_width = 75}').md %}]",
   "%{%luaeval('Util.STL.git {trunc_width = 70}')%}",
-  "%=",
   "%{%luaeval('Util.STL.filename {trunc_width = 40}')%}",
   "%=",
+  "%{%luaeval('Util.STL.location {trunc_width = 60}')%}",
   "%{%luaeval('Util.STL.lint {trunc_width = 70}')%}",
   "%{%luaeval('Util.STL.diagnostic {trunc_width = 70}')%}",
   "%{%luaeval('Util.STL.fileinfo {trunc_width = 70}')%}",
-  "%{%luaeval('Util.STL.location {trunc_width = 60}')%}",
+  "♥",
 }, " ")
 o.whichwrap = "b,s,<,>,[,],~"
 o.guifont = "BerkeleyMono Nerd Font Mono:h16"
