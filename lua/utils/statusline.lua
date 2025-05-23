@@ -15,7 +15,7 @@ H.ensure_get_icon = function()
     return
   elseif _G.MiniIcons ~= nil then
     -- Prefer 'mini.icons'
-    H.get_icon = function(filetype) return _G.MiniIcons.get("filetype", filetype) end
+    H.get_icon = function(filetype) return MiniIcons.get("filetype", filetype) end
   else
     -- Try falling back to 'nvim-web-devicons'
     local has_devicons, devicons = pcall(require, "nvim-web-devicons")
@@ -98,13 +98,12 @@ H.diagnostic_levels = {
   { name = "HINT", sign = "⚑" },
 }
 
-H.diagnostic_is_disabled = function() return not vim.diagnostic.is_enabled { bufnr = 0 } end
+---@param buf_id number
+H.compute_attached_lsp = function(buf_id) return string.rep("*", vim.tbl_count(vim.lsp.get_clients { bufnr = buf_id })) end
 
-H.diagnostic_get_count = function(buf_id) return vim.diagnostic.count(buf_id) end
-
--- Diagnostic counts per buffer id
----@type table<integer, table<string, integer>>
-H.diagnostic_counts = {}
+-- String representation of attached LSP clients per buffer id
+---@type table<integer, string | nil>
+H.attached_lsp = {}
 
 ---@class SimpleStatuslineArgs
 ---@field icon string|nil
@@ -133,15 +132,22 @@ M.generate = function()
 
       if #linters == 0 then
         local counts = vim.tbl_count(names)
-        return "[" .. "󰦕" .. (counts > 0 and " " .. string.rep("+", counts) or "") .. "]"
+        return "[󰦕" .. "" .. (counts > 0 and " " .. string.rep("+", counts) or "") .. "]"
       end
-      return "󱉶 [" .. table.concat(linters, "|") .. "]"
+      return "[󱉶" .. table.concat(linters, "|") .. "]"
+    end,
+    lsp = function()
+      local attached = H.attached_lsp[vim.api.nvim_get_current_buf()] or ""
+
+      if attached == "" then return "[󰰎]" end
+      return ("[󰰎 %s]"):format(attached)
     end,
     diagnostic = function(args)
-      if H.is_truncated(args.trunc_width) or not vim.diagnostic.is_enabled { bufnr = 0 } then return "" end
+      if H.is_truncated(args.trunc_width) then return "" end
 
-      local count = H.diagnostic_counts[vim.api.nvim_get_current_buf()]
-      if count == nil or H.diagnostic_is_disabled() then return "" end
+      local buf = vim.api.nvim_get_current_buf()
+      local count = vim.diagnostic.count(buf)
+      if count == nil or (not vim.diagnostic.is_enabled { bufnr = buf }) then return "" end
 
       local severity, t = vim.diagnostic.severity, {}
       -- construct diagnostic info
@@ -152,7 +158,7 @@ M.generate = function()
       end
 
       local icon = args.icon or ""
-      if vim.tbl_count(t) == 0 then return ("[%s]"):format(icon) end
+      if #t == 0 then return string.format("[%s]", icon) end
       return string.format("[%s %s]", icon, table.concat(t, " "))
     end,
     filename = function(args)
@@ -174,23 +180,30 @@ M.generate = function()
 
       -- Add filetype icon
       H.ensure_get_icon()
-      if H.get_icon ~= nil then filetype = H.get_icon(filetype) .. " " .. filetype end
+      ---@type string
+      local resolved_ft
+      if H.get_icon ~= nil then
+        resolved_ft = string.format("%s %s", H.get_icon(filetype), filetype)
+      else
+        resolved_ft = filetype
+      end
 
       -- Construct output string if truncated or buffer is not normal
-      if H.is_truncated(args.trunc_width) or vim.bo.buftype ~= "" then return filetype end
+      if H.is_truncated(args.trunc_width) or vim.bo.buftype ~= "" then return resolved_ft end
 
+      -- local icon = args.icon or "♥"
       -- Construct output string with extra file info
-      return string.format("%s", filetype)
+      return resolved_ft
     end,
     location = function()
       -- '%l:%2v:%-2{virtcol("$") - 1}' .. (" %s"):format(icon)
       -- local icon = args.icon or "♥"
       return "%-5.(%l:%c%V%) %P"
     end,
-    ---@return {md:string, hl:string}
     mode = function()
       local mi = H.modes[vim.fn.mode()]
-      return { md = mi.short, hl = mi.hl }
+      local resolved = { md = mi.short, hl = mi.hl }
+      return ("%%#%s#[%s]"):format(resolved.hl, resolved.md)
     end,
     git = function(args)
       if H.isnt_normal_buffer() then return "" end
@@ -212,12 +225,29 @@ M.setup = function()
       { group = augroup "statusline", pattern = pattern, callback = callback, desc = desc }
     )
   end
+  local set_default_hl = function(name, data)
+    data.default = true
+    vim.api.nvim_set_hl(0, name, data)
+  end
 
-  local track_diagnostics = vim.schedule_wrap(function(data)
-    H.diagnostic_counts[data.buf] = vim.api.nvim_buf_is_valid(data.buf) and H.diagnostic_get_count(data.buf) or nil
+  set_default_hl("MiniStatuslineModeNormal", { link = "Cursor" })
+  set_default_hl("MiniStatuslineModeInsert", { link = "DiffChange" })
+  set_default_hl("MiniStatuslineModeVisual", { link = "DiffAdd" })
+  set_default_hl("MiniStatuslineModeReplace", { link = "DiffDelete" })
+  set_default_hl("MiniStatuslineModeCommand", { link = "DiffText" })
+  set_default_hl("MiniStatuslineModeOther", { link = "IncSearch" })
+
+  set_default_hl("MiniStatuslineDevinfo", { link = "StatusLine" })
+  set_default_hl("MiniStatuslineFilename", { link = "StatusLineNC" })
+  set_default_hl("MiniStatuslineFileinfo", { link = "StatusLine" })
+  set_default_hl("MiniStatuslineInactive", { link = "StatusLineNC" })
+
+  -- Use `schedule_wrap()` because at `LspDetach` server is still present
+  local track_lsp = vim.schedule_wrap(function(data)
+    H.attached_lsp[data.buf] = vim.api.nvim_buf_is_valid(data.buf) and H.compute_attached_lsp(data.buf) or nil
     vim.cmd "redrawstatus"
   end)
-  au("DiagnosticChanged", "*", track_diagnostics, "Track diagnostics")
+  au({ "LspAttach", "LspDetach" }, "*", track_lsp, "Track LSP clients")
 end
 
 return M

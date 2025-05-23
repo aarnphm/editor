@@ -122,7 +122,7 @@ o.undolevels = 9999
 o.showtabline = 0
 o.smoothscroll = true
 
-o.shortmess = "aoOTIcF"
+o.shortmess = "aoIcF"
 o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 o.cot = "menu,menuone,noinsert,fuzzy,popup"
 o.cia = "kind,abbr,menu"
@@ -169,16 +169,11 @@ o.virtualedit = "block"
 
 o.ls = 3
 o.stl = table.concat({
-  "[%{%luaeval('Util.STL.mode {trunc_width = 75}').md %}]",
-  "%{%luaeval('Util.STL.git {trunc_width = 70}')%}",
-  "%{%luaeval('Util.STL.filename {trunc_width = 40}')%}",
+  "%{%luaeval('Util.STL.mode {trunc_width = 40}')%}",
+  "%#StatusLine# %{%luaeval('Util.STL.git {trunc_width = 70}')%} %{%luaeval('Util.STL.filename {trunc_width = 40}')%}",
   "%=",
-  "%{%luaeval('Util.STL.location {trunc_width = 60}')%}",
-  "%{%luaeval('Util.STL.lint {trunc_width = 70}')%}",
-  "%{%luaeval('Util.STL.diagnostic {trunc_width = 70}')%}",
-  "%{%luaeval('Util.STL.fileinfo {trunc_width = 70}')%}",
-  "♥",
-}, " ")
+  " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
+}, "")
 o.whichwrap = "b,s,<,>,[,],~"
 o.guifont = "BerkeleyMono Nerd Font Mono:h16"
 o.cmdheight = 1

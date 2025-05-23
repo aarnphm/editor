@@ -37,12 +37,12 @@ function M.setup(opts)
 
   LazyEvent.mappings.LazyFile = { id = "LazyFile", event = { "BufReadPost", "BufNewFile", "BufWritePre" } }
   LazyEvent.mappings["User LazyFile"] = LazyEvent.mappings.LazyFile
+  M.statusline.setup()
 
   require("lazy").setup(opts)
 
   M.on_very_lazy(function()
     M.format.setup()
-    M.statusline.setup()
 
     Util.format.snacks_toggle():map "<leader>uf"
     Util.format.snacks_toggle(true):map "<leader>uF"

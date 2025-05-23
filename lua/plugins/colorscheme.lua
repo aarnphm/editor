@@ -21,6 +21,13 @@ return {
           AvanteReversedThirdTitle = { fg = palette.purple_two },
           AvanteConflictCurrent = { bg = palette.red_two },
           AvanteConflictIncoming = { bg = palette.green_two },
+          -- mini.nvim
+          MiniStatuslineModeNormal = { bg = palette.blue_two },
+          MiniStatuslineModeVisual = { bg = palette.green_two },
+          MiniStatuslineModeInsert = { bg = palette.orange_two },
+          MiniStatuslineModeReplace = { bg = palette.red_two },
+          MiniStatuslineModeCommand = { bg = palette.purple_two },
+          MiniStatuslineModeOther = { bg = palette.purple_two },
         },
       }
     end,
