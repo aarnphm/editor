@@ -426,6 +426,19 @@ vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, 
     end
   end,
 })
+-- auto wrap based on column width
+vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+  group = augroup "auto_wrap",
+  callback = function()
+    local columns = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
+    if columns < 120 then
+      vim.wo.wrap = true
+      vim.wo.linebreak = true
+    else
+      vim.wo.wrap = false
+    end
+  end,
+})
 -- add bigfile filetype and disable some defaults on bigfile
 -- add http, dotenv, tsconfig
 vim.filetype.add {
