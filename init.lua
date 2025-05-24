@@ -427,10 +427,10 @@ vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, 
   end,
 })
 -- auto wrap based on column width
-vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinEnter", "BufEnter", "FocusLost" }, {
   group = augroup "auto_wrap",
   callback = function()
-    local columns = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
+    local columns = vim.api.nvim_win_get_width(0)
     if columns < 120 then
       vim.wo.wrap = true
       vim.wo.linebreak = true
