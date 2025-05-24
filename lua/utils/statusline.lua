@@ -10,18 +10,9 @@ H.isnt_normal_buffer = function() return vim.bo.buftype ~= "" end
 H.get_icon = nil
 
 H.ensure_get_icon = function()
-  if H.get_icon ~= nil then
-    -- Cache only once
-    return
-  elseif _G.MiniIcons ~= nil then
-    -- Prefer 'mini.icons'
-    H.get_icon = function(filetype) return MiniIcons.get("filetype", filetype) end
-  else
-    -- Try falling back to 'nvim-web-devicons'
-    local has_devicons, devicons = pcall(require, "nvim-web-devicons")
-    if not has_devicons then return end
-    H.get_icon = function() return (devicons.get_icon(vim.fn.expand "%:t", nil, { default = true })) end
-  end
+  -- Cache only once
+  if H.get_icon ~= nil then return end
+  H.get_icon = function(filetype) return require("mini.icons").get("filetype", filetype) end
 end
 
 H.is_truncated = function(trunc_width)
@@ -41,9 +32,7 @@ end
 
 H.get_hunks = function()
   local hunks = {}
-  if vim.g.loaded_gitgutter then
-    hunks = vim.fn.GitGutterGetHunkSummary()
-  elseif vim.b.gitsigns_status_dict then
+  if vim.b.gitsigns_status_dict then
     hunks = {
       vim.b.gitsigns_status_dict.added,
       vim.b.gitsigns_status_dict.changed,
@@ -128,23 +117,23 @@ M.generate = function()
       local linters = lint.get_running()
       local names = lint._resolve_linter_by_ft(vim.bo.filetype)
 
-      if H.is_truncated(args.trunc_width) then return #linters == 0 and "󰦕" or "󱉶" end
+      if H.is_truncated(args.trunc_width) then return #linters == 0 and "[󰦕]" or "[󱉶]" end
 
       if #linters == 0 then
         local counts = vim.tbl_count(names)
-        return "[󰦕" .. "" .. (counts > 0 and " " .. string.rep("+", counts) or "") .. "]"
+        return "[󰦕" .. (counts > 0 and " " .. string.rep("+", counts) or "") .. "]"
       end
-      return "[󱉶" .. table.concat(linters, "|") .. "]"
+      return "[󱉶 " .. table.concat(linters, "|") .. "]"
     end,
-    lsp = function()
+    lsp = function(args)
       local attached = H.attached_lsp[vim.api.nvim_get_current_buf()] or ""
 
-      if attached == "" then return "[󰰎]" end
-      return ("[󰰎 %s]"):format(attached)
+      local icon = args.icon or "󰰎"
+      if attached == "" then return string.format("[%s]", icon) end
+      if H.is_truncated(args.trunc_width) then return string.format("[%s %d]", icon, #attached) end
+      return string.format("[%s %s]", icon, attached)
     end,
     diagnostic = function(args)
-      if H.is_truncated(args.trunc_width) then return "" end
-
       local buf = vim.api.nvim_get_current_buf()
       local count = vim.diagnostic.count(buf)
       if count == nil or (not vim.diagnostic.is_enabled { bufnr = buf }) then return "" end
@@ -158,6 +147,7 @@ M.generate = function()
       end
 
       local icon = args.icon or ""
+      if H.is_truncated(args.trunc_width) then return string.format("[%s %d]", icon, #t) end
       if #t == 0 then return string.format("[%s]", icon) end
       return string.format("[%s %s]", icon, table.concat(t, " "))
     end,
@@ -200,9 +190,9 @@ M.generate = function()
       -- local icon = args.icon or "♥"
       return "%-5.(%l:%c%V%) %P"
     end,
-    mode = function()
+    mode = function(args)
       local mi = H.modes[vim.fn.mode()]
-      local resolved = { md = mi.short, hl = mi.hl }
+      local resolved = { md = H.is_truncated(args.trunc_width) and mi.short or mi.long, hl = mi.hl }
       return ("%%#%s#[%s]"):format(resolved.hl, resolved.md)
     end,
     git = function(args)
@@ -210,6 +200,8 @@ M.generate = function()
       local icon = args.icon or ""
       local head = H.get_branch(icon)
       local hunks = H.get_hunks()
+
+      if H.is_truncated(args.trunc_width) then return string.format("[%s]", head) end
 
       if hunks == H.concat_hunks { 0, 0, 0 } and head == "" then hunks = "" end
       if hunks ~= "" and head ~= "" then head = head .. " " end

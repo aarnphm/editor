@@ -1,8 +1,8 @@
 return {
-  { "mason.nvim", opts = { ensure_installed = { "oxlint" } } },
-  { "nvim-lint", opts = { linters_by_ft = { typescript = { "eslint", "oxlint" } } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "oxlint" } } },
+  { "mfussenegger/nvim-lint", opts = { linters_by_ft = { typescript = { "eslint", "oxlint" } } } },
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         vtsls = {

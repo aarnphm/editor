@@ -73,9 +73,9 @@ return {
       vim.g.db_ui_execute_on_save = false
     end,
   },
-  { "mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "sqlfluff" } } },
   {
-    "nvim-lint",
+    "mfussenegger/nvim-lint",
     opts = function(_, opts)
       for _, ft in ipairs(sql_ft) do
         opts.linters_by_ft[ft] = opts.linters_by_ft[ft] or {}

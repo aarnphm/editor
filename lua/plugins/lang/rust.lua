@@ -71,5 +71,5 @@ return {
       end
     end,
   },
-  { "nvim-lspconfig", opts = { servers = { taplo = {}, rust_analyzer = { enabled = false } } } },
+  { "neovim/nvim-lspconfig", opts = { servers = { taplo = {}, rust_analyzer = { enabled = false } } } },
 }

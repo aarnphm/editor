@@ -1,9 +1,9 @@
 return {
-  { "mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt", "golangci-lint" } } },
-  { "nvim-lint", opts = { linters_by_ft = { go = { "golangcilint" } } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt", "golangci-lint" } } },
+  { "mfussenegger/nvim-lint", opts = { linters_by_ft = { go = { "golangcilint" } } } },
   { "conform.nvim", opts = { formatters_by_ft = { go = { "goimports", "gofumpt" } } } },
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         gopls = {

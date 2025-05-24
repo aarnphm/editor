@@ -485,7 +485,7 @@ require("lazy").setup {
       "neovim/nvim-lspconfig",
       event = "VeryLazy",
       dependencies = {
-        "mason.nvim",
+        "mason-org/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         { "b0o/SchemaStore.nvim", lazy = true, version = false, ft = { "json", "yaml" } },
       },

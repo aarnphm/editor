@@ -1,7 +1,7 @@
 return {
-  { "mason.nvim", opts = { ensure_installed = { "nil" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "nil" } } },
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         nil_ls = {

@@ -1,3 +1,3 @@
 return {
-  { "nvim-lspconfig", opts = { servers = { zls = {} } } },
+  { "neovim/nvim-lspconfig", opts = { servers = { zls = {} } } },
 }

@@ -1,7 +1,7 @@
 return {
-  { "mason.nvim", opts = { ensure_installed = { "ruff", "basedpyright", "mypy" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "ruff", "basedpyright", "mypy" } } },
   {
-    "nvim-lint",
+    "mfussenegger/nvim-lint",
     opts = {
       linters_by_ft = { python = { "ruff", "mypy" } },
       linters = {
@@ -20,7 +20,7 @@ return {
   },
   { "conform.nvim", opts = { formatters_by_ft = { python = { "ruff_fix", "ruff_organize_import" } } } },
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         basedpyright = {},

@@ -47,7 +47,7 @@ M.has_config = Util.memoize(M.has_config)
 M.has_parser = Util.memoize(M.has_parser)
 
 return {
-  { "mason.nvim", opts = { ensure_installed = { "prettier" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "prettier" } } },
   {
     "conform.nvim",
     ---@param opts conform.setupOpts

@@ -3,9 +3,9 @@
 local markdown_render_backend = "render-markdown"
 
 return {
-  { "mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
   {
-    "nvim-lint",
+    "mfussenegger/nvim-lint",
     opts = {
       linters_by_ft = { markdown = { "markdownlint", "typos" } },
       linters = {
@@ -21,7 +21,7 @@ return {
     },
   },
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         typos_lsp = {},

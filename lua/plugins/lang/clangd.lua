@@ -1,5 +1,5 @@
 return {
-  { "mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
   {
     "p00f/clangd_extensions.nvim",
     lazy = true,
@@ -31,7 +31,7 @@ return {
     },
   },
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         clangd = {

@@ -316,7 +316,7 @@ M.colors = {
 
 M.plugin = {
   {
-    "nvim-lspconfig",
+    "neovim/nvim-lspconfig",
     opts = {
       servers = {
         tailwindcss = {
