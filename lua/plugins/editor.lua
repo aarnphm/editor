@@ -119,6 +119,8 @@ return {
   {
     "stevearc/conform.nvim",
     lazy = true,
+    cmd = "ConformInfo",
+    dependencies = { "mason.nvim" },
     init = function()
       -- install conform formatter on VeryLazy
       Util.on_very_lazy(function()

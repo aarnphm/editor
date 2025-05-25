@@ -4,6 +4,7 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     version = false,
+    opts_extend = { "ensure_installed" },
     opts = {
       ensure_installed = { "stylua", "shfmt", "beautysh", "selene", "hadolint", "ast-grep", "typos", "cbfmt" },
       ui = { backdrop = 100 },
@@ -33,7 +34,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile", "BufWritePre" },
-    dependencies = { "mason-org/mason.nvim", "williamboman/mason-lspconfig.nvim" },
+    dependencies = { "mason-org/mason.nvim", "mason-org/mason-lspconfig.nvim" },
     ---@class PluginLspOptions
     ---@field setup table<string, fun(server: string, opts: table<string, any>): boolean>
     opts = {
