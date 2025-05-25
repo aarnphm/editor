@@ -67,8 +67,8 @@ g.loaded_netrw = 1
 g.loaded_netrwPlugin = 1
 g.loaded_netrwSettings = 1
 
-g.mapleader = " "
-g.maplocalleader = ","
+g.mapleader = vim.keycode "<space>"
+g.maplocalleader = vim.keycode ","
 -- Fix markdown indentation settings
 g.markdown_recommended_style = 0
 -- autoformat on save
@@ -141,8 +141,7 @@ o.list = true
 o.listchars = "tab:»·,lead:·,leadmultispace:»···,nbsp:+,trail:·,extends:→,precedes:←"
 o.inccommand = "split"
 o.foldenable = true
-o.fcs =
-  "foldopen:,foldclose:,fold: ,trunc:…,foldsep: ,diff:╱,eob: ,vert:│,horiz:─,horizdown:┬,horizup:┴,verthoriz:┼,vertleft:┤,vertright:├"
+o.fcs = "foldopen:,foldclose:,fold: ,trunc:…,foldsep: ,diff:╱,eob: "
 
 o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
 o.foldmethod = "indent"

@@ -33,7 +33,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile", "BufWritePre" },
-    dependencies = { "mason-org/mason.nvim", "mason-lspconfig.nvim" },
+    dependencies = { "mason-org/mason.nvim", "williamboman/mason-lspconfig.nvim" },
     ---@class PluginLspOptions
     ---@field setup table<string, fun(server: string, opts: table<string, any>): boolean>
     opts = {
