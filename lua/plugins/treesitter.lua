@@ -15,7 +15,7 @@ return {
     version = false,
     build = ":TSUpdate",
     event = "LazyFile",
-    branch = "main",
+    branch = "master",
     lazy = vim.fn.argc(-1) == 0,
     keys = {
       { "<c-space>", desc = "Increment Selection" },
@@ -60,6 +60,8 @@ return {
           keymaps = {
             ["ib"] = { query = "@code_cell.inner", desc = "in block" },
             ["ab"] = { query = "@code_cell.outer", desc = "around block" },
+            ["af"] = { query = "@function.outer", desc = "outer function" },
+            ["if"] = { query = "@function.inner", desc = "inner function" },
           },
         },
         swap = {
@@ -88,18 +90,18 @@ return {
     "nvim-treesitter/nvim-treesitter-textobjects",
     event = "LazyFile",
     enabled = true,
-    branch = "main",
+    branch = "master",
     config = function()
       -- If treesitter is already loaded, we need to run config again for textobjects
       if Util.is_loaded "nvim-treesitter" then
         local opts = Util.opts "nvim-treesitter"
-        require("nvim-treesitter.config").setup { textobjects = opts.textobjects }
+        require("nvim-treesitter.configs").setup { textobjects = opts.textobjects }
       end
 
       -- When in diff mode, we want to use the default
       -- vim text objects c & C instead of the treesitter ones.
-      local move = require "nvim-treesitter-textobjects.move" ---@type table<string,fun(...)>
-      local config = require "nvim-treesitter.config"
+      local move = require "nvim-treesitter.textobjects.move" ---@type table<string,fun(...)>
+      local config = require "nvim-treesitter.configs"
       for name, fn in pairs(move) do
         if name:find "goto" == 1 then
           move[name] = function(q, ...)
