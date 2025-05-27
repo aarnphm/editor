@@ -429,6 +429,7 @@ vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, 
 vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinEnter", "BufEnter", "FocusLost" }, {
   group = augroup "auto_wrap",
   callback = function()
+    if vim.bo.filetype == "minifiles" then return end
     local columns = vim.api.nvim_win_get_width(0)
     if columns < 120 then
       vim.wo.wrap = true
