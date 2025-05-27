@@ -2,14 +2,14 @@ return {
   {
     "j-hui/fidget.nvim",
     event = "LspAttach",
-    enabled = false,
+    enabled = true,
     opts = { progress = { display = { render_limit = 3, done_ttl = 2 } } },
   },
   {
     "folke/noice.nvim",
     event = "LazyFile",
     dependencies = { "MunifTanjim/nui.nvim" },
-    enabled = true,
+    enabled = false,
     opts = {
       presets = {
         bottom_search = false,
