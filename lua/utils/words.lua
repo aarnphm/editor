@@ -26,10 +26,9 @@ local timer = (vim.uv or vim.loop).new_timer()
 function M.enable()
   if M.enabled then return end
   M.enabled = true
-  local group = vim.api.nvim_create_augroup("snacks_words", { clear = true })
 
   vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "ModeChanged" }, {
-    group = group,
+    group = augroup "lsp_words",
     callback = function()
       if not M.is_enabled { modes = true } then
         M.clear()
@@ -43,7 +42,7 @@ end
 function M.disable()
   if not M.enabled then return end
   M.enabled = false
-  vim.api.nvim_del_augroup_by_name "snacks_words"
+  vim.api.nvim_del_augroup_by_name "lsp_words"
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
     vim.api.nvim_buf_clear_namespace(buf, ns2, 0, -1)

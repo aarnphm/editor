@@ -1,24 +1,16 @@
 vim.loader.enable()
 
----@generic T
----Pretty print a value for better inspect. Under the hood it uses vim.inspect
----@param v T any type
----@return T
-_G.P = function(v)
-  print(vim.inspect(v))
-  return v
-end
-
-local TABWIDTH = 2
-
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
-_G.hi = function(name, opts)
+
+local hi = function(name, opts)
   opts.default = opts.default or true
   opts.force = opts.force or true
   vim.api.nvim_set_hl(0, name, opts)
 end
 
-_G.convert_avante_diff_to_qf = function()
+local convert_avante_diff_to_qf = function()
+  local _A = Util.opts "avante.nvim"
+  if not _A then return end
   require("avante.diff").conflicts_to_qf_items(function(items)
     if #items > 0 then
       vim.fn.setqflist(items, "r")
@@ -99,6 +91,10 @@ wo.sidescrolloff = 5
 wo.wrap = false
 wo.cursorline = true
 wo.cursorcolumn = false
+wo.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
+
+local bo = vim.bo
+bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 
 local o = vim.o
 o.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
@@ -143,12 +139,13 @@ o.inccommand = "split"
 o.foldenable = true
 o.fcs = "foldopen:,foldclose:,fold: ,trunc:…,foldsep: ,diff:╱,eob: "
 
-o.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
 o.foldmethod = "indent"
 o.foldtext = "v:lua.require'utils'.ui.foldtext()"
 o.foldlevel = 99
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"
+
+local TABWIDTH = 2
 
 o.tabstop = TABWIDTH
 o.softtabstop = TABWIDTH
@@ -168,8 +165,7 @@ o.virtualedit = "block"
 
 o.ls = 3
 o.stl = table.concat({
-  "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}",
-  "%#StatusLine# %{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
+  "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#StatusLine# %{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
   "%=",
   " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
 }, "")

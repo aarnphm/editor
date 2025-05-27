@@ -3,7 +3,7 @@ return {
     "nvim-treesitter/playground",
     lazy = true,
     cmd = "TSPlaygroundToggle",
-    dependencies = "nvim-treesitter/nvim-treesitter",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
@@ -15,6 +15,7 @@ return {
     version = false,
     build = ":TSUpdate",
     event = "LazyFile",
+    branch = "main",
     lazy = vim.fn.argc(-1) == 0,
     keys = {
       { "<c-space>", desc = "Increment Selection" },
@@ -23,7 +24,6 @@ return {
     opts = {
       ensure_installed = "all",
       auto_install = true,
-      -- parser_install_dir = rtp_path,
       ignore_install = { "phpdoc" },
       indent = { enable = true },
       highlight = { enable = true },
@@ -34,6 +34,7 @@ return {
       textobjects = {
         move = {
           enable = true,
+          set_jumps = true,
           goto_next_start = {
             ["]f"] = "@function.outer",
             ["]c"] = "@class.outer",
@@ -87,23 +88,24 @@ return {
     "nvim-treesitter/nvim-treesitter-textobjects",
     event = "LazyFile",
     enabled = true,
+    branch = "main",
     config = function()
       -- If treesitter is already loaded, we need to run config again for textobjects
       if Util.is_loaded "nvim-treesitter" then
         local opts = Util.opts "nvim-treesitter"
-        require("nvim-treesitter.configs").setup { textobjects = opts.textobjects }
+        require("nvim-treesitter.config").setup { textobjects = opts.textobjects }
       end
 
       -- When in diff mode, we want to use the default
       -- vim text objects c & C instead of the treesitter ones.
-      local move = require "nvim-treesitter.textobjects.move" ---@type table<string,fun(...)>
-      local configs = require "nvim-treesitter.configs"
+      local move = require "nvim-treesitter-textobjects.move" ---@type table<string,fun(...)>
+      local config = require "nvim-treesitter.config"
       for name, fn in pairs(move) do
         if name:find "goto" == 1 then
           move[name] = function(q, ...)
             if vim.wo.diff then
-              local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
-              for key, query in pairs(config or {}) do
+              local cfg = config.get_module("textobjects.move")[name] ---@type table<string,string>
+              for key, query in pairs(cfg or {}) do
                 if q == query and key:find "[%]%[][cC]" then
                   vim.cmd("normal! " .. key)
                   return

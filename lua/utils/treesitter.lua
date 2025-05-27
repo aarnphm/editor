@@ -66,7 +66,7 @@ function M.setup(opts)
 
   if type(opts.ensure_installed) == "table" then opts.ensure_installed = Util.dedup(opts.ensure_installed) end
 
-  require("nvim-treesitter.configs").setup(opts)
+  require("nvim-treesitter.config").setup(opts)
 end
 
 return M

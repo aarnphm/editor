@@ -3,7 +3,6 @@ return {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
-    ---@type copilot_config
     opts = {
       panel = { enabled = false },
       suggestion = {

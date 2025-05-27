@@ -2,14 +2,14 @@ return {
   {
     "j-hui/fidget.nvim",
     event = "LspAttach",
+    enabled = false,
     opts = { progress = { display = { render_limit = 3, done_ttl = 2 } } },
   },
   {
     "folke/noice.nvim",
     event = "LazyFile",
-    dependencies = { "nui.nvim" },
-    enabled = false,
-    ---@type NoiceConfig
+    dependencies = { "MunifTanjim/nui.nvim" },
+    enabled = true,
     opts = {
       presets = {
         bottom_search = false,
@@ -18,7 +18,7 @@ return {
         lsp_doc_border = false,
       },
       cmdline = { view = "cmdline" },
-      messages = { view = "mini", view_history = "mini" },
+      messages = { view = "mini", view_history = "split" },
       views = {
         split = { size = "15%" },
         popup = { disable = true },

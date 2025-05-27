@@ -49,7 +49,7 @@ function M.maximize()
         -- `VimLeavePre` might be another consideration? Not sure about differences between the 2
         vim.api.nvim_create_autocmd("ExitPre", {
           once = true,
-          group = vim.api.nvim_create_augroup("lazyvim_restore_max_exit_pre", { clear = true }),
+          group = augroup "restore_max_exit_pre",
           desc = "Restore width/height when close Neovim while maximized",
           callback = function() M.maximize.set(false) end,
         })

@@ -28,6 +28,10 @@ return {
           -- Setup some globals for debugging (lazy-loaded)
           _G.dd = function(...) Snacks.debug.inspect(...) end
           _G.bt = function() Snacks.debug.backtrace() end
+          _G.P = function(...)
+            print(vim.inspect(...))
+            return ...
+          end
         end,
       })
     end,
