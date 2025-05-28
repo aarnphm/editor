@@ -3,9 +3,12 @@
 ---@class vim.api.keyset.create_autocmd.opts: vim.api.keyset.create_autocmd
 ---@field callback? fun(ev:vim.api.create_autocmd.callback.args):boolean?
 
---- @param event string | string[] (string|array) Event(s) that will trigger the handler
---- @param opts vim.api.keyset.create_autocmd.opts
---- @return integer
+---@module "utils"
+_G.Util = ...
+
+---@param event string | string[] (string|array) Event(s) that will trigger the handler
+---@param opts vim.api.keyset.create_autocmd.opts
+---@return integer
 function vim.api.nvim_create_autocmd(event, opts) end
 
 ---@class vim.diagnostic.config.Opts: vim.diagnostic.Opts
@@ -25,7 +28,7 @@ function vim.api.nvim_create_autocmd(event, opts) end
 ---@overload fun(mode: string|string[], lhs: string, rhs: string|(fun(...): any), opts: vim.keymap.set.LazyOpts)
 function vim.keymap.set(mode, lhs, rhs, opts) end
 
---- we need to add hints for leap.nvim
+---we need to add hints for leap.nvim
 ---@class LeapSpecialKeys
 ---@field next_target string
 ---@field prev_target string[]
