@@ -8,17 +8,6 @@ local hi = function(name, opts)
   vim.api.nvim_set_hl(0, name, opts)
 end
 
-local convert_avante_diff_to_qf = function()
-  local _A = Util.opts "avante.nvim"
-  if not _A then return end
-  require("avante.diff").conflicts_to_qf_items(function(items)
-    if #items > 0 then
-      vim.fn.setqflist(items, "r")
-      vim.cmd "copen"
-    end
-  end)
-end
-
 ---@param mode string|string[]
 ---@param lhs string
 ---@param rhs string|(fun(...): any)
@@ -28,8 +17,9 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+local g = vim.g
 if vim.uv.os_uname().sysname == "Darwin" then
-  vim.g.clipboard = {
+  g.clipboard = {
     name = "macOS-clipboard",
     copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
     paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
@@ -37,7 +27,6 @@ if vim.uv.os_uname().sysname == "Darwin" then
   }
 end
 
-local g = vim.g
 g.loaded_gzip = 1
 g.loaded_zip = 1
 g.loaded_zipPlugin = 1
@@ -165,8 +154,8 @@ o.virtualedit = "block"
 
 o.ls = 3
 o.stl = table.concat({
-  "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#StatusLine# %{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
-  "%=",
+  "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#MiniStatuslineDevinfo#%{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
+  "%#StatusLine#%=",
   " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
 }, "")
 o.whichwrap = "b,s,<,>,[,],~"
@@ -191,9 +180,9 @@ if vim.g.neovide then
   vim.g.neovide_input_macos_option_key_is_meta = "only_left"
 
   -- shortcuts
-  vim.keymap.set("n", "<D-s>", ":w<CR>") -- Save
-  vim.keymap.set("v", "<D-c>", '"+y') -- Copy
-  vim.keymap.set("n", "<D-v>", '"+P') -- Paste normal mode
+  vim.keymap.set("n", "<D-s>", ":w<CR>")
+  vim.keymap.set("v", "<D-c>", '"+y')
+  vim.keymap.set("n", "<D-v>", '"+P')
   vim.api.nvim_set_keymap("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
   vim.api.nvim_set_keymap("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
   vim.api.nvim_set_keymap("t", "<D-v>", "<C-R>+", { noremap = true, silent = true })
@@ -218,7 +207,6 @@ map(
 map("n", "<leader>sq", function() vim.cmd.Quartz() end, { desc = "terminal: attach new quartz" })
 map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
-map("n", "<leader>aq", function() convert_avante_diff_to_qf() end, { desc = "avante: convert diff to quickfix" })
 
 map("n", "<C-x>", function() Snacks.bufdelete() end, { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })

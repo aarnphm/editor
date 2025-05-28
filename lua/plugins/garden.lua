@@ -141,6 +141,20 @@ return {
     },
     keys = {
       { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "avante: open" },
+      {
+        "<leader>aq",
+        function()
+          local _A = Util.opts "avante.nvim"
+          if not _A then return end
+          require("avante.diff").conflicts_to_qf_items(function(items)
+            if #items > 0 then
+              vim.fn.setqflist(items, "r")
+              vim.cmd "copen"
+            end
+          end)
+        end,
+        desc = "avante: convert diff to quickfix",
+      },
       { "<leader>aC", "<cmd>AvanteChat<CR>", desc = "avante: chat" },
       { "<leader>al", "<cmd>AvanteAsk position=left<CR>", desc = "avante: open on right panel" },
     },

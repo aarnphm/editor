@@ -192,7 +192,11 @@ M.generate = function()
     end,
     mode = function(args)
       local mi = H.modes[vim.fn.mode()]
-      local resolved = { md = H.is_truncated(args.trunc_width) and mi.short or mi.long, hl = mi.hl }
+      local force_shorts = args.force_shorts or true
+      local resolved = {
+        md = H.is_truncated(args.trunc_width) and mi.short or (force_shorts and mi.short or mi.long),
+        hl = mi.hl,
+      }
       return ("%%#%s#[%s]"):format(resolved.hl, resolved.md)
     end,
     git = function(args)

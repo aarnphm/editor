@@ -1,5 +1,5 @@
 return {
-  { "mason-org/mason.nvim", opts = { ensure_installed = { "nil" } } },
+  { "mason-org/mason.nvim", opts = { ensure_installed = { "alejandra" } } },
   {
     "neovim/nvim-lspconfig",
     opts = {
