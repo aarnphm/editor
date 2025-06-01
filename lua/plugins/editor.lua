@@ -191,7 +191,7 @@ return {
             or not vim.api.nvim_win_is_valid(win)
             or vim.fn.win_gettype(win) ~= ""
             or vim.wo[win].winbar ~= ""
-            or vim.bo[buf].ft == "help" and vim.bo[buf].ft == "Avante" and vim.bo[buf].buftype == "terminal"
+            or vim.tbl_contains({ "help", "Avante", "terminal" }, vim.bo[buf].ft)
           then
             return false
           end
@@ -215,9 +215,8 @@ return {
         end,
       },
     },
-    config = function(_, opts)
+    config = function()
       vim.keymap.set("n", "<leader>;", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
-      require("dropbar").setup(opts)
     end,
   },
   {

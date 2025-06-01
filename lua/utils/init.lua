@@ -35,11 +35,7 @@ M.did_setup = false
 function M.setup(opts)
   _G.Util = M
 
-  LazyEvent.mappings.LazyFile = {
-    id = "LazyFile",
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-    pattern = "LazyFile",
-  }
+  LazyEvent.mappings.LazyFile = { id = "LazyFile", event = { "BufReadPost", "BufNewFile", "BufWritePre" } }
   LazyEvent.mappings["User LazyFile"] = LazyEvent.mappings.LazyFile
   M.statusline.setup()
 

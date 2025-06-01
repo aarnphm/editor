@@ -9,6 +9,20 @@ return {
     "nvim-treesitter/nvim-treesitter-context",
     event = "LazyFile",
     opts = { mode = "cursor", enable = true, max_lines = 5 },
+    keys = {
+      {
+        "[c",
+        function() require("treesitter-context").go_to_context(vim.v.count1) end,
+        silent = true,
+        desc = "treesitter: go to next context",
+      },
+      {
+        "]c",
+        function() require("treesitter-context").go_to_context(-vim.v.count1) end,
+        silent = true,
+        desc = "treesitter: go to previous context",
+      },
+    },
   },
   {
     "nvim-treesitter/nvim-treesitter",
