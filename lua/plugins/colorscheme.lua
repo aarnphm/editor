@@ -7,7 +7,16 @@ return {
     opts = function()
       local palette = require "flexoki.palette"
       return {
+        styles = {
+          italic = true,
+        },
         highlight_groups = {
+          -- treesitter disabling italics for parameters
+          -- because it is kinda annoying
+          ["@variable"] = { fg = palette.text, italic = false },
+          ["@parameter"] = { fg = palette.purple_two, italic = false },
+          ["@variable.parameter"] = { fg = palette.purple_two, italic = false },
+          -- normal colorscheme
           StatusLine = { fg = palette.orange_two, bg = palette.overlay },
           StatusLineNC = { bg = palette.overlay },
           QuickFixLine = { bg = palette.highlight_high },
