@@ -154,8 +154,8 @@ o.virtualedit = "block"
 
 o.ls = 3
 o.stl = table.concat({
-  "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#MiniStatuslineDevinfo#%{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
-  "%#StatusLine#%=",
+  "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#StatusLine#%{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
+  "%=",
   " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
 }, "")
 o.whichwrap = "b,s,<,>,[,],~"
@@ -385,6 +385,17 @@ vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnte
   group = numtoggle,
   callback = function()
     if vim.wo.number and vim.fn.mode() ~= "i" then vim.wo.relativenumber = true end
+  end,
+})
+-- disable number on terminal buffer
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = numtoggle,
+  pattern = { "terminal" },
+  callback = function()
+    if vim.bo.number then
+      vim.bo.number = false
+      vim.bo.relativenumber = false
+    end
   end,
 })
 vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
