@@ -2,7 +2,7 @@ vim.loader.enable()
 
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 
-local hi = function(name, opts)
+_G.hi = function(name, opts)
   opts.default = opts.default or true
   opts.force = opts.force or true
   vim.api.nvim_set_hl(0, name, opts)
@@ -89,7 +89,7 @@ local o = vim.o
 o.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
 o.confirm = true
 o.winminwidth = 3
-o.termguicolors = true
+o.termguicolors = true -- false if on MacOS Terminal
 
 o.writebackup = false
 o.autowrite = true
