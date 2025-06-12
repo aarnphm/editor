@@ -48,16 +48,16 @@ return {
   {
     "saghen/blink.cmp",
     version = false,
-    build = "nix run .#build-plugin",
+    build = "cargo build --release",
     dependencies = {
       "rafamadriz/friendly-snippets",
       "moyiz/blink-emoji.nvim",
     },
     event = "InsertEnter",
-    opts_extend = { "sources.completion.enabled_providers", "sources.default" },
+    opts_extend = { "sources.default" },
     ---@type blink.cmp.Config
     opts = {
-      fuzzy = { implementation = "prefer_rust" },
+      fuzzy = { implementation = "rust" },
       appearance = { kind_icons = { Copilot = "" } },
       snippets = { expand = function(snippet) return Util.cmp.expand(snippet) end },
       signature = { enabled = false },
