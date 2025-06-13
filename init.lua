@@ -62,7 +62,6 @@ g.extra_plugins = {
   "plugins.lang.rust",
   "plugins.lang.yaml",
   "plugins.lang.json",
-  "plugins.lang.clangd",
   "plugins.lang.python",
   "plugins.lang.zig",
   "plugins.lang.markdown",
