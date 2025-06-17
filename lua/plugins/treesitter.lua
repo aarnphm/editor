@@ -47,7 +47,7 @@ return {
     opts = {
       ensure_installed = "all",
       auto_install = true,
-      ignore_install = { "phpdoc" },
+      ignore_install = { "phpdoc", "ipkg" },
       indent = { enable = true },
       highlight = { enable = true },
       injections = {
