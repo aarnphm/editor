@@ -61,6 +61,7 @@ return {
     lazy = true,
     opts_extend = { "spec" },
     opts = {
+      win = { border = "single" },
       spec = {
         { "<BS>", desc = "treesitter: decrement selection", mode = "x" },
         { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
