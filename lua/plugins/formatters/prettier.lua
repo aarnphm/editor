@@ -11,6 +11,7 @@ local supported = {
   "json",
   "jsonc",
   "less",
+  "markdown",
   "markdown.mdx",
   "scss",
   "sass",
