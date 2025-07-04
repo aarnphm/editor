@@ -1,5 +1,4 @@
 return {
-  { "folke/ts-comments.nvim", event = "LazyFile", opts = {} },
   {
     "ggandor/flit.nvim",
     opts = { labeled_modes = "nx" },
@@ -105,6 +104,21 @@ return {
       },
     },
   },
+  { "folke/ts-comments.nvim", event = "LazyFile", opts = {} },
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    cmd = "LazyDev",
+    opts = {
+      library = {
+        { path = "~/workspace/neovim-plugins/avante.nvim/lua", words = { "avante" } },
+        { path = "~/workspace/neovim-plugins/surf.nvim/lua", words = { "surf" } },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        { path = "snacks.nvim", words = { "Snacks" } },
+        { path = "conform.nvim", words = { "conform" } },
+      },
+    },
+  },
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTelescope" },
@@ -116,65 +130,59 @@ return {
     },
   },
   {
-    "stevearc/conform.nvim",
+    "folke/which-key.nvim",
+    event = "LazyFile",
     lazy = true,
-    cmd = "ConformInfo",
-    dependencies = { "mason.nvim" },
-    init = function()
-      -- install conform formatter on VeryLazy
-      Util.on_very_lazy(function()
-        Util.format.register {
-          name = "conform.nvim",
-          priority = 100,
-          primary = true,
-          format = function(buf) require("conform").format { bufnr = buf } end,
-          sources = function(buf)
-            local ret = require("conform").list_formatters(buf)
-            ---@param v conform.FormatterInfo
-            return vim.tbl_map(function(v) return v.name end, ret)
-          end,
-        }
-      end)
-    end,
+    opts_extend = { "spec" },
+    opts = {
+      win = { border = "single" },
+      spec = {
+        { "<BS>", desc = "treesitter: decrement selection", mode = "x" },
+        { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
+        {
+          mode = { "n", "v" },
+          { "<leader>a", group = "avante", icon = { icon = " ", color = "cyan" } },
+          { "<leader><tab>", group = "tabs" },
+          { "<leader>c", group = "code" },
+          { "<leader>f", group = "file/find" },
+          { "<leader>g", group = "git" },
+          { "<leader>h", group = "hunks" },
+          { "<leader>q", group = "quit/session" },
+          { "<leader>s", group = "search" },
+          { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+          { "<leader>x", group = "dignostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+          { "[", group = "prev" },
+          { "]", group = "next" },
+          { "g", group = "goto" },
+          { "gs", group = "surround" },
+          { "z", group = "fold" },
+          {
+            "<leader>b",
+            group = "buffer",
+            expand = function() return require("which-key.extras").expand.buf() end,
+          },
+          {
+            "<leader>w",
+            group = "windows",
+            proxy = "<c-w>",
+            expand = function() return require("which-key.extras").expand.win() end,
+          },
+          -- better descriptions
+          { "gx", desc = "util: open with system app" },
+        },
+      },
+      disable = { ft = { "minifiles" } },
+    },
     keys = {
       {
-        "<leader>cF",
-        function() require("conform").format { formatters = { "injected" }, timeout_ms = 3000 } end,
-        mode = { "n", "v" },
-        desc = "format: injected langs",
+        "<leader>?",
+        function() require("which-key").show { global = false } end,
+        desc = "which-key: buffer keymaps",
       },
-    },
-    ---@type conform.setupOpts
-    opts = {
-      default_format_opts = { timeout_ms = 3000 },
-      formatters_by_ft = {
-        lua = { "stylua" },
-        toml = { "taplo" },
-        proto = { "buf", "protolint" },
-        zsh = { "beautysh", fallback = true },
-        sh = { "shfmt" },
-      },
-      ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
-      formatters = {
-        injected = {
-          options = { ignore_errors = true },
-          lang_to_ext = {
-            bash = "sh",
-            c_sharp = "cs",
-            elixir = "exs",
-            javascript = "js",
-            julia = "jl",
-            latex = "tex",
-            markdown = "md",
-            python = "py",
-            ruby = "rb",
-            rust = "rs",
-            teal = "tl",
-            typescript = "ts",
-          },
-        },
-        beautysh = { prepend_args = { "-i", "2" } },
-        taplo = { append_args = { "-c", "align_entries=false" } },
+      {
+        "<c-w><space>",
+        function() require("which-key").show { keys = "<c-w>", loop = true } end,
+        desc = "which-key: window hydra mode",
       },
     },
   },
@@ -278,6 +286,72 @@ return {
           desc = "qf: collapse context",
         },
       },
+    },
+  },
+  {
+    "lewis6991/gitsigns.nvim",
+    event = "LazyFile",
+    keys = {
+      {
+        "]h",
+        function()
+          if vim.wo.diff then
+            vim.cmd.normal { "]c", bang = true }
+          else
+            require("gitsigns.actions").nav_hunk "next"
+          end
+        end,
+        desc = "git: next hunk",
+      },
+      {
+        "[h",
+        function()
+          if vim.wo.diff then
+            vim.cmd.normal { "[c", bang = true }
+          else
+            require("gitsigns.actions").nav_hunk "prev"
+          end
+        end,
+        desc = "git: prev hunk",
+      },
+      {
+        "<leader>hb",
+        function() require("gitsigns.actions").blame_line { full = true } end,
+        desc = "git: blame line",
+      },
+      {
+        "[H",
+        function() require("gitsigns.actions").nav_hunk "first" end,
+        desc = "git: first hunk",
+      },
+      {
+        "[H",
+        function() require("gitsigns.actions").nav_hunk "last" end,
+        desc = "git: last hunk",
+      },
+      {
+        "<leader>hp",
+        function() require("gitsigns.actions").preview_hunk_inline() end,
+        desc = "git: preview hunk inline",
+      },
+      {
+        "<leader>hP",
+        function() require("gitsigns.actions").preview_hunk() end,
+        desc = "git: preview hunk",
+      },
+      { "<leader>hR", ":Gitsigns reset_buffer<CR>", desc = "git: reset buffer" },
+      { "<leader>hS", ":Gitsigns stage_buffer<CR>", desc = "git: stage buffer" },
+      { "<leader>hs", ":Gitsigns stage_hunk<CR>", mode = { "n", "v" }, desc = "git: stage hunk" },
+      { "<leader>hr", ":Gitsigns reset_hunk<CR>", mode = { "n", "v" }, desc = "git: reset hunk" },
+      { "<leader>hh", ":Gitsigns setqflist<CR>", mode = { "n", "v" }, desc = "git: set qflist" },
+      { "ih", ":<C-U>Gitsigns select_hunk<CR>", mode = { "o", "x" }, desc = "git: select hunk" },
+    },
+    ---@type Gitsigns.Config
+    opts = {
+      numhl = true,
+      attach_to_untracked = true,
+      _new_sign_calc = true,
+      _refresh_staged_on_update = true,
     },
   },
 }

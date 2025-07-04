@@ -1,5 +1,68 @@
 return {
   {
+    "stevearc/conform.nvim",
+    lazy = true,
+    cmd = "ConformInfo",
+    dependencies = { "mason.nvim" },
+    init = function()
+      -- install conform formatter on VeryLazy
+      Util.on_very_lazy(function()
+        Util.format.register {
+          name = "conform.nvim",
+          priority = 100,
+          primary = true,
+          format = function(buf) require("conform").format { bufnr = buf } end,
+          sources = function(buf)
+            local ret = require("conform").list_formatters(buf)
+            ---@param v conform.FormatterInfo
+            return vim.tbl_map(function(v) return v.name end, ret)
+          end,
+        }
+      end)
+    end,
+    keys = {
+      {
+        "<leader>cF",
+        function() require("conform").format { formatters = { "injected" }, timeout_ms = 3000 } end,
+        mode = { "n", "v" },
+        desc = "format: injected langs",
+      },
+    },
+    ---@type conform.setupOpts
+    opts = {
+      default_format_opts = { timeout_ms = 3000 },
+      formatters_by_ft = {
+        lua = { "stylua" },
+        toml = { "taplo" },
+        proto = { "buf", "protolint" },
+        zsh = { "beautysh", fallback = true },
+        sh = { "shfmt" },
+      },
+      ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
+      formatters = {
+        injected = {
+          options = { ignore_errors = true },
+          lang_to_ext = {
+            bash = "sh",
+            c_sharp = "cs",
+            elixir = "exs",
+            javascript = "js",
+            julia = "jl",
+            latex = "tex",
+            markdown = "md",
+            python = "py",
+            ruby = "rb",
+            rust = "rs",
+            teal = "tl",
+            typescript = "ts",
+          },
+        },
+        beautysh = { prepend_args = { "-i", "2" } },
+        taplo = { append_args = { "-c", "align_entries=false" } },
+      },
+    },
+  },
+  {
     "mason-org/mason.nvim",
     cmd = "Mason",
     build = ":MasonUpdate",

@@ -158,9 +158,9 @@ o.stl = table.concat({
   " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
 }, "")
 o.whichwrap = "b,s,<,>,[,],~"
-o.guifont = "BerkeleyMono Nerd Font Mono:h16"
+o.guifont = "Berkeley Mono:h16"
 o.cmdheight = 1
-o.guicursor = "" -- "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
+o.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
 o.conceallevel = 0
 
 local background = os.getenv "XDG_SYSTEM_THEME"
@@ -203,7 +203,6 @@ map(
   function() Util.terminal.side(nil, { startinsert = true }) end,
   { desc = "terminal: attach new process" }
 )
-map("n", "<leader>sq", function() vim.cmd.Quartz() end, { desc = "terminal: attach new quartz" })
 map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 

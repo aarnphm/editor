@@ -1,14 +1,8 @@
 return {
   {
-    "nvim-treesitter/playground",
-    lazy = true,
-    cmd = "TSPlaygroundToggle",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-  },
-  {
     "nvim-treesitter/nvim-treesitter-context",
     event = "LazyFile",
-    opts = { mode = "cursor", enable = true, max_lines = 8 },
+    opts = { mode = "cursor", enable = true, max_lines = 5 },
     keys = {
       {
         "[c",
