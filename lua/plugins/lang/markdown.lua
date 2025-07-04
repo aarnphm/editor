@@ -1,7 +1,7 @@
 -- markdown render backend
 ---@type "markview" | "render-markdown"
 local markdown_render_backend = "render-markdown"
-local enable_renderer = true
+local enable_renderer = false
 
 return {
   { "mason-org/mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },

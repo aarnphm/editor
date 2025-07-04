@@ -110,7 +110,7 @@ return {
     dev = true,
     version = false,
     enabled = false,
-    build = "nix run .#plugin",
+    build = "make",
     event = "LazyFile",
     dependencies = {
       "MunifTanjim/nui.nvim",
@@ -164,25 +164,8 @@ return {
       provider = "openai", -- tbh we can switch to copilot
       cursor_applying_provider = "claude-haiku",
       memory_summary_provider = "claude",
-      claude = {
-        -- api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
-      },
-      copilot = {
-        model = "claude-3.7-sonnet",
-      },
-      openai = {
-        -- api_key_name = "cmd:bw get notes oai-api-key",
-        model = "o3-mini",
-      },
-      cohere = {
-        model = "command-r-plus-08-2024",
-        -- api_key_name = "cmd:bw get notes cohere-api-key",
-      },
-      gemini = {
-        -- api_key_name = "cmd:bw get notes gemini-api-key",
-      },
       rag_service = {
-        enabled = true,
+        enabled = false,
         runner = "nix",
         llm_model = "o4-mini",
         embed_model = "text-embedding-3-small",
@@ -204,177 +187,50 @@ return {
         sidebar_header = { align = "left", rounded = false },
         input = { prefix = "➜ ", height = 3 },
       },
-      vendors = {
-        ---@type AvanteProvider
-        perplexity = {
-          endpoint = "https://api.perplexity.ai/chat/completions",
-          model = "llama-3.1-sonar-large-128k-online",
-          api_key_name = "cmd:bw get notes perplexity-api-key",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint,
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
-              },
-              body = {
-                model = opts.model,
-                messages = { -- you can make your own message, but this is very advanced
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                },
-                temperature = 0,
-                max_tokens = 8192,
-                stream = true, -- this will be set by default.
-              },
-            }
-          end,
-          -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
-          parse_response = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
+      providers = {
+        claude = {
+          -- api_key_name = { "bw", "get", "notes", "anthropic-api-key" },
+        },
+        copilot = {
+          model = "claude-3.7-sonnet",
+        },
+        openai = {
+          -- api_key_name = "cmd:bw get notes oai-api-key",
+          model = "o3-mini",
+        },
+        cohere = {
+          model = "command-r-plus-08-2024",
+          -- api_key_name = "cmd:bw get notes cohere-api-key",
+        },
+        gemini = {
+          -- api_key_name = "cmd:bw get notes gemini-api-key",
         },
         ---@type AvanteProvider
         groq = {
-          endpoint = "https://api.groq.com/openai/v1/chat/completions",
-          model = "llama-3.1-70b-versatile",
+          __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint,
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
-              },
-              body = {
-                model = opts.model,
-                messages = { -- you can make your own message, but this is very advanced
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                },
-                temperature = 0,
-                max_tokens = 4096,
-                stream = true, -- this will be set by default.
-              },
-            }
-          end,
-          parse_response = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
+          endpoint = "https://api.groq.com/openai/v1/",
+          model = "llama-3.3-70b-versatile",
+          disable_tools = true,
         },
         ---@type AvanteProvider
         deepseek = {
-          endpoint = "https://api.deepseek.com/chat/completions",
+          __inherited_from = "openai",
+          endpoint = "https://api.deepseek.com/",
           model = "deepseek-coder",
           api_key_name = "DEEPSEEK_API_KEY",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint,
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
-              },
-              body = {
-                model = opts.model,
-                messages = { -- you can make your own message, but this is very advanced
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                },
-                temperature = 0,
-                max_tokens = 4096,
-                stream = true, -- this will be set by default.
-              },
-            }
-          end,
-          parse_response = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
         },
         ---@type AvanteProvider
         codestral = {
+          __inherited_from = "openai",
           endpoint = "",
           model = "mistralai/Codestral-22B-v0.1",
           api_key_name = "BENTOCLOUD_API_KEY",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint .. "/v1/chat/completions",
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-              },
-              body = {
-                model = opts.model,
-                messages = { -- you can make your own message, but this is very advanced
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                },
-                max_tokens = 1024,
-                stream = true,
-              },
-            }
-          end,
-          -- The below function is used if the vendors has specific SSE spec that is not claude or openai.
-          parse_response = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
         },
         ---@type AvanteProvider
         ollama = {
           endpoint = "127.0.0.1:11434/v1",
           model = "codegemma",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint .. "/chat/completions",
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-              },
-              body = {
-                model = opts.model,
-                messages = { -- you can make your own message, but this is very advanced
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                },
-                max_tokens = 2048,
-                stream = true,
-              },
-            }
-          end,
-          parse_response = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
-        },
-        ---@type AvanteProvider
-        mistral = {
-          endpoint = "https://api.mistral.ai/v1/chat/completions",
-          model = "mistral-7b-v0.1",
-          api_key_name = "MISTRAL_API_KEY",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint,
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
-              },
-              body = {
-                model = opts.model,
-                messages = {
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = table.concat(code_opts.user_prompts, "\n\n") },
-                },
-                temperature = 0,
-                max_tokens = 4096,
-                stream = true,
-              },
-            }
-          end,
-          parse_response = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
         },
       },
     },

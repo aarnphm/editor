@@ -1,6 +1,5 @@
 return {
   { "mason-org/mason.nvim", opts = { ensure_installed = { "goimports", "gofumpt", "golangci-lint" } } },
-  { "mfussenegger/nvim-lint", opts = { linters_by_ft = { go = { "golangcilint" } } } },
   { "stevearc/conform.nvim", opts = { formatters_by_ft = { go = { "goimports", "gofumpt" } } } },
   {
     "neovim/nvim-lspconfig",
@@ -30,7 +29,6 @@ return {
                 rangeVariableTypes = true,
               },
               analyses = {
-                fieldalignment = true,
                 nilness = true,
                 unusedparams = true,
                 unusedwrite = true,

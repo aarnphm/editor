@@ -52,5 +52,10 @@
     "prefix": "hdots",
     "body": ["\\cdots"],
     "description": "horizontal dots"
+  },
+  "qed": {
+    "prefix": "qed",
+    "body": ["\\boxed{}"],
+    "description": "q.e.d"
   }
 }

@@ -147,8 +147,8 @@ o.showbreak = "↳  "
 o.splitbelow = true
 o.splitright = true
 o.timeout = true
-o.timeoutlen = vim.g.vscode and 1000 or 300
-o.updatetime = 250
+o.timeoutlen = vim.g.vscode and 1000 or 200
+o.updatetime = 200
 o.virtualedit = "block"
 
 o.ls = 3
