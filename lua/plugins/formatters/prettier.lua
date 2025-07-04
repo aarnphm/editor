@@ -11,8 +11,8 @@ local supported = {
   "json",
   "jsonc",
   "less",
-  "markdown",
   "markdown.mdx",
+  "markdown",
   "scss",
   "sass",
   "typescript",
@@ -54,7 +54,11 @@ return {
     opts = function(_, opts)
       opts.formatters_by_ft = opts.formatters_by_ft or {}
       for _, ft in ipairs(supported) do
-        opts.formatters_by_ft[ft] = { "prettier" }
+        if vim.tbl_contains({ "markdown", "markdown.mdx" }, ft) then
+          opts.formatters_by_ft[ft] = { "prettier", "cbfmt" }
+        else
+          opts.formatters_by_ft[ft] = { "prettier" }
+        end
       end
 
       opts.formatters = opts.formatters or {}

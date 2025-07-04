@@ -28,6 +28,7 @@ return {
         desc = "format: injected langs",
       },
     },
+    opts_extend = { "formatters" },
     ---@type conform.setupOpts
     opts = {
       default_format_opts = { timeout_ms = 3000 },

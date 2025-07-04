@@ -18,7 +18,29 @@ return {
       },
     },
   },
-  { "stevearc/conform.nvim", opts = { formatters_by_ft = { python = { "ruff_fix", "ruff_organize_import" } } } },
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters = {
+        ruff_organize_import = {
+          inherit = false,
+          command = "ruff",
+          args = {
+            "check",
+            "--fix",
+            "--force-exclude",
+            "--exit-zero",
+            "--no-cache",
+            "--stdin-filename",
+            "$FILENAME",
+            "-",
+          },
+          stdin = true,
+        },
+      },
+      formatters_by_ft = { python = { "ruff_fix", "ruff_organize_import" } },
+    },
+  },
   {
     "neovim/nvim-lspconfig",
     opts = {
