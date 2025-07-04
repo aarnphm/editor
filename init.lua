@@ -419,19 +419,123 @@ vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, 
   end,
 })
 -- auto wrap based on column width
--- vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinEnter", "BufEnter", "FocusLost" }, {
---   group = augroup "auto_wrap",
---   callback = function()
---     if vim.bo.filetype == "minifiles" then return end
---     local columns = vim.api.nvim_win_get_width(0)
---     if columns < 120 then
---       vim.wo.wrap = true
---       vim.wo.linebreak = true
---     else
---       vim.wo.wrap = false
---     end
---   end,
--- })
+if false then
+  vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinEnter", "BufEnter", "FocusLost" }, {
+    group = augroup "auto_wrap",
+    callback = function()
+      if vim.bo.filetype == "minifiles" then return end
+      local columns = vim.api.nvim_win_get_width(0)
+      if columns < 120 then
+        vim.wo.wrap = true
+        vim.wo.linebreak = true
+      else
+        vim.wo.wrap = false
+      end
+    end,
+  })
+end
+-- automatically setup frontmatter for markdown files
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+  group = augroup "markdown_frontmatter",
+  pattern = "*.md",
+  callback = function(ev)
+    local buf_dir = vim.fs.dirname(ev.match)
+
+    local vaults = {
+      { root = vim.fn.expand "~" .. "/workspace/garden/content" },
+      { root = vim.fn.expand "~" .. "/workspace/capstone/manuals/content" },
+      { root = vim.fn.expand "~" .. "/workspace/capstone/docs/content" },
+    }
+
+    local is_vault_note = false
+    local matching_root = nil
+    for _, vault in ipairs(vaults) do
+      if buf_dir:sub(1, #vault.root) == vault.root then
+        is_vault_note = true
+        matching_root = vault.root
+        break
+      end
+    end
+
+    local is_tag_note = false
+    if matching_root and ev.match:sub(1, #matching_root) == matching_root then
+      if ev.match:find(matching_root .. "/tags/") then is_tag_note = true end
+    end
+
+    local buf = ev.buf
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    local filename = vim.fs.basename(ev.match)
+    local id = filename:gsub("%.md$", "")
+
+    local fm_start, fm_end
+    if lines[1] and lines[1]:match "^---%s*$" then
+      fm_start = 1
+      for i = 2, #lines do
+        if lines[i]:match "^---%s*$" then
+          fm_end = i
+          break
+        end
+      end
+    end
+
+    local existing = {}
+    if fm_start and fm_end and fm_end > fm_start + 1 then
+      local yaml_body = table.concat(vim.list_slice(lines, fm_start + 1, fm_end - 1), "\n")
+      local json_str = vim.fn.system({ "yq", "eval", "-o=json", "-" }, yaml_body)
+      local ok, parsed = pcall(vim.fn.json_decode, json_str)
+      if ok and type(parsed) == "table" then existing = parsed end
+    end
+
+    local defaults
+    if is_vault_note and not is_tag_note then
+      defaults = { id = id, tags = { "seed" }, date = os.date "%Y-%m-%d" }
+    else
+      defaults = { title = id }
+    end
+
+    local frontmatter = vim.tbl_deep_extend("force", defaults, existing)
+    if frontmatter.title == nil then frontmatter.title = id end
+    if frontmatter.aliases and #frontmatter.aliases == 0 then frontmatter.aliases = nil end
+
+    if is_vault_note and not is_tag_note then
+      local raw_offset = os.date "%z" -- timezone offset
+      local tz = string.format("%s%s:%s", raw_offset:sub(1, 1), raw_offset:sub(2, 3), raw_offset:sub(4, 5))
+      frontmatter.modified = os.date "%Y-%m-%d %H:%M:%S" .. " GMT" .. tz
+    end
+
+    local function encode_yaml(tbl)
+      local result = {}
+      local keys = vim.tbl_keys(tbl)
+      table.sort(keys)
+      for _, k in ipairs(keys) do
+        local v = tbl[k]
+        if type(v) == "table" then
+          table.insert(result, k .. ":")
+          for _, item in ipairs(v) do
+            table.insert(result, "  - " .. tostring(item))
+          end
+        else
+          if type(v) == "string" and v:find "[^%w%-_.:]" then
+            table.insert(result, k .. ': "' .. v:gsub('"', '\\"') .. '"')
+          else
+            table.insert(result, k .. ": " .. tostring(v))
+          end
+        end
+      end
+      return result
+    end
+
+    local new_fm = { "---" }
+    vim.list_extend(new_fm, encode_yaml(frontmatter))
+    table.insert(new_fm, "---")
+
+    if fm_start and fm_end then
+      vim.api.nvim_buf_set_lines(buf, fm_start - 1, fm_end, false, new_fm)
+    else
+      vim.api.nvim_buf_set_lines(buf, 0, 0, false, vim.list_extend(new_fm, { "" }))
+    end
+  end,
+})
 -- add bigfile filetype and disable some defaults on bigfile
 -- add http, dotenv, tsconfig
 vim.filetype.add {
