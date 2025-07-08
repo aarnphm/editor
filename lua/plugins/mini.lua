@@ -286,7 +286,7 @@ return {
   {
     "echasnovski/mini.starter",
     version = false,
-    enabled = true,
+    enabled = false,
     event = "VimEnter",
     opts = function()
       local pad = string.rep(" ", 20)

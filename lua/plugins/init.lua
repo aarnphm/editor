@@ -1,7 +1,7 @@
 return {
   "nvim-lua/plenary.nvim",
-  "tpope/vim-fugitive",
   "tpope/vim-repeat",
+  { "tpope/vim-fugitive", enabled = false },
   { "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
   { "folke/lazy.nvim", version = false },
   {
