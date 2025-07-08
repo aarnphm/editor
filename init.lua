@@ -499,30 +499,19 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 
     if is_vault_note and not is_tag_note then
       local raw_offset = os.date "%z" -- timezone offset
+      ---@cast raw_offset string
       local tz = string.format("%s%s:%s", raw_offset:sub(1, 1), raw_offset:sub(2, 3), raw_offset:sub(4, 5))
       frontmatter.modified = os.date "%Y-%m-%d %H:%M:%S" .. " GMT" .. tz
     end
 
-    local function encode_yaml(tbl)
-      local result = {}
-      local keys = vim.tbl_keys(tbl)
-      table.sort(keys)
-      for _, k in ipairs(keys) do
-        local v = tbl[k]
-        if type(v) == "table" then
-          table.insert(result, k .. ":")
-          for _, item in ipairs(v) do
-            table.insert(result, "  - " .. tostring(item))
-          end
-        else
-          if type(v) == "string" and v:find "[^%w%-_.:]" then
-            table.insert(result, k .. ': "' .. v:gsub('"', '\\"') .. '"')
-          else
-            table.insert(result, k .. ": " .. tostring(v))
-          end
-        end
+    local encode_yaml = function(tbl)
+      local json = vim.fn.json_encode(tbl)
+      local yaml_str = vim.fn.system({ "yq", "eval", "-P", "-p=json", "-" }, json)
+      local results = {}
+      for line in yaml_str:gmatch "[^\r\n]+" do
+        table.insert(results, line)
       end
-      return result
+      return results
     end
 
     local new_fm = { "---" }
