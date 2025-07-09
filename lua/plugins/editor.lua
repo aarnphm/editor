@@ -133,6 +133,7 @@ return {
     "folke/which-key.nvim",
     event = "LazyFile",
     lazy = true,
+    enabled = false,
     opts_extend = { "spec" },
     opts = {
       win = { border = "single" },

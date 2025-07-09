@@ -93,6 +93,7 @@ function M.enable(enable, buf)
     vim.b.autoformat = enable
   else
     vim.g.autoformat = enable
+    vim.g.markdown_frontmatter = enable
     vim.b.autoformat = nil
   end
 end

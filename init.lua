@@ -439,6 +439,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   group = augroup "markdown_frontmatter",
   pattern = "*.md",
   callback = function(ev)
+    if not vim.g.markdown_frontmatter then return end
     local buf_dir = vim.fs.dirname(ev.match)
 
     local vaults = {
