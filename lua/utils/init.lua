@@ -37,7 +37,7 @@ function M.setup(opts)
 
   LazyEvent.mappings.LazyFile = { id = "LazyFile", event = { "BufReadPost", "BufNewFile", "BufWritePre" } }
   LazyEvent.mappings["User LazyFile"] = LazyEvent.mappings.LazyFile
-  M.statusline.setup()
+  -- M.statusline.setup()
 
   require("lazy").setup(opts)
 
