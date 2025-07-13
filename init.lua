@@ -54,6 +54,7 @@ g.maplocalleader = vim.keycode ","
 g.markdown_recommended_style = 0
 -- autoformat on save
 g.autoformat = true
+g.markdown_frontmatter = true
 -- additional plugins to be used.
 g.extra_plugins = {
   -- lang
