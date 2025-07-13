@@ -2,6 +2,7 @@ return {
   {
     "nuvic/flexoki-nvim",
     name = "flexoki",
+    enabled = true,
     priority = 1000,
     ---@return Options
     opts = function()

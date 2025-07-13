@@ -30,6 +30,7 @@ setmetatable(M, {
 M.STL = M.statusline.generate()
 
 M.did_setup = false
+M.simple_line = true
 
 ---@param opts LazyConfig
 function M.setup(opts)
@@ -37,7 +38,15 @@ function M.setup(opts)
 
   LazyEvent.mappings.LazyFile = { id = "LazyFile", event = { "BufReadPost", "BufNewFile", "BufWritePre" } }
   LazyEvent.mappings["User LazyFile"] = LazyEvent.mappings.LazyFile
-  -- M.statusline.setup()
+  if not M.simple_line then
+    M.statusline.setup()
+
+    vim.o.stl = table.concat({
+      "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#StatusLine#%{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
+      "%=",
+      " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
+    }, "")
+  end
 
   require("lazy").setup(opts)
 

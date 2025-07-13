@@ -152,11 +152,6 @@ o.updatetime = 200
 o.virtualedit = "block"
 
 o.ls = 3
--- o.stl = table.concat({
---   "%{%luaeval('Util.STL.mode {trunc_width = 120}')%}%#StatusLine#%{%luaeval('Util.STL.git {trunc_width = 120}')%} %{%luaeval('Util.STL.filename {trunc_width = 120}')%}",
---   "%=",
---   " %{%luaeval('Util.STL.location {trunc_width = 120}')%} %{%luaeval('Util.STL.diagnostic {trunc_width = 120}')%}%{%luaeval('Util.STL.lint {trunc_width = 120}')%}%{%luaeval('Util.STL.lsp {trunc_width = 120}')%}",
--- }, "")
 o.whichwrap = "b,s,<,>,[,],~"
 o.guifont = "Berkeley Mono:h16"
 o.cmdheight = 1
