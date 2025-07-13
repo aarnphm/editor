@@ -1,0 +1,16 @@
+{
+  "Inline math block": {
+    "prefix": "mk",
+    "body": "$$$0$$",
+    "description": "Insert inline math delimiters $$ with cursor in between"
+  },
+  "Display math block": {
+    "prefix": "dm",
+    "body": [
+      "$$",
+      "$0",
+      "$$"
+    ],
+    "description": "Insert display math block $$ ... $$ with a blank line for math content"
+  }
+}
