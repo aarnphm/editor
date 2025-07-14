@@ -75,6 +75,33 @@ local snippets = {
   s('hat', { t('\\hat{'), i(1), t('}') }, { condition = in_math }),
 }
 
+-- Greek letters shortcuts using ;<char>  (e.g. ;a -> \alpha)
+local greek_letters = {
+  a = 'alpha', b = 'beta', g = 'gamma', d = 'delta', e = 'epsilon', z = 'zeta',
+  h = 'eta', t = 'theta', i = 'iota', k = 'kappa', l = 'lambda', m = 'mu', n = 'nu',
+  x = 'xi', p = 'pi', r = 'rho', s = 'sigma', u = 'upsilon', f = 'phi', c = 'chi',
+  q = 'psi', o = 'omega',
+  A = 'Alpha', B = 'Beta', G = 'Gamma', D = 'Delta', E = 'Epsilon', Z = 'Zeta',
+  H = 'Eta', T = 'Theta', I = 'Iota', K = 'Kappa', L = 'Lambda', M = 'Mu', N = 'Nu',
+  X = 'Xi', P = 'Pi', R = 'Rho', S = 'Sigma', U = 'Upsilon', F = 'Phi', C = 'Chi',
+  Q = 'Psi', O = 'Omega',
+}
+
+for key, name in pairs(greek_letters) do
+  table.insert(snippets, s({ trig = ';' .. key, wordTrig = false }, { t('\\' .. name) }, {
+    condition = in_math, autotrigger = true,
+  }))
+end
+
+-- Basic pairs: lr -> \left( <expr> \right)
+ table.insert(snippets, s('lr', {
+   t('\\left('), i(1), t('\\right)'),
+ }, { condition = in_math }))
+
+-- floor and ceil
+ table.insert(snippets, s('fl', { t('\\lfloor'), i(1), t('\\rfloor') }, { condition = in_math }))
+ table.insert(snippets, s('ceil', { t('\\lceil'), i(1), t('\\rceil') }, { condition = in_math }))
+
 -- Register snippets for the markdown filetype
 MiniSnips.add('markdown', snippets)
 
