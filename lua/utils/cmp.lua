@@ -4,7 +4,6 @@ local M = {}
 ---@alias lazyvim.util.cmp.Action fun():boolean?
 ---@type table<string, lazyvim.util.cmp.Action>
 M.actions = {
-  -- Native Snippets
   snippet_forward = function()
     if vim.snippet.active { direction = 1 } then
       vim.schedule(function() vim.snippet.jump(1) end)
@@ -13,13 +12,6 @@ M.actions = {
   end,
   snippet_stop = function()
     if vim.snippet then vim.snippet.stop() end
-  end,
-  ai_accept = function()
-    if require("copilot.suggestion").is_visible() then
-      Util.create_undo()
-      require("copilot.suggestion").accept()
-      return true
-    end
   end,
 }
 

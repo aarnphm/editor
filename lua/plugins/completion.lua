@@ -246,7 +246,7 @@ return {
               return cmp.select_and_accept()
             end
           end,
-          Util.cmp.map { "snippet_forward", "ai_accept" },
+          Util.cmp.map { "snippet_forward" },
           "fallback",
         },
       },
