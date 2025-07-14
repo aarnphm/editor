@@ -1,7 +1,7 @@
 ---@class lazyvim.util.treesitter
 local M = {}
 
-function M.goto_prev_node()
+M.goto_prev_node = function()
   local ts_utils = require "nvim-treesitter.ts_utils"
   local node = ts_utils.get_node_at_cursor()
   if not node then return end
@@ -18,7 +18,7 @@ function M.goto_prev_node()
   ts_utils.goto_node(dest_node)
 end
 
-function M.goto_next_node()
+M.goto_next_node = function()
   local ts_utils = require "nvim-treesitter.ts_utils"
   local node = ts_utils.get_node_at_cursor()
   if not node then return end
@@ -35,7 +35,7 @@ function M.goto_next_node()
   ts_utils.goto_node(dest_node)
 end
 
-function M.goto_parent_node()
+M.goto_parent_node = function()
   local ts_utils = require "nvim-treesitter.ts_utils"
   local node = ts_utils.get_node_at_cursor()
   if not node then return end
@@ -44,7 +44,7 @@ function M.goto_parent_node()
   ts_utils.goto_node(dest_node)
 end
 
-function M.goto_child_node()
+M.goto_child_node = function()
   local ts_utils = require "nvim-treesitter.ts_utils"
   local node = ts_utils.get_node_at_cursor()
   if not node then return end
@@ -54,7 +54,7 @@ function M.goto_child_node()
 end
 
 ---@param opts TSConfig
-function M.setup(opts)
+M.setup = function(opts)
   local map = function(mode, lhs, rhs, desc)
     vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, desc = desc })
   end
