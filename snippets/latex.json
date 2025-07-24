@@ -57,5 +57,10 @@
     "prefix": "qed",
     "body": ["\\boxed{}"],
     "description": "q.e.d"
+  },
+  "begin": {
+    "prefix": "beg",
+    "body": ["\\begin{${1}}", "$0", "\\end{${1}}"],
+    "description": "begin and end"
   }
 }
