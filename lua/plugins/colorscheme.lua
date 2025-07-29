@@ -18,7 +18,7 @@ return {
           ["@parameter"] = { fg = palette.purple_two, italic = false },
           ["@variable.parameter"] = { fg = palette.purple_two, italic = false },
           -- normal colorscheme
-          StatusLine = { fg = palette.orange_two, bg = palette.overlay },
+          StatusLine = { fg = palette.orange_two, bg = palette.none },
           StatusLineNC = { bg = palette.overlay },
           QuickFixLine = { bg = palette.highlight_high },
           Winbar = { bg = palette.base },
