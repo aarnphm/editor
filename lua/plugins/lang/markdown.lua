@@ -138,7 +138,7 @@ return {
   {
     "aarnphm/luasnip-latex-snippets.nvim",
     version = false,
-    enabled = false,
+    enabled = true,
     lazy = true,
     ft = { "markdown", "norg", "rmd", "org" },
     dependencies = {
