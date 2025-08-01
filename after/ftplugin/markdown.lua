@@ -27,8 +27,6 @@ local function load_latex_snippets()
       end
     end
   end
-  -- additional handwritten snippets
-  tbl["omega"] = "\\omega$0"
   return tbl
 end
 
@@ -80,4 +78,3 @@ vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
 end, { expr = true, silent = true, buffer = true, desc = "snippet: jump backwards" })
 
 return M
-
