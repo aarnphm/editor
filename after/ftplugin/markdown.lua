@@ -77,4 +77,11 @@ vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
   return "<S-Tab>"
 end, { expr = true, silent = true, buffer = true, desc = "snippet: jump backwards" })
 
+vim.keymap.set("i", "<D-k>", function()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "[[]]" })
+  vim.api.nvim_win_set_cursor(0, { row, col + 2 })
+  if Util.has "blink.cmp" then require("blink.cmp").show { providers = { "lsp" } } end
+end, { buffer = true, desc = "wikilink: insert" })
+
 return M

@@ -431,6 +431,11 @@ if false then
   })
 end
 -- automatically setup frontmatter for markdown files
+_G.VAULTS = {
+  { root = vim.fn.expand "~" .. "/workspace/garden/content", tags = { "garden" }, new_note_dir = "thoughts" },
+  { root = vim.fn.expand "~" .. "/workspace/capstone/manuals/content", tags = { "capstone" } },
+  { root = vim.fn.expand "~" .. "/workspace/capstone/docs/content", tags = { "capstone-docs" } },
+}
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   group = augroup "markdown_frontmatter",
   pattern = "*.md",
@@ -438,15 +443,9 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     if not vim.g.markdown_frontmatter then return end
     local buf_dir = vim.fs.dirname(ev.match)
 
-    local vaults = {
-      { root = vim.fn.expand "~" .. "/workspace/garden/content" },
-      { root = vim.fn.expand "~" .. "/workspace/capstone/manuals/content" },
-      { root = vim.fn.expand "~" .. "/workspace/capstone/docs/content" },
-    }
-
     local is_vault_note = false
     local matching_root = nil
-    for _, vault in ipairs(vaults) do
+    for _, vault in ipairs(VAULTS) do
       if buf_dir:sub(1, #vault.root) == vault.root then
         is_vault_note = true
         matching_root = vault.root
@@ -522,6 +521,28 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     end
   end,
 })
+vim.api.nvim_create_user_command("ObsidianNew", function(opts)
+  local name = table.concat(opts.fargs, " ")
+  if name == "" then
+    Util.error "ObsidianNew: provide a note name"
+    return
+  end
+  if not name:match "%.md$" then name = name .. ".md" end
+  local cur = vim.api.nvim_buf_get_name(0)
+  local vault = nil
+  for _, v in ipairs(VAULTS) do
+    if cur:sub(1, #v.root) == v.root then
+      vault = v
+      break
+    end
+  end
+  if not vault then vault = VAULTS[1] end
+  local dir = vault.root
+  if vault.new_note_dir and vault.new_note_dir ~= "" then dir = dir .. "/" .. vault.new_note_dir end
+  local path = dir .. "/" .. name
+  vim.fn.mkdir(vim.fs.dirname(path), "p")
+  vim.cmd("edit " .. vim.fn.fnameescape(path))
+end, { nargs = "+", complete = "file", desc = "obsidian: new note" })
 -- add bigfile filetype and disable some defaults on bigfile
 -- add http, dotenv, tsconfig
 vim.filetype.add {
