@@ -15,7 +15,7 @@ return {
         bigfile = { enabled = true, size = 1.5 * 1024 * 1024 },
         notifier = { enabled = false },
         input = { enabled = true },
-        image = { enabled = true, math = { enabled = false }, convert = { notify = false } },
+        image = { enabled = false, math = { enabled = false }, convert = { notify = false } },
         rename = { enabled = true },
         quickfile = { enabled = true },
         statuscolumn = { enabled = true },

@@ -453,6 +453,8 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
       end
     end
 
+    if not matching_root then return end
+
     local is_tag_note = false
     if matching_root and ev.match:sub(1, #matching_root) == matching_root then
       if ev.match:find(matching_root .. "/tags/") then is_tag_note = true end
