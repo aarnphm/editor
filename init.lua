@@ -73,6 +73,8 @@ g.extra_plugins = {
   -- linters
   "plugins.linters.eslint",
 }
+g.enable_highlighturl = false
+g.enable_autowrap = false
 
 local wo = vim.wo
 wo.scrolloff = 2
@@ -399,23 +401,25 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave"
   end,
 })
 -- highlight URL
-local highlighturl_group = augroup "highlighturl"
-vim.api.nvim_create_autocmd("ColorScheme", {
-  group = highlighturl_group,
-  callback = function() hi("HighlightURL", { default = true, underline = true }) end,
-})
-vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
-  group = highlighturl_group,
-  callback = function(args)
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then
-        Util.set_url_match(win)
+if g.enable_highlighturl then
+  local highlighturl_group = augroup "highlighturl"
+  vim.api.nvim_create_autocmd("ColorScheme", {
+    group = highlighturl_group,
+    callback = function() hi("HighlightURL", { default = true, underline = true }) end,
+  })
+  vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+    group = highlighturl_group,
+    callback = function(args)
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then
+          Util.set_url_match(win)
+        end
       end
-    end
-  end,
-})
+    end,
+  })
+end
 -- auto wrap based on column width
-if false then
+if g.enable_autowrap then
   vim.api.nvim_create_autocmd({ "VimEnter", "VimResized", "WinEnter", "BufEnter", "FocusLost" }, {
     group = augroup "auto_wrap",
     callback = function()

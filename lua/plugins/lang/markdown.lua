@@ -8,7 +8,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     opts = {
-      linters_by_ft = { markdown = { "markdownlint", "typos" } },
+      linters_by_ft = { markdown = { "markdownlint" } },
       linters = {
         markdownlint = {
           condition = function(ctx)
@@ -25,7 +25,6 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        typos_lsp = {},
         markdown_oxide = {
           capabilities = {
             workspace = {
