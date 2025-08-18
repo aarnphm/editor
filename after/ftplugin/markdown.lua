@@ -84,6 +84,8 @@ vim.keymap.set("i", "<D-k>", function()
   if Util.has "blink.cmp" then require("blink.cmp").show { providers = { "lsp" } } end
 end, { buffer = true, desc = "wikilink: insert" })
 
+local _md_heading_ns = vim.api.nvim_create_namespace "md_headings_popup"
+
 local function _md_collect_headings()
   local buf = 0
   local ok, parser = pcall(vim.treesitter.get_parser, buf, "markdown", {})
@@ -99,6 +101,7 @@ local function _md_collect_headings()
     (setext_heading) @h
   ]]
   )
+  ---@type {line: string, level: integer, text: string}[]
   local items = {}
   for _, node in query:iter_captures(root, buf, 0, -1) do
     local start_row, _, end_row, _ = node:range()
@@ -131,23 +134,21 @@ local function _md_open_headings_popup()
   local src_win = vim.api.nvim_get_current_win()
   local items = _md_collect_headings()
   if #items == 0 then return end
+  ---@type string[]
   local lines = {}
-  local l2i = {}
   local max_length = 0
   for i, it in ipairs(items) do
-    local label = i <= 26 and string.char(96 + i) or " "
     local indent = string.rep("  ", math.max(it.level - 1, 0))
-    local line = (i <= 26 and (label .. " ") or "  ") .. indent .. it.text
+    local line = indent .. it.text
     lines[i] = line
     if #line > max_length then max_length = #line end
-    if i <= 26 then l2i[label] = i end
   end
   local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
-  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-  vim.api.nvim_buf_set_option(buf, "modifiable", true)
+  vim.api.nvim_set_option_value("buftype", "nofile", { buf = buf })
+  vim.api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
+  vim.api.nvim_set_option_value("modifiable", true, { buf = buf })
+  vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-  vim.api.nvim_buf_set_option(buf, "modifiable", false)
   local width = math.min(max_length + 2, math.max(20, math.floor(vim.o.columns * 0.8)))
   local height = math.min(#lines, math.max(5, math.floor(vim.o.lines * 0.6)))
   local row = math.floor((vim.o.lines - height) / 2)
@@ -161,8 +162,30 @@ local function _md_open_headings_popup()
     style = "minimal",
     border = "rounded",
   })
-  vim.api.nvim_win_set_option(win, "wrap", false)
-  vim.api.nvim_win_set_option(win, "cursorline", true)
+  vim.api.nvim_set_option_value("wrap", false, { win = win })
+  vim.api.nvim_set_option_value("cursorline", true, { win = win })
+  ---@type table<string, table<any>>
+  local groups = {}
+  for i, it in ipairs(items) do
+    ---@type string
+    local init
+    local trimmed = vim.trim(it.text)
+    local link_inside = trimmed:match "^%[%[([^%]]+)%]%]"
+    if link_inside then
+      ---@type string
+      local before_alias = link_inside:match "^[^|]+"
+      if before_alias then init = before_alias:match "%a" end
+    else
+      init = trimmed:match "%a"
+    end
+    if init then
+      init = init:lower()
+      if init:match "%a" then
+        groups[init] = groups[init] or {}
+        table.insert(groups[init], i)
+      end
+    end
+  end
   local jump_to_index = function(idx)
     if not idx or not items[idx] then return end
     local target = items[idx]
@@ -171,8 +194,108 @@ local function _md_open_headings_popup()
     pcall(vim.api.nvim_win_set_cursor, src_win, { target.line + 1, 0 })
     vim.cmd "normal! zvzz"
   end
-  for label, idx in pairs(l2i) do
-    vim.keymap.set("n", label, function() jump_to_index(idx) end, { buffer = buf, nowait = true, silent = true })
+  local second_active = false
+  local second_keys_set = {}
+  local second_extmarks = {}
+  local function clear_second()
+    if #second_extmarks > 0 then
+      for _, id in ipairs(second_extmarks) do
+        pcall(vim.api.nvim_buf_del_extmark, buf, _md_heading_ns, id)
+      end
+    end
+    second_extmarks = {}
+    if #second_keys_set > 0 then
+      for _, k in ipairs(second_keys_set) do
+        pcall(vim.keymap.del, "n", k, { buffer = buf })
+      end
+    end
+    second_keys_set = {}
+    second_active = false
+  end
+  local second_choice_keys = {
+    "a",
+    "s",
+    "d",
+    "f",
+    "l",
+    ";",
+    "h",
+    "g",
+    "u",
+    "i",
+    "o",
+    "p",
+    "w",
+    "e",
+    "r",
+    "t",
+    "y",
+    "c",
+    "v",
+    "b",
+    "n",
+    "m",
+    "x",
+    "z",
+  }
+  local function enter_second(init)
+    local list = groups[init]
+    if not list or #list <= 1 then return end
+    clear_second()
+    second_active = true
+    local mid = math.ceil(#lines / 2)
+    table.sort(list, function(a, b)
+      local da = math.abs(a - mid)
+      local db = math.abs(b - mid)
+      if da ~= db then return da < db end
+      return a > b
+    end)
+    local assigned = {}
+    for i, idx in ipairs(list) do
+      local key = second_choice_keys[i]
+      if not key then break end
+      table.insert(second_keys_set, key)
+      assigned[idx] = key
+      vim.keymap.set("n", key, function()
+        clear_second()
+        jump_to_index(idx)
+      end, { buffer = buf, nowait = true, silent = true })
+    end
+    for idx, key in pairs(assigned) do
+      local id = vim.api.nvim_buf_set_extmark(buf, _md_heading_ns, idx - 1, 0, {
+        virt_text = { { key .. " ", "IncSearch" } },
+        virt_text_pos = "overlay",
+        virt_text_win_col = 0,
+      })
+      table.insert(second_extmarks, id)
+    end
+  end
+  local function on_first(char)
+    local list = groups[char]
+    if not list or #list == 0 then return end
+    if #list == 1 then
+      jump_to_index(list[1])
+    else
+      enter_second(char)
+    end
+  end
+
+  local function move_cursor(delta)
+    local cur = vim.api.nvim_win_get_cursor(win)
+    local new_row = math.max(1, math.min(#lines, cur[1] + delta))
+    if new_row ~= cur[1] then vim.api.nvim_win_set_cursor(win, { new_row, 0 }) end
+  end
+
+  vim.keymap.set("n", "j", function() move_cursor(1) end, { buffer = buf, nowait = true, silent = true })
+  vim.keymap.set("n", "k", function() move_cursor(-1) end, { buffer = buf, nowait = true, silent = true })
+  for byte = string.byte "a", string.byte "z" do
+    local ch = string.char(byte)
+    if ch ~= "j" and ch ~= "k" then
+      vim.keymap.set("n", ch, function()
+        if second_active then return end
+        on_first(ch)
+      end, { buffer = buf, nowait = true, silent = true })
+    end
   end
   vim.keymap.set("n", "<CR>", function()
     local cur = vim.api.nvim_win_get_cursor(win)[1]
@@ -184,17 +307,18 @@ local function _md_open_headings_popup()
     function() pcall(vim.api.nvim_win_close, win, true) end,
     { buffer = buf, nowait = true, silent = true }
   )
-  vim.keymap.set(
-    "n",
-    "<Esc>",
-    function() pcall(vim.api.nvim_win_close, win, true) end,
-    { buffer = buf, nowait = true, silent = true }
-  )
+  vim.keymap.set("n", "<Esc>", function()
+    if second_active then
+      clear_second()
+    else
+      pcall(vim.api.nvim_win_close, win, true)
+    end
+  end, { buffer = buf, nowait = true, silent = true })
 end
 
 vim.keymap.set(
   "n",
-  "ghh",
+  "gh",
   _md_open_headings_popup,
   { buffer = true, silent = true, desc = "markdown: headings quick jump" }
 )

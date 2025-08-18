@@ -13,7 +13,7 @@ Plugins ecosystem:
 - folke's plugins (which-key.nvim, todo-comments.nvim)
 - vim-motion with leap.nvim and flit.nvim
 
-```prolog
+```text
 Startuptime: 37.49ms
 
 Based on the actual CPU time of the Neovim process till UIEnter.
