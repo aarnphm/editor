@@ -109,7 +109,7 @@ o.undolevels = 9999
 o.showtabline = 0
 o.smoothscroll = true
 
-o.shortmess = "aoIcF"
+o.shortmess = "ltTaoOIcF"
 o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
 o.cot = "menu,menuone,noinsert,fuzzy,popup"
 o.cia = "kind,abbr,menu"
@@ -144,7 +144,7 @@ o.shiftwidth = TABWIDTH
 o.shiftround = true
 
 -- UI config
-o.showmode = false
+o.showmode = true
 o.showcmd = true
 o.showbreak = "↳  "
 o.splitbelow = true
