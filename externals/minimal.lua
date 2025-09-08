@@ -249,7 +249,7 @@ require("lazy").setup {
       end,
     },
     {
-      "echasnovski/mini.nvim",
+      "nvim-mini/mini.nvim",
       version = false,
       event = "VeryLazy",
       dependencies = {

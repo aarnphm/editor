@@ -46,7 +46,23 @@ return {
     opts = {
       extra = {},
       align = { mappings = { start = "<leader>ga", start_with_preview = "<leader>gA" } },
-      pick = { options = { use_cache = true }, window = { prompt_prefix = "󰄾 " } },
+      pick = {
+        options = { use_cache = true },
+        window = {
+          prompt_prefix = "󰄾 ",
+          config = function()
+            local height = math.floor(0.618 * vim.o.lines)
+            local width = math.floor(0.618 * vim.o.columns)
+            return {
+              anchor = "NW",
+              height = height,
+              width = width,
+              row = 1 + math.floor(0.21 * (vim.o.lines + height)),
+              col = math.floor(0.5 * (vim.o.columns - width)),
+            }
+          end,
+        },
+      },
       bracketed = { window = { suffix = "" }, treesitter = { suffix = "" } },
       files = {
         windows = {
@@ -281,74 +297,6 @@ return {
           require("mini." .. module).setup(config)
         end
       end)
-    end,
-  },
-  {
-    "echasnovski/mini.starter",
-    version = false,
-    enabled = false,
-    event = "VimEnter",
-    opts = function()
-      local pad = string.rep(" ", 20)
-
-      ---@param name string shortcuts to show on starter
-      ---@param action string | fun(...): any any callable or commands
-      ---@param section string given name under which section
-      local new_section = function(name, action, section)
-        return { name = name, action = action, section = pad .. section }
-      end
-
-      local starter = require "mini.starter"
-      local config = {
-        evaluate_single = true,
-        header = table.concat({
-          [[                                  __]],
-          [[     ___     ___    ___   __  __ /\_\    ___ ___]],
-          [[    / _ `\  / __`\ / __`\/\ \/\ \\/\ \  / __` __`\]],
-          [[   /\ \/\ \/\  __//\ \_\ \ \ \_/ |\ \ \/\ \/\ \/\ \]],
-          [[   \ \_\ \_\ \____\ \____/\ \___/  \ \_\ \_\ \_\ \_\]],
-          [[    \/_/\/_/\/____/\/___/  \/__/    \/_/\/_/\/_/\/_/]],
-        }, "\n"),
-        items = {
-          new_section("Files", Util.pick "files", "Picker"),
-          new_section("Recents", Util.pick "oldfiles", "Picker"),
-          new_section("Word", Util.pick "live_grep", "Picker"),
-          new_section("Config", Util.pick.config_files(), "Config"),
-          new_section("Lazy", "Lazy", "Config"),
-          new_section("New", "ene | startinsert", "Builtin"),
-          new_section("Quit", "qa", "Builtin"),
-        },
-        content_hooks = {
-          starter.gen_hook.adding_bullet(pad .. "░ ", false),
-          starter.gen_hook.aligning("center", "center"),
-        },
-      }
-      return config
-    end,
-    config = function(_, config)
-      -- close Lazy and re-open when starter is ready
-      if vim.o.filetype == "lazy" then
-        vim.cmd.close()
-        vim.api.nvim_create_autocmd("User", {
-          pattern = "MiniStarterOpened",
-          callback = function() require("lazy").show() end,
-        })
-      end
-
-      local starter = require "mini.starter"
-      starter.setup(config)
-
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimStarted",
-        callback = function(ev)
-          local stats = require("lazy").stats()
-          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          local pad_footer = string.rep(" ", 8)
-          starter.config.footer = pad_footer .. "⚡ loaded " .. stats.count .. " plugins in " .. ms .. "ms"
-          -- INFO: based on @echasnovski's recommendation (thanks a lot!!!)
-          if vim.bo[ev.buf].filetype == "ministarter" then pcall(starter.refresh) end
-        end,
-      })
     end,
   },
 }
