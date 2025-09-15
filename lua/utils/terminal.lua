@@ -60,6 +60,8 @@ function M.open(cmd, opts)
   else
     terminals[termkey] = require("lazy.util").float_term(cmd, opts)
     local buf = terminals[termkey].buf
+    -- Disable mini.indentscope in all lazyterm buffers
+    vim.b[buf].miniindentscope_disable = true
     vim.b[buf].lazyterm_cmd = cmd
     if opts.esc_esc == false then vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true }) end
     if opts.ctrl_hjkl == false then
@@ -89,12 +91,14 @@ function M.open(cmd, opts)
 end
 
 ---@param cmd? string[]|string
----@param opts? {height?: number, persistent?: boolean, startinsert?: boolean}
+---@param opts? {height?: number, persistent?: boolean, startinsert?: boolean, focus?: boolean}
 function M.bottom(cmd, opts)
-  opts = vim.tbl_deep_extend("force", { height = 15, persistent = true, startinsert = false }, opts or {})
+  opts = vim.tbl_deep_extend("force", { height = 15, persistent = true, startinsert = false, focus = true }, opts or {})
   cmd = cmd or { vim.o.shell }
   vim.cmd.new()
-  vim.cmd.wincmd "J"
+  if opts.focus then
+    vim.cmd.wincmd "J"
+  end
 
   -- winopts
   local win = vim.api.nvim_get_current_win()
@@ -107,6 +111,8 @@ function M.bottom(cmd, opts)
   vim.b[buf].filetype = "lazyterm"
   vim.b[buf].buftype = "nofile"
   vim.bo[buf].modifiable = false
+  -- Disable mini.indentscope in all lazyterm buffers
+  vim.b[buf].miniindentscope_disable = true
 
   -- mappings
   vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
@@ -169,6 +175,8 @@ function M.side(cmd, opts)
   vim.b[buf].filetype = "lazyterm"
   vim.b[buf].buftype = "nofile"
   vim.bo[buf].modifiable = false
+  -- Disable mini.indentscope in all lazyterm buffers
+  vim.b[buf].miniindentscope_disable = true
 
   -- mappings
   vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })

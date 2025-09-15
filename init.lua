@@ -73,13 +73,13 @@ g.extra_plugins = {
   -- linters
   "plugins.linters.eslint",
 }
-g.enable_highlighturl = false
+g.enable_highlighturl = true
 g.enable_autowrap = false
 
 local wo = vim.wo
 wo.scrolloff = 2
 wo.sidescrolloff = 5
-wo.wrap = false
+wo.wrap = true
 wo.cursorline = true
 wo.cursorcolumn = false
 wo.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
@@ -569,7 +569,7 @@ vim.filetype.add {
 vim.api.nvim_create_user_command("Quartz", function(opts)
   local state = {
     cwd = nil,
-    height = 15,
+    height = 8, -- Reduced from 15 to 8 lines for unfocused terminal
     background = false,
     cmd = { "pnpm", "exec", "quartz/bootstrap-cli.mjs", "build", "--serve", "--verbose", "--bundleInfo" },
   }
@@ -607,7 +607,13 @@ vim.api.nvim_create_user_command("Quartz", function(opts)
       Util.info "Quartz process started in background"
     end
   else
-    Util.terminal.bottom(state.cmd, { height = state.height, cwd = state.cwd })
+    -- Create terminal with unfocused settings
+    Util.terminal.bottom(state.cmd, {
+      height = state.height,
+      cwd = state.cwd,
+      startinsert = false, -- Don't auto-focus the terminal
+      focus = false, -- Don't move focus to the terminal
+    })
   end
 end, {
   desc = "quartz: start server",
@@ -620,6 +626,58 @@ end, {
       ---@param x string
       vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
     )
+    return candidates
+  end,
+})
+
+vim.api.nvim_create_user_command("Codex", function(opts)
+  local state = {
+    cwd = nil,
+    width = 80,
+    args = {},
+  }
+
+  -- Parse arguments: cwd=..., width=..., pass-through others to codex
+  for _, arg in ipairs(opts.fargs) do
+    local value = arg:match "cwd=([^%s]+)"
+    if value then
+      state.cwd = value
+    else
+      local width_value = arg:match "width=(%d+)"
+      if width_value then
+        state.width = tonumber(width_value)
+      else
+        table.insert(state.args, arg)
+      end
+    end
+  end
+
+  if state.cwd == nil then state.cwd = Util.root() end
+
+  -- Build command. Use interactive TUI (supports full-screen UI in a terminal)
+  local cmd = { "codex" }
+  for _, a in ipairs(state.args) do
+    table.insert(cmd, a)
+  end
+
+  -- Open a terminal on the right and run Codex TUI
+  Util.terminal.side(cmd, {
+    width = state.width,
+    startinsert = true,
+    side = "right",
+    cwd = state.cwd,
+  })
+end, {
+  desc = "codex: open TUI on the right",
+  nargs = "*",
+  complete = function(_, _, _)
+    local candidates = {} ---@type string[]
+    vim.list_extend(
+      candidates,
+      ---@param x string
+      vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
+    )
+    vim.list_extend(candidates, { "width=60", "width=80", "width=100", "width=120" })
     return candidates
   end,
 })
