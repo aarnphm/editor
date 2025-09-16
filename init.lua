@@ -79,7 +79,7 @@ g.enable_autowrap = false
 local wo = vim.wo
 wo.scrolloff = 2
 wo.sidescrolloff = 5
-wo.wrap = true
+wo.wrap = false
 wo.cursorline = true
 wo.cursorcolumn = false
 wo.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
@@ -655,7 +655,7 @@ vim.api.nvim_create_user_command("Codex", function(opts)
   if state.cwd == nil then state.cwd = Util.root() end
 
   -- Build command. Use interactive TUI (supports full-screen UI in a terminal)
-  local cmd = { "codex" }
+  local cmd = { "codex", "--search" }
   for _, a in ipairs(state.args) do
     table.insert(cmd, a)
   end

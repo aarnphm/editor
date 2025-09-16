@@ -151,7 +151,7 @@ return {
           end,
         },
       },
-      indentscope = { symbol = "│", options = { try_as_border = true } },
+      indentscope = { enabled = false, symbol = "│", options = { try_as_border = true } },
       icons = {
         file = {
           [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
