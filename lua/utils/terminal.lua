@@ -93,12 +93,11 @@ end
 ---@param cmd? string[]|string
 ---@param opts? {height?: number, persistent?: boolean, startinsert?: boolean, focus?: boolean}
 function M.bottom(cmd, opts)
-  opts = vim.tbl_deep_extend("force", { height = 15, persistent = true, startinsert = false, focus = true }, opts or {})
+  opts =
+    vim.tbl_deep_extend("force", { height = 15, persistent = true, startinsert = false, focus = true }, opts or {})
   cmd = cmd or { vim.o.shell }
   vim.cmd.new()
-  if opts.focus then
-    vim.cmd.wincmd "J"
-  end
+  if opts.focus then vim.cmd.wincmd "J" end
 
   -- winopts
   local win = vim.api.nvim_get_current_win()
@@ -153,7 +152,8 @@ end
 ---@param cmd? string[]|string
 ---@param opts? {width?: number, persistent?: boolean, startinsert?: boolean, side?: "left" | "right"}
 function M.side(cmd, opts)
-  opts = vim.tbl_deep_extend("force", { width = 80, persistent = true, startinsert = false, side = "right" }, opts or {})
+  opts =
+    vim.tbl_deep_extend("force", { width = 80, persistent = true, startinsert = false, side = "right" }, opts or {})
   cmd = cmd or { vim.o.shell }
 
   if opts.side == "left" then

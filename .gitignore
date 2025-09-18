@@ -44,3 +44,6 @@ zettelkasten/*
 .avante_chat_history
 .envrc
 .env
+.nvimlog
+AGENTS.md
+CLAUDE.md

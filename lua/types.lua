@@ -4,7 +4,7 @@
 ---@field callback? fun(ev:vim.api.create_autocmd.callback.args):boolean?
 
 ---@module "utils"
-_G.Util = ...
+_G.Util = require "utils"
 
 ---@param event string | string[] (string|array) Event(s) that will trigger the handler
 ---@param opts vim.api.keyset.create_autocmd.opts

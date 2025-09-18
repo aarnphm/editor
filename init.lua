@@ -244,10 +244,10 @@ map("n", "<LocalLeader>sw", "<C-w>r", { desc = "window: swap position" })
 map("n", "<LocalLeader>vs", "<C-w>v", { desc = "edit: split window vertically" })
 map("n", "<LocalLeader>hs", "<C-w>s", { desc = "edit: split window horizontally" })
 map("n", "<LocalLeader>cd", ":lcd %:p:h<cr>", { desc = "misc: change directory to current file buffer" })
-map("n", "<LocalLeader>]", "<cmd>vertical resize -10<cr>", { noremap = false, desc = "windows: resize right 10px" })
-map("n", "<LocalLeader>[", "<cmd>vertical resize +10<cr>", { noremap = false, desc = "windows: resize left 10px" })
-map("n", "<LocalLeader>-", "<cmd>resize -10<cr>", { noremap = false, desc = "windows: resize down 10px" })
-map("n", "<LocalLeader>=", "<cmd>resize +10<cr>", { noremap = false, desc = "windows: resize up 10px" })
+map("n", "<LocalLeader>]", "<cmd>vertical resize -5<cr>", { noremap = false, desc = "windows: resize right 10px" })
+map("n", "<LocalLeader>[", "<cmd>vertical resize +5<cr>", { noremap = false, desc = "windows: resize left 10px" })
+map("n", "<LocalLeader>-", "<cmd>resize -5<cr>", { noremap = false, desc = "windows: resize down 10px" })
+map("n", "<LocalLeader>=", "<cmd>resize +5<cr>", { noremap = false, desc = "windows: resize up 10px" })
 map("n", "<leader><leader>b", "<cmd>wincmd =<cr>", { noremap = true, silent = true, desc = "windows: balance" })
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "search: next" })
@@ -396,6 +396,22 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave"
   group = numtoggle,
   callback = function()
     if vim.wo.number then vim.wo.relativenumber = false end
+  end,
+})
+
+local term_group = augroup "terminal_io"
+vim.api.nvim_create_autocmd({ "BufEnter", "TermOpen", "TermEnter" }, {
+  group = term_group,
+  callback = function(ev)
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(ev.buf) and vim.bo[ev.buf].buftype == "terminal" then vim.cmd.startinsert() end
+    end)
+  end,
+})
+vim.api.nvim_create_autocmd({ "BufLeave", "TermLeave" }, {
+  group = term_group,
+  callback = function(ev)
+    if vim.fn.mode() == "t" and vim.bo[ev.buf].buftype == "terminal" then vim.cmd.stopinsert() end
   end,
 })
 -- highlight URL
@@ -626,58 +642,6 @@ end, {
       ---@param x string
       vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
     )
-    return candidates
-  end,
-})
-
-vim.api.nvim_create_user_command("Codex", function(opts)
-  local state = {
-    cwd = nil,
-    width = 80,
-    args = {},
-  }
-
-  -- Parse arguments: cwd=..., width=..., pass-through others to codex
-  for _, arg in ipairs(opts.fargs) do
-    local value = arg:match "cwd=([^%s]+)"
-    if value then
-      state.cwd = value
-    else
-      local width_value = arg:match "width=(%d+)"
-      if width_value then
-        state.width = tonumber(width_value)
-      else
-        table.insert(state.args, arg)
-      end
-    end
-  end
-
-  if state.cwd == nil then state.cwd = Util.root() end
-
-  -- Build command. Use interactive TUI (supports full-screen UI in a terminal)
-  local cmd = { "codex", "--search" }
-  for _, a in ipairs(state.args) do
-    table.insert(cmd, a)
-  end
-
-  -- Open a terminal on the right and run Codex TUI
-  Util.terminal.side(cmd, {
-    width = state.width,
-    startinsert = true,
-    side = "right",
-    cwd = state.cwd,
-  })
-end, {
-  desc = "codex: open TUI on the right",
-  nargs = "*",
-  complete = function(_, _, _)
-    local candidates = {} ---@type string[]
-    vim.list_extend(
-      candidates,
-      ---@param x string
-      vim.tbl_map(function(x) return "cwd=" .. x end, { Util.root() })
-    )
-    vim.list_extend(candidates, { "width=60", "width=80", "width=100", "width=120" })
     return candidates
   end,
 })

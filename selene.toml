@@ -3,5 +3,3 @@ std = "lua52+vim"
 multiple_statements = "allow"
 global_usage = "allow"
 mixed_table = "allow"
-[globals]
-Util = { any = true }
