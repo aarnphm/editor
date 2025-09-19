@@ -14,6 +14,15 @@ local deepcopy = vim.deepcopy
 
 local Layout = { version = 1 }
 
+---@class LayoutActiveState
+---@field data table
+---@field mapping table<integer, integer>
+---@field tab number
+
+local active_layout ---@type LayoutActiveState?
+local pending_redraw
+local in_redraw = false
+
 local layout_root = fn.stdpath "state" .. "/layouts"
 
 local function ensure_dir(path)
@@ -28,6 +37,104 @@ local function ensure_dir(path)
 end
 
 ensure_dir(layout_root)
+
+local function set_active_layout(data, mapping)
+  if not data or type(data) ~= "table" or type(data.windows) ~= "table" then
+    active_layout = nil
+    return
+  end
+
+  local tracked = {
+    data = data,
+    mapping = {},
+    tab = api.nvim_get_current_tabpage(),
+  }
+
+  for index, win in pairs(mapping or {}) do
+    if api.nvim_win_is_valid(win) then
+      tracked.mapping[index] = win
+      local info = data.windows[index]
+      if info then info.bufnr = api.nvim_win_get_buf(win) end
+    end
+  end
+
+  active_layout = tracked
+end
+
+local function current_viewport()
+  local columns = vim.o.columns or 0
+  local lines = vim.o.lines or 0
+  local cmdheight = vim.o.cmdheight or 0
+  local editor_lines = lines - cmdheight
+  if editor_lines < 1 then editor_lines = 1 end
+  return {
+    columns = columns,
+    lines = lines,
+    cmdheight = cmdheight,
+    editor_lines = editor_lines,
+  }
+end
+
+local function update_ratios(data)
+  if not data or type(data.windows) ~= "table" then return end
+  local viewport = current_viewport()
+  data.viewport = viewport
+  local columns = math.max(viewport.columns, 1)
+  local editor_lines = math.max(viewport.editor_lines, 1)
+  for _, info in ipairs(data.windows) do
+    if info then
+      if type(info.width) == "number" and info.width > 0 then
+        info.width_ratio = math.min(1, math.max(info.width / columns, 0))
+      elseif info.width_ratio then
+        info.width_ratio = math.min(1, math.max(info.width_ratio, 0))
+      else
+        info.width_ratio = nil
+      end
+      if type(info.height) == "number" and info.height > 0 then
+        info.height_ratio = math.min(1, math.max(info.height / editor_lines, 0))
+      elseif info.height_ratio then
+        info.height_ratio = math.min(1, math.max(info.height_ratio, 0))
+      else
+        info.height_ratio = nil
+      end
+    end
+  end
+end
+
+local function apply_ratios(data, mapping)
+  if not data or type(data.windows) ~= "table" then return end
+  local viewport = data.viewport or current_viewport()
+  local columns = math.max(viewport.columns or vim.o.columns or 0, 1)
+  local editor_lines = math.max(viewport.editor_lines or (vim.o.lines - (vim.o.cmdheight or 0)), 1)
+  for index, win in pairs(mapping or {}) do
+    if api.nvim_win_is_valid(win) then
+      local info = data.windows[index]
+      if info then
+        local width_ratio = info.width_ratio
+        if (not width_ratio or width_ratio <= 0) and info.width and columns > 0 then
+          width_ratio = info.width / columns
+        end
+        if width_ratio and width_ratio > 0 then
+          local target_width = math.max(1, math.floor(columns * width_ratio + 0.5))
+          pcall(api.nvim_win_set_width, win, target_width)
+        end
+
+        local height_ratio = info.height_ratio
+        if (not height_ratio or height_ratio <= 0) and info.height and editor_lines > 0 then
+          height_ratio = info.height / editor_lines
+        end
+        if height_ratio and height_ratio > 0 then
+          local target_height = math.max(1, math.floor(editor_lines * height_ratio + 0.5))
+          pcall(api.nvim_win_set_height, win, target_height)
+        end
+
+        info.width = api.nvim_win_get_width(win)
+        info.height = api.nvim_win_get_height(win)
+      end
+    end
+  end
+  update_ratios(data)
+end
 
 local function sanitize(text, fallback)
   if not text then return fallback end
@@ -146,7 +253,30 @@ local function capture_window(winid, warnings)
     if ok then return view end
   end)
 
-  if buftype == "" then
+  local scratchpad = rawget(_G, "Scratchpad")
+  if
+    not info.kind
+    and scratchpad
+    and type(scratchpad.is_scratch_buffer) == "function"
+    and scratchpad.is_scratch_buffer(buf)
+  then
+    info.kind = "scratchpad"
+    info.filetype = filetype
+    info.buflisted = api.nvim_buf_get_option(buf, "buflisted")
+    if type(scratchpad.capture) == "function" then
+      local ok_capture, state = pcall(scratchpad.capture, winid, buf)
+      if ok_capture then
+        info.scratchpad = state
+      else
+        warnings[#warnings + 1] = string.format("layout: failed to capture scratchpad (%s)", state)
+      end
+    end
+    if not info.scratchpad then info.kind = nil end
+  end
+
+  if info.kind == "scratchpad" then
+    -- nothing else to classify
+  elseif buftype == "" then
     if file == "" then
       info.kind = "empty"
       info.buflisted = api.nvim_buf_get_option(buf, "buflisted")
@@ -247,14 +377,20 @@ local function capture_layout()
 
   local current_win = api.nvim_get_current_win()
   local current_index
+  local mapping = {}
   for _, info in ipairs(windows) do
     if info.winid == current_win then current_index = info.index end
+    if info.winid and api.nvim_win_is_valid(info.winid) then
+      mapping[info.index] = info.winid
+      local buf = api.nvim_win_get_buf(info.winid)
+      if buf and api.nvim_buf_is_valid(buf) then info.bufnr = buf end
+    end
     info.winid = nil
   end
 
   local saved_at = os.time()
 
-  return {
+  local data = {
     version = Layout.version,
     saved_at = saved_at,
     saved_at_iso = os.date("!%Y-%m-%dT%H:%M:%SZ", saved_at),
@@ -262,8 +398,11 @@ local function capture_layout()
     layout = tree,
     windows = windows,
     current = current_index,
-  },
-    warnings
+  }
+
+  update_ratios(data)
+
+  return data, warnings, mapping
 end
 
 local function sort_windows_by_orientation(windows, orientation)
@@ -373,6 +512,29 @@ local function apply_window(info, win, notices)
         if not restored then fallback_squad_restore(win, buf, info.squad.state) end
       end
     end
+  elseif info.kind == "scratchpad" then
+    vim.cmd "enew"
+    local buf = api.nvim_get_current_buf()
+    local scratchpad = rawget(_G, "Scratchpad")
+    local restored = false
+    if scratchpad and type(scratchpad.rehydrate) == "function" then
+      local ok_restore, err = pcall(scratchpad.rehydrate, win, buf, info.scratchpad)
+      if ok_restore then
+        restored = true
+      else
+        notices[#notices + 1] = string.format("layout: scratchpad restore failed (%s)", err)
+      end
+    else
+      notices[#notices + 1] = "layout: scratchpad restore fallback (scratchpad unavailable)"
+    end
+    if not restored then
+      api.nvim_buf_set_option(buf, "bufhidden", info.bufhidden or "hide")
+      api.nvim_buf_set_option(buf, "buftype", "nofile")
+      api.nvim_buf_set_option(buf, "buflisted", false)
+      api.nvim_buf_set_option(buf, "modifiable", false)
+      api.nvim_buf_set_lines(buf, 0, -1, false, { "-- scratchpad state unavailable --" })
+    end
+    restore_buffer_options(buf, info)
   elseif info.kind == "empty" then
     vim.cmd "enew"
     local buf = api.nvim_get_current_buf()
@@ -401,6 +563,13 @@ local function restore_layout(data)
     return
   end
 
+  local notices = {}
+
+  local ok_cmdheight, err_cmdheight = pcall(function() vim.o.cmdheight = 1 end)
+  if not ok_cmdheight then
+    notices[#notices + 1] = string.format("layout: failed to set cmdheight (%s)", err_cmdheight)
+  end
+
   vim.cmd.stopinsert()
   vim.cmd [[silent! only]]
 
@@ -408,10 +577,41 @@ local function restore_layout(data)
   local mapping = {}
   build_layout(data.layout, base_win, mapping)
 
-  local notices = {}
+  local desired_views = {}
   for index, info in ipairs(data.windows) do
     local win = mapping[index]
-    if win and api.nvim_win_is_valid(win) then apply_window(info, win, notices) end
+    if win and api.nvim_win_is_valid(win) then
+      apply_window(info, win, notices)
+      info.bufnr = api.nvim_win_get_buf(win)
+      info.view = api.nvim_win_call(win, function()
+        local ok, view = pcall(fn.winsaveview)
+        if ok then return view end
+      end)
+      desired_views[index] = info.view
+    end
+  end
+
+  if next(mapping) then apply_ratios(data, mapping) end
+
+  for index, win in pairs(mapping) do
+    if api.nvim_win_is_valid(win) then
+      local info = data.windows[index]
+      if info then
+        local view = desired_views[index]
+        if view then pcall(fn.winrestview, view) end
+        info.view = api.nvim_win_call(win, function()
+          local ok, view_data = pcall(fn.winsaveview)
+          if ok then return view_data end
+        end)
+      end
+    end
+  end
+
+  for index, win in pairs(mapping) do
+    if api.nvim_win_is_valid(win) then
+      local info = data.windows[index]
+      if info then info.bufnr = api.nvim_win_get_buf(win) end
+    end
   end
 
   if data.current then
@@ -420,7 +620,136 @@ local function restore_layout(data)
   end
 
   if #notices > 0 then Util.warn(table.concat(notices, "\n")) end
+
+  set_active_layout(data, mapping)
 end
+
+local function collect_valid_buffers(state)
+  local buffers = {}
+  local views = {}
+  local mapping = state and state.mapping or {}
+  if mapping then
+    for index, win in pairs(mapping) do
+      if api.nvim_win_is_valid(win) then
+        local buf = api.nvim_win_get_buf(win)
+        if buf and api.nvim_buf_is_valid(buf) then buffers[index] = buf end
+        local view = api.nvim_win_call(win, function()
+          local ok, view_data = pcall(fn.winsaveview)
+          if ok then return view_data end
+        end)
+        if view then views[index] = view end
+      end
+    end
+  end
+
+  if vim.tbl_isempty(buffers) and state then
+    for index, info in ipairs(state.data.windows or {}) do
+      local buf = info and info.bufnr
+      if buf and api.nvim_buf_is_valid(buf) then buffers[index] = buf end
+    end
+  end
+
+  return buffers, views
+end
+
+local function redraw_internal(opts)
+  if not active_layout or active_layout.tab ~= api.nvim_get_current_tabpage() then return false end
+  local data = active_layout.data
+  if not data or type(data.layout) ~= "table" then return false end
+
+  local buffers, views = collect_valid_buffers(active_layout)
+  if vim.tbl_isempty(buffers) then return false end
+
+  vim.cmd.stopinsert()
+  vim.cmd [[silent! only]]
+
+  local base_win = api.nvim_get_current_win()
+  local mapping = {}
+  build_layout(data.layout, base_win, mapping)
+
+  local notices = {}
+  local desired_views = {}
+  for index, win in pairs(mapping) do
+    if api.nvim_win_is_valid(win) then
+      local info = data.windows[index]
+      if info then
+        local buf = buffers[index]
+        if buf and api.nvim_buf_is_valid(buf) then
+          api.nvim_win_set_buf(win, buf)
+          info.bufnr = buf
+        else
+          apply_window(info, win, notices)
+          info.bufnr = api.nvim_win_get_buf(win)
+        end
+        set_winopts(win, info.winopts)
+        desired_views[index] = views[index] or info.view
+      end
+    end
+  end
+
+  if next(mapping) then apply_ratios(data, mapping) end
+
+  for index, win in pairs(mapping) do
+    if api.nvim_win_is_valid(win) then
+      local info = data.windows[index]
+      if info then
+        local view = desired_views[index]
+        if view then pcall(fn.winrestview, view) end
+        info.view = api.nvim_win_call(win, function()
+          local ok, view_data = pcall(fn.winsaveview)
+          if ok then return view_data end
+        end)
+        info.bufnr = api.nvim_win_get_buf(win)
+      end
+    end
+  end
+
+  if data.current then
+    local target = mapping[data.current]
+    if target and api.nvim_win_is_valid(target) then api.nvim_set_current_win(target) end
+  end
+
+  set_active_layout(data, mapping)
+  if #notices > 0 then Util.warn(table.concat(notices, "\n")) end
+  return true
+end
+
+function Layout.redraw(opts)
+  if in_redraw then return false end
+  in_redraw = true
+  local ok, result = pcall(redraw_internal, opts)
+  in_redraw = false
+  if not ok then
+    Util.error("layout: redraw failed - " .. result)
+    return false
+  end
+  return result
+end
+
+local function schedule_redraw(reason)
+  if pending_redraw or not active_layout then return end
+  pending_redraw = true
+  vim.defer_fn(function()
+    pending_redraw = false
+    if active_layout then Layout.redraw { reason = reason } end
+  end, 50)
+end
+
+vim.api.nvim_create_autocmd("VimResized", {
+  callback = function() schedule_redraw "resize" end,
+})
+
+vim.api.nvim_create_autocmd("WinResized", {
+  callback = function() schedule_redraw "winresize" end,
+})
+
+vim.api.nvim_create_autocmd("OptionSet", {
+  pattern = "cmdheight",
+  callback = function()
+    if active_layout and active_layout.data then update_ratios(active_layout.data) end
+    schedule_redraw "cmdheight"
+  end,
+})
 
 local function available_layouts(cwd)
   local dir = project_dir(cwd, false)
@@ -437,7 +766,7 @@ local function available_layouts(cwd)
 end
 
 function Layout.save(name)
-  local data, warnings = capture_layout()
+  local data, warnings, mapping = capture_layout()
   if not data then
     Util.warn "layout: nothing to save"
     return
@@ -450,7 +779,12 @@ function Layout.save(name)
     return
   end
 
-  local ok, encoded = pcall(json.encode, data)
+  local persistable = deepcopy(data)
+  for _, info in ipairs(persistable.windows) do
+    if info then info.bufnr = nil end
+  end
+
+  local ok, encoded = pcall(json.encode, persistable)
   if not ok then
     Util.error("layout: failed to encode layout - " .. encoded)
     return
@@ -465,6 +799,8 @@ function Layout.save(name)
   if warnings and #warnings > 0 then Util.warn(table.concat(warnings, "\n")) end
 
   Util.info(string.format("layout: saved %s", fn.fnamemodify(path, ":~")))
+
+  set_active_layout(data, mapping)
 end
 
 function Layout.load(name)
@@ -499,7 +835,7 @@ local function completion(arg_lead, cmd_line, _)
   local subcmd = parts[2]
 
   if not subcmd or (#parts == 2 and not cmd_line:match "%s$") then
-    local options = { "save", "load" }
+    local options = { "save", "load", "redraw" }
     local matches = {}
     for _, option in ipairs(options) do
       if option:find("^" .. vim.pesc(arg_lead)) then matches[#matches + 1] = option end
@@ -514,6 +850,8 @@ local function completion(arg_lead, cmd_line, _)
     end
     return matches
   end
+
+  if subcmd == "redraw" then return {} end
 
   return {}
 end
@@ -530,6 +868,8 @@ vim.api.nvim_create_user_command("Layout", function(opts)
     Layout.save(args[2])
   elseif subcmd == "load" then
     Layout.load(args[2])
+  elseif subcmd == "redraw" then
+    if not Layout.redraw { reason = "command" } then Util.warn "layout: nothing to redraw" end
   else
     Util.warn("layout: unknown subcommand '" .. subcmd .. "'")
   end

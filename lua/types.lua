@@ -28,6 +28,41 @@ function vim.api.nvim_create_autocmd(event, opts) end
 ---@overload fun(mode: string|string[], lhs: string, rhs: string|(fun(...): any), opts: vim.keymap.set.LazyOpts)
 function vim.keymap.set(mode, lhs, rhs, opts) end
 
+---@class ScratchPadConfig
+---@field width integer
+---@field output_height integer
+---@field side "left"|"right"
+---@field focus_on_open boolean
+
+---@class ScratchPadState
+---@field code_buf? integer
+---@field output_buf? integer
+---@field code_win? integer
+---@field output_win? integer
+---@field side? "left"|"right"
+---@field output_lines? string[]
+---@field last_selection? { line1?: integer, line2?: integer }
+
+---@class ScratchPadCapture
+---@field kind string
+---@field lines string[]
+---@field side? "left"|"right"
+---@field view? table
+
+---@class ScratchPad
+---@field config ScratchPadConfig
+---@field state ScratchPadState
+---@field augroup integer
+---@field _win_closed_autocmd? boolean
+---@field open fun(opts?: {side?:"left"|"right", width?:integer, output_height?:integer, focus?:boolean}): (integer?, integer?)
+---@field close fun()
+---@field run fun(line1?: integer, line2?: integer, buf?: integer): string[]|nil
+---@field write_output fun(lines: string[])
+---@field clear_output fun()
+---@field capture fun(win?: integer, buf?: integer): ScratchPadCapture?
+---@field rehydrate fun(win?: integer, buf?: integer, state?: ScratchPadCapture)
+---@field is_scratch_buffer fun(buf: integer): boolean
+
 ---we need to add hints for leap.nvim
 ---@class LeapSpecialKeys
 ---@field next_target string
