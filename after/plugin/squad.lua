@@ -399,12 +399,12 @@ local function apply_terminal_mappings(buf)
   vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
   vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
   vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
-  vim.keymap.set("t", "<c-d>", function()
-    if stop_squad then stop_squad "manual" end
-  end, { buffer = buf, nowait = true })
-  vim.keymap.set("n", "<c-d>", function()
-    if stop_squad then stop_squad "manual" end
-  end, { buffer = buf, nowait = true })
+  -- vim.keymap.set("t", "<c-d>", function()
+  --   if stop_squad then stop_squad "manual" end
+  -- end, { buffer = buf, nowait = true })
+  -- vim.keymap.set("n", "<c-d>", function()
+  --   if stop_squad then stop_squad "manual" end
+  -- end, { buffer = buf, nowait = true })
   vim.keymap.set("n", "gf", function()
     local f = vim.fn.findfile(vim.fn.expand "<cfile>")
     if f ~= "" then
