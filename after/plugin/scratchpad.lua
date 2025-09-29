@@ -92,7 +92,6 @@ local function configure_code_buffer(buf)
   api.nvim_set_option_value("buflisted", false, { buf = buf })
   api.nvim_set_option_value("modifiable", true, { buf = buf })
   api.nvim_set_option_value("filetype", "lua", { buf = buf })
-  api.nvim_set_option_value("spell", false, { buf = buf })
   vim.b[buf].scratchpad = true
   vim.b[buf].scratchpad_kind = "code"
   vim.b[buf].scratchpad_state_version = 1
@@ -125,6 +124,10 @@ local function configure_code_buffer(buf)
       buffer = buf,
       desc = "Clear Lua scratchpad output",
     })
+    vim.keymap.set("n", "q", function() Scratchpad.close() end, {
+      buffer = buf,
+      desc = "Close Lua scratchpad",
+    })
     vim.b[buf].scratchpad_keymaps = true
   end
 
@@ -150,10 +153,7 @@ local function configure_output_buffer(buf)
   api.nvim_set_option_value("undofile", false, { buf = buf })
   api.nvim_set_option_value("modeline", false, { buf = buf })
   api.nvim_set_option_value("buflisted", false, { buf = buf })
-  api.nvim_set_option_value("modifiable", false, { buf = buf })
-  api.nvim_set_option_value("readonly", true, { buf = buf })
   api.nvim_set_option_value("filetype", "lua", { buf = buf })
-  api.nvim_set_option_value("spell", false, { buf = buf })
   vim.b[buf].scratchpad = true
   vim.b[buf].scratchpad_kind = "output"
   vim.b[buf].scratchpad_state_version = 1
@@ -170,9 +170,26 @@ local function configure_output_buffer(buf)
   end
 
   if not vim.b[buf].scratchpad_named then
+    local was_readonly = api.nvim_get_option_value("readonly", { buf = buf })
+    local was_modifiable = api.nvim_get_option_value("modifiable", { buf = buf })
+    if was_readonly then api.nvim_set_option_value("readonly", false, { buf = buf }) end
+    if not was_modifiable then api.nvim_set_option_value("modifiable", true, { buf = buf }) end
     api.nvim_buf_set_name(buf, "lua-scratchpad://output")
     api.nvim_buf_set_lines(buf, 0, -1, false, { "-- output" })
     vim.b[buf].scratchpad_named = true
+    if was_readonly then api.nvim_set_option_value("readonly", true, { buf = buf }) end
+    if not was_modifiable then api.nvim_set_option_value("modifiable", false, { buf = buf }) end
+  end
+
+  api.nvim_set_option_value("modifiable", false, { buf = buf })
+  api.nvim_set_option_value("readonly", true, { buf = buf })
+
+  if not vim.b[buf].scratchpad_keymaps then
+    vim.keymap.set("n", "q", function() Scratchpad.close() end, {
+      buffer = buf,
+      desc = "Close Lua scratchpad",
+    })
+    vim.b[buf].scratchpad_keymaps = true
   end
 end
 
@@ -356,6 +373,17 @@ function Scratchpad.run(line1, line2, buf)
     return ...
   end
 
+  local original_print = _G.print
+  local original_vim_print = vim.print
+  local original_vim_pretty_print = vim.pretty_print
+  local has_pretty_print = original_vim_pretty_print ~= nil
+
+  local function restore_prints()
+    _G.print = original_print
+    vim.print = original_vim_print
+    if has_pretty_print then vim.pretty_print = original_vim_pretty_print end
+  end
+
   local env_vim = setmetatable({ print = capture }, {
     __index = vim,
     __newindex = vim,
@@ -371,9 +399,18 @@ function Scratchpad.run(line1, line2, buf)
   end
 
   local ok, trace = xpcall(function()
+    _G.print = capture
+    vim.print = capture
+    if has_pretty_print then vim.pretty_print = capture end
     local results = { chunk() }
     if #results > 0 then capture(unpack(results)) end
-  end, function(e) return debug.traceback(e, 2) end)
+    restore_prints()
+  end, function(e)
+    restore_prints()
+    return debug.traceback(e, 2)
+  end)
+
+  restore_prints()
 
   if not ok then
     push "! runtime error"
