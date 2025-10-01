@@ -54,7 +54,7 @@ local DEFAULT_LAYOUT = {
 }
 
 local DEFAULT_CODEX_MODEL = "gpt-5-codex"
-local DEFAULT_CLAUDE_MODEL = "sonnet"
+local DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
 local DEFAULT_SQUAD_SPEC = string.format("codex::1[model=%s]", DEFAULT_CODEX_MODEL)
 
 local LAYOUT_ALIASES = {
