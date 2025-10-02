@@ -157,7 +157,7 @@ o.virtualedit = "block"
 o.ls = 3
 o.whichwrap = "b,s,<,>,[,],~"
 o.guifont = "Berkeley Mono:h16"
-o.cmdheight = 0
+o.cmdheight = 1
 o.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
 o.conceallevel = 0
 

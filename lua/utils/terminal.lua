@@ -104,8 +104,44 @@ function M.bottom(cmd, opts)
   vim.api.nvim_win_set_height(0, opts.height)
   vim.wo.winfixheight = true
 
-  -- bufopts
   local buf = vim.api.nvim_get_current_buf()
+
+  local function enforce_height(winid)
+    if not winid or not vim.api.nvim_win_is_valid(winid) then return end
+    vim.api.nvim_win_set_height(winid, opts.height)
+    vim.api.nvim_win_set_option(winid, "winfixheight", true)
+  end
+
+  enforce_height(win)
+
+  local resize_group = vim.api.nvim_create_augroup(string.format("lazyterm_bottom_%d", buf), { clear = true })
+
+  vim.api.nvim_create_autocmd("BufWinEnter", {
+    group = resize_group,
+    buffer = buf,
+    callback = function()
+      local target = vim.fn.bufwinid(buf)
+      if target ~= -1 then enforce_height(target) end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("WinEnter", {
+    group = resize_group,
+    callback = function(event)
+      if event.buf ~= buf then return end
+      local target = vim.fn.bufwinid(buf)
+      if target ~= -1 then enforce_height(target) end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "WinResized", "VimResized", "TabEnter" }, {
+    group = resize_group,
+    callback = function()
+      local target = vim.fn.bufwinid(buf)
+      if target ~= -1 then enforce_height(target) end
+    end,
+  })
+  -- bufopts
   vim.b[buf].lazyterm_cmd = cmd
   vim.b[buf].filetype = "lazyterm"
   vim.b[buf].buftype = "nofile"
@@ -131,6 +167,7 @@ function M.bottom(cmd, opts)
     once = true,
     buffer = buf,
     callback = function()
+      pcall(vim.api.nvim_del_augroup_by_id, resize_group)
       vim.schedule(function()
         if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
         if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_delete(buf, { force = true }) end
