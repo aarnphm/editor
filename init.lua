@@ -605,6 +605,7 @@ vim.api.nvim_create_user_command("Quartz", function(opts)
   if state.background then
     local job_id = vim.fn.jobstart(state.cmd, {
       cwd = state.cwd,
+      env = { NODE_ENV = "development" },
       on_exit = function(_, code)
         if code == 0 then
           Util.info "Quartz can be accessed at http://localhost:8080"
