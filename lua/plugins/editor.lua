@@ -190,7 +190,7 @@ return {
   {
     "Bekaboo/dropbar.nvim",
     version = false,
-    enabled = false,
+    enabled = true,
     event = "LazyFile",
     ---@type dropbar_configs_t
     opts = {

@@ -60,7 +60,8 @@ return {
     opts = function()
       ---@type render.md.UserConfig
       return {
-        completions = { blink = { enabled = true } },
+        enabled = false,
+        completions = { blink = { enabled = false } },
         render_modes = { "n", "c" },
         anti_conceal = { enabled = true },
         max_file_size = Snacks.config.bigfile.size,

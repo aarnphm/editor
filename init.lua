@@ -192,7 +192,7 @@ map({ "n", "x" }, " ", "", { noremap = true })
 map(
   "n",
   "<leader>st",
-  function() Util.terminal.bottom(nil, { startinsert = true }) end,
+  function() Util.terminal.bottom(nil, { height = 10, startinsert = true }) end,
   { desc = "terminal: attach new process" }
 )
 map(
@@ -585,7 +585,7 @@ vim.filetype.add {
 vim.api.nvim_create_user_command("Quartz", function(opts)
   local state = {
     cwd = nil,
-    height = 8, -- Reduced from 15 to 8 lines for unfocused terminal
+    height = 3, -- Reduced from 15 to 8 lines for unfocused terminal
     background = false,
     cmd = { "pnpm", "exec", "quartz/bootstrap-cli.mjs", "build", "--serve", "--verbose", "--bundleInfo" },
   }

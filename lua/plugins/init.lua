@@ -58,8 +58,8 @@ return {
           StatusLine = { fg = palette.orange_two, bg = palette.overlay },
           StatusLineNC = { bg = palette.overlay },
           QuickFixLine = { bg = palette.highlight_high },
-          Winbar = { bg = palette.base },
-          WinbarNC = { bg = palette.base },
+          WinBar = { bg = palette.base },
+          WinBarNC = { bg = palette.base },
           -- avante.nvim
           AvanteTitle = { bg = palette.red_two },
           AvanteReversedTitle = { fg = palette.red_two },
