@@ -167,23 +167,44 @@ local function _md_open_headings_popup()
   ---@type table<string, table<any>>
   local groups = {}
   for i, it in ipairs(items) do
-    ---@type string
-    local init
+    ---@type string[]
+    local initials = {}
+    local seen = {}
+    local function add_initial(str)
+      if not str then return end
+      local ch = str:match "%a"
+      if not ch then return end
+      ch = ch:lower()
+      if seen[ch] then return end
+      seen[ch] = true
+      table.insert(initials, ch)
+    end
     local trimmed = vim.trim(it.text)
     local link_inside = trimmed:match "^%[%[([^%]]+)%]%]"
     if link_inside then
       ---@type string
       local before_alias = link_inside:match "^[^|]+"
-      if before_alias then init = before_alias:match "%a" end
-    else
-      init = trimmed:match "%a"
-    end
-    if init then
-      init = init:lower()
-      if init:match "%a" then
-        groups[init] = groups[init] or {}
-        table.insert(groups[init], i)
+      add_initial(before_alias)
+      if before_alias then
+        for segment in before_alias:gmatch "[^/]+" do
+          add_initial(segment)
+        end
       end
+      local alias = link_inside:match "|(.+)$"
+      if alias then add_initial(alias) end
+    else
+      add_initial(trimmed)
+    end
+    for _, init in ipairs(initials) do
+      groups[init] = groups[init] or {}
+      local exists = false
+      for _, idx in ipairs(groups[init]) do
+        if idx == i then
+          exists = true
+          break
+        end
+      end
+      if not exists then table.insert(groups[init], i) end
     end
   end
   local jump_to_index = function(idx)
