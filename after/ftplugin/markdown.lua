@@ -152,7 +152,7 @@ local function _md_open_headings_popup()
   local width = math.min(max_length + 2, math.max(20, math.floor(vim.o.columns * 0.8)))
   local height = math.min(#lines, math.max(5, math.floor(vim.o.lines * 0.6)))
   local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.max(0, vim.o.columns - width - 2)
+  local col = 2
   local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     row = row,

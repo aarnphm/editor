@@ -75,7 +75,7 @@ local function analyze_children(bufnr, node)
         if sub:type() == "list_item" then
           first_child_row = first_child_row or select(1, sub:start())
           local text = first_line_text(bufnr, sub):lower()
-          if text:match "^_meta:%s*" or text:match "^_meta%s*$" then
+          if text:match "^%[meta%]%s*:%s*" or text:match "^%[meta%]%s*$" then
             has_meta = true
             break
           end
@@ -92,8 +92,9 @@ local function build_insert_lines(indent, date)
   local child_indent = indent .. "  "
   local date_indent = child_indent .. "  "
   return {
-    child_indent .. "- \\_meta:",
+    child_indent .. "- [meta]:",
     date_indent .. "- date: " .. date,
+    date_indent .. "- tags: [fruit]",
   }
 end
 
@@ -129,7 +130,7 @@ local function ensure_arena_meta(bufnr, initial_tick)
     if text == "" then goto continue end
     local normalized = text:lower()
     if normalized:sub(1, 1) == "\\" then normalized = normalized:sub(2) end
-    if normalized:match "^_meta:%s*" or normalized:match "^date:%s*" then goto continue end
+    if normalized:match "^%[meta%]%s*:%s*" or normalized:match "^date:%s*" then goto continue end
 
     local has_meta, child_list, first_child_row = analyze_children(bufnr, node)
     if has_meta then goto continue end

@@ -52,9 +52,27 @@ return {
         menu = {
           draw = {
             treesitter = { "lsp" },
-            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" } },
+            columns = { { "kind_icon" }, { "kind" }, { "label", "label_description", gap = 2 } },
             components = {
-              label_description = { width = { max = 40 }, text = function(ctx) return ctx.label_description or "" end },
+              label_description = { width = { max = 0 }, text = function(ctx) return ctx.label_description or "" end },
+              kind_icon = {
+                text = function(ctx)
+                  local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
+                  return kind_icon
+                end,
+                -- (optional) use highlights from mini.icons
+                highlight = function(ctx)
+                  local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+                  return hl
+                end,
+              },
+              kind = {
+                -- (optional) use highlights from mini.icons
+                highlight = function(ctx)
+                  local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+                  return hl
+                end,
+              },
             },
             padding = 0,
             gap = 1,
@@ -66,6 +84,7 @@ return {
         list = {
           selection = {
             preselect = function() return not require("blink.cmp").snippet_active { direction = 1 } end,
+            auto_insert = false,
           },
         },
       },
@@ -110,6 +129,8 @@ return {
           Util.cmp.map { "snippet_forward" },
           "fallback",
         },
+        ["<Up>"] = false,
+        ["<Down>"] = false,
       },
     },
   },
