@@ -73,6 +73,10 @@ return {
           max_number = 3,
         },
         mappings = { synchronize = "<leader>" },
+        include_ignored_globs = {
+          "**/letters/*",
+          "**/docs/*",
+        },
       },
       ---@class MiniSurroundOpts
       surround = {

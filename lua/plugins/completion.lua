@@ -10,11 +10,6 @@ return {
         enabled = true,
         auto_trigger = false,
         debounce = 75,
-        keymap = {
-          accept = "<M-CR>",
-          next = "<M-]>",
-          prev = "<M-[>",
-        },
       },
       filetypes = {
         markdown = true,

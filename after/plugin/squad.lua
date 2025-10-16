@@ -28,6 +28,7 @@ local Util = require "utils"
 local async = require "plenary.async"
 local async_util = require "plenary.async.util"
 local scheduler = async_util.scheduler
+local uv = vim.loop
 
 ---@class SquadPanel
 ---@field name string
@@ -51,6 +52,7 @@ local DEFAULT_LAYOUT = {
   mode = "vertical", -- vertical: right side with horizontal splits
   height = 18,
   width = 80,
+  position = "right",
 }
 
 local DEFAULT_CODEX_MODEL = "gpt-5-codex"
@@ -61,7 +63,8 @@ local LAYOUT_ALIASES = {
   horizontal = { mode = "horizontal" },
   bottom = { mode = "horizontal" },
   vertical = { mode = "vertical" },
-  right = { mode = "vertical" },
+  right = { mode = "vertical", position = "right" },
+  left = { mode = "vertical", position = "left" },
   side = { mode = "vertical" },
 }
 
@@ -89,6 +92,11 @@ local RESERVED_OPTION_KEYS = {
   width = true,
   height = true,
 }
+
+-- worktree configuration
+local WORKTREE_BASE_DIR = vim.env.SQUAD_WORKTREE_DIR or (vim.fn.stdpath "state" .. "/squad/worktrees")
+local WORKTREE_STATE_FILE = vim.fn.stdpath "state" .. "/squad/worktree-state.json"
+local WORKTREE_NAME_PATTERN = "^[%w][%w%-_]*$"
 
 local function trim(str)
   if type(str) ~= "string" then return str end
@@ -250,6 +258,15 @@ local function parse_agent_spec(raw)
   name = trim(name)
   if not name or name == "" then return nil, "squad: missing agent name" end
 
+  -- extract worktree from agent name if present (e.g. claude/worktree-name)
+  local worktree
+  local slash_pos = name:find "/"
+  if slash_pos then
+    worktree = trim(name:sub(slash_pos + 1))
+    name = trim(name:sub(1, slash_pos - 1))
+    if worktree == "" then worktree = nil end
+  end
+
   local opts, err
   if rest then
     opts, err = parse_options(rest)
@@ -258,11 +275,25 @@ local function parse_agent_spec(raw)
     opts = {}
   end
 
-  if prompt and prompt ~= "" and prompt:find "=" then
-    local inline_opts = select(1, parse_options("{" .. prompt .. "}"))
-    if inline_opts then
-      opts = vim.tbl_deep_extend("force", opts, inline_opts)
-      prompt = nil
+  -- extract worktree from prompt if present (e.g. [/worktree-name,opts])
+  if prompt and prompt ~= "" then
+    if prompt:sub(1, 1) == "/" then
+      -- prompt starts with /, extract worktree
+      local comma_pos = prompt:find ","
+      if comma_pos then
+        worktree = trim(prompt:sub(2, comma_pos - 1))
+        prompt = trim(prompt:sub(comma_pos + 1))
+      else
+        worktree = trim(prompt:sub(2))
+        prompt = nil
+      end
+    elseif prompt:find "=" then
+      -- check if prompt contains options
+      local inline_opts = select(1, parse_options("{" .. prompt .. "}"))
+      if inline_opts then
+        opts = vim.tbl_deep_extend("force", opts, inline_opts)
+        prompt = nil
+      end
     end
   end
 
@@ -276,6 +307,7 @@ local function parse_agent_spec(raw)
     prompt = prompt,
     options = opts,
     count = count,
+    worktree = worktree,
   }
 end
 
@@ -383,6 +415,259 @@ local function strip_termcolor_sequences(text)
   -- Remove single-character C1 controls used by termcolor
   sanitized = sanitized:gsub("\194[\128-\159]", "")
   return sanitized
+end
+
+-- worktree state management
+local function ensure_worktree_state_dir()
+  local dir = vim.fn.fnamemodify(WORKTREE_STATE_FILE, ":h")
+  if vim.fn.isdirectory(dir) == 0 then vim.fn.mkdir(dir, "p") end
+end
+
+local function load_worktree_state()
+  if vim.fn.filereadable(WORKTREE_STATE_FILE) == 0 then return { worktrees = {} } end
+
+  local ok, content = pcall(vim.fn.readfile, WORKTREE_STATE_FILE)
+  if not ok or not content then return { worktrees = {} } end
+
+  local json_str = table.concat(content, "\n")
+  ok, content = pcall(vim.fn.json_decode, json_str)
+  if not ok or type(content) ~= "table" then return { worktrees = {} } end
+
+  return content
+end
+
+local function save_worktree_state(state)
+  if type(state) ~= "table" then return false end
+
+  ensure_worktree_state_dir()
+  local ok, json_str = pcall(vim.fn.json_encode, state)
+  if not ok then return false end
+
+  ok = pcall(vim.fn.writefile, { json_str }, WORKTREE_STATE_FILE)
+  return ok
+end
+
+local function get_worktree_path(name)
+  if not name or name == "" then return nil end
+  return WORKTREE_BASE_DIR .. "/" .. name
+end
+
+local function validate_worktree_name(name)
+  if not name or name == "" then return false, "worktree name cannot be empty" end
+
+  if not name:match(WORKTREE_NAME_PATTERN) then
+    return false,
+      string.format(
+        "invalid worktree name `%s`: must start with alphanumeric and contain only alphanumeric, dash, or underscore",
+        name
+      )
+  end
+
+  return true
+end
+
+local function register_worktree(name, path, branch, agent)
+  local state = load_worktree_state()
+  state.worktrees = state.worktrees or {}
+
+  if not state.worktrees[name] then
+    state.worktrees[name] = {
+      path = path,
+      branch = branch,
+      agents = { agent },
+      created_at = os.time(),
+      last_used = os.time(),
+    }
+  else
+    state.worktrees[name].last_used = os.time()
+    local agents = state.worktrees[name].agents or {}
+    local found = false
+    for _, a in ipairs(agents) do
+      if a == agent then
+        found = true
+        break
+      end
+    end
+    if not found then table.insert(agents, agent) end
+    state.worktrees[name].agents = agents
+  end
+
+  save_worktree_state(state)
+end
+
+-- git worktree operations
+local function is_git_repo()
+  local result = vim.fn.system "git rev-parse --is-inside-work-tree 2>/dev/null"
+  return vim.v.shell_error == 0 and trim(result) == "true"
+end
+
+local function get_git_root()
+  if not is_git_repo() then return nil end
+  local root = vim.fn.system "git rev-parse --show-toplevel 2>/dev/null"
+  if vim.v.shell_error ~= 0 then return nil end
+  return trim(root)
+end
+
+local function git_worktree_list()
+  local result = vim.fn.system "git worktree list --porcelain 2>/dev/null"
+  if vim.v.shell_error ~= 0 then return {} end
+
+  local worktrees = {}
+  local current = {}
+
+  for line in result:gmatch "[^\r\n]+" do
+    if line:match "^worktree " then
+      if current.path then table.insert(worktrees, current) end
+      current = { path = trim(line:sub(10)) }
+    elseif line:match "^branch " then
+      current.branch = trim(line:sub(8))
+    end
+  end
+
+  if current.path then table.insert(worktrees, current) end
+
+  return worktrees
+end
+
+local function worktree_exists(path)
+  local worktrees = git_worktree_list()
+  for _, wt in ipairs(worktrees) do
+    if wt.path == path then return true, wt.branch end
+  end
+  return false
+end
+
+local function create_worktree(name, source_path)
+  local ok, err = validate_worktree_name(name)
+  if not ok then return nil, err end
+
+  local path = get_worktree_path(name)
+  if not path then return nil, "failed to determine worktree path" end
+
+  -- check if worktree already exists
+  local exists, existing_branch = worktree_exists(path)
+  if exists then return path, existing_branch end
+
+  -- ensure worktree directory exists
+  local base_dir = vim.fn.fnamemodify(path, ":h")
+  if vim.fn.isdirectory(base_dir) == 0 then vim.fn.mkdir(base_dir, "p") end
+
+  -- create worktree with new branch
+  local branch = "squad/" .. name
+  local cmd = string.format("git worktree add -b %s %s 2>&1", vim.fn.shellescape(branch), vim.fn.shellescape(path))
+  local result = vim.fn.system(cmd)
+
+  if vim.v.shell_error ~= 0 then
+    -- branch might already exist, try without -b
+    cmd = string.format("git worktree add %s %s 2>&1", vim.fn.shellescape(path), vim.fn.shellescape(branch))
+    result = vim.fn.system(cmd)
+
+    if vim.v.shell_error ~= 0 then return nil, string.format("failed to create worktree: %s", trim(result)) end
+  end
+
+  return path, branch
+end
+
+-- agent context setup
+local function path_exists(path)
+  if type(path) ~= "string" or path == "" then return false end
+  local stat = uv.fs_lstat(path)
+  return stat ~= nil
+end
+
+local function safe_symlink(source, target)
+  if not path_exists(source) then return false end
+
+  local source_real = uv.fs_realpath(source) or source
+  local target_stat = uv.fs_lstat(target)
+
+  if target_stat then
+    local existing = uv.fs_realpath(target)
+    if existing == source_real then return true end
+    vim.fn.delete(target, "rf")
+  end
+
+  local parent = vim.fn.fnamemodify(target, ":h")
+  if parent ~= "" and parent ~= target and vim.fn.isdirectory(parent) == 0 then vim.fn.mkdir(parent, "p") end
+
+  local source_stat = uv.fs_lstat(source_real) or uv.fs_lstat(source)
+  local flags
+  if source_stat and source_stat.type == "directory" then
+    flags = uv.constants and uv.constants.UV_FS_SYMLINK_DIR or 1
+  elseif source_stat and source_stat.type == "file" then
+    flags = uv.constants and uv.constants.UV_FS_SYMLINK_FILE or 0
+  end
+
+  local ok, err = uv.fs_symlink(source, target, flags)
+  if ok then return true end
+
+  -- fallback to shell command when libuv symlink fails (e.g. older platforms)
+  local cmd = string.format("ln -s %s %s", vim.fn.shellescape(source), vim.fn.shellescape(target))
+  vim.fn.system(cmd)
+  if vim.v.shell_error == 0 then return true end
+
+  if err then Util.warn(string.format("squad: symlink failed for %s -> %s (%s)", source, target, err)) end
+  return false
+end
+
+local function safe_copy(source, target)
+  if vim.fn.filereadable(source) == 0 and vim.fn.isdirectory(source) == 0 then return false end
+
+  if vim.fn.filereadable(target) == 1 or vim.fn.isdirectory(target) == 1 then
+    -- skip if target already exists
+    return true
+  end
+
+  local cmd = vim.fn.isdirectory(source) == 1 and "cp -r %s %s" or "cp %s %s"
+  cmd = string.format(cmd, vim.fn.shellescape(source), vim.fn.shellescape(target))
+  vim.fn.system(cmd)
+  return vim.v.shell_error == 0
+end
+
+local function setup_claude_context(worktree_path, source_path)
+  local warnings = {}
+
+  -- symlink .claude directory if it exists
+  local source_claude_path = source_path .. "/.claude"
+  if path_exists(source_claude_path) then
+    local target_claude_path = worktree_path .. "/.claude"
+    if not safe_symlink(source_claude_path, target_claude_path) then
+      table.insert(warnings, "failed to symlink .claude")
+    end
+  end
+
+  -- symlink CLAUDE.md if it exists
+  local source_claude_md = source_path .. "/CLAUDE.md"
+  if vim.fn.filereadable(source_claude_md) == 1 then
+    local target_claude_md = worktree_path .. "/CLAUDE.md"
+    if not safe_symlink(source_claude_md, target_claude_md) then
+      table.insert(warnings, "failed to symlink CLAUDE.md")
+    end
+  end
+
+  return warnings
+end
+
+local function setup_codex_context(worktree_path, source_path)
+  local warnings = {}
+
+  -- copy AGENTS.md if it exists
+  local source_agents_md = source_path .. "/AGENTS.md"
+  if vim.fn.filereadable(source_agents_md) == 1 then
+    local target_agents_md = worktree_path .. "/AGENTS.md"
+    if not safe_copy(source_agents_md, target_agents_md) then table.insert(warnings, "failed to copy AGENTS.md") end
+  end
+
+  return warnings
+end
+
+local function setup_agent_context(worktree_path, agent, source_path)
+  if agent == "claude" then
+    return setup_claude_context(worktree_path, source_path)
+  elseif agent == "codex" then
+    return setup_codex_context(worktree_path, source_path)
+  end
+  return {}
 end
 
 local function handle_entry_closed(entry)
@@ -612,6 +897,7 @@ local function setup_terminal_window(entry, layout)
     panel = panel.name,
     prompt = panel.prompt,
     layout = layout.mode,
+    position = layout.position,
     display = display,
     term_opts = persisted_term_opts,
   }
@@ -714,13 +1000,18 @@ local function create_vertical_layout(panels, layout)
   if #panels == 0 then return {} end
 
   local width = layout.width or DEFAULT_LAYOUT.width
+  local position = layout.position or DEFAULT_LAYOUT.position or "right"
   local entries = {}
 
   for index, panel in ipairs(panels) do
     local win
     if index == 1 then
       vim.cmd "vnew"
-      vim.cmd "wincmd L"
+      if position == "left" then
+        vim.cmd "wincmd H"
+      else
+        vim.cmd "wincmd L"
+      end
       win = vim.api.nvim_get_current_win()
       vim.api.nvim_win_set_width(win, width)
       pcall(vim.api.nvim_win_set_option, win, "winfixwidth", true)
@@ -860,6 +1151,105 @@ local function run_squad(args_line)
   local entries = create_layout(panels, layout)
   if not entries or #entries == 0 then
     Util.warn "squad: nothing to launch"
+    return
+  end
+
+  launch_terminal_panels(entries, layout)
+end
+
+local function run_squad_wktr(args_line)
+  -- check if we're in a git repo
+  if not is_git_repo() then
+    Util.error "squad wktr: not in a git repository"
+    return
+  end
+
+  local git_root = get_git_root()
+  if not git_root then
+    Util.error "squad wktr: failed to determine git root"
+    return
+  end
+
+  -- parse layout and agents
+  local layout, agent_specs_or_err = parse_layout_and_agents(args_line)
+  if not layout then
+    Util.error(agent_specs_or_err)
+    return
+  end
+
+  -- validate and setup worktrees
+  local has_worktree = false
+  local worktree_map = {}
+
+  for _, spec in ipairs(agent_specs_or_err) do
+    if spec.worktree then
+      has_worktree = true
+
+      -- validate worktree name
+      local ok, err = validate_worktree_name(spec.worktree)
+      if not ok then
+        Util.error(err)
+        return
+      end
+
+      -- check for duplicate worktree assignments
+      if worktree_map[spec.worktree] then
+        if worktree_map[spec.worktree] ~= spec.name then
+          Util.error(
+            string.format("squad wktr: worktree `%s` cannot be shared between different agents", spec.worktree)
+          )
+          return
+        end
+      else
+        worktree_map[spec.worktree] = spec.name
+      end
+
+      -- create or verify worktree
+      local worktree_path, branch = create_worktree(spec.worktree, git_root)
+      if not worktree_path then
+        Util.error(branch) -- branch contains error message
+        return
+      end
+
+      -- setup agent context
+      local warnings = setup_agent_context(worktree_path, spec.name, git_root)
+      for _, warning in ipairs(warnings) do
+        Util.warn(string.format("squad wktr: %s", warning))
+      end
+
+      -- set cwd to worktree path
+      spec.options = spec.options or {}
+      spec.options.cwd = worktree_path
+
+      -- register worktree
+      register_worktree(spec.worktree, worktree_path, branch, spec.name)
+
+      Util.info(string.format("squad wktr: using worktree `%s` for %s at %s", spec.worktree, spec.name, worktree_path))
+    end
+  end
+
+  -- reject if no worktrees were specified
+  if not has_worktree then
+    Util.error "squad wktr: no worktrees specified (use regular :Squad command instead)"
+    return
+  end
+
+  -- prepare panels
+  local panels, panel_err = prepare_panels(agent_specs_or_err, layout)
+  if not panels then
+    Util.error(panel_err)
+    return
+  end
+
+  if #panels == 0 then
+    Util.warn "squad wktr: nothing to launch"
+    return
+  end
+
+  -- create layout and launch
+  local entries = create_layout(panels, layout)
+  if not entries or #entries == 0 then
+    Util.warn "squad wktr: nothing to launch"
     return
   end
 
@@ -1103,8 +1493,19 @@ function _G.Squad.rehydrate_terminal(win, buf, state)
   end
 end
 
-vim.api.nvim_create_user_command("Squad", function(opts) run_squad(opts.args) end, {
-  desc = "launch multiple agents in a shared terminal layout",
+vim.api.nvim_create_user_command("Squad", function(opts)
+  local args = opts.args or ""
+  local trimmed = trim(args)
+
+  -- check if first argument is wktr subcommand
+  if trimmed:match "^wktr%s+" or trimmed == "wktr" then
+    local wktr_args = trim(trimmed:sub(5)) -- remove "wktr" prefix
+    run_squad_wktr(wktr_args)
+  else
+    run_squad(args)
+  end
+end, {
+  desc = "launch multiple agents in a shared terminal layout (use 'wktr' subcommand for worktrees)",
   nargs = "*",
   complete = squad_complete,
 })

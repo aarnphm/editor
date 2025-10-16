@@ -5,6 +5,9 @@ local M = {}
 function M.files(opts)
   opts = opts or {}
 
+  require("utils.pick").set_force_include_globs(opts.include_ignored_globs)
+  opts.include_ignored_globs = nil
+
   local show_dotfiles = true
   local filter_show = function(_) return true end
   local filter_hide = function(fs_entry) return not vim.startswith(fs_entry.name, ".") end
