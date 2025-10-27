@@ -1,0 +1,9 @@
+{
+  "Insert Current Datetime": {
+    "prefix": "datetimenow",
+    "body": [
+      "${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} ${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND} GMT${CURRENT_TIMEZONE_OFFSET}"
+    ],
+    "description": "Insert the current date/time using ISO format with timezone offset."
+  }
+}
