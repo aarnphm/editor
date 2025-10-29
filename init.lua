@@ -504,7 +504,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 
     local defaults
     if is_vault_note and not is_tag_note then
-      defaults = { id = id, tags = { "seed" }, date = os.date "%Y-%m-%d" }
+      defaults = { date = os.date "%Y-%m-%d", id = id, tags = { "seed" }, title = id }
     else
       defaults = { title = id }
     end
@@ -522,7 +522,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 
     local encode_yaml = function(tbl)
       local json = vim.fn.json_encode(tbl)
-      local yaml_str = vim.fn.system({ "yq", "eval", "-P", "-p=json", "-" }, json)
+      local yaml_str = vim.fn.system({ "yq", "eval", "sort_keys(..)", "-P", "-p=json", "-" }, json)
       local results = {}
       for line in yaml_str:gmatch "[^\r\n]+" do
         table.insert(results, line)
