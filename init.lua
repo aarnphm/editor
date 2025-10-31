@@ -587,7 +587,7 @@ vim.api.nvim_create_user_command("Quartz", function(opts)
     cwd = nil,
     height = 3, -- Reduced from 15 to 8 lines for unfocused terminal
     background = false,
-    cmd = { "pnpm", "exec", "quartz/bootstrap-cli.mjs", "build", "--serve", "--verbose", "--bundleInfo" },
+    cmd = { "pnpm", "exec", "tsx", "quartz/scripts/dev.ts" },
   }
   for _, arg in ipairs(opts.fargs) do
     if arg == "bg" then

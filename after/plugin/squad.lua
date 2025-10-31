@@ -5,8 +5,12 @@
 --  here: it will create a horizontal panel, to the bottom, with 4 vertical-split panels, 2 for codex, 2 for claude-code
 -- :Squad codex::{model=gpt-5-codex},codex::{model=gpt-4o}
 --  here: will follow similar layout scheme, but then each of the two codex panel, first one uses gpt-5-codex, the second one uses gpt-4o
---  :Squad codex::{model=gpt-5-codex}[Some prompt here]
+-- :Squad codex::{model=gpt-5-codex}[Some prompt here]
 --  here: will follow similar layout scheme, but additionally it will pass in the prompt here.
+-- :Squad codex::{agent=true}
+--  here: enables agent mode, passing --dangerously-bypass-approvals-and-sandbox for codex
+-- :Squad claude::{agent=true}
+--  here: enables agent mode, passing --allow-dangerously-skip-permissions for claude
 --
 --  Now, but should be using `codex` and `claude` respectively. We should only follow either AGENTS.md or CLAUDE.md
 --  - If either one exists, then we should create a shallow ls to the other
@@ -91,6 +95,7 @@ local RESERVED_OPTION_KEYS = {
   args = true,
   width = true,
   height = true,
+  agent = true,
 }
 
 -- worktree configuration
@@ -187,6 +192,8 @@ local function parse_value(raw)
   local first = raw:sub(1, 1)
   local last = raw:sub(-1)
   if (first == '"' and last == '"') or (first == "'" and last == "'") then return raw:sub(2, -2) end
+  if raw == "true" then return true end
+  if raw == "false" then return false end
   return raw
 end
 
@@ -793,7 +800,7 @@ local function build_agent_command(panel)
   local cmd
   if name == "codex" then
     if not opts.model then opts.model = DEFAULT_CODEX_MODEL end
-    cmd = { "codex", "--search" }
+    cmd = { "codex", "--enable", "web_search_request" }
   elseif name == "claude" then
     if not opts.model then opts.model = DEFAULT_CLAUDE_MODEL end
     cmd = { "claude" }
@@ -813,6 +820,15 @@ local function build_agent_command(panel)
   end
 
   if opts.model then add_flag("model", opts.model) end
+
+  -- Add agent-specific dangerous flags if agent=true
+  if opts.agent then
+    if name == "codex" then
+      table.insert(extra_args, "--dangerously-bypass-approvals-and-sandbox")
+    elseif name == "claude" then
+      table.insert(extra_args, "--allow-dangerously-skip-permissions")
+    end
+  end
 
   -- Pass through any additional options (except reserved ones) via args.
   for key, value in pairs(opts) do
@@ -1282,6 +1298,7 @@ local AGENT_COMPLETIONS = { "codex::", "claude::" }
 local OPTION_COMPLETIONS = {
   "{count=}",
   "{model=}",
+  "{agent=}",
   "{cwd=}",
   "{env=}",
   "{cmd=}",
@@ -1293,6 +1310,7 @@ local OPTION_COMPLETIONS = {
 local OPTION_KEY_COMPLETIONS = {
   "count=",
   "model=",
+  "agent=",
   "cwd=",
   "env=",
   "cmd=",
@@ -1463,6 +1481,15 @@ local function squad_complete(arg_lead, cmd_line, _)
       if typed == "" or vim.startswith(model, typed) then add("model=" .. model, { keep = prefix_keep }) end
     end
     if typed ~= "" then add("model=" .. typed, { keep = prefix_keep }) end
+    return suggestions
+  end
+
+  if key == "agent" then
+    local typed = trim(value_part or "")
+    local agent_values = { "true", "false" }
+    for _, val in ipairs(agent_values) do
+      if typed == "" or vim.startswith(val, typed) then add("agent=" .. val, { keep = prefix_keep }) end
+    end
     return suggestions
   end
 
