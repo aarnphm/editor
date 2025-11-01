@@ -585,7 +585,7 @@ vim.filetype.add {
 vim.api.nvim_create_user_command("Quartz", function(opts)
   local state = {
     cwd = nil,
-    height = 3, -- Reduced from 15 to 8 lines for unfocused terminal
+    height = 7, -- Reduced from 15 to 8 lines for unfocused terminal
     background = false,
     cmd = { "pnpm", "exec", "tsx", "quartz/scripts/dev.ts" },
   }

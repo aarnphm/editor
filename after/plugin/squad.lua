@@ -61,6 +61,7 @@ local DEFAULT_LAYOUT = {
 
 local DEFAULT_CODEX_MODEL = "gpt-5-codex"
 local DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
+local DEFAULT_CURSOR_MODEL = "gpt-5"
 local DEFAULT_SQUAD_SPEC = string.format("codex::1[model=%s]", DEFAULT_CODEX_MODEL)
 
 local LAYOUT_ALIASES = {
@@ -84,6 +85,20 @@ local CLAUDE_MODELS = {
   "sonnet",
   "opus",
   "haiku",
+}
+
+local CURSOR_MODELS = {
+  "gpt-5",
+  "gpt-5-codex",
+  "composer-1",
+  "sonnet-4.5",
+  "sonnet-4.5-thinking",
+}
+
+local AGENT_MODEL_SUGGESTIONS = {
+  codex = CODEX_MODELS,
+  claude = CLAUDE_MODELS,
+  cursor = CURSOR_MODELS,
 }
 
 local RESERVED_OPTION_KEYS = {
@@ -668,11 +683,34 @@ local function setup_codex_context(worktree_path, source_path)
   return warnings
 end
 
+local function setup_cursor_context(worktree_path, source_path)
+  local warnings = {}
+
+  -- prefer CURSOR.md when available, otherwise fall back to AGENTS.md
+  local source_cursor_md = source_path .. "/CURSOR.md"
+  if vim.fn.filereadable(source_cursor_md) == 1 then
+    local target_cursor_md = worktree_path .. "/CURSOR.md"
+    if not safe_copy(source_cursor_md, target_cursor_md) then table.insert(warnings, "failed to copy CURSOR.md") end
+  else
+    local fallback_agents_md = source_path .. "/AGENTS.md"
+    if vim.fn.filereadable(fallback_agents_md) == 1 then
+      local target_agents_md = worktree_path .. "/AGENTS.md"
+      if not safe_copy(fallback_agents_md, target_agents_md) then
+        table.insert(warnings, "failed to copy AGENTS.md")
+      end
+    end
+  end
+
+  return warnings
+end
+
 local function setup_agent_context(worktree_path, agent, source_path)
   if agent == "claude" then
     return setup_claude_context(worktree_path, source_path)
   elseif agent == "codex" then
     return setup_codex_context(worktree_path, source_path)
+  elseif agent == "cursor" then
+    return setup_cursor_context(worktree_path, source_path)
   end
   return {}
 end
@@ -804,6 +842,9 @@ local function build_agent_command(panel)
   elseif name == "claude" then
     if not opts.model then opts.model = DEFAULT_CLAUDE_MODEL end
     cmd = { "claude" }
+  elseif name == "cursor" then
+    if not opts.model then opts.model = DEFAULT_CURSOR_MODEL end
+    cmd = { "cursor-agent" }
   else
     return nil, string.format("squad: unsupported agent `%s`", name)
   end
@@ -827,6 +868,10 @@ local function build_agent_command(panel)
       table.insert(extra_args, "--dangerously-bypass-approvals-and-sandbox")
     elseif name == "claude" then
       table.insert(extra_args, "--allow-dangerously-skip-permissions")
+    elseif name == "cursor" then
+      table.insert(extra_args, "--force")
+      table.insert(extra_args, "--approve-mcps")
+      table.insert(extra_args, "--browser")
     end
   end
 
@@ -1294,7 +1339,7 @@ local LAYOUT_COMPLETIONS = (function()
   return items
 end)()
 
-local AGENT_COMPLETIONS = { "codex::", "claude::" }
+local AGENT_COMPLETIONS = { "codex::", "claude::", "cursor::" }
 local OPTION_COMPLETIONS = {
   "{count=}",
   "{model=}",
@@ -1475,7 +1520,7 @@ local function squad_complete(arg_lead, cmd_line, _)
   end
 
   if key == "model" then
-    local target_models = name == "claude" and CLAUDE_MODELS or CODEX_MODELS
+    local target_models = AGENT_MODEL_SUGGESTIONS[name] or CODEX_MODELS
     local typed = trim(value_part or "")
     for _, model in ipairs(target_models) do
       if typed == "" or vim.startswith(model, typed) then add("model=" .. model, { keep = prefix_keep }) end
@@ -1547,6 +1592,15 @@ vim.api.nvim_create_user_command(
   function(opts) run_squad(build_single_agent_spec("claude", opts.args)) end,
   {
     desc = "launch a single Claude squad terminal",
+    nargs = "*",
+  }
+)
+
+vim.api.nvim_create_user_command(
+  "Cursor",
+  function(opts) run_squad(build_single_agent_spec("cursor", opts.args)) end,
+  {
+    desc = "launch a single Cursor squad terminal",
     nargs = "*",
   }
 )
