@@ -54,14 +54,14 @@ local push_stream
 
 local DEFAULT_LAYOUT = {
   mode = "vertical", -- vertical: right side with horizontal splits
-  height = 18,
+  height = 22,
   width = 80,
   position = "right",
 }
 
 local DEFAULT_CODEX_MODEL = "gpt-5-codex"
 local DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
-local DEFAULT_CURSOR_MODEL = "gpt-5"
+local DEFAULT_CURSOR_MODEL = "composer-1"
 local DEFAULT_SQUAD_SPEC = string.format("codex::1[model=%s]", DEFAULT_CODEX_MODEL)
 
 local LAYOUT_ALIASES = {
