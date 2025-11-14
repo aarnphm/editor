@@ -541,6 +541,29 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     end
   end,
 })
+vim.api.nvim_create_user_command("ClearBuffer", function()
+  local removed, failures = 0, {}
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_is_loaded(buf) then
+      if vim.api.nvim_buf_get_name(buf) == "" then
+        local ok, err = pcall(vim.api.nvim_buf_delete, buf, { force = true })
+        if ok then
+          removed = removed + 1
+        else
+          table.insert(failures, string.format("buffer %d: %s", buf, err))
+        end
+      end
+    end
+  end
+  if removed == 0 then
+    Util.info "ClearBuffer: no [No Name] buffers"
+  else
+    local suffix = removed == 1 and "" or "s"
+    Util.info(string.format("ClearBuffer: removed %d buffer%s", removed, suffix))
+  end
+  if #failures > 0 then Util.warn("ClearBuffer: unable to remove\n" .. table.concat(failures, "\n")) end
+end, { desc = "buffer: delete unnamed buffers" })
+
 vim.api.nvim_create_user_command("ObsidianNew", function(opts)
   local name = table.concat(opts.fargs, " ")
   if name == "" then
