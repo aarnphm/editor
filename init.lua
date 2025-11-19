@@ -82,10 +82,6 @@ wo.sidescrolloff = 5
 wo.wrap = false
 wo.cursorline = true
 wo.cursorcolumn = false
-wo.foldexpr = "v:lua.require'utils'.ui.foldexpr()"
-
-local bo = vim.bo
-bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 
 local o = vim.o
 o.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
