@@ -58,10 +58,10 @@ local stop_squad ---@type fun(reason?: string, err?: string)|nil
 
 local DEFAULT_LAYOUT = SquadDSL.DEFAULT_LAYOUT
 
-local DEFAULT_CODEX_MODEL = "gpt-5"
+local DEFAULT_CODEX_MODEL = "gpt-5.1"
 local DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
 local DEFAULT_CURSOR_MODEL = "composer-1"
-local DEFAULT_GEMINI_MODEL = "auto"
+local DEFAULT_GEMINI_MODEL = "gemini-3-pro"
 local DEFAULT_SQUAD_SPEC = string.format("codex::1[model=%s]", DEFAULT_CODEX_MODEL)
 
 local LAYOUT_ALIASES = SquadDSL.LAYOUT_ALIASES
@@ -78,7 +78,8 @@ local function parse_layout_and_agents(arg_line)
 end
 
 local CODEX_MODELS = {
-  "gpt-5-codex",
+  "gpt-5.1-codex",
+  "gpt-5.1",
   "gpt-5",
   "gpt-4.1",
   "gpt-4o",
@@ -100,6 +101,7 @@ local CURSOR_MODELS = {
 }
 
 local GEMINI_MODELS = {
+  "gemini-3-pro",
   "gemini-2.5-flash",
   "gemini-2.5-flash-lite",
   "gemini-2.5-pro",

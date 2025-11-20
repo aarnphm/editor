@@ -14,7 +14,6 @@ local deepcopy = vim.deepcopy
 
 local Layout = { version = 2 }
 
-
 local layout_root = fn.stdpath "state" .. "/layouts"
 
 local function ensure_dir(path)
@@ -302,9 +301,7 @@ local function capture_layout()
         local job_id = vars and vars.terminal_job_id
         if job_id then
           local ok, job = pcall(fn.jobinfo, job_id)
-          if ok and type(job) == "table" then
-            cmd = job.cmd
-          end
+          if ok and type(job) == "table" then cmd = job.cmd end
         end
       end
 
@@ -336,7 +333,6 @@ local function capture_layout()
 
       terminals[#terminals + 1] = entry
       mapping[idx] = winid
-
     elseif buftype == "" and file ~= "" then
       local pos = api.nvim_win_get_cursor(winid)
       local entry = {
@@ -539,10 +535,8 @@ local function restore_layout(data)
 
       local ok, job = pcall(fn.termopen, cmd, term_opts)
       if not ok or job <= 0 then
-        notices[#notices + 1] = string.format(
-          "layout: failed to restart terminal (%s)",
-          ok and "termopen returned 0" or job
-        )
+        notices[#notices + 1] =
+          string.format("layout: failed to restart terminal (%s)", ok and "termopen returned 0" or job)
       else
         vim.b[buf].lazyterm_cmd = term_entry.command
 
