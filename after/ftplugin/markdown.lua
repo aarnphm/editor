@@ -344,4 +344,77 @@ vim.keymap.set(
   { buffer = true, silent = true, desc = "markdown: headings quick jump" }
 )
 
+---@param line string
+---@return { indent: string, current: string, next: string, rest: string }?
+local function _md_list_parts(line)
+  local indent, marker = line:match "^(%s*)([%-%+%*]%s+%[[ xX%-]%]%s+)"
+  if indent then
+    local rest = line:sub(#indent + #marker + 1)
+    return { indent = indent, current = marker, next = marker, rest = rest }
+  end
+
+  indent, marker = line:match "^(%s*)([%-%+%*]%s+)"
+  if indent then
+    local rest = line:sub(#indent + #marker + 1)
+    return { indent = indent, current = marker, next = marker, rest = rest }
+  end
+
+  local num, sep
+  indent, num, sep = line:match "^(%s*)(%d+)([.)])%s+"
+  if indent then
+    local current = string.format("%s%s ", num, sep)
+    local next_marker = string.format("%d%s ", tonumber(num) + 1, sep)
+    local rest = line:sub(#indent + #current + 1)
+    return { indent = indent, current = current, next = next_marker, rest = rest }
+  end
+end
+
+---@param opts? { blockquote_only?: boolean }
+local function _md_smart_cr(opts)
+  opts = opts or {}
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+
+  if not opts.blockquote_only then
+    local parts = _md_list_parts(line)
+    if parts then
+      if parts.rest:match "^%s*$" and col >= #line then
+        vim.api.nvim_buf_set_lines(0, row - 1, row, false, { parts.indent })
+        vim.api.nvim_win_set_cursor(0, { row, #parts.indent })
+        return vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+      end
+
+      return vim.api.nvim_replace_termcodes("<CR>" .. parts.next, true, false, true)
+    end
+  end
+
+  local bq_prefix = line:match "^%s*>+%s*"
+  if bq_prefix then return vim.api.nvim_replace_termcodes("<CR>" .. bq_prefix, true, false, true) end
+
+  return vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+end
+
+vim.keymap.set("i", "<CR>", _md_smart_cr, { buffer = true, expr = true, desc = "markdown: continue list" })
+vim.keymap.set(
+  "i",
+  "<S-CR>",
+  function() return _md_smart_cr { blockquote_only = true } end,
+  { buffer = true, expr = true, desc = "markdown: continue blockquote" }
+)
+
+local function _md_insert_emdash() return "—" end
+
+vim.keymap.set(
+  "i",
+  "<M-_>",
+  _md_insert_emdash,
+  { buffer = true, expr = true, desc = "markdown: insert em dash (Option+Shift+-)" }
+)
+vim.keymap.set(
+  "i",
+  "<M-->",
+  _md_insert_emdash,
+  { buffer = true, expr = true, desc = "markdown: insert em dash (Option+-)" }
+)
+
 return M

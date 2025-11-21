@@ -78,6 +78,7 @@ local function parse_layout_and_agents(arg_line)
 end
 
 local CODEX_MODELS = {
+  "gpt-5.1-codex-max",
   "gpt-5.1-codex",
   "gpt-5.1",
   "gpt-5",

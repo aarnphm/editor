@@ -263,6 +263,59 @@ M.set_url_match = function(win)
   vim.w[win].highlighturl_enabled = true
 end
 
+--- Find a URL on the current line that covers the cursor position.
+---@return string? url
+function M.url_under_cursor()
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+
+  local start = 0
+  while true do
+    local match = vim.fn.matchstrpos(line, M.url_matcher, start)
+    local url, s, e = match[1], match[2], match[3]
+    if s == -1 then return nil end
+    if col >= s and col < e then return url end
+    if e <= start then start = start + 1 else start = e end
+  end
+end
+
+--- Open a given URL with the system browser.
+---@param url string
+function M.open_url(url)
+  if not url or url == "" then
+    M.warn "open-url: no link under cursor"
+    return
+  end
+
+  if vim.ui and vim.ui.open then
+    local ok, err = pcall(vim.ui.open, url)
+    if ok then return end
+    M.warn(("open-url: fell back to system opener (%s)"):format(err or "unknown error"))
+  end
+
+  local opener ---@type string[]|nil
+  if vim.fn.has "wsl" == 1 and vim.fn.executable "wslview" == 1 then
+    opener = { "wslview", url }
+  elseif vim.fn.executable "xdg-open" == 1 then
+    opener = { "xdg-open", url }
+  elseif vim.fn.executable "open" == 1 then
+    opener = { "open", url }
+  elseif M.is_win() then
+    opener = { "cmd.exe", "/c", "start", "", url }
+  end
+
+  if not opener then
+    M.error "open-url: no system opener found (install xdg-open/wslview/open)"
+    return
+  end
+
+  local runner = vim.system or vim.fn.jobstart
+  local ok, res = pcall(runner, opener, { detach = true })
+  if not ok or (type(res) == "number" and res <= 0) then
+    M.error("open-url: failed to launch opener for " .. url)
+  end
+end
+
 --- XXX: Vendorred from lazy.nvim for now
 
 ---@param path string

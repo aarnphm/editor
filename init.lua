@@ -221,6 +221,14 @@ map("n", "<leader><leader>l", ":lua ", { noremap = true, silent = true, desc = "
 map("n", "<LocalLeader>g", ":grep ", { noremap = false, desc = "edit: grep pattern" })
 map("n", "<LocalLeader>l", ":lgrep ", { noremap = false, desc = "edit: grep pattern (window)" })
 map("n", "\\", ":let @/=''<CR>:noh<CR>", { silent = true, desc = "window: Clean highlight" })
+map("n", "gl", function()
+  local url = Util.url_under_cursor()
+  if not url then
+    Util.warn "open-url: no link under cursor"
+    return
+  end
+  Util.open_url(url)
+end, { desc = "util: open link under cursor" })
 map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })
