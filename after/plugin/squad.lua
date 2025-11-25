@@ -88,9 +88,10 @@ local CODEX_MODELS = {
 }
 
 local CLAUDE_MODELS = {
-  "sonnet",
-  "opus",
-  "haiku",
+  "claude-sonnet-4-5-20250929",
+  "claude-opus-4-5-20251101",
+  "claude-opus-4-1-20250805",
+  "claude-haiku-4-5-20251001",
 }
 
 local CURSOR_MODELS = {
