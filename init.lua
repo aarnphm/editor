@@ -229,6 +229,7 @@ map("n", "gl", function()
   end
   Util.open_url(url)
 end, { desc = "util: open link under cursor" })
+map("v", "gll", [[c{{sidenotes[<C-r>"]:}}<Left><Left>]], { desc = "wrap: selection in sidenote" })
 map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })

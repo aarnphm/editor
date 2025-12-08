@@ -1,9 +1,30 @@
 {
   "Insert Current Datetime": {
-    "prefix": "datetimenow",
+    "prefix": "dtn",
     "body": [
       "${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} ${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND} GMT${CURRENT_TIMEZONE_OFFSET}"
     ],
     "description": "Insert the current date/time using ISO format with timezone offset."
+  },
+  "Insert sidenotes": {
+    "prefix": "sdn",
+    "body": [
+      "{{sidenotes[$1]:$2}}"
+    ],
+    "description": "Insert sidenotes"
+  },
+  "Insert quotes": {
+    "prefix": "qts",
+    "body": [
+      "> $1\n>\n> $2"
+    ],
+    "description": "Insert quotes"
+  },
+  "Insert another quotes": {
+    "prefix": "qt",
+    "body": [
+      "\n```quotes\n$1\n\n$2\n```\n"
+    ],
+    "description": "Insert callout quotes from garden"
   }
 }

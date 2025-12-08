@@ -239,7 +239,6 @@ local function _md_open_headings_popup()
     "d",
     "f",
     "l",
-    ";",
     "h",
     "g",
     "u",
@@ -406,7 +405,7 @@ local function _md_insert_emdash() return "—" end
 
 vim.keymap.set(
   "i",
-  "<M-_>",
+  "<S-M-->",
   _md_insert_emdash,
   { buffer = true, expr = true, desc = "markdown: insert em dash (Option+Shift+-)" }
 )
