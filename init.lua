@@ -58,18 +58,19 @@ g.markdown_frontmatter = true
 -- additional plugins to be used.
 g.extra_plugins = {
   -- lang
+  "plugins.lang.clangd",
+  "plugins.lang.json",
   "plugins.lang.go",
   "plugins.lang.nix",
   "plugins.lang.rust",
   "plugins.lang.yaml",
-  "plugins.lang.json",
   "plugins.lang.python",
   "plugins.lang.ocaml",
-  "plugins.lang.zig",
-  "plugins.lang.zig",
   "plugins.lang.markdown",
+  -- "plugins.lang.sql",
   "plugins.lang.tailwind",
   "plugins.lang.typescript",
+  "plugins.lang.zig",
   -- formatters
   "plugins.formatters.prettier",
   -- linters

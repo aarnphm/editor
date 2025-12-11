@@ -1,33 +1,5 @@
 return {
   {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-    enabled = false,
-    opts = {
-      panel = { enabled = false },
-      suggestion = {
-        enabled = true,
-        auto_trigger = false,
-        debounce = 75,
-      },
-      filetypes = {
-        markdown = true,
-        sh = function()
-          if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env.*") then return false end
-          return true
-        end,
-      },
-      server_opts_overrides = {
-        settings = {
-          advanced = {
-            inlineSuggestCount = 3,
-          },
-        },
-      },
-    },
-  },
-  {
     "saghen/blink.cmp",
     version = false,
     build = "cargo build --release",
@@ -45,6 +17,7 @@ return {
       signature = { enabled = false },
       completion = {
         menu = {
+          auto_show = false,
           draw = {
             treesitter = { "lsp" },
             columns = { { "kind_icon" }, { "kind" }, { "label", "label_description", gap = 2 } },
@@ -75,7 +48,7 @@ return {
         },
         accept = { auto_brackets = { enabled = false } },
         documentation = { auto_show = false, auto_show_delay_ms = 200 },
-        trigger = { show_in_snippet = false },
+        trigger = { show_in_snippet = true },
         list = {
           selection = {
             preselect = function() return not require("blink.cmp").snippet_active { direction = 1 } end,
@@ -111,7 +84,7 @@ return {
         },
       },
       keymap = {
-        preset = "super-tab",
+        preset = "default",
         ["<CR>"] = { "select_and_accept", "fallback" },
         ["<Tab>"] = {
           function(cmp)
@@ -121,7 +94,6 @@ return {
               return cmp.select_and_accept()
             end
           end,
-          Util.cmp.map { "snippet_forward" },
           "fallback",
         },
         ["<Up>"] = false,
