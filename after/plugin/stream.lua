@@ -145,6 +145,8 @@ local function ensure_stream_meta(bufnr, initial_tick)
   end)
 end
 
+local pending_stream = {}
+
 vim.api.nvim_create_autocmd("BufWritePost", {
   group = stream_group,
   pattern = "*.md",
@@ -152,7 +154,16 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     if not is_stream(ev.buf) then return end
     if vim.bo[ev.buf].buftype ~= "" then return end
     if not vim.bo[ev.buf].modifiable then return end
+
+    if pending_stream[ev.buf] then
+      pending_stream[ev.buf]:stop()
+      pending_stream[ev.buf] = nil
+    end
+
     local tick = vim.api.nvim_buf_get_changedtick(ev.buf)
-    vim.schedule(function() ensure_stream_meta(ev.buf, tick) end)
+    pending_stream[ev.buf] = vim.defer_fn(function()
+      pending_stream[ev.buf] = nil
+      ensure_stream_meta(ev.buf, tick)
+    end, 50)
   end,
 })

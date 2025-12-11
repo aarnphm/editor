@@ -11,22 +11,14 @@ if not ok then
 end
 
 local arena_group = augroup "arena_meta"
-
-local TARGETS = (function()
-  local roots = {}
-  local main = vim.fs.normalize(vim.fn.expand "~/workspace/garden/content/are.na.md")
-  local legacy = vim.fs.normalize(vim.fn.expand "~/workspace/garden/content/are.na")
-  roots[main] = true
-  roots[legacy] = true
-  return roots
-end)()
+local ARENA_PATH = vim.fs.normalize(vim.fn.expand "~/workspace/garden/content/are.na.md")
 
 local function is_target(bufnr)
   local name = vim.api.nvim_buf_get_name(bufnr)
   if name == "" then return false end
   local real = vim.uv.fs_realpath(name) or name
   real = vim.fs.normalize(real)
-  return TARGETS[real] or false
+  return real == ARENA_PATH
 end
 
 local function frontmatter_end(lines)
@@ -98,7 +90,7 @@ local function build_insert_lines(indent, date)
   }
 end
 
-local function ensure_arena_meta(bufnr, initial_tick)
+local function ensure_arena_meta(bufnr, initial_tick, auto_save)
   if not vim.api.nvim_buf_is_valid(bufnr) then return end
   if vim.api.nvim_buf_get_changedtick(bufnr) ~= initial_tick then return end
 
@@ -157,19 +149,42 @@ local function ensure_arena_meta(bufnr, initial_tick)
 
   table.sort(modifications, function(a, b) return a.row > b.row end)
 
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local cursor_row = cursor[1] - 1
+
   for _, mod in ipairs(modifications) do
     local lines_to_insert = build_insert_lines(mod.indent, date)
     local existing = vim.api.nvim_buf_get_lines(bufnr, mod.row, mod.row + 1, false)[1]
     if existing and existing:match "^%s*$" then vim.api.nvim_buf_set_lines(bufnr, mod.row, mod.row + 1, false, {}) end
     vim.api.nvim_buf_set_lines(bufnr, mod.row, mod.row, false, lines_to_insert)
+    if mod.row <= cursor_row then cursor_row = cursor_row + #lines_to_insert end
   end
 
-  vim.schedule(function()
-    if not vim.api.nvim_buf_is_valid(bufnr) then return end
-    if vim.bo[bufnr].modified then
-      vim.api.nvim_buf_call(bufnr, function() vim.cmd "silent! keepjumps noautocmd write" end)
-    end
-  end)
+  pcall(vim.api.nvim_win_set_cursor, 0, { cursor_row + 1, cursor[2] })
+
+  if auto_save then
+    vim.schedule(function()
+      if not vim.api.nvim_buf_is_valid(bufnr) then return end
+      if vim.bo[bufnr].modified then
+        vim.api.nvim_buf_call(bufnr, function() vim.cmd "silent! keepjumps noautocmd write" end)
+      end
+    end)
+  end
+end
+
+local pending_arena = {}
+
+local function schedule_arena_meta(bufnr, auto_save, delay)
+  if pending_arena[bufnr] then
+    pending_arena[bufnr]:stop()
+    pending_arena[bufnr] = nil
+  end
+
+  local tick = vim.api.nvim_buf_get_changedtick(bufnr)
+  pending_arena[bufnr] = vim.defer_fn(function()
+    pending_arena[bufnr] = nil
+    ensure_arena_meta(bufnr, tick, auto_save)
+  end, delay)
 end
 
 vim.api.nvim_create_autocmd("BufWritePost", {
@@ -179,7 +194,17 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     if not is_target(ev.buf) then return end
     if vim.bo[ev.buf].buftype ~= "" then return end
     if not vim.bo[ev.buf].modifiable then return end
-    local tick = vim.api.nvim_buf_get_changedtick(ev.buf)
-    vim.schedule(function() ensure_arena_meta(ev.buf, tick) end)
+    schedule_arena_meta(ev.buf, true, 50)
+  end,
+})
+
+vim.api.nvim_create_autocmd("InsertLeave", {
+  group = arena_group,
+  pattern = "*.md",
+  callback = function(ev)
+    if not is_target(ev.buf) then return end
+    if vim.bo[ev.buf].buftype ~= "" then return end
+    if not vim.bo[ev.buf].modifiable then return end
+    schedule_arena_meta(ev.buf, false, 100)
   end,
 })

@@ -64,6 +64,8 @@ g.extra_plugins = {
   "plugins.lang.yaml",
   "plugins.lang.json",
   "plugins.lang.python",
+  "plugins.lang.ocaml",
+  "plugins.lang.zig",
   "plugins.lang.zig",
   "plugins.lang.markdown",
   "plugins.lang.tailwind",

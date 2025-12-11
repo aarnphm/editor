@@ -59,7 +59,7 @@ local stop_squad ---@type fun(reason?: string, err?: string)|nil
 local DEFAULT_LAYOUT = SquadDSL.DEFAULT_LAYOUT
 
 local DEFAULT_CODEX_MODEL = "gpt-5.1"
-local DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
+local DEFAULT_CLAUDE_MODEL = "claude-opus-4-5-20251101"
 local DEFAULT_CURSOR_MODEL = "composer-1"
 local DEFAULT_GEMINI_MODEL = "gemini-3-pro"
 local DEFAULT_SQUAD_SPEC = string.format("codex::1[model=%s]", DEFAULT_CODEX_MODEL)
@@ -90,8 +90,8 @@ local CODEX_MODELS = {
 local CLAUDE_MODELS = {
   "claude-sonnet-4-5-20250929",
   "claude-opus-4-5-20251101",
-  "claude-opus-4-1-20250805",
   "claude-haiku-4-5-20251001",
+  "claude-opus-4-1-20250805",
 }
 
 local CURSOR_MODELS = {
@@ -109,11 +109,36 @@ local GEMINI_MODELS = {
   "gemini-2.5-pro",
 }
 
+-- model aliases: short names -> full model IDs
+local MODEL_ALIASES = {
+  -- claude aliases
+  opus = "claude-opus-4-5-20251101",
+  ["opus-4.5"] = "claude-opus-4-5-20251101",
+  sonnet = "claude-sonnet-4-5-20250929",
+  ["sonnet-4.5"] = "claude-sonnet-4-5-20250929",
+  haiku = "claude-haiku-4-5-20251001",
+  ["haiku-4.5"] = "claude-haiku-4-5-20251001",
+  -- gemini aliases
+  ["gemini-3"] = "gemini-3-pro",
+}
+
+local function resolve_model_alias(model)
+  if not model then return model end
+  return MODEL_ALIASES[model] or model
+end
+
+-- include aliases in completion suggestions
+local CLAUDE_MODEL_SUGGESTIONS = vim.list_extend(
+  { "opus", "opus-4.5", "sonnet", "sonnet-4.5", "haiku", "haiku-4.5" },
+  CLAUDE_MODELS
+)
+local GEMINI_MODEL_SUGGESTIONS = vim.list_extend({ "gemini-3" }, GEMINI_MODELS)
+
 local AGENT_MODEL_SUGGESTIONS = {
   codex = CODEX_MODELS,
-  claude = CLAUDE_MODELS,
+  claude = CLAUDE_MODEL_SUGGESTIONS,
   cursor = CURSOR_MODELS,
-  gemini = GEMINI_MODELS,
+  gemini = GEMINI_MODEL_SUGGESTIONS,
 }
 
 local SquadCompleter = SquadComplete.new {
@@ -588,7 +613,10 @@ local function build_agent_command(panel)
     end
   end
 
-  if opts.model then add_flag("model", opts.model) end
+  if opts.model then
+    opts.model = resolve_model_alias(opts.model)
+    add_flag("model", opts.model)
+  end
 
   -- Add agent-specific dangerous flags if agent=true
   if opts.agent then
