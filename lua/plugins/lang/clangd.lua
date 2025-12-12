@@ -1,6 +1,19 @@
 return {
   { "mason-org/mason.nvim", opts = { ensure_installed = { "clang-format", "clangd" } } },
   {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        cpp = { "clang-format" },
+        c = { "clang-format" },
+        objc = { "clang-format" },
+        objcpp = { "clang-format" },
+        cuda = { "clang-format" },
+        cu = { "clang-format" },
+      },
+    },
+  },
+  {
     "p00f/clangd_extensions.nvim",
     lazy = true,
     version = false,
