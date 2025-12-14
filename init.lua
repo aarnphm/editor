@@ -27,27 +27,6 @@ if vim.uv.os_uname().sysname == "Darwin" then
   }
 end
 
-g.loaded_gzip = 1
-g.loaded_zip = 1
-g.loaded_zipPlugin = 1
-g.loaded_tar = 1
-g.loaded_tarPlugin = 1
-
-g.loaded_getscript = 1
-g.loaded_getscriptPlugin = 1
-g.loaded_vimball = 1
-g.loaded_vimballPlugin = 1
-g.loaded_2html_plugin = 1
-
-g.loaded_matchit = 1
-g.loaded_matchparen = 1
-g.loaded_logiPat = 1
-g.loaded_rrhelper = 1
-
-g.loaded_netrw = 1
-g.loaded_netrwPlugin = 1
-g.loaded_netrwSettings = 1
-
 g.mapleader = vim.keycode "<space>"
 g.maplocalleader = vim.keycode ","
 -- Fix markdown indentation settings
@@ -82,7 +61,7 @@ g.enable_autowrap = false
 local wo = vim.wo
 wo.scrolloff = 2
 wo.sidescrolloff = 5
-wo.wrap = false
+wo.wrap = true
 wo.cursorline = true
 wo.cursorcolumn = false
 
@@ -272,6 +251,7 @@ map("i", ",", ",<c-g>u")
 map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
 map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
+map("n", "-", "<CMD>Oil<CR>", { desc = "fs: open parent directory" })
 
 hi("HighlightURL", { default = true, underline = true })
 hi("CmpGhostText", { link = "Comment", default = true })

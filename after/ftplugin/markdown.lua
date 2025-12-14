@@ -378,9 +378,7 @@ local function _md_smart_cr(opts)
     local parts = _md_list_parts(line)
     if parts then
       if parts.rest:match "^%s*$" and col >= #line then
-        vim.api.nvim_buf_set_lines(0, row - 1, row, false, { parts.indent })
-        vim.api.nvim_win_set_cursor(0, { row, #parts.indent })
-        return vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+        return vim.api.nvim_replace_termcodes("<C-u>" .. parts.indent .. "<CR>", true, false, true)
       end
 
       return vim.api.nvim_replace_termcodes("<CR>" .. parts.next, true, false, true)
