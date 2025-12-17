@@ -19,24 +19,35 @@ local cases = {
     label = "layout bracket agent",
     cmd_line = ":Squad vertical::[",
     lead = "",
+    cursor_pos = #":Squad vertical::[",
     expect_fragment = "vertical::[codex",
   },
   {
     label = "agent option brace",
     cmd_line = ":Squad codex::{",
     lead = "",
+    cursor_pos = #":Squad codex::{",
     expect_fragment = "codex::{model=",
+  },
+  {
+    label = "model completion inside template",
+    cmd_line = ":Squad codex::{model=}",
+    lead = "codex::{model=",
+    cursor_pos = #":Squad codex::{model=",
+    expect_fragment = "codex::{model=gpt-5-codex",
   },
   {
     label = "prompt args bracket",
     cmd_line = ":Squad codex[",
     lead = "",
+    cursor_pos = #":Squad codex[",
     expect_fragment = 'codex[args=""',
   },
   {
     label = "spec template surfaced",
     cmd_line = ":Squad ",
     lead = "",
+    cursor_pos = #":Squad ",
     expect_fragment = "vertical::[codex,claude]",
   },
 }
@@ -49,7 +60,7 @@ local function has_fragment(items, fragment)
 end
 
 for _, case in ipairs(cases) do
-  local result = completer:complete(case.lead or "", case.cmd_line, 0)
+  local result = completer:complete(case.lead or "", case.cmd_line, case.cursor_pos or 0)
   assert(
     has_fragment(result, case.expect_fragment),
     string.format("completion %s missing `%s`", case.label, case.expect_fragment)

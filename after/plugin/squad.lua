@@ -58,7 +58,7 @@ local stop_squad ---@type fun(reason?: string, err?: string)|nil
 
 local DEFAULT_LAYOUT = SquadDSL.DEFAULT_LAYOUT
 
-local DEFAULT_CODEX_MODEL = "gpt-5.1"
+local DEFAULT_CODEX_MODEL = "gpt-5.2"
 local DEFAULT_CLAUDE_MODEL = "claude-opus-4-5-20251101"
 local DEFAULT_CURSOR_MODEL = "composer-1"
 local DEFAULT_GEMINI_MODEL = "gemini-3-pro"
@@ -78,6 +78,7 @@ local function parse_layout_and_agents(arg_line)
 end
 
 local CODEX_MODELS = {
+  "gpt-5.2",
   "gpt-5.1-codex-max",
   "gpt-5.1-codex",
   "gpt-5.1",
@@ -128,10 +129,8 @@ local function resolve_model_alias(model)
 end
 
 -- include aliases in completion suggestions
-local CLAUDE_MODEL_SUGGESTIONS = vim.list_extend(
-  { "opus", "opus-4.5", "sonnet", "sonnet-4.5", "haiku", "haiku-4.5" },
-  CLAUDE_MODELS
-)
+local CLAUDE_MODEL_SUGGESTIONS =
+  vim.list_extend({ "opus", "opus-4.5", "sonnet", "sonnet-4.5", "haiku", "haiku-4.5" }, CLAUDE_MODELS)
 local GEMINI_MODEL_SUGGESTIONS = vim.list_extend({ "gemini-3" }, GEMINI_MODELS)
 
 local AGENT_MODEL_SUGGESTIONS = {
@@ -141,9 +140,16 @@ local AGENT_MODEL_SUGGESTIONS = {
   gemini = GEMINI_MODEL_SUGGESTIONS,
 }
 
+local SQUAD_SPEC_TEMPLATES = {
+  "vertical::[codex,claude]",
+  "codex::2,claude::2",
+  "left::[gemini,claude],right::[codex,cursor]",
+}
+
 local SquadCompleter = SquadComplete.new {
   layout_aliases = LAYOUT_ALIASES,
   agent_models = AGENT_MODEL_SUGGESTIONS,
+  spec_templates = SQUAD_SPEC_TEMPLATES,
 }
 
 local RESERVED_OPTION_KEYS = {

@@ -1,9 +1,16 @@
 return {
   "nvim-lua/plenary.nvim",
   "tpope/vim-repeat",
-  "stevearc/oil.nvim",
   { "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
   { "folke/lazy.nvim", version = false },
+  {
+    "stevearc/oil.nvim",
+    cmd = "Oil",
+    lazy = false,
+    opts = {
+      delete_to_trash = false,
+    },
+  },
   {
     "folke/snacks.nvim",
     priority = 1000,
@@ -12,7 +19,7 @@ return {
     opts = function()
       return {
         toggle = { map = Util.safe_keymap_set },
-        bigfile = { enabled = true, size = 1.5 * 1024 * 1024 },
+        bigfile = { enabled = true, line_length = 1000 },
         notifier = { enabled = false },
         input = { enabled = true },
         image = { enabled = false, math = { enabled = false }, convert = { notify = false } },

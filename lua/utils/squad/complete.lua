@@ -115,9 +115,21 @@ local function prompt_payload_state(payload)
   return trimmed, needs_close
 end
 
-function Completion:complete(arg_lead, cmd_line)
+local function cmd_line_before_cursor(cmd_line, cursor_pos)
+  if type(cmd_line) ~= "string" then return "" end
+  if type(cursor_pos) ~= "number" then return cmd_line end
+
+  if cursor_pos < 0 then cursor_pos = 0 end
+  if cursor_pos > #cmd_line then cursor_pos = #cmd_line end
+
+  return cmd_line:sub(1, cursor_pos)
+end
+
+function Completion:complete(arg_lead, cmd_line, cursor_pos)
   local suggestions = {}
   local seen = {}
+
+  cmd_line = cmd_line_before_cursor(cmd_line or "", cursor_pos)
 
   local after_cmd = cmd_line:match "^%s*:%S+%s*(.*)$" or ""
   local spec = SquadDSL.trim(after_cmd)
@@ -201,8 +213,8 @@ function Completion:complete(arg_lead, cmd_line)
   end
 
   if spec == "" then
-    for _, template in ipairs(self.spec_templates) do
-      add(template, { absolute = true })
+    for _, template in ipairs(self.spec_templates or {}) do
+      add(template)
     end
     for _, alias in ipairs(self.layout_completions) do
       add(alias)
