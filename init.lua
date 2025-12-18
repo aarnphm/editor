@@ -670,6 +670,64 @@ end, {
   end,
 })
 
+local omni_providers = {
+  claude = "https://claude.ai/chat/%s",
+  chatgpt = "https://chatgpt.com/c/%s",
+  gemini = "https://gemini.google.com/app/%s",
+}
+
+local omni_provider_order = { "claude", "chatgpt", "gemini" }
+
+local function omni_open(provider, session_id)
+  provider = (provider or ""):lower()
+  local fmt = omni_providers[provider]
+  if not fmt then
+    Util.error(("omni: invalid provider %q (expected: claude|chatgpt|gemini)"):format(provider))
+    return
+  end
+  if not session_id or session_id == "" then
+    Util.error(("omni: missing session id for %s"):format(provider))
+    return
+  end
+
+  Util.open_url(fmt:format(session_id))
+end
+
+vim.api.nvim_create_user_command("Omni", function(opts)
+  if #opts.fargs ~= 2 then
+    Util.error "omni: expected 2 args: Omni <claude|chatgpt|gemini> <session_id>"
+    return
+  end
+  omni_open(opts.fargs[1], opts.fargs[2])
+end, {
+  nargs = "+",
+  desc = "omni: open chat session in browser",
+  complete = function(arg_lead, cmd_line, _)
+    local parts = vim.split(cmd_line, "%s+", { trimempty = true })
+    local trailing_space = cmd_line:match "%s$" ~= nil
+    if #parts == 1 or (#parts == 2 and not trailing_space) then
+      local needle = vim.pesc(arg_lead)
+      return vim.tbl_filter(function(x) return x:find("^" .. needle) end, omni_provider_order)
+    end
+    return {}
+  end,
+})
+
+vim.api.nvim_create_user_command("OmniClaude", function(opts) omni_open("claude", opts.fargs[1]) end, {
+  nargs = 1,
+  desc = "omni: open claude session in browser",
+})
+
+vim.api.nvim_create_user_command("OmniChat", function(opts) omni_open("chatgpt", opts.fargs[1]) end, {
+  nargs = 1,
+  desc = "omni: open chatgpt session in browser",
+})
+
+vim.api.nvim_create_user_command("OmniGem", function(opts) omni_open("gemini", opts.fargs[1]) end, {
+  nargs = 1,
+  desc = "omni: open gemini session in browser",
+})
+
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
