@@ -65,7 +65,6 @@ return {
       vim.keymap.set("n", "gs", "<Plug>(leap-from-window)")
     end,
   },
-  -- search/replace in multiple files
   {
     "MagicDuck/grug-far.nvim",
     opts = {
@@ -75,35 +74,112 @@ return {
     cmd = "GrugFar",
     keys = {
       {
-        "<leader>sr",
-        function()
-          local grug = require "grug-far"
-          local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
-          grug.open {
-            transient = true,
-            prefills = {
-              filesFilter = ext and ext ~= "" and "*." .. ext or nil,
-            },
-          }
-        end,
+        "<LocalLeader>w",
+        function() require("grug-far").open { transient = true, windowCreationCommand = "60vsplit" } end,
         mode = { "n", "v" },
         desc = "search: open and replace",
       },
       {
-        "<leader>sw",
+        "<LocalLeader>hw",
         function()
-          local grug = require "grug-far"
-          grug.open {
+          require("grug-far").open {
             transient = true,
+            windowCreationCommand = "topleft 60vsplit",
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (left)",
+      },
+      {
+        "<LocalLeader>jw",
+        function()
+          require("grug-far").open {
+            transient = true,
+            instanceName = "far-below",
+            windowCreationCommand = "botright 15split",
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (below)",
+      },
+      {
+        "<Leader>w",
+        function()
+          local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
+          require("grug-far").open {
+            transient = true,
+            windowCreationCommand = "60vsplit",
+            prefills = { filesFilter = ext and ext ~= "" and "*." .. ext or nil },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (current filetype)",
+      },
+      {
+        "<Leader>hw",
+        function()
+          local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
+          require("grug-far").open {
+            transient = true,
+            windowCreationCommand = "topleft 60vsplit",
+            prefills = { filesFilter = ext and ext ~= "" and "*." .. ext or nil },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (current filetype, left)",
+      },
+      {
+        "<Leader>jw",
+        function()
+          local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
+          require("grug-far").open {
+            transient = true,
+            instanceName = "far-below",
+            windowCreationCommand = "botright 15split",
+            prefills = { filesFilter = ext and ext ~= "" and "*." .. ext or nil },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (current filetype, below)",
+      },
+      {
+        "<Leader>/",
+        function()
+          require("grug-far").open {
+            transient = true,
+            windowCreationCommand = "60vsplit",
             prefills = { search = vim.fn.expand "<cword>" },
           }
         end,
         mode = { "n", "v" },
         desc = "search: open and replace (cursor word)",
       },
+      {
+        "<Leader>h/",
+        function()
+          require("grug-far").open {
+            transient = true,
+            windowCreationCommand = "topleft 60vsplit",
+            prefills = { search = vim.fn.expand "<cword>" },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (cursor word, left)",
+      },
+      {
+        "<Leader>j/",
+        function()
+          require("grug-far").open {
+            transient = true,
+            windowCreationCommand = "botright 15split",
+            prefills = { search = vim.fn.expand "<cword>" },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "search: open and replace (cursor word, below)",
+      },
     },
   },
-  { "folke/ts-comments.nvim", event = "LazyFile", opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
@@ -120,7 +196,7 @@ return {
   },
   {
     "folke/todo-comments.nvim",
-    cmd = { "TodoTelescope" },
+    cmd = { "TodoQuickFix", "TodoLocList" },
     event = "LazyFile",
     opts = {},
     keys = {
@@ -189,7 +265,7 @@ return {
   {
     "Bekaboo/dropbar.nvim",
     version = false,
-    enabled = false,
+    enabled = true,
     event = "LazyFile",
     ---@type dropbar_configs_t
     opts = {
@@ -352,20 +428,6 @@ return {
       attach_to_untracked = true,
       _new_sign_calc = true,
       _refresh_staged_on_update = true,
-    },
-  },
-  -- support for image pasting
-  {
-    "HakonHarnes/img-clip.nvim",
-    event = "LazyFile",
-    opts = {
-      default = {
-        embed_image_as_base64 = false,
-        prompt_for_file_name = false,
-        drag_and_drop = {
-          insert_mode = true,
-        },
-      },
     },
   },
 }

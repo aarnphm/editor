@@ -1,16 +1,10 @@
 return {
   "nvim-lua/plenary.nvim",
   "tpope/vim-repeat",
-  { "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
   { "folke/lazy.nvim", version = false },
-  {
-    "stevearc/oil.nvim",
-    cmd = "Oil",
-    lazy = false,
-    opts = {
-      delete_to_trash = false,
-    },
-  },
+  { "romainl/vim-cool", event = { "CursorMoved", "InsertEnter" } },
+  { "folke/ts-comments.nvim", event = "LazyFile", opts = {} },
+  { "stevearc/oil.nvim", event = "LazyFile", opts = { delete_to_trash = false } },
   {
     "folke/snacks.nvim",
     priority = 1000,

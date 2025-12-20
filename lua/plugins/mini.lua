@@ -230,16 +230,6 @@ return {
         Util.pick "oldfiles",
         desc = "mini.pick: oldfiles",
       },
-      {
-        "<LocalLeader>w",
-        Util.pick "live_grep",
-        desc = "mini.pick: grep word",
-      },
-      {
-        "<Leader>/",
-        '<CMD>:Pick grep pattern="<cword>"<CR>',
-        desc = "mini.pick: grep word",
-      },
       -- mini.files
       {
         "<LocalLeader>/",

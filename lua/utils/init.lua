@@ -262,6 +262,7 @@ end
 
 --- Find a URL on the current line that covers the cursor position.
 ---@return string? url
+---NOTE: require("vim.ui")._get_urls()[1] apparently also returns the url here, pretty neat.
 function M.url_under_cursor()
   local line = vim.api.nvim_get_current_line()
   local col = vim.api.nvim_win_get_cursor(0)[2]

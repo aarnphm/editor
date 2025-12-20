@@ -1,5 +1,3 @@
-vim.loader.enable()
-
 _G.augroup = function(name) return vim.api.nvim_create_augroup(("simple_%s"):format(name), { clear = true }) end
 
 _G.hi = function(name, opts)
