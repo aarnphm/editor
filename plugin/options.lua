@@ -48,7 +48,7 @@ o.inccommand = "split"
 o.foldenable = true
 o.fcs = "foldopen:,foldclose:,fold: ,trunc:…,foldsep: ,diff:╱,eob: "
 
-o.foldmethod = "indent"
+o.foldmethod = "expr"
 o.foldtext = "v:lua.require'utils'.ui.foldtext()"
 o.foldlevel = 99
 o.foldlevelstart = 99

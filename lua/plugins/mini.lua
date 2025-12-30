@@ -69,7 +69,7 @@ return {
           preview = false,
           width_focus = 30,
           width_nofocus = 30,
-          width_preview = math.floor(0.45 * vim.o.columns),
+          width_preview = math.floor(0.25 * vim.o.columns),
           max_number = 3,
         },
         mappings = { synchronize = "<leader>" },

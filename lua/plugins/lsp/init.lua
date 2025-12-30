@@ -98,8 +98,9 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile", "BufWritePre" },
-    dependencies = { "mason-org/mason.nvim", "mason-org/mason-lspconfig.nvim" },
+    event = "LazyFile",
+    dependencies = { "mason-org/mason.nvim", { "mason-org/mason-lspconfig.nvim", config = function() end } },
+    opts_extend = { "servers.*.keys" },
     ---@class PluginLspOptions
     ---@field setup table<string, fun(server: string, opts: table<string, any>): boolean>
     opts = {
@@ -132,97 +133,84 @@ return {
       -- provide the inlay hints.
       inlay_hints = {
         enabled = true,
-        exclude = { "vue", "typescriptreact", "typescript", "javascript", "python" },
+        exclude = { "vue", "typescriptreact", "typescript", "javascript", "lua", "python" },
       },
       -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the code lenses.
-      codelens = { enabled = false },
+      codelens = { enabled = true },
       -- Enable lsp cursor word highlighting
       document_highlight = { enabled = true },
-      capabilities = {
-        workspace = {
-          didChangeWatchedFiles = { dynamicRegistration = false },
-          fileOperations = { didRename = true, willRename = true },
-        },
-        textDocument = {
-          completion = {
-            snippetSupport = true,
-            resolveSupport = {
-              properties = { "documentation", "detail", "additionalTextEdits" },
-            },
-            completionItem = {
-              documentationFormat = { "markdown", "plaintext" },
-              snippetSupport = true,
-              preselectSupport = true,
-              insertReplaceSupport = true,
-              labelDetailsSupport = true,
-              deprecatedSupport = true,
-              commitCharactersSupport = true,
-              tagSupport = { valueSet = { 1 } },
-              resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits" } },
+      -- LSP Server Settings
+      -- Sets the default configuration for an LSP client (or all clients if the special name "*" is used).
+      ---@alias lazyvim.lsp.Config vim.lsp.Config|{mason?:boolean, enabled?:boolean, keys?:LazyKeysLspSpec[]}
+      ---@type table<string, lazyvim.lsp.Config|boolean>
+      servers = {
+        servers = {
+          ["*"] = {
+            capabilities = {
+              workspace = {
+                didChangeWatchedFiles = { dynamicRegistration = false },
+                fileOperations = { didRename = true, willRename = true },
+              },
             },
           },
-        },
-      },
-      -- all of the server below will be installed by default
-      ---@type table<string, vim.lsp.Config | table | boolean>
-      servers = {
-        bashls = {},
-        lua_ls = {
-          settings = {
-            Lua = {
-              runtime = {
-                version = "LuaJIT",
-                special = { reload = "require" },
-              },
-              library = { vim.env.VIMRUNTIME },
-              telemetry = { enable = false },
-              semantic = { enable = true },
-              completion = { workspaceWord = true, callSnippet = "Replace" },
-              hover = { expandAlias = false },
-              hint = {
-                enable = true,
-                setType = false,
-                paramType = true,
-                paramName = false,
-                semicolon = "Disable",
-                arrayIndex = "Disable",
-              },
-              doc = {
-                privateName = { "^_" },
-              },
-              type = {
-                castNumberToInteger = true,
-              },
-              diagnostics = {
-                disable = { "incomplete-signature-doc", "trailing-space" },
-                groupSeverity = {
-                  strong = "Warning",
-                  strict = "Warning",
+          bashls = {},
+          lua_ls = {
+            settings = {
+              Lua = {
+                runtime = {
+                  version = "LuaJIT",
+                  special = { reload = "require" },
                 },
-                groupFileStatus = {
-                  ["ambiguity"] = "Opened",
-                  ["await"] = "Opened",
-                  ["codestyle"] = "None",
-                  ["duplicate"] = "Opened",
-                  ["global"] = "Opened",
-                  ["luadoc"] = "Opened",
-                  ["redefined"] = "Opened",
-                  ["strict"] = "Opened",
-                  ["strong"] = "Opened",
-                  ["type-check"] = "Opened",
-                  ["unbalanced"] = "Opened",
-                  ["unused"] = "Opened",
+                library = { vim.env.VIMRUNTIME },
+                telemetry = { enable = false },
+                semantic = { enable = true },
+                completion = { workspaceWord = true, callSnippet = "Replace" },
+                hover = { expandAlias = false },
+                hint = {
+                  enable = true,
+                  setType = false,
+                  paramType = true,
+                  paramName = false,
+                  semicolon = "Disable",
+                  arrayIndex = "Disable",
                 },
-                unusedLocalExclude = { "_*" },
-              },
-              format = {
-                enable = true,
-                defaultConfig = {
-                  indent_style = "space",
-                  indent_size = "2",
-                  continuation_indent_size = "2",
+                doc = {
+                  privateName = { "^_" },
+                },
+                type = {
+                  castNumberToInteger = true,
+                },
+                diagnostics = {
+                  disable = { "incomplete-signature-doc", "trailing-space" },
+                  groupSeverity = {
+                    strong = "Warning",
+                    strict = "Warning",
+                  },
+                  groupFileStatus = {
+                    ["ambiguity"] = "Opened",
+                    ["await"] = "Opened",
+                    ["codestyle"] = "None",
+                    ["duplicate"] = "Opened",
+                    ["global"] = "Opened",
+                    ["luadoc"] = "Opened",
+                    ["redefined"] = "Opened",
+                    ["strict"] = "Opened",
+                    ["strong"] = "Opened",
+                    ["type-check"] = "Opened",
+                    ["unbalanced"] = "Opened",
+                    ["unused"] = "Opened",
+                  },
+                  unusedLocalExclude = { "_*" },
+                },
+                format = {
+                  enable = true,
+                  defaultConfig = {
+                    indent_style = "space",
+                    indent_size = "2",
+                    continuation_indent_size = "2",
+                  },
                 },
               },
             },
@@ -231,7 +219,7 @@ return {
       },
     },
     ---@param opts PluginLspOptions
-    config = function(_, opts)
+    config = vim.schedule_wrap(function(_, opts)
       Util.format.register(Util.lsp.formatter())
       Util.lsp.setup()
 
@@ -261,76 +249,44 @@ return {
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      local servers = opts.servers
-      ---@type lsp.ClientCapabilities
-      local capabilities = vim.tbl_deep_extend(
-        "force",
-        {},
-        vim.lsp.protocol.make_client_capabilities(),
-        Util.has "blink.cmp" and require("blink.cmp").get_lsp_capabilities() or {},
-        opts.capabilities or {}
-      )
+      if opts.servers["*"] then vim.lsp.config("*", opts.servers["*"]) end
 
       -- get all the servers that are available through mason-lspconfig
-      local have_mlsp, mlsp = pcall(require, "mason-lspconfig")
-      local all_mslp_servers = {}
-      if have_mlsp then
-        all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings").get_mason_map().lspconfig_to_package)
-      end
+      local have_mason = Util.has "mason-lspconfig.nvim"
+      local mason_all = have_mason
+          and vim.tbl_keys(require("mason-lspconfig.mappings").get_mason_map().lspconfig_to_package)
+        or {} --[[ @as string[] ]]
+      local mason_exclude = {} ---@type string[]
 
-      ---@param server string
+      ---@return boolean? exclude automatic setup
       local function configure(server)
-        local server_opts = vim.tbl_deep_extend("force", {
-          capabilities = vim.deepcopy(capabilities),
-          flags = { debounce_text_changes = 300 },
-        }, servers[server] or {})
+        if server == "*" then return false end
+        local sopts = opts.servers[server]
+        sopts = sopts == true and {} or (not sopts) and { enabled = false } or sopts --[[@as lazyvim.lsp.Config]]
 
-        if server_opts.enabled == false then return end
-
-        if opts.setup[server] then
-          if opts.setup[server](server, server_opts) then return end
-        elseif opts.setup["*"] then
-          if opts.setup["*"](server, server_opts) then return end
+        if sopts.enabled == false then
+          mason_exclude[#mason_exclude + 1] = server
+          return
         end
 
-        vim.lsp.config(server, server_opts)
-
-        -- manually enable if mason=false or if this is a server that cannot be installed with mason-lspconfig
-        if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
-          vim.lsp.enable(server)
-          return true
+        local use_mason = sopts.mason ~= false and vim.tbl_contains(mason_all, server)
+        local setup = opts.setup[server] or opts.setup["*"]
+        if setup and setup(server, sopts) then
+          mason_exclude[#mason_exclude + 1] = server
+        else
+          vim.lsp.config(server, sopts) -- configure the server
+          if not use_mason then vim.lsp.enable(server) end
         end
-
-        return false
+        return use_mason
       end
 
-      local ensure_installed = {} ---@type string[]
-      local exclude_automatic_enable = {} ---@type string[]
-
-      for server, server_opts in pairs(servers) do
-        if server_opts then
-          server_opts = server_opts == true and {} or server_opts
-          if server_opts.enabled ~= false then
-            -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-            if configure(server) then
-              exclude_automatic_enable[#exclude_automatic_enable + 1] = server
-            else
-              ensure_installed[#ensure_installed + 1] = server
-            end
-          end
-        end
-      end
-
-      if have_mlsp then
-        mlsp.setup {
-          ensure_installed = vim.tbl_deep_extend(
-            "force",
-            ensure_installed,
-            Util.opts("mason-lspconfig.nvim").ensure_installed or {}
-          ),
-          automatic_enable = { exclude = exclude_automatic_enable },
+      local install = vim.tbl_filter(configure, vim.tbl_keys(opts.servers))
+      if have_mason then
+        require("mason-lspconfig").setup {
+          ensure_installed = vim.list_extend(install, Util.opts("mason-lspconfig.nvim").ensure_installed or {}),
+          automatic_enable = { exclude = mason_exclude },
         }
       end
-    end,
+    end),
   },
 }

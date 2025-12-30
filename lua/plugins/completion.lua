@@ -84,7 +84,7 @@ return {
         },
       },
       keymap = {
-        preset = "default",
+        preset = "super-tab",
         ["<CR>"] = { "select_and_accept", "fallback" },
         ["<Tab>"] = {
           function(cmp)
@@ -94,6 +94,7 @@ return {
               return cmp.select_and_accept()
             end
           end,
+          Util.cmp.map { "snippet_forward" },
           "fallback",
         },
         ["<Up>"] = false,
