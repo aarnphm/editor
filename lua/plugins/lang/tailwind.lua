@@ -314,7 +314,7 @@ M.colors = {
   },
 }
 
-M.plugin = {
+return {
   {
     "neovim/nvim-lspconfig",
     opts = {
@@ -365,6 +365,7 @@ M.plugin = {
   {
     "echasnovski/mini.hipatterns",
     event = "LazyFile",
+    enabled = false,
     opts = function()
       local hi = require "mini.hipatterns"
       return {
@@ -444,5 +445,3 @@ M.plugin = {
     end,
   },
 }
-
-return M.plugin

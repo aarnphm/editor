@@ -19,8 +19,7 @@ return {
   {
     "mrcjkb/rustaceanvim",
     version = vim.fn.has "nvim-0.10.0" == 0 and "^4" or false,
-    lazy = false,
-    ft = "rust",
+    ft = { "rust" },
     opts = {
       server = {
         on_attach = function(_, bufnr)

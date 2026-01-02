@@ -37,13 +37,9 @@ vim.g.extra_plugins = {
   "plugins.lang.ocaml",
   "plugins.lang.markdown",
   -- "plugins.lang.sql",
-  "plugins.lang.tailwind",
+  -- "plugins.lang.tailwind",
   "plugins.lang.typescript",
   "plugins.lang.zig",
-  -- formatters
-  "plugins.formatters.prettier",
-  -- linters
-  "plugins.linters.eslint",
 }
 -- underscore URL
 vim.g.enable_highlighturl = true
