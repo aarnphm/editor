@@ -14,6 +14,10 @@ return {
     },
   },
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "cpp" } },
+  },
+  {
     "p00f/clangd_extensions.nvim",
     lazy = true,
     version = false,
@@ -87,7 +91,7 @@ return {
         clangd = function(_, opts)
           local clangd_ext_opts = Util.opts "clangd_extensions.nvim"
           require("clangd_extensions").setup(vim.tbl_deep_extend("force", clangd_ext_opts or {}, { server = opts }))
-          return true
+          return false
         end,
       },
     },

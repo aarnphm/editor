@@ -17,6 +17,10 @@ return {
     },
   },
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "rust", "ron" } },
+  },
+  {
     "mrcjkb/rustaceanvim",
     version = vim.fn.has "nvim-0.10.0" == 0 and "^4" or false,
     ft = { "rust" },
@@ -56,6 +60,22 @@ return {
                 ["async-recursion"] = { "async_recursion" },
               },
             },
+            files = {
+              exclude = {
+                ".direnv",
+                ".git",
+                ".jj",
+                ".github",
+                ".gitlab",
+                "bin",
+                "node_modules",
+                "target",
+                "venv",
+                ".venv",
+              },
+              -- Avoid Roots Scanned hanging, see https://github.com/rust-lang/rust-analyzer/issues/12613#issuecomment-2096386344
+              watcher = "client",
+            },
           },
         },
       },
@@ -70,5 +90,13 @@ return {
       end
     end,
   },
-  { "neovim/nvim-lspconfig", opts = { servers = { taplo = {}, rust_analyzer = { enabled = false } } } },
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        taplo = true,
+        rust_analyzer = { enabled = false },
+      },
+    },
+  },
 }
