@@ -12,15 +12,14 @@ return {
     ---@type blink.cmp.Config
     opts = {
       fuzzy = { implementation = "rust" },
-      appearance = { kind_icons = { Copilot = "" } },
-      snippets = { expand = function(snippet) return Util.cmp.expand(snippet) end },
+      snippets = { preset = "default" },
       signature = { enabled = false },
       completion = {
         menu = {
           auto_show = false,
           draw = {
             treesitter = { "lsp" },
-            columns = { { "kind_icon" }, { "kind" }, { "label", "label_description", gap = 2 } },
+            columns = { { "kind_icon" }, { "label", "label_description", gap = 2 } },
             components = {
               label_description = { width = { max = 0 }, text = function(ctx) return ctx.label_description or "" end },
               kind_icon = {
@@ -84,22 +83,17 @@ return {
         },
       },
       keymap = {
-        preset = "super-tab",
-        ["<CR>"] = { "select_and_accept", "fallback" },
-        ["<Tab>"] = {
-          function(cmp)
-            if cmp.snippet_active() then
-              return cmp.accept()
-            else
-              return cmp.select_and_accept()
-            end
-          end,
-          Util.cmp.map { "snippet_forward" },
-          "fallback",
-        },
+        preset = "enter",
+        ["<C-y>"] = { "select_and_accept" },
         ["<Up>"] = false,
         ["<Down>"] = false,
       },
     },
+    ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
+    config = function(_, opts)
+      opts.snippets.expand = Util.cmp.expand
+
+      require("blink.cmp").setup(opts)
+    end,
   },
 }

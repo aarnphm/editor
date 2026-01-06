@@ -86,7 +86,7 @@ local function build_insert_lines(indent, date)
   return {
     child_indent .. "- [meta]:",
     date_indent .. "- date: " .. date,
-    date_indent .. "- tags: [fruit]",
+    date_indent .. "- tags: []",
   }
 end
 

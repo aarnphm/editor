@@ -81,7 +81,7 @@ vim.keymap.set("i", "<D-k>", function()
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "[[]]" })
   vim.api.nvim_win_set_cursor(0, { row, col + 2 })
-  if Util.has "blink.cmp" then require("blink.cmp").show { providers = { "path" } } end
+  if Util.has "blink.cmp" then require("blink.cmp").show { providers = { "lsp" } } end
 end, { buffer = true, desc = "wikilink: insert" })
 
 local _md_heading_ns = vim.api.nvim_create_namespace "md_headings_popup"

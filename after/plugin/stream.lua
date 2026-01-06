@@ -72,7 +72,7 @@ local function build_meta_lines(datetime, next_line)
     "- [meta]:",
     "  - date: " .. datetime,
     "  - tags:",
-    "    - fruit",
+    "    - life",
   }
   if next_line and next_line:match "^%s*$" then return meta end
   table.insert(meta, "")
