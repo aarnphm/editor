@@ -81,7 +81,6 @@ vim.keymap.set("i", "<D-k>", function()
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { "[[]]" })
   vim.api.nvim_win_set_cursor(0, { row, col + 2 })
-  if Util.has "blink.cmp" then require("blink.cmp").show { providers = { "lsp" } } end
 end, { buffer = true, desc = "wikilink: insert" })
 
 local _md_heading_ns = vim.api.nvim_create_namespace "md_headings_popup"
@@ -371,7 +370,13 @@ end
 ---@param opts? { blockquote_only?: boolean }
 local function _md_smart_cr(opts)
   opts = opts or {}
-  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  ok, blink = pcall(require, "blink.cmp")
+  if ok and blink.is_menu_visible and blink.select_and_accept and blink.is_menu_visible() then
+    blink.select_and_accept()
+    return ""
+  end
+
+  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
   local line = vim.api.nvim_get_current_line()
 
   if not opts.blockquote_only then
