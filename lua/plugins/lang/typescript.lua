@@ -53,6 +53,8 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        tsserver = { enabled = false },
+        ts_ls = { enabled = false },
         vtsls = {
           -- explicitly add default filetypes, so that we can extend
           -- them in related extras
@@ -70,6 +72,7 @@ return {
               enableMoveToFileCodeAction = true,
               autoUseWorkspaceTsdk = true,
               experimental = {
+                maxInlayHintLength = 30,
                 completion = {
                   enableServerSideFuzzyMatch = true,
                 },
@@ -94,10 +97,12 @@ return {
             {
               "gD",
               function()
-                local params = vim.lsp.util.make_position_params(vim.api.nvim_get_current_win(), "utf-8")
+                local win = vim.api.nvim_get_current_win()
+                local params = vim.lsp.util.make_position_params(win, "utf-16")
                 Util.lsp.execute {
                   command = "typescript.goToSourceDefinition",
                   arguments = { params.textDocument.uri, params.position },
+                  open = true,
                 }
               end,
               desc = "lsp: goto source definition",
@@ -108,6 +113,7 @@ return {
                 Util.lsp.execute {
                   command = "typescript.findAllFileReferences",
                   arguments = { vim.uri_from_bufnr(0) },
+                  open = true,
                 }
               end,
               desc = "lsp: file references",
@@ -146,7 +152,7 @@ return {
         tsserver = function() return true end,
         ts_ls = function() return true end,
         vtsls = function(_, opts)
-          Util.lsp.on_attach(function(client, bufnr)
+          Snacks.util.lsp.on({ name = "vtsls" }, function(_, client)
             client.commands["_typescript.moveToFileRefactoring"] = function(command, _)
               ---@type lsp.LSPAny, lsp.LSPAny, lsp.LSPAny
               local action, uri, range = unpack(command.arguments)
@@ -193,7 +199,8 @@ return {
                 end)
               end, bufnr)
             end
-          end, "vtsls")
+          end)
+
           -- copy typescript settings to javascript
           opts.settings.javascript =
             vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})

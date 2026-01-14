@@ -1,146 +1,34 @@
--- local LSP keys setup
 local M = {}
 
----@type LazyKeysLspSpec[] | vim.NIL
-M._keys = nil
+---@type LazyKeysLspSpec[]|nil
+M._keys = {}
 
----@alias LazyKeysLspSpec LazyKeysSpec|{has?:string|string[], cond?:fun():boolean}
----@alias LazyKeysLsp LazyKeys|{has?:string|string[], cond?:fun():boolean}
+---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string|string[], enabled?:fun():boolean}
+---@alias LazyKeysLsp LazyKeys|{has?:string|string[], enabled?:fun():boolean}
 
-local diagnostic_goto = function(next, severity)
-  return function()
-    vim.diagnostic.jump {
-      count = (next and 1 or -1) * vim.v.count1,
-      severity = severity and vim.diagnostic.severity[severity] or nil,
-      float = true,
-    }
-  end
-end
-
----@return LazyKeysLsp[]
-M.get = function()
-  if not M._keys then
-    M._keys = {
-      { "<leader>cl", Snacks.picker.lsp_config, desc = "lsp: info" },
-      { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
-      { "<C-k>", vim.lsp.buf.signature_help, mode = "i", desc = "lsp: signature help", has = "signatureHelp" },
-      { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
-      { "gy", vim.lsp.buf.type_definition, desc = "lsp: t[y]pe definition" },
-      { "gD", vim.lsp.buf.declaration, desc = "lsp: peek declaration", has = "declaration" },
-      { "gR", Util.lsp.buf.references, desc = "lsp: show references", has = "definition", nowait = true },
-      { "gd", Util.lsp.buf.definitions, desc = "lsp: peek definition", has = "definition" },
-      { "gI", Util.lsp.buf.implementations, desc = "lsp: implementation" },
-      { "<leader>d", function() vim.diagnostic.open_float() end, desc = "lsp: show line diagnostics" },
-      { "]d", diagnostic_goto(true), desc = "lsp: Next diagnostic" },
-      { "[d", diagnostic_goto(false), desc = "lsp: Next diagnostic" },
-      { "]e", diagnostic_goto(true, vim.diagnostic.severity.E), desc = "lsp: next error" },
-      { "[e", diagnostic_goto(false, vim.diagnostic.severity.E), desc = "lsp: prev error" },
-      { "]w", diagnostic_goto(true, vim.diagnostic.severity.W), desc = "lsp: next warning" },
-      { "[w", diagnostic_goto(false, vim.diagnostic.severity.W), desc = "lsp: prev warning" },
-      { "<leader>ca", vim.lsp.buf.code_action, desc = "lsp: code action", mode = { "n", "v" }, has = "codeAction" },
-      { "<leader>cc", vim.lsp.codelens.run, desc = "lsp: run codelens", mode = { "n", "v" }, has = "codeLens" },
-      {
-        "<leader><leader>f",
-        function() Util.format { force = true } end,
-        mode = { "n", "v" },
-        desc = "style: format buffer",
-      },
-      {
-        "<leader>cC",
-        vim.lsp.codelens.refresh,
-        desc = "lsp: refresh & display codelens",
-        mode = { "n" },
-        has = "codeLens",
-      },
-      {
-        "<leader>cR",
-        function() Snacks.rename.rename_file() end,
-        desc = "lsp: rename file",
-        mode = { "n" },
-        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
-      },
-      { "<leader>cA", Util.lsp.action.source, desc = "lsp: source action", has = "codeAction" },
-      {
-        "]]",
-        function() Util.words.jump(vim.v.count1) end,
-        has = "documentHighlight",
-        desc = "Next Reference",
-        cond = function() return Util.words.is_enabled() end,
-      },
-      {
-        "[[",
-        function() Util.words.jump(-vim.v.count1) end,
-        has = "documentHighlight",
-        desc = "Prev Reference",
-        cond = function() return Util.words.is_enabled() end,
-      },
-      {
-        "<C-n>",
-        function() Util.words.jump(vim.v.count1, true) end,
-        has = "documentHighlight",
-        desc = "Next Reference",
-        cond = function() return Util.words.is_enabled() end,
-      },
-      {
-        "<C-p>",
-        function() Util.words.jump(-vim.v.count1, true) end,
-        has = "documentHighlight",
-        desc = "Prev Reference",
-        cond = function() return Util.words.is_enabled() end,
-      },
-    }
-  end
-  return M._keys
-end
-
----@param buffer number
----@param method string|string[]
-function M.has(buffer, method)
-  if type(method) == "table" then
-    for _, m in ipairs(method) do
-      if M.has(buffer, m) then return true end
+---@param filter vim.lsp.get_clients.Filter
+---@param spec LazyKeysLspSpec[]
+function M.set(filter, spec)
+  local Keys = require "lazy.core.handler.keys"
+  for _, keys in pairs(Keys.resolve(spec)) do
+    ---@cast keys LazyKeysLsp
+    local filters = {} ---@type vim.lsp.get_clients.Filter[]
+    if keys.has then
+      local methods = type(keys.has) == "string" and { keys.has } or keys.has --[[@as string[] ]]
+      for _, method in ipairs(methods) do
+        method = method:find "/" and method or ("textDocument/" .. method)
+        filters[#filters + 1] = vim.tbl_extend("force", vim.deepcopy(filter), { method = method })
+      end
+    else
+      filters[#filters + 1] = filter
     end
-    return false
-  end
-  method = method:find "/" and method or "textDocument/" .. method
-  local clients = Util.lsp.get_clients { bufnr = buffer }
-  for _, client in ipairs(clients) do
-    if client:supports_method(method, buffer) then return true end
-  end
-  return false
-end
 
----@return LazyKeysLsp[]
-function M.resolve(buffer)
-  local Keys = require "lazy.core.handler.keys"
-  if not Keys.resolve then return {} end
-  local spec = M.get()
-  ---@type PluginLspOptions
-  local opts = Util.opts "nvim-lspconfig"
-  local clients = Util.lsp.get_clients { bufnr = buffer }
-  for _, client in ipairs(clients) do
-    local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
-    vim.list_extend(spec, maps)
-  end
-  return Keys.resolve(spec)
-end
-
-function M.on_attach(_, buffer)
-  local Keys = require "lazy.core.handler.keys"
-  local keymaps = M.resolve(buffer)
-
-  for _, keys in pairs(keymaps) do
-    local has = not keys.has or M.has(buffer, keys.has)
-    local cond = not (keys.cond == false or ((type(keys.cond) == "function") and not keys.cond()))
-
-    if has and cond then
+    for _, f in ipairs(filters) do
       local opts = Keys.opts(keys)
-      ---@cast opts vim.keymap.set.LazyOpts
-      opts.cond = nil
-      opts.has = nil
-      opts.silent = opts.silent ~= false
-      opts.buffer = buffer
-      vim.keymap.set(keys.mode or "n", keys.lhs, keys.rhs, opts)
+      ---@cast opts snacks.keymap.set.Opts
+      opts.lsp = f
+      opts.enabled = keys.enabled
+      Snacks.keymap.set(keys.mode or "n", keys.lhs, keys.rhs, opts)
     end
   end
 end

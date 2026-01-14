@@ -191,6 +191,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     end
 
     local buf = ev.buf
+    local was_modified = vim.bo[buf].modified
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     local filename = vim.fs.basename(ev.match)
     local id = filename:gsub("%.md$", "")
@@ -224,6 +225,14 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     local frontmatter = vim.tbl_deep_extend("force", defaults, existing)
     if frontmatter.title == nil then frontmatter.title = id end
     if frontmatter.aliases and #frontmatter.aliases == 0 then frontmatter.aliases = nil end
+
+    local existing_no_modified = vim.deepcopy(existing)
+    existing_no_modified.modified = nil
+    local frontmatter_no_modified = vim.deepcopy(frontmatter)
+    frontmatter_no_modified.modified = nil
+    local meta_changed = not vim.deep_equal(frontmatter_no_modified, existing_no_modified)
+
+    if not was_modified and not meta_changed then return end
 
     if is_vault_note and not is_tag_note then
       local raw_offset = os.date "%z" -- timezone offset

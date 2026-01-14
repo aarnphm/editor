@@ -7,6 +7,24 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+local diagnostic_goto = function(next, severity)
+  return function()
+    vim.diagnostic.jump {
+      count = (next and 1 or -1) * vim.v.count1,
+      severity = severity and vim.diagnostic.severity[severity] or nil,
+      float = true,
+    }
+  end
+end
+
+map("n", "<leader>d", vim.diagnostic.open_float, { desc = "editor: show line diagnostics" })
+map("n", "]d", diagnostic_goto(true), { desc = "editor: Next diagnostic" })
+map("n", "[d", diagnostic_goto(false), { desc = "editor: Next diagnostic" })
+map("n", "]e", diagnostic_goto(true, vim.diagnostic.severity.ERROR), { desc = "editor: next error" })
+map("n", "[e", diagnostic_goto(false, vim.diagnostic.severity.ERROR), { desc = "editor: prev error" })
+map("n", "]w", diagnostic_goto(true, vim.diagnostic.severity.WARN), { desc = "editor: next warning" })
+map("n", "[w", diagnostic_goto(false, vim.diagnostic.severity.WARN), { desc = "editor: prev warning" })
+
 map({ "n", "x" }, " ", "", { noremap = true })
 -- Open a terminal at the bottom of the screen with a fixed height.
 map(

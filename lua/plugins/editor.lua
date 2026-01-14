@@ -195,6 +195,47 @@ return {
     },
   },
   {
+    "folke/trouble.nvim",
+    cmd = { "Trouble" },
+    opts = {
+      modes = {
+        lsp = {
+          win = { position = "right" },
+        },
+      },
+    },
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "trouble: diagnostics" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "trouble: buffer diagnostics" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "trouble: symbols" },
+      { "<leader>cS", "<cmd>Trouble lsp toggle<cr>", desc = "trouble: LSP references/definitions/..." },
+      {
+        "[q",
+        function()
+          if require("trouble").is_open() then
+            require("trouble").prev { skip_groups = true, jump = true }
+          else
+            local ok, err = pcall(vim.cmd.cprev)
+            if not ok then vim.notify(err, vim.log.levels.ERROR) end
+          end
+        end,
+        desc = "trouble: previous trouble/quickfix item",
+      },
+      {
+        "]q",
+        function()
+          if require("trouble").is_open() then
+            require("trouble").next { skip_groups = true, jump = true }
+          else
+            local ok, err = pcall(vim.cmd.cnext)
+            if not ok then vim.notify(err, vim.log.levels.ERROR) end
+          end
+        end,
+        desc = "trouble: next trouble/quickfix item",
+      },
+    },
+  },
+  {
     "folke/todo-comments.nvim",
     cmd = { "TodoQuickFix", "TodoLocList" },
     event = "LazyFile",

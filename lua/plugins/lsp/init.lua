@@ -103,129 +103,217 @@ return {
     opts_extend = { "servers.*.keys" },
     ---@class PluginLspOptions
     ---@field setup table<string, fun(server: string, opts: table<string, any>): boolean>
-    opts = {
-      -- options for vim.diagnostic.config()
-      ---@type vim.diagnostic.config.Opts
-      diagnostics = {
-        severity_sort = true,
-        underline = false,
-        update_in_insert = false,
-        -- enable virtual text with { spacing = 2, min = "Error" }
-        virtual_text = false,
-        float = {
-          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-          focusable = false,
-          focus = false,
-          format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-          source = "if_many",
-        },
-        signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = "✖",
-            [vim.diagnostic.severity.WARN] = "▲",
-            [vim.diagnostic.severity.HINT] = "⚑",
-            [vim.diagnostic.severity.INFO] = "●",
+    opts = function()
+      return {
+        -- options for vim.diagnostic.config()
+        ---@type vim.diagnostic.config.Opts
+        diagnostics = {
+          severity_sort = true,
+          underline = false,
+          update_in_insert = false,
+          -- enable virtual text with { spacing = 2, min = "Error" }
+          virtual_text = false,
+          float = {
+            close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+            focusable = false,
+            focus = false,
+            format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
+            source = "if_many",
+          },
+          signs = {
+            text = {
+              [vim.diagnostic.severity.ERROR] = "✖",
+              [vim.diagnostic.severity.WARN] = "▲",
+              [vim.diagnostic.severity.HINT] = "⚑",
+              [vim.diagnostic.severity.INFO] = "●",
+            },
           },
         },
-      },
-      -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
-      -- Be aware that you also will need to properly configure your LSP server to
-      -- provide the inlay hints.
-      inlay_hints = {
-        enabled = true,
-        exclude = { "vue", "typescriptreact", "typescript", "javascript", "lua", "python" },
-      },
-      -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
-      -- Be aware that you also will need to properly configure your LSP server to
-      -- provide the code lenses.
-      codelens = { enabled = true },
-      -- Enable lsp cursor word highlighting
-      document_highlight = { enabled = true },
-      -- LSP Server Settings
-      -- Sets the default configuration for an LSP client (or all clients if the special name "*" is used).
-      ---@alias lazyvim.lsp.Config vim.lsp.Config|{mason?:boolean, enabled?:boolean, keys?:LazyKeysLspSpec[]}
-      ---@type table<string, lazyvim.lsp.Config|boolean>
-      servers = {
+        -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
+        -- Be aware that you also will need to properly configure your LSP server to
+        -- provide the inlay hints.
+        inlay_hints = {
+          enabled = true,
+          exclude = { "vue", "typescriptreact", "typescript", "javascript", "lua", "python" },
+        },
+        -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
+        -- Be aware that you also will need to properly configure your LSP server to
+        -- provide the code lenses.
+        codelens = { enabled = true },
+        -- Enable lsp cursor word highlighting
+        document_highlight = { enabled = true },
+        -- LSP Server Settings
+        -- Sets the default configuration for an LSP client (or all clients if the special name "*" is used).
+        ---@alias lazyvim.lsp.Config vim.lsp.Config|{mason?:boolean, enabled?:boolean, keys?:LazyKeysLspSpec[]}
+        ---@type table<string, lazyvim.lsp.Config|boolean>
         servers = {
-          ["*"] = {
-            capabilities = {
-              workspace = {
-                didChangeWatchedFiles = { dynamicRegistration = false },
-                fileOperations = { didRename = true, willRename = true },
+          servers = {
+            ["*"] = {
+              capabilities = {
+                workspace = {
+                  didChangeWatchedFiles = { dynamicRegistration = false },
+                  fileOperations = { didRename = true, willRename = true },
+                },
+              },
+              keys = {
+                { "<leader>cl", Snacks.picker.lsp_config, desc = "lsp: info" },
+                { "K", vim.lsp.buf.hover, desc = "lsp: Hover" },
+                {
+                  "<C-k>",
+                  vim.lsp.buf.signature_help,
+                  mode = "i",
+                  desc = "lsp: signature help",
+                  has = "signatureHelp",
+                },
+                { "gr", vim.lsp.buf.rename, desc = "lsp: rename", has = "rename" },
+                { "gy", vim.lsp.buf.type_definition, desc = "lsp: t[y]pe definition" },
+                { "gD", vim.lsp.buf.declaration, desc = "lsp: peek declaration", has = "declaration" },
+                { "gR", Util.lsp.buf.references, desc = "lsp: show references", has = "definition", nowait = true },
+                { "gd", Util.lsp.buf.definitions, desc = "lsp: peek definition", has = "definition" },
+                { "gI", Util.lsp.buf.implementations, desc = "lsp: implementation" },
+                {
+                  "<leader>ca",
+                  vim.lsp.buf.code_action,
+                  desc = "lsp: code action",
+                  mode = { "n", "v" },
+                  has = "codeAction",
+                },
+                {
+                  "<leader>cc",
+                  vim.lsp.codelens.run,
+                  desc = "lsp: run codelens",
+                  mode = { "n", "v" },
+                  has = "codeLens",
+                },
+                {
+                  "<leader><leader>f",
+                  function() Util.format { force = true } end,
+                  mode = { "n", "v" },
+                  desc = "style: format buffer",
+                },
+                {
+                  "<leader>cC",
+                  vim.lsp.codelens.refresh,
+                  desc = "lsp: refresh & display codelens",
+                  mode = { "n" },
+                  has = "codeLens",
+                },
+                {
+                  "<leader>cR",
+                  function() Snacks.rename.rename_file() end,
+                  desc = "lsp: rename file",
+                  mode = { "n" },
+                  has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+                },
+                { "<leader>cA", Util.lsp.action.source, desc = "lsp: source action", has = "codeAction" },
+                {
+                  "]]",
+                  function() Snacks.words.jump(vim.v.count1) end,
+                  has = "documentHighlight",
+                  desc = "lsp: next reference",
+                  enabled = function() return Snacks.words.is_enabled() end,
+                },
+                {
+                  "[[",
+                  function() Snacks.words.jump(-vim.v.count1) end,
+                  has = "documentHighlight",
+                  desc = "lsp: prev reference",
+                  enabled = function() return Snacks.words.is_enabled() end,
+                },
+                {
+                  "<C-n>",
+                  function() Snacks.words.jump(vim.v.count1, true) end,
+                  has = "documentHighlight",
+                  desc = "lsp: next reference",
+                  enabled = function() return Snacks.words.is_enabled() end,
+                },
+                {
+                  "<C-p>",
+                  function() Snacks.words.jump(-vim.v.count1, true) end,
+                  has = "documentHighlight",
+                  desc = "lsp: prev reference",
+                  enabled = function() return Snacks.words.is_enabled() end,
+                },
               },
             },
-          },
-          bashls = {},
-          lua_ls = {
-            settings = {
-              Lua = {
-                runtime = {
-                  version = "LuaJIT",
-                  special = { reload = "require" },
-                },
-                library = { vim.env.VIMRUNTIME },
-                telemetry = { enable = false },
-                semantic = { enable = true },
-                completion = { workspaceWord = true, callSnippet = "Replace" },
-                hover = { expandAlias = false },
-                hint = {
-                  enable = true,
-                  setType = false,
-                  paramType = true,
-                  paramName = false,
-                  semicolon = "Disable",
-                  arrayIndex = "Disable",
-                },
-                doc = {
-                  privateName = { "^_" },
-                },
-                type = {
-                  castNumberToInteger = true,
-                },
-                diagnostics = {
-                  disable = { "incomplete-signature-doc", "trailing-space" },
-                  groupSeverity = {
-                    strong = "Warning",
-                    strict = "Warning",
+            bashls = {},
+            lua_ls = {
+              settings = {
+                Lua = {
+                  runtime = {
+                    version = "LuaJIT",
+                    special = { reload = "require" },
                   },
-                  groupFileStatus = {
-                    ["ambiguity"] = "Opened",
-                    ["await"] = "Opened",
-                    ["codestyle"] = "None",
-                    ["duplicate"] = "Opened",
-                    ["global"] = "Opened",
-                    ["luadoc"] = "Opened",
-                    ["redefined"] = "Opened",
-                    ["strict"] = "Opened",
-                    ["strong"] = "Opened",
-                    ["type-check"] = "Opened",
-                    ["unbalanced"] = "Opened",
-                    ["unused"] = "Opened",
+                  library = { vim.env.VIMRUNTIME },
+                  telemetry = { enable = false },
+                  semantic = { enable = true },
+                  completion = { workspaceWord = true, callSnippet = "Replace" },
+                  hover = { expandAlias = false },
+                  hint = {
+                    enable = true,
+                    setType = false,
+                    paramType = true,
+                    paramName = false,
+                    semicolon = "Disable",
+                    arrayIndex = "Disable",
                   },
-                  unusedLocalExclude = { "_*" },
-                },
-                format = {
-                  enable = true,
-                  defaultConfig = {
-                    indent_style = "space",
-                    indent_size = "2",
-                    continuation_indent_size = "2",
+                  doc = {
+                    privateName = { "^_" },
+                  },
+                  type = {
+                    castNumberToInteger = true,
+                  },
+                  diagnostics = {
+                    disable = { "incomplete-signature-doc", "trailing-space" },
+                    groupSeverity = {
+                      strong = "Warning",
+                      strict = "Warning",
+                    },
+                    groupFileStatus = {
+                      ["ambiguity"] = "Opened",
+                      ["await"] = "Opened",
+                      ["codestyle"] = "None",
+                      ["duplicate"] = "Opened",
+                      ["global"] = "Opened",
+                      ["luadoc"] = "Opened",
+                      ["redefined"] = "Opened",
+                      ["strict"] = "Opened",
+                      ["strong"] = "Opened",
+                      ["type-check"] = "Opened",
+                      ["unbalanced"] = "Opened",
+                      ["unused"] = "Opened",
+                    },
+                    unusedLocalExclude = { "_*" },
+                  },
+                  format = {
+                    enable = true,
+                    defaultConfig = {
+                      indent_style = "space",
+                      indent_size = "2",
+                      continuation_indent_size = "2",
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-    },
+      }
+    end,
     ---@param opts PluginLspOptions
     config = vim.schedule_wrap(function(_, opts)
       Util.format.register(Util.lsp.formatter())
-      Util.lsp.setup()
+
+      -- setup keymaps
+      for server, server_opts in pairs(opts.servers) do
+        if type(server_opts) == "table" and server_opts.keys then
+          require("plugins.lsp.keymaps").set({ name = server ~= "*" and server or nil }, server_opts.keys)
+        end
+      end
 
       -- inlay hints
       if opts.inlay_hints.enabled then
-        Util.lsp.on_supports_method("textDocument/inlayHint", function(_, buffer)
+        Snacks.util.lsp.on({ method = "textDocument/inlayHint" }, function(buffer)
           if
             vim.api.nvim_buf_is_valid(buffer)
             and vim.bo[buffer].buftype == ""
@@ -238,7 +326,7 @@ return {
 
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
-        Util.lsp.on_supports_method("textDocument/codeLens", function(_, buffer)
+        Snacks.util.lsp.on({ method = "textDocument/codeLens" }, function(buffer)
           vim.lsp.codelens.refresh()
           vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
             buffer = buffer,

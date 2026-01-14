@@ -47,7 +47,7 @@ return {
         gopls = function()
           -- workaround for gopls not supporting semanticTokensProvider
           -- https://github.com/golang/go/issues/54531#issuecomment-1464982242
-          Util.lsp.on_attach(function(client, _)
+          Snacks.util.lsp.on({ name = "gopls" }, function(_, client)
             if client.name == "gopls" then
               if not client.server_capabilities.semanticTokensProvider then
                 ---@type lsp.SemanticTokensClientCapabilities
