@@ -16,7 +16,8 @@ return {
       signature = { enabled = false },
       completion = {
         menu = {
-          auto_show = function(ctx, items) return vim.tbl_contains({ "scss", "css", "lua", "rust" }, vim.bo.filetype) end,
+          -- auto_show = function(ctx, items) return vim.tbl_contains({ "scss", "css", "lua", "rust" }, vim.bo.filetype) end,
+          auto_show = true,
           draw = {
             treesitter = { "lsp" },
             columns = { { "kind_icon" }, { "label", "label_description", gap = 2 } },

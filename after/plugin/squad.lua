@@ -58,7 +58,7 @@ local stop_squad ---@type fun(reason?: string, err?: string)|nil
 
 local DEFAULT_LAYOUT = SquadDSL.DEFAULT_LAYOUT
 
-local DEFAULT_CODEX_MODEL = "gpt-5.2"
+local DEFAULT_CODEX_MODEL = "gpt-5.2-codex"
 local DEFAULT_CLAUDE_MODEL = "claude-opus-4-5-20251101"
 local DEFAULT_CURSOR_MODEL = "composer-1"
 local DEFAULT_GEMINI_MODEL = "gemini-3-pro-preview"
