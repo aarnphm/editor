@@ -5,6 +5,7 @@ local enable_renderer = true
 
 return {
   { "mason-org/mason.nvim", opts = { ensure_installed = { "markdownlint", "typos" } } },
+  { "stevearc/conform.nvim", opts = { formatters_by_ft = { md = { "oxfmt" } } } },
   {
     "mfussenegger/nvim-lint",
     opts = {

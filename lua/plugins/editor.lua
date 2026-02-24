@@ -12,7 +12,7 @@ return {
     end,
   },
   {
-    "ggandor/leap.nvim",
+    url = "https://codeberg.org/andyg/leap.nvim",
     keys = {
       { "s", mode = { "n", "x", "o" }, desc = "motion: leap forward to" },
       { "S", mode = { "n", "x", "o" }, desc = "motion: leap backward to" },

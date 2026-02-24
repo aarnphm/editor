@@ -158,6 +158,7 @@ return {
           [".gitignore"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
           ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
           [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
+          [".oxlintrc.json"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
           [".node-version"] = { glyph = "", hl = "MiniIconsGreen" },
           [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
           [".yarnrc.yml"] = { glyph = "", hl = "MiniIconsBlue" },
