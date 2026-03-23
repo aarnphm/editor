@@ -680,6 +680,8 @@ local function _md_transform_paste(lines)
   return lines
 end
 
+vim.g._md_paste_hook_installed = true
+
 -- markdown-only paste hook: cleans urls and optionally converts html -> markdown.
 if vim.g._md_paste_hook_installed ~= true then
   vim.g._md_paste_hook_installed = true

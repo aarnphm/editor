@@ -47,3 +47,4 @@ zettelkasten/*
 .nvimlog
 AGENTS.md
 CLAUDE.md
+*.backup-from-hm

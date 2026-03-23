@@ -191,13 +191,6 @@ return {
                 desc = "style: format buffer",
               },
               {
-                "<leader>cC",
-                vim.lsp.codelens.refresh,
-                desc = "lsp: refresh & display codelens",
-                mode = { "n" },
-                has = "codeLens",
-              },
-              {
                 "<leader>cR",
                 function() Snacks.rename.rename_file() end,
                 desc = "lsp: rename file",
@@ -325,7 +318,7 @@ return {
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
         Snacks.util.lsp.on({ method = "textDocument/codeLens" }, function(buffer)
-          vim.lsp.codelens.refresh()
+          vim.lsp.codelens.enable(true, { bufnr = bufnr })
           vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
             buffer = buffer,
             callback = vim.lsp.codelens.refresh,
