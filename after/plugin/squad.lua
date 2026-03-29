@@ -78,6 +78,7 @@ local function parse_layout_and_agents(arg_line)
 end
 
 local CODEX_MODELS = {
+  "gpt-5.4",
   "gpt-5.2",
   "gpt-5.1-codex-max",
   "gpt-5.1-codex",
@@ -89,6 +90,8 @@ local CODEX_MODELS = {
 }
 
 local CLAUDE_MODELS = {
+  "claude-sonnet-4-6",
+  "claude-opus-4-6",
   "claude-sonnet-4-5-20250929",
   "claude-opus-4-5-20251101",
   "claude-haiku-4-5-20251001",
@@ -104,7 +107,7 @@ local CURSOR_MODELS = {
 }
 
 local GEMINI_MODELS = {
-  "gemini-3-pro",
+  "gemini-3.1-pro-review",
   "gemini-2.5-flash",
   "gemini-2.5-flash-lite",
   "gemini-2.5-pro",
@@ -113,14 +116,14 @@ local GEMINI_MODELS = {
 -- model aliases: short names -> full model IDs
 local MODEL_ALIASES = {
   -- claude aliases
-  opus = "claude-opus-4-5-20251101",
+  opus = "claude-opus-4-6",
   ["opus-4.5"] = "claude-opus-4-5-20251101",
-  sonnet = "claude-sonnet-4-5-20250929",
+  sonnet = "claude-sonnet-4-6",
   ["sonnet-4.5"] = "claude-sonnet-4-5-20250929",
   haiku = "claude-haiku-4-5-20251001",
   ["haiku-4.5"] = "claude-haiku-4-5-20251001",
   -- gemini aliases
-  ["gemini-3"] = "gemini-3-pro",
+  ["gemini-3"] = "gemini-3.1-pro-review",
 }
 
 local function resolve_model_alias(model)

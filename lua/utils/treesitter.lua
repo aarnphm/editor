@@ -100,6 +100,14 @@ local function win_find_cl()
   return vim.fn.globpath(path, pattern, true, true)[1]
 end
 
+local function treesitter_cli_works()
+  if vim.fn.executable "tree-sitter" ~= 1 then return false end
+  local ok, res = pcall(vim.system, { "tree-sitter", "--version" }, { timeout = 3000 })
+  if not ok then return false end
+  local out = res:wait()
+  return out.code == 0
+end
+
 ---@return boolean ok, lazyvim.util.treesitter.Health health
 function M.check()
   local is_win = vim.fn.has "win32" == 1
@@ -116,7 +124,7 @@ function M.check()
 
   ---@class lazyvim.util.treesitter.Health: table<string,boolean>
   local ret = {
-    ["tree-sitter (CLI)"] = have "tree-sitter",
+    ["tree-sitter (CLI)"] = treesitter_cli_works(),
     ["C compiler"] = have_cc,
     tar = have "tar",
     curl = have "curl",
@@ -156,33 +164,48 @@ function M.build(cb)
 end
 
 ---@param cb fun(ok:boolean, err?:string)
-function M.ensure_treesitter_cli(cb)
-  if vim.fn.executable "tree-sitter" == 1 then return cb(true) end
-
-  -- try installing with mason
-  if not pcall(require, "mason") then
-    return cb(false, "`mason.nvim` is disabled in your config, so we cannot install it automatically.")
+local function install_with_cargo(cb)
+  if vim.fn.executable "cargo" ~= 1 then
+    return cb(false, "No `cargo` found. Install Rust via https://rustup.rs then retry.")
   end
+  Util.info("Compiling `tree-sitter-cli` with cargo (this takes ~60s)...", { title = "treesitter" })
+  vim.system({ "cargo", "install", "tree-sitter-cli" }, {}, vim.schedule_wrap(function(out)
+    if out.code == 0 and treesitter_cli_works() then
+      Util.info("Installed `tree-sitter-cli` via cargo.", { title = "treesitter" })
+      cb(true)
+    else
+      cb(false, "`cargo install tree-sitter-cli` failed:\n" .. (out.stderr or ""))
+    end
+  end))
+end
 
-  -- check again since we might have installed it already
-  if vim.fn.executable "tree-sitter" == 1 then return cb(true) end
+---@param cb fun(ok:boolean, err?:string)
+function M.ensure_treesitter_cli(cb)
+  if treesitter_cli_works() then return cb(true) end
+
+  -- try mason first (instant download), fall back to cargo (compiles from source)
+  if not pcall(require, "mason") then return install_with_cargo(cb) end
 
   local mr = require "mason-registry"
   mr.refresh(function()
     local p = mr.get_package "tree-sitter-cli"
+
+    -- mason binary exists but broken (glibc mismatch), remove it
+    if p:is_installed() and not treesitter_cli_works() then pcall(function() p:uninstall() end) end
+
     if not p:is_installed() then
-      Util.info "Installing `tree-sitter-cli` with `mason.nvim`..."
-      p:install(
-        nil,
-        vim.schedule_wrap(function(success)
-          if success then
-            Util.info "Installed `tree-sitter-cli` with `mason.nvim`."
-            cb(true)
-          else
-            cb(false, "Failed to install `tree-sitter-cli` with `mason.nvim`.")
-          end
-        end)
-      )
+      Util.info "Installing `tree-sitter-cli` with mason..."
+      p:install(nil, vim.schedule_wrap(function(success)
+        if success and treesitter_cli_works() then
+          Util.info "Installed `tree-sitter-cli` with mason."
+          return cb(true)
+        end
+        -- mason binary doesn't work, clean up and try cargo
+        if p:is_installed() then pcall(function() p:uninstall() end) end
+        install_with_cargo(cb)
+      end))
+    else
+      install_with_cargo(cb)
     end
   end)
 end
