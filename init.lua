@@ -65,6 +65,6 @@ vim.opt.runtimepath:prepend(lazypath)
 require("utils").setup {
   spec = { { import = "plugins" } },
   change_detection = { notify = false },
-  ui = { border = "none", backdrop = 100, wrap = false },
+  ui = { border = "single", backdrop = 100, wrap = false },
   dev = { path = "~/workspace/neovim-plugins/" },
 }
