@@ -1,14 +1,19 @@
 return {
   {
     "saghen/blink.cmp",
-    version = false,
+    version = "1.*",
     build = "cargo build --release",
+    opts_extend = {
+      "sources.completion.enabled_providers",
+      "sources.compat",
+      "sources.default",
+    },
     dependencies = {
       "rafamadriz/friendly-snippets",
       "moyiz/blink-emoji.nvim",
+      "saghen/blink.lib",
     },
     event = "InsertEnter",
-    opts_extend = { "sources.default" },
     ---@type blink.cmp.Config
     opts = {
       fuzzy = { implementation = "rust" },

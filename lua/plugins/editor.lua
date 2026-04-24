@@ -1,19 +1,11 @@
 return {
   {
-    "ggandor/flit.nvim",
-    opts = { labeled_modes = "nx" },
-    keys = function()
-      ---@type LazyKeysSpec[]
-      local ret = {}
-      for _, key in ipairs { "f", "F", "t", "T" } do
-        ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-      end
-      return ret
-    end,
-  },
-  {
     url = "https://codeberg.org/andyg/leap.nvim",
     keys = {
+      { "f", mode = { "n", "x", "o" }, desc = "motion: leap forward to char" },
+      { "F", mode = { "n", "x", "o" }, desc = "motion: leap backward to char" },
+      { "t", mode = { "n", "x", "o" }, desc = "motion: leap forward till char" },
+      { "T", mode = { "n", "x", "o" }, desc = "motion: leap backward till char" },
       { "s", mode = { "n", "x", "o" }, desc = "motion: leap forward to" },
       { "S", mode = { "n", "x", "o" }, desc = "motion: leap backward to" },
       -- Linewise.
@@ -21,18 +13,30 @@ return {
         "gA",
         'V<cmd>lua require("leap.treesitter").select()<cr>',
         mode = { "n", "x", "o" },
-        desc = "motion: leap treesiter (linewise)",
+        desc = "motion: leap treesitter (linewise)",
       },
       {
         "ga",
         function()
-          local sk = vim.deepcopy(require("leap").opts.special_keys) ---@type LeapSpecialKeys
-          -- The items in `special_keys` can be both strings or tables - the
-          -- shortest workaround might be the below one:
-          sk.next_target = vim.fn.flatten(vim.list_extend({ "a" }, { sk.next_target }))
-          sk.prev_target = vim.fn.flatten(vim.list_extend({ "A" }, { sk.prev_target }))
+          ---@param key string
+          ---@param keys LeapKey
+          ---@return string[]
+          local function prepend_key(key, keys)
+            local ret = { key }
+            if type(keys) == "table" then
+              vim.list_extend(ret, keys)
+            else
+              ret[#ret + 1] = keys
+            end
+            return ret
+          end
 
-          require("leap.treesitter").select { opts = { special_keys = sk } }
+          ---@type LeapKeys
+          local sk = vim.deepcopy(require("leap").opts.keys)
+          sk.next_target = prepend_key("a", sk.next_target)
+          sk.prev_target = prepend_key("A", sk.prev_target)
+
+          require("leap.treesitter").select { opts = { keys = sk } }
         end,
         mode = { "n", "x", "o" },
         desc = "motion: leap treesitter",
@@ -60,9 +64,56 @@ return {
       for key, val in pairs(opts) do
         leap.opts[key] = val
       end
-      vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
-      vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
-      vim.keymap.set("n", "gs", "<Plug>(leap-from-window)")
+
+      local function ft_safe_labels()
+        local mode = vim.fn.mode(1)
+        if mode == "n" or mode == "v" or mode == "V" or mode == "\22" then return nil end
+        return ""
+      end
+
+      local function ft(key_specific_args)
+        leap.leap(vim.tbl_deep_extend("keep", key_specific_args, {
+          inputlen = 1,
+          inclusive = true,
+          opts = {
+            labels = "",
+            safe_labels = ft_safe_labels(),
+            vim_opts = { ["go.ignorecase"] = false },
+          },
+        }))
+      end
+
+      local clever = require("leap.user").with_traversal_keys
+      local clever_f = clever("f", "F")
+      local clever_t = clever("t", "T")
+
+      vim.keymap.set(
+        { "n", "x", "o" },
+        "f",
+        function() ft { opts = clever_f } end,
+        { desc = "motion: leap forward to char" }
+      )
+      vim.keymap.set(
+        { "n", "x", "o" },
+        "F",
+        function() ft { backward = true, opts = clever_f } end,
+        { desc = "motion: leap backward to char" }
+      )
+      vim.keymap.set(
+        { "n", "x", "o" },
+        "t",
+        function() ft { offset = -1, opts = clever_t } end,
+        { desc = "motion: leap forward till char" }
+      )
+      vim.keymap.set(
+        { "n", "x", "o" },
+        "T",
+        function() ft { backward = true, offset = 1, opts = clever_t } end,
+        { desc = "motion: leap backward till char" }
+      )
+      vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)", { desc = "motion: leap forward to" })
+      vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)", { desc = "motion: leap backward to" })
+      vim.keymap.set("n", "gs", "<Plug>(leap-from-window)", { desc = "motion: leap from window" })
     end,
   },
   {
@@ -256,7 +307,7 @@ return {
       win = { border = "single" },
       spec = {
         { "<BS>", desc = "treesitter: decrement selection", mode = "x" },
-        { "<c-space>", desc = "treesiter: increment selection", mode = { "x", "n" } },
+        { "<c-space>", desc = "treesitter: increment selection", mode = { "x", "n" } },
         {
           mode = { "n", "v" },
           { "<leader>a", group = "avante", icon = { icon = " ", color = "cyan" } },
@@ -268,7 +319,7 @@ return {
           { "<leader>q", group = "quit/session" },
           { "<leader>s", group = "search" },
           { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
-          { "<leader>x", group = "dignostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+          { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
           { "[", group = "prev" },
           { "]", group = "next" },
           { "g", group = "goto" },
@@ -312,6 +363,14 @@ return {
     ---@type dropbar_configs_t
     opts = {
       bar = {
+        update_events = {
+          buf = {
+            "FileChangedShellPost",
+            "TextChanged",
+            "ModeChanged",
+            "BufWritePost",
+          },
+        },
         enable = function(buf, win, _)
           if
             not vim.api.nvim_buf_is_valid(buf)
@@ -342,7 +401,8 @@ return {
         end,
       },
     },
-    config = function()
+    config = function(_, opts)
+      require("dropbar").setup(opts)
       vim.keymap.set("n", "<leader>;", '<cmd>lua require("dropbar.api").pick()<cr>', { desc = "dropbar: pick" })
     end,
   },

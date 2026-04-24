@@ -13,7 +13,7 @@ return {
     opts = function()
       return {
         toggle = { map = Util.safe_keymap_set },
-        bigfile = { enabled = true, line_length = 1000 },
+        bigfile = { enabled = true, size = 1.5 * 1024 * 1024, line_length = 1000 },
         notifier = { enabled = false },
         input = { enabled = true },
         image = { enabled = false, math = { enabled = false }, convert = { notify = false } },

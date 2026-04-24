@@ -64,21 +64,23 @@ function vim.keymap.set(mode, lhs, rhs, opts) end
 ---@field is_scratch_buffer fun(buf: integer): boolean
 
 ---we need to add hints for leap.nvim
----@class LeapSpecialKeys
----@field next_target string
----@field prev_target string[]
----@field next_group string
----@field prev_group string[]
+---@alias LeapKey string|string[]
+---
+---@class LeapKeys
+---@field next_target LeapKey
+---@field prev_target LeapKey
+---@field next_group LeapKey
+---@field prev_group LeapKey
 ---
 ---@class LeapOpts: table<string, any>
 ---@field preview_filter nil | fun(...): any
 ---@field max_highlighted_traversal_targets number
----@field cas_sensitive boolean
 ---@field equivalence_classes string[]
 ---@field substitute_chars table<string, string>
----@field safe_labels string[]
----@field labels string[]
----@field special_keys LeapSpecialKeys
+---@field safe_labels string|string[]|nil
+---@field labels string|string[]
+---@field keys LeapKeys
+---@field vim_opts table<string, boolean|integer|string|fun(...): any>
 ---
 ---@class Leap
 ---@field opts LeapOpts
