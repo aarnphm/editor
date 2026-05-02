@@ -531,5 +531,34 @@ return {
       _new_sign_calc = true,
       _refresh_staged_on_update = true,
     },
+    config = function(_, opts)
+      require("gitsigns").setup(opts)
+
+      -- Git LFS smudge shim: gitsigns reads the index/HEAD blob with `git show`,
+      -- which returns the raw LFS pointer. The buffer is the smudged content,
+      -- so the diff treats every line as changed. Detect pointer text in the
+      -- result and pipe it through `git lfs smudge` to recover the real bytes.
+      if vim.fn.executable "git-lfs" ~= 1 then return end
+
+      local Obj = require("gitsigns.git").Obj
+      local original = Obj.get_show_text
+      local pointer_prefix = "version https://git-lfs.github.com/spec/"
+
+      function Obj:get_show_text(revision, relpath)
+        local stdout, stderr = original(self, revision, relpath)
+        if not (stdout and stdout[1] and vim.startswith(stdout[1], pointer_prefix)) then
+          return stdout, stderr
+        end
+        local path = relpath or self.relpath
+        if not path then return stdout, stderr end
+        local stdin = table.concat(stdout, "\n") .. "\n"
+        local smudged, _, code = self.repo:command(
+          { "lfs", "smudge", "--", path },
+          { stdin = stdin, ignore_error = true }
+        )
+        if code == 0 and smudged then return smudged, stderr end
+        return stdout, stderr
+      end
+    end,
   },
 }

@@ -288,6 +288,33 @@ return {
           require("mini." .. module).setup(config)
         end
       end)
+
+      -- Git LFS shim for mini.diff: gen_source.git fetches the index version via
+      -- `git show :0:./<file>`, which returns the raw LFS pointer for tracked
+      -- files. Wrap set_ref_text so we detect pointer text and smudge it back
+      -- to real content before the differ runs.
+      if opts.diff and opts.diff.enabled ~= false and vim.fn.executable "git-lfs" == 1 then
+        local mini_diff = require "mini.diff"
+        local original = mini_diff.set_ref_text
+        local prefix = "version https://git-lfs.github.com/spec/"
+        mini_diff.set_ref_text = function(buf_id, text)
+          local s = type(text) == "table" and table.concat(text, "\n") or text
+          if type(s) == "string" and s:sub(1, #prefix) == prefix then
+            local path = vim.api.nvim_buf_get_name(buf_id)
+            if path ~= "" then
+              local r = vim
+                .system({ "git", "lfs", "smudge", "--", vim.fn.fnamemodify(path, ":t") }, {
+                  cwd = vim.fn.fnamemodify(path, ":h"),
+                  stdin = s,
+                  text = true,
+                })
+                :wait()
+              if r.code == 0 and r.stdout and r.stdout ~= "" then return original(buf_id, r.stdout) end
+            end
+          end
+          return original(buf_id, text)
+        end
+      end
     end,
   },
 }
