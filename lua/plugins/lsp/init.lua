@@ -296,6 +296,37 @@ return {
     config = vim.schedule_wrap(function(_, opts)
       Util.format.register(Util.lsp.formatter())
 
+      local function clear_vim_nil(value)
+        if type(value) ~= "table" then return end
+        for key, child in pairs(value) do
+          if child == vim.NIL then
+            value[key] = nil
+          else
+            clear_vim_nil(child)
+          end
+        end
+      end
+
+      local function normalize_file_operation_filters(client)
+        local workspace = client.server_capabilities and client.server_capabilities.workspace
+        local file_operations = workspace and workspace.fileOperations
+        if type(file_operations) ~= "table" then return end
+
+        clear_vim_nil(file_operations)
+      end
+
+      local file_operation_group = vim.api.nvim_create_augroup("lsp_file_operation_filters", { clear = true })
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = file_operation_group,
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client then normalize_file_operation_filters(client) end
+        end,
+      })
+      for _, client in ipairs(vim.lsp.get_clients()) do
+        normalize_file_operation_filters(client)
+      end
+
       -- setup keymaps
       for server, server_opts in pairs(opts.servers) do
         if type(server_opts) == "table" and server_opts.keys then
