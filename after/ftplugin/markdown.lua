@@ -422,275 +422,60 @@ vim.keymap.set(
 ---@param url string
 ---@return string
 local function _md_clean_url(url)
-  local s = vim.trim(url or "")
-  if s == "" then return s end
-
-  -- common markdown autolink wrapper
-  s = s:gsub("^<", ""):gsub(">$", "")
-
-  -- only strip `curius` tracking param; keep all other query params and fragments.
-  local base, fragment = s:match "^(.-)(#.*)$"
+  local base, fragment = url:match "^(.-)(#.*)$"
   if not base then
-    base = s
+    base = url
     fragment = ""
   end
+
   local before_query, query = base:match "^(.-)%?(.*)$"
-  if before_query then
-    local kept = {}
-    for part in query:gmatch "[^&]+" do
-      local name = part:match "^([^=]+)"
-      if name ~= "curius" then table.insert(kept, part) end
-    end
-    if #kept > 0 then
-      s = before_query .. "?" .. table.concat(kept, "&") .. fragment
-    else
-      s = before_query .. fragment
-    end
-  else
-    s = base .. fragment
+  if not before_query then return base .. fragment end
+
+  local kept = {}
+  for part in query:gmatch "[^&]+" do
+    local name = part:match "^([^=]+)"
+    if name ~= "curius" then table.insert(kept, part) end
   end
-
-  -- if it's just a domain root, drop the trailing slash for aesthetics.
-  local scheme, rest = s:match "^([%a][%w+.-]*)://(.+)$"
-  if scheme then
-    local host, path = rest:match "^([^/]+)(/.*)$"
-    if host and path == "/" then return string.format("%s://%s", scheme, host) end
-    return s
-  end
-
-  local host, path = s:match "^([^/]+)(/.*)$"
-  if host and path == "/" then return host end
-  return s
-end
-
----@param text string
----@return boolean
-local function _md_is_bare_url(text)
-  local s = vim.trim(text or "")
-  if s == "" then return false end
-  if s:find "%s" then return false end
-
-  if s:match "^https?://%S+$" then return true end
-  if s:match "^www%.%S+$" then return true end
-  if s:match "^[%w%-%._~]+%.[%a][%w%-]+%S*$" then return true end
-  return false
+  if #kept == 0 then return before_query .. fragment end
+  return before_query .. "?" .. table.concat(kept, "&") .. fragment
 end
 
 ---@param text string
 ---@return string
-local function _md_decode_html_entities(text)
-  local s = text
-  s = s:gsub("&nbsp;", " ")
-  s = s:gsub("&amp;", "&")
-  s = s:gsub("&lt;", "<")
-  s = s:gsub("&gt;", ">")
-  s = s:gsub("&quot;", '"')
-  s = s:gsub("&#39;", "'")
-  s = s:gsub("&#(%d+);", function(n)
-    local nr = tonumber(n)
-    if not nr then return "" end
-    return vim.fn.nr2char(nr)
-  end)
-  s = s:gsub("&#x([0-9A-Fa-f]+);", function(hex)
-    local nr = tonumber(hex, 16)
-    if not nr then return "" end
-    return vim.fn.nr2char(nr)
-  end)
-  return s
+local function _md_clean_url_token(text)
+  local url, suffix = text:match "^(.+)([.,;:!?])$"
+  if not url then return _md_clean_url(text) end
+  return _md_clean_url(url) .. suffix
 end
 
 ---@param text string
 ---@return string
-local function _md_html_inline_to_markdown(text)
-  local s = text
-
-  -- links
-  s = s:gsub("<%s*[aA][^>]-href%s*=%s*([\"'])(.-)%1[^>]*>([%s%S]-)</%s*[aA]%s*>", function(_, href, inner)
-    local label = _md_html_inline_to_markdown(inner)
-    label = label:gsub("%s+", " ")
-    label = vim.trim(label)
-    local cleaned = _md_clean_url(href)
-    if label == "" then return cleaned end
-    return string.format("[%s](%s)", label, cleaned)
-  end)
-
-  -- basic emphasis
-  s = s:gsub("<%s*[sS][tT][rR][oO][nN][gG][^>]*>([%s%S]-)</%s*[sS][tT][rR][oO][nN][gG]%s*>", "**%1**")
-  s = s:gsub("<%s*[bB][^>]*>([%s%S]-)</%s*[bB]%s*>", "**%1**")
-  s = s:gsub("<%s*[eE][mM][^>]*>([%s%S]-)</%s*[eE][mM]%s*>", "*%1*")
-  s = s:gsub("<%s*[iI][^>]*>([%s%S]-)</%s*[iI]%s*>", "*%1*")
-
-  -- inline code (do this after emphasis to avoid backticks getting emphasized)
-  s = s:gsub("<%s*[cC][oO][dD][eE][^>]*>([%s%S]-)</%s*[cC][oO][dD][eE]%s*>", function(inner)
-    local decoded = _md_decode_html_entities(inner)
-    decoded = decoded:gsub("%s+", " ")
-    decoded = vim.trim(decoded)
-    decoded = decoded:gsub("`", "\\`")
-    return "`" .. decoded .. "`"
-  end)
-
-  -- strip remaining tags
-  s = s:gsub("<[^>]+>", "")
-  s = _md_decode_html_entities(s)
-  return s
-end
-
----@param html string
----@return string
-local function _md_html_to_markdown(html)
-  local input = (html or ""):gsub("\r\n", "\n"):gsub("\r", "\n")
-  if input == "" then return input end
-
-  -- if pandoc exists, prefer it for correctness.
-  if vim.fn.executable "pandoc" == 1 then
-    local res = vim
-      .system({ "pandoc", "-f", "html", "-t", "gfm", "--wrap=none" }, { stdin = input, text = true })
-      :wait()
-    if res.code == 0 and res.stdout and res.stdout ~= "" then return vim.trim(res.stdout) end
-  end
-
-  local s = input
-  s = s:gsub("<!%-%-[%s%S]-%-%->", "")
-  s = s:gsub("<%s*[sS][cC][rR][iI][pP][tT][^>]*>[%s%S]-</%s*[sS][cC][rR][iI][pP][tT]%s*>", "")
-  s = s:gsub("<%s*[sS][tT][yY][lL][eE][^>]*>[%s%S]-</%s*[sS][tT][yY][lL][eE]%s*>", "")
-  s = s:gsub("<%s*[bB][rR]%s*/?%s*>", "\n")
-
-  -- code blocks
-  s = s:gsub(
-    "<%s*[pP][rR][eE][^>]*>%s*<%s*[cC][oO][dD][eE]([^>]*)>([%s%S]-)</%s*[cC][oO][dD][eE]%s*>%s*</%s*[pP][rR][eE]%s*>",
-    function(attrs, code)
-      local lang = attrs:match "language%-([%w_+-]+)" or attrs:match 'lang%s*=%s*"([^"]+)"'
-      local decoded = _md_decode_html_entities(code)
-      decoded = decoded:gsub("\n+$", "")
-      return string.format("\n```%s\n%s\n```\n", lang or "", decoded)
-    end
-  )
-  s = s:gsub("<%s*[pP][rR][eE][^>]*>([%s%S]-)</%s*[pP][rR][eE]%s*>", function(code)
-    local decoded = _md_decode_html_entities(code)
-    decoded = decoded:gsub("\n+$", "")
-    return string.format("\n```\n%s\n```\n", decoded)
-  end)
-
-  -- headings
-  s = s:gsub("<%s*[hH]([1-6])[^>]*>([%s%S]-)</%s*[hH]%1%s*>", function(level, inner)
-    local hashes = string.rep("#", tonumber(level) or 1)
-    local md = _md_html_inline_to_markdown(inner):gsub("\n+", " ")
-    md = vim.trim(md)
-    return string.format("\n%s %s\n\n", hashes, md)
-  end)
-
-  -- blockquotes (best-effort, single level)
-  s = s:gsub(
-    "<%s*[bB][lL][oO][cC][kK][qQ][uU][oO][tT][eE][^>]*>([%s%S]-)</%s*[bB][lL][oO][cC][kK][qQ][uU][oO][tT][eE]%s*>",
-    function(inner)
-      local md = _md_html_to_markdown(inner)
-      md = md:gsub("\n", "\n> ")
-      md = vim.trim(md)
-      return "\n> " .. md .. "\n\n"
-    end
-  )
-
-  -- lists (best-effort, flatten nested lists)
-  s = s:gsub("<%s*/%s*[uU][lL]%s*>", "\n")
-  s = s:gsub("<%s*/%s*[oO][lL]%s*>", "\n")
-  s = s:gsub("<%s*[uU][lL][^>]*>", "\n")
-  s = s:gsub("<%s*[oO][lL][^>]*>", "\n")
-  s = s:gsub("<%s*[lL][iI][^>]*>", "\n- ")
-  s = s:gsub("</%s*[lL][iI]%s*>", "")
-
-  -- paragraphs / divs
-  s = s:gsub("</%s*[pP]%s*>", "\n\n")
-  s = s:gsub("<%s*[pP][^>]*>", "")
-  s = s:gsub("</%s*[dD][iI][vV]%s*>", "\n\n")
-  s = s:gsub("<%s*[dD][iI][vV][^>]*>", "")
-
-  -- remaining inline
-  s = _md_html_inline_to_markdown(s)
-
-  -- normalize whitespace
-  s = s:gsub("[ \t]+\n", "\n")
-  s = s:gsub("\n\n\n+", "\n\n")
-  return vim.trim(s)
-end
-
----@param raw string
----@param md string
----@return boolean
-local function _md_markdown_is_richer(raw, md)
-  local a = vim.trim(raw or "")
-  local b = vim.trim(md or "")
-  if b == "" then return false end
-  if a == b then return false end
-
-  -- common markdown "signals" that don't exist in plain text copies.
-  if b:find "%]%(" and not a:find "%]%(" then return true end -- links
-  if b:find "```" and not a:find "```" then return true end -- code fences
-  if b:find "\n%- " and not a:find "\n%- " then return true end -- lists
-  return false
-end
-
----@return string?
-local function _md_clipboard_rtf_to_markdown()
-  if vim.uv.os_uname().sysname ~= "Darwin" then return nil end
-  if vim.fn.executable "pbpaste" ~= 1 then return nil end
-  if vim.fn.executable "textutil" ~= 1 then return nil end
-
-  local rtf_res = vim.system({ "pbpaste", "-Prefer", "rtf" }, { text = true }):wait()
-  if rtf_res.code ~= 0 or not rtf_res.stdout then return nil end
-
-  local rtf = rtf_res.stdout
-  if not rtf:match "^%{%s*\\rtf" then return nil end
-
-  local html_res = vim
-    .system({ "textutil", "-convert", "html", "-stdin", "-stdout" }, { stdin = rtf, text = true })
-    :wait()
-  if html_res.code ~= 0 or not html_res.stdout then return nil end
-
-  local md = _md_html_to_markdown(html_res.stdout)
-  if vim.trim(md) == "" then return nil end
-  return md
+local function _md_clean_pasted_urls(text)
+  text = text:gsub("https?://[^%s<>()%[%]{}\"']+", _md_clean_url_token)
+  text = text:gsub("www%.[^%s<>()%[%]{}\"']+", _md_clean_url_token)
+  return text
 end
 
 ---@param lines string[]
 ---@return string[]
 local function _md_transform_paste(lines)
   local raw = table.concat(lines or {}, "\n")
-  local trimmed = vim.trim(raw)
-  if trimmed == "" then return lines end
-
-  -- if it's a bare url, strip tracking params.
-  if _md_is_bare_url(trimmed) then return { _md_clean_url(trimmed) } end
-
-  -- if it's a markdown link / autolink, still clean the url portion.
-  local cleaned = trimmed
-  cleaned = cleaned:gsub("<(https?://[^>]+)>", function(url) return "<" .. _md_clean_url(url) .. ">" end)
-  cleaned = cleaned:gsub("%((https?://[^%s)]+)%)", function(url) return "(" .. _md_clean_url(url) .. ")" end)
-  if cleaned ~= trimmed then return vim.split(cleaned, "\n", { plain = true, trimempty = false }) end
-
-  -- if you copied markdown already, don't try to "upgrade" it from rtf.
-  if trimmed:find "%]%(" or trimmed:find "```" then return lines end
-
-  -- macos: rich clipboard types often store a better version as rtf, which we can
-  -- roundtrip through html and then down to markdown.
-  local rtf_md = _md_clipboard_rtf_to_markdown()
-  if rtf_md and _md_markdown_is_richer(raw, rtf_md) then
-    return vim.split(rtf_md, "\n", { plain = true, trimempty = false })
-  end
-
-  return lines
+  local cleaned = _md_clean_pasted_urls(raw)
+  if cleaned == raw then return lines end
+  return vim.split(cleaned, "\n", { plain = true, trimempty = false })
 end
 
-vim.g._md_paste_hook_installed = true
+local _md_paste_hook_version = 2
 
--- markdown-only paste hook: cleans urls and optionally converts html -> markdown.
-if vim.g._md_paste_hook_installed ~= true then
-  vim.g._md_paste_hook_installed = true
+if vim.g._md_paste_hook_version ~= _md_paste_hook_version then
+  vim.g._md_paste_hook_version = _md_paste_hook_version
 
   vim.paste = (function(overridden)
-    ---@type string[]
-    local chunked = {}
+    local chunked = ""
 
     return function(lines, phase)
+      phase = phase or -1
+
       -- don't mess with cmdline pastes, it gets weird fast.
       if vim.fn.getcmdtype() ~= "" then return overridden(lines, phase) end
 
@@ -700,13 +485,13 @@ if vim.g._md_paste_hook_installed ~= true then
       local is_first_chunk = phase < 2
       local is_last_chunk = phase == -1 or phase == 3
 
-      if is_first_chunk then chunked = {} end
-      vim.list_extend(chunked, lines)
+      if is_first_chunk then chunked = "" end
+      chunked = chunked .. table.concat(lines, "\n")
 
       if not is_last_chunk then return true end
 
-      local transformed = _md_transform_paste(chunked)
-      chunked = {}
+      local transformed = _md_transform_paste(vim.split(chunked, "\n", { plain = true, trimempty = false }))
+      chunked = ""
       return overridden(transformed, -1)
     end
   end)(vim.paste)

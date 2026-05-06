@@ -229,7 +229,6 @@ return {
             },
           },
           bashls = {},
-          mojo = {},
           lua_ls = {
             settings = {
               Lua = {
