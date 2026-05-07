@@ -139,7 +139,7 @@ return {
         -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
         -- Be aware that you also will need to properly configure your LSP server to
         -- provide the code lenses.
-        codelens = { enabled = true },
+        codelens = { enabled = true, inline = true },
         -- Enable lsp cursor word highlighting
         document_highlight = { enabled = true },
         -- LSP Server Settings
@@ -347,20 +347,7 @@ return {
       end
 
       -- code lens
-      if opts.codelens.enabled and vim.lsp.codelens then
-        local codelens_group = vim.api.nvim_create_augroup("lsp_codelens_refresh", { clear = true })
-        local function refresh_codelens(buffer) vim.lsp.codelens.enable(true, { bufnr = buffer }) end
-
-        Snacks.util.lsp.on({ method = "textDocument/codeLens" }, function(buffer)
-          refresh_codelens(buffer)
-          vim.api.nvim_clear_autocmds { group = codelens_group, buffer = buffer }
-          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-            group = codelens_group,
-            buffer = buffer,
-            callback = function() refresh_codelens(buffer) end,
-          })
-        end)
-      end
+      if opts.codelens.enabled and vim.lsp.codelens then Util.lsp.codelens.setup(opts.codelens) end
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 

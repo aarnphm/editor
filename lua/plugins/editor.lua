@@ -546,9 +546,7 @@ return {
 
       function Obj:get_show_text(revision, relpath)
         local stdout, stderr = original(self, revision, relpath)
-        if not (stdout and stdout[1] and vim.startswith(stdout[1], pointer_prefix)) then
-          return stdout, stderr
-        end
+        if not (stdout and stdout[1] and vim.startswith(stdout[1], pointer_prefix)) then return stdout, stderr end
         local path = relpath or self.relpath
         if not path then return stdout, stderr end
         local stdin = table.concat(stdout, "\n") .. "\n"

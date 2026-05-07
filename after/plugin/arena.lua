@@ -94,8 +94,8 @@ local function ensure_arena_meta(bufnr, initial_tick, auto_save)
   if not vim.api.nvim_buf_is_valid(bufnr) then return end
   if vim.api.nvim_buf_get_changedtick(bufnr) ~= initial_tick then return end
 
-  local ok, parser = pcall(vim.treesitter.get_parser, bufnr, "markdown", {})
-  if not ok or not parser then return end
+  local parser_ok, parser = pcall(vim.treesitter.get_parser, bufnr, "markdown", {})
+  if not parser_ok or not parser then return end
 
   local tree = parser:parse()[1]
   if not tree then return end

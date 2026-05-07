@@ -84,9 +84,9 @@ local function any_lua_match(match, _, source, predicate)
   return check_nodes(match, source, predicate, true, function(text, pred) return text:find(pred[3]) ~= nil end)
 end
 
-local function match(match, _, source, predicate)
+local function match(captures, _, source, predicate)
   return check_nodes(
-    match,
+    captures,
     source,
     predicate,
     false,
@@ -94,9 +94,9 @@ local function match(match, _, source, predicate)
   )
 end
 
-local function any_match(match, _, source, predicate)
+local function any_match(captures, _, source, predicate)
   return check_nodes(
-    match,
+    captures,
     source,
     predicate,
     true,
@@ -104,8 +104,8 @@ local function any_match(match, _, source, predicate)
   )
 end
 
-local function contains(match, _, source, predicate)
-  return check_nodes(match, source, predicate, false, function(text, pred)
+local function contains(captures, _, source, predicate)
+  return check_nodes(captures, source, predicate, false, function(text, pred)
     for i = 3, #pred do
       if not text:find(pred[i], 1, true) then return false end
     end
@@ -113,8 +113,8 @@ local function contains(match, _, source, predicate)
   end)
 end
 
-local function any_contains(match, _, source, predicate)
-  return check_nodes(match, source, predicate, true, function(text, pred)
+local function any_contains(captures, _, source, predicate)
+  return check_nodes(captures, source, predicate, true, function(text, pred)
     for i = 3, #pred do
       if text:find(pred[i], 1, true) then return true end
     end
@@ -122,8 +122,8 @@ local function any_contains(match, _, source, predicate)
   end)
 end
 
-local function any_of(match, _, source, predicate)
-  local nodes = match[predicate[2]]
+local function any_of(captures, _, source, predicate)
+  local nodes = captures[predicate[2]]
   if not nodes or #nodes == 0 then return true end
 
   predicate.string_set = predicate.string_set or {}

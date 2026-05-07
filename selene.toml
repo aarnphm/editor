@@ -1,4 +1,4 @@
-std = "lua52+vim"
+std = "vim"
 [lints]
 multiple_statements = "allow"
 global_usage = "allow"

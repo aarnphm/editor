@@ -1,0 +1,42 @@
+---
+base: lua52
+lua_versions:
+  - luajit
+globals:
+  vim:
+    any: true
+  jit:
+    any: true
+  Util:
+    any: true
+  Snacks:
+    any: true
+  MiniStatusline:
+    any: true
+  MiniIcons:
+    any: true
+  MiniFiles:
+    any: true
+  MiniHipatterns:
+    any: true
+  VAULTS:
+    any: true
+  load:
+    any: true
+  augroup:
+    args:
+      - type: string
+  hi:
+    args:
+      - type: string
+      - type: table
+  describe:
+    any: true
+  it:
+    any: true
+  before_each:
+    any: true
+  after_each:
+    any: true
+  assert:
+    any: true

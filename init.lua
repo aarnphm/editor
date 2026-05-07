@@ -6,6 +6,11 @@ _G.hi = function(name, opts)
   vim.api.nvim_set_hl(0, name, opts)
 end
 
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 local background = os.getenv "XDG_SYSTEM_THEME"
 vim.go.background = background ~= nil and background or "dark"
 if vim.uv.os_uname().sysname == "Darwin" then
@@ -65,6 +70,7 @@ vim.opt.runtimepath:prepend(lazypath)
 
 require("utils").setup {
   spec = { { import = "plugins" } },
+  rocks = { enabled = false },
   change_detection = { notify = false },
   ui = { border = "single", backdrop = 100, wrap = false },
   dev = { path = "~/workspace/neovim-plugins/" },

@@ -35,7 +35,7 @@ local Util = require "utils"
 local async = require "plenary.async"
 local async_util = require "plenary.async.util"
 local scheduler = async_util.scheduler
-local uv = vim.loop
+local uv = vim.uv
 local SquadDSL = require "utils.squad.dsl"
 local SquadComplete = require "utils.squad.complete"
 
@@ -67,8 +67,6 @@ local DEFAULT_SQUAD_SPEC = string.format("codex::1[model=%s]", DEFAULT_CODEX_MOD
 local LAYOUT_ALIASES = SquadDSL.LAYOUT_ALIASES
 
 local trim = SquadDSL.trim
-local last_top_level_chunk = SquadDSL.last_top_level_chunk
-local trailing_unmatched_segment = SquadDSL.trailing_unmatched_segment
 
 local function parse_layout_and_agents(arg_line)
   return SquadDSL.parse_layout_and_agents(arg_line, {
@@ -334,7 +332,7 @@ local function worktree_exists(path)
   return false
 end
 
-local function create_worktree(name, source_path)
+local function create_worktree(name)
   local ok, err = validate_worktree_name(name)
   if not ok then return nil, err end
 
@@ -836,9 +834,7 @@ local function create_vertical_layout(panels, layout)
     local right_panels = {}
 
     for _, panel in ipairs(panels) do
-      if panel.position == "left" then
-        table.insert(left_panels, panel)
-      elseif panel.position == "right" then
+      if panel.position == "right" then
         table.insert(right_panels, panel)
       else
         table.insert(left_panels, panel)
@@ -948,7 +944,7 @@ local function create_layout(panels, layout)
   end
 end
 
-local function prepare_panels(agent_specs, layout)
+local function prepare_panels(agent_specs)
   local panels = {}
   for _, spec in ipairs(agent_specs) do
     local base_options = spec.options or {}
@@ -988,7 +984,7 @@ local function launch_terminal_panels(entries, layout)
       local ok, err = setup_terminal_window(entry, layout)
       if not ok then
         if err then Util.error(err) end
-        if stop_squad then stop_squad("error", err) end
+        if stop_squad then stop_squad "error" end
         return
       end
     end
@@ -1035,7 +1031,7 @@ local function run_squad(args_line)
     return
   end
 
-  local panels, panel_err = prepare_panels(agent_specs_or_err, layout)
+  local panels, panel_err = prepare_panels(agent_specs_or_err)
   if not panels then
     Util.error(panel_err)
     return
@@ -1103,7 +1099,7 @@ local function run_squad_wktr(args_line)
       end
 
       -- create or verify worktree
-      local worktree_path, branch = create_worktree(spec.worktree, git_root)
+      local worktree_path, branch = create_worktree(spec.worktree)
       if not worktree_path then
         Util.error(branch) -- branch contains error message
         return
@@ -1133,7 +1129,7 @@ local function run_squad_wktr(args_line)
   end
 
   -- prepare panels
-  local panels, panel_err = prepare_panels(agent_specs_or_err, layout)
+  local panels, panel_err = prepare_panels(agent_specs_or_err)
   if not panels then
     Util.error(panel_err)
     return

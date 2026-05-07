@@ -53,7 +53,6 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        tsserver = { enabled = false },
         ts_ls = { enabled = false },
         vtsls = {
           -- explicitly add default filetypes, so that we can extend
@@ -147,18 +146,16 @@ return {
         },
       },
       setup = {
-        --- @deprecated -- tsserver renamed to ts_ls but not yet released, so keep this for now
-        --- the proper approach is to check the nvim-lspconfig release version when it's released to determine the server name dynamically
-        tsserver = function() return true end,
         ts_ls = function() return true end,
         vtsls = function(_, opts)
           Snacks.util.lsp.on({ name = "vtsls" }, function(_, client)
             client.commands["_typescript.moveToFileRefactoring"] = function(command, _)
               ---@type lsp.LSPAny, lsp.LSPAny, lsp.LSPAny
               local action, uri, range = unpack(command.arguments)
+              local bufnr = vim.api.nvim_get_current_buf()
 
               local function move(newf)
-                client.request("workspace/executeCommand", {
+                client:request("workspace/executeCommand", {
                   command = command.command,
                   arguments = { action, uri, range, newf },
                 })
@@ -167,7 +164,7 @@ return {
               ---@cast uri string
               local fname = vim.uri_to_fname(uri)
               ---@cast range lsp.Range
-              client.request("workspace/executeCommand", {
+              client:request("workspace/executeCommand", {
                 command = "typescript.tsserverRequest",
                 arguments = {
                   "getMoveToRefactoringFileSuggestions",

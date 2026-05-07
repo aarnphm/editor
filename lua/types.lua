@@ -6,10 +6,10 @@
 ---@module "utils"
 _G.Util = require "utils"
 
----@param event string | string[] (string|array) Event(s) that will trigger the handler
----@param opts vim.api.keyset.create_autocmd.opts
+---@param _event string | string[] (string|array) Event(s) that will trigger the handler
+---@param _opts vim.api.keyset.create_autocmd.opts
 ---@return integer
-function vim.api.nvim_create_autocmd(event, opts) end
+function vim.api.nvim_create_autocmd(_event, _opts) end
 
 ---@class vim.diagnostic.config.Opts: vim.diagnostic.Opts
 ---@field float? vim.diagnostic.config.Opts.Float
@@ -26,7 +26,7 @@ function vim.api.nvim_create_autocmd(event, opts) end
 ---@field has nil
 
 ---@overload fun(mode: string|string[], lhs: string, rhs: string|(fun(...): any), opts: vim.keymap.set.LazyOpts)
-function vim.keymap.set(mode, lhs, rhs, opts) end
+function vim.keymap.set(_mode, _lhs, _rhs, _opts) end
 
 ---@class ScratchPadConfig
 ---@field width integer

@@ -17,10 +17,11 @@ return {
         notifier = { enabled = false },
         input = { enabled = true },
         image = { enabled = false, math = { enabled = false }, convert = { notify = false } },
+        picker = { enabled = true },
         rename = { enabled = true },
         quickfile = { enabled = true },
         statuscolumn = { enabled = true },
-        words = { enabled = false },
+        words = { enabled = true },
       }
     end,
     init = function()
@@ -36,6 +37,11 @@ return {
           end
         end,
       })
+    end,
+    config = function(_, opts)
+      require("snacks").setup(opts)
+      Snacks.input.enable()
+      Snacks.picker.setup()
     end,
   },
   {
@@ -62,6 +68,8 @@ return {
           QuickFixLine = { bg = palette.highlight_high },
           WinBar = { bg = palette.base },
           WinBarNC = { bg = palette.base },
+          LspCodeLens = { fg = palette.purple_two, italic = true },
+          LspCodeLensSeparator = { fg = palette.muted, italic = true },
           -- avante.nvim
           AvanteTitle = { bg = palette.red_two },
           AvanteReversedTitle = { fg = palette.red_two },

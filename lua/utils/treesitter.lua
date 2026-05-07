@@ -169,14 +169,18 @@ local function install_with_cargo(cb)
     return cb(false, "No `cargo` found. Install Rust via https://rustup.rs then retry.")
   end
   Util.info("Compiling `tree-sitter-cli` with cargo (this takes ~60s)...", { title = "treesitter" })
-  vim.system({ "cargo", "install", "tree-sitter-cli" }, {}, vim.schedule_wrap(function(out)
-    if out.code == 0 and treesitter_cli_works() then
-      Util.info("Installed `tree-sitter-cli` via cargo.", { title = "treesitter" })
-      cb(true)
-    else
-      cb(false, "`cargo install tree-sitter-cli` failed:\n" .. (out.stderr or ""))
-    end
-  end))
+  vim.system(
+    { "cargo", "install", "tree-sitter-cli" },
+    {},
+    vim.schedule_wrap(function(out)
+      if out.code == 0 and treesitter_cli_works() then
+        Util.info("Installed `tree-sitter-cli` via cargo.", { title = "treesitter" })
+        cb(true)
+      else
+        cb(false, "`cargo install tree-sitter-cli` failed:\n" .. (out.stderr or ""))
+      end
+    end)
+  )
 end
 
 ---@param cb fun(ok:boolean, err?:string)
@@ -195,15 +199,18 @@ function M.ensure_treesitter_cli(cb)
 
     if not p:is_installed() then
       Util.info "Installing `tree-sitter-cli` with mason..."
-      p:install(nil, vim.schedule_wrap(function(success)
-        if success and treesitter_cli_works() then
-          Util.info "Installed `tree-sitter-cli` with mason."
-          return cb(true)
-        end
-        -- mason binary doesn't work, clean up and try cargo
-        if p:is_installed() then pcall(function() p:uninstall() end) end
-        install_with_cargo(cb)
-      end))
+      p:install(
+        nil,
+        vim.schedule_wrap(function(success)
+          if success and treesitter_cli_works() then
+            Util.info "Installed `tree-sitter-cli` with mason."
+            return cb(true)
+          end
+          -- mason binary doesn't work, clean up and try cargo
+          if p:is_installed() then pcall(function() p:uninstall() end) end
+          install_with_cargo(cb)
+        end)
+      )
     else
       install_with_cargo(cb)
     end

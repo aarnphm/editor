@@ -11,7 +11,6 @@
 ---@field terminal lazyvim.util.terminal
 ---@field treesitter lazyvim.util.treesitter
 ---@field statusline lazyvim.util.statusline
----@field words lazyvim.util.words
 local M = {}
 
 local LazyUtil = require "lazy.core.util"

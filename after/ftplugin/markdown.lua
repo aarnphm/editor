@@ -370,7 +370,7 @@ end
 ---@param opts? { blockquote_only?: boolean }
 local function _md_smart_cr(opts)
   opts = opts or {}
-  ok, blink = pcall(require, "blink.cmp")
+  local ok, blink = pcall(require, "blink.cmp")
   if ok and blink.is_menu_visible and blink.select_and_accept and blink.is_menu_visible() then
     blink.select_and_accept()
     return ""
