@@ -50,7 +50,7 @@ return {
       opts.formatters = opts.formatters or {}
       opts.formatters.mojo_format = vim.tbl_deep_extend("force", opts.formatters.mojo_format or {}, {
         command = "mojo",
-        args = { "format", "-q", "$FILENAME" },
+        args = { "format", "--line-length", "119", "-q", "$FILENAME" },
         stdin = false,
       })
     end,
