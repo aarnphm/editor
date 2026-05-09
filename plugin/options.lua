@@ -20,6 +20,10 @@ o.pumheight = 20
 o.expandtab = true
 o.mouse = "a"
 o.number = true
+o.numberwidth = 1
+o.signcolumn = "yes:1"
+o.foldcolumn = "0"
+o.statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum} "
 o.swapfile = false
 o.autowrite = true
 o.undofile = true
@@ -27,8 +31,8 @@ o.undolevels = 9999
 o.showtabline = 0
 o.smoothscroll = true
 
-o.shortmess = "ltTaoOIcF"
-o.formatexpr = "v:lua.require'utils'.format.formatexpr()"
+o.shortmess = "ltTaoOcF"
+o.formatexpr = "v:lua.vim.lsp.formatexpr()"
 o.cot = "menu,menuone,noinsert,fuzzy,popup"
 o.cia = "kind,abbr,menu"
 o.formatoptions = "tcqjron"
@@ -72,7 +76,7 @@ o.timeoutlen = vim.g.vscode and 1000 or 200
 o.updatetime = 200
 o.virtualedit = "block"
 
-o.ls = 3
+o.ls = 2
 o.whichwrap = "b,s,<,>,[,],~"
 o.guifont = "Berkeley Mono:h16"
 o.cmdheight = 1

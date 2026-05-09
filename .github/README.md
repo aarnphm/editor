@@ -5,31 +5,29 @@ fast. minimalist. choose 2
 
 </div>
 
-Plugins ecosystem:
+Plugin spine:
 
-- flexoki for contrast vibes, rose-pine for soho vibes
+- flexoki for color
 - mini.nvim for minimalist everything
-- LSP integration (blink.cmp, nvim-lspconfig, copilot.lua, mason-org, conform.nvim, nvim-lint)
-- folke's plugins (which-key.nvim, todo-comments.nvim)
-- vim-motion with leap.nvim and flit.nvim
+- blink.cmp for completion
+- built-in LSP plus nvim-lspconfig
+- conform.nvim for formatting
+- nvim-treesitter
+- dropbar breadcrumbs
+- leap.nvim for motion
+- gitsigns.nvim for hunks
+- grug-far.nvim for search and replace
 
 ```text
-Startuptime: 37.49ms
-
-Based on the actual CPU time of the Neovim process till UIEnter.
-This is more accurate than `nvim --startuptime`.
-  LazyStart 17.83ms
-  LazyDone  33.49ms (+15.66ms)
-  UIEnter   37.49ms (+4ms)
+Startuptime target: boring and low.
+Plugin manager: vim.pack.
+Lockfile: nvim-pack-lock.json.
 ```
-
-If you wish to try out something more structural, try out [nvimdots](https://github.com/ayamir/nvimdots) or [lazyvim](https://github.com/lazyvim/lazyvim)
 
 > [!note]
 >
-> For rustaceanvim, setup `rust-analyzer` separately with nix (via dix)
+> Language servers and formatters are installed outside this repo. The flake is for editor tooling, not for owning every LSP binary.
 
-This is largely build on top of some structural hierarchy of previous LazyVim versions.
-I have no intention of migrating this to LazyVim, as this ia a great playground for me to experiment and test neovim.
+This config is deliberately monolithic at `init.lua` for the hot path, with ordinary Neovim hierarchy for startup files, filetype hooks, after-plugin hooks, queries, snippets, and scripts.
 
 Used with [dix](https://github.com/aarnphm/dix)

@@ -3,7 +3,7 @@ vim.cmd [[
   anoremenu PopUp.Inspect                 <Cmd>Inspect<CR>
   amenu     PopUp.-1-                     <Nop>
   anoremenu PopUp.Go\ to\ definition      <Cmd>lua vim.lsp.buf.definition()<CR>
-  anoremenu PopUp.References              <Cmd>lua require"utils".lsp.buf.references()<CR>
+  anoremenu PopUp.References              <Cmd>lua vim.lsp.buf.references()<CR>
   anoremenu PopUp.Show\ Diagnostics       <Cmd>lua vim.diagnostic.open_float()<CR>
   anoremenu PopUp.Show\ All\ Diagnostics  <Cmd>lua vim.diagnostic.setqflist()<CR>
   anoremenu PopUp.Configure\ Diagnostics  <Cmd>help vim.diagnostic.config()<CR>

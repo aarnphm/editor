@@ -7,6 +7,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "dbout",
     "gitsigns-blame",
     "grug-far",
+    "nvim-pack",
     "help",
     "lspinfo",
     "neotest-output",
@@ -90,10 +91,24 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   pattern = "*",
   callback = function() vim.hl.on_yank { higroup = "IncSearch" } end,
 })
+-- Clear search highlights once the cursor leaves the current match.
+vim.api.nvim_create_autocmd("CursorMoved", {
+  group = augroup "clear_search_highlight",
+  callback = function()
+    local ok, count = pcall(vim.fn.searchcount, { recompute = 1, maxcount = 0 })
+    if not ok or count.exact_match ~= 0 then return end
+
+    vim.schedule(function()
+      if vim.v.hlsearch ~= 0 then vim.cmd.nohlsearch() end
+    end)
+  end,
+})
 -- auto trim trailing whitespace
 vim.api.nvim_create_autocmd("BufWritePost", {
   group = augroup "trim_whitespace",
   callback = function()
+    if vim.bo.buftype ~= "" or not vim.bo.modifiable then return end
+
     -- basically the same as mini.trailspace
     local curpos = vim.api.nvim_win_get_cursor(0)
     ---Search and replace trailing whitespace

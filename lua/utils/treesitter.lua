@@ -1,57 +1,4 @@
----@class lazyvim.util.treesitter
 local M = {}
-
-M.goto_prev_node = function()
-  local ts_utils = require "nvim-treesitter.ts_utils"
-  local node = ts_utils.get_node_at_cursor()
-  if not node then return end
-  local dest_node = ts_utils.get_previous_node(node, true, true)
-  if not dest_node then
-    local cur_node = node:parent() ---@as TSNode
-    while cur_node do
-      dest_node = ts_utils.get_previous_node(cur_node, false, false)
-      if dest_node then break end
-      cur_node = cur_node:parent() ---@as TSNode
-    end
-  end
-  if not dest_node then return end
-  ts_utils.goto_node(dest_node)
-end
-
-M.goto_next_node = function()
-  local ts_utils = require "nvim-treesitter.ts_utils"
-  local node = ts_utils.get_node_at_cursor()
-  if not node then return end
-  local dest_node = ts_utils.get_next_node(node, true, true)
-  if not dest_node then
-    local cur_node = node:parent()
-    while cur_node do
-      dest_node = ts_utils.get_next_node(cur_node, false, false)
-      if dest_node then break end
-      cur_node = cur_node:parent()
-    end
-  end
-  if not dest_node then return end
-  ts_utils.goto_node(dest_node)
-end
-
-M.goto_parent_node = function()
-  local ts_utils = require "nvim-treesitter.ts_utils"
-  local node = ts_utils.get_node_at_cursor()
-  if not node then return end
-  local dest_node = node:parent()
-  if not dest_node then return end
-  ts_utils.goto_node(dest_node)
-end
-
-M.goto_child_node = function()
-  local ts_utils = require "nvim-treesitter.ts_utils"
-  local node = ts_utils.get_node_at_cursor()
-  if not node then return end
-  local dest_node = ts_utils.get_named_children(node)[1]
-  if not dest_node then return end
-  ts_utils.goto_node(dest_node)
-end
 
 M._installed = nil ---@type table<string,boolean>?
 M._queries = {} ---@type table<string,boolean>
@@ -77,12 +24,10 @@ end
 
 ---@param what string|number|nil
 ---@param query? string
----@overload fun(buf?:number):boolean
----@overload fun(ft:string):boolean
 ---@return boolean
 function M.have(what, query)
   what = what or vim.api.nvim_get_current_buf()
-  what = type(what) == "number" and vim.bo[what].filetype or what --[[@as string]]
+  what = type(what) == "number" and vim.bo[what].filetype or what
   local lang = vim.treesitter.language.get_lang(what)
   if lang == nil or M.get_installed()[lang] == nil then return false end
   if query and not M.have_query(lang, query) then return false end
@@ -92,130 +37,6 @@ end
 function M.foldexpr() return M.have(nil, "folds") and vim.treesitter.foldexpr() or "0" end
 
 function M.indentexpr() return M.have(nil, "indents") and require("nvim-treesitter").indentexpr() or -1 end
-
----@return string?
-local function win_find_cl()
-  local path = "C:/Program Files (x86)/Microsoft Visual Studio"
-  local pattern = "*/*/VC/Tools/MSVC/*/bin/Hostx64/x64/cl.exe"
-  return vim.fn.globpath(path, pattern, true, true)[1]
-end
-
-local function treesitter_cli_works()
-  if vim.fn.executable "tree-sitter" ~= 1 then return false end
-  local ok, res = pcall(vim.system, { "tree-sitter", "--version" }, { timeout = 3000 })
-  if not ok then return false end
-  local out = res:wait()
-  return out.code == 0
-end
-
----@return boolean ok, lazyvim.util.treesitter.Health health
-function M.check()
-  local is_win = vim.fn.has "win32" == 1
-  ---@param tool string
-  ---@param win boolean?
-  local function have(tool, win) return (win == nil or is_win == win) and vim.fn.executable(tool) == 1 end
-
-  local have_cc = vim.env.CC ~= nil or have("cc", false) or have("cl", true) or (is_win and win_find_cl() ~= nil)
-
-  if not have_cc and is_win and vim.fn.executable "gcc" == 1 then
-    vim.env.CC = "gcc"
-    have_cc = true
-  end
-
-  ---@class lazyvim.util.treesitter.Health: table<string,boolean>
-  local ret = {
-    ["tree-sitter (CLI)"] = treesitter_cli_works(),
-    ["C compiler"] = have_cc,
-    tar = have "tar",
-    curl = have "curl",
-  }
-  local ok = true
-  for _, v in pairs(ret) do
-    ok = ok and v
-  end
-  return ok, ret
-end
-
----@param cb fun()
-function M.build(cb)
-  M.ensure_treesitter_cli(function(_, err)
-    local ok, health = M.check()
-    if ok then
-      return cb()
-    else
-      local lines = { "Unmet requirements for **nvim-treesitter** `main`:" }
-      local keys = vim.tbl_keys(health) ---@type string[]
-      table.sort(keys)
-      for _, k in pairs(keys) do
-        lines[#lines + 1] = ("- %s `%s`"):format(health[k] and "✅" or "❌", k)
-      end
-      vim.list_extend(lines, {
-        "",
-        "See the requirements at [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter/tree/main?tab=readme-ov-file#requirements)",
-        "Run `:checkhealth nvim-treesitter` for more information.",
-      })
-      if vim.fn.has "win32" == 1 and not health["C compiler"] then
-        lines[#lines + 1] = "Install a C compiler with `winget install --id=BrechtSanders.WinLibs.POSIX.UCRT -e`"
-      end
-      vim.list_extend(lines, err and { "", err } or {})
-      Util.error(lines, { title = "treesitter" })
-    end
-  end)
-end
-
----@param cb fun(ok:boolean, err?:string)
-local function install_with_cargo(cb)
-  if vim.fn.executable "cargo" ~= 1 then
-    return cb(false, "No `cargo` found. Install Rust via https://rustup.rs then retry.")
-  end
-  Util.info("Compiling `tree-sitter-cli` with cargo (this takes ~60s)...", { title = "treesitter" })
-  vim.system(
-    { "cargo", "install", "tree-sitter-cli" },
-    {},
-    vim.schedule_wrap(function(out)
-      if out.code == 0 and treesitter_cli_works() then
-        Util.info("Installed `tree-sitter-cli` via cargo.", { title = "treesitter" })
-        cb(true)
-      else
-        cb(false, "`cargo install tree-sitter-cli` failed:\n" .. (out.stderr or ""))
-      end
-    end)
-  )
-end
-
----@param cb fun(ok:boolean, err?:string)
-function M.ensure_treesitter_cli(cb)
-  if treesitter_cli_works() then return cb(true) end
-
-  -- try mason first (instant download), fall back to cargo (compiles from source)
-  if not pcall(require, "mason") then return install_with_cargo(cb) end
-
-  local mr = require "mason-registry"
-  mr.refresh(function()
-    local p = mr.get_package "tree-sitter-cli"
-
-    -- mason binary exists but broken (glibc mismatch), remove it
-    if p:is_installed() and not treesitter_cli_works() then pcall(function() p:uninstall() end) end
-
-    if not p:is_installed() then
-      Util.info "Installing `tree-sitter-cli` with mason..."
-      p:install(
-        nil,
-        vim.schedule_wrap(function(success)
-          if success and treesitter_cli_works() then
-            Util.info "Installed `tree-sitter-cli` with mason."
-            return cb(true)
-          end
-          -- mason binary doesn't work, clean up and try cargo
-          if p:is_installed() then pcall(function() p:uninstall() end) end
-          install_with_cargo(cb)
-        end)
-      )
-    else
-      install_with_cargo(cb)
-    end
-  end)
-end
 
 local MATH_NODES = {
   displayed_equation = true,
@@ -237,19 +58,15 @@ local CODE_BLOCK_NODES = {
 function M.in_text(check_parent)
   local node = vim.treesitter.get_node { ignore_injections = false }
 
-  -- Check for code blocks in any filetype
   local block_node = node
   while block_node do
-    if CODE_BLOCK_NODES[block_node:type()] then
-      return true -- If in a code block, always consider it text
-    end
+    if CODE_BLOCK_NODES[block_node:type()] then return true end
     block_node = block_node:parent()
   end
 
   while node do
     if node:type() == "text_mode" then
       if check_parent then
-        -- For \text{}
         local parent = node:parent()
         if parent and MATH_NODES[parent:type()] then return false end
       end
@@ -262,17 +79,13 @@ function M.in_text(check_parent)
   return true
 end
 
-M.in_math = function()
+function M.in_math()
   local node = vim.treesitter.get_node { ignore_injections = false }
-  local current_filetype = vim.bo.filetype
 
-  -- Check if we are in a markdown file and inside a code block
-  if current_filetype == "markdown" or current_filetype == "quarto" then
+  if vim.bo.filetype == "markdown" or vim.bo.filetype == "quarto" then
     local block_node = node
     while block_node do
-      if CODE_BLOCK_NODES[block_node:type()] then
-        return false -- If in a code block in markdown, never consider it math zone
-      end
+      if CODE_BLOCK_NODES[block_node:type()] then return false end
       block_node = block_node:parent()
     end
   end
@@ -288,6 +101,6 @@ M.in_math = function()
   return false
 end
 
-M.not_math = function() return M.in_text(true) end
+function M.not_math() return M.in_text(true) end
 
 return M

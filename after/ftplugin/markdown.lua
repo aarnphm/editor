@@ -44,7 +44,7 @@ local function expand(trigger, body)
   vim.api.nvim_buf_set_text(bufnr, row - 1, col - #trigger, row - 1, col, { "" })
   -- Move cursor to start of removed trigger
   vim.api.nvim_win_set_cursor(0, { row, col - #trigger })
-  Util.cmp.expand(body)
+  vim.snippet.expand(body)
 end
 
 vim.keymap.set("i", "<Tab>", function()
@@ -370,12 +370,6 @@ end
 ---@param opts? { blockquote_only?: boolean }
 local function _md_smart_cr(opts)
   opts = opts or {}
-  local ok, blink = pcall(require, "blink.cmp")
-  if ok and blink.is_menu_visible and blink.select_and_accept and blink.is_menu_visible() then
-    blink.select_and_accept()
-    return ""
-  end
-
   local _, col = unpack(vim.api.nvim_win_get_cursor(0))
   local line = vim.api.nvim_get_current_line()
 

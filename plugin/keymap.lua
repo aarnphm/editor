@@ -1,7 +1,7 @@
 ---@param mode string|string[]
 ---@param lhs string
 ---@param rhs string|(fun(...): any)
----@param opts? vim.keymap.set.LazyOpts
+---@param opts? vim.keymap.set.Opts
 local map = function(mode, lhs, rhs, opts)
   opts = vim.tbl_extend("force", { noremap = true, silent = true }, opts or {})
   vim.keymap.set(mode, lhs, rhs, opts)
@@ -32,23 +32,10 @@ map("n", "]w", diagnostic_goto(true, vim.diagnostic.severity.WARN), { desc = "ed
 map("n", "[w", diagnostic_goto(false, vim.diagnostic.severity.WARN), { desc = "editor: prev warning" })
 
 map({ "n", "x" }, " ", "", { noremap = true })
--- Open a terminal at the bottom of the screen with a fixed height.
-map(
-  "n",
-  "<leader>st",
-  function() Util.terminal.bottom(nil, { height = 10, startinsert = true }) end,
-  { desc = "terminal: attach new process" }
-)
-map(
-  "n",
-  "<LocalLeader>st",
-  function() Util.terminal.side(nil, { startinsert = true }) end,
-  { desc = "terminal: attach new process" }
-)
 map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 
-map("n", "<C-x>", function() Snacks.bufdelete() end, { desc = "buffer: delete" })
+map("n", "<C-x>", "<cmd>bdelete<cr>", { desc = "buffer: delete" })
 map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
 map("i", "<M-BS>", "<C-W>", { desc = "insert: delete word", remap = false })
 
@@ -117,5 +104,4 @@ map("n", "<leader>uI", "<cmd>InspectTree<cr>", { desc = "inspect: tree" })
 map("i", ",", ",<c-g>u")
 map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
-map("n", "<LocalLeader>p", "<cmd>Lazy<cr>", { desc = "package: show manager" })
-map("n", "-", "<CMD>Oil<CR>", { desc = "fs: open parent directory" })
+map("n", "<LocalLeader>p", "<cmd>PackStatus<cr>", { desc = "package: show manager" })
