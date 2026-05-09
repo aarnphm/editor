@@ -1,6 +1,6 @@
 ## project structure & module organization
 
-This Neovim configuration is anchored by `init.lua`, which intentionally owns the small native plugin list plus the core LSP, Tree-sitter, motion, color, file, and breadcrumb setup. Native plugin management uses `vim.pack`; plugin state is tracked in `nvim-pack-lock.json`. Startup options, keymaps, autocommands, menus, and user commands belong in `plugin/` so they follow Neovim's normal startup hierarchy. Shared helpers stay in `lua/utils`, with typed shims in `lua/types.lua`. Filetype-local behavior belongs in `after/ftplugin/`. Custom plugin hooks that should load after startup plugins belong in `after/plugin/`. Tree-sitter query overrides belong in `queries/` or `after/queries/`. Snippets reside in `snippets/`.
+This Neovim configuration is anchored by `init.lua`, which intentionally owns globals plus the small native plugin list. Native plugin management uses `vim.pack`; plugin state is tracked in `nvim-pack-lock.json`. Startup options, keymaps, autocommands, menus, and user commands belong in `plugin/` so they follow Neovim's normal startup hierarchy. Plugin setup belongs in `after/plugin/`. Filetype-local behavior, including language-specific LSP and formatter setup, belongs in `after/ftplugin/`. Shared helpers stay flattened in `lua/utils.lua`, with typed shims in `lua/types.lua`. Tree-sitter query overrides belong in `queries/` or `after/queries/`. Snippets reside in `snippets/`.
 
 This should follow neovim file structure best practice. Most of initial keyboards/options plugins is now saved under `plugin/`.
 
@@ -15,7 +15,7 @@ This should follow neovim file structure best practice. Most of initial keyboard
 - Launching with `NVIM_APPNAME=nvim nvim` verifies the config interactively; use `:PackStatus` for plugin status and `:checkhealth` to inspect toolchain issues.
 
 ## coding style & naming conventions
-Use two-space indentation and spaces for tabs; align with Stylua defaults. Prefer double quotes unless interpolation or escaping argues otherwise. Keep the top-level config monolithic unless it becomes genuinely hard to scan; helper modules should stay small and namespaced under `Util` to satisfy Selene. Global additions should be declared in `lua/types.lua` so the language server and Selene stay quiet.
+Use two-space indentation and spaces for tabs; align with Stylua defaults. Prefer double quotes unless interpolation or escaping argues otherwise. Keep the top-level config runtime-native rather than abstraction-heavy; shared helper behavior should stay namespaced under `Util` in `lua/utils.lua` to satisfy Selene. Global additions should be declared in `lua/types.lua` so the language server and Selene stay quiet.
 
 ## testing guidelines
 Before committing, format and lint (`stylua . && selene .`). To ensure plugins resolve, run `NVIM_APPNAME=nvim nvim --headless "+lua print('boot-ok')" +qa` and review diff in `nvim-pack-lock.json`. For runtime sanity, launch Neovim with the same `NVIM_APPNAME` and trigger `:checkhealth` for any new toolchains (e.g., language servers). When adding snippets or Treesitter queries, open representative files and run `:InspectTree` to confirm highlights and ensure no errors log to `:messages`.
