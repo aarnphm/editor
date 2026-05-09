@@ -53,23 +53,3 @@ vim.api.nvim_create_user_command("ObsidianNew", function(opts)
   vim.fn.mkdir(vim.fs.dirname(path), "p")
   vim.cmd("edit " .. vim.fn.fnameescape(path))
 end, { nargs = "+", complete = "file", desc = "obsidian: new note (supports subpaths)" })
--- add bigfile filetype and disable some defaults on bigfile
--- add http, dotenv, tsconfig
-vim.filetype.add {
-  extension = {
-    ["http"] = "http",
-    env = "dotenv",
-    h = "c",
-    ["j2"] = "jinja",
-    mojo = "mojo",
-    ["🔥"] = "mojo",
-  },
-  filename = {
-    [".env"] = "dotenv",
-    ["env"] = "dotenv",
-  },
-  pattern = {
-    ["[jt]sconfig.*.json"] = "jsonc",
-    ["%.env%.[%w_.-]+"] = "dotenv",
-  },
-}

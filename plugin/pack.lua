@@ -27,6 +27,21 @@ local function update_pack(opts)
   })
 end
 
+local function build_pack(opts)
+  if not (Util.pack and Util.pack.build) then
+    vim.notify("PackBuild unavailable", vim.log.levels.ERROR, { title = "vim.pack" })
+    return
+  end
+
+  local names = #opts.fargs > 0 and opts.fargs or nil
+  local built = Util.pack.build(names)
+  if #built == 0 then
+    vim.notify("No build hooks matched", vim.log.levels.INFO, { title = "vim.pack" })
+    return
+  end
+  vim.notify("Built: " .. table.concat(built, ", "), vim.log.levels.INFO, { title = "vim.pack" })
+end
+
 vim.api.nvim_create_user_command("PackStatus", function()
   local lines = {}
   for _, plugin in ipairs(pack_get()) do
@@ -59,4 +74,10 @@ end, {
   nargs = "*",
   complete = complete_pack_names,
   desc = "vim.pack: update lockfile metadata",
+})
+
+vim.api.nvim_create_user_command("PackBuild", function(opts) build_pack(opts) end, {
+  nargs = "*",
+  complete = complete_pack_names,
+  desc = "vim.pack: run plugin build hooks",
 })

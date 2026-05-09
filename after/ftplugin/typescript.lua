@@ -1,3 +1,43 @@
+Util.lsp.formatters({ "javascript", "javascriptreact", "typescript", "typescriptreact" }, { "prettier" })
+vim.cmd.runtime "after/ftplugin/tailwindcss.lua"
+
+local vtsls = {
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "javascript.jsx",
+    "typescript",
+    "typescriptreact",
+    "typescript.tsx",
+  },
+  settings = {
+    complete_function_calls = true,
+    vtsls = {
+      enableMoveToFileCodeAction = true,
+      autoUseWorkspaceTsdk = true,
+      experimental = {
+        maxInlayHintLength = 30,
+        completion = { enableServerSideFuzzyMatch = true },
+      },
+    },
+    typescript = {
+      updateImportsOnFileMove = { enabled = "always" },
+      suggest = { completeFunctionCalls = true },
+      inlayHints = {
+        enumMemberValues = { enabled = true },
+        functionLikeReturnTypes = { enabled = true },
+        parameterNames = { enabled = "literals" },
+        parameterTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        variableTypes = { enabled = false },
+      },
+    },
+  },
+}
+vtsls.settings.javascript = vim.tbl_deep_extend("force", {}, vtsls.settings.typescript)
+
+Util.lsp.enable("vtsls", vtsls)
+
 vim.bo.commentstring = "// %s"
 
 local function source_action(kind)

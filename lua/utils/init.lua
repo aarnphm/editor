@@ -1,4 +1,5 @@
 ---@class simple.util
+---@field lsp simple.util.lsp
 ---@field root simple.util.root
 ---@field treesitter simple.util.treesitter
 ---@field ui simple.util.ui

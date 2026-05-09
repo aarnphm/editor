@@ -1,3 +1,10 @@
+Util.lsp.formatters({ "markdown", "markdown.mdx" }, { "prettier", "cbfmt" })
+Util.lsp.enable("markdown_oxide", {
+  capabilities = {
+    workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
+  },
+})
+
 ---@return table<string,string>
 local function load_latex_snippets()
   local path = vim.fn.stdpath "config" .. "/snippets/latex.json"

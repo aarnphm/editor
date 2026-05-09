@@ -1,4 +1,4 @@
-; extends
+;; extends
 ((inline) @_inline (#match? @_inline "^(import|export)")) @nospell
 
 ((fenced_code_block

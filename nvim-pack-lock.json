@@ -1,9 +1,13 @@
 {
   "plugins": {
     "blink.cmp": {
-      "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
+      "rev": "d3874d2a13aa19b095bdd10d37a82a8f0aa7cad3",
       "src": "https://github.com/Saghen/blink.cmp.git",
-      "version": "'v1.10.2'"
+      "version": "'main'"
+    },
+    "blink.lib": {
+      "rev": "f29d8bac6549bc1e7d699c83f680823d7def98bd",
+      "src": "https://github.com/Saghen/blink.lib.git"
     },
     "conform.nvim": {
       "rev": "dca1a190aa85f9065979ef35802fb77131911106",
@@ -29,9 +33,17 @@
       "rev": "21790e59dd0109a92a70cb874dd002af186314f5",
       "src": "https://github.com/MagicDuck/grug-far.nvim.git"
     },
+    "lazydev.nvim": {
+      "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
+      "src": "https://github.com/folke/lazydev.nvim.git"
+    },
     "leap.nvim": {
       "rev": "eab814a744e1b0c9316bf3c5a9766ad28ad7be79",
       "src": "https://codeberg.org/andyg/leap.nvim.git"
+    },
+    "mason.nvim": {
+      "rev": "e54f5bf5f12c560da31c17eee5b3e1bd369f3ff9",
+      "src": "https://github.com/mason-org/mason.nvim.git"
     },
     "mini.nvim": {
       "rev": "60b5aaac2f0465d67699702e76b9baebf52cb42f",
