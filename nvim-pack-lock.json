@@ -51,7 +51,7 @@
       "version": "'main'"
     },
     "leap.nvim": {
-      "rev": "eab814a744e1b0c9316bf3c5a9766ad28ad7be79",
+      "rev": "940bc5e716a8cde63bd47e1b13f30fd9075ec0c8",
       "src": "https://codeberg.org/andyg/leap.nvim.git",
       "version": "'main'"
     },
@@ -66,7 +66,7 @@
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "60b5aaac2f0465d67699702e76b9baebf52cb42f",
+      "rev": "a5fda91040763cf9ad70bdce1c656b0f4ba1d16e",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
