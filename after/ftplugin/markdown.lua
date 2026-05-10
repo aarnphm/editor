@@ -4,6 +4,15 @@ Util.lsp.enable("markdown_oxide", {
     workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
   },
 })
+vim.cmd.runtime "after/ftplugin/latex.lua"
+
+local function luasnip_jump(direction)
+  local ok, luasnip = pcall(require, "luasnip")
+  if ok and luasnip.jumpable(direction) then
+    luasnip.jump(direction)
+    return true
+  end
+end
 
 ---@return table<string,string>
 local function load_latex_snippets()
@@ -51,11 +60,13 @@ local function expand(trigger, body)
   vim.api.nvim_buf_set_text(bufnr, row - 1, col - #trigger, row - 1, col, { "" })
   -- Move cursor to start of removed trigger
   vim.api.nvim_win_set_cursor(0, { row, col - #trigger })
-  vim.snippet.expand(body)
+  Util.cmp.expand(body)
 end
 
 vim.keymap.set("i", "<Tab>", function()
   if M._snippets == nil then M._snippets = load_latex_snippets() end
+
+  if luasnip_jump(1) then return end
 
   -- inside snippets
   if vim.snippet.active { direction = 1 } then
@@ -77,6 +88,8 @@ vim.keymap.set("i", "<Tab>", function()
 end, { expr = true, silent = true, buffer = true, desc = "snippet: expand or indent" })
 
 vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  if luasnip_jump(-1) then return end
+
   if vim.snippet.active { direction = -1 } then
     vim.schedule(function() vim.snippet.jump(-1) end)
     return

@@ -116,29 +116,55 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     vim.api.nvim_win_set_cursor(0, curpos)
   end,
 })
--- toggle number on focussed window
-local numtoggle = augroup "numtoggle"
-vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
-  group = numtoggle,
+local numbercolumn = augroup "numbercolumn"
+local file_statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum} "
+local editor_focused = true
+
+local function file_buffer(buf)
+  if not vim.api.nvim_buf_is_valid(buf) or vim.bo[buf].buftype ~= "" then return false end
+
+  local name = vim.api.nvim_buf_get_name(buf)
+  return name:sub(1, 1) == "/" or name:match "^%a:[/\\]" ~= nil
+end
+
+local function set_winopt(win, name, value) pcall(vim.api.nvim_set_option_value, name, value, { win = win }) end
+
+local function refresh_numbercolumn()
+  local current_win = vim.api.nvim_get_current_win()
+  local mode = vim.fn.mode()
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local enabled = file_buffer(buf)
+
+    set_winopt(win, "number", enabled)
+    set_winopt(win, "relativenumber", enabled and editor_focused and win == current_win and mode ~= "i")
+    set_winopt(win, "signcolumn", enabled and "yes:1" or "no")
+    set_winopt(win, "statuscolumn", enabled and file_statuscolumn or "")
+  end
+end
+
+vim.api.nvim_create_autocmd(
+  { "BufEnter", "BufWinEnter", "FileType", "InsertEnter", "InsertLeave", "TermOpen", "WinEnter", "WinLeave" },
+  {
+    group = numbercolumn,
+    callback = function() vim.schedule(refresh_numbercolumn) end,
+  }
+)
+
+vim.api.nvim_create_autocmd("FocusGained", {
+  group = numbercolumn,
   callback = function()
-    if vim.wo.number and vim.fn.mode() ~= "i" then vim.wo.relativenumber = true end
+    editor_focused = true
+    vim.schedule(refresh_numbercolumn)
   end,
 })
--- disable number on terminal buffer
-vim.api.nvim_create_autocmd("TermOpen", {
-  group = numtoggle,
-  pattern = { "terminal" },
+
+vim.api.nvim_create_autocmd("FocusLost", {
+  group = numbercolumn,
   callback = function()
-    if vim.bo.number then
-      vim.bo.number = false
-      vim.bo.relativenumber = false
-    end
-  end,
-})
-vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
-  group = numtoggle,
-  callback = function()
-    if vim.wo.number then vim.wo.relativenumber = false end
+    editor_focused = false
+    vim.schedule(refresh_numbercolumn)
   end,
 })
 

@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "LuaSnip": {
+      "rev": "a62e1083a3cfe8b6b206e7d3d33a51091df25357",
+      "src": "https://github.com/L3MON4D3/LuaSnip.git",
+      "version": "'master'"
+    },
     "blink.cmp": {
       "rev": "d3874d2a13aa19b095bdd10d37a82a8f0aa7cad3",
       "src": "https://github.com/Saghen/blink.cmp.git",
@@ -40,6 +45,10 @@
     "leap.nvim": {
       "rev": "eab814a744e1b0c9316bf3c5a9766ad28ad7be79",
       "src": "https://codeberg.org/andyg/leap.nvim.git"
+    },
+    "luasnip-latex-snippets.nvim": {
+      "rev": "0ac8350bc250a5e1b4dd330b33670bf2c8822b53",
+      "src": "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git"
     },
     "mason.nvim": {
       "rev": "e54f5bf5f12c560da31c17eee5b3e1bd369f3ff9",
