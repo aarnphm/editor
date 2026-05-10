@@ -48,7 +48,7 @@ vim.api.nvim_create_user_command("PackStatus", function()
     local marker = plugin.active and "*" or " "
     local spec = plugin.spec or {}
     local rev = plugin.rev and plugin.rev:sub(1, 8) or "unlocked"
-    table.insert(lines, ("%s %-24s %-10s %s"):format(marker, spec.name or "?", rev, spec.src or ""))
+    table.insert(lines, ("%s %-30s %-10s %s"):format(marker, spec.name or "?", rev, spec.src or ""))
   end
 
   if #lines == 0 then
