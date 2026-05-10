@@ -29,6 +29,173 @@ function M.on_load(name, fn)
   vim.schedule(function() fn(name) end)
 end
 
+local default_pack_specs = {
+  { src = "https://github.com/nuvic/flexoki-nvim.git", name = "flexoki" },
+  { src = "https://github.com/echasnovski/mini.nvim.git", name = "mini.nvim" },
+  { src = "https://github.com/Saghen/blink.lib.git", name = "blink.lib", lazy = true },
+  {
+    src = "https://github.com/Saghen/blink.cmp.git",
+    name = "blink.cmp",
+    version = "main",
+    lazy = true,
+    event = "InsertEnter",
+    dependencies = { "blink.lib", "friendly-snippets" },
+    build = function()
+      vim.cmd.packadd "blink.lib"
+      vim.cmd.packadd "blink.cmp"
+      require("blink.cmp").build():wait(60000)
+    end,
+  },
+  { src = "https://github.com/rafamadriz/friendly-snippets.git", name = "friendly-snippets", lazy = true },
+  {
+    src = "https://github.com/L3MON4D3/LuaSnip.git",
+    name = "LuaSnip",
+    version = "master",
+    lazy = true,
+    build = (not jit.os:find "Windows")
+        and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+      or nil,
+    opts = function()
+      return {
+        history = true,
+        region_check_events = "InsertEnter",
+        delete_check_events = "TextChanged",
+        ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+        load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+          markdown = { "lua", "json", "tex" },
+        },
+      }
+    end,
+    config = function(_, opts) require("luasnip").config.setup(opts) end,
+  },
+  {
+    src = "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git",
+    name = "luasnip-latex-snippets.nvim",
+    lazy = true,
+    dependencies = { "LuaSnip" },
+  },
+  { src = "https://github.com/mason-org/mason.nvim.git", name = "mason.nvim" },
+  { src = "https://github.com/stevearc/conform.nvim.git", name = "conform.nvim" },
+  { src = "https://codeberg.org/andyg/leap.nvim.git", name = "leap.nvim" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter.git", name = "nvim-treesitter", version = "main" },
+  { src = "https://github.com/neovim/nvim-lspconfig.git", name = "nvim-lspconfig" },
+  { src = "https://github.com/folke/lazydev.nvim.git", name = "lazydev.nvim", lazy = true },
+  { src = "https://github.com/Bekaboo/dropbar.nvim.git", name = "dropbar.nvim" },
+  { src = "https://github.com/lewis6991/gitsigns.nvim.git", name = "gitsigns.nvim" },
+  {
+    src = "https://github.com/MagicDuck/grug-far.nvim.git",
+    name = "grug-far.nvim",
+    lazy = true,
+    cmd = "GrugFar",
+    opts = {
+      headerMaxWidth = 50,
+      windowCreationCommand = "botright vsplit",
+    },
+    config = function(_, opts) require("grug-far").setup(opts) end,
+  },
+}
+
+local pack = { specs = {} }
+local loaded = {}
+
+local function pack_specs_for_add(specs)
+  local ret = {}
+  for _, spec in ipairs(specs) do
+    pack.specs[spec.name] = spec
+    ret[#ret + 1] = {
+      src = spec.src,
+      name = spec.name,
+      version = spec.version,
+    }
+  end
+  return ret
+end
+
+local function pack_dependency_names(spec)
+  local ret = {}
+  for _, dep in ipairs(spec.dependencies or {}) do
+    ret[#ret + 1] = type(dep) == "string" and dep or dep.name
+  end
+  return ret
+end
+
+local function pack_plugin_info(name)
+  local ok_info, plugins = pcall(vim.pack.get, { name }, { info = false })
+  if not ok_info then return nil end
+  return plugins[1]
+end
+
+function pack.opts(spec)
+  if type(spec) == "string" then spec = pack.get(spec) end
+  if not spec then return nil end
+  if type(spec.opts) == "function" then return spec.opts(spec) end
+  return spec.opts
+end
+
+function pack.get(name) return pack.specs[name] end
+
+function pack.load(name)
+  if loaded[name] then return end
+
+  local spec = pack.get(name)
+  if not spec then
+    vim.cmd.packadd(name)
+    loaded[name] = true
+    return
+  end
+
+  for _, dep in ipairs(pack_dependency_names(spec)) do
+    pack.load(dep)
+  end
+
+  vim.cmd.packadd(name)
+  loaded[name] = true
+
+  local opts = pack.opts(spec)
+  if spec.config then spec.config(spec, opts or {}) end
+end
+
+function pack.run_build(name)
+  local spec = pack.get(name)
+  if not (spec and spec.build) then return false end
+
+  local info = pack_plugin_info(name)
+  if not (info and info.path) then return false end
+
+  if type(spec.build) == "function" then
+    spec.build(spec, info.path)
+    return true
+  end
+
+  local cmd = type(spec.build) == "table" and spec.build or { vim.o.shell, vim.o.shellcmdflag, spec.build }
+  local result = vim.system(cmd, { cwd = info.path, text = true }):wait()
+  if result.code ~= 0 then
+    error(("PackBuild failed for %s\n%s"):format(name, result.stderr ~= "" and result.stderr or result.stdout))
+  end
+  return true
+end
+
+function pack.build(names)
+  names = names or vim.tbl_keys(pack.specs)
+  if type(names) == "string" then names = { names } end
+
+  local built = {}
+  for _, name in ipairs(names) do
+    if pack.run_build(name) then built[#built + 1] = name end
+  end
+  return built
+end
+
+function pack.setup(specs)
+  if not vim.pack then error "This config expects Nvim with vim.pack support" end
+
+  pack.specs = {}
+  loaded = {}
+  vim.pack.add(pack_specs_for_add(specs or default_pack_specs), { confirm = false, load = function() end })
+end
+
+M.pack = pack
+
 ---@param mode string|string[]
 ---@param lhs string
 ---@param rhs string|function
@@ -107,7 +274,7 @@ function M.set_default(option, value)
 end
 
 M.url_matcher =
-"\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
 
 ---@param win integer?
 function M.delete_url_match(win)
@@ -495,8 +662,9 @@ end
 function cmp.snippet_preview(snippet)
   local ok, parsed = pcall(function() return vim.lsp._snippet_grammar.parse(snippet) end)
   return ok and tostring(parsed)
-      or cmp.snippet_replace(snippet, function(placeholder) return cmp.snippet_preview(placeholder.text) end):gsub("%$0",
-        "")
+    or cmp
+      .snippet_replace(snippet, function(placeholder) return cmp.snippet_preview(placeholder.text) end)
+      :gsub("%$0", "")
 end
 
 -- This function replaces nested placeholders in a snippet with LSP placeholders.
@@ -529,7 +697,7 @@ function cmp.expand(snippet)
     ok = pcall(vim.snippet.expand, fixed)
 
     local msg = ok and "Failed to parse snippet,\nbut was able to fix it automatically."
-        or ("Failed to parse snippet.\n" .. err)
+      or ("Failed to parse snippet.\n" .. err)
 
     Util[ok and "warn" or "error"](
       ([[%s
