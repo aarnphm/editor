@@ -58,7 +58,8 @@ end
 local function fileinfo()
   local ft = vim.bo[bufnr()].filetype
   if ft == "" or vim.bo[bufnr()].buftype ~= "" then return "" end
-  return narrow(90) and ft or (ft .. " " .. vim.bo[bufnr()].fileencoding)
+  local encoding = vim.bo[bufnr()].fileencoding
+  return not narrow(90) and encoding ~= "" and (ft .. " " .. encoding) or ft
 end
 
 local function branch()
