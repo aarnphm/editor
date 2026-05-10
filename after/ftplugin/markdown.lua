@@ -1,4 +1,13 @@
 Util.lsp.formatters({ "markdown", "markdown.mdx" }, { "prettier", "cbfmt" })
+Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint" })
+Util.lint.linter("markdownlint", {
+  condition = function(ctx)
+    return vim.fs.find(
+      { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" },
+      { path = ctx.filename, upward = true }
+    )[1]
+  end,
+})
 Util.lsp.enable("markdown_oxide", {
   capabilities = {
     workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },

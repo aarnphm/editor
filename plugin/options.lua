@@ -66,7 +66,7 @@ o.shiftwidth = TABWIDTH
 o.shiftround = true
 
 -- UI config
-o.showmode = true
+o.showmode = false
 o.showcmd = true
 o.showbreak = "↳  "
 o.splitbelow = true
@@ -76,7 +76,7 @@ o.timeoutlen = vim.g.vscode and 1000 or 200
 o.updatetime = 200
 o.virtualedit = "block"
 
-o.ls = 2
+o.ls = 3
 o.whichwrap = "b,s,<,>,[,],~"
 o.guifont = "Berkeley Mono:h16"
 o.cmdheight = 1

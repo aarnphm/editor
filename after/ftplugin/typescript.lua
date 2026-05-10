@@ -1,4 +1,5 @@
 Util.lsp.formatters({ "javascript", "javascriptreact", "typescript", "typescriptreact" }, { "prettier" })
+Util.lint.linters({ "javascript", "javascriptreact", "typescript", "typescriptreact" }, { "oxlint" })
 vim.cmd.runtime "after/ftplugin/tailwindcss.lua"
 
 local vtsls = {

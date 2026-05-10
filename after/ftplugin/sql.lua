@@ -1,4 +1,7 @@
-Util.lsp.formatters("sql", { "sqlfluff" })
+local sql_filetypes = { "sql", "mysql", "plsql", "ddl" }
+
+Util.lsp.formatters(sql_filetypes, { "sqlfluff" })
+Util.lint.linters(sql_filetypes, { "sqlfluff" })
 
 vim.bo.commentstring = "-- %s"
 vim.bo.shiftwidth = 2

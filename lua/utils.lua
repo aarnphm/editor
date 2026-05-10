@@ -29,6 +29,97 @@ function M.on_load(name, fn)
   vim.schedule(function() fn(name) end)
 end
 
+local lint = {
+  events = { "BufWritePost", "BufReadPost", "InsertLeave" },
+  linters_by_ft = {},
+  linter_configs = {},
+}
+
+local function list(value) return type(value) == "table" and value or { value } end
+
+function lint.debounce(ms, fn)
+  local timer = vim.uv.new_timer()
+  return function(...)
+    local args = { ... }
+    timer:start(ms, 0, function()
+      timer:stop()
+      vim.schedule_wrap(fn)(unpack(args))
+    end)
+  end
+end
+
+function lint.apply()
+  if not package.loaded.lint then return end
+
+  local lint_mod = require "lint"
+  for name, linter in pairs(lint.linter_configs) do
+    if type(linter) == "table" and type(lint_mod.linters[name]) == "table" then
+      lint_mod.linters[name] = vim.tbl_deep_extend("force", lint_mod.linters[name], linter)
+    else
+      lint_mod.linters[name] = linter
+    end
+  end
+  lint_mod.linters_by_ft = vim.tbl_deep_extend("force", lint_mod.linters_by_ft or {}, lint.linters_by_ft)
+end
+
+function lint.linter(name, opts)
+  lint.linter_configs[name] = vim.tbl_deep_extend("force", lint.linter_configs[name] or {}, opts)
+  lint.apply()
+end
+
+function lint.linters(filetypes, names)
+  filetypes = list(filetypes)
+  names = list(names)
+
+  for _, filetype in ipairs(filetypes) do
+    lint.linters_by_ft[filetype] = lint.linters_by_ft[filetype] or {}
+    for _, name in ipairs(names) do
+      if not vim.tbl_contains(lint.linters_by_ft[filetype], name) then
+        lint.linters_by_ft[filetype][#lint.linters_by_ft[filetype] + 1] = name
+      end
+    end
+  end
+
+  lint.apply()
+end
+
+local function lint_module()
+  if not package.loaded.lint and M.pack and M.pack.get "nvim-lint" then pcall(M.pack.load, "nvim-lint") end
+
+  local ok, lint_mod = pcall(require, "lint")
+  if not ok then return nil end
+  lint.apply()
+  return lint_mod
+end
+
+function lint.try(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  if bufnr ~= vim.api.nvim_get_current_buf() then
+    return vim.api.nvim_buf_call(bufnr, function() lint.try(0) end)
+  end
+
+  local lint_mod = lint_module()
+  if not lint_mod then return end
+
+  local names = lint_mod._resolve_linter_by_ft(vim.bo.filetype)
+  names = vim.list_extend({}, names or {})
+  if #names == 0 then vim.list_extend(names, lint_mod.linters_by_ft["_"] or {}) end
+  vim.list_extend(names, lint_mod.linters_by_ft["*"] or {})
+
+  local ctx = { filename = vim.api.nvim_buf_get_name(bufnr) }
+  ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
+  names = vim.tbl_filter(function(name)
+    local linter = lint_mod.linters[name]
+    if not linter then M.warn("linter: not found " .. name, { title = "nvim-lint" }) end
+    return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
+  end, names)
+
+  if #names > 0 then lint_mod.try_lint(names) end
+end
+
+M.lint = lint
+
 local pack = { specs = {} }
 local loaded = {}
 
@@ -208,7 +299,7 @@ function M.set_default(option, value)
 end
 
 M.url_matcher =
-"\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
 
 ---@param win integer?
 function M.delete_url_match(win)
@@ -596,7 +687,7 @@ end
 function cmp.snippet_preview(snippet)
   local ok, parsed = pcall(function() return vim.lsp._snippet_grammar.parse(snippet) end)
   return ok and tostring(parsed)
-      or cmp
+    or cmp
       .snippet_replace(snippet, function(placeholder) return cmp.snippet_preview(placeholder.text) end)
       :gsub("%$0", "")
 end
@@ -631,7 +722,7 @@ function cmp.expand(snippet)
     ok = pcall(vim.snippet.expand, fixed)
 
     local msg = ok and "Failed to parse snippet,\nbut was able to fix it automatically."
-        or ("Failed to parse snippet.\n" .. err)
+      or ("Failed to parse snippet.\n" .. err)
 
     Util[ok and "warn" or "error"](
       ([[%s
