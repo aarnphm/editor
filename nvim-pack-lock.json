@@ -12,59 +12,73 @@
     },
     "blink.lib": {
       "rev": "f29d8bac6549bc1e7d699c83f680823d7def98bd",
-      "src": "https://github.com/Saghen/blink.lib.git"
+      "src": "https://github.com/Saghen/blink.lib.git",
+      "version": "'main'"
     },
     "conform.nvim": {
       "rev": "dca1a190aa85f9065979ef35802fb77131911106",
-      "src": "https://github.com/stevearc/conform.nvim.git"
+      "src": "https://github.com/stevearc/conform.nvim.git",
+      "version": "'master'"
     },
     "dropbar.nvim": {
       "rev": "f0a42bd92aa647e44221397723453403f5e20f16",
-      "src": "https://github.com/Bekaboo/dropbar.nvim.git"
+      "src": "https://github.com/Bekaboo/dropbar.nvim.git",
+      "version": "'master'"
     },
     "flexoki": {
       "rev": "079554c242a86be5d1a95598c7c6368d6eedd7a3",
-      "src": "https://github.com/nuvic/flexoki-nvim.git"
+      "src": "https://github.com/nuvic/flexoki-nvim.git",
+      "version": "'main'"
     },
     "friendly-snippets": {
       "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
-      "src": "https://github.com/rafamadriz/friendly-snippets.git"
+      "src": "https://github.com/rafamadriz/friendly-snippets.git",
+      "version": "'main'"
     },
     "gitsigns.nvim": {
       "rev": "dd3f588bacbeb041be6facf1742e42097f62165d",
-      "src": "https://github.com/lewis6991/gitsigns.nvim.git"
+      "src": "https://github.com/lewis6991/gitsigns.nvim.git",
+      "version": "'main'"
     },
     "grug-far.nvim": {
       "rev": "21790e59dd0109a92a70cb874dd002af186314f5",
-      "src": "https://github.com/MagicDuck/grug-far.nvim.git"
+      "src": "https://github.com/MagicDuck/grug-far.nvim.git",
+      "version": "'main'"
     },
     "lazydev.nvim": {
       "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
-      "src": "https://github.com/folke/lazydev.nvim.git"
+      "src": "https://github.com/folke/lazydev.nvim.git",
+      "version": "'main'"
     },
     "leap.nvim": {
       "rev": "eab814a744e1b0c9316bf3c5a9766ad28ad7be79",
-      "src": "https://codeberg.org/andyg/leap.nvim.git"
+      "src": "https://codeberg.org/andyg/leap.nvim.git",
+      "version": "'main'"
     },
     "luasnip-latex-snippets.nvim": {
       "rev": "0ac8350bc250a5e1b4dd330b33670bf2c8822b53",
-      "src": "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git"
+      "src": "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git",
+      "version": "'main'"
     },
     "mason.nvim": {
       "rev": "e54f5bf5f12c560da31c17eee5b3e1bd369f3ff9",
-      "src": "https://github.com/mason-org/mason.nvim.git"
+      "src": "https://github.com/mason-org/mason.nvim.git",
+      "version": "'main'"
     },
     "mini.nvim": {
       "rev": "60b5aaac2f0465d67699702e76b9baebf52cb42f",
-      "src": "https://github.com/echasnovski/mini.nvim.git"
+      "src": "https://github.com/echasnovski/mini.nvim.git",
+      "version": "'main'"
     },
     "nvim-lint": {
       "rev": "eab58b48eb11d7745c11c505e0f3057165902461",
-      "src": "https://github.com/mfussenegger/nvim-lint.git"
+      "src": "https://github.com/mfussenegger/nvim-lint.git",
+      "version": "'master'"
     },
     "nvim-lspconfig": {
       "rev": "451d4ef9abd4f0f08e379ef0d55d1c391b6125a7",
-      "src": "https://github.com/neovim/nvim-lspconfig.git"
+      "src": "https://github.com/neovim/nvim-lspconfig.git",
+      "version": "'master'"
     },
     "nvim-treesitter": {
       "rev": "4916d6592ede8c07973490d9322f187e07dfefac",

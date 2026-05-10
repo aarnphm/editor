@@ -19,12 +19,6 @@ Plugin spine:
 - gitsigns.nvim for hunks
 - grug-far.nvim for search and replace
 
-```text
-Startuptime target: boring and low.
-Plugin manager: vim.pack.
-Lockfile: nvim-pack-lock.json.
-```
-
 > [!note]
 >
 > LuaLS is bootstrapped by Mason by default. Other language servers and formatters are expected on PATH or in the flake/dev environment.

@@ -120,18 +120,98 @@ end
 
 M.lint = lint
 
-local pack = { specs = {} }
+local pack = {
+  defaults = {
+    lazy = true,
+    version = "main",
+  },
+  specs = {},
+}
 local loaded = {}
+
+local function pack_expand_src(src)
+  if src:match "^[%w_.-]+/[%w_.-]+$" then return ("https://github.com/%s.git"):format(src) end
+  return src
+end
+
+local function pack_name_from_src(src) return src:gsub("%.git$", ""):match "([^/:%s]+)$" end
+
+local function pack_string_is_source(value) return value:find "/" ~= nil or value:find ":" ~= nil end
+
+local function pack_table_is_spec(value)
+  if type(value) ~= "table" then return false end
+  if value.src or value.name then return true end
+  if type(value[1]) ~= "string" then return false end
+
+  for key in pairs(value) do
+    if type(key) ~= "number" then return true end
+  end
+  return #value == 1 and pack_string_is_source(value[1])
+end
+
+local function pack_normalize_spec(raw_spec)
+  local spec = type(raw_spec) == "string" and { src = raw_spec } or vim.tbl_extend("force", {}, raw_spec)
+  spec.src = spec.src or spec[1]
+  if not spec.src then error "Pack spec missing src" end
+
+  spec[1] = nil
+  spec.name = spec.name or pack_name_from_src(spec.src)
+  if not spec.name then error(("Pack spec missing name: %s"):format(spec.src)) end
+  spec.src = pack_expand_src(spec.src)
+  return vim.tbl_extend("force", pack.defaults, spec)
+end
+
+local function pack_dependency_name(dep, add_spec)
+  if type(dep) == "string" and not pack_string_is_source(dep) then return dep end
+  if type(dep) == "table" and dep.name and not (dep.src or dep[1]) then return dep.name end
+  return add_spec(dep).name
+end
+
+local function pack_dependency_names_from_spec(dependencies, add_spec)
+  if not dependencies then return {} end
+  if pack_table_is_spec(dependencies) then return { pack_dependency_name(dependencies, add_spec) } end
+
+  return vim.tbl_map(function(dep) return pack_dependency_name(dep, add_spec) end, dependencies)
+end
+
+local function pack_store_spec(ret, indexes, spec)
+  local existing = pack.specs[spec.name]
+  if existing then
+    local existing_dependencies = existing.dependencies
+    spec = vim.tbl_extend("force", existing, spec)
+    if existing_dependencies and spec.dependencies then
+      spec.dependencies = vim.list_extend(vim.deepcopy(existing_dependencies), spec.dependencies)
+    end
+    pack.specs[spec.name] = spec
+
+    local add_spec = ret[indexes[spec.name]]
+    add_spec.src = spec.src
+    add_spec.version = spec.version
+    return spec
+  end
+
+  pack.specs[spec.name] = spec
+  indexes[spec.name] = #ret + 1
+  ret[indexes[spec.name]] = {
+    src = spec.src,
+    name = spec.name,
+    version = spec.version,
+  }
+  return spec
+end
 
 local function pack_specs_for_add(specs)
   local ret = {}
-  for _, spec in ipairs(specs) do
-    pack.specs[spec.name] = spec
-    ret[#ret + 1] = {
-      src = spec.src,
-      name = spec.name,
-      version = spec.version,
-    }
+  local indexes = {}
+
+  local function add_spec(raw_spec)
+    local spec = pack_normalize_spec(raw_spec)
+    spec.dependencies = pack_dependency_names_from_spec(spec.dependencies, add_spec)
+    return pack_store_spec(ret, indexes, spec)
+  end
+
+  for _, raw_spec in ipairs(specs) do
+    add_spec(raw_spec)
   end
   return ret
 end
@@ -216,7 +296,13 @@ function pack.setup(specs)
 
   pack.specs = {}
   loaded = {}
-  vim.pack.add(pack_specs_for_add(specs), { confirm = false, load = function() end })
+  local add_specs = pack_specs_for_add(specs)
+  vim.pack.add(add_specs, { confirm = false, load = function() end })
+
+  for _, add_spec in ipairs(add_specs) do
+    local spec = pack.get(add_spec.name)
+    if spec and spec.lazy == false then pack.load(add_spec.name) end
+  end
 end
 
 M.pack = pack

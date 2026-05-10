@@ -49,64 +49,52 @@ hi("CmpGhostText", { link = "Comment", default = true })
 hi("LeapBackdrop", { link = "Comment" })
 hi("LeapMatch", { fg = vim.go.background == "dark" and "white" or "black", bold = true, nocombine = true })
 
-local specs = {
-  { src = "https://github.com/nuvic/flexoki-nvim.git",    name = "flexoki" },
-  { src = "https://github.com/echasnovski/mini.nvim.git", name = "mini.nvim" },
-  { src = "https://github.com/Saghen/blink.lib.git",      name = "blink.lib", lazy = true },
+Util.pack.setup {
+  "folke/lazydev.nvim",
+  "echasnovski/mini.nvim",
+  "mason-org/mason.nvim",
+  "lewis6991/gitsigns.nvim",
+  "nvim-treesitter/nvim-treesitter",
+  "https://codeberg.org/andyg/leap.nvim.git",
   {
-    src = "https://github.com/Saghen/blink.cmp.git",
-    name = "blink.cmp",
-    version = "main",
-    lazy = true,
+    "Saghen/blink.cmp",
     event = "InsertEnter",
-    dependencies = { "blink.lib", "friendly-snippets" },
+    dependencies = { "Saghen/blink.lib", "rafamadriz/friendly-snippets" },
     build = function()
       vim.cmd.packadd "blink.lib"
       vim.cmd.packadd "blink.cmp"
       require("blink.cmp").build():wait(60000)
     end,
   },
-  { src = "https://github.com/rafamadriz/friendly-snippets.git",    name = "friendly-snippets", lazy = true },
+  { "nuvic/flexoki-nvim", name = "flexoki" },
+  { "stevearc/conform.nvim", version = "master" },
+  { "mfussenegger/nvim-lint", version = "master" },
+  { "neovim/nvim-lspconfig", version = "master" },
+  { "Bekaboo/dropbar.nvim", version = "master" },
   {
-    src = "https://github.com/L3MON4D3/LuaSnip.git",
-    name = "LuaSnip",
-    version = "master",
-    lazy = true,
-    build = (not jit.os:find "Windows")
-        and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+    "aarnphm/luasnip-latex-snippets.nvim",
+    dependencies = {
+      "L3MON4D3/LuaSnip",
+      version = "master",
+      build = (not jit.os:find "Windows")
+          and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
         or nil,
-    opts = function()
-      return {
-        history = true,
-        region_check_events = "InsertEnter",
-        delete_check_events = "TextChanged",
-        ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
-        load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
-          markdown = { "lua", "json", "tex" },
-        },
-      }
-    end,
-    config = function(_, opts) require("luasnip").config.setup(opts) end,
+      opts = function()
+        return {
+          history = true,
+          region_check_events = "InsertEnter",
+          delete_check_events = "TextChanged",
+          ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+          load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+            markdown = { "lua", "json", "tex" },
+          },
+        }
+      end,
+      config = function(_, opts) require("luasnip").config.setup(opts) end,
+    },
   },
   {
-    src = "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git",
-    name = "luasnip-latex-snippets.nvim",
-    lazy = true,
-    dependencies = { "LuaSnip" },
-  },
-  { src = "https://github.com/mason-org/mason.nvim.git",            name = "mason.nvim" },
-  { src = "https://github.com/stevearc/conform.nvim.git",           name = "conform.nvim" },
-  { src = "https://github.com/mfussenegger/nvim-lint.git",          name = "nvim-lint",         lazy = true },
-  { src = "https://codeberg.org/andyg/leap.nvim.git",               name = "leap.nvim" },
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter.git", name = "nvim-treesitter",   version = "main" },
-  { src = "https://github.com/neovim/nvim-lspconfig.git",           name = "nvim-lspconfig" },
-  { src = "https://github.com/folke/lazydev.nvim.git",              name = "lazydev.nvim",      lazy = true },
-  { src = "https://github.com/Bekaboo/dropbar.nvim.git",            name = "dropbar.nvim" },
-  { src = "https://github.com/lewis6991/gitsigns.nvim.git",         name = "gitsigns.nvim" },
-  {
-    src = "https://github.com/MagicDuck/grug-far.nvim.git",
-    name = "grug-far.nvim",
-    lazy = true,
+    "MagicDuck/grug-far.nvim",
     cmd = "GrugFar",
     opts = {
       headerMaxWidth = 50,
@@ -115,5 +103,3 @@ local specs = {
     config = function(_, opts) require("grug-far").setup(opts) end,
   },
 }
-
-Util.pack.setup(specs)
