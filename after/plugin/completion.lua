@@ -47,7 +47,7 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
       },
       cmdline = { enabled = false },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer", "stream_meta", "arena_meta" },
         per_filetype = {
           lua = { inherit_defaults = true, "lazydev" },
         },
@@ -62,6 +62,20 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
               ignored_filetypes = { "git", "gitcommit" },
               extended_filetypes = { markdown = { "latex" } },
             },
+          },
+          stream_meta = {
+            name = "Stream",
+            module = "stream.completion",
+            score_offset = 80,
+            min_keyword_length = 0,
+            async = true,
+          },
+          arena_meta = {
+            name = "Arena",
+            module = "arena.completion",
+            score_offset = 80,
+            min_keyword_length = 0,
+            async = true,
           },
         },
       },

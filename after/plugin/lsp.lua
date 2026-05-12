@@ -8,6 +8,29 @@ local function lsp_map(bufnr, mode, lhs, rhs, desc)
   vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
 end
 
+local function jump_to_first_location(what)
+  if vim.tbl_isempty(what.items) then return end
+  vim.fn.setqflist({}, " ", what)
+  vim.cmd "cfirst"
+end
+
+local function clear_lsp_json_nulls(value)
+  if value == vim.NIL or type(value) == "userdata" then return nil end
+  if type(value) ~= "table" then return value end
+
+  for key, child in pairs(value) do
+    value[key] = clear_lsp_json_nulls(child)
+  end
+  return value
+end
+
+local function normalize_lsp_file_operations(client)
+  local workspace = client.server_capabilities and client.server_capabilities.workspace
+  if not (workspace and workspace.fileOperations) then return end
+
+  workspace.fileOperations = clear_lsp_json_nulls(workspace.fileOperations)
+end
+
 Util.lsp.prepend_mason_bin()
 require("mason").setup()
 
@@ -192,6 +215,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if not client then return end
 
+    normalize_lsp_file_operations(client)
     Util.lsp.run_attach_handlers(client, ev)
 
     lsp_map(ev.buf, "n", "K", vim.lsp.buf.hover, "lsp: hover")
@@ -199,7 +223,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lsp_map(ev.buf, "n", "gr", vim.lsp.buf.rename, "lsp: rename")
     lsp_map(ev.buf, "n", "gy", vim.lsp.buf.type_definition, "lsp: type definition")
     lsp_map(ev.buf, "n", "gD", vim.lsp.buf.declaration, "lsp: declaration")
-    lsp_map(ev.buf, "n", "gd", vim.lsp.buf.definition, "lsp: definition")
+    lsp_map(
+      ev.buf,
+      "n",
+      "gd",
+      function() vim.lsp.buf.definition { on_list = jump_to_first_location } end,
+      "lsp: definition"
+    )
     lsp_map(ev.buf, "n", "gI", vim.lsp.buf.implementation, "lsp: implementation")
     lsp_map(ev.buf, "n", "gR", vim.lsp.buf.references, "lsp: references")
     lsp_map(ev.buf, { "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "lsp: code action")
@@ -212,3 +242,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     )
   end,
 })
+
+for _, client in ipairs(vim.lsp.get_clients()) do
+  normalize_lsp_file_operations(client)
+end

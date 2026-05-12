@@ -1,6 +1,6 @@
 ---@class simple.util
 ---@field lsp simple.util.lsp
----@field pack table<string, any>
+---@field pack simple.util.pack
 ---@field root simple.util.root
 ---@field treesitter simple.util.treesitter
 ---@field ui simple.util.ui
@@ -120,6 +120,7 @@ end
 
 M.lint = lint
 
+---@class simple.util.pack
 local pack = {
   defaults = {
     lazy = true,
@@ -385,7 +386,7 @@ function M.set_default(option, value)
 end
 
 M.url_matcher =
-  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+"\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
 
 ---@param win integer?
 function M.delete_url_match(win)
@@ -773,7 +774,7 @@ end
 function cmp.snippet_preview(snippet)
   local ok, parsed = pcall(function() return vim.lsp._snippet_grammar.parse(snippet) end)
   return ok and tostring(parsed)
-    or cmp
+      or cmp
       .snippet_replace(snippet, function(placeholder) return cmp.snippet_preview(placeholder.text) end)
       :gsub("%$0", "")
 end
@@ -808,7 +809,7 @@ function cmp.expand(snippet)
     ok = pcall(vim.snippet.expand, fixed)
 
     local msg = ok and "Failed to parse snippet,\nbut was able to fix it automatically."
-      or ("Failed to parse snippet.\n" .. err)
+        or ("Failed to parse snippet.\n" .. err)
 
     Util[ok and "warn" or "error"](
       ([[%s
