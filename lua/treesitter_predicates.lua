@@ -1,3 +1,5 @@
+local M = {}
+
 local magic_prefixes = { ["\\v"] = true, ["\\m"] = true, ["\\M"] = true, ["\\V"] = true }
 
 local function vim_regex(pattern)
@@ -140,14 +142,18 @@ local function any_of(captures, _, source, predicate)
   return false
 end
 
-add_predicate("eq?", eq)
-add_predicate("any-eq?", any_eq)
-add_predicate("lua-match?", lua_match)
-add_predicate("any-lua-match?", any_lua_match)
-add_predicate("match?", match)
-add_predicate("any-match?", any_match)
-add_predicate("vim-match?", match)
-add_predicate("any-vim-match?", any_match)
-add_predicate("contains?", contains)
-add_predicate("any-contains?", any_contains)
-add_predicate("any-of?", any_of)
+function M.setup()
+  add_predicate("eq?", eq)
+  add_predicate("any-eq?", any_eq)
+  add_predicate("lua-match?", lua_match)
+  add_predicate("any-lua-match?", any_lua_match)
+  add_predicate("match?", match)
+  add_predicate("any-match?", any_match)
+  add_predicate("vim-match?", match)
+  add_predicate("any-vim-match?", any_match)
+  add_predicate("contains?", contains)
+  add_predicate("any-contains?", any_contains)
+  add_predicate("any-of?", any_of)
+end
+
+return M

@@ -1,16 +1,27 @@
 if vim.g.luasnip_latex_snippets_configured then return end
 vim.g.luasnip_latex_snippets_configured = true
 
-Util.pack.load "luasnip-latex-snippets.nvim"
+local function setup_luasnip_latex()
+  if vim.g.luasnip_latex_snippets_loaded then return end
+  vim.g.luasnip_latex_snippets_loaded = true
 
-local luasnip = require "luasnip"
-local latex_snippets = require "luasnip-latex-snippets"
+  Util.pack.load "luasnip-latex-snippets.nvim"
 
-latex_snippets.setup { use_treesitter = true, allow_on_markdown = false }
-latex_snippets.setup_markdown()
+  local luasnip = require "luasnip"
+  local latex_snippets = require "luasnip-latex-snippets"
 
-for _, filetype in ipairs { "norg", "org", "rmd", "quarto" } do
-  luasnip.filetype_extend(filetype, { "markdown" })
+  latex_snippets.setup { use_treesitter = true, allow_on_markdown = false }
+  latex_snippets.setup_markdown()
+
+  for _, filetype in ipairs { "norg", "org", "rmd", "quarto" } do
+    luasnip.filetype_extend(filetype, { "markdown" })
+  end
+
+  luasnip.config.setup { enable_autosnippets = true }
 end
 
-luasnip.config.setup { enable_autosnippets = true }
+vim.api.nvim_create_autocmd("InsertEnter", {
+  group = augroup "luasnip_latex",
+  once = true,
+  callback = setup_luasnip_latex,
+})

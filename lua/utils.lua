@@ -129,6 +129,17 @@ local pack = {
   specs = {},
 }
 local loaded = {}
+local pack_load_events = {}
+local pack_load_event_id = 0
+
+local function pack_now() return vim.uv.hrtime() / 1000000 end
+
+local function pack_record_load(event)
+  pack_load_event_id = pack_load_event_id + 1
+  event.id = pack_load_event_id
+  event.self_ms = math.max(event.elapsed_ms - event.dependency_ms, 0)
+  pack_load_events[#pack_load_events + 1] = event
+end
 
 local function pack_expand_src(src)
   if src:match "^[%w_.-]+/[%w_.-]+$" then return ("https://github.com/%s.git"):format(src) end
@@ -244,21 +255,60 @@ function pack.load(name)
   if loaded[name] then return end
 
   local spec = pack.get(name)
-  if not spec then
+  local event = {
+    name = name,
+    phase = vim.v.vim_did_enter == 0 and "startup" or "runtime",
+    started_ms = pack_now(),
+    dependency_ms = 0,
+    packadd_ms = 0,
+    config_ms = 0,
+    elapsed_ms = 0,
+    ok = false,
+  }
+
+  local ok, err = xpcall(function()
+    if not spec then
+      local packadd_start = pack_now()
+      vim.cmd.packadd(name)
+      event.packadd_ms = pack_now() - packadd_start
+      loaded[name] = true
+      return
+    end
+
+    for _, dep in ipairs(pack_dependency_names(spec)) do
+      local dependency_start = pack_now()
+      pack.load(dep)
+      event.dependency_ms = event.dependency_ms + pack_now() - dependency_start
+    end
+
+    local packadd_start = pack_now()
     vim.cmd.packadd(name)
+    event.packadd_ms = pack_now() - packadd_start
+
+    local opts = pack.opts(spec)
+    if spec.config then
+      local config_start = pack_now()
+      spec.config(spec, opts or {})
+      event.config_ms = pack_now() - config_start
+    end
     loaded[name] = true
-    return
+  end, debug.traceback)
+
+  event.ok = ok
+  event.elapsed_ms = pack_now() - event.started_ms
+  event.error = not ok and err or nil
+  pack_record_load(event)
+
+  if not ok then error(err, 0) end
+end
+
+function pack.profile(opts)
+  opts = opts or {}
+  local ret = {}
+  for _, event in ipairs(pack_load_events) do
+    if opts.all or event.phase == "startup" then ret[#ret + 1] = vim.deepcopy(event) end
   end
-
-  for _, dep in ipairs(pack_dependency_names(spec)) do
-    pack.load(dep)
-  end
-
-  vim.cmd.packadd(name)
-  loaded[name] = true
-
-  local opts = pack.opts(spec)
-  if spec.config then spec.config(spec, opts or {}) end
+  return ret
 end
 
 function pack.run_build(name)
@@ -297,6 +347,8 @@ function pack.setup(specs)
 
   pack.specs = {}
   loaded = {}
+  pack_load_events = {}
+  pack_load_event_id = 0
   local add_specs = pack_specs_for_add(specs)
   vim.pack.add(add_specs, { confirm = false, load = function() end })
 
@@ -386,7 +438,7 @@ function M.set_default(option, value)
 end
 
 M.url_matcher =
-"\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
 
 ---@param win integer?
 function M.delete_url_match(win)
@@ -774,7 +826,7 @@ end
 function cmp.snippet_preview(snippet)
   local ok, parsed = pcall(function() return vim.lsp._snippet_grammar.parse(snippet) end)
   return ok and tostring(parsed)
-      or cmp
+    or cmp
       .snippet_replace(snippet, function(placeholder) return cmp.snippet_preview(placeholder.text) end)
       :gsub("%$0", "")
 end
@@ -809,7 +861,7 @@ function cmp.expand(snippet)
     ok = pcall(vim.snippet.expand, fixed)
 
     local msg = ok and "Failed to parse snippet,\nbut was able to fix it automatically."
-        or ("Failed to parse snippet.\n" .. err)
+      or ("Failed to parse snippet.\n" .. err)
 
     Util[ok and "warn" or "error"](
       ([[%s
@@ -833,6 +885,10 @@ lsp.formatters_by_ft = {}
 
 local enabled_servers = {}
 local attach_handlers = {}
+local mason_setup = false
+local lsp_defaults_configured = false
+local pending_lsp_enable = {}
+local pending_lsp_enable_scheduled = false
 
 local mason_bin = vim.fs.joinpath(vim.fn.stdpath "data", "mason", "bin")
 
@@ -886,7 +942,69 @@ function lsp.prepend_mason_bin()
   end
 end
 
+function lsp.configure_defaults()
+  if lsp_defaults_configured then return end
+
+  vim.lsp.config("*", {
+    capabilities = {
+      textDocument = {
+        completion = {
+          completionItem = {
+            snippetSupport = true,
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = { valueSet = { 1 } },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits", "command", "data" } },
+            tagSupport = { valueSet = { 1 } },
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" },
+          },
+          contextSupport = true,
+          insertTextMode = 1,
+        },
+      },
+      workspace = {
+        didChangeWatchedFiles = { dynamicRegistration = false },
+        fileOperations = { didRename = true, willRename = true },
+      },
+    },
+  })
+
+  lsp_defaults_configured = true
+end
+
+function lsp.setup_mason()
+  lsp.prepend_mason_bin()
+  if mason_setup then return true end
+
+  if M.pack and M.pack.get "mason.nvim" then pcall(M.pack.load, "mason.nvim") end
+
+  local ok, mason = pcall(require, "mason")
+  if not ok then return false end
+
+  mason.setup()
+  mason_setup = true
+  return true
+end
+
 function lsp.ensure_mason_packages(packages, package_servers)
+  if vim.v.vim_did_enter == 0 then
+    vim.api.nvim_create_autocmd("VimEnter", {
+      once = true,
+      callback = function()
+        vim.schedule(function() lsp.ensure_mason_packages(packages, package_servers) end)
+      end,
+    })
+    return
+  end
+
+  if not lsp.setup_mason() then return end
+
   local ok, registry = pcall(require, "mason-registry")
   if not ok then return end
 
@@ -940,6 +1058,31 @@ end
 
 function lsp.enable(name, config)
   if enabled_servers[name] then return end
+
+  if vim.v.vim_did_enter == 0 then
+    pending_lsp_enable[name] = { name = name, config = config }
+    if not pending_lsp_enable_scheduled then
+      pending_lsp_enable_scheduled = true
+      vim.api.nvim_create_autocmd("VimEnter", {
+        once = true,
+        callback = function()
+          vim.schedule(function()
+            local pending = pending_lsp_enable
+            pending_lsp_enable = {}
+            pending_lsp_enable_scheduled = false
+            for _, item in pairs(pending) do
+              lsp.enable(item.name, item.config)
+            end
+          end)
+        end,
+      })
+    end
+    return
+  end
+
+  lsp.prepend_mason_bin()
+  if M.pack and M.pack.get "nvim-lspconfig" then pcall(M.pack.load, "nvim-lspconfig") end
+  lsp.configure_defaults()
 
   if config ~= nil then vim.lsp.config(name, config) end
 

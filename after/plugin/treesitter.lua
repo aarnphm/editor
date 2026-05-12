@@ -1,5 +1,4 @@
--- treesitter
-Util.pack.load "nvim-treesitter"
+local setup_done = false
 
 local function register_mojo_parser()
   local ok_parsers, parsers = pcall(require, "nvim-treesitter.parsers")
@@ -13,12 +12,35 @@ local function register_mojo_parser()
   }
 end
 
-local ts = require "nvim-treesitter"
-ts.setup()
-register_mojo_parser()
-Util.treesitter.get_installed(true)
+local function setup_treesitter()
+  if setup_done then return true end
+  setup_done = true
+
+  Util.pack.load "nvim-treesitter"
+  local ok, ts = pcall(require, "nvim-treesitter")
+  if not ok then return false end
+
+  require("treesitter_predicates").setup()
+  ts.setup()
+  register_mojo_parser()
+  Util.treesitter.get_installed(true)
+  return true
+end
+
+local function start_treesitter(buf, ft)
+  if ft == "" or not setup_treesitter() then return end
+  if not Util.treesitter.have(ft) then return end
+
+  if Util.treesitter.have(ft, "highlights") then pcall(vim.treesitter.start, buf) end
+  if Util.treesitter.have(ft, "indents") then Util.set_default("indentexpr", "v:lua.Util.treesitter.indentexpr()") end
+  if Util.treesitter.have(ft, "folds") and Util.set_default("foldmethod", "expr") then
+    Util.set_default("foldexpr", "v:lua.Util.treesitter.foldexpr()")
+  end
+end
 
 vim.api.nvim_create_user_command("TSInstallDefault", function()
+  if not setup_treesitter() then return end
+
   local missing = vim.tbl_filter(function(lang) return not Util.treesitter.have(lang) end, {
     "bash",
     "c",
@@ -55,21 +77,32 @@ vim.api.nvim_create_user_command("TSInstallDefault", function()
     Util.info "treesitter: all configured parsers are installed"
     return
   end
-  ts.install(missing, { summary = true })
+  require("nvim-treesitter").install(missing, { summary = true })
 end, { desc = "treesitter: install configured missing parsers" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "treesitter",
   callback = function(ev)
     local ft = ev.match
-    if not Util.treesitter.have(ft) then return end
+    if vim.v.vim_did_enter == 0 then return end
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(ev.buf) then
+        vim.api.nvim_buf_call(ev.buf, function() start_treesitter(ev.buf, ft) end)
+      end
+    end)
+  end,
+})
 
-    if Util.treesitter.have(ft, "highlights") then pcall(vim.treesitter.start, ev.buf) end
-    if Util.treesitter.have(ft, "indents") then
-      Util.set_default("indentexpr", "v:lua.Util.treesitter.indentexpr()")
-    end
-    if Util.treesitter.have(ft, "folds") and Util.set_default("foldmethod", "expr") then
-      Util.set_default("foldexpr", "v:lua.Util.treesitter.foldexpr()")
-    end
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = augroup "treesitter_startup_buffers",
+  once = true,
+  callback = function()
+    vim.defer_fn(function()
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(buf) then
+          vim.api.nvim_buf_call(buf, function() start_treesitter(buf, vim.bo[buf].filetype) end)
+        end
+      end
+    end, 20)
   end,
 })

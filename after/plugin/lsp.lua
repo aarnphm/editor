@@ -1,6 +1,4 @@
-Util.pack.load "mason.nvim"
-Util.pack.load "conform.nvim"
-Util.pack.load "nvim-lspconfig"
+Util.lsp.prepend_mason_bin()
 
 local function silent_map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc }) end
 
@@ -31,9 +29,6 @@ local function normalize_lsp_file_operations(client)
   workspace.fileOperations = clear_lsp_json_nulls(workspace.fileOperations)
 end
 
-Util.lsp.prepend_mason_bin()
-require("mason").setup()
-
 local function format_enabled(bufnr)
   if bufnr == nil or bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
   if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then return false end
@@ -51,6 +46,26 @@ local function set_autoformat(enabled, buf_only)
   end
 end
 
+local conform_setup = false
+
+local function conform()
+  if not conform_setup then
+    Util.pack.load "conform.nvim"
+    require("conform").setup {
+      default_format_opts = { timeout_ms = 3000, lsp_format = "fallback" },
+      formatters_by_ft = Util.lsp.formatters_by_ft,
+      formatters = {
+        injected = { options = { ignore_errors = true } },
+        prettier = { condition = Util.lsp.prettier_enabled },
+        ruff_fix = { condition = Util.lsp.ruff_format_enabled },
+        ruff_organize_imports = { condition = Util.lsp.ruff_format_enabled },
+      },
+    }
+    conform_setup = true
+  end
+  return require "conform"
+end
+
 local function format_info()
   local bufnr = vim.api.nvim_get_current_buf()
   local buffer_setting = vim.b[bufnr].autoformat
@@ -61,34 +76,16 @@ local function format_info()
     ("- effective: %s"):format(format_enabled(bufnr) and "enabled" or "disabled"),
   }
 
-  local conform_ok, conform = pcall(require, "conform")
-  if conform_ok then
-    local formatters = conform.list_formatters(bufnr)
-    lines[#lines + 1] = ""
-    lines[#lines + 1] = #formatters > 0 and "# Formatters" or "# Formatters\n- none"
-    for _, formatter in ipairs(formatters) do
-      local marker = formatter.available and "x" or " "
-      lines[#lines + 1] = ("- [%s] %s"):format(marker, formatter.name)
-    end
+  local formatters = conform().list_formatters(bufnr)
+  lines[#lines + 1] = ""
+  lines[#lines + 1] = #formatters > 0 and "# Formatters" or "# Formatters\n- none"
+  for _, formatter in ipairs(formatters) do
+    local marker = formatter.available and "x" or " "
+    lines[#lines + 1] = ("- [%s] %s"):format(marker, formatter.name)
   end
 
   Util[format_enabled(bufnr) and "info" or "warn"](lines)
 end
-
-require("conform").setup {
-  default_format_opts = { timeout_ms = 3000, lsp_format = "fallback" },
-  format_on_save = function(bufnr)
-    if not format_enabled(bufnr) then return end
-    return { timeout_ms = 3000, lsp_format = "fallback" }
-  end,
-  formatters_by_ft = Util.lsp.formatters_by_ft,
-  formatters = {
-    injected = { options = { ignore_errors = true } },
-    prettier = { condition = Util.lsp.prettier_enabled },
-    ruff_fix = { condition = Util.lsp.ruff_format_enabled },
-    ruff_organize_imports = { condition = Util.lsp.ruff_format_enabled },
-  },
-}
 
 vim.api.nvim_create_user_command("Format", function(opts)
   local range
@@ -99,7 +96,7 @@ vim.api.nvim_create_user_command("Format", function(opts)
       ["end"] = { opts.line2, end_line:len() },
     }
   end
-  require("conform").format { async = true, lsp_format = "fallback", range = range }
+  conform().format { async = true, lsp_format = "fallback", range = range }
 end, { desc = "format: selection or buffer", range = true })
 vim.api.nvim_create_user_command("FormatInfo", format_info, { desc = "format: info" })
 vim.api.nvim_create_user_command("FormatDisable", function(opts)
@@ -118,96 +115,62 @@ end, { bang = true, desc = "format: toggle autoformat" })
 silent_map(
   { "n", "v" },
   "<leader><leader>f",
-  function() require("conform").format { async = true, lsp_format = "fallback" } end,
+  function() conform().format { async = true, lsp_format = "fallback" } end,
   "format: buffer"
 )
 silent_map(
   { "n", "v" },
   "<leader>cF",
-  function() require("conform").format { formatters = { "injected" }, timeout_ms = 3000 } end,
+  function() conform().format { formatters = { "injected" }, timeout_ms = 3000 } end,
   "format: injected langs"
 )
 silent_map("n", "<leader>uf", "<cmd>FormatToggle<cr>", "format: toggle autoformat")
 silent_map("n", "<leader>uF", "<cmd>FormatToggle!<cr>", "format: toggle buffer autoformat")
 
-vim.diagnostic.config {
-  severity_sort = true,
-  underline = false,
-  update_in_insert = false,
-  virtual_text = false,
-  float = {
-    close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-    focusable = false,
-    focus = false,
-    source = "if_many",
-    format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
-  },
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = "✖",
-      [vim.diagnostic.severity.WARN] = "▲",
-      [vim.diagnostic.severity.HINT] = "⚑",
-      [vim.diagnostic.severity.INFO] = "●",
-    },
-  },
-}
-
-vim.lsp.config("*", {
-  capabilities = {
-    textDocument = {
-      completion = {
-        completionItem = {
-          snippetSupport = true,
-          commitCharactersSupport = false,
-          deprecatedSupport = true,
-          documentationFormat = { "markdown", "plaintext" },
-          insertReplaceSupport = true,
-          insertTextModeSupport = { valueSet = { 1 } },
-          labelDetailsSupport = true,
-          preselectSupport = false,
-          resolveSupport = { properties = { "documentation", "detail", "additionalTextEdits", "command", "data" } },
-          tagSupport = { valueSet = { 1 } },
-        },
-        completionList = {
-          itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" },
-        },
-        contextSupport = true,
-        insertTextMode = 1,
-      },
-    },
-    workspace = {
-      didChangeWatchedFiles = { dynamicRegistration = false },
-      fileOperations = { didRename = true, willRename = true },
-    },
-  },
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = augroup "format_on_save",
+  callback = function(event)
+    if not format_enabled(event.buf) then return end
+    conform().format { bufnr = event.buf, timeout_ms = 3000, lsp_format = "fallback" }
+  end,
 })
 
-Util.lsp.enable("lua_ls", {
-  settings = {
-    Lua = {
-      runtime = { version = "LuaJIT", special = { reload = "require" } },
-      library = { vim.env.VIMRUNTIME },
-      telemetry = { enable = false },
-      semantic = { enable = true },
-      completion = { workspaceWord = true, callSnippet = "Replace" },
-      hover = { expandAlias = false },
-      hint = {
-        enable = true,
-        setType = false,
-        paramType = true,
-        paramName = false,
-        semicolon = "Disable",
-        arrayIndex = "Disable",
-      },
-      diagnostics = {
-        disable = { "incomplete-signature-doc", "trailing-space" },
-        unusedLocalExclude = { "_*" },
+local function setup_diagnostics()
+  vim.diagnostic.config {
+    severity_sort = true,
+    underline = false,
+    update_in_insert = false,
+    virtual_text = false,
+    float = {
+      close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+      focusable = false,
+      focus = false,
+      source = "if_many",
+      format = function(diagnostic) return string.format("%s (%s)", diagnostic.message, diagnostic.source) end,
+    },
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = "✖",
+        [vim.diagnostic.severity.WARN] = "▲",
+        [vim.diagnostic.severity.HINT] = "⚑",
+        [vim.diagnostic.severity.INFO] = "●",
       },
     },
-  },
-})
+  }
+end
 
-Util.lsp.ensure_mason_packages({ "lua-language-server" }, { ["lua-language-server"] = "lua_ls" })
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = augroup "diagnostics",
+  once = true,
+  callback = function()
+    vim.schedule(function()
+      setup_diagnostics()
+      for _, client in ipairs(vim.lsp.get_clients()) do
+        normalize_lsp_file_operations(client)
+      end
+    end)
+  end,
+})
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = augroup "lsp_attach",
@@ -242,7 +205,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
     )
   end,
 })
-
-for _, client in ipairs(vim.lsp.get_clients()) do
-  normalize_lsp_file_operations(client)
-end

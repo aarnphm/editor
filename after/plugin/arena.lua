@@ -15,16 +15,28 @@ local function normalize_path(path)
   return vim.fs.normalize(vim.uv.fs_realpath(expanded) or expanded)
 end
 
-local ok, TS_QUERY = pcall(
-  vim.treesitter.query.parse,
-  "markdown",
-  [[
+local ts_query
+local ts_query_warned = false
+
+local function arena_query()
+  if ts_query then return ts_query end
+
+  local ok, query = pcall(
+    vim.treesitter.query.parse,
+    "markdown",
+    [[
   (list_item) @item
 ]]
-)
-if not ok then
-  vim.schedule(function() vim.notify("arena-meta: markdown Treesitter parser unavailable", vim.log.levels.WARN) end)
-  return
+  )
+  if ok then
+    ts_query = query
+    return ts_query
+  end
+
+  if not ts_query_warned then
+    ts_query_warned = true
+    vim.schedule(function() vim.notify("arena-meta: markdown Treesitter parser unavailable", vim.log.levels.WARN) end)
+  end
 end
 
 local arena_group = augroup "arena_meta"
@@ -357,14 +369,17 @@ local function ensure_arena_meta(bufnr, initial_tick, auto_save)
 
   local tree = parser:parse()[1]
   if not tree then return end
+  local query = arena_query()
+  if not query then return end
+
   local root = tree:root()
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local fm_end = frontmatter_end(lines)
   local date = current_date()
   local modifications = {}
 
-  for id, node in TS_QUERY:iter_captures(root, bufnr, 0, -1) do
-    if TS_QUERY.captures[id] ~= "item" then goto continue end
+  for id, node in query:iter_captures(root, bufnr, 0, -1) do
+    if query.captures[id] ~= "item" then goto continue end
     local sr, sc = node:start()
     if sr <= fm_end then goto continue end
 

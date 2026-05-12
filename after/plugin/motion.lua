@@ -1,8 +1,15 @@
--- leap.nvim
-Util.pack.load "leap.nvim"
+local leap
+local clever_f
+local clever_t
 
-local leap = require "leap"
-leap.opts["max_highlighted_traversal_targets"] = 15
+local function setup_leap()
+  if leap then return leap end
+
+  Util.pack.load "leap.nvim"
+  leap = require "leap"
+  leap.opts["max_highlighted_traversal_targets"] = 15
+  return leap
+end
 
 local function leap_ft_safe_labels()
   local mode = vim.fn.mode(1)
@@ -11,7 +18,8 @@ local function leap_ft_safe_labels()
 end
 
 local function leap_ft(args)
-  leap.leap(vim.tbl_deep_extend("keep", args, {
+  local leap_mod = setup_leap()
+  leap_mod.leap(vim.tbl_deep_extend("keep", args, {
     inputlen = 1,
     inclusive = true,
     opts = {
@@ -20,6 +28,16 @@ local function leap_ft(args)
       vim_opts = { ["go.ignorecase"] = false },
     },
   }))
+end
+
+local function traversal_keys(forward, backward)
+  if forward == "f" then
+    if not clever_f then clever_f = require("leap.user").with_traversal_keys("f", "F") end
+    return clever_f
+  end
+
+  if not clever_t then clever_t = require("leap.user").with_traversal_keys(forward, backward) end
+  return clever_t
 end
 
 local function prepend_leap_key(key, keys)
@@ -33,6 +51,7 @@ local function prepend_leap_key(key, keys)
 end
 
 local function leap_line_start(skip_range)
+  local leap_mod = setup_leap()
   local win = vim.api.nvim_get_current_win()
   local info = vim.fn.getwininfo(win)[1]
   local cur_line = vim.fn.line "."
@@ -59,51 +78,55 @@ local function leap_line_start(skip_range)
     return math.abs(cur_screen_row - left_row) < math.abs(cur_screen_row - right_row)
   end)
 
-  leap.leap { target_windows = { win }, targets = targets }
+  leap_mod.leap { target_windows = { win }, targets = targets }
 end
 
-local clever = require("leap.user").with_traversal_keys
-local clever_f = clever("f", "F")
-local clever_t = clever("t", "T")
+local function feed_leap_plug(keys)
+  return function()
+    setup_leap()
+    vim.api.nvim_feedkeys(vim.keycode(keys), "m", false)
+  end
+end
+
 vim.keymap.set(
   { "n", "x", "o" },
   "f",
-  function() leap_ft { opts = clever_f } end,
+  function() leap_ft { opts = traversal_keys("f", "F") } end,
   { desc = "motion: leap forward to char" }
 )
 vim.keymap.set(
   { "n", "x", "o" },
   "F",
-  function() leap_ft { backward = true, opts = clever_f } end,
+  function() leap_ft { backward = true, opts = traversal_keys("f", "F") } end,
   { desc = "motion: leap backward to char" }
 )
 vim.keymap.set(
   { "n", "x", "o" },
   "t",
-  function() leap_ft { offset = -1, opts = clever_t } end,
+  function() leap_ft { offset = -1, opts = traversal_keys("t", "T") } end,
   { desc = "motion: leap forward till char" }
 )
 vim.keymap.set(
   { "n", "x", "o" },
   "T",
-  function() leap_ft { backward = true, offset = 1, opts = clever_t } end,
+  function() leap_ft { backward = true, offset = 1, opts = traversal_keys("t", "T") } end,
   { desc = "motion: leap backward till char" }
 )
-vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)", { desc = "motion: leap forward to" })
-vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)", { desc = "motion: leap backward to" })
-vim.keymap.set("n", "gs", "<Plug>(leap-from-window)", { desc = "motion: leap from window" })
+vim.keymap.set({ "n", "x", "o" }, "s", feed_leap_plug "<Plug>(leap-forward)", { desc = "motion: leap forward to" })
+vim.keymap.set({ "n", "x", "o" }, "S", feed_leap_plug "<Plug>(leap-backward)", { desc = "motion: leap backward to" })
+vim.keymap.set("n", "gs", feed_leap_plug "<Plug>(leap-from-window)", { desc = "motion: leap from window" })
 vim.keymap.set({ "n", "x", "o" }, "ga", function()
-  local keys = vim.deepcopy(leap.opts.keys)
+  local leap_mod = setup_leap()
+  local keys = vim.deepcopy(leap_mod.opts.keys)
   keys.next_target = prepend_leap_key("a", keys.next_target)
   keys.prev_target = prepend_leap_key("A", keys.prev_target)
   require("leap.treesitter").select { opts = { keys = keys } }
 end, { desc = "motion: leap treesitter" })
-vim.keymap.set(
-  { "n", "x", "o" },
-  "gA",
-  'V<cmd>lua require("leap.treesitter").select()<cr>',
-  { desc = "motion: leap treesitter (linewise)" }
-)
+vim.keymap.set({ "n", "x", "o" }, "gA", function()
+  setup_leap()
+  vim.cmd.normal { "V", bang = true }
+  require("leap.treesitter").select()
+end, { desc = "motion: leap treesitter (linewise)" })
 vim.keymap.set("o", "|", function()
   vim.cmd "normal! V"
   leap_line_start()

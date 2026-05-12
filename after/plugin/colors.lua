@@ -1,37 +1,37 @@
 -- colorscheme
 Util.pack.load "flexoki"
 
-local ok, palette = pcall(require, "flexoki.palette")
+local ok, flexoki = pcall(require, "flexoki")
 if not ok then
   vim.cmd.colorscheme "habamax"
 else
-  require("flexoki").setup {
+  flexoki.setup {
     styles = { italic = true },
     highlight_groups = {
-      ["@variable"] = { fg = palette.text, italic = false },
-      ["@parameter"] = { fg = palette.purple_two, italic = false },
-      ["@variable.parameter"] = { fg = palette.purple_two, italic = false },
-      StatusLine = { fg = palette.text, bg = palette.overlay },
-      StatusLineNC = { fg = palette.muted, bg = palette.overlay },
-      SimpleStatusline = { fg = palette.text, bg = palette.overlay },
-      SimpleStatuslineModeNormal = { fg = palette.base, bg = palette.blue_two, bold = true },
-      SimpleStatuslineModeInsert = { fg = palette.base, bg = palette.green_two, bold = true },
-      SimpleStatuslineModeVisual = { fg = palette.base, bg = palette.magenta_two, bold = true },
-      SimpleStatuslineModeReplace = { fg = palette.base, bg = palette.red_two, bold = true },
-      SimpleStatuslineModeCommand = { fg = palette.base, bg = palette.yellow_two, bold = true },
-      SimpleStatuslineModeOther = { fg = palette.base, bg = palette.purple_two, bold = true },
-      SimpleStatuslineAccent = { fg = palette.blue_two, bg = palette.overlay },
-      SimpleStatuslineWarn = { fg = palette.orange_two, bg = palette.overlay },
-      SimpleStatuslineFile = { fg = palette.text, bg = palette.overlay, bold = true },
-      SimpleStatuslineInfo = { fg = palette.purple_two, bg = palette.overlay },
-      SimpleStatuslineMuted = { fg = palette.muted, bg = palette.overlay },
-      SimpleStatuslineLocation = { fg = palette.cyan_two, bg = palette.overlay },
-      QuickFixLine = { bg = palette.highlight_high },
-      WinBar = { bg = palette.base },
-      WinBarNC = { bg = palette.base },
-      LspCodeLens = { fg = palette.purple_two, italic = true },
-      LspCodeLensSeparator = { fg = palette.muted, italic = true },
-      DropBarMenuCurrentContext = { bg = palette.base },
+      ["@variable"] = { fg = "text", italic = false },
+      ["@parameter"] = { fg = "purple_two", italic = false },
+      ["@variable.parameter"] = { fg = "purple_two", italic = false },
+      StatusLine = { fg = "text", bg = "overlay" },
+      StatusLineNC = { fg = "muted", bg = "overlay" },
+      SimpleStatusline = { fg = "text", bg = "overlay" },
+      SimpleStatuslineModeNormal = { fg = "base", bg = "blue_two", bold = true },
+      SimpleStatuslineModeInsert = { fg = "base", bg = "green_two", bold = true },
+      SimpleStatuslineModeVisual = { fg = "base", bg = "magenta_two", bold = true },
+      SimpleStatuslineModeReplace = { fg = "base", bg = "red_two", bold = true },
+      SimpleStatuslineModeCommand = { fg = "base", bg = "yellow_two", bold = true },
+      SimpleStatuslineModeOther = { fg = "base", bg = "purple_two", bold = true },
+      SimpleStatuslineAccent = { fg = "blue_two", bg = "overlay" },
+      SimpleStatuslineWarn = { fg = "orange_two", bg = "overlay" },
+      SimpleStatuslineFile = { fg = "text", bg = "overlay", bold = true },
+      SimpleStatuslineInfo = { fg = "purple_two", bg = "overlay" },
+      SimpleStatuslineMuted = { fg = "muted", bg = "overlay" },
+      SimpleStatuslineLocation = { fg = "cyan_two", bg = "overlay" },
+      QuickFixLine = { bg = "highlight_high" },
+      WinBar = { bg = "base" },
+      WinBarNC = { bg = "base" },
+      LspCodeLens = { fg = "purple_two", italic = true },
+      LspCodeLensSeparator = { fg = "muted", italic = true },
+      DropBarMenuCurrentContext = { bg = "base" },
     },
   }
   vim.cmd.colorscheme "flexoki"

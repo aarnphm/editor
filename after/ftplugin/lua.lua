@@ -7,6 +7,33 @@ require("lazydev").setup {
   },
 }
 
+Util.lsp.enable("lua_ls", {
+  settings = {
+    Lua = {
+      runtime = { version = "LuaJIT", special = { reload = "require" } },
+      library = { vim.env.VIMRUNTIME },
+      telemetry = { enable = false },
+      semantic = { enable = true },
+      completion = { workspaceWord = true, callSnippet = "Replace" },
+      hover = { expandAlias = false },
+      hint = {
+        enable = true,
+        setType = false,
+        paramType = true,
+        paramName = false,
+        semicolon = "Disable",
+        arrayIndex = "Disable",
+      },
+      diagnostics = {
+        disable = { "incomplete-signature-doc", "trailing-space" },
+        unusedLocalExclude = { "_*" },
+      },
+    },
+  },
+})
+
+Util.lsp.ensure_mason_packages({ "lua-language-server" }, { ["lua-language-server"] = "lua_ls" })
+
 Util.lsp.formatters("lua", { "stylua" })
 Util.lint.linters("lua", { "selene" })
 Util.lint.linter("selene", {
