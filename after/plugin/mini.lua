@@ -261,8 +261,8 @@ local function git_root()
 end
 
 local function startup_git_files_window()
-  local width = math.min(96, math.max(40, math.floor(0.62 * vim.o.columns)))
-  local height = math.min(28, math.max(12, math.floor(0.54 * vim.o.lines)))
+  local width = math.min(120, math.max(56, math.floor(0.78 * vim.o.columns)))
+  local height = math.min(36, math.max(16, math.floor(0.68 * vim.o.lines)))
 
   width = math.min(width, math.max(1, vim.o.columns - 4))
   height = math.min(height, math.max(1, vim.o.lines - 4))

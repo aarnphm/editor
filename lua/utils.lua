@@ -1161,6 +1161,72 @@ end
 
 function lsp.ruff_format_enabled(_, ctx) return not lsp.skip_ruff_format(ctx and ctx.filename) end
 
+local cbfmt_languages = M.memoize(function(config)
+  local ok, lines = pcall(vim.fn.readfile, config)
+  if not ok then return {} end
+
+  local languages = {}
+  local in_languages = false
+  for _, line in ipairs(lines) do
+    local section = line:match "^%s*%[([^%]]+)%]"
+    if section then
+      in_languages = section == "languages"
+    elseif in_languages then
+      local key = line:match "^%s*[\"']([^\"']+)[\"']%s*=" or line:match "^%s*([%w_.+-]+)%s*="
+      if key then languages[key] = true end
+    end
+  end
+
+  return languages
+end)
+
+local function markdown_code_fence_language(line)
+  local marker, info = line:match "^%s*(```+)%s*(.-)%s*$"
+  if not marker then
+    marker, info = line:match "^%s*(~~~+)%s*(.-)%s*$"
+  end
+  if not marker then return nil end
+
+  local language = info:match "^%{?%.?([%w_.+-]+)"
+  return language, marker:sub(1, 1), #marker
+end
+
+local function markdown_has_cbfmt_language(bufnr, languages)
+  local in_fence = false
+  local fence_char = nil
+  local fence_len = 0
+
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
+    local language, char, len = markdown_code_fence_language(line)
+    if char then
+      if in_fence then
+        if char == fence_char and len >= fence_len then
+          in_fence = false
+          fence_char = nil
+          fence_len = 0
+        end
+      else
+        if language and languages[language] then return true end
+        in_fence = true
+        fence_char = char
+        fence_len = len
+      end
+    end
+  end
+
+  return false
+end
+
+function lsp.cbfmt_enabled(_, ctx)
+  if not (ctx and ctx.buf and vim.api.nvim_buf_is_valid(ctx.buf)) then return false end
+
+  local start = ctx.dirname or vim.fs.dirname(ctx.filename)
+  local config = start and vim.fs.find(".cbfmt.toml", { path = start, upward = true, type = "file" })[1]
+  if not config then return false end
+
+  return markdown_has_cbfmt_language(ctx.buf, cbfmt_languages(config))
+end
+
 local prettier_has_config = M.memoize(function(filename)
   if vim.fn.executable "prettier" == 0 then return false end
   vim.fn.system { "prettier", "--find-config-path", filename }

@@ -55,6 +55,7 @@ local function conform()
       default_format_opts = { timeout_ms = 3000, lsp_format = "fallback" },
       formatters_by_ft = Util.lsp.formatters_by_ft,
       formatters = {
+        cbfmt = { condition = Util.lsp.cbfmt_enabled },
         injected = { options = { ignore_errors = true } },
         prettier = { condition = Util.lsp.prettier_enabled },
         ruff_fix = { condition = Util.lsp.ruff_format_enabled },
