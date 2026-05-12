@@ -56,6 +56,11 @@ Util.pack.setup {
   "lewis6991/gitsigns.nvim",
   "nvim-treesitter/nvim-treesitter",
   "https://codeberg.org/andyg/leap.nvim.git",
+  { "nuvic/flexoki-nvim",     name = "flexoki" },
+  { "stevearc/conform.nvim",  version = "master" },
+  { "mfussenegger/nvim-lint", version = "master" },
+  { "neovim/nvim-lspconfig",  version = "master" },
+  { "Bekaboo/dropbar.nvim",   version = "master" },
   {
     "Saghen/blink.cmp",
     event = "InsertEnter",
@@ -66,31 +71,28 @@ Util.pack.setup {
       require("blink.cmp").build():wait(60000)
     end,
   },
-  { "nuvic/flexoki-nvim", name = "flexoki" },
-  { "stevearc/conform.nvim", version = "master" },
-  { "mfussenegger/nvim-lint", version = "master" },
-  { "neovim/nvim-lspconfig", version = "master" },
-  { "Bekaboo/dropbar.nvim", version = "master" },
   {
     "aarnphm/luasnip-latex-snippets.nvim",
     dependencies = {
-      "L3MON4D3/LuaSnip",
-      version = "master",
-      build = (not jit.os:find "Windows")
-          and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-        or nil,
-      opts = function()
-        return {
-          history = true,
-          region_check_events = "InsertEnter",
-          delete_check_events = "TextChanged",
-          ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
-          load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
-            markdown = { "lua", "json", "tex" },
-          },
-        }
-      end,
-      config = function(_, opts) require("luasnip").config.setup(opts) end,
+      {
+        "L3MON4D3/LuaSnip",
+        version = "master",
+        build = (not jit.os:find "Windows")
+            and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+            or nil,
+        opts = function()
+          return {
+            history = true,
+            region_check_events = "InsertEnter",
+            delete_check_events = "TextChanged",
+            ft_func = function() return vim.split(vim.bo.filetype, ".", { plain = true }) end,
+            load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft {
+              markdown = { "lua", "json", "tex" },
+            },
+          }
+        end,
+        config = function(_, opts) require("luasnip").config.setup(opts) end,
+      }
     },
   },
   {
