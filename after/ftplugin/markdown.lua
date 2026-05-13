@@ -372,28 +372,81 @@ vim.keymap.set(
 )
 
 ---@param line string
----@return { indent: string, current: string, next: string, rest: string }?
-local function _md_list_parts(line)
-  local indent, marker = line:match "^(%s*)([%-%+%*]%s+%[[ xX%-]%]%s+)"
-  if indent then
-    local rest = line:sub(#indent + #marker + 1)
-    return { indent = indent, current = marker, next = marker, rest = rest }
+---@return string indent
+---@return string quote
+---@return string body
+local function _md_split_quote_prefix(line)
+  local indent = line:match "^(%s*)" or ""
+  local idx = #indent + 1
+  local quote = ""
+
+  while line:sub(idx, idx) == ">" do
+    quote = quote .. ">"
+    idx = idx + 1
+    local spaces = line:match("^(%s*)", idx) or ""
+    quote = quote .. spaces
+    idx = idx + #spaces
   end
 
-  indent, marker = line:match "^(%s*)([%-%+%*]%s+)"
+  return indent, quote, line:sub(idx)
+end
+
+---@param line string
+---@return { prefix: string, insert_prefix: string, next: string, rest: string }?
+local function _md_list_parts(line)
+  local function result(base_indent, quote, indent, next_marker, rest)
+    return {
+      prefix = base_indent .. quote .. indent,
+      insert_prefix = quote .. indent,
+      next = next_marker,
+      rest = rest,
+    }
+  end
+
+  local base_indent, quote, body = _md_split_quote_prefix(line)
+  local indent, marker = body:match "^(%s*)([%-%+%*]%s+%[[ xX%-]%]%s+)"
   if indent then
-    local rest = line:sub(#indent + #marker + 1)
-    return { indent = indent, current = marker, next = marker, rest = rest }
+    local rest = body:sub(#indent + #marker + 1)
+    return result(base_indent, quote, indent, marker, rest)
+  end
+
+  indent, marker = body:match "^(%s*)([%-%+%*]%s+)"
+  if indent then
+    local rest = body:sub(#indent + #marker + 1)
+    return result(base_indent, quote, indent, marker, rest)
   end
 
   local num, sep
-  indent, num, sep = line:match "^(%s*)(%d+)([.)])%s+"
+  indent, num, sep = body:match "^(%s*)(%d+)([.)])%s+"
   if indent then
     local current = string.format("%s%s ", num, sep)
     local next_marker = string.format("%d%s ", tonumber(num) + 1, sep)
-    local rest = line:sub(#indent + #current + 1)
-    return { indent = indent, current = current, next = next_marker, rest = rest }
+    local rest = body:sub(#indent + #current + 1)
+    return result(base_indent, quote, indent, next_marker, rest)
   end
+end
+
+---@param line string
+---@return string?
+local function _md_blockquote_prefix(line)
+  local base_indent, quote = _md_split_quote_prefix(line)
+  if quote == "" then return nil end
+  return base_indent .. quote, quote
+end
+
+---@param line string
+---@return string
+local function _md_next_line_prefix(line)
+  local parts = _md_list_parts(line)
+  if parts then
+    if parts.rest:match "^%s*$" then return parts.prefix end
+    return parts.prefix .. parts.next
+  end
+
+  local bq_prefix = _md_blockquote_prefix(line)
+  if bq_prefix then return bq_prefix end
+
+  return line:match "^(%s*)" or ""
 end
 
 ---@param opts? { blockquote_only?: boolean }
@@ -406,17 +459,40 @@ local function _md_smart_cr(opts)
     local parts = _md_list_parts(line)
     if parts then
       if parts.rest:match "^%s*$" and col >= #line then
-        return vim.api.nvim_replace_termcodes("<C-u>" .. parts.indent .. "<CR>", true, false, true)
+        return vim.api.nvim_replace_termcodes(
+          "<Esc>0C" .. parts.prefix .. "<CR>" .. parts.insert_prefix,
+          true,
+          false,
+          true
+        )
       end
 
-      return vim.api.nvim_replace_termcodes("<CR>" .. parts.next, true, false, true)
+      return vim.api.nvim_replace_termcodes("<CR>" .. parts.insert_prefix .. parts.next, true, false, true)
     end
   end
 
-  local bq_prefix = line:match "^%s*>+%s*"
-  if bq_prefix then return vim.api.nvim_replace_termcodes("<CR>" .. bq_prefix, true, false, true) end
+  local _, bq_insert_prefix = _md_blockquote_prefix(line)
+  if bq_insert_prefix then return vim.api.nvim_replace_termcodes("<CR>" .. bq_insert_prefix, true, false, true) end
 
   return vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+end
+
+---@param command "o"|"O"
+local function _md_smart_open(command)
+  if vim.v.count > 0 then
+    local keys = vim.api.nvim_replace_termcodes(("%d%s"):format(vim.v.count, command), true, false, true)
+    vim.api.nvim_feedkeys(keys, "n", false)
+    return
+  end
+
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local line = vim.api.nvim_get_current_line()
+  local prefix = _md_next_line_prefix(line)
+  local insert_row = command == "o" and row or (row - 1)
+
+  vim.api.nvim_buf_set_lines(0, insert_row, insert_row, false, { prefix })
+  vim.api.nvim_win_set_cursor(0, { insert_row + 1, math.max(#prefix - 1, 0) })
+  vim.cmd "startinsert!"
 end
 
 vim.keymap.set("i", "<CR>", _md_smart_cr, { buffer = true, expr = true, desc = "markdown: continue list" })
@@ -426,6 +502,14 @@ vim.keymap.set(
   function() return _md_smart_cr { blockquote_only = true } end,
   { buffer = true, expr = true, desc = "markdown: continue blockquote" }
 )
+vim.keymap.set("n", "o", function() _md_smart_open "o" end, {
+  buffer = true,
+  desc = "markdown: open continuation below",
+})
+vim.keymap.set("n", "O", function() _md_smart_open "O" end, {
+  buffer = true,
+  desc = "markdown: open continuation above",
+})
 
 local function _md_insert_emdash() return "—" end
 
