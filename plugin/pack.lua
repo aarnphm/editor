@@ -19,29 +19,6 @@ local function complete_pack_names(arg_lead)
   return matches
 end
 
-local function update_pack(opts)
-  local names = #opts.fargs > 0 and opts.fargs or nil
-  vim.pack.update(names, {
-    force = opts.bang,
-    target = opts.target,
-  })
-end
-
-local function build_pack(opts)
-  if not (Util.pack and Util.pack.build) then
-    vim.notify("PackBuild unavailable", vim.log.levels.ERROR, { title = "vim.pack" })
-    return
-  end
-
-  local names = #opts.fargs > 0 and opts.fargs or nil
-  local built = Util.pack.build(names)
-  if #built == 0 then
-    vim.notify("No build hooks matched", vim.log.levels.INFO, { title = "vim.pack" })
-    return
-  end
-  vim.notify("Built: " .. table.concat(built, ", "), vim.log.levels.INFO, { title = "vim.pack" })
-end
-
 local profile_buf
 local source_stack = {}
 local source_events = {}
@@ -228,24 +205,34 @@ vim.api.nvim_create_user_command("PackStatus", function()
   vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "vim.pack" })
 end, { desc = "vim.pack: show managed plugins" })
 
-vim.api.nvim_create_user_command("PackUpdate", function(opts) update_pack(opts) end, {
+vim.api.nvim_create_user_command("PackUpdate", function(opts)
+  opts = vim.tbl_extend("force", { target = "lockfile", bang = true }, opts or {})
+  local names = #opts.fargs > 0 and opts.fargs or nil
+  vim.pack.update(names, {
+    force = opts.bang,
+    target = opts.target,
+  })
+end, {
   bang = true,
   nargs = "*",
   complete = complete_pack_names,
   desc = "vim.pack: update plugins",
 })
 
-vim.api.nvim_create_user_command("PackLock", function(opts)
-  opts.target = "lockfile"
-  update_pack(opts)
-end, {
-  bang = true,
-  nargs = "*",
-  complete = complete_pack_names,
-  desc = "vim.pack: update lockfile metadata",
-})
+vim.api.nvim_create_user_command("PackBuild", function(opts)
+  if not (Util.pack and Util.pack.build) then
+    vim.notify("PackBuild unavailable", vim.log.levels.ERROR, { title = "vim.pack" })
+    return
+  end
 
-vim.api.nvim_create_user_command("PackBuild", function(opts) build_pack(opts) end, {
+  local names = #opts.fargs > 0 and opts.fargs or nil
+  local built = Util.pack.build(names)
+  if #built == 0 then
+    vim.notify("No build hooks matched", vim.log.levels.INFO, { title = "vim.pack" })
+    return
+  end
+  vim.notify("Built: " .. table.concat(built, ", "), vim.log.levels.INFO, { title = "vim.pack" })
+end, {
   nargs = "*",
   complete = complete_pack_names,
   desc = "vim.pack: run plugin build hooks",
