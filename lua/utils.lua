@@ -126,6 +126,7 @@ local pack = {
     lazy = true,
     version = "main",
   },
+  maintenance = false,
   specs = {},
 }
 local loaded = {}
@@ -149,6 +150,19 @@ end
 local function pack_name_from_src(src) return src:gsub("%.git$", ""):match "([^/:%s]+)$" end
 
 local function pack_string_is_source(value) return value:find "/" ~= nil or value:find ":" ~= nil end
+
+local function pack_arg_is_update_command(arg)
+  if type(arg) ~= "string" then return false end
+  arg = arg:gsub("^%+", "")
+  return arg:match "^%s*PackUpdate!?%s*$" ~= nil or arg:match "^%s*PackUpdate!?%s+" ~= nil
+end
+
+local function pack_argv_requests_maintenance()
+  for _, arg in ipairs(vim.v.argv or {}) do
+    if pack_arg_is_update_command(arg) then return true end
+  end
+  return false
+end
 
 local function pack_table_is_spec(value)
   if type(value) ~= "table" then return false end
@@ -250,6 +264,10 @@ function pack.opts(spec)
 end
 
 function pack.get(name) return pack.specs[name] end
+
+function pack.begin_maintenance() pack.maintenance = true end
+
+function pack.in_maintenance() return pack.maintenance or pack_argv_requests_maintenance() end
 
 function pack.load(name)
   if loaded[name] then return end
@@ -979,6 +997,7 @@ function lsp.configure_defaults()
 end
 
 function lsp.setup_mason()
+  if M.pack and M.pack.in_maintenance and M.pack.in_maintenance() then return false end
   lsp.prepend_mason_bin()
   if mason_setup then return true end
 
@@ -993,6 +1012,8 @@ function lsp.setup_mason()
 end
 
 function lsp.ensure_mason_packages(packages, package_servers)
+  if M.pack and M.pack.in_maintenance and M.pack.in_maintenance() then return end
+
   if vim.v.vim_did_enter == 0 then
     vim.api.nvim_create_autocmd("VimEnter", {
       once = true,
@@ -1058,6 +1079,7 @@ end
 
 function lsp.enable(name, config)
   if enabled_servers[name] then return end
+  if M.pack and M.pack.in_maintenance and M.pack.in_maintenance() then return end
 
   if vim.v.vim_did_enter == 0 then
     pending_lsp_enable[name] = { name = name, config = config }

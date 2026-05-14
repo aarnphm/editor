@@ -1,3 +1,5 @@
+if Util.pack.in_maintenance() then return end
+
 Util.pack.load "lazydev.nvim"
 
 require("lazydev").setup {
