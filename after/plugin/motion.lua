@@ -18,8 +18,8 @@ local function leap_ft_safe_labels()
 end
 
 local function leap_ft(args)
-  local leap_mod = setup_leap()
-  leap_mod.leap(vim.tbl_deep_extend("keep", args, {
+  setup_leap()
+  leap.leap(vim.tbl_deep_extend("keep", args, {
     inputlen = 1,
     inclusive = true,
     opts = {
@@ -31,12 +31,15 @@ local function leap_ft(args)
 end
 
 local function traversal_keys(forward, backward)
+  setup_leap()
+  local leap_user = require "leap.user"
+
   if forward == "f" then
-    if not clever_f then clever_f = require("leap.user").with_traversal_keys("f", "F") end
+    if not clever_f then clever_f = leap_user.with_traversal_keys("f", "F") end
     return clever_f
   end
 
-  if not clever_t then clever_t = require("leap.user").with_traversal_keys(forward, backward) end
+  if not clever_t then clever_t = leap_user.with_traversal_keys(forward, backward) end
   return clever_t
 end
 
@@ -51,7 +54,7 @@ local function prepend_leap_key(key, keys)
 end
 
 local function leap_line_start(skip_range)
-  local leap_mod = setup_leap()
+  setup_leap()
   local win = vim.api.nvim_get_current_win()
   local info = vim.fn.getwininfo(win)[1]
   local cur_line = vim.fn.line "."
@@ -78,7 +81,7 @@ local function leap_line_start(skip_range)
     return math.abs(cur_screen_row - left_row) < math.abs(cur_screen_row - right_row)
   end)
 
-  leap_mod.leap { target_windows = { win }, targets = targets }
+  leap.leap { target_windows = { win }, targets = targets }
 end
 
 local function feed_leap_plug(keys)
@@ -116,8 +119,8 @@ vim.keymap.set({ "n", "x", "o" }, "s", feed_leap_plug "<Plug>(leap-forward)", { 
 vim.keymap.set({ "n", "x", "o" }, "S", feed_leap_plug "<Plug>(leap-backward)", { desc = "motion: leap backward to" })
 vim.keymap.set("n", "gs", feed_leap_plug "<Plug>(leap-from-window)", { desc = "motion: leap from window" })
 vim.keymap.set({ "n", "x", "o" }, "ga", function()
-  local leap_mod = setup_leap()
-  local keys = vim.deepcopy(leap_mod.opts.keys)
+  setup_leap()
+  local keys = vim.deepcopy(leap.opts.keys)
   keys.next_target = prepend_leap_key("a", keys.next_target)
   keys.prev_target = prepend_leap_key("A", keys.prev_target)
   require("leap.treesitter").select { opts = { keys = keys } }
