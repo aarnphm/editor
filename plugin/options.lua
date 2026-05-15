@@ -25,8 +25,6 @@ o.signcolumn = "yes:1"
 o.foldcolumn = "0"
 o.statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum} "
 o.swapfile = false
-o.autowrite = true
-o.undofile = true
 o.undolevels = 9999
 o.showtabline = 0
 o.smoothscroll = true

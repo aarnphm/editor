@@ -6,6 +6,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "checkhealth",
     "dbout",
     "gitsigns-blame",
+    "minigit",
     "grug-far",
     "nvim-pack",
     "help",

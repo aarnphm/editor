@@ -1,64 +1,37 @@
-local leap
-local clever_f
-local clever_t
+local map = vim.keymap.set
 
-local function setup_leap()
-  if leap then return leap end
-
+local function leap()
   Util.pack.load "leap.nvim"
-  leap = require "leap"
-  leap.opts["max_highlighted_traversal_targets"] = 15
-  return leap
+  return require "leap"
 end
 
-local function leap_ft_safe_labels()
-  local mode = vim.fn.mode(1)
-  if mode == "n" or mode == "v" or mode == "V" or mode == "\22" then return nil end
-  return ""
+local function ft_opts(forward, backward)
+  return require("leap.user").with_traversal_keys(forward, backward, {
+    labels = "",
+    safe_labels = vim.fn.mode(1):match "o" and "" or nil,
+    vim_opts = { ["go.ignorecase"] = false },
+  })
 end
 
-local function leap_ft(args)
-  setup_leap()
-  leap.leap(vim.tbl_deep_extend("keep", args, {
-    inputlen = 1,
-    inclusive = true,
-    opts = {
-      labels = "",
-      safe_labels = leap_ft_safe_labels(),
-      vim_opts = { ["go.ignorecase"] = false },
-    },
-  }))
-end
-
-local function traversal_keys(forward, backward)
-  setup_leap()
-  local leap_user = require "leap.user"
-
-  if forward == "f" then
-    if not clever_f then clever_f = leap_user.with_traversal_keys("f", "F") end
-    return clever_f
+local function leap_ft(forward, backward, args)
+  args = args or {}
+  return function()
+    leap().leap(vim.tbl_deep_extend("force", {
+      inputlen = 1,
+      inclusive = true,
+      opts = ft_opts(forward, backward),
+    }, args))
   end
-
-  if not clever_t then clever_t = leap_user.with_traversal_keys(forward, backward) end
-  return clever_t
 end
 
-local function prepend_leap_key(key, keys)
-  local ret = { key }
-  if type(keys) == "table" then
-    vim.list_extend(ret, keys)
-  else
-    ret[#ret + 1] = keys
-  end
-  return ret
+local function leap_to(args)
+  return function() leap().leap(type(args) == "function" and args() or vim.deepcopy(args)) end
 end
 
-local function leap_line_start(skip_range)
-  setup_leap()
-  local win = vim.api.nvim_get_current_win()
+local function line_start_targets(win, skip_range)
   local info = vim.fn.getwininfo(win)[1]
-  local cur_line = vim.fn.line "."
-  local cur_screen_row = vim.fn.screenpos(win, cur_line, 1).row
+  local cursor = vim.api.nvim_win_get_cursor(win)[1]
+  local cursor_row = vim.fn.screenpos(win, cursor, 1).row
   local targets = {}
   skip_range = skip_range or 2
 
@@ -68,9 +41,7 @@ local function leap_line_start(skip_range)
     if fold_end ~= -1 then
       line = fold_end + 1
     else
-      if line < cur_line - skip_range or line > cur_line + skip_range then
-        targets[#targets + 1] = { pos = { line, 1 } }
-      end
+      if math.abs(line - cursor) > skip_range then targets[#targets + 1] = { pos = { line, 1 } } end
       line = line + 1
     end
   end
@@ -78,63 +49,52 @@ local function leap_line_start(skip_range)
   table.sort(targets, function(left, right)
     local left_row = vim.fn.screenpos(win, left.pos[1], left.pos[2]).row
     local right_row = vim.fn.screenpos(win, right.pos[1], right.pos[2]).row
-    return math.abs(cur_screen_row - left_row) < math.abs(cur_screen_row - right_row)
+    return math.abs(cursor_row - left_row) < math.abs(cursor_row - right_row)
   end)
 
-  leap.leap { target_windows = { win }, targets = targets }
+  return targets
 end
 
-local function feed_leap_plug(keys)
-  return function()
-    setup_leap()
-    vim.api.nvim_feedkeys(vim.keycode(keys), "m", false)
-  end
+local function leap_line_start()
+  local win = vim.api.nvim_get_current_win()
+  leap().leap { windows = { win }, targets = line_start_targets(win) }
 end
 
-vim.keymap.set(
-  { "n", "x", "o" },
-  "f",
-  function() leap_ft { opts = traversal_keys("f", "F") } end,
-  { desc = "motion: leap forward to char" }
-)
-vim.keymap.set(
-  { "n", "x", "o" },
-  "F",
-  function() leap_ft { backward = true, opts = traversal_keys("f", "F") } end,
-  { desc = "motion: leap backward to char" }
-)
-vim.keymap.set(
-  { "n", "x", "o" },
-  "t",
-  function() leap_ft { offset = -1, opts = traversal_keys("t", "T") } end,
-  { desc = "motion: leap forward till char" }
-)
-vim.keymap.set(
-  { "n", "x", "o" },
-  "T",
-  function() leap_ft { backward = true, offset = 1, opts = traversal_keys("t", "T") } end,
-  { desc = "motion: leap backward till char" }
-)
-vim.keymap.set({ "n", "x", "o" }, "s", feed_leap_plug "<Plug>(leap-forward)", { desc = "motion: leap forward to" })
-vim.keymap.set({ "n", "x", "o" }, "S", feed_leap_plug "<Plug>(leap-backward)", { desc = "motion: leap backward to" })
-vim.keymap.set("n", "gs", feed_leap_plug "<Plug>(leap-from-window)", { desc = "motion: leap from window" })
-vim.keymap.set({ "n", "x", "o" }, "ga", function()
-  setup_leap()
-  local keys = vim.deepcopy(leap.opts.keys)
-  keys.next_target = prepend_leap_key("a", keys.next_target)
-  keys.prev_target = prepend_leap_key("A", keys.prev_target)
-  require("leap.treesitter").select { opts = { keys = keys } }
-end, { desc = "motion: leap treesitter" })
-vim.keymap.set({ "n", "x", "o" }, "gA", function()
-  setup_leap()
+local function linewise_leap_line_start()
+  if vim.fn.mode(1) ~= "V" then vim.cmd.normal { "V", bang = true } end
+  leap_line_start()
+end
+
+local function leap_treesitter()
+  leap()
+  require("leap.treesitter").select {
+    opts = require("leap.user").with_traversal_keys("a", "A"),
+  }
+end
+
+local function leap_treesitter_linewise()
+  leap()
   vim.cmd.normal { "V", bang = true }
   require("leap.treesitter").select()
-end, { desc = "motion: leap treesitter (linewise)" })
-vim.keymap.set("o", "|", function()
-  vim.cmd "normal! V"
-  leap_line_start()
-end, { desc = "motion: leap line start (linewise)" })
-vim.keymap.set("x", "|", function()
-  if vim.fn.mode(1) ~= "V" then vim.cmd "normal! V" end
-  leap_line_start()
-end, { desc = "motion: leap line start" })
+end
+
+local modes = { "n", "x", "o" }
+local function plug(lhs, rhs, desc) map(modes, lhs, rhs, { desc = desc }) end
+
+plug("s", leap_to { inclusive = true }, "motion: leap forward to")
+plug("S", leap_to { backward = true }, "motion: leap backward to")
+map(
+  "n",
+  "gs",
+  leap_to(function() return { windows = require("leap.user").get_enterable_windows() } end),
+  { desc = "motion: leap from window" }
+)
+
+plug("f", leap_ft("f", "F"), "motion: leap forward to char")
+plug("F", leap_ft("f", "F", { backward = true }), "motion: leap backward to char")
+plug("t", leap_ft("t", "T", { offset = -1 }), "motion: leap forward till char")
+plug("T", leap_ft("t", "T", { backward = true, offset = 1 }), "motion: leap backward till char")
+
+plug("ga", leap_treesitter, "motion: leap treesitter")
+plug("gA", leap_treesitter_linewise, "motion: leap treesitter (linewise)")
+map({ "x", "o" }, "|", linewise_leap_line_start, { desc = "motion: leap line start" })

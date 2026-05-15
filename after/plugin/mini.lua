@@ -46,6 +46,7 @@ local function setup_pick()
 end
 
 local function setup_files()
+  setup_icons()
   once(
     "files",
     function()

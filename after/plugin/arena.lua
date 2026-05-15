@@ -1,15 +1,3 @@
-local disabled_completion = {}
-
-function disabled_completion.new() return setmetatable({}, { __index = disabled_completion }) end
-
-function disabled_completion:enabled() return false end
-
-function disabled_completion:get_completions(_, callback)
-  callback { is_incomplete_forward = false, is_incomplete_backward = false, items = {} }
-end
-
-package.preload["arena.completion"] = function() return disabled_completion end
-
 local function normalize_path(path)
   local expanded = vim.fn.expand(path)
   return vim.fs.normalize(vim.uv.fs_realpath(expanded) or expanded)
