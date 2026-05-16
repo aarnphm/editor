@@ -32,9 +32,11 @@ local function start_treesitter(buf, ft)
   if not Util.treesitter.have(ft) then return end
 
   if Util.treesitter.have(ft, "highlights") then pcall(vim.treesitter.start, buf) end
-  if Util.treesitter.have(ft, "indents") then Util.set_default("indentexpr", "v:lua.Util.treesitter.indentexpr()") end
+  if Util.treesitter.have(ft, "indents") then
+    Util.set_default("indentexpr", 'v:lua.require("utils").treesitter.indentexpr()')
+  end
   if Util.treesitter.have(ft, "folds") and Util.set_default("foldmethod", "expr") then
-    Util.set_default("foldexpr", "v:lua.Util.treesitter.foldexpr()")
+    Util.set_default("foldexpr", 'v:lua.require("utils").treesitter.foldexpr()')
   end
 end
 

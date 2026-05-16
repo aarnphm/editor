@@ -2,25 +2,15 @@
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup "filetype_q",
   pattern = {
-    "PlenaryTestPopup",
     "checkhealth",
-    "dbout",
     "gitsigns-blame",
     "minigit",
     "grug-far",
     "nvim-pack",
     "help",
     "lspinfo",
-    "neotest-output",
-    "neotest-output-panel",
-    "neotest-summary",
-    "notify",
     "qf",
-    "spectre_panel",
     "startuptime",
-    "tsplayground",
-    "fugitive",
-    "fugitiveblame",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false

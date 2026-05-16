@@ -51,7 +51,7 @@ o.foldenable = true
 o.fcs = "foldopen:,foldclose:,fold: ,trunc:…,foldsep: ,diff:╱,eob: "
 
 o.foldmethod = "expr"
-o.foldtext = "v:lua.require'utils'.ui.foldtext()"
+o.foldtext = 'v:lua.require("utils").ui.foldtext()'
 o.foldlevel = 99
 o.foldlevelstart = 99
 o.foldopen = "block,mark,percent,quickfix,search,tag,undo"

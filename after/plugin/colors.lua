@@ -24,6 +24,8 @@ else
       SimpleStatuslineWarn = { fg = "orange_two", bg = "overlay" },
       SimpleStatuslineFile = { fg = "text", bg = "overlay", bold = true },
       SimpleStatuslineInfo = { fg = "purple_two", bg = "overlay" },
+      SimpleStatuslineLint = { fg = "green_two", bg = "overlay" },
+      SimpleStatuslineLintRunning = { fg = "yellow_two", bg = "overlay", bold = true },
       SimpleStatuslineMuted = { fg = "muted", bg = "overlay" },
       SimpleStatuslineLocation = { fg = "cyan_two", bg = "overlay" },
       QuickFixLine = { bg = "highlight_high" },

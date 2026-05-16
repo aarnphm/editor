@@ -114,11 +114,23 @@ end
 local function lint()
   if narrow(115) then return "" end
 
-  local ok, lint_mod = pcall(require, "lint")
-  if not ok then return "" end
+  local buf = bufnr()
+  local names = Util.lint.names(buf)
+  if #names == 0 then return "" end
 
-  local running = lint_mod.get_running()
-  return #running > 0 and ("lint:" .. table.concat(running, ",")) or ""
+  local running = Util.lint.running(buf)
+  local active = #running > 0
+  local label = active and "linting" or "lint"
+  local display_names = active and running or names
+  local text = ""
+
+  if #display_names == 1 then
+    text = label .. ":" .. display_names[1]
+  else
+    text = narrow(145) and (label .. "+" .. #display_names) or (label .. ":" .. table.concat(display_names, ","))
+  end
+
+  return text, active and "SimpleStatuslineLintRunning" or "SimpleStatuslineLint"
 end
 
 local function recording()
@@ -147,6 +159,7 @@ end
 
 function M.render()
   local mode_label, mode_hl = mode()
+  local lint_status, lint_hl = lint()
   return table.concat {
     hl(mode_hl),
     " ",
@@ -163,8 +176,8 @@ function M.render()
     "%=",
     part("SimpleStatuslineMuted", recording()),
     part("SimpleStatuslineMuted", search()),
+    part(lint_hl, lint_status),
     part("SimpleStatuslineInfo", lsp()),
-    part("SimpleStatuslineInfo", lint()),
     part("SimpleStatuslineMuted", fileinfo()),
     hl "SimpleStatuslineLocation",
     " %l:%c %p%% ",
@@ -183,6 +196,8 @@ local default_highlights = {
   SimpleStatuslineWarn = "StatusLine",
   SimpleStatuslineFile = "StatusLine",
   SimpleStatuslineInfo = "StatusLine",
+  SimpleStatuslineLint = "StatusLine",
+  SimpleStatuslineLintRunning = "StatusLine",
   SimpleStatuslineMuted = "StatusLineNC",
   SimpleStatuslineLocation = "StatusLine",
 }

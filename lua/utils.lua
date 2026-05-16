@@ -8,32 +8,12 @@ local M = {}
 
 function M.is_win() return vim.uv.os_uname().sysname:find "Windows" ~= nil end
 
----@param plugin string
----@return boolean
-function M.has(plugin)
-  if not vim.pack then return false end
-  local ok, plugins = pcall(vim.pack.get, nil, { info = false })
-  if not ok then return false end
-  for _, item in ipairs(plugins) do
-    if item.active and item.spec and item.spec.name == plugin then return true end
-  end
-  return false
-end
-
----@return table<string, any>
-function M.opts(_) return {} end
-
----@param name string
----@param fn fun(name: string): nil
-function M.on_load(name, fn)
-  vim.schedule(function() fn(name) end)
-end
-
 local lint = {
   events = { "BufWritePost", "BufReadPost", "InsertLeave" },
   linters_by_ft = {},
   linter_configs = {},
 }
+local lint_redraw_timers = {}
 
 local function list(value) return type(value) == "table" and value or { value } end
 
@@ -92,6 +72,81 @@ local function lint_module()
   return lint_mod
 end
 
+local function resolve_linter_names(lint_mod, bufnr)
+  local names = lint_mod._resolve_linter_by_ft(vim.bo[bufnr].filetype)
+  names = vim.list_extend({}, names or {})
+  if #names == 0 then vim.list_extend(names, lint_mod.linters_by_ft["_"] or {}) end
+  vim.list_extend(names, lint_mod.linters_by_ft["*"] or {})
+
+  local ctx = { filename = vim.api.nvim_buf_get_name(bufnr) }
+  ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
+  return vim.tbl_filter(function(name)
+    local linter = lint_mod.linters[name]
+    if not linter then M.warn("linter: not found " .. name, { title = "nvim-lint" }) end
+    return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
+  end, names)
+end
+
+local function stop_lint_redraw_timer(bufnr)
+  local timer = lint_redraw_timers[bufnr]
+  if not timer then return end
+
+  lint_redraw_timers[bufnr] = nil
+  timer:stop()
+  timer:close()
+end
+
+local function redraw_lint_status(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  vim.cmd.redrawstatus()
+end
+
+local function watch_lint_status(lint_mod, bufnr)
+  stop_lint_redraw_timer(bufnr)
+  redraw_lint_status(bufnr)
+  if #lint_mod.get_running(bufnr) == 0 then return end
+
+  local timer = vim.uv.new_timer()
+  lint_redraw_timers[bufnr] = timer
+  timer:start(
+    200,
+    200,
+    vim.schedule_wrap(function()
+      if lint_redraw_timers[bufnr] ~= timer then return end
+      if not vim.api.nvim_buf_is_valid(bufnr) then
+        stop_lint_redraw_timer(bufnr)
+        return
+      end
+
+      local running = lint_mod.get_running(bufnr)
+      if #running == 0 then
+        redraw_lint_status(bufnr)
+        stop_lint_redraw_timer(bufnr)
+      end
+    end)
+  )
+end
+
+function lint.names(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if not vim.api.nvim_buf_is_valid(bufnr) then return {} end
+
+  local lint_mod = lint_module()
+  return lint_mod and resolve_linter_names(lint_mod, bufnr) or {}
+end
+
+function lint.running(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if not vim.api.nvim_buf_is_valid(bufnr) or not package.loaded.lint then return {} end
+
+  local ok, lint_mod = pcall(require, "lint")
+  if not ok then return {} end
+
+  local names = lint_mod.get_running(bufnr)
+  table.sort(names)
+  return names
+end
+
 function lint.try(bufnr)
   bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
   if not vim.api.nvim_buf_is_valid(bufnr) then return end
@@ -102,20 +157,11 @@ function lint.try(bufnr)
   local lint_mod = lint_module()
   if not lint_mod then return end
 
-  local names = lint_mod._resolve_linter_by_ft(vim.bo.filetype)
-  names = vim.list_extend({}, names or {})
-  if #names == 0 then vim.list_extend(names, lint_mod.linters_by_ft["_"] or {}) end
-  vim.list_extend(names, lint_mod.linters_by_ft["*"] or {})
-
-  local ctx = { filename = vim.api.nvim_buf_get_name(bufnr) }
-  ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
-  names = vim.tbl_filter(function(name)
-    local linter = lint_mod.linters[name]
-    if not linter then M.warn("linter: not found " .. name, { title = "nvim-lint" }) end
-    return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
-  end, names)
-
-  if #names > 0 then lint_mod.try_lint(names) end
+  local names = resolve_linter_names(lint_mod, bufnr)
+  if #names > 0 then
+    lint_mod.try_lint(names)
+    watch_lint_status(lint_mod, bufnr)
+  end
 end
 
 M.lint = lint
@@ -378,16 +424,6 @@ end
 
 M.pack = pack
 
----@param mode string|string[]
----@param lhs string
----@param rhs string|function
----@param opts? vim.keymap.set.Opts
-function M.safe_keymap_set(mode, lhs, rhs, opts)
-  opts = opts or {}
-  opts.silent = opts.silent ~= false
-  vim.keymap.set(mode, lhs, rhs, opts)
-end
-
 ---@param msg any
 ---@param opts? table
 local function notify(level, msg, opts)
@@ -402,16 +438,6 @@ function M.info(msg, opts) notify(vim.log.levels.INFO, msg, opts) end
 function M.warn(msg, opts) notify(vim.log.levels.WARN, msg, opts) end
 
 function M.error(msg, opts) notify(vim.log.levels.ERROR, msg, opts) end
-
----@generic T
----@param fn fun(): T
----@param opts? { msg?: string }
----@return T?
-function M.try(fn, opts)
-  local ok, ret = pcall(fn)
-  if ok then return ret end
-  M.error((opts and opts.msg or "operation failed") .. "\n" .. ret)
-end
 
 ---@param path string
 ---@return string
@@ -574,8 +600,6 @@ end
 
 function root.bufpath(buf) return root.realpath(vim.api.nvim_buf_get_name(assert(buf))) end
 
-function root.cwd() return root.realpath(vim.uv.cwd()) or "" end
-
 function root.realpath(path)
   if path == "" or path == nil then return nil end
   path = vim.uv.fs_realpath(path) or path
@@ -615,24 +639,6 @@ function root.detect(opts)
     end
   end
   return ret
-end
-
-function root.info()
-  local roots = root.detect { all = true }
-  local lines = {}
-  local first = true
-  for _, item in ipairs(roots) do
-    for _, path in ipairs(item.paths) do
-      lines[#lines + 1] = ("- [%s] `%s` **(%s)**"):format(
-        first and "x" or " ",
-        path,
-        type(item.spec) == "table" and table.concat(item.spec, ", ") or item.spec
-      )
-      first = false
-    end
-  end
-  M.info(lines, { title = "Roots" })
-  return roots[1] and roots[1].paths[1] or vim.uv.cwd()
 end
 
 ---@param opts? {normalize?:boolean, buf?:number}
@@ -706,12 +712,6 @@ local MATH_NODES = {
   math_environment = true,
 }
 
-local TEXT_NODES = {
-  label_definition = true,
-  label_reference = true,
-  text_mode = true,
-}
-
 local CODE_BLOCK_NODES = {
   fenced_code_block = true,
   indented_code_block = true,
@@ -741,28 +741,6 @@ function treesitter.in_text(check_parent)
   return true
 end
 
-function treesitter.in_math()
-  local node = vim.treesitter.get_node { ignore_injections = false }
-
-  if vim.bo.filetype == "markdown" or vim.bo.filetype == "quarto" then
-    local block_node = node
-    while block_node do
-      if CODE_BLOCK_NODES[block_node:type()] then return false end
-      block_node = block_node:parent()
-    end
-  end
-
-  while node do
-    if TEXT_NODES[node:type()] then
-      return false
-    elseif MATH_NODES[node:type()] then
-      return true
-    end
-    node = node:parent()
-  end
-  return false
-end
-
 function treesitter.not_math() return treesitter.in_text(true) end
 
 M.treesitter = treesitter
@@ -777,54 +755,10 @@ function ui.foldtext()
   }, " ")
 end
 
-function ui.foldexpr()
-  local buf = vim.api.nvim_get_current_buf()
-  if vim.b[buf].ts_folds == nil then
-    if vim.bo[buf].filetype == "" then return "0" end
-    vim.b[buf].ts_folds = pcall(vim.treesitter.get_parser, buf)
-  end
-  return vim.b[buf].ts_folds and vim.treesitter.foldexpr() or "0"
-end
-
----@return {fg?:string}?
-function ui.fg(name)
-  local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
-  local fg = hl and hl.fg or hl.foreground
-  return fg and { fg = string.format("#%06x", fg) } or nil
-end
-
 M.ui = ui
 
 ---@class simple.util.cmp
 local cmp = {}
-
----@alias simple.util.cmp.Action fun():boolean?
----@type table<string, simple.util.cmp.Action>
-cmp.actions = {
-  snippet_forward = function()
-    if vim.snippet.active { direction = 1 } then
-      vim.schedule(function() vim.snippet.jump(1) end)
-      return true
-    end
-  end,
-  snippet_stop = function()
-    if vim.snippet then vim.snippet.stop() end
-  end,
-}
-
----@param actions string[]
----@param fallback? string|fun()
-function cmp.map(actions, fallback)
-  return function()
-    for _, name in ipairs(actions) do
-      if cmp.actions[name] then
-        local ret = cmp.actions[name]()
-        if ret then return true end
-      end
-    end
-    return type(fallback) == "function" and fallback() or fallback
-  end
-end
 
 ---@alias Placeholder {n:number, text:string}
 
@@ -856,13 +790,6 @@ function cmp.snippet_fix(snippet)
     texts[placeholder.n] = texts[placeholder.n] or cmp.snippet_preview(placeholder.text)
     return "${" .. placeholder.n .. ":" .. texts[placeholder.n] .. "}"
   end)
-end
-
-function cmp.visible()
-  ---@module 'blink.cmp'
-  local blink = package.loaded["blink.cmp"]
-  if blink then return blink.windows and blink.windows.autocomplete.win:is_open() end
-  return false
 end
 
 function cmp.expand(snippet)
