@@ -1,6 +1,7 @@
 ---@class simple.util
 ---@field lsp simple.util.lsp
 ---@field pack simple.util.pack
+---@field obsidian simple.util.obsidian
 ---@field root simple.util.root
 ---@field treesitter simple.util.treesitter
 ---@field ui simple.util.ui
@@ -662,6 +663,242 @@ function root.git()
 end
 
 M.root = root
+
+---@class simple.util.obsidian
+local obsidian = {}
+
+local obsidian_file_extensions = { ".md", ".base", ".canvas" }
+
+---@param path string?
+---@return string?
+local function obsidian_normalize_path(path)
+  if not path or path == "" then return nil end
+  return M.norm(vim.fn.fnamemodify(vim.fn.expand(path), ":p"))
+end
+
+---@param path string
+---@return boolean
+local function obsidian_is_file(path)
+  local stat = vim.uv.fs_stat(path)
+  return stat ~= nil and stat.type == "file"
+end
+
+---@return string[]
+local function obsidian_vault_roots()
+  local roots = {}
+  for _, vault in ipairs(_G.VAULTS or {}) do
+    if type(vault) == "table" and type(vault.root) == "string" then
+      local root_path = obsidian_normalize_path(vault.root)
+      if root_path then roots[#roots + 1] = root_path end
+    end
+  end
+  return roots
+end
+
+---@param path string
+---@return string?
+local function obsidian_vault_root(path)
+  path = obsidian_normalize_path(path)
+  if not path then return nil end
+
+  local best_root = nil
+  for _, root_path in ipairs(obsidian_vault_roots()) do
+    if path == root_path or path:sub(1, #root_path + 1) == root_path .. "/" then
+      if not best_root or #root_path > #best_root then best_root = root_path end
+    end
+  end
+  if best_root then return best_root end
+
+  local dir = obsidian_is_file(path) and vim.fs.dirname(path) or path
+  local marker = vim.fs.find(".obsidian", { path = dir, upward = true, type = "directory" })[1]
+  return marker and M.norm(vim.fs.dirname(marker)) or nil
+end
+
+---@param path string
+---@return string[]
+local function obsidian_candidate_names(path)
+  if path:match "%.[^/%.]+$" then return { path } end
+
+  local names = { path }
+  for _, ext in ipairs(obsidian_file_extensions) do
+    names[#names + 1] = path .. ext
+  end
+  return names
+end
+
+---@param vault_root string
+---@param relpath string
+---@return string?
+local function obsidian_file_in_root(vault_root, relpath)
+  relpath = relpath:gsub("^/+", "")
+  for _, name in ipairs(obsidian_candidate_names(relpath)) do
+    local path = M.norm(vim.fs.joinpath(vault_root, name))
+    if obsidian_is_file(path) then return path end
+  end
+end
+
+---@param vault_root string
+---@param name string
+---@return string?
+local function obsidian_find_by_basename(vault_root, name)
+  local candidates = {}
+  for _, candidate in ipairs(obsidian_candidate_names(name)) do
+    candidates[vim.fs.basename(candidate)] = true
+  end
+
+  local matches = vim.fs.find(function(file, path)
+    if not candidates[file] then return false end
+    local normalized = M.norm(path)
+    return not normalized:find("/.obsidian/", 1, true) and not normalized:find("/node_modules/", 1, true)
+  end, { path = vault_root, type = "file", limit = 1 })
+
+  return matches[1] and M.norm(matches[1]) or nil
+end
+
+---@param target string
+---@param current_file string
+---@return string?
+local function obsidian_resolve_path(target, current_file)
+  local vault_root = obsidian_vault_root(current_file)
+  if not vault_root then return nil end
+
+  if target == "" then return obsidian_normalize_path(current_file) end
+
+  local current_dir = vim.fs.dirname(current_file)
+  local current_relative = obsidian_file_in_root(current_dir, target)
+  if current_relative then return current_relative end
+
+  local root_relative = obsidian_file_in_root(vault_root, target)
+  if root_relative then return root_relative end
+
+  if not target:find("/", 1, true) then return obsidian_find_by_basename(vault_root, target) end
+end
+
+---@param fragment string
+---@return string
+local function obsidian_decode_fragment(fragment)
+  local ok, decoded = pcall(vim.uri_decode, fragment)
+  return ok and decoded or fragment
+end
+
+---@param text string
+---@return string
+local function obsidian_heading_slug(text) return text:lower():gsub("%s+", "-"):gsub("[^%w%-_]", "") end
+
+---@param text string
+---@return string
+local function obsidian_unquote(text)
+  local quoted = text:match '^"(.*)"$' or text:match "^'(.*)'$"
+  return quoted or text
+end
+
+---@param fragment string?
+---@return boolean
+function obsidian.jump_to_fragment(fragment)
+  if not fragment or fragment == "" or fragment:sub(1, 1) == "{" then return false end
+
+  fragment = vim.trim(obsidian_decode_fragment(fragment))
+  if fragment == "" then return false end
+
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  if fragment:sub(1, 1) == "^" then
+    local block = vim.pesc(fragment)
+    for row, line in ipairs(lines) do
+      local start_col = line:find(block)
+      if start_col then
+        vim.api.nvim_win_set_cursor(0, { row, start_col - 1 })
+        vim.cmd "normal! zvzz"
+        return true
+      end
+    end
+    return false
+  end
+
+  local target_slug = obsidian_heading_slug(fragment)
+  for row, line in ipairs(lines) do
+    local heading = line:match "^%s*#+%s*(.-)%s*#*%s*$"
+    if heading then
+      heading = vim.trim(heading)
+      if heading == fragment or obsidian_heading_slug(heading) == target_slug then
+        vim.api.nvim_win_set_cursor(0, { row, 0 })
+        vim.cmd "normal! zvzz"
+        return true
+      end
+    end
+  end
+
+  for row, line in ipairs(lines) do
+    local name = line:match "^%s*name:%s*(.-)%s*$"
+    if name and obsidian_unquote(vim.trim(name)) == fragment then
+      vim.api.nvim_win_set_cursor(0, { row, 0 })
+      vim.cmd "normal! zvzz"
+      return true
+    end
+  end
+
+  return false
+end
+
+---@param bufnr? integer
+---@return { raw: string, target: string, fragment: string?, path: string }?
+function obsidian.resolve_wikilink_at_cursor(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  if not vim.api.nvim_buf_is_valid(bufnr) then return nil end
+
+  local filetype = vim.bo[bufnr].filetype
+  if filetype ~= "markdown" and filetype ~= "markdown.mdx" then return nil end
+
+  local current_file = vim.api.nvim_buf_get_name(bufnr)
+  if current_file == "" then return nil end
+
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1] or ""
+  local cursor = col + 1
+  local search_start = 1
+
+  while true do
+    local link_start = line:find("[[", search_start, true)
+    if not link_start then return nil end
+
+    local link_end = line:find("]]", link_start + 2, true)
+    if not link_end then return nil end
+
+    if cursor >= link_start and cursor <= link_end + 1 then
+      local raw = line:sub(link_start + 2, link_end - 1)
+      local target = vim.trim(raw:match "^[^|]+" or raw)
+      if target == "" or target:match "^%a[%w+.-]*://" then return nil end
+
+      local path_target, fragment = target:match "^(.-)#(.*)$"
+      if not path_target then path_target = target end
+      path_target = path_target:gsub("^/+", "")
+
+      local path = obsidian_resolve_path(path_target, current_file)
+      if not path then return nil end
+
+      return { raw = raw, target = path_target, fragment = fragment, path = path }
+    end
+
+    search_start = link_end + 2
+  end
+end
+
+---@param bufnr? integer
+---@return boolean
+function obsidian.open_wikilink_at_cursor(bufnr)
+  local target = obsidian.resolve_wikilink_at_cursor(bufnr)
+  if not target then return false end
+
+  local ok, err = pcall(vim.cmd.edit, vim.fn.fnameescape(target.path))
+  if not ok then
+    M.warn(("obsidian: failed to open %s\n%s"):format(target.path, err))
+    return true
+  end
+
+  obsidian.jump_to_fragment(target.fragment)
+  return true
+end
+
+M.obsidian = obsidian
 
 ---@class simple.util.treesitter
 local treesitter = {}

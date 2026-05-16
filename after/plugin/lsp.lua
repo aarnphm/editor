@@ -12,6 +12,11 @@ local function jump_to_first_location(what)
   vim.cmd "cfirst"
 end
 
+local function go_to_definition()
+  if Util.obsidian.open_wikilink_at_cursor() then return end
+  vim.lsp.buf.definition { on_list = jump_to_first_location }
+end
+
 local function clear_lsp_json_nulls(value)
   if value == vim.NIL or type(value) == "userdata" then return nil end
   if type(value) ~= "table" then return value end
@@ -187,13 +192,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lsp_map(ev.buf, "n", "gr", vim.lsp.buf.rename, "lsp: rename")
     lsp_map(ev.buf, "n", "gy", vim.lsp.buf.type_definition, "lsp: type definition")
     lsp_map(ev.buf, "n", "gD", vim.lsp.buf.declaration, "lsp: declaration")
-    lsp_map(
-      ev.buf,
-      "n",
-      "gd",
-      function() vim.lsp.buf.definition { on_list = jump_to_first_location } end,
-      "lsp: definition"
-    )
+    lsp_map(ev.buf, "n", "gd", go_to_definition, "lsp: definition")
     lsp_map(ev.buf, "n", "gI", vim.lsp.buf.implementation, "lsp: implementation")
     lsp_map(ev.buf, "n", "gR", vim.lsp.buf.references, "lsp: references")
     lsp_map(ev.buf, { "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "lsp: code action")
