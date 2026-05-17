@@ -8,7 +8,27 @@ Util.lint.linter("markdownlint", {
     )[1]
   end,
 })
+local markdown_oxide_root_markers = { { ".obsidian", ".moxide.toml" }, ".git" }
+
+local function markdown_oxide_vault_root(bufnr)
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if path == "" then return nil end
+
+  path = vim.uv.fs_realpath(path) or Util.norm(path)
+  for _, vault in ipairs(_G.VAULTS or {}) do
+    if type(vault) == "table" and type(vault.root) == "string" then
+      local root = Util.norm(vim.fn.fnamemodify(vim.fn.expand(vault.root), ":p"))
+      root = vim.uv.fs_realpath(root) or root
+      if Util.lsp.path_is_under(path, root) then return root end
+    end
+  end
+end
+
 Util.lsp.enable("markdown_oxide", {
+  root_markers = markdown_oxide_root_markers,
+  root_dir = function(bufnr, on_dir)
+    on_dir(markdown_oxide_vault_root(bufnr) or vim.fs.root(bufnr, markdown_oxide_root_markers))
+  end,
   capabilities = {
     workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
   },

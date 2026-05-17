@@ -786,10 +786,86 @@ end
 local function obsidian_heading_slug(text) return text:lower():gsub("%s+", "-"):gsub("[^%w%-_]", "") end
 
 ---@param text string
+---@param needle string
+---@return integer?
+local function obsidian_find_unescaped(text, needle)
+  local escaped = false
+  for idx = 1, #text do
+    local char = text:sub(idx, idx)
+    if escaped then
+      escaped = false
+    elseif char == "\\" then
+      escaped = true
+    elseif char == needle then
+      return idx
+    end
+  end
+end
+
+---@param text string
+---@param needle string
+---@return integer?
+local function obsidian_find_escaped(text, needle)
+  local escaped = false
+  for idx = 1, #text do
+    local char = text:sub(idx, idx)
+    if escaped then
+      if char == needle then return idx - 1 end
+      escaped = false
+    elseif char == "\\" then
+      escaped = true
+    end
+  end
+end
+
+---@param text string
+---@return string
+local function obsidian_unescape(text) return text:gsub("\\([\\|#%]])", "%1") end
+
+---@param text string
 ---@return string
 local function obsidian_unquote(text)
   local quoted = text:match '^"(.*)"$' or text:match "^'(.*)'$"
   return quoted or text
+end
+
+---@param raw string
+---@return { target: string, alias: string? }?
+local function obsidian_split_target_alias(raw)
+  local idx = obsidian_find_unescaped(raw, "|")
+  local escaped_delimiter = false
+  if not idx then
+    idx = obsidian_find_escaped(raw, "|")
+    escaped_delimiter = idx ~= nil
+  end
+
+  if not idx then return { target = vim.trim(obsidian_unescape(raw)) } end
+
+  local target = raw:sub(1, idx - 1)
+  local alias = raw:sub(idx + (escaped_delimiter and 2 or 1))
+  alias = vim.trim(obsidian_unescape(alias))
+
+  return {
+    target = vim.trim(obsidian_unescape(target)),
+    alias = alias ~= "" and alias or nil,
+  }
+end
+
+---@param target string
+---@return string path_target
+---@return string? fragment
+local function obsidian_split_target_fragment(target)
+  local idx = obsidian_find_unescaped(target, "#")
+  local escaped_delimiter = false
+  if not idx then
+    idx = obsidian_find_escaped(target, "#")
+    escaped_delimiter = idx ~= nil
+  end
+  if not idx then return vim.trim(obsidian_unescape(target)), nil end
+
+  local path_target = target:sub(1, idx - 1)
+  local fragment = target:sub(idx + (escaped_delimiter and 2 or 1))
+  return vim.trim(obsidian_unescape(path_target)), obsidian_unescape(fragment)
 end
 
 ---@param fragment string?
@@ -840,7 +916,7 @@ function obsidian.jump_to_fragment(fragment)
 end
 
 ---@param bufnr? integer
----@return { raw: string, target: string, fragment: string?, path: string }?
+---@return { raw: string, target: string, fragment: string?, alias: string?, path: string }?
 function obsidian.resolve_wikilink_at_cursor(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   if not vim.api.nvim_buf_is_valid(bufnr) then return nil end
@@ -865,17 +941,18 @@ function obsidian.resolve_wikilink_at_cursor(bufnr)
 
     if cursor >= link_start and cursor <= link_end + 1 then
       local raw = line:sub(link_start + 2, link_end - 1)
-      local target = vim.trim(raw:match "^[^|]+" or raw)
-      if target == "" or target:match "^%a[%w+.-]*://" then return nil end
+      local parsed = obsidian_split_target_alias(raw)
+      if not parsed then return nil end
+      if parsed.target:match "^%a[%w+.-]*://" then return nil end
 
-      local path_target, fragment = target:match "^(.-)#(.*)$"
-      if not path_target then path_target = target end
+      local path_target, fragment = obsidian_split_target_fragment(parsed.target)
+      if path_target:match "^%a[%w+.-]*://" then return nil end
       path_target = path_target:gsub("^/+", "")
 
       local path = obsidian_resolve_path(path_target, current_file)
       if not path then return nil end
 
-      return { raw = raw, target = path_target, fragment = fragment, path = path }
+      return { raw = raw, target = path_target, fragment = fragment, alias = parsed.alias, path = path }
     end
 
     search_start = link_end + 2
