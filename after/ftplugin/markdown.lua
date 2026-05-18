@@ -1,20 +1,11 @@
 Util.lsp.formatters({ "markdown", "markdown.mdx" }, { "prettier", "cbfmt" })
 Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint" })
 
-local function _md_load_renderer()
-  if not (Util.pack and Util.pack.get "render-markdown.nvim") then return false end
+vim.keymap.set("n", "<localleader>mm", function()
+  if not (Util.pack and Util.pack.get "render-markdown.nvim") then return end
   local ok, err = pcall(Util.pack.load, "render-markdown.nvim")
-  if ok then return true end
-
+  if ok then return require("render-markdown").buf_toggle() end
   Util.warn(("render-markdown: %s"):format(tostring(err):gsub("\n.*", "")), { title = "markdown" })
-  return false
-end
-
-_md_load_renderer()
-
-vim.keymap.set("n", "<leader>um", function()
-  if not _md_load_renderer() then return end
-  require("render-markdown").buf_toggle()
 end, { buffer = true, silent = true, desc = "markdown: toggle render" })
 
 local markdownlint_config_names = { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" }

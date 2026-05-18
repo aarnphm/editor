@@ -237,59 +237,6 @@ local function file_buffer_exists()
   return false
 end
 
-local function empty_startup_buffer()
-  if #vim.api.nvim_list_uis() == 0 then return false end
-  if vim.fn.argc(-1) > 0 then return false end
-
-  local buf = vim.api.nvim_get_current_buf()
-  if vim.bo[buf].buftype ~= "" or vim.api.nvim_buf_get_name(buf) ~= "" or vim.bo[buf].modified then return false end
-  if vim.api.nvim_buf_line_count(buf) ~= 1 then return false end
-
-  local line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-  return line == nil or line == ""
-end
-
-local function git_root()
-  if vim.fn.executable "git" ~= 1 then return nil end
-
-  local cwd = vim.uv.cwd()
-  if not cwd then return nil end
-
-  local result = vim.system({ "git", "-C", cwd, "rev-parse", "--show-toplevel" }, { text = true }):wait()
-  if result.code ~= 0 or not result.stdout or result.stdout == "" then return nil end
-
-  return Util.norm(vim.trim(result.stdout))
-end
-
-local function startup_git_files_window()
-  local width = math.min(120, math.max(56, math.floor(0.78 * vim.o.columns)))
-  local height = math.min(36, math.max(16, math.floor(0.68 * vim.o.lines)))
-
-  width = math.min(width, math.max(1, vim.o.columns - 4))
-  height = math.min(height, math.max(1, vim.o.lines - 4))
-
-  return {
-    anchor = "NW",
-    width = width,
-    height = height,
-    row = math.max(0, math.floor((vim.o.lines - height) / 2)),
-    col = math.max(0, math.floor((vim.o.columns - width) / 2)),
-  }
-end
-
-local function open_startup_git_files()
-  if not empty_startup_buffer() then return end
-
-  local root = git_root()
-  if not root then return end
-
-  setup_pick()
-  require("mini.pick").builtin.files({ tool = "git" }, {
-    source = { cwd = root, name = "Git files" },
-    window = { config = startup_git_files_window },
-  })
-end
-
 vim.api.nvim_create_autocmd("InsertEnter", {
   group = augroup "mini_pairs",
   once = true,
@@ -339,7 +286,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
   group = augroup "mini_defer",
   once = true,
   callback = function()
-    vim.schedule(open_startup_git_files)
     vim.defer_fn(setup_text_editing, 10)
     if file_buffer_exists() then vim.defer_fn(setup_file_features, 20) end
   end,
