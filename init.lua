@@ -79,6 +79,20 @@ local function limit_render_markdown_latex()
   return true
 end
 
+local render_markdown_config = {
+  enabled = false,
+  preset = "obsidian",
+  file_types = { "markdown", "markdown.mdx" },
+  render_modes = { "n", "c", "t" },
+  completions = { lsp = { enabled = true } },
+  latex = {
+    enabled = vim.fn.executable "latex2text" == 1 or vim.fn.executable "utftex" == 1,
+  },
+  sign = { enabled = false },
+}
+
+vim.g.render_markdown_config = render_markdown_config
+
 Util.pack.setup {
   "folke/lazydev.nvim",
   "echasnovski/mini.nvim",
@@ -90,16 +104,7 @@ Util.pack.setup {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     dependencies = { "nvim-treesitter", "mini.nvim" },
-    opts = {
-      preset = "obsidian",
-      file_types = { "markdown", "markdown.mdx" },
-      render_modes = { "n", "c", "t" },
-      completions = { lsp = { enabled = true } },
-      latex = {
-        enabled = vim.fn.executable "latex2text" == 1 or vim.fn.executable "utftex" == 1,
-      },
-      sign = { enabled = false },
-    },
+    opts = render_markdown_config,
     config = function(_, opts)
       if opts.latex and opts.latex.enabled and not limit_render_markdown_latex() then
         opts = vim.deepcopy(opts)
