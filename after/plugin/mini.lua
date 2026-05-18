@@ -12,7 +12,7 @@ end
 local function setup_icons()
   once("icons", function()
     local icons = require "mini.icons"
-    icons.setup()
+    if not _G.MiniIcons then icons.setup() end
     icons.mock_nvim_web_devicons()
   end)
 end

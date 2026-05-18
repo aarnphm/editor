@@ -1,12 +1,37 @@
 Util.lsp.formatters({ "markdown", "markdown.mdx" }, { "prettier", "cbfmt" })
 Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint" })
+
+local function _md_load_renderer()
+  if not (Util.pack and Util.pack.get "render-markdown.nvim") then return false end
+  local ok, err = pcall(Util.pack.load, "render-markdown.nvim")
+  if ok then return true end
+
+  Util.warn(("render-markdown: %s"):format(tostring(err):gsub("\n.*", "")), { title = "markdown" })
+  return false
+end
+
+_md_load_renderer()
+
+vim.keymap.set("n", "<leader>um", function()
+  if not _md_load_renderer() then return end
+  require("render-markdown").buf_toggle()
+end, { buffer = true, silent = true, desc = "markdown: toggle render" })
+
+local markdownlint_config_names = { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" }
+
+local function markdownlint_config(path)
+  path = path ~= "" and path or vim.api.nvim_buf_get_name(0)
+  if path == "" then return nil end
+  return vim.fs.find(markdownlint_config_names, { path = path, upward = true, type = "file" })[1]
+end
+
 Util.lint.linter("markdownlint", {
-  condition = function(ctx)
-    return vim.fs.find(
-      { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" },
-      { path = ctx.filename, upward = true }
-    )[1]
-  end,
+  args = {
+    "--stdin",
+    "--config",
+    function() return markdownlint_config(vim.api.nvim_buf_get_name(0)) end,
+  },
+  condition = function(ctx) return markdownlint_config(ctx.filename) end,
 })
 local markdown_oxide_root_markers = { { ".obsidian", ".moxide.toml" }, ".git" }
 
@@ -24,15 +49,51 @@ local function markdown_oxide_vault_root(bufnr)
   end
 end
 
-Util.lsp.enable("markdown_oxide", {
+local function markdown_oxide_root(bufnr)
+  return markdown_oxide_vault_root(bufnr) or vim.fs.root(bufnr, markdown_oxide_root_markers)
+end
+
+local markdown_oxide_config = {
   root_markers = markdown_oxide_root_markers,
   root_dir = function(bufnr, on_dir)
-    on_dir(markdown_oxide_vault_root(bufnr) or vim.fs.root(bufnr, markdown_oxide_root_markers))
+    local root = markdown_oxide_root(bufnr)
+    if root then on_dir(root) end
   end,
   capabilities = {
     workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
   },
-})
+}
+
+Util.lsp.enable("markdown_oxide", markdown_oxide_config)
+
+local function start_markdown_oxide(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].filetype ~= "markdown" then return end
+  if #vim.lsp.get_clients { bufnr = bufnr, name = "markdown_oxide" } > 0 then return end
+  if not Util.lsp.server_is_available("markdown_oxide", markdown_oxide_config) then return end
+
+  Util.lsp.prepend_mason_bin()
+  if Util.pack and Util.pack.get "nvim-lspconfig" then pcall(Util.pack.load, "nvim-lspconfig") end
+  Util.lsp.configure_defaults()
+  vim.lsp.config("markdown_oxide", markdown_oxide_config)
+
+  local root = markdown_oxide_root(bufnr)
+  if not root then return end
+
+  local config = vim.tbl_deep_extend("force", vim.deepcopy(vim.lsp.config.markdown_oxide), { root_dir = root })
+  vim.lsp.start(config, { bufnr = bufnr, silent = true })
+end
+
+local markdown_buf = vim.api.nvim_get_current_buf()
+if vim.v.vim_did_enter == 0 then
+  vim.api.nvim_create_autocmd("VimEnter", {
+    once = true,
+    callback = function()
+      vim.schedule(function() start_markdown_oxide(markdown_buf) end)
+    end,
+  })
+else
+  start_markdown_oxide(markdown_buf)
+end
 vim.cmd.runtime "after/ftplugin/latex.lua"
 
 local function luasnip_jump(direction)

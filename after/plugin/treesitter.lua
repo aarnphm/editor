@@ -57,6 +57,7 @@ vim.api.nvim_create_user_command("TSInstallDefault", function()
     "jsdoc",
     "json",
     "jsonc",
+    "latex",
     "lua",
     "markdown",
     "markdown_inline",

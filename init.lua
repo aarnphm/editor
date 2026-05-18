@@ -57,6 +57,28 @@ Util.pack.setup {
   "nvim-treesitter/nvim-treesitter",
   "https://codeberg.org/andyg/leap.nvim.git",
   { "nuvic/flexoki-nvim", name = "flexoki" },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter", "mini.nvim" },
+    opts = {
+      preset = "obsidian",
+      file_types = { "markdown", "markdown.mdx" },
+      render_modes = { "n", "c", "t" },
+      completions = { lsp = { enabled = true } },
+      latex = {
+        enabled = vim.fn.executable "latex2text" == 1 or vim.fn.executable "utftex" == 1,
+      },
+      sign = { enabled = false },
+    },
+    config = function(_, opts)
+      local ok_icons, icons = pcall(require, "mini.icons")
+      if ok_icons then
+        if not _G.MiniIcons then icons.setup() end
+        icons.mock_nvim_web_devicons()
+      end
+      require("render-markdown").setup(opts)
+    end,
+  },
   { "stevearc/conform.nvim", version = "master" },
   { "mfussenegger/nvim-lint", version = "master" },
   { "neovim/nvim-lspconfig", version = "master" },
