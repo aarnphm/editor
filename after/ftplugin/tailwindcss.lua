@@ -7,6 +7,8 @@ Util.lsp.enable("tailwindcss", {
     "html-eex",
     "javascript",
     "javascriptreact",
+    "less",
+    "scss",
     "svelte",
     "typescript",
     "typescriptreact",

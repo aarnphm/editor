@@ -50,50 +50,6 @@ hi("CmpGhostText", { link = "Comment", default = true })
 hi("LeapBackdrop", { link = "Comment" })
 hi("LeapMatch", { fg = vim.go.background == "dark" and "white" or "black", bold = true, nocombine = true })
 
-local function limit_render_markdown_latex()
-  local ok, latex = pcall(require, "render-markdown.handler.latex")
-  if not ok or not (debug and debug.getupvalue) then return false end
-
-  -- render-markdown fans out one converter process per unique formula. Keep
-  -- the upstream cache, but run the converter path one formula at a time.
-  local handler
-  for index = 1, 20 do
-    local name, value = debug.getupvalue(latex.parse, index)
-    if not name then break end
-    if name == "Handler" and type(value) == "table" then
-      handler = value
-      break
-    end
-  end
-  if not handler then return false end
-  if handler._simple_serial_convert then return true end
-
-  handler._simple_serial_convert = handler.convert
-  handler.convert = function(cmd, inputs)
-    local failed = {}
-    for _, input in ipairs(inputs) do
-      local ok_convert, remaining = pcall(handler._simple_serial_convert, cmd, { input })
-      if not ok_convert or #remaining > 0 then failed[#failed + 1] = input end
-    end
-    return failed
-  end
-  return true
-end
-
-local render_markdown_config = {
-  enabled = false,
-  preset = "obsidian",
-  file_types = { "markdown", "markdown.mdx" },
-  render_modes = { "n", "c", "t" },
-  completions = { lsp = { enabled = true } },
-  latex = {
-    enabled = vim.fn.executable "latex2text" == 1 or vim.fn.executable "utftex" == 1,
-  },
-  sign = { enabled = false },
-}
-
-vim.g.render_markdown_config = render_markdown_config
-
 Util.pack.setup {
   "folke/lazydev.nvim",
   "echasnovski/mini.nvim",
@@ -102,23 +58,6 @@ Util.pack.setup {
   "nvim-treesitter/nvim-treesitter",
   "https://codeberg.org/andyg/leap.nvim.git",
   { "nuvic/flexoki-nvim", name = "flexoki" },
-  {
-    "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = { "nvim-treesitter", "mini.nvim" },
-    opts = render_markdown_config,
-    config = function(_, opts)
-      if opts.latex and opts.latex.enabled and not limit_render_markdown_latex() then
-        opts = vim.deepcopy(opts)
-        opts.latex.enabled = false
-      end
-      local ok_icons, icons = pcall(require, "mini.icons")
-      if ok_icons then
-        if not _G.MiniIcons then icons.setup() end
-        icons.mock_nvim_web_devicons()
-      end
-      require("render-markdown").setup(opts)
-    end,
-  },
   { "stevearc/conform.nvim", version = "master" },
   { "mfussenegger/nvim-lint", version = "master" },
   { "neovim/nvim-lspconfig", version = "master" },

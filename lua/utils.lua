@@ -1155,6 +1155,7 @@ local mason_bin = vim.fs.joinpath(vim.fn.stdpath "data", "mason", "bin")
 local server_executables = {
   bashls = "bash-language-server",
   clangd = "clangd",
+  cssls = "vscode-css-language-server",
   gopls = "gopls",
   jsonls = "vscode-json-language-server",
   lua_ls = "lua-language-server",

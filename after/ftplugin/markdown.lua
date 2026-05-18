@@ -1,31 +1,6 @@
 Util.lsp.formatters({ "markdown", "markdown.mdx" }, { "prettier", "cbfmt" })
 Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint" })
 
-local function _md_load_renderer()
-  if not (Util.pack and Util.pack.get "render-markdown.nvim") then return end
-  local ok, err = pcall(Util.pack.load, "render-markdown.nvim")
-  if ok then return true end
-  Util.warn(("render-markdown: %s"):format(tostring(err):gsub("\n.*", "")), { title = "markdown" })
-end
-
-local function _md_warm_renderer(bufnr)
-  if
-    not vim.api.nvim_buf_is_valid(bufnr)
-    or not vim.tbl_contains({ "markdown", "markdown.mdx" }, vim.bo[bufnr].filetype)
-  then
-    return
-  end
-  vim.api.nvim_buf_call(bufnr, _md_load_renderer)
-end
-
-local function _md_schedule_renderer(bufnr)
-  vim.schedule(function() _md_warm_renderer(bufnr) end)
-end
-
-vim.keymap.set("n", "<localleader>mm", function()
-  if _md_load_renderer() then require("render-markdown").buf_toggle() end
-end, { buffer = true, silent = true, desc = "markdown: toggle render" })
-
 local markdownlint_config_names = { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" }
 
 local function markdownlint_config(path)
@@ -93,7 +68,6 @@ local function start_markdown_oxide(bufnr)
 end
 
 local markdown_buf = vim.api.nvim_get_current_buf()
-_md_schedule_renderer(markdown_buf)
 if vim.v.vim_did_enter == 0 then
   vim.api.nvim_create_autocmd("VimEnter", {
     once = true,
