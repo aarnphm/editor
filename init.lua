@@ -42,6 +42,7 @@ vim.g.mapleader = vim.keycode "<space>"
 vim.g.maplocalleader = vim.keycode ","
 vim.g.markdown_recommended_style = 0
 vim.g.autoformat = true
+vim.g.markdown_frontmatter = true
 vim.g.enable_highlighturl = true
 
 hi("HighlightURL", { default = true, underline = true })

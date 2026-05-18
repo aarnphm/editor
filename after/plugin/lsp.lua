@@ -1,5 +1,60 @@
 Util.lsp.prepend_mason_bin()
 
+local mason_commands = {
+  Mason = { nargs = 0, desc = "mason: open" },
+  MasonInstall = { nargs = "+", desc = "mason: install packages" },
+  MasonUninstall = { nargs = "+", desc = "mason: uninstall packages" },
+  MasonUninstallAll = { nargs = 0, desc = "mason: uninstall all packages" },
+  MasonUpdate = { nargs = 0, desc = "mason: update registries" },
+  MasonLog = { nargs = 0, desc = "mason: open log" },
+}
+
+local mason_commands_loaded = false
+
+local function setup_mason_commands()
+  if mason_commands_loaded then return true end
+  for name in pairs(mason_commands) do
+    pcall(vim.api.nvim_del_user_command, name)
+  end
+  if not Util.lsp.setup_mason() then
+    Util.error "Mason unavailable"
+    return false
+  end
+  mason_commands_loaded = true
+  return true
+end
+
+local function complete_mason_command(name, arg_lead, cmdline, cursor_pos)
+  if not setup_mason_commands() then return {} end
+  local command = vim.api.nvim_get_commands({})[name]
+  if not (command and type(command.complete) == "function") then return {} end
+  return command.complete(arg_lead, cmdline, cursor_pos)
+end
+
+local function run_mason_command(name, opts)
+  if not setup_mason_commands() then return end
+  vim.api.nvim_cmd({
+    cmd = name,
+    args = opts.fargs,
+    bang = opts.bang,
+    mods = opts.smods,
+  }, {})
+end
+
+for name, command in pairs(mason_commands) do
+  local command_opts = vim.tbl_extend("force", {}, command)
+  if command_opts.nargs ~= 0 then
+    command_opts.complete = function(arg_lead, cmdline, cursor_pos)
+      return complete_mason_command(name, arg_lead, cmdline, cursor_pos)
+    end
+  end
+  vim.api.nvim_create_user_command(
+    name,
+    function(command_args) run_mason_command(name, command_args) end,
+    command_opts
+  )
+end
+
 local function silent_map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc }) end
 
 local function lsp_map(bufnr, mode, lhs, rhs, desc)
@@ -44,10 +99,12 @@ end
 local function set_autoformat(enabled, buf_only)
   if buf_only then
     vim.b.autoformat = enabled
+    vim.b.markdown_frontmatter = enabled
   else
     vim.g.autoformat = enabled
     vim.g.markdown_frontmatter = enabled
     vim.b.autoformat = nil
+    vim.b.markdown_frontmatter = nil
   end
 end
 

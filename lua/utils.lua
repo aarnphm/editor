@@ -1,6 +1,7 @@
 ---@class simple.util
 ---@field lsp simple.util.lsp
 ---@field pack simple.util.pack
+---@field markdown simple.util.markdown
 ---@field obsidian simple.util.obsidian
 ---@field root simple.util.root
 ---@field treesitter simple.util.treesitter
@@ -1510,5 +1511,148 @@ function lsp.prettier_enabled(_, ctx)
 end
 
 M.lsp = lsp
+
+---@class simple.util.markdown
+local markdown = {}
+
+---@param cmd string[]
+---@param input string?
+---@return string
+local function markdown_system(cmd, input)
+  local result = vim.system(cmd, { stdin = input, text = true }):wait()
+  if result.code ~= 0 then error((result.stderr or "") ~= "" and result.stderr or table.concat(cmd, " ")) end
+  return result.stdout or ""
+end
+
+---@param yaml string
+---@return table<string, any>
+local function markdown_yaml_to_table(yaml)
+  if vim.trim(yaml) == "" then return {} end
+  local json = markdown_system({ "yq", "eval", "-o=json", "-" }, yaml)
+  local ok, parsed = pcall(vim.fn.json_decode, json)
+  if ok and type(parsed) == "table" then return parsed end
+  return {}
+end
+
+---@param tbl table<string, any>
+---@return string[]
+local function markdown_table_to_yaml(tbl)
+  local yaml = markdown_system({ "yq", "eval", "sort_keys(..)", "-P", "-p=json", "-" }, vim.fn.json_encode(tbl))
+  local lines = {}
+  for line in yaml:gmatch "[^\r\n]+" do
+    table.insert(lines, line)
+  end
+  return lines
+end
+
+---@param path string
+---@return table<string, any>? vault
+---@return string? root
+local function markdown_vault_for_path(path)
+  if path == "" or not path:match "%.md$" then return nil, nil end
+
+  local normalized_path = vim.uv.fs_realpath(path) or vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ":p"))
+  for _, vault in ipairs(_G.VAULTS or {}) do
+    if type(vault) == "table" and type(vault.root) == "string" then
+      local vault_root = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(vault.root), ":p"))
+      vault_root = vim.uv.fs_realpath(vault_root) or vault_root
+      if lsp.path_is_under(normalized_path, vault_root) then return vault, vault_root end
+    end
+  end
+end
+
+---@param bufnr integer?
+---@return boolean
+function markdown.frontmatter_enabled(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if vim.g.markdown_frontmatter == false then return false end
+  if vim.b[bufnr].markdown_frontmatter ~= nil then return vim.b[bufnr].markdown_frontmatter end
+  return true
+end
+
+---@param bufnr integer?
+---@return boolean
+function markdown.update_frontmatter(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
+  if not markdown.frontmatter_enabled(bufnr) then return false end
+  if vim.bo[bufnr].buftype ~= "" or not vim.bo[bufnr].modifiable then return false end
+  if vim.fn.executable "yq" == 0 then
+    M.warn("frontmatter: yq is required", { title = "markdown" })
+    return false
+  end
+
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  local vault, vault_root = markdown_vault_for_path(path)
+  if not vault or not vault_root then return false end
+
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local fm_start, fm_end
+
+  if lines[1] and lines[1]:match "^---%s*$" then
+    fm_start = 1
+    for i = 2, #lines do
+      if lines[i]:match "^---%s*$" then
+        fm_end = i
+        break
+      end
+    end
+  end
+
+  local existing = {}
+  if fm_start and fm_end and fm_end > fm_start + 1 then
+    local ok, parsed =
+      pcall(markdown_yaml_to_table, table.concat(vim.list_slice(lines, fm_start + 1, fm_end - 1), "\n"))
+    if not ok then
+      M.warn(("frontmatter: %s"):format(tostring(parsed):gsub("\n.*", "")), { title = "markdown" })
+      return false
+    end
+    existing = parsed
+  end
+
+  local filename = vim.fs.basename(path)
+  local id = filename:gsub("%.md$", "")
+  local is_tag_note = lsp.path_is_under(path, vim.fs.joinpath(vault_root, "tags"))
+  local default_frontmatter = is_tag_note and { title = id }
+    or { date = os.date "%Y-%m-%d", id = id, tags = { "seed" }, title = id }
+  local frontmatter = vim.tbl_deep_extend("force", default_frontmatter, existing)
+
+  if frontmatter.title == nil then frontmatter.title = id end
+  if frontmatter.aliases and #frontmatter.aliases == 0 then frontmatter.aliases = nil end
+
+  local existing_no_modified = vim.deepcopy(existing)
+  existing_no_modified.modified = nil
+  local frontmatter_no_modified = vim.deepcopy(frontmatter)
+  frontmatter_no_modified.modified = nil
+  local meta_changed = not vim.deep_equal(frontmatter_no_modified, existing_no_modified)
+
+  if not vim.bo[bufnr].modified and not meta_changed then return false end
+
+  if not is_tag_note then
+    local offset = os.date "%z"
+    frontmatter.modified = os.date "%Y-%m-%d %H:%M:%S"
+      .. string.format(" GMT%s%s:%s", offset:sub(1, 1), offset:sub(2, 3), offset:sub(4, 5))
+  end
+
+  local ok, yaml = pcall(markdown_table_to_yaml, frontmatter)
+  if not ok then
+    M.warn(("frontmatter: %s"):format(tostring(yaml):gsub("\n.*", "")), { title = "markdown" })
+    return false
+  end
+
+  local new_fm = { "---" }
+  vim.list_extend(new_fm, yaml)
+  table.insert(new_fm, "---")
+
+  if fm_start and fm_end then
+    vim.api.nvim_buf_set_lines(bufnr, fm_start - 1, fm_end, false, new_fm)
+  else
+    vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, vim.list_extend(new_fm, { "" }))
+  end
+
+  return true
+end
+
+M.markdown = markdown
 
 return M
