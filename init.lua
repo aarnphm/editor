@@ -16,8 +16,6 @@ end
 
 for _, plugin in ipairs {
   "gzip",
-  "netrw",
-  "netrwPlugin",
   "rplugin",
   "tarPlugin",
   "tutor",
@@ -44,6 +42,7 @@ vim.g.markdown_recommended_style = 0
 vim.g.autoformat = true
 vim.g.markdown_frontmatter = true
 vim.g.enable_highlighturl = true
+vim.g.netrw_liststyle = 3
 
 hi("HighlightURL", { default = true, underline = true })
 hi("CmpGhostText", { link = "Comment", default = true })
@@ -57,7 +56,7 @@ Util.pack.setup {
   "lewis6991/gitsigns.nvim",
   "nvim-treesitter/nvim-treesitter",
   "https://codeberg.org/andyg/leap.nvim.git",
-  { "nuvic/flexoki-nvim", name = "flexoki" },
+  { "kepano/flexoki-neovim", name = "flexoki" },
   { "stevearc/conform.nvim", version = "master" },
   { "mfussenegger/nvim-lint", version = "master" },
   { "neovim/nvim-lspconfig", version = "master" },

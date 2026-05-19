@@ -26,8 +26,8 @@
       "version": "'master'"
     },
     "flexoki": {
-      "rev": "079554c242a86be5d1a95598c7c6368d6eedd7a3",
-      "src": "https://github.com/nuvic/flexoki-nvim.git",
+      "rev": "c3e2251e813d29d885a7cbbe9808a7af234d845d",
+      "src": "https://github.com/kepano/flexoki-neovim.git",
       "version": "'main'"
     },
     "friendly-snippets": {

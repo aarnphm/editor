@@ -1,5 +1,7 @@
 local blink = Util.pack.get "blink.cmp"
 
+if not blink then return end
+
 vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
   group = augroup "blink",
   once = true,

@@ -206,12 +206,11 @@ vim.api.nvim_create_user_command("PackStatus", function()
 end, { desc = "vim.pack: show managed plugins" })
 
 vim.api.nvim_create_user_command("PackUpdate", function(opts)
-  opts = vim.tbl_extend("force", { target = "lockfile", bang = true }, opts or {})
   if Util.pack and Util.pack.begin_maintenance then Util.pack.begin_maintenance() end
   local names = #opts.fargs > 0 and opts.fargs or nil
   vim.pack.update(names, {
     force = opts.bang,
-    target = opts.target,
+    target = "version",
   })
 end, {
   bang = true,

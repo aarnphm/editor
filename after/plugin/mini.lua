@@ -1,5 +1,7 @@
 local did = {}
 
+local centered = false
+
 local function silent_map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc }) end
 
 local function once(name, fn)
@@ -30,6 +32,7 @@ local function setup_pick()
       window = {
         prompt_prefix = "󰄾 ",
         config = function()
+          if not centered then return end
           local height = math.floor(0.618 * vim.o.lines)
           local width = math.floor(0.618 * vim.o.columns)
           return {
@@ -297,6 +300,10 @@ local function pick_files(cwd)
 end
 
 silent_map("n", "<leader>f", function() pick_files(Util.root.git()) end, "files: find in root")
+silent_map("n", "<leader>b", function()
+  setup_pick()
+  require("mini.pick").builtin.buffers()
+end, "buffers: open")
 silent_map("n", "<localleader>f", function()
   setup_pick()
   require("mini.extra").pickers.oldfiles()
