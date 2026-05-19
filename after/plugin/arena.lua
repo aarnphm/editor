@@ -23,7 +23,7 @@ local function arena_query()
 
   if not ts_query_warned then
     ts_query_warned = true
-    vim.schedule(function() vim.notify("arena-meta: markdown Treesitter parser unavailable", vim.log.levels.WARN) end)
+    vim.schedule(function() Util.warn("markdown Treesitter parser unavailable", { title = "arena" }) end)
   end
 end
 

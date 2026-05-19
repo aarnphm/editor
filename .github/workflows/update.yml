@@ -35,7 +35,7 @@ jobs:
           XDG_CONFIG_HOME: ${{ github.workspace }}/..
           NVIM_APPNAME: ${{ github.event.repository.name }}
         run: |
-          nvim --headless "+PackUpdate!" +qa
+          nvim --headless "+PackLock" +qa
           test -s nvim-pack-lock.json
 
       - id: meta

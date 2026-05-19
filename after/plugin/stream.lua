@@ -461,7 +461,7 @@ local function edit_stream_buffer()
 
   local ok, err = pcall(vim.cmd, "keepalt edit " .. vim.fn.fnameescape(STREAM_PATH))
   if not ok then
-    vim.notify(("Sadd could not open %s: %s"):format(STREAM_PATH, err), vim.log.levels.ERROR)
+    Util.error(("Sadd could not open %s: %s"):format(STREAM_PATH, err), { title = "stream" })
     return nil
   end
 
@@ -478,7 +478,7 @@ end
 local function add_stream_entry(opts)
   local entry, err = parse_stream_entry_args(opts.fargs)
   if not entry then
-    vim.notify(err, vim.log.levels.ERROR)
+    Util.error(err, { title = "stream" })
     return
   end
 
@@ -486,7 +486,7 @@ local function add_stream_entry(opts)
   if not bufnr then return end
   if vim.bo[bufnr].buftype ~= "" then return end
   if not vim.bo[bufnr].modifiable then
-    vim.notify("Sadd stream buffer is not modifiable", vim.log.levels.ERROR)
+    Util.error("Sadd stream buffer is not modifiable", { title = "stream" })
     return
   end
 

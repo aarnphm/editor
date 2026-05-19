@@ -6,7 +6,7 @@ This should follow neovim file structure best practice. Most of initial keyboard
 
 ## build, test, and development commands
 - `NVIM_APPNAME=nvim nvim --headless "+lua print('boot-ok')" +qa` verifies that native `vim.pack` bootstrap and core modules load.
-- `NVIM_APPNAME=nvim nvim --headless "+PackUpdate!" +qa` updates managed plugins and rewrites `nvim-pack-lock.json`.
+- `NVIM_APPNAME=nvim nvim --headless "+PackLock" +qa` updates managed plugins and rewrites `nvim-pack-lock.json`.
 - `nix develop` enters the repo tool shell with Neovim nightly, Stylua, Selene, fd, yq, shellcheck, and Lua language tooling.
 - `nix flake check` runs the offline format/lint/script checks. It does not boot Neovim because first-time `vim.pack` installs need network.
 - `NVIM_APPNAME=nvim nvim --headless "+PackStatus" +qa` checks the registered native pack set.

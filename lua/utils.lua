@@ -202,7 +202,10 @@ local function pack_string_is_source(value) return value:find "/" ~= nil or valu
 local function pack_arg_is_update_command(arg)
   if type(arg) ~= "string" then return false end
   arg = arg:gsub("^%+", "")
-  return arg:match "^%s*PackUpdate!?%s*$" ~= nil or arg:match "^%s*PackUpdate!?%s+" ~= nil
+  return arg:match "^%s*PackUpdate!?%s*$" ~= nil
+    or arg:match "^%s*PackUpdate!?%s+" ~= nil
+    or arg:match "^%s*PackLock!?%s*$" ~= nil
+    or arg:match "^%s*PackLock!?%s+" ~= nil
 end
 
 local function pack_argv_requests_maintenance()
