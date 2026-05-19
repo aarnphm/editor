@@ -82,6 +82,46 @@ local function dirty()
   return vim.bo[bufnr()].modified and "+" or ""
 end
 
+local function hunk_summary(hunks)
+  local summary = { added = 0, changed = 0, removed = 0, hunks = 0 }
+  for _, hunk in ipairs(hunks or {}) do
+    summary.hunks = summary.hunks + 1
+    if hunk.type == "add" then
+      summary.added = summary.added + hunk.added.count
+    elseif hunk.type == "delete" then
+      summary.removed = summary.removed + hunk.removed.count
+    elseif hunk.type == "change" then
+      local added, removed = hunk.added.count, hunk.removed.count
+      local changed = math.min(added, removed)
+      summary.changed = summary.changed + changed
+      summary.added = summary.added + added - changed
+      summary.removed = summary.removed + removed - changed
+    end
+  end
+  return summary
+end
+
+local function diff_summary(summary)
+  local items = {}
+  if summary.hunks > 0 then items[#items + 1] = "#" .. summary.hunks end
+  if summary.added > 0 then items[#items + 1] = "+" .. summary.added end
+  if summary.changed > 0 then items[#items + 1] = "~" .. summary.changed end
+  if summary.removed > 0 then items[#items + 1] = "-" .. summary.removed end
+  return table.concat(items, " ")
+end
+
+local function staged()
+  local buf = bufnr()
+  if vim.bo[buf].buftype ~= "" then return "" end
+
+  local cache_mod = package.loaded["gitsigns.cache"]
+  local cache = cache_mod and cache_mod.cache and cache_mod.cache[buf]
+  if not (cache and cache.hunks_staged and #cache.hunks_staged > 0) then return "" end
+
+  local summary = diff_summary(hunk_summary(cache.hunks_staged))
+  return summary ~= "" and ("staged:" .. summary) or ""
+end
+
 local function diagnostics()
   local buf = bufnr()
   if not vim.diagnostic.is_enabled { bufnr = buf } then return "" end
@@ -166,14 +206,15 @@ function M.render()
     mode_label,
     " ",
     hl "SimpleStatusline",
-    part("SimpleStatuslineAccent", branch()),
-    part("SimpleStatuslineMuted", dirty()),
-    part("SimpleStatuslineWarn", diagnostics()),
     "%<",
     hl "SimpleStatuslineFile",
     " ",
     filename(),
     "%=",
+    part("SimpleStatuslineAccent", branch()),
+    part("SimpleStatuslineMuted", dirty()),
+    part("SimpleStatuslineDebug", staged()),
+    part("SimpleStatuslineWarn", diagnostics()),
     part("SimpleStatuslineMuted", recording()),
     part("SimpleStatuslineMuted", search()),
     part(lint_hl, lint_status),

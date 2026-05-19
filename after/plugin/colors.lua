@@ -29,6 +29,7 @@ else
       SimpleStatuslineModeCommand = { fg = c.bg, bg = c["ye-2"], bold = true },
       SimpleStatuslineModeOther = { fg = c.bg, bg = c["pu-2"], bold = true },
       SimpleStatuslineAccent = { fg = c["bl-2"], bg = c.ui },
+      SimpleStatuslineDebug = { fg = c["or-2"], bg = c.ui },
       SimpleStatuslineWarn = { fg = c["or-2"], bg = c.ui },
       SimpleStatuslineFile = { fg = c.tx, bg = c.ui, bold = true },
       SimpleStatuslineInfo = { fg = c["pu-2"], bg = c.ui },
