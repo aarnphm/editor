@@ -179,14 +179,47 @@ end, { buffer = true, desc = "wikilink: insert" })
 
 local _md_heading_ns = vim.api.nvim_create_namespace "md_headings_popup"
 
-local function _md_collect_headings()
-  local buf = 0
+---@class simple.markdown.heading
+---@field line integer
+---@field level integer
+---@field text string
+
+---@param line string
+---@return string?
+---@return integer?
+local function _md_atx_heading(line)
+  local hashes, text = line:match "^%s*(#+)%s*(.-)%s*$"
+  if not hashes or #hashes > 6 then return nil end
+  text = vim.trim(text:gsub("%s*#+%s*$", ""))
+  if text == "" then return nil end
+  return text, #hashes
+end
+
+---@param line string
+---@return integer?
+local function _md_setext_level(line)
+  if line:match "^%s*=+%s*$" then return 1 end
+  if line:match "^%s*-+%s*$" then return 2 end
+end
+
+---@param line string
+---@return string?
+local function _md_setext_text(line)
+  if _md_atx_heading(line) then return nil end
+  local text = vim.trim(line)
+  if text == "" or text:match "^[%-%*_]+$" then return nil end
+  return text
+end
+
+---@param buf integer
+---@return simple.markdown.heading[]?
+local function _md_collect_headings_with_treesitter(buf)
   local ok, parser = pcall(vim.treesitter.get_parser, buf, "markdown", {})
-  if not ok or not parser then return {} end
+  if not ok or not parser then return nil end
   local trees = parser:parse()
-  if not trees or not trees[1] then return {} end
+  if not trees or not trees[1] then return nil end
   local root = trees[1]:root()
-  if not root then return {} end
+  if not root then return nil end
   local query = vim.treesitter.query.parse(
     "markdown",
     [[
@@ -194,7 +227,7 @@ local function _md_collect_headings()
     (setext_heading) @h
   ]]
   )
-  ---@type {line: string, level: integer, text: string}[]
+  ---@type simple.markdown.heading[]
   local items = {}
   for _, node in query:iter_captures(root, buf, 0, -1) do
     local start_row, _, end_row, _ = node:range()
@@ -202,25 +235,67 @@ local function _md_collect_headings()
     local level = 1
     if node:type() == "atx_heading" then
       local line = (vim.api.nvim_buf_get_lines(buf, start_row, start_row + 1, false)[1] or "")
-      local hashes = line:match "^%s*(#+)"
-      if hashes then level = #hashes end
-      line = line:gsub("^%s*#+%s*", "")
-      line = line:gsub("%s*#+%s*$", "")
-      text = vim.trim(line)
+      text, level = _md_atx_heading(line)
     else
       local first = (vim.api.nvim_buf_get_lines(buf, start_row, start_row + 1, false)[1] or "")
       local underline = (vim.api.nvim_buf_get_lines(buf, end_row - 1, end_row, false)[1] or "")
-      if underline:match "^%s*=+%s*$" then
-        level = 1
-      elseif underline:match "^%s*-+%s*$" then
-        level = 2
-      end
-      text = vim.trim(first)
+      level = _md_setext_level(underline) or level
+      text = _md_setext_text(first)
     end
-    if text ~= "" then table.insert(items, { line = start_row, level = level, text = text }) end
+    if text and text ~= "" then table.insert(items, { line = start_row, level = level, text = text }) end
   end
   table.sort(items, function(a, b) return a.line < b.line end)
   return items
+end
+
+---@param buf integer
+---@return simple.markdown.heading[]
+local function _md_collect_headings_with_lines(buf)
+  local items = {}
+  local prev_line
+  local prev_row
+  local in_frontmatter = false
+  local line_count = vim.api.nvim_buf_line_count(buf)
+
+  for start_row = 0, line_count - 1, 512 do
+    local lines = vim.api.nvim_buf_get_lines(buf, start_row, math.min(start_row + 512, line_count), false)
+    for offset, line in ipairs(lines) do
+      local row = start_row + offset - 1
+
+      if row == 0 and line:match "^%s*%-%-%-%s*$" then
+        in_frontmatter = true
+        prev_line = nil
+        prev_row = nil
+      elseif in_frontmatter then
+        if row > 0 and line:match "^%s*%-%-%-%s*$" then in_frontmatter = false end
+        prev_line = nil
+        prev_row = nil
+      else
+        local text, level = _md_atx_heading(line)
+        if text then table.insert(items, { line = row, level = level, text = text }) end
+
+        level = _md_setext_level(line)
+        text = prev_line and _md_setext_text(prev_line) or nil
+        if level and text and prev_row then table.insert(items, { line = prev_row, level = level, text = text }) end
+
+        prev_line = line
+        prev_row = row
+      end
+    end
+  end
+
+  return items
+end
+
+---@return simple.markdown.heading[]
+local function _md_collect_headings()
+  local buf = 0
+  if Util.is_bigfile(buf) then return _md_collect_headings_with_lines(buf) end
+
+  local items = _md_collect_headings_with_treesitter(buf)
+  if items then return items end
+
+  return _md_collect_headings_with_lines(buf)
 end
 
 local function _md_open_headings_popup()

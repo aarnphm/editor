@@ -1,17 +1,5 @@
 local setup_done = false
 
-local function add_bundled_query_runtime()
-  local init = vim.api.nvim_get_runtime_file("lua/nvim-treesitter/init.lua", false)[1]
-  if not init then return end
-
-  local root = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(init)))
-  local runtime = vim.fs.joinpath(root, "runtime")
-  if vim.fn.isdirectory(runtime) == 0 then return end
-  if vim.tbl_contains(vim.opt.runtimepath:get(), runtime) then return end
-
-  vim.opt.runtimepath:prepend(runtime)
-end
-
 local function register_mojo_parser()
   local ok_parsers, parsers = pcall(require, "nvim-treesitter.parsers")
   if not ok_parsers then return end
@@ -26,10 +14,9 @@ end
 
 local function setup_treesitter()
   if setup_done then return true end
-  setup_done = true
 
   Util.pack.load "nvim-treesitter"
-  add_bundled_query_runtime()
+  Util.add_nvim_treesitter_query_runtime()
   local ok, ts = pcall(require, "nvim-treesitter")
   if not ok then return false end
 
@@ -37,6 +24,7 @@ local function setup_treesitter()
   ts.setup()
   register_mojo_parser()
   Util.treesitter.get_installed(true)
+  setup_done = true
   return true
 end
 
@@ -50,6 +38,26 @@ local function start_treesitter(buf, ft)
   end
   if Util.treesitter.have(ft, "folds") and Util.set_default("foldmethod", "expr") then
     Util.set_default("foldexpr", 'v:lua.require("utils").treesitter.foldexpr()')
+  end
+end
+
+local function start_treesitter_buffer(buf, ft)
+  if not (vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_is_loaded(buf)) then return end
+  vim.api.nvim_buf_call(buf, function() start_treesitter(buf, ft or vim.bo[buf].filetype) end)
+end
+
+local function start_loaded_buffers()
+  local targets = {}
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      local ft = vim.bo[buf].filetype
+      if ft ~= "" and not Util.is_bigfile(buf) then targets[#targets + 1] = { buf = buf, ft = ft } end
+    end
+  end
+
+  if #targets == 0 or not setup_treesitter() then return end
+  for _, target in ipairs(targets) do
+    start_treesitter_buffer(target.buf, target.ft)
   end
 end
 
@@ -101,24 +109,12 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function(ev)
     local ft = ev.match
     if vim.v.vim_did_enter == 0 then return end
-    vim.schedule(function()
-      if vim.api.nvim_buf_is_valid(ev.buf) then
-        vim.api.nvim_buf_call(ev.buf, function() start_treesitter(ev.buf, ft) end)
-      end
-    end)
+    vim.schedule(function() start_treesitter_buffer(ev.buf, ft) end)
   end,
 })
 
 vim.api.nvim_create_autocmd("VimEnter", {
   group = augroup "treesitter_startup_buffers",
   once = true,
-  callback = function()
-    vim.defer_fn(function()
-      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.api.nvim_buf_is_loaded(buf) then
-          vim.api.nvim_buf_call(buf, function() start_treesitter(buf, vim.bo[buf].filetype) end)
-        end
-      end
-    end, 20)
-  end,
+  callback = function() vim.schedule(start_loaded_buffers) end,
 })

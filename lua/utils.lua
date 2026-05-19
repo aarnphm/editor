@@ -12,6 +12,14 @@ local M = {}
 
 function M.is_win() return vim.uv.os_uname().sysname:find "Windows" ~= nil end
 
+function M.add_nvim_treesitter_query_runtime()
+  local runtime = vim.fs.joinpath(vim.fn.stdpath "data", "site/pack/core/opt/nvim-treesitter/runtime")
+  if vim.fn.isdirectory(runtime) == 0 then return end
+  if vim.tbl_contains(vim.opt.runtimepath:get(), runtime) then return end
+
+  vim.opt.runtimepath:append(runtime)
+end
+
 local lint = {
   events = { "BufWritePost", "BufReadPost", "InsertLeave" },
   linters_by_ft = {},
@@ -416,6 +424,8 @@ end
 function pack.setup(specs)
   if not vim.pack then error "This config expects Nvim with vim.pack support" end
 
+  M.add_nvim_treesitter_query_runtime()
+
   pack.specs = {}
   loaded = {}
   pack_load_events = {}
@@ -464,7 +474,7 @@ end
 ---@field line_length integer
 M.bigfile = {
   size = 2 * 1024 * 1024,
-  lines = 100000,
+  lines = 80000,
   line_length = 10000,
 }
 
@@ -588,7 +598,10 @@ function M.quickfile.setup()
 
   local lang = vim.treesitter.language.get_lang(ft)
   if vim.tbl_contains(M.quickfile.exclude, lang) then lang = nil end
-  if not (lang and pcall(vim.treesitter.start, bufnr, lang)) then vim.bo[bufnr].syntax = ft end
+  M.add_nvim_treesitter_query_runtime()
+
+  local ok_query, query = pcall(vim.treesitter.query.get, lang, "highlights")
+  if not (lang and ok_query and query and pcall(vim.treesitter.start, bufnr, lang)) then vim.bo[bufnr].syntax = ft end
 
   vim.cmd.redraw()
 end
@@ -599,7 +612,13 @@ if not vim.g.simple_treesitter_bigfile_guard then
 
   function vim.treesitter.start(buf, lang)
     local bufnr = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
-    if M.is_bigfile(bufnr) then return end
+    if M.is_bigfile(bufnr) then
+      Util.info(
+        "file is considered larger than 1.5MB, disable treesitter to avoid performance churn.",
+        { title = "bigfile" }
+      )
+      return
+    end
     return treesitter_start(buf, lang)
   end
 end
