@@ -44,10 +44,14 @@ vim.g.markdown_frontmatter = true
 vim.g.enable_highlighturl = true
 vim.g.netrw_liststyle = 3
 
+Util.bigfile.setup()
+
 hi("HighlightURL", { default = true, underline = true })
 hi("CmpGhostText", { link = "Comment", default = true })
 hi("LeapBackdrop", { link = "Comment" })
 hi("LeapMatch", { fg = vim.go.background == "dark" and "white" or "black", bold = true, nocombine = true })
+
+Util.quickfile.setup()
 
 Util.pack.setup {
   "folke/lazydev.nvim",

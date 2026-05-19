@@ -107,6 +107,15 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     vim.api.nvim_win_set_cursor(0, curpos)
   end,
 })
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+  group = augroup "bigfile",
+  callback = function(ev)
+    if not Util.is_bigfile(ev.buf) then return end
+    Util.bigfile.apply(ev.buf)
+  end,
+})
+
 local numbercolumn = augroup "numbercolumn"
 local file_statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum} "
 local editor_focused = true
@@ -127,11 +136,12 @@ local function refresh_numbercolumn()
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
     local enabled = file_buffer(buf)
+    local bigfile = enabled and Util.is_bigfile(buf)
 
     set_winopt(win, "number", enabled)
     set_winopt(win, "relativenumber", enabled and editor_focused and win == current_win and mode ~= "i")
     set_winopt(win, "signcolumn", enabled and "yes:1" or "no")
-    set_winopt(win, "statuscolumn", enabled and file_statuscolumn or "")
+    set_winopt(win, "statuscolumn", enabled and not bigfile and file_statuscolumn or "")
   end
 end
 
@@ -139,7 +149,7 @@ vim.api.nvim_create_autocmd(
   { "BufEnter", "BufWinEnter", "FileType", "InsertEnter", "InsertLeave", "TermOpen", "WinEnter", "WinLeave" },
   {
     group = numbercolumn,
-    callback = function() vim.schedule(refresh_numbercolumn) end,
+    callback = refresh_numbercolumn,
   }
 )
 
@@ -147,7 +157,7 @@ vim.api.nvim_create_autocmd("FocusGained", {
   group = numbercolumn,
   callback = function()
     editor_focused = true
-    vim.schedule(refresh_numbercolumn)
+    refresh_numbercolumn()
   end,
 })
 
@@ -155,7 +165,7 @@ vim.api.nvim_create_autocmd("FocusLost", {
   group = numbercolumn,
   callback = function()
     editor_focused = false
-    vim.schedule(refresh_numbercolumn)
+    refresh_numbercolumn()
   end,
 })
 

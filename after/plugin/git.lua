@@ -23,6 +23,7 @@ local function setup_gitsigns()
   require("gitsigns").setup {
     numhl = true,
     attach_to_untracked = true,
+    max_file_length = Util.bigfile.lines,
     _new_sign_calc = true,
     _refresh_staged_on_update = true,
     on_attach = function(buf)

@@ -17,7 +17,7 @@ Util.lint.linter("markdownlint", {
   },
   condition = function(ctx) return markdownlint_config(ctx.filename) end,
 })
-local markdown_oxide_root_markers = { { ".obsidian", ".moxide.toml" }, ".git" }
+local markdown_oxide_root_markers = { ".obsidian", ".moxide.toml" }
 
 local function markdown_oxide_vault_root(bufnr)
   local path = vim.api.nvim_buf_get_name(bufnr)
@@ -48,20 +48,20 @@ local markdown_oxide_config = {
   },
 }
 
-Util.lsp.enable("markdown_oxide", markdown_oxide_config)
-
 local function start_markdown_oxide(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].filetype ~= "markdown" then return end
+  if Util.is_bigfile(bufnr) then return end
   if #vim.lsp.get_clients { bufnr = bufnr, name = "markdown_oxide" } > 0 then return end
+
+  local root = markdown_oxide_root(bufnr)
+  if not root then return end
+
   if not Util.lsp.server_is_available("markdown_oxide", markdown_oxide_config) then return end
 
   Util.lsp.prepend_mason_bin()
   if Util.pack and Util.pack.get "nvim-lspconfig" then pcall(Util.pack.load, "nvim-lspconfig") end
   Util.lsp.configure_defaults()
   vim.lsp.config("markdown_oxide", markdown_oxide_config)
-
-  local root = markdown_oxide_root(bufnr)
-  if not root then return end
 
   local config = vim.tbl_deep_extend("force", vim.deepcopy(vim.lsp.config.markdown_oxide), { root_dir = root })
   vim.lsp.start(config, { bufnr = bufnr, silent = true })

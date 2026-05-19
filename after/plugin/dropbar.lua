@@ -36,8 +36,7 @@ local function setup_dropbar()
           return false
         end
 
-        local stat = vim.uv.fs_stat(vim.api.nvim_buf_get_name(buf))
-        if stat and stat.size > 1.5 * 1024 * 1024 then return false end
+        if Util.is_bigfile(buf) then return false end
 
         return vim.bo[buf].ft == "markdown"
           or pcall(vim.treesitter.get_parser, buf)

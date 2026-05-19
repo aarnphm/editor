@@ -1,5 +1,17 @@
 local setup_done = false
 
+local function add_bundled_query_runtime()
+  local init = vim.api.nvim_get_runtime_file("lua/nvim-treesitter/init.lua", false)[1]
+  if not init then return end
+
+  local root = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(init)))
+  local runtime = vim.fs.joinpath(root, "runtime")
+  if vim.fn.isdirectory(runtime) == 0 then return end
+  if vim.tbl_contains(vim.opt.runtimepath:get(), runtime) then return end
+
+  vim.opt.runtimepath:prepend(runtime)
+end
+
 local function register_mojo_parser()
   local ok_parsers, parsers = pcall(require, "nvim-treesitter.parsers")
   if not ok_parsers then return end
@@ -17,6 +29,7 @@ local function setup_treesitter()
   setup_done = true
 
   Util.pack.load "nvim-treesitter"
+  add_bundled_query_runtime()
   local ok, ts = pcall(require, "nvim-treesitter")
   if not ok then return false end
 
@@ -28,7 +41,7 @@ local function setup_treesitter()
 end
 
 local function start_treesitter(buf, ft)
-  if ft == "" or not setup_treesitter() then return end
+  if ft == "" or Util.is_bigfile(buf) or not setup_treesitter() then return end
   if not Util.treesitter.have(ft) then return end
 
   if Util.treesitter.have(ft, "highlights") then pcall(vim.treesitter.start, buf) end

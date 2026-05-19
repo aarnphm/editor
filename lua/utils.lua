@@ -6,6 +6,8 @@
 ---@field root simple.util.root
 ---@field treesitter simple.util.treesitter
 ---@field ui simple.util.ui
+---@field bigfile simple.util.bigfile
+---@field quickfile simple.util.quickfile
 local M = {}
 
 function M.is_win() return vim.uv.os_uname().sysname:find "Windows" ~= nil end
@@ -454,6 +456,152 @@ function M.norm(path)
   end
   path = path:gsub("\\", "/"):gsub("/+", "/")
   return path:sub(-1) == "/" and path:sub(1, -2) or path
+end
+
+---@class simple.util.bigfile
+---@field size integer
+---@field lines integer
+---@field line_length integer
+M.bigfile = {
+  size = 2 * 1024 * 1024,
+  lines = 100000,
+  line_length = 10000,
+}
+
+---@param path string
+---@param bufnr integer
+---@return boolean
+function M.bigfile.matches(path, bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
+
+  local size = vim.fn.getfsize(path)
+  if size <= 0 then return false end
+  if size > M.bigfile.size then return true end
+
+  if not vim.api.nvim_buf_is_loaded(bufnr) then return false end
+
+  local lines = vim.api.nvim_buf_line_count(bufnr)
+  if lines > M.bigfile.lines then return true end
+
+  return lines > 0 and (size - lines) / lines > M.bigfile.line_length
+end
+
+---@param bufnr? integer
+---@return boolean
+function M.is_bigfile(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
+  if vim.bo[bufnr].filetype == "bigfile" then return true end
+
+  local cached = vim.b[bufnr].simple_bigfile
+  if cached ~= nil then return cached == true end
+
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  if name ~= "" then
+    if M.bigfile.matches(name, bufnr) then
+      vim.b[bufnr].simple_bigfile = true
+      return true
+    end
+  end
+
+  return false
+end
+
+---@param bufnr integer
+---@return string
+function M.bigfile.filetype(bufnr) return vim.filetype.match { buf = bufnr } or "" end
+
+---@param bufnr integer
+function M.bigfile.apply(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+
+  vim.b[bufnr].simple_bigfile = true
+  vim.b[bufnr].minidiff_disable = true
+  vim.b[bufnr].minihipatterns_disable = true
+  vim.b[bufnr].completion = false
+
+  local ft = M.bigfile.filetype(bufnr)
+  vim.b[bufnr].simple_bigfile_filetype = ft
+
+  vim.api.nvim_buf_call(bufnr, function()
+    if vim.fn.exists ":NoMatchParen" ~= 0 then pcall(vim.cmd.NoMatchParen) end
+    vim.opt_local.foldmethod = "manual"
+    vim.opt_local.statuscolumn = ""
+    vim.opt_local.conceallevel = 0
+  end)
+
+  vim.schedule(function()
+    if vim.api.nvim_buf_is_valid(bufnr) and ft ~= "" then vim.bo[bufnr].syntax = ft end
+  end)
+end
+
+function M.bigfile.setup()
+  if vim.g.simple_bigfile_setup then return end
+  vim.g.simple_bigfile_setup = true
+
+  vim.filetype.add {
+    pattern = {
+      [".*"] = {
+        function(path, bufnr)
+          if not path or not bufnr or vim.bo[bufnr].filetype == "bigfile" then return end
+
+          local name = vim.api.nvim_buf_get_name(bufnr)
+          if name == "" or M.norm(path) ~= M.norm(name) then return end
+          if not M.bigfile.matches(path, bufnr) then return end
+
+          vim.b[bufnr].simple_bigfile = true
+          return "bigfile"
+        end,
+      },
+    },
+  }
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("simple_bigfile", { clear = true }),
+    pattern = "bigfile",
+    callback = function(ev) M.bigfile.apply(ev.buf) end,
+  })
+end
+
+---@class simple.util.quickfile
+---@field exclude string[]
+M.quickfile = {
+  exclude = { "latex" },
+}
+
+function M.quickfile.setup()
+  if vim.v.vim_did_enter == 1 then return end
+  if vim.bo.buftype ~= "" then return end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_name(bufnr) == "" then return end
+
+  local ft = vim.filetype.match { buf = bufnr }
+  if not ft then return end
+
+  if ft == "bigfile" then
+    vim.b[bufnr].simple_bigfile = true
+    vim.bo[bufnr].filetype = "bigfile"
+    vim.cmd.redraw()
+    return
+  end
+
+  local lang = vim.treesitter.language.get_lang(ft)
+  if vim.tbl_contains(M.quickfile.exclude, lang) then lang = nil end
+  if not (lang and pcall(vim.treesitter.start, bufnr, lang)) then vim.bo[bufnr].syntax = ft end
+
+  vim.cmd.redraw()
+end
+
+if not vim.g.simple_treesitter_bigfile_guard then
+  vim.g.simple_treesitter_bigfile_guard = true
+  local treesitter_start = vim.treesitter.start
+
+  function vim.treesitter.start(buf, lang)
+    local bufnr = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
+    if M.is_bigfile(bufnr) then return end
+    return treesitter_start(buf, lang)
+  end
 end
 
 local cache = {} ---@type table<function, table<string, any>>
