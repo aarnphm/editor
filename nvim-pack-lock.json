@@ -1,12 +1,12 @@
 {
   "plugins": {
     "LuaSnip": {
-      "rev": "a62e1083a3cfe8b6b206e7d3d33a51091df25357",
+      "rev": "0abc8f390b278c3b4aabc4c004ac8a088b65cf24",
       "src": "https://github.com/L3MON4D3/LuaSnip.git",
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "2ef3db111181c5eef22a462aa0122349a6027f28",
+      "rev": "35e3923a09ff3db150ceff80004befcbbfa071a0",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
@@ -16,7 +16,7 @@
       "version": "'main'"
     },
     "conform.nvim": {
-      "rev": "dca1a190aa85f9065979ef35802fb77131911106",
+      "rev": "18aeab3d63d350dcf44d64c462cc489a3412af40",
       "src": "https://github.com/stevearc/conform.nvim.git",
       "version": "'master'"
     },
@@ -41,7 +41,7 @@
       "version": "'main'"
     },
     "grug-far.nvim": {
-      "rev": "21790e59dd0109a92a70cb874dd002af186314f5",
+      "rev": "5506c2f59dc9ab2ed6c233585412b24d31d51521",
       "src": "https://github.com/MagicDuck/grug-far.nvim.git",
       "version": "'main'"
     },
@@ -61,22 +61,22 @@
       "version": "'main'"
     },
     "mason.nvim": {
-      "rev": "e54f5bf5f12c560da31c17eee5b3e1bd369f3ff9",
+      "rev": "cbf8d285e1462dd24acf3507817be2bbcb035919",
       "src": "https://github.com/mason-org/mason.nvim.git",
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "17c448b0f3f29c0857a3436fc64e1d7cb9267ec3",
+      "rev": "264b5c8fc6e82212af0dc5c345145cfa916efeb6",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
     "nvim-lint": {
-      "rev": "665525810630701b84181e4d9eefd24b49845b29",
+      "rev": "d48f3a76189d03b2239f6df1b2f7e3fa8353743b",
       "src": "https://github.com/mfussenegger/nvim-lint.git",
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "75e49cfa588a89ca667d767c0afef3ceac205faa",
+      "rev": "246572944c2a1e2a646c2e7609ff619b0fe74c18",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
