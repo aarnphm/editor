@@ -50,7 +50,7 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
       },
       cmdline = { enabled = false },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "stream_meta", "arena_meta" },
+        default = { "lsp", "path", "snippets", "buffer", "emoji", "stream_meta", "arena_meta" },
         per_filetype = {
           lua = { inherit_defaults = true, "lazydev" },
         },
@@ -65,6 +65,13 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
               ignored_filetypes = { "git", "gitcommit" },
               extended_filetypes = { markdown = { "latex" } },
             },
+          },
+          emoji = {
+            module = "blink-emoji",
+            name = "Emoji",
+            score_offset = 15,
+            opts = { insert = true },
+            should_show_items = function() return vim.tbl_contains({ "gitcommit", "markdown" }, vim.o.filetype) end,
           },
           stream_meta = {
             name = "Stream",

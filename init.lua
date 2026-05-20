@@ -68,7 +68,11 @@ Util.pack.setup {
   {
     "Saghen/blink.cmp",
     event = "InsertEnter",
-    dependencies = { "Saghen/blink.lib", "rafamadriz/friendly-snippets" },
+    dependencies = {
+      "Saghen/blink.lib",
+      "rafamadriz/friendly-snippets",
+      { "aarnphm/blink-emoji.nvim", version = "master" },
+    },
     build = function()
       vim.cmd.packadd "blink.lib"
       vim.cmd.packadd "blink.cmp"

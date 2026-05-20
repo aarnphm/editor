@@ -5,6 +5,11 @@
       "src": "https://github.com/L3MON4D3/LuaSnip.git",
       "version": "'master'"
     },
+    "blink-emoji.nvim": {
+      "rev": "16d1ee0d7ac4607f0657cfc508639912d5ab22e2",
+      "src": "https://github.com/aarnphm/blink-emoji.nvim.git",
+      "version": "'master'"
+    },
     "blink.cmp": {
       "rev": "35e3923a09ff3db150ceff80004befcbbfa071a0",
       "src": "https://github.com/Saghen/blink.cmp.git",

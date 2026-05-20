@@ -1,28 +1,20 @@
 local setup_done = false
 
-local function register_mojo_parser()
-  local ok_parsers, parsers = pcall(require, "nvim-treesitter.parsers")
-  if not ok_parsers then return end
-  parsers.mojo = {
+local function setup_treesitter()
+  if setup_done then return true end
+
+  Util.pack.load "nvim-treesitter"
+  local parser = require "nvim-treesitter.parsers"
+  Util.treesitter.setup()
+
+  parser.mojo = {
     install_info = {
       url = "https://github.com/lsh/tree-sitter-mojo",
       revision = "03966fb3f209bea86844aab3bd0f2158a5a8bb8d",
       queries = "queries",
     },
   }
-end
 
-local function setup_treesitter()
-  if setup_done then return true end
-
-  Util.pack.load "nvim-treesitter"
-  Util.add_nvim_treesitter_query_runtime()
-  local ok, ts = pcall(require, "nvim-treesitter")
-  if not ok then return false end
-
-  require("treesitter_predicates").setup()
-  ts.setup()
-  register_mojo_parser()
   Util.treesitter.get_installed(true)
   setup_done = true
   return true

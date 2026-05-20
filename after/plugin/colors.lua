@@ -16,6 +16,8 @@ else
 
       StatusLine = { fg = c.tx, bg = c.ui },
       StatusLineNC = { fg = c["tx-2"], bg = c.ui },
+      WinSeparator = { fg = c["ui-2"], bg = c.bg },
+      VertSplit = { link = "WinSeparator" },
       MsgArea = { fg = c.tx, bg = c.bg },
       MsgSeparator = { fg = c["tx-3"], bg = c.bg },
       ModeMsg = { fg = c.tx, bg = c.bg },

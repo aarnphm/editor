@@ -35,14 +35,14 @@ local function setup_gitsigns()
         if vim.wo.diff then
           vim.cmd.normal { "]c", bang = true }
         else
-          require("gitsigns.actions").nav_hunk "next"
+          require("gitsigns.actions").nav_hunk("next", { target = "all" })
         end
       end, "git: next hunk")
       hmap("n", "[h", function()
         if vim.wo.diff then
           vim.cmd.normal { "[c", bang = true }
         else
-          require("gitsigns.actions").nav_hunk "prev"
+          require("gitsigns.actions").nav_hunk("prev", { target = "all" })
         end
       end, "git: prev hunk")
       hmap("n", "[H", gitsigns_action("nav_hunk", "first"), "git: first hunk")
