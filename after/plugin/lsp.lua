@@ -110,6 +110,22 @@ end
 
 local conform_setup = false
 
+local ruff_format_config_args = {
+  "--config",
+  "indent-width=2",
+  "--config",
+  "line-length=119",
+  "--config",
+  "preview=true",
+}
+
+local function ruff_args(command, args)
+  local ret = { "ruff", command }
+  vim.list_extend(ret, ruff_format_config_args)
+  vim.list_extend(ret, args)
+  return ret
+end
+
 local function conform()
   if not conform_setup then
     Util.pack.load "conform.nvim"
@@ -120,8 +136,54 @@ local function conform()
         cbfmt = { condition = Util.lsp.cbfmt_enabled },
         injected = { options = { ignore_errors = true } },
         prettier = { condition = Util.lsp.prettier_enabled },
-        ruff_fix = { condition = Util.lsp.ruff_format_enabled },
-        ruff_organize_imports = { condition = Util.lsp.ruff_format_enabled },
+        ruff_fix = {
+          command = "uvx",
+          args = ruff_args("check", {
+            "--fix",
+            "--force-exclude",
+            "--exit-zero",
+            "--no-cache",
+            "--stdin-filename",
+            "$FILENAME",
+            "-",
+          }),
+          condition = Util.lsp.ruff_format_enabled,
+        },
+        ruff_format = {
+          command = "uvx",
+          args = ruff_args("format", { "--force-exclude", "--stdin-filename", "$FILENAME", "-" }),
+          condition = Util.lsp.ruff_format_enabled,
+          range_args = function(_, ctx)
+            return ruff_args("format", {
+              "--force-exclude",
+              "--range",
+              string.format(
+                "%d:%d-%d:%d",
+                ctx.range.start[1],
+                ctx.range.start[2] + 1,
+                ctx.range["end"][1],
+                ctx.range["end"][2] + 1
+              ),
+              "--stdin-filename",
+              "$FILENAME",
+              "-",
+            })
+          end,
+        },
+        ruff_organize_imports = {
+          command = "uvx",
+          args = ruff_args("check", {
+            "--fix",
+            "--force-exclude",
+            "--select=I001",
+            "--exit-zero",
+            "--no-cache",
+            "--stdin-filename",
+            "$FILENAME",
+            "-",
+          }),
+          condition = Util.lsp.ruff_format_enabled,
+        },
       },
     }
     conform_setup = true

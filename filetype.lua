@@ -3,6 +3,7 @@ vim.filetype.add {
     ["http"] = "http",
     env = "dotenv",
     h = "c",
+    ipynb = "json",
     ["j2"] = "jinja",
     mojo = "mojo",
     ["🔥"] = "mojo",

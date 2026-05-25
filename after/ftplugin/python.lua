@@ -10,11 +10,31 @@ Util.lint.linter("mypy", {
     return vim.fs.find({ "pyproject.toml", "mypy.ini" }, { path = ctx.filename, upward = true })[1]
   end,
 })
+
+local ruff_configuration = {
+  ["indent-width"] = 2,
+  ["line-length"] = 119,
+  preview = true,
+}
+
 Util.lsp.enable("ruff", {
+  cmd = { "uvx", "ruff", "server" },
   cmd_env = { RUFF_TRACE = "messages" },
-  init_options = { settings = { logLevel = "error" } },
+  init_options = {
+    settings = {
+      configuration = ruff_configuration,
+      format = {
+        backend = "uv",
+        preview = true,
+      },
+      lineLength = ruff_configuration["line-length"],
+      logLevel = "error",
+    },
+  },
 })
-Util.lsp.enable "ty"
+Util.lsp.enable("ty", {
+  cmd = { "uvx", "ty", "server" },
+})
 
 Util.lsp.on_attach("ruff", "disable_format_for_excluded_roots", function(client, ev)
   if not Util.lsp.skip_ruff_format(vim.api.nvim_buf_get_name(ev.buf)) then return end

@@ -1752,7 +1752,7 @@ function lsp.use_ruff_formatters(bufnr)
   local path = vim.api.nvim_buf_get_name(bufnr)
   if lsp.skip_ruff_format(path) then return {} end
 
-  return { "ruff_fix", "ruff_organize_imports" }
+  return { "ruff_fix", "ruff_organize_imports", "ruff_format" }
 end
 
 function lsp.ruff_format_enabled(_, ctx) return not lsp.skip_ruff_format(ctx and ctx.filename) end
