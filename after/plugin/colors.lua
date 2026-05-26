@@ -6,6 +6,8 @@ if not ok then
   vim.cmd.colorscheme "habamax"
 else
   local c = require("flexoki.palette").palette()
+  local diff_preview_fg = c._name == "light" and "#ffffff" or "#000000"
+  local diff_preview_change_fg = "#000000"
   flexoki.setup {
     float_window_style = "border",
     highlight_groups = {
@@ -73,9 +75,11 @@ else
       GitSignsAdd = { link = "SignAdd" },
       GitSignsChange = { link = "SignChange" },
       GitSignsDelete = { link = "SignDelete" },
-      GitSignsAddInline = { fg = c["gr-2"] },
-      GitSignsChangeInline = { fg = c["ye-2"] },
-      GitSignsDeleteInline = { fg = c["re-2"] },
+      GitSignsAddPreview = { fg = diff_preview_fg, bg = c.gr },
+      GitSignsDeletePreview = { fg = diff_preview_fg, bg = c.re },
+      GitSignsAddInline = { fg = diff_preview_fg, bg = c.gr },
+      GitSignsChangeInline = { fg = diff_preview_change_fg, bg = c.ye },
+      GitSignsDeleteInline = { fg = diff_preview_fg, bg = c.re },
       SignAdd = { fg = c["gr-2"], bg = "NONE" },
       SignChange = { fg = c["ye-2"], bg = "NONE" },
       SignDelete = { fg = c["re-2"], bg = "NONE" },

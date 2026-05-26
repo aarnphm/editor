@@ -20,6 +20,10 @@ local function setup_gitsigns()
     return function() require("gitsigns.actions")[name](unpack(args)) end
   end
 
+  local function gitsigns_visual_action(name)
+    return function() require("gitsigns.actions")[name] { vim.fn.line ".", vim.fn.line "v" } end
+  end
+
   require("gitsigns").setup {
     numhl = true,
     attach_to_untracked = true,
@@ -52,8 +56,10 @@ local function setup_gitsigns()
       hmap("n", "<leader>hP", gitsigns_action "preview_hunk", "git: preview hunk")
       hmap("n", "<leader>hR", "<cmd>Gitsigns reset_buffer<cr>", "git: reset buffer")
       hmap("n", "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>", "git: stage buffer")
-      hmap({ "n", "v" }, "<leader>hs", "<cmd>Gitsigns stage_hunk<cr>", "git: stage hunk")
-      hmap({ "n", "v" }, "<leader>hr", "<cmd>Gitsigns reset_hunk<cr>", "git: reset hunk")
+      hmap("n", "<leader>hs", gitsigns_action "stage_hunk", "git: stage hunk")
+      hmap("v", "<leader>hs", gitsigns_visual_action "stage_hunk", "git: stage hunk")
+      hmap("n", "<leader>hr", gitsigns_action "reset_hunk", "git: reset hunk")
+      hmap("v", "<leader>hr", gitsigns_visual_action "reset_hunk", "git: reset hunk")
       hmap({ "n", "v" }, "<leader>hh", "<cmd>Gitsigns setqflist<cr>", "git: set qflist")
       hmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<cr>", "git: select hunk")
     end,
