@@ -1,4 +1,7 @@
-Util.lsp.formatters({ "javascript", "javascriptreact", "typescript", "typescriptreact" }, { "prettier" })
+Util.lsp.formatters(
+  { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  { "oxfmt", lsp_format = "never" }
+)
 Util.lint.linters({ "javascript", "javascriptreact", "typescript", "typescriptreact" }, { "oxlint" })
 vim.cmd.runtime "after/ftplugin/tailwindcss.lua"
 
@@ -37,6 +40,11 @@ local vtsls = {
 }
 vtsls.settings.javascript = vim.tbl_deep_extend("force", {}, vtsls.settings.typescript)
 
+Util.lsp.on_attach("vtsls", "disable_formatting", function(client)
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
+  client.server_capabilities.documentOnTypeFormattingProvider = nil
+end)
 Util.lsp.enable("vtsls", vtsls)
 
 vim.bo.commentstring = "// %s"

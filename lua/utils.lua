@@ -1508,26 +1508,6 @@ local ruff_format_excluded_roots = {
   "$WORKSPACE/monpy",
 }
 
-local prettier_filetypes = {
-  "css",
-  "graphql",
-  "handlebars",
-  "html",
-  "javascript",
-  "javascriptreact",
-  "json",
-  "jsonc",
-  "less",
-  "markdown",
-  "markdown.mdx",
-  "sass",
-  "scss",
-  "typescript",
-  "typescriptreact",
-  "vue",
-  "yaml",
-}
-
 function lsp.prepend_mason_bin()
   if vim.env.PATH and not vim.env.PATH:find(mason_bin, 1, true) then
     vim.env.PATH = mason_bin .. ":" .. vim.env.PATH
@@ -1636,6 +1616,51 @@ function lsp.formatters(filetypes, formatters)
   for _, filetype in ipairs(filetypes) do
     lsp.formatters_by_ft[filetype] = formatters
   end
+end
+
+local function add_formatter_names(names, seen, formatters)
+  if type(formatters) ~= "table" then return end
+
+  for _, name in ipairs(formatters) do
+    if type(name) == "string" and not seen[name] then
+      names[#names + 1] = name
+      seen[name] = true
+    end
+  end
+end
+
+local function matching_formatter_config(bufnr)
+  local filetype = vim.bo[bufnr].filetype
+  if filetype == "" then return nil end
+
+  local candidates = { filetype }
+  local parts = vim.split(filetype, ".", { plain = true })
+  for i = #parts, 1, -1 do
+    candidates[#candidates + 1] = parts[i]
+  end
+  candidates[#candidates + 1] = "_"
+
+  for _, candidate in ipairs(candidates) do
+    local formatters = lsp.formatters_by_ft[candidate]
+    if formatters and not (type(formatters) == "table" and vim.tbl_isempty(formatters)) then return formatters end
+  end
+end
+
+function lsp.formatter_names(bufnr)
+  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+  if not vim.api.nvim_buf_is_valid(bufnr) then return {} end
+
+  local names = {}
+  local seen = {}
+  local formatters = matching_formatter_config(bufnr)
+  if type(formatters) == "function" then
+    local ok, resolved = pcall(formatters, bufnr)
+    formatters = ok and resolved or nil
+  end
+
+  add_formatter_names(names, seen, formatters)
+  add_formatter_names(names, seen, lsp.formatters_by_ft["*"])
+  return names
 end
 
 function lsp.executable_for(name, config)
@@ -1815,6 +1840,7 @@ end
 
 function lsp.cbfmt_enabled(_, ctx)
   if not (ctx and ctx.buf and vim.api.nvim_buf_is_valid(ctx.buf)) then return false end
+  if not (ctx.filename and ctx.filename ~= "") then return false end
 
   local start = ctx.dirname or vim.fs.dirname(ctx.filename)
   local config = start and vim.fs.find(".cbfmt.toml", { path = start, upward = true, type = "file" })[1]
@@ -1823,23 +1849,17 @@ function lsp.cbfmt_enabled(_, ctx)
   return markdown_has_cbfmt_language(ctx.buf, cbfmt_languages(config))
 end
 
-local prettier_has_config = M.memoize(function(filename)
-  if vim.fn.executable "prettier" == 0 then return false end
-  vim.fn.system { "prettier", "--find-config-path", filename }
-  return vim.v.shell_error == 0
-end)
+function lsp.use_markdown_formatters(bufnr)
+  local formatters = { "oxfmt", lsp_format = "never" }
+  local filename = vim.api.nvim_buf_get_name(bufnr)
+  local ctx = {
+    buf = bufnr,
+    dirname = filename ~= "" and vim.fs.dirname(filename) or nil,
+    filename = filename,
+  }
 
-local prettier_has_parser = M.memoize(function(filetype, filename)
-  if vim.fn.executable "prettier" == 0 then return false end
-  if vim.tbl_contains(prettier_filetypes, filetype) then return true end
-
-  local ret = vim.fn.system { "prettier", "--file-info", filename }
-  local parsed_ok, info = pcall(vim.json.decode, ret)
-  return parsed_ok and info and info.inferredParser ~= nil and info.inferredParser ~= vim.NIL
-end)
-
-function lsp.prettier_enabled(_, ctx)
-  return prettier_has_parser(vim.bo[ctx.buf].filetype, ctx.filename) and prettier_has_config(ctx.filename)
+  if lsp.cbfmt_enabled(nil, ctx) then formatters[#formatters + 1] = "cbfmt" end
+  return formatters
 end
 
 M.lsp = lsp

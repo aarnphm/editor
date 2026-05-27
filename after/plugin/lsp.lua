@@ -119,6 +119,11 @@ local ruff_format_config_args = {
   "preview=true",
 }
 
+local function oxfmt_stdin_filepath(ctx)
+  if ctx.filename:lower():match "%.ipynb$" then return ctx.filename .. ".json" end
+  return ctx.filename
+end
+
 local function ruff_args(command, args)
   local ret = { "ruff", command }
   vim.list_extend(ret, ruff_format_config_args)
@@ -135,7 +140,9 @@ local function conform()
       formatters = {
         cbfmt = { condition = Util.lsp.cbfmt_enabled },
         injected = { options = { ignore_errors = true } },
-        prettier = { condition = Util.lsp.prettier_enabled },
+        oxfmt = {
+          args = function(_, ctx) return { "--stdin-filepath", oxfmt_stdin_filepath(ctx) } end,
+        },
         ruff_fix = {
           command = "uvx",
           args = ruff_args("check", {
@@ -221,7 +228,7 @@ vim.api.nvim_create_user_command("Format", function(opts)
       ["end"] = { opts.line2, end_line:len() },
     }
   end
-  conform().format { async = true, lsp_format = "fallback", range = range }
+  conform().format { async = true, range = range }
 end, { desc = "format: selection or buffer", range = true })
 vim.api.nvim_create_user_command("FormatInfo", format_info, { desc = "format: info" })
 vim.api.nvim_create_user_command("FormatDisable", function(opts)
@@ -237,12 +244,7 @@ vim.api.nvim_create_user_command("FormatToggle", function(opts)
   format_info()
 end, { bang = true, desc = "format: toggle autoformat" })
 
-silent_map(
-  { "n", "v" },
-  "<leader><leader>f",
-  function() conform().format { async = true, lsp_format = "fallback" } end,
-  "format: buffer"
-)
+silent_map({ "n", "v" }, "<leader><leader>f", function() conform().format { async = true } end, "format: buffer")
 silent_map(
   { "n", "v" },
   "<leader>cF",
@@ -256,7 +258,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup "format_on_save",
   callback = function(event)
     if not format_enabled(event.buf) then return end
-    conform().format { bufnr = event.buf, timeout_ms = 3000, lsp_format = "fallback" }
+    conform().format { bufnr = event.buf, timeout_ms = 3000 }
   end,
 })
 
@@ -315,12 +317,5 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lsp_map(ev.buf, "n", "gI", vim.lsp.buf.implementation, "lsp: implementation")
     lsp_map(ev.buf, "n", "gR", vim.lsp.buf.references, "lsp: references")
     lsp_map(ev.buf, { "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "lsp: code action")
-    lsp_map(
-      ev.buf,
-      { "n", "v" },
-      "<leader><leader>f",
-      function() vim.lsp.buf.format { async = true } end,
-      "lsp: format"
-    )
   end,
 })

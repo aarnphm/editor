@@ -9,20 +9,62 @@ local function file_buffer_exists()
   return false
 end
 
+local function gitsigns_action(name, ...)
+  local args = { ... }
+  return function() require("gitsigns.actions")[name](unpack(args)) end
+end
+
+local function gitsigns_visual_action(name)
+  return function() require("gitsigns.actions")[name] { vim.fn.line ".", vim.fn.line "v" } end
+end
+
+local function setup_gitsigns_keymaps(buf)
+  local function hmap(mode, lhs, rhs, desc)
+    vim.keymap.set(mode, lhs, rhs, { buffer = buf, silent = true, desc = desc })
+  end
+
+  local function nav_hunk(direction, target)
+    return function()
+      if vim.wo.diff then
+        local command = direction == "prev" and "[c" or "]c"
+        vim.cmd.normal { command, bang = true }
+      else
+        require("gitsigns.actions").nav_hunk(direction, { target = target })
+      end
+    end
+  end
+
+  hmap({ "n", "v" }, "]h", nav_hunk("next", "unstaged"), "git: next current hunk")
+  hmap({ "n", "v" }, "[h", nav_hunk("prev", "unstaged"), "git: prev current hunk")
+  hmap({ "n", "v" }, "]H", nav_hunk("next", "staged"), "git: next staged hunk")
+  hmap({ "n", "v" }, "[H", nav_hunk("prev", "staged"), "git: prev staged hunk")
+  hmap("n", "<leader>hb", function() require("gitsigns.actions").blame_line { full = true } end, "git: blame line")
+  hmap("n", "<leader>hp", gitsigns_action "preview_hunk_inline", "git: preview hunk inline")
+  hmap("n", "<leader>hP", gitsigns_action "preview_hunk", "git: preview hunk")
+  hmap("n", "<leader>hR", "<cmd>Gitsigns reset_buffer<cr>", "git: reset buffer")
+  hmap("n", "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>", "git: stage buffer")
+  hmap("n", "<leader>hs", gitsigns_action "stage_hunk", "git: stage hunk")
+  hmap("v", "<leader>hs", gitsigns_visual_action "stage_hunk", "git: stage hunk")
+  hmap("n", "<leader>hr", gitsigns_action "reset_hunk", "git: reset hunk")
+  hmap("v", "<leader>hr", gitsigns_visual_action "reset_hunk", "git: reset hunk")
+  hmap({ "n", "v" }, "<leader>hh", "<cmd>Gitsigns setqflist<cr>", "git: set qflist")
+  hmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<cr>", "git: select hunk")
+end
+
+local function setup_attached_gitsigns_keymaps()
+  local cache_mod = package.loaded["gitsigns.cache"]
+  if not cache_mod then return end
+
+  for buf in pairs(cache_mod.cache or {}) do
+    if vim.api.nvim_buf_is_valid(buf) then setup_gitsigns_keymaps(buf) end
+  end
+end
+
 local function setup_gitsigns()
   if setup_done then return end
   setup_done = true
 
   Util.pack.load "gitsigns.nvim"
-
-  local function gitsigns_action(name, ...)
-    local args = { ... }
-    return function() require("gitsigns.actions")[name](unpack(args)) end
-  end
-
-  local function gitsigns_visual_action(name)
-    return function() require("gitsigns.actions")[name] { vim.fn.line ".", vim.fn.line "v" } end
-  end
 
   require("gitsigns").setup {
     numhl = true,
@@ -30,39 +72,7 @@ local function setup_gitsigns()
     max_file_length = Util.bigfile.lines,
     _new_sign_calc = true,
     _refresh_staged_on_update = true,
-    on_attach = function(buf)
-      local function hmap(mode, lhs, rhs, desc)
-        vim.keymap.set(mode, lhs, rhs, { buffer = buf, silent = true, desc = desc })
-      end
-
-      hmap("n", "]h", function()
-        if vim.wo.diff then
-          vim.cmd.normal { "]c", bang = true }
-        else
-          require("gitsigns.actions").nav_hunk("next", { target = "all" })
-        end
-      end, "git: next hunk")
-      hmap("n", "[h", function()
-        if vim.wo.diff then
-          vim.cmd.normal { "[c", bang = true }
-        else
-          require("gitsigns.actions").nav_hunk("prev", { target = "all" })
-        end
-      end, "git: prev hunk")
-      hmap("n", "[H", gitsigns_action("nav_hunk", "first"), "git: first hunk")
-      hmap("n", "]H", gitsigns_action("nav_hunk", "last"), "git: last hunk")
-      hmap("n", "<leader>hb", function() require("gitsigns.actions").blame_line { full = true } end, "git: blame line")
-      hmap("n", "<leader>hp", gitsigns_action "preview_hunk_inline", "git: preview hunk inline")
-      hmap("n", "<leader>hP", gitsigns_action "preview_hunk", "git: preview hunk")
-      hmap("n", "<leader>hR", "<cmd>Gitsigns reset_buffer<cr>", "git: reset buffer")
-      hmap("n", "<leader>hS", "<cmd>Gitsigns stage_buffer<cr>", "git: stage buffer")
-      hmap("n", "<leader>hs", gitsigns_action "stage_hunk", "git: stage hunk")
-      hmap("v", "<leader>hs", gitsigns_visual_action "stage_hunk", "git: stage hunk")
-      hmap("n", "<leader>hr", gitsigns_action "reset_hunk", "git: reset hunk")
-      hmap("v", "<leader>hr", gitsigns_visual_action "reset_hunk", "git: reset hunk")
-      hmap({ "n", "v" }, "<leader>hh", "<cmd>Gitsigns setqflist<cr>", "git: set qflist")
-      hmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<cr>", "git: select hunk")
-    end,
+    on_attach = setup_gitsigns_keymaps,
   }
 
   do
@@ -104,3 +114,5 @@ vim.api.nvim_create_autocmd("VimEnter", {
     if file_buffer_exists() then vim.defer_fn(setup_gitsigns, 20) end
   end,
 })
+
+setup_attached_gitsigns_keymaps()

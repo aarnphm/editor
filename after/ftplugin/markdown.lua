@@ -1,4 +1,4 @@
-Util.lsp.formatters({ "markdown", "markdown.mdx" }, { "prettier", "cbfmt" })
+Util.lsp.formatters({ "markdown", "markdown.mdx" }, Util.lsp.use_markdown_formatters)
 Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint" })
 
 local markdownlint_config_names = { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" }
@@ -47,6 +47,11 @@ local markdown_oxide_config = {
     workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
   },
 }
+Util.lsp.on_attach("markdown_oxide", "disable_formatting", function(client)
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
+  client.server_capabilities.documentOnTypeFormattingProvider = nil
+end)
 
 local function start_markdown_oxide(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].filetype ~= "markdown" then return end
@@ -124,6 +129,72 @@ local M = {}
 
 ---@type table<string, any>
 M._snippets = nil
+M._list_continuation_tab = nil
+
+local _md_list_parts
+
+local _md_list_continuation_tab_timeout_ns = 1000000000
+
+---@return integer
+local function _md_indent_width()
+  local width = vim.bo.shiftwidth
+  if width <= 0 then width = vim.bo.tabstop end
+  if width <= 0 then return 2 end
+  return width
+end
+
+---@param parts table
+---@return string
+local function _md_nested_list_indent(parts)
+  if parts.kind == "ordered" then return string.rep(" ", #parts.marker) end
+  return string.rep(" ", _md_indent_width())
+end
+
+---@param parts table
+---@return string
+local function _md_nested_list_marker(parts)
+  if parts.kind == "ordered" then return "1" .. parts.sep .. " " end
+  return parts.marker
+end
+
+---@return string?
+local function _md_nested_list_from_double_tab()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+  if col ~= #line or not _md_list_parts then
+    M._list_continuation_tab = nil
+    return nil
+  end
+
+  local parts = _md_list_parts(line)
+  if not parts or parts.prefix ~= "" or not parts.rest:match "^%s*$" then
+    M._list_continuation_tab = nil
+    return nil
+  end
+
+  local now = vim.uv.hrtime()
+  local state = M._list_continuation_tab
+  M._list_continuation_tab = {
+    bufnr = vim.api.nvim_get_current_buf(),
+    row = row,
+    marker = parts.marker,
+    at = now,
+  }
+
+  if
+    not state
+    or state.bufnr ~= vim.api.nvim_get_current_buf()
+    or state.row ~= row
+    or state.marker ~= parts.marker
+    or now - state.at > _md_list_continuation_tab_timeout_ns
+  then
+    return nil
+  end
+
+  local text = _md_nested_list_indent(parts) .. _md_nested_list_marker(parts)
+  M._list_continuation_tab = nil
+  return vim.api.nvim_replace_termcodes("<C-u>" .. text, true, false, true)
+end
 
 ---@param trigger string
 ---@param body string
@@ -147,6 +218,9 @@ vim.keymap.set("i", "<Tab>", function()
     vim.schedule(function() vim.snippet.jump(1) end)
     return
   end
+
+  local nested_list = _md_nested_list_from_double_tab()
+  if nested_list then return nested_list end
 
   -- not math, then returns per usual
   if Util.treesitter.not_math() then return "\t" end
@@ -532,14 +606,17 @@ local function _md_split_quote_prefix(line)
 end
 
 ---@param line string
----@return { prefix: string, insert_prefix: string, next: string, rest: string }?
-local function _md_list_parts(line)
-  local function result(base_indent, quote, indent, next_marker, rest)
+---@return { prefix: string, insert_prefix: string, marker: string, next: string, rest: string, kind: string, sep?: string }?
+function _md_list_parts(line)
+  local function result(base_indent, quote, indent, marker, next_marker, rest, kind, sep)
     return {
       prefix = base_indent .. quote .. indent,
       insert_prefix = quote .. indent,
+      marker = marker,
       next = next_marker,
       rest = rest,
+      kind = kind,
+      sep = sep,
     }
   end
 
@@ -547,13 +624,14 @@ local function _md_list_parts(line)
   local indent, marker = body:match "^(%s*)([%-%+%*]%s+%[[ xX%-]%]%s+)"
   if indent then
     local rest = body:sub(#indent + #marker + 1)
-    return result(base_indent, quote, indent, marker, rest)
+    local bullet, checked = marker:match "^([%-%+%*])%s+%[([ xX%-])%]"
+    return result(base_indent, quote, indent, string.format("%s [%s] ", bullet, checked), marker, rest, "task")
   end
 
   indent, marker = body:match "^(%s*)([%-%+%*]%s+)"
   if indent then
     local rest = body:sub(#indent + #marker + 1)
-    return result(base_indent, quote, indent, marker, rest)
+    return result(base_indent, quote, indent, marker:sub(1, 1) .. " ", marker, rest, "unordered")
   end
 
   local num, sep
@@ -562,7 +640,7 @@ local function _md_list_parts(line)
     local current = string.format("%s%s ", num, sep)
     local next_marker = string.format("%d%s ", tonumber(num) + 1, sep)
     local rest = body:sub(#indent + #current + 1)
-    return result(base_indent, quote, indent, next_marker, rest)
+    return result(base_indent, quote, indent, current, next_marker, rest, "ordered", sep)
   end
 end
 

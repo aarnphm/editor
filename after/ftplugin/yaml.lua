@@ -1,4 +1,9 @@
-Util.lsp.formatters("yaml", { "prettier" })
+Util.lsp.formatters("yaml", { "oxfmt", lsp_format = "never" })
+Util.lsp.on_attach("yamlls", "disable_formatting", function(client)
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
+  client.server_capabilities.documentOnTypeFormattingProvider = nil
+end)
 Util.lsp.enable("yamlls", {
   capabilities = {
     textDocument = {
@@ -12,7 +17,7 @@ Util.lsp.enable("yamlls", {
     redhat = { telemetry = { enabled = false } },
     yaml = {
       keyOrdering = false,
-      format = { enable = true, singleQuote = true, bracketSpacing = false, printWidth = 120 },
+      format = { enable = false },
       validate = true,
       schemaStore = { enable = true },
     },

@@ -42,6 +42,7 @@ else
       SimpleStatuslineWarn = { fg = c["or-2"], bg = c.ui },
       SimpleStatuslineFile = { fg = c.tx, bg = c.ui, bold = true },
       SimpleStatuslineInfo = { fg = c["pu-2"], bg = c.ui },
+      SimpleStatuslineFormatter = { fg = c["ma-2"], bg = c.ui },
       SimpleStatuslineLint = { fg = c["gr-2"], bg = c.ui },
       SimpleStatuslineLintRunning = { fg = c["ye-2"], bg = c.ui, bold = true },
       SimpleStatuslineMuted = { fg = c["tx-3"], bg = c.ui },

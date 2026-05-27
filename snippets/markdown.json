@@ -8,23 +8,17 @@
   },
   "Insert sidenotes": {
     "prefix": "sdn",
-    "body": [
-      "{{sidenotes[$1]:$2}}"
-    ],
+    "body": ["{{sidenotes[$1]:$2}}"],
     "description": "Insert sidenotes"
   },
   "Insert quotes": {
     "prefix": "qts",
-    "body": [
-      "> $1\n>\n> $2"
-    ],
+    "body": ["> $1\n>\n> $2"],
     "description": "Insert quotes"
   },
   "Insert another quotes": {
     "prefix": "qt",
-    "body": [
-      "\n```quotes\n$1\n\n$2\n```\n"
-    ],
+    "body": ["\n```quotes\n$1\n\n$2\n```\n"],
     "description": "Insert callout quotes from garden"
   }
 }

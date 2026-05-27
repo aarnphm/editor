@@ -50,6 +50,18 @@ local function part(group, value)
   return value ~= "" and (hl(group) .. " " .. value) or ""
 end
 
+local function clickable_part(group, handler, value)
+  value = esc(value)
+  if value == "" then return "" end
+  return ("%s %%%d@v:lua.%s@%s%%T"):format(hl(group), winid(), handler, value)
+end
+
+local function tool_label(label, names)
+  if #names == 0 then return "" end
+  if #names == 1 then return label .. ":" .. names[1] end
+  return narrow(145) and (label .. "+" .. #names) or (label .. ":" .. names[1] .. "+" .. (#names - 1))
+end
+
 local function filename()
   if vim.bo[bufnr()].buftype == "terminal" then return "%t" end
   return narrow(100) and "%t%m%r" or "%f%m%r"
@@ -147,8 +159,7 @@ local function lsp()
   if #clients == 0 then return "" end
 
   table.sort(clients)
-  if #clients == 1 then return "lsp:" .. clients[1] end
-  return narrow(145) and ("lsp+" .. #clients) or ("lsp:" .. clients[1] .. "+" .. (#clients - 1))
+  return tool_label("lsp", clients)
 end
 
 local function lint()
@@ -162,15 +173,15 @@ local function lint()
   local active = #running > 0
   local label = active and "linting" or "lint"
   local display_names = active and running or names
-  local text = ""
+  return tool_label(label, display_names), active and "SimpleStatuslineLintRunning" or "SimpleStatuslineLint"
+end
 
-  if #display_names == 1 then
-    text = label .. ":" .. display_names[1]
-  else
-    text = narrow(145) and (label .. "+" .. #display_names) or (label .. ":" .. table.concat(display_names, ","))
-  end
+local function formatter()
+  if narrow(115) then return "" end
 
-  return text, active and "SimpleStatuslineLintRunning" or "SimpleStatuslineLint"
+  local names = Util.lsp.formatter_names(bufnr())
+  if #names == 0 then return "" end
+  return tool_label("fmt", names)
 end
 
 local function recording()
@@ -197,6 +208,121 @@ local function mode()
   return current.label, current.hl
 end
 
+local detail_win ---@type integer?
+
+local function target_buf(minwid)
+  local win = tonumber(minwid)
+  if win and vim.api.nvim_win_is_valid(win) then return vim.api.nvim_win_get_buf(win) end
+  return vim.api.nvim_get_current_buf()
+end
+
+local function close_details()
+  if detail_win and vim.api.nvim_win_is_valid(detail_win) then pcall(vim.api.nvim_win_close, detail_win, true) end
+  detail_win = nil
+end
+
+local function clamp(value, min, max) return math.max(min, math.min(value, max)) end
+
+local function detail_position(width, height)
+  local mouse = vim.fn.getmousepos()
+  local total_width = width + 2
+  local total_height = height + 2
+  local screenrow = tonumber(mouse.screenrow) or 0
+  local screencol = tonumber(mouse.screencol) or 0
+
+  if screenrow <= 1 then screenrow = math.max(1, vim.o.lines - vim.o.cmdheight) end
+  if screencol <= 1 then screencol = math.floor(vim.o.columns / 2) end
+
+  local row = math.max(0, screenrow - total_height - 1)
+  local col = clamp(screencol - math.floor(total_width / 2) - 1, 0, math.max(0, vim.o.columns - total_width))
+  return row, col
+end
+
+local function tool_root(buf) return Util.root.get { buf = buf } end
+
+local function append_tool(lines, name, root)
+  lines[#lines + 1] = "- " .. name
+  if root and root ~= "" then lines[#lines + 1] = "  root: " .. root end
+end
+
+local function open_details(lines)
+  close_details()
+
+  local body = #lines > 0 and lines or { "- none" }
+
+  local width = 0
+  for _, line in ipairs(body) do
+    width = math.max(width, #line + 2)
+  end
+  width = math.min(math.max(width, 34), math.max(20, vim.o.columns - 4))
+  local height = math.min(#body, math.max(1, vim.o.lines - 4))
+  local float_buf = vim.api.nvim_create_buf(false, true)
+  local row, col = detail_position(width, height)
+
+  vim.api.nvim_buf_set_lines(float_buf, 0, -1, false, body)
+  vim.bo[float_buf].bufhidden = "wipe"
+  vim.bo[float_buf].modifiable = false
+
+  detail_win = vim.api.nvim_open_win(float_buf, true, {
+    relative = "editor",
+    row = row,
+    col = col,
+    width = width,
+    height = height,
+    border = "rounded",
+    style = "minimal",
+  })
+  vim.wo[detail_win].cursorline = true
+  vim.wo[detail_win].wrap = false
+
+  vim.keymap.set("n", "q", close_details, { buffer = float_buf, silent = true })
+  vim.keymap.set("n", "<Esc>", close_details, { buffer = float_buf, silent = true })
+end
+
+function M.show_lsp(minwid)
+  local buf = target_buf(minwid)
+  local fallback_root = tool_root(buf)
+  local clients = {}
+  for _, client in ipairs(vim.lsp.get_clients { bufnr = buf }) do
+    if client.name ~= "copilot" then clients[#clients + 1] = client end
+  end
+  table.sort(clients, function(a, b) return a.name < b.name end)
+
+  local lines = {}
+  for _, client in ipairs(clients) do
+    append_tool(lines, client.name, client.root_dir or (client.config and client.config.root_dir) or fallback_root)
+  end
+
+  open_details(lines)
+end
+
+function M.show_lint(minwid)
+  local buf = target_buf(minwid)
+  local root = tool_root(buf)
+  local running = {}
+  for _, name in ipairs(Util.lint.running(buf)) do
+    running[name] = true
+  end
+
+  local lines = {}
+  for _, name in ipairs(Util.lint.names(buf)) do
+    append_tool(lines, running[name] and (name .. " (running)") or name, root)
+  end
+
+  open_details(lines)
+end
+
+function M.show_formatters(minwid)
+  local buf = target_buf(minwid)
+  local root = tool_root(buf)
+  local lines = {}
+  for _, name in ipairs(Util.lsp.formatter_names(buf)) do
+    append_tool(lines, name, root)
+  end
+
+  open_details(lines)
+end
+
 function M.render()
   local mode_label, mode_hl = mode()
   local lint_status, lint_hl = lint()
@@ -217,8 +343,9 @@ function M.render()
     part("SimpleStatuslineWarn", diagnostics()),
     part("SimpleStatuslineMuted", recording()),
     part("SimpleStatuslineMuted", search()),
-    part(lint_hl, lint_status),
-    part("SimpleStatuslineInfo", lsp()),
+    clickable_part(lint_hl, "SimpleStatuslineClickLint", lint_status),
+    clickable_part("SimpleStatuslineInfo", "SimpleStatuslineClickLsp", lsp()),
+    clickable_part("SimpleStatuslineFormatter", "SimpleStatuslineClickFormatter", formatter()),
     part("SimpleStatuslineMuted", fileinfo()),
     hl "SimpleStatuslineLocation",
     " %l:%c %p%% ",
@@ -237,6 +364,7 @@ local default_highlights = {
   SimpleStatuslineWarn = "StatusLine",
   SimpleStatuslineFile = "StatusLine",
   SimpleStatuslineInfo = "StatusLine",
+  SimpleStatuslineFormatter = "StatusLine",
   SimpleStatuslineLint = "StatusLine",
   SimpleStatuslineLintRunning = "StatusLine",
   SimpleStatuslineMuted = "StatusLineNC",
@@ -248,4 +376,7 @@ for name, link in pairs(default_highlights) do
 end
 
 _G.SimpleStatusline = M
+_G.SimpleStatuslineClickFormatter = function(minwid) M.show_formatters(minwid) end
+_G.SimpleStatuslineClickLint = function(minwid) M.show_lint(minwid) end
+_G.SimpleStatuslineClickLsp = function(minwid) M.show_lsp(minwid) end
 vim.o.statusline = "%!v:lua.SimpleStatusline.render()"
