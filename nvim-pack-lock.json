@@ -11,7 +11,7 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "1b8809dcbb20f023b7cc69ec560e927ae858f9b2",
+      "rev": "5ee69ea52492fa038b3a1cd8de55edffe205c77d",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
@@ -66,7 +66,7 @@
       "version": "'main'"
     },
     "mason.nvim": {
-      "rev": "bb639d4bf385a4d89f478b83af4d770be05ab7eb",
+      "rev": "16ba83bfc8a25f52bb545134f5bee082b195c460",
       "src": "https://github.com/mason-org/mason.nvim.git",
       "version": "'main'"
     },
