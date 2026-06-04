@@ -251,6 +251,14 @@ vim.keymap.set("i", "<D-k>", function()
   vim.api.nvim_win_set_cursor(0, { row, col + 2 })
 end, { buffer = true, desc = "wikilink: insert" })
 
+local function _md_insert_sidenote() Util.cmp.expand "{{sidenotes[$1]: $2}}" end
+
+vim.keymap.set("i", "gasn", _md_insert_sidenote, { buffer = true, desc = "sidenote: insert" })
+vim.keymap.set("x", "gasn", [[c{{sidenotes[<C-r>"]: }}<Left><Left>]], {
+  buffer = true,
+  desc = "sidenote: wrap selection",
+})
+
 local _md_heading_ns = vim.api.nvim_create_namespace "md_headings_popup"
 
 ---@class simple.markdown.heading

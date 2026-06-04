@@ -15,6 +15,12 @@ else
       ["@variable"] = { fg = c.tx, italic = false },
       ["@parameter"] = { fg = c["pu-2"], italic = false },
       ["@variable.parameter"] = { fg = c["pu-2"], italic = false },
+      ["@markup.heading.1.markdown"] = { fg = c["bl-2"], bold = true },
+      ["@markup.heading.2.markdown"] = { fg = c["pu-2"], bold = true },
+      ["@markup.heading.3.markdown"] = { fg = c["ma-2"], bold = true },
+      ["@markup.heading.4.markdown"] = { fg = c["cy-2"], bold = true },
+      ["@markup.heading.5.markdown"] = { fg = c["gr-2"], bold = true },
+      ["@markup.heading.6.markdown"] = { fg = c["or-2"], bold = true },
 
       StatusLine = { fg = c.tx, bg = c.ui },
       StatusLineNC = { fg = c["tx-2"], bg = c.ui },

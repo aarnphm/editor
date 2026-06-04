@@ -18,26 +18,84 @@ local function gitsigns_visual_action(name)
   return function() require("gitsigns.actions")[name] { vim.fn.line ".", vim.fn.line "v" } end
 end
 
+local function staged_hunks(buf)
+  local cache_mod = package.loaded["gitsigns.cache"]
+  local cache = cache_mod and cache_mod.cache and cache_mod.cache[buf]
+  if not (cache and cache.hunks_staged and #cache.hunks_staged > 0) then return {} end
+
+  local hunks = vim.deepcopy(cache.hunks_staged)
+  table.sort(hunks, function(a, b) return a.added.start < b.added.start end)
+  return hunks
+end
+
+local function echo_warning(message) vim.api.nvim_echo({ { message, "WarningMsg" } }, false, {}) end
+
+local function cursor_indent_column(line)
+  local _, col = vim.fn.getline(line):find "^%s*"
+  return col or 0
+end
+
+local function foldopen_search() return vim.tbl_contains(vim.opt.foldopen:get(), "search") end
+
 local function setup_gitsigns_keymaps(buf)
   local function hmap(mode, lhs, rhs, desc)
     vim.keymap.set(mode, lhs, rhs, { buffer = buf, silent = true, desc = desc })
   end
 
-  local function nav_hunk(direction, target)
+  local function nav_unstaged_hunk(direction)
     return function()
       if vim.wo.diff then
         local command = direction == "prev" and "[c" or "]c"
         vim.cmd.normal { command, bang = true }
       else
-        require("gitsigns.actions").nav_hunk(direction, { target = target })
+        require("gitsigns.actions").nav_hunk(direction, { target = "unstaged" })
       end
     end
   end
 
-  hmap({ "n", "v" }, "]h", nav_hunk("next", "unstaged"), "git: next current hunk")
-  hmap({ "n", "v" }, "[h", nav_hunk("prev", "unstaged"), "git: prev current hunk")
-  hmap({ "n", "v" }, "]H", nav_hunk("next", "staged"), "git: next staged hunk")
-  hmap({ "n", "v" }, "[H", nav_hunk("prev", "staged"), "git: prev staged hunk")
+  local function nav_staged_hunk(direction)
+    return function()
+      if vim.wo.diff then
+        local command = direction == "prev" and "[c" or "]c"
+        vim.cmd.normal { command, bang = true }
+        return
+      end
+
+      local hunks = staged_hunks(vim.api.nvim_get_current_buf())
+      if #hunks == 0 then
+        echo_warning "No staged hunks"
+        return
+      end
+
+      local line = vim.api.nvim_win_get_cursor(0)[1]
+      local buf_line_count = vim.api.nvim_buf_line_count(0)
+      local index
+      local forwards = direction == "next"
+
+      for _ = 1, vim.v.count1 do
+        index = require("gitsigns.hunks").find_nearest_hunk(line, hunks, direction, vim.o.wrapscan, buf_line_count)
+        if not index then
+          echo_warning "No more staged hunks"
+          vim.api.nvim_win_set_cursor(0, { line, cursor_indent_column(line) })
+          return
+        end
+
+        local hunk = hunks[index]
+        line = forwards and hunk.added.start or hunk.vend
+        line = math.max(math.min(line, buf_line_count), 1)
+      end
+
+      vim.cmd [[normal! m']]
+      vim.api.nvim_win_set_cursor(0, { line, cursor_indent_column(line) })
+      if foldopen_search() then vim.cmd "silent! foldopen!" end
+      vim.api.nvim_echo({ { ("Staged hunk %d of %d"):format(index, #hunks), "None" } }, false, {})
+    end
+  end
+
+  hmap({ "n", "v" }, "]h", nav_unstaged_hunk "next", "git: next current hunk")
+  hmap({ "n", "v" }, "[h", nav_unstaged_hunk "prev", "git: prev current hunk")
+  hmap({ "n", "v" }, "]hh", nav_staged_hunk "next", "git: next staged hunk")
+  hmap({ "n", "v" }, "[hh", nav_staged_hunk "prev", "git: prev staged hunk")
   hmap("n", "<leader>hb", function() require("gitsigns.actions").blame_line { full = true } end, "git: blame line")
   hmap("n", "<leader>hp", gitsigns_action "preview_hunk_inline", "git: preview hunk inline")
   hmap("n", "<leader>hP", gitsigns_action "preview_hunk", "git: preview hunk")
