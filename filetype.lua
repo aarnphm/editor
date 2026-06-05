@@ -1,5 +1,7 @@
 vim.filetype.add {
   extension = {
+    fc = "markdown",
+    flashcards = "markdown",
     ["http"] = "http",
     env = "dotenv",
     h = "c",

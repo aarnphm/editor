@@ -1,7 +1,22 @@
 Util.lsp.formatters({ "markdown", "markdown.mdx" }, Util.lsp.use_markdown_formatters)
-Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint" })
+Util.lint.linters({ "markdown", "markdown.mdx" }, { "markdownlint", "markdownlint_flashcards" })
 
 local markdownlint_config_names = { ".markdownlint.jsonc", ".markdownlint.yaml", ".markdownlint.yml" }
+local markdownlint_flashcard_suffixes = {
+  "%.flashcards$",
+  "%.fc$",
+  "%.flashcards%.md$",
+  "%.fc%.md$",
+}
+local markdownlint_efm = "stdin:%l:%c %m,stdin:%l %m"
+
+local function markdownlint_flashcard_path(path)
+  if path == "" then return false end
+  for _, suffix in ipairs(markdownlint_flashcard_suffixes) do
+    if path:match(suffix) then return true end
+  end
+  return false
+end
 
 local function markdownlint_config(path)
   path = path ~= "" and path or vim.api.nvim_buf_get_name(0)
@@ -15,7 +30,29 @@ Util.lint.linter("markdownlint", {
     "--config",
     function() return markdownlint_config(vim.api.nvim_buf_get_name(0)) end,
   },
-  condition = function(ctx) return markdownlint_config(ctx.filename) end,
+  condition = function(ctx) return markdownlint_config(ctx.filename) and not markdownlint_flashcard_path(ctx.filename) end,
+})
+
+Util.lint.linter("markdownlint_flashcards", {
+  cmd = "markdownlint",
+  stdin = true,
+  args = {
+    "--stdin",
+    "--config",
+    function() return markdownlint_config(vim.api.nvim_buf_get_name(0)) end,
+    "--disable",
+    "MD041",
+    "--",
+  },
+  ignore_exitcode = true,
+  stream = "stderr",
+  parser = function(output, bufnr, linter_cwd)
+    return require("lint.parser").from_errorformat(markdownlint_efm, {
+      source = "markdownlint",
+      severity = vim.diagnostic.severity.WARN,
+    })(output, bufnr, linter_cwd)
+  end,
+  condition = function(ctx) return markdownlint_config(ctx.filename) and markdownlint_flashcard_path(ctx.filename) end,
 })
 local markdown_oxide_root_markers = { ".obsidian", ".moxide.toml" }
 
@@ -253,8 +290,8 @@ end, { buffer = true, desc = "wikilink: insert" })
 
 local function _md_insert_sidenote() Util.cmp.expand "{{sidenotes[$1]: $2}}" end
 
-vim.keymap.set("i", "gasdn", _md_insert_sidenote, { buffer = true, desc = "sidenote: insert" })
-vim.keymap.set("x", "gasdn", [[c{{sidenotes[<C-r>"]: }}<Left><Left>]], {
+vim.keymap.set("i", "asdf", _md_insert_sidenote, { buffer = true, desc = "sidenote: insert" })
+vim.keymap.set("x", "asdf", [[c{{sidenotes[<C-r>"]: }}<Left><Left>]], {
   buffer = true,
   desc = "sidenote: wrap selection",
 })

@@ -7,7 +7,7 @@
     "description": "Insert the current date/time using ISO format with timezone offset."
   },
   "Insert sidenotes": {
-    "prefix": ["sdn", "gasdn"],
+    "prefix": ["sdn", "asdf"],
     "body": ["{{sidenotes[$1]: $2}}"],
     "description": "Insert sidenotes"
   },

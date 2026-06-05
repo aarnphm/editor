@@ -165,7 +165,7 @@ local function meta_completion_text(key, indent, include_bullet)
     return prefix .. key .. ": " .. current_date()
   end
   if key == "tags" then return prefix .. "tags: [${1}]" end
-  if key == "socials" then return prefix .. "socials:\n" .. child_indent .. "- ${1:site}: ${2:url}" end
+  if key == "socials" then return prefix .. "socials:\n" .. "  - ${1:site}: ${2:url}" end
   if key == "pinned" or key == "later" or key == "json" or key == "sidebar" then return prefix .. key .. ": true" end
   if key == "view" or key == "layout" then return prefix .. key .. ": ${1:list}" end
   if key == "coord" then return prefix .. "coord: [${1:lat}, ${2:lng}]" end
