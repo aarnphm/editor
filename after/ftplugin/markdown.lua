@@ -253,8 +253,8 @@ end, { buffer = true, desc = "wikilink: insert" })
 
 local function _md_insert_sidenote() Util.cmp.expand "{{sidenotes[$1]: $2}}" end
 
-vim.keymap.set("i", "gasn", _md_insert_sidenote, { buffer = true, desc = "sidenote: insert" })
-vim.keymap.set("x", "gasn", [[c{{sidenotes[<C-r>"]: }}<Left><Left>]], {
+vim.keymap.set("i", "gasdn", _md_insert_sidenote, { buffer = true, desc = "sidenote: insert" })
+vim.keymap.set("x", "gasdn", [[c{{sidenotes[<C-r>"]: }}<Left><Left>]], {
   buffer = true,
   desc = "sidenote: wrap selection",
 })

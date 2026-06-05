@@ -1,8 +1,16 @@
 local root = vim.env.MARKDOWN_FRONTMATTER_ROOT
 local path = vim.api.nvim_buf_get_name(0)
+local ignored_suffixes = {
+  "%.flashcards%.md$",
+  "%.fc%.md$",
+}
 
 if not root or root == "" then error "MARKDOWN_FRONTMATTER_ROOT is not set" end
 if path == "" then error "buffer has no file path" end
+
+for _, suffix in ipairs(ignored_suffixes) do
+  if path:match(suffix) then return end
+end
 
 local function system(cmd, input)
   local result = vim.system(cmd, { stdin = input, text = true }):wait()

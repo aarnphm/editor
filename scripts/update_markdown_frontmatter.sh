@@ -52,7 +52,7 @@ if [ "$JOBS_COUNT" -lt 1 ]; then JOBS_COUNT=1; fi
 export MARKDOWN_FRONTMATTER_ROOT="$ROOT_DIRECTORY"
 export MARKDOWN_FRONTMATTER_LUA="$FRONTMATTER_LUA"
 
-fd --extension md --type f . "$ROOT_DIRECTORY" --print0 \
+fd --extension md --type f . "$ROOT_DIRECTORY" --exclude "*.flashcards.md" --exclude "*.fc.md" --print0 \
   | xargs -0 -n1 -P "$JOBS_COUNT" bash -c '
     file="$1"
     printf "Updating frontmatter: %s\n" "$file"

@@ -1866,6 +1866,10 @@ M.lsp = lsp
 
 ---@class simple.util.markdown
 local markdown = {}
+local markdown_frontmatter_ignored_suffixes = {
+  "%.flashcards%.md$",
+  "%.fc%.md$",
+}
 
 ---@param cmd string[]
 ---@param input string?
@@ -1913,6 +1917,16 @@ local function markdown_vault_for_path(path)
   end
 end
 
+---@param path string?
+---@return boolean
+function markdown.frontmatter_ignored_path(path)
+  if type(path) ~= "string" or path == "" then return false end
+  for _, suffix in ipairs(markdown_frontmatter_ignored_suffixes) do
+    if path:match(suffix) then return true end
+  end
+  return false
+end
+
 ---@param bufnr integer?
 ---@return boolean
 function markdown.frontmatter_enabled(bufnr)
@@ -1929,12 +1943,15 @@ function markdown.update_frontmatter(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) then return false end
   if not markdown.frontmatter_enabled(bufnr) then return false end
   if vim.bo[bufnr].buftype ~= "" or not vim.bo[bufnr].modifiable then return false end
+
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if markdown.frontmatter_ignored_path(path) then return false end
+
   if vim.fn.executable "yq" == 0 then
     M.warn("frontmatter: yq is required", { title = "markdown" })
     return false
   end
 
-  local path = vim.api.nvim_buf_get_name(bufnr)
   local vault, vault_root = markdown_vault_for_path(path)
   if not vault or not vault_root then return false end
 
