@@ -61,7 +61,7 @@
       "version": "'main'"
     },
     "luasnip-latex-snippets.nvim": {
-      "rev": "a14046e91afd5f3852b26733d75c0c51ef41cbff",
+      "rev": "9d930c0042501b79b3a58fc18b0ee832f97bb1e3",
       "src": "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git",
       "version": "'main'"
     },
