@@ -80,7 +80,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup "highlight_yank",
   pattern = "*",
-  callback = function() vim.hl.on_yank { higroup = "IncSearch" } end,
+  callback = function() vim.hl.hl_op { higroup = "IncSearch" } end,
 })
 -- Clear search highlights once the cursor leaves the current match.
 vim.api.nvim_create_autocmd("CursorMoved", {
