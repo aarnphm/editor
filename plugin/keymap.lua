@@ -23,6 +23,23 @@ local diagnostic_goto = function(next, severity)
   end
 end
 
+local apply_macro_to_visual_selection = function()
+  local register = vim.fn.getcharstr()
+  if register == "" or register == "\027" or register == "\003" then return end
+
+  local first = vim.fn.line "v"
+  local last = vim.fn.line "."
+  if first > last then
+    first, last = last, first
+  end
+
+  vim.cmd {
+    cmd = "normal",
+    args = { "@" .. register },
+    range = { first, last },
+  }
+end
+
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "editor: show line diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "editor: Next diagnostic" })
 map("n", "[d", diagnostic_goto(false), { desc = "editor: Next diagnostic" })
@@ -66,6 +83,7 @@ map("n", "gl", function()
   Util.open_url(url)
 end, { desc = "util: open link under cursor" })
 map("v", "gll", [[c{{sidenotes[<C-r>"]:}}<Left><Left>]], { desc = "wrap: selection in sidenote" })
+map("x", "aa@", apply_macro_to_visual_selection, { desc = "macro: apply to selection" })
 map("n", ";", ":", { silent = false, desc = "command: Enter command mode" })
 map("v", "J", ":m '>+1<CR>gv=gv", { desc = "edit: Move this line down" })
 map("v", "K", ":m '<-2<CR>gv=gv", { desc = "edit: Move this line up" })
