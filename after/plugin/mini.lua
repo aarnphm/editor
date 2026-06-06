@@ -48,6 +48,11 @@ local function setup_pick()
   end)
 end
 
+Util.ui.pick = function(opts)
+  setup_pick()
+  return require("mini.pick").start(opts)
+end
+
 local function setup_files()
   setup_icons()
   once(

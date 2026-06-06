@@ -1392,6 +1392,7 @@ end
 M.treesitter = treesitter
 
 ---@class simple.util.ui
+---@field pick? fun(opts:table):any
 local ui = {}
 
 function ui.foldtext()

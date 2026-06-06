@@ -157,9 +157,8 @@ local function ordered_meta_keys(lines)
   return keys
 end
 
-local function meta_completion_text(key, indent, include_bullet)
+local function meta_completion_text(key, include_bullet)
   local prefix = include_bullet and "- " or ""
-  local child_indent = indent .. "  "
 
   if key == "date" or key == "accessed" or key == "accessed_date" then
     return prefix .. key .. ": " .. current_date()
@@ -202,7 +201,6 @@ local function arena_meta_context(ctx)
   if not parent_indent then return nil end
 
   return {
-    indent = indent,
     include_bullet = include_bullet,
     replace_start = replace_start,
     replace_end = cursor_col,
@@ -231,7 +229,7 @@ local function completion_response(keys, meta_context, cursor)
       detail = meta_context.detail,
       insertTextFormat = vim.lsp.protocol.InsertTextFormat.Snippet,
       textEdit = {
-        newText = meta_completion_text(key, meta_context.indent, meta_context.include_bullet),
+        newText = meta_completion_text(key, meta_context.include_bullet),
         range = {
           start = { line = cursor[1] - 1, character = meta_context.replace_start },
           ["end"] = { line = cursor[1] - 1, character = meta_context.replace_end },
