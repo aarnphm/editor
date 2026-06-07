@@ -40,6 +40,11 @@ local apply_macro_to_visual_selection = function()
   }
 end
 
+local delete_buffer = function()
+  Util.pack.load "mini.nvim"
+  require("mini.bufremove").delete(0, false)
+end
+
 map("n", "<leader>d", vim.diagnostic.open_float, { desc = "editor: show line diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "editor: Next diagnostic" })
 map("n", "[d", diagnostic_goto(false), { desc = "editor: Next diagnostic" })
@@ -52,8 +57,8 @@ map({ "n", "x" }, " ", "", { noremap = true })
 map("t", "<C-w><C-q>", "<C-\\><C-n><C-w>q", { desc = "terminal: close" })
 map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 
-map("n", "<C-x>", "<cmd>bdelete<cr>", { desc = "buffer: delete" })
-map("n", "<C-q>", "<cmd>:bd<cr>", { desc = "buffer: delete" })
+map("n", "<C-x>", delete_buffer, { desc = "buffer: delete" })
+map("n", "<C-q>", delete_buffer, { desc = "buffer: delete" })
 map("i", "<M-BS>", "<C-W>", { desc = "insert: delete word", remap = false })
 
 map("n", "<Leader>v", "gcc", { desc = "comment: visual line", remap = true, silent = true })
