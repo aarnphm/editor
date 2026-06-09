@@ -11,7 +11,7 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "3db7326f54b73df4789e0fd6274bedda33975fea",
+      "rev": "b02ac65634bdb8af2dcc4eb6c807c060e1e15ae6",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "229b79051b380377664edc4cbd534930154921a1",
+      "rev": "ed19590a3a9792901553c388d1aadafce012f80d",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
