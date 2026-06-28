@@ -61,6 +61,14 @@ local function lsp_map(bufnr, mode, lhs, rhs, desc)
   vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
 end
 
+local function has_buffer_keymap(bufnr, mode, lhs)
+  local normalized_lhs = vim.fn.keytrans(vim.keycode(lhs))
+  for _, keymap in ipairs(vim.api.nvim_buf_get_keymap(bufnr, mode)) do
+    if keymap.lhs == lhs or keymap.lhs == normalized_lhs then return true end
+  end
+  return false
+end
+
 local function jump_to_first_location(what)
   if vim.tbl_isempty(what.items) then return end
   vim.fn.setqflist({}, " ", what)
@@ -309,7 +317,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     Util.lsp.run_attach_handlers(client, ev)
 
     lsp_map(ev.buf, "n", "K", vim.lsp.buf.hover, "lsp: hover")
-    lsp_map(ev.buf, "i", "<C-k>", vim.lsp.buf.signature_help, "lsp: signature help")
+    if not has_buffer_keymap(ev.buf, "i", "<C-k>") then
+      lsp_map(ev.buf, "i", "<C-k>", vim.lsp.buf.signature_help, "lsp: signature help")
+    end
     lsp_map(ev.buf, "n", "gr", vim.lsp.buf.rename, "lsp: rename")
     lsp_map(ev.buf, "n", "gy", vim.lsp.buf.type_definition, "lsp: type definition")
     lsp_map(ev.buf, "n", "gD", vim.lsp.buf.declaration, "lsp: declaration")

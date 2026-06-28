@@ -288,6 +288,10 @@ vim.keymap.set("i", "<D-k>", function()
   vim.api.nvim_win_set_cursor(0, { row, col + 2 })
 end, { buffer = true, desc = "wikilink: insert" })
 
+local function _md_insert_markdown_link() Util.cmp.expand "[$1]($2)" end
+
+vim.keymap.set("i", "<C-k>", _md_insert_markdown_link, { buffer = true, desc = "markdown link: insert" })
+
 local function _md_insert_sidenote() Util.cmp.expand "{{sidenotes[$1]: $2}}" end
 
 vim.keymap.set("i", "asdf", _md_insert_sidenote, { buffer = true, desc = "sidenote: insert" })
@@ -804,7 +808,10 @@ local function _md_clean_url(url)
   local kept = {}
   for part in query:gmatch "[^&]+" do
     local name = part:match "^([^=]+)"
-    if name ~= "curius" then table.insert(kept, part) end
+    local normalized = name and name:lower() or ""
+    if normalized ~= "curius" and normalized ~= "utm" and not normalized:match "^utm[_-]" then
+      table.insert(kept, part)
+    end
   end
   if #kept == 0 then return before_query .. fragment end
   return before_query .. "?" .. table.concat(kept, "&") .. fragment
