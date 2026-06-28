@@ -59,7 +59,7 @@ Util.pack.setup {
   "mason-org/mason.nvim",
   "lewis6991/gitsigns.nvim",
   "nvim-treesitter/nvim-treesitter",
-  "https://codeberg.org/andyg/leap.nvim.git",
+  "https://git.disroot.org/andyg/leap.nvim.git",
   { "kepano/flexoki-neovim", name = "flexoki" },
   { "stevearc/conform.nvim", version = "master" },
   { "mfussenegger/nvim-lint", version = "master" },
