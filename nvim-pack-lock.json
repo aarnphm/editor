@@ -71,7 +71,7 @@
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "c5cdbadeb423ff724e27a42ab2d1c504d1d6fc5a",
+      "rev": "d74190c1528aaf12ba5f3a29d03524c6b81e18b3",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
