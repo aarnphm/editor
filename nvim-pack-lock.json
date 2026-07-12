@@ -46,7 +46,7 @@
       "version": "'main'"
     },
     "grug-far.nvim": {
-      "rev": "beb2ce490b72048c587e8a3d919cba1b4608bb04",
+      "rev": "1cc080f55706b38aabfa97d40acb6adf59ac4a5a",
       "src": "https://github.com/MagicDuck/grug-far.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "d6ac7a0d46555d44bf21f4f9c65f5201f818b475",
+      "rev": "5955a100ae7155962330643924e21a798b9bdc91",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
