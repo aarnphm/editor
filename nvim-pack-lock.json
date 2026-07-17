@@ -71,7 +71,7 @@
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "05a80b0340a92136a93ab04346cf97de3f165948",
+      "rev": "9459d7f41ae77d909579dab0aea2bdd3210fac9f",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "d5b6e3db4c17b0146f63a2fc47e2027a754b2cb1",
+      "rev": "b386c50cd7816f8c8a2b13b298a218af1f5a75c6",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
