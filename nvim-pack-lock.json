@@ -55,6 +55,11 @@
       "src": "https://github.com/folke/lazydev.nvim.git",
       "version": "'main'"
     },
+    "leap.nvim": {
+      "rev": "d7f8ee64155b7790188f17a993390f32577cfb81",
+      "src": "https://git.disroot.org/andyg/leap.nvim.git",
+      "version": "'main'"
+    },
     "luasnip-latex-snippets.nvim": {
       "rev": "33f54bed72f58e88786c247304ba4bf87753d5ab",
       "src": "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git",
@@ -81,7 +86,7 @@
       "version": "'master'"
     },
     "nvim-treesitter": {
-      "rev": "bd41519ff7901da11ba6e1c8f419f17f2d94305a",
+      "rev": "0153df68b44fa97a3e11696ca55cbdd7a6d42398",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter.git",
       "version": "'main'"
     }
