@@ -11,12 +11,12 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "d33327a0ed7bfe3cd5dfa2fdd2738ad74f9e0ea3",
+      "rev": "dbcf63b90b358f058637ea370202e3849013383b",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
     "blink.lib": {
-      "rev": "5876dd95deeb70aadbe9f1c0b7117a135061cdac",
+      "rev": "2789206e10a0e4880f808c2aaf52bc57d876b481",
       "src": "https://github.com/Saghen/blink.lib.git",
       "version": "'main'"
     },
@@ -46,7 +46,7 @@
       "version": "'main'"
     },
     "grug-far.nvim": {
-      "rev": "0f6a5d0d7a70659b11bbcd6b3673ee0fe61b6024",
+      "rev": "6e05398cf6cad05b3fb46569db96b1ccfcbbd402",
       "src": "https://github.com/MagicDuck/grug-far.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "7ab79bb1b57160a537f427ac8a6026102f12b701",
+      "rev": "b7b920947f21339ee41fbb38c79d6445e12900aa",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
