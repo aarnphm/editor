@@ -385,7 +385,15 @@ local function ensure_stream_meta(bufnr, initial_tick)
   end)
 end
 
-local function is_stream_identifier(value) return value:match "^[a-z][a-z0-9-]*$" ~= nil end
+local function is_stream_tag(value)
+  if value == "" or value:sub(1, 1) == "/" or value:sub(-1) == "/" or value:find("//", 1, true) then return false end
+
+  for segment in value:gmatch "[^/]+" do
+    if not segment:match "^[a-z][a-z0-9-]*$" then return false end
+  end
+
+  return true
+end
 
 local function parse_stream_tags(value)
   local tags = {}
@@ -393,7 +401,7 @@ local function parse_stream_tags(value)
   for raw_tag in value:gmatch "[^,]+" do
     local tag = vim.trim(raw_tag):lower()
     if tag ~= "" then
-      if not is_stream_identifier(tag) then return nil, ("invalid stream tag `%s`"):format(vim.trim(raw_tag)) end
+      if not is_stream_tag(tag) then return nil, ("invalid stream tag `%s`"):format(vim.trim(raw_tag)) end
       table.insert(tags, tag)
     end
   end
@@ -417,6 +425,7 @@ local function parse_stream_entry_args(args)
     tags = DEFAULT_STREAM_TAGS,
     flags = {},
   }
+  local title = {}
 
   for _, arg in ipairs(args) do
     local key, value = arg:match "^([%w_-]+)=(.*)$"
@@ -435,17 +444,21 @@ local function parse_stream_entry_args(args)
       end
     else
       local flag = arg:lower()
-      if not STREAM_ENTRY_FLAGS[flag] then return nil, ("unknown Sadd option `%s`"):format(arg) end
-      parsed.flags[flag] = true
+      if STREAM_ENTRY_FLAGS[flag] then
+        parsed.flags[flag] = true
+      else
+        table.insert(title, arg)
+      end
     end
   end
 
+  parsed.title = table.concat(title, " ")
   return parsed
 end
 
 local function build_stream_entry_lines(entry)
   local lines = {
-    "## untitled",
+    "## " .. (entry.title ~= "" and entry.title or "untitled"),
     "",
   }
   vim.list_extend(lines, build_meta_lines(current_datetime(), "", entry))
