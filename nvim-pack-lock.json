@@ -56,7 +56,7 @@
       "version": "'main'"
     },
     "leap.nvim": {
-      "rev": "52bc56ba61b1f54f123e29d6df7d1b7a0393eeac",
+      "rev": "57dff92b81db7ae32260d626f30dfcfb13d00d27",
       "src": "https://git.disroot.org/andyg/leap.nvim.git",
       "version": "'main'"
     },
