@@ -17,7 +17,7 @@ end
 vim.api.nvim_create_autocmd(Util.lint.events, {
   group = augroup "nvim_lint",
   callback = Util.lint.debounce(100, function(args)
-    if Util.is_bigfile(args.buf) then return end
+    if Util.is_bigfile(args.buf) or vim.b[args.buf].simple_arena then return end
     try_lint(args.buf)
   end),
 })

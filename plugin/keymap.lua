@@ -7,6 +7,18 @@ local map = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+---@param mark string
+---@param characters table<string, string>
+---@return fun(): string
+local compose_character = function(mark, characters)
+  return function()
+    local character = vim.fn.getcharstr()
+    if character == vim.keycode "<Esc>" or character == vim.keycode "<C-c>" then return character end
+    if character == vim.keycode "<BS>" or character == vim.keycode "<C-h>" then return "" end
+    return characters[character] or mark .. character
+  end
+end
+
 local diagnostic_goto = function(next, severity)
   return function()
     vim.diagnostic.jump {
@@ -60,6 +72,30 @@ map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 map("n", "<C-x>", delete_buffer, { desc = "buffer: delete" })
 map("n", "<C-q>", delete_buffer, { desc = "buffer: delete" })
 map("i", "<M-BS>", "<C-W>", { desc = "insert: delete word", remap = false })
+map("i", "<M-e>", compose_character("´", { e = "é", E = "É" }), { expr = true, desc = "insert: acute accent" })
+map("i", "<M-`>", compose_character("`", { a = "à", e = "è", u = "ù", A = "À", E = "È", U = "Ù" }), {
+  expr = true,
+  desc = "insert: grave accent",
+})
+map(
+  "i",
+  "<M-i>",
+  compose_character(
+    "ˆ",
+    { a = "â", e = "ê", i = "î", o = "ô", u = "û", A = "Â", E = "Ê", I = "Î", O = "Ô", U = "Û" }
+  ),
+  { expr = true, desc = "insert: circumflex accent" }
+)
+map(
+  "i",
+  "<M-u>",
+  compose_character("¨", { e = "ë", i = "ï", u = "ü", y = "ÿ", E = "Ë", I = "Ï", U = "Ü", Y = "Ÿ" }),
+  { expr = true, desc = "insert: diaeresis" }
+)
+map("i", "<M-c>", "ç", { desc = "insert: cedilla" })
+map("i", "<M-C>", "Ç", { desc = "insert: uppercase cedilla" })
+map("i", "<M-\\>", "«", { desc = "insert: opening guillemet" })
+map("i", "<M-S-\\>", "»", { desc = "insert: closing guillemet" })
 
 map("n", "<Leader>v", "gcc", { desc = "comment: visual line", remap = true, silent = true })
 map("x", "<Leader>v", "gc", { desc = "comment: visual line", remap = true, silent = true })

@@ -1,5 +1,13 @@
 local setup_done = false
 
+local function buffer_feature_enabled(buf, feature) return vim.b[buf]["simple_treesitter_" .. feature] ~= false end
+
+local function buffer_features_enabled(buf)
+  return buffer_feature_enabled(buf, "highlight")
+    or buffer_feature_enabled(buf, "indent")
+    or buffer_feature_enabled(buf, "folds")
+end
+
 local function setup_treesitter()
   if setup_done then return true end
 
@@ -21,14 +29,20 @@ local function setup_treesitter()
 end
 
 local function start_treesitter(buf, ft)
-  if ft == "" or Util.is_bigfile(buf) or not setup_treesitter() then return end
+  if ft == "" or Util.is_bigfile(buf) or not buffer_features_enabled(buf) or not setup_treesitter() then return end
   if not Util.treesitter.have(ft) then return end
 
-  if Util.treesitter.have(ft, "highlights") then pcall(vim.treesitter.start, buf) end
-  if Util.treesitter.have(ft, "indents") then
+  if buffer_feature_enabled(buf, "highlight") and Util.treesitter.have(ft, "highlights") then
+    pcall(vim.treesitter.start, buf)
+  end
+  if buffer_feature_enabled(buf, "indent") and Util.treesitter.have(ft, "indents") then
     Util.set_default("indentexpr", 'v:lua.require("utils").treesitter.indentexpr()')
   end
-  if Util.treesitter.have(ft, "folds") and Util.set_default("foldmethod", "expr") then
+  if
+    buffer_feature_enabled(buf, "folds")
+    and Util.treesitter.have(ft, "folds")
+    and Util.set_default("foldmethod", "expr")
+  then
     Util.set_default("foldexpr", 'v:lua.require("utils").treesitter.foldexpr()')
   end
 end
@@ -43,7 +57,9 @@ local function start_loaded_buffers()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) then
       local ft = vim.bo[buf].filetype
-      if ft ~= "" and not Util.is_bigfile(buf) then targets[#targets + 1] = { buf = buf, ft = ft } end
+      if ft ~= "" and not Util.is_bigfile(buf) and buffer_features_enabled(buf) then
+        targets[#targets + 1] = { buf = buf, ft = ft }
+      end
     end
   end
 

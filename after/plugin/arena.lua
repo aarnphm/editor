@@ -55,6 +55,49 @@ local function is_target(bufnr)
   return normalize_path(name) == ARENA_PATH
 end
 
+local function mark_arena_buffer(bufnr)
+  if not is_target(bufnr) then return false end
+
+  vim.b[bufnr].simple_arena = true
+  vim.b[bufnr].simple_treesitter_highlight = false
+  vim.b[bufnr].simple_treesitter_indent = false
+  vim.b[bufnr].simple_treesitter_folds = false
+  vim.b[bufnr].minihipatterns_disable = true
+  return true
+end
+
+local function apply_arena_buffer_profile(bufnr)
+  if not mark_arena_buffer(bufnr) then return end
+
+  pcall(vim.treesitter.stop, bufnr)
+  vim.bo[bufnr].syntax = ""
+  vim.bo[bufnr].indentexpr = ""
+
+  for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
+    vim.wo[win].foldmethod = "manual"
+    vim.wo[win].foldexpr = "0"
+    Util.delete_url_match(win)
+  end
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+  group = arena_group,
+  pattern = "*.md",
+  callback = function(ev) mark_arena_buffer(ev.buf) end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = arena_group,
+  pattern = "markdown",
+  callback = function(ev) apply_arena_buffer_profile(ev.buf) end,
+})
+
+vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
+  group = arena_group,
+  pattern = "*.md",
+  callback = function(ev) apply_arena_buffer_profile(ev.buf) end,
+})
+
 local function frontmatter_end(lines)
   if not lines[1] or not lines[1]:match "^%-%-%-%s*$" then return -1 end
   for i = 2, #lines do

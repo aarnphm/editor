@@ -92,7 +92,7 @@ end)
 
 local function start_markdown_oxide(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].filetype ~= "markdown" then return end
-  if Util.is_bigfile(bufnr) then return end
+  if Util.is_bigfile(bufnr) or vim.b[bufnr].simple_arena then return end
   if #vim.lsp.get_clients { bufnr = bufnr, name = "markdown_oxide" } > 0 then return end
 
   local root = markdown_oxide_root(bufnr)

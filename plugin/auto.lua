@@ -194,6 +194,7 @@ if vim.g.enable_highlighturl then
   vim.api.nvim_create_autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
     group = highlighturl_group,
     callback = function(args)
+      if vim.b[args.buf].simple_arena then return end
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         if vim.api.nvim_win_get_buf(win) == args.buf and not vim.w[win].highlighturl_enabled then
           Util.set_url_match(win)

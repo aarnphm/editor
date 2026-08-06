@@ -612,11 +612,9 @@ if not vim.g.simple_treesitter_bigfile_guard then
 
   function vim.treesitter.start(buf, lang)
     local bufnr = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
+    if vim.b[bufnr].simple_treesitter_highlight == false then return end
     if M.is_bigfile(bufnr) then
-      Util.info(
-        "file is considered larger than 1.5MB, disable treesitter to avoid performance churn.",
-        { title = "bigfile" }
-      )
+      Util.info("file is considered large, disable treesitter to avoid performance churn.", { title = "bigfile" })
       return
     end
     return treesitter_start(buf, lang)
