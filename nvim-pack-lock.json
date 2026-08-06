@@ -56,7 +56,7 @@
       "version": "'main'"
     },
     "leap.nvim": {
-      "rev": "57dff92b81db7ae32260d626f30dfcfb13d00d27",
+      "rev": "b3f60bab38bdcbaa79a3ea0fd0f5be2a425572d6",
       "src": "https://git.disroot.org/andyg/leap.nvim.git",
       "version": "'main'"
     },
@@ -86,7 +86,7 @@
       "version": "'master'"
     },
     "nvim-treesitter": {
-      "rev": "7b6cc8949f9999c5ed91436cbe24aa5f99c42025",
+      "rev": "3d3321b560a63ff92a8692401f303a5123336b86",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter.git",
       "version": "'main'"
     }
