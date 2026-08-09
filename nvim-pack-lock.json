@@ -11,12 +11,12 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "cba53eff1948109ec0f47cbead4f07494d1e25c9",
+      "rev": "8ca29c2eb34f5ce4770bffc0d62e6f636a4e8526",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
     "blink.lib": {
-      "rev": "8b04d0e0acc8565cfa4dd291a89a9212b7262633",
+      "rev": "c8fdc12c8a2fab6cf786dd7141a283f8079f902b",
       "src": "https://github.com/Saghen/blink.lib.git",
       "version": "'main'"
     },
@@ -56,7 +56,7 @@
       "version": "'main'"
     },
     "leap.nvim": {
-      "rev": "0ad54efaf2a09d95be54a4348b198a105fab8392",
+      "rev": "0d0549b13428855c063468a6935c18e933599a18",
       "src": "https://git.disroot.org/andyg/leap.nvim.git",
       "version": "'main'"
     },
@@ -86,7 +86,7 @@
       "version": "'master'"
     },
     "nvim-treesitter": {
-      "rev": "3d3321b560a63ff92a8692401f303a5123336b86",
+      "rev": "c9f9ed6c1892f629ea399f4ee7905f2686fa13f2",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter.git",
       "version": "'main'"
     }
