@@ -72,10 +72,10 @@ map("t", "<C-w>", "<C-\\><C-n>", { desc = "terminal: change to normal mode" })
 map("n", "<C-x>", delete_buffer, { desc = "buffer: delete" })
 map("n", "<C-q>", delete_buffer, { desc = "buffer: delete" })
 map("i", "<M-BS>", "<C-W>", { desc = "insert: delete word", remap = false })
-map("i", "<M-e>", compose_character("´", { e = "é", E = "É" }), { expr = true, desc = "insert: acute accent" })
+map("i", "<M-e>", compose_character("´", { e = "é", E = "É" }), { expr = true, desc = "insert[fr]: acute accent" })
 map("i", "<M-`>", compose_character("`", { a = "à", e = "è", u = "ù", A = "À", E = "È", U = "Ù" }), {
   expr = true,
-  desc = "insert: grave accent",
+  desc = "insert[fr]: grave accent",
 })
 map(
   "i",
@@ -84,18 +84,18 @@ map(
     "ˆ",
     { a = "â", e = "ê", i = "î", o = "ô", u = "û", A = "Â", E = "Ê", I = "Î", O = "Ô", U = "Û" }
   ),
-  { expr = true, desc = "insert: circumflex accent" }
+  { expr = true, desc = "insert[fr]: circumflex accent" }
 )
 map(
   "i",
   "<M-u>",
   compose_character("¨", { e = "ë", i = "ï", u = "ü", y = "ÿ", E = "Ë", I = "Ï", U = "Ü", Y = "Ÿ" }),
-  { expr = true, desc = "insert: diaeresis" }
+  { expr = true, desc = "insert[fr]: diaeresis" }
 )
-map("i", "<M-c>", "ç", { desc = "insert: cedilla" })
-map("i", "<M-C>", "Ç", { desc = "insert: uppercase cedilla" })
-map("i", "<M-\\>", "«", { desc = "insert: opening guillemet" })
-map("i", "<M-S-\\>", "»", { desc = "insert: closing guillemet" })
+map("i", "<M-c>", "ç", { desc = "insert[fr]: cedilla" })
+map("i", "<M-C>", "Ç", { desc = "insert[fr]: uppercase cedilla" })
+map("i", "<M-\\>", "«", { desc = "insert[fr]: opening guillemet" })
+map("i", "<M-S-\\>", "»", { desc = "insert[fr]: closing guillemet" })
 
 map("n", "<Leader>v", "gcc", { desc = "comment: visual line", remap = true, silent = true })
 map("x", "<Leader>v", "gc", { desc = "comment: visual line", remap = true, silent = true })

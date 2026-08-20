@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
   once = true,
   callback = function()
     Util.pack.load "blink.cmp"
-    local opts = {
+    require("blink.cmp").setup {
       enabled = function() return not Util.is_bigfile(0) and vim.b.completion ~= false end,
       fuzzy = { implementation = "prefer_rust" },
       snippets = { preset = "default", expand = Util.cmp.expand },
@@ -96,6 +96,5 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
         ["<Down>"] = false,
       },
     }
-    require("blink.cmp").setup(opts)
   end,
 })
