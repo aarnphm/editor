@@ -18,6 +18,27 @@ local STREAM_META_FIELD_ORDER = {
   "protected",
 }
 local METADATA_PARENT_LOOKBACK = 1024
+local TRAINING_LOG_TAGS = { "life", "o/training" }
+
+local stream_meta_query
+
+local function get_stream_meta_query()
+  if stream_meta_query then return stream_meta_query end
+
+  local ok, query = pcall(
+    vim.treesitter.query.parse,
+    "markdown",
+    [[
+  (section
+    (list
+      (list_item) @meta))
+]]
+  )
+  if not ok then return nil end
+
+  stream_meta_query = query
+  return stream_meta_query
+end
 
 local function is_stream(bufnr)
   local name = vim.api.nvim_buf_get_name(bufnr)
@@ -100,6 +121,7 @@ local function build_meta_lines(datetime, next_line, meta)
   for _, tag in ipairs(tags) do
     table.insert(lines, "    - " .. tag)
   end
+  if meta.description then table.insert(lines, "  - description: " .. meta.description) end
   for _, flag in ipairs(STREAM_ENTRY_FLAG_ORDER) do
     if flags[flag] then table.insert(lines, "  - " .. flag .. ": true") end
   end
@@ -420,7 +442,51 @@ local function parse_stream_bool(value)
   return nil
 end
 
-local function parse_stream_entry_args(args)
+local function tokenize_stream_entry_args(raw_args)
+  local args = {}
+  local token = {}
+  local token_started = false
+  local quoted = false
+  local escaped = false
+
+  local function push_token()
+    if not token_started then return end
+    table.insert(args, table.concat(token))
+    token = {}
+    token_started = false
+  end
+
+  for idx = 1, #raw_args do
+    local char = raw_args:sub(idx, idx)
+    if escaped then
+      table.insert(token, char)
+      token_started = true
+      escaped = false
+    elseif char == "\\" then
+      escaped = true
+      token_started = true
+    elseif char == '"' then
+      quoted = not quoted
+      token_started = true
+    elseif char:match "%s" and not quoted then
+      push_token()
+    else
+      table.insert(token, char)
+      token_started = true
+    end
+  end
+
+  if escaped then table.insert(token, "\\") end
+  if quoted then return nil, "has an unterminated double-quoted value" end
+
+  push_token()
+  return args
+end
+
+local function parse_stream_entry_args(raw_args)
+  local args, tokenize_err = tokenize_stream_entry_args(raw_args)
+  if not args then return nil, "Sadd " .. tokenize_err end
+
   local parsed = {
     tags = DEFAULT_STREAM_TAGS,
     flags = {},
@@ -439,6 +505,9 @@ local function parse_stream_entry_args(args)
         local flag_value = parse_stream_bool(value)
         if flag_value == nil then return nil, ("Sadd %s= expects true or false"):format(key) end
         parsed.flags[key] = flag_value or nil
+      elseif key == "description" then
+        if value == "" then return nil, "Sadd description= needs text" end
+        parsed.description = value
       else
         return nil, ("unknown Sadd option `%s`"):format(key)
       end
@@ -454,6 +523,100 @@ local function parse_stream_entry_args(args)
 
   parsed.title = table.concat(title, " ")
   return parsed
+end
+
+local function primary_paragraph(node)
+  for child in node:iter_children() do
+    local type = child:type()
+    if type == "paragraph" then return child end
+    if
+      type ~= "list_marker_minus"
+      and type ~= "list_marker_plus"
+      and type ~= "list_marker_star"
+      and type ~= "block_continuation"
+    then
+      break
+    end
+  end
+end
+
+local function first_line_text(bufnr, node)
+  local paragraph = primary_paragraph(node)
+  if not paragraph then return "" end
+
+  local text = vim.treesitter.get_node_text(paragraph, bufnr)
+  if not text then return "" end
+
+  return vim.trim(vim.split(text, "\n", { plain = true, trimempty = true })[1] or "")
+end
+
+local function child_list(node)
+  for child in node:iter_children() do
+    if child:type() == "list" then return child end
+  end
+end
+
+local function parse_meta_node(bufnr, node)
+  if not first_line_text(bufnr, node):lower():match "^%[meta%]%s*:%s*$" then return nil end
+
+  local fields = child_list(node)
+  if not fields then return nil end
+
+  local meta = { tags = {} }
+  for field in fields:iter_children() do
+    if field:type() ~= "list_item" then goto continue end
+
+    local key, value = first_line_text(bufnr, field):match "^([%w_-]+):%s*(.*)$"
+    key = key and key:lower() or nil
+    if key == "tags" then
+      local tags = child_list(field)
+      if tags then
+        for tag_node in tags:iter_children() do
+          if tag_node:type() == "list_item" then
+            local tag = first_line_text(bufnr, tag_node):lower()
+            if tag ~= "" then meta.tags[tag] = true end
+          end
+        end
+      end
+    elseif key == "description" then
+      meta.description = value
+    end
+
+    ::continue::
+  end
+
+  return meta
+end
+
+local function next_training_log_description(bufnr)
+  local parser_ok, parser = pcall(vim.treesitter.get_parser, bufnr, "markdown", {})
+  if not parser_ok or not parser then return nil, "Strain requires the Markdown Treesitter parser" end
+
+  local parse_ok, trees = pcall(function() return parser:parse() end)
+  local tree = parse_ok and trees and trees[1] or nil
+  if not tree then return nil, "Strain could not parse the stream buffer" end
+
+  local query = get_stream_meta_query()
+  if not query then return nil, "Strain could not compile its Markdown Treesitter query" end
+
+  for id, node in query:iter_captures(tree:root(), bufnr, 0, -1) do
+    if query.captures[id] ~= "meta" then goto continue end
+
+    local meta = parse_meta_node(bufnr, node)
+    if meta and meta.tags[TRAINING_LOG_TAGS[1]] and meta.tags[TRAINING_LOG_TAGS[2]] and meta.description then
+      local digits = meta.description:lower():match "training%s+log%s+(%d+)"
+      local number = digits and tonumber(digits) or nil
+      if number then
+        local next_number = tostring(number + 1)
+        local width = math.max(#digits, #next_number)
+        return ("training log %0" .. width .. "d"):format(number + 1)
+      end
+    end
+
+    ::continue::
+  end
+
+  return nil, "Strain could not find a numbered training log tagged life and o/training"
 end
 
 local function build_stream_entry_lines(entry)
@@ -474,7 +637,7 @@ local function edit_stream_buffer()
 
   local ok, err = pcall(vim.cmd, "keepalt edit " .. vim.fn.fnameescape(STREAM_PATH))
   if not ok then
-    Util.error(("Sadd could not open %s: %s"):format(STREAM_PATH, err), { title = "stream" })
+    Util.error(("could not open stream %s: %s"):format(STREAM_PATH, err), { title = "stream" })
     return nil
   end
 
@@ -488,18 +651,12 @@ local function stream_insert_row(lines)
   return #lines
 end
 
-local function add_stream_entry(opts)
-  local entry, err = parse_stream_entry_args(opts.fargs)
-  if not entry then
-    Util.error(err, { title = "stream" })
-    return
-  end
-
-  local bufnr = edit_stream_buffer()
+local function insert_stream_entry(entry, bufnr)
+  bufnr = bufnr or edit_stream_buffer()
   if not bufnr then return end
   if vim.bo[bufnr].buftype ~= "" then return end
   if not vim.bo[bufnr].modifiable then
-    Util.error("Sadd stream buffer is not modifiable", { title = "stream" })
+    Util.error("stream buffer is not modifiable", { title = "stream" })
     return
   end
 
@@ -518,8 +675,56 @@ local function add_stream_entry(opts)
   vim.cmd "startinsert"
 end
 
+local function add_stream_entry(opts)
+  local entry, err = parse_stream_entry_args(opts.args)
+  if not entry then
+    Util.error(err, { title = "stream" })
+    return
+  end
+
+  insert_stream_entry(entry)
+end
+
+local function add_strain_entry(opts)
+  local title, title_err = tokenize_stream_entry_args(opts.args)
+  if not title then
+    Util.error("Strain " .. title_err, { title = "stream" })
+    return
+  end
+
+  local title_text = vim.trim(table.concat(title, " "))
+  if title_text == "" then
+    Util.error("Strain needs a title", { title = "stream" })
+    return
+  end
+
+  local bufnr = edit_stream_buffer()
+  if not bufnr then return end
+
+  local description, description_err = next_training_log_description(bufnr)
+  if not description then
+    Util.error(description_err, { title = "stream" })
+    return
+  end
+
+  insert_stream_entry({
+    title = title_text,
+    tags = vim.deepcopy(TRAINING_LOG_TAGS),
+    flags = {},
+    description = description,
+  }, bufnr)
+end
+
 local function complete_stream_entry_args(arg_lead)
-  local completions = { "tag=", "tags=", "private", "private=true", "draft=true", "protected=true" }
+  local completions = {
+    "tag=",
+    "tags=",
+    'description="',
+    "private",
+    "private=true",
+    "draft=true",
+    "protected=true",
+  }
   local matches = {}
 
   for _, completion in ipairs(completions) do
@@ -533,6 +738,11 @@ vim.api.nvim_create_user_command("Sadd", add_stream_entry, {
   nargs = "*",
   complete = complete_stream_entry_args,
   desc = "stream: add a new stream entry",
+})
+
+vim.api.nvim_create_user_command("Strain", add_strain_entry, {
+  nargs = "+",
+  desc = "stream: add the next numbered training log",
 })
 
 local pending_stream = {}
