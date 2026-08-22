@@ -56,7 +56,7 @@
       "version": "'main'"
     },
     "leap.nvim": {
-      "rev": "e51ba2a70169bb6fd58342312ccde591242ac739",
+      "rev": "7884f9455e5bf07bd11a3dcd9f961095a966a5d7",
       "src": "https://git.disroot.org/andyg/leap.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "bff1bd61cb1455040533201ca1edf1e84efa578f",
+      "rev": "221c43884319e791519f0d6c94a7f2fbcd653278",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
