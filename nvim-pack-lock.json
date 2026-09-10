@@ -11,7 +11,7 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "f72465357ede7f8d899f34816d49408813c374c6",
+      "rev": "f705c79404bad658dac6998e300cc6632f5b9f7f",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
@@ -36,12 +36,12 @@
       "version": "'main'"
     },
     "friendly-snippets": {
-      "rev": "30bfd475adadfd4f286f86168831348dfd8aecdc",
+      "rev": "a5a73e586521fe5c12d751ad81a0db67649a94ed",
       "src": "https://github.com/rafamadriz/friendly-snippets.git",
       "version": "'main'"
     },
     "gitsigns.nvim": {
-      "rev": "5be654f2232c10ddcad19c1607a67b6b4b78fc29",
+      "rev": "f2421c550618d257048afa650413d9e542ddbe67",
       "src": "https://github.com/lewis6991/gitsigns.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "19576de1c1b6d1b5e231ea6ef9cba9a811c322bb",
+      "rev": "84b6b6c3f13cb34a6c8a0354b0da4c67d8ccf867",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
