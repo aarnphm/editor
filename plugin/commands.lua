@@ -1,3 +1,18 @@
+vim.api.nvim_create_user_command("Cheatsheet", function(opts)
+  local kind = opts.args == "" and "keymaps" or opts.args
+  if kind ~= "keymaps" and kind ~= "commands" then
+    Util.warn "Cheatsheet: expected keymaps or commands"
+    return
+  end
+  Util.ui.cheatsheet(kind)
+end, {
+  nargs = "?",
+  complete = function(lead)
+    return vim.tbl_filter(function(kind) return vim.startswith(kind, lead) end, { "keymaps", "commands" })
+  end,
+  desc = "help: search keyboard shortcuts or commands",
+})
+
 vim.api.nvim_create_user_command("ClearBuffer", function()
   local removed, failures = 0, {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do

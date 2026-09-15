@@ -106,6 +106,11 @@ local function current_datetime()
   )
 end
 
+local function current_date()
+  local local_t = os.date("*t", os.time())
+  return string.format("%04d-%02d-%02d", local_t.year, local_t.month, local_t.day)
+end
+
 local function leading_spaces(line) return #(line:match "^(%s*)" or "") end
 
 local function build_meta_lines(datetime, next_line, meta)
@@ -627,6 +632,10 @@ local function build_stream_entry_lines(entry)
   vim.list_extend(lines, build_meta_lines(current_datetime(), "", entry))
   table.insert(lines, "")
   local body_line = #lines
+  if entry.body and #entry.body > 0 then
+    vim.list_extend(lines, entry.body)
+    if entry.body[#entry.body] ~= "" then table.insert(lines, "") end
+  end
   table.insert(lines, "---")
   table.insert(lines, "")
   return lines, body_line
@@ -685,16 +694,16 @@ local function add_stream_entry(opts)
   insert_stream_entry(entry)
 end
 
-local function add_strain_entry(opts)
+local function add_training_log_entry(opts, command_name, body)
   local title, title_err = tokenize_stream_entry_args(opts.args)
   if not title then
-    Util.error("Strain " .. title_err, { title = "stream" })
+    Util.error(command_name .. " " .. title_err, { title = "stream" })
     return
   end
 
   local title_text = vim.trim(table.concat(title, " "))
   if title_text == "" then
-    Util.error("Strain needs a title", { title = "stream" })
+    Util.error(command_name .. " needs a title", { title = "stream" })
     return
   end
 
@@ -712,7 +721,15 @@ local function add_strain_entry(opts)
     tags = vim.deepcopy(TRAINING_LOG_TAGS),
     flags = {},
     description = description,
+    body = body,
   }, bufnr)
+end
+
+local function add_strain_entry(opts) add_training_log_entry(opts, "Strain") end
+
+local function add_stri_entry(opts)
+  local analytics_embed = ("![[triathlon#%s#analytics]]"):format(current_date())
+  add_training_log_entry(opts, "Stri", { analytics_embed })
 end
 
 local function complete_stream_entry_args(arg_lead)
@@ -743,6 +760,11 @@ vim.api.nvim_create_user_command("Sadd", add_stream_entry, {
 vim.api.nvim_create_user_command("Strain", add_strain_entry, {
   nargs = "+",
   desc = "stream: add the next numbered training log",
+})
+
+vim.api.nvim_create_user_command("Stri", add_stri_entry, {
+  nargs = "+",
+  desc = "stream: add the next numbered training log with today's analytics",
 })
 
 local pending_stream = {}

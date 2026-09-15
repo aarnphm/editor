@@ -19,6 +19,16 @@ Plugin spine:
 - gitsigns.nvim for hunks
 - grug-far.nvim for search and replace
 
+Search the live configuration with Mini's cheatsheets:
+
+| Shortcut | Command | Contents |
+| --- | --- | --- |
+| `Space ?` | `:Cheatsheet` or `:Cheatsheet keymaps` | Global and current-buffer mappings across all modes, with descriptions |
+| `Space :` | `:Cheatsheet commands` | Built-in Ex commands and registered user commands, including commands without a shortcut |
+| `Space l s` | `:LatexShortcut` | LaTeX snippet triggers and expansions |
+
+Type to filter, use `Ctrl-n` / `Ctrl-p` to move, `Tab` to preview details or callback source, and `Esc` to close. In the keymap picker, `Enter` invokes the selected mapping; in the commands picker it runs commands known to take no arguments or fills the command line for editing. Buffer-local entries reflect the buffer where the picker opens, and plugin entries appear once registered. The leader is `Space`; the local leader is `,`.
+
 Startup time you may ask? Check `PackProfile`. Here's running on M1 MAX:
 
 ```text

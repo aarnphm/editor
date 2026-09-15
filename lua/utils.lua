@@ -1391,6 +1391,7 @@ M.treesitter = treesitter
 
 ---@class simple.util.ui
 ---@field pick? fun(opts:table):any
+---@field cheatsheet fun(kind:"keymaps"|"commands"):any
 local ui = {}
 
 function ui.foldtext()

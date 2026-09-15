@@ -53,6 +53,13 @@ Util.ui.pick = function(opts)
   return require("mini.pick").start(opts)
 end
 
+Util.ui.cheatsheet = function(kind)
+  setup_pick()
+  local pickers = require("mini.extra").pickers
+  if kind == "commands" then return pickers.commands() end
+  return pickers.keymaps { mode = "all", scope = "all" }
+end
+
 local function setup_files()
   setup_icons()
   once(
@@ -309,10 +316,6 @@ silent_map("n", "<leader>b", function()
   setup_pick()
   require("mini.pick").builtin.buffers()
 end, "buffers: open")
-silent_map("n", "<leader>?", function()
-  setup_pick()
-  require("mini.extra").pickers.keymaps()
-end, "keymaps: search")
 silent_map("n", "<localleader>f", function()
   setup_pick()
   require("mini.extra").pickers.oldfiles()
