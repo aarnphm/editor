@@ -34,6 +34,157 @@ vim.api.nvim_create_user_command("ClearBuffer", function()
   if #failures > 0 then Util.warn("ClearBuffer: unable to remove\n" .. table.concat(failures, "\n")) end
 end, { desc = "buffer: delete unnamed buffers" })
 
+local function sauna_arguments(raw)
+  local args, index = {}, 1
+  while index <= #raw do
+    local space = raw:sub(index):match "^%s*"
+    index = index + #space
+    if index > #raw then break end
+    local key = raw:sub(index):match "^([%a][%w_-]*)="
+    local chars, quote, quoted = {}, nil, false
+    while index <= #raw do
+      local char = raw:sub(index, index)
+      if char == "\\" and index < #raw then
+        index = index + 1
+        chars[#chars + 1] = raw:sub(index, index)
+      elseif quote then
+        if char == quote then
+          quote = nil
+        else
+          chars[#chars + 1] = char
+        end
+      elseif (char == '"' or char == "'") and (#chars == 0 or chars[#chars] == "=") then
+        quote, quoted = char, true
+      elseif char:match "%s" then
+        break
+      else
+        chars[#chars + 1] = char
+      end
+      index = index + 1
+    end
+    if quote then return nil, "unterminated quoted value" end
+    args[#args + 1] = { value = table.concat(chars), key = key, quoted = quoted, space = space }
+  end
+  return args
+end
+
+local function sauna_temperature(candidate)
+  local value = candidate:gsub("[cCfF]$", ""):gsub("°$", "")
+  if value:match "^[+-]?%d+%.?%d*$" then return candidate:match "[cCfF]$" and candidate or candidate .. "F" end
+end
+
+local function sauna_option(key, value)
+  if key == "temperature" then
+    return sauna_temperature(value), "temperature= expects a number with an optional F or C unit"
+  elseif key == "duration" then
+    local amount, unit = value:lower():match "^(%d+%.?%d*)%s*(%a*)$"
+    local units = { [""] = true, m = true, min = true, mins = true, minute = true, minutes = true }
+    local seconds = amount and tonumber(amount) * 60
+    if not seconds or seconds <= 0 or seconds >= math.huge or seconds % 1 ~= 0 or not units[unit] then
+      return nil, "duration= expects positive minutes, such as 75 or '75 mins'"
+    end
+    return amount .. " mins"
+  elseif key == "lap-phases" then
+    local names = { s = "hot sauna", cp = "cold plunge", b = "break" }
+    local phases = {}
+    for _, phase in ipairs(vim.split(value, "[-|]")) do
+      phase = vim.trim(phase):lower()
+      phase = names[phase] or phase
+      if phase ~= "hot sauna" and phase ~= "cold plunge" and phase ~= "break" then
+        return nil, "lap-phases= expects S, CP, B or full phase names separated by '-' or '|'"
+      end
+      phases[#phases + 1] = phase
+    end
+    return table.concat(phases, " | ")
+  elseif key == "htl" and value ~= "" then
+    local number = tonumber(value)
+    if not number or number ~= number or number < 0 or number >= math.huge then
+      return nil, "htl= expects a non-negative number"
+    end
+  elseif (key == "strava" or key == "garmin") and value ~= "" then
+    local number = tonumber(value)
+    if not value:match "^%d+$" or not number or number <= 0 or number > 9007199254740991 then
+      return nil, key .. "= expects a positive integer activity ID"
+    end
+  elseif key == "location" and value == "" then
+    return nil, "location= needs a value; quote locations containing spaces"
+  end
+  return value
+end
+
+vim.api.nvim_create_user_command("Sauna", function(opts)
+  local args, err = sauna_arguments(opts.args)
+  if not args then
+    Util.warn("Sauna: " .. err)
+    return
+  end
+
+  local title = {}
+  local fields = {
+    duration = "75 mins",
+    ["lap-phases"] = "hot sauna | cold plunge | hot sauna | break",
+    location = "Othership Adelaide",
+    htl = "<HTL>",
+    strava = "",
+    garmin = "",
+  }
+  for _, arg in ipairs(args) do
+    local key = arg.key == "lap-phasees" and "lap-phases" or arg.key
+    if key and (fields[key] ~= nil or key == "temperature") then
+      local value, value_err = sauna_option(key, vim.trim(arg.value:sub(#arg.key + 2)))
+      if not value then
+        Util.warn("Sauna: " .. value_err)
+        return
+      end
+      fields[key] = value
+    else
+      title[#title + 1] = arg
+    end
+  end
+  if not fields.temperature and #title > 1 and not title[#title].quoted then
+    fields.temperature = sauna_temperature(title[#title].value)
+    if fields.temperature then table.remove(title) end
+  end
+  local title_text = vim.trim(table.concat(vim.tbl_map(function(arg) return arg.space .. arg.value end, title)))
+  if title_text == "" then
+    Util.warn "Sauna: expected <title> [temperature] [key=value ...]"
+    return
+  end
+
+  local now = os.time()
+  vim.api.nvim_put({
+    "```tracking",
+    "title: " .. title_text,
+    "date: " .. os.date("%Y-%m-%d", now),
+    "time: " .. os.date("%H:%M", now),
+    "duration: " .. fields.duration,
+    "activity: sauna",
+    "temperature: " .. (fields.temperature or "<temperature>"),
+    "humidity: 11%",
+    "cooldown: cold plunge",
+    "lap-phases: " .. fields["lap-phases"],
+    "location: " .. fields.location,
+    "htl: " .. fields.htl,
+    "strava:" .. (fields.strava ~= "" and " " .. fields.strava or ""),
+    "garmin:" .. (fields.garmin ~= "" and " " .. fields.garmin or ""),
+    "```",
+  }, "l", true, false)
+end, {
+  nargs = "+",
+  complete = function(lead)
+    return vim.tbl_filter(function(option) return vim.startswith(option, lead) end, {
+      "duration=",
+      "temperature=",
+      "lap-phases=",
+      "location=",
+      "htl=",
+      "strava=",
+      "garmin=",
+    })
+  end,
+  desc = "tracking: insert a sauna session with duration, temperature, laps, location, HTL, and activity IDs",
+})
+
 local latex_shortcut_cache = nil
 
 local function latex_shortcut_pack_root()
