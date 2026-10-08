@@ -55,11 +55,6 @@
       "src": "https://github.com/folke/lazydev.nvim.git",
       "version": "'main'"
     },
-    "leap.nvim": {
-      "rev": "277e04fad21e3af05a55cc414757b09a704f2a92",
-      "src": "https://git.disroot.org/andyg/leap.nvim.git",
-      "version": "'main'"
-    },
     "luasnip-latex-snippets.nvim": {
       "rev": "33f54bed72f58e88786c247304ba4bf87753d5ab",
       "src": "https://github.com/aarnphm/luasnip-latex-snippets.nvim.git",
@@ -76,12 +71,12 @@
       "version": "'main'"
     },
     "nvim-lint": {
-      "rev": "3d55c8f67c6ae5c15e1042571e107c7a3d5c5f4e",
+      "rev": "f6230a5c06ba59e6059c14637f1dbe29a7978b9b",
       "src": "https://github.com/mfussenegger/nvim-lint.git",
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "33497f4930d40f28a465d38a763a00fc6902c658",
+      "rev": "db68de3575fff9dd9bb78b34c8371759ed35fe34",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
