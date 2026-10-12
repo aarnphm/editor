@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "c59fc922f718fa055f69f5f3bc888f23211571eb",
+      "rev": "6d27c288ff951e1e94cb5f91c800adeddf0dc0c2",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
