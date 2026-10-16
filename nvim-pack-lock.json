@@ -11,7 +11,7 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "8219b58f1c11a2fb1644d3c7116c509fa8348ec0",
+      "rev": "10198f904da1e7f77aeb0368414f871568c0d898",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
@@ -71,7 +71,7 @@
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "8831fa150fa26492cfe135801fa498132f1491d2",
+      "rev": "e3f2349a65143ff062f0b70ee9d68d8ce35c7059",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
