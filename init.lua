@@ -24,7 +24,6 @@ for _, plugin in ipairs {
   vim.g["loaded_" .. plugin] = 1
 end
 
-
 if vim.uv.os_uname().sysname == "Darwin" then
   vim.g.clipboard = {
     name = "macOS-clipboard",
@@ -57,7 +56,11 @@ Util.pack.setup {
   "nvim-treesitter/nvim-treesitter",
   "https://git.disroot.org/andyg/leap.nvim.git",
   { "kepano/flexoki-neovim", name = "flexoki" },
-  { "stevearc/conform.nvim", version = "master" },
+  {
+    "stevearc/conform.nvim",
+    version = "master",
+    dependencies = { { "nvim-neotest/nvim-nio", version = "v1.10.1" } },
+  },
   { "mfussenegger/nvim-lint", version = "master" },
   { "neovim/nvim-lspconfig", version = "master" },
   { "Bekaboo/dropbar.nvim", version = "master" },

@@ -129,6 +129,14 @@ local ruff_format_config_args = {
 
 local function oxfmt_stdin_filepath(ctx)
   if ctx.filename:lower():match "%.ipynb$" then return ctx.filename .. ".json" end
+  local filetype = vim.bo[ctx.buf].filetype
+  if filetype == "markdown" or filetype == "markdown.mdx" then
+    local extension = vim.fn.fnamemodify(ctx.filename, ":e"):lower()
+    local markdown_extensions = { "md", "markdown", "mdown", "mkdn", "mkd", "mdx" }
+    if not vim.tbl_contains(markdown_extensions, extension) then
+      return ctx.filename .. (filetype == "markdown.mdx" and ".mdx" or ".md")
+    end
+  end
   return ctx.filename
 end
 
@@ -145,7 +153,18 @@ local function conform()
     require("conform").setup {
       default_format_opts = { timeout_ms = 3000, lsp_format = "fallback" },
       formatters_by_ft = Util.lsp.formatters_by_ft,
+      format_after_save = function(bufnr)
+        if not format_enabled(bufnr) then
+          if not Util.markdown.frontmatter_pending(bufnr) then return end
+          return { bufnr = bufnr, formatters = { "markdown_frontmatter" }, lsp_format = "never" }
+        end
+        return { bufnr = bufnr }
+      end,
       formatters = {
+        markdown_frontmatter = {
+          format = Util.markdown.format_frontmatter,
+          condition = function(_, ctx) return Util.markdown.frontmatter_pending(ctx.buf) end,
+        },
         cbfmt = { condition = Util.lsp.cbfmt_enabled },
         injected = { options = { ignore_errors = true } },
         oxfmt = {
@@ -265,8 +284,8 @@ silent_map("n", "<leader>uF", "<cmd>FormatToggle!<cr>", "format: toggle buffer a
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup "format_on_save",
   callback = function(event)
-    if not format_enabled(event.buf) then return end
-    conform().format { bufnr = event.buf, timeout_ms = 3000 }
+    if not format_enabled(event.buf) and not Util.markdown.frontmatter_pending(event.buf) then return end
+    conform()
   end,
 })
 

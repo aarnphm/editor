@@ -85,6 +85,11 @@
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
+    "nvim-nio": {
+      "rev": "21f5324bfac14e22ba26553caf69ec76ae8a7662",
+      "src": "https://github.com/nvim-neotest/nvim-nio.git",
+      "version": "'v1.10.1'"
+    },
     "nvim-treesitter": {
       "rev": "29212d826054bb2948fa9d3a99eca9bf6a050eb2",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter.git",

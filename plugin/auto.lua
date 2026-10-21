@@ -212,6 +212,6 @@ _G.VAULTS = {
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   group = augroup "markdown_frontmatter",
   pattern = "*.md",
-  desc = "markdown: update frontmatter before format",
-  callback = function(ev) Util.markdown.update_frontmatter(ev.buf) end,
+  desc = "markdown: prepare asynchronous frontmatter update",
+  callback = function(ev) Util.markdown.prepare_frontmatter(ev.buf) end,
 })

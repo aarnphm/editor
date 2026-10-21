@@ -1613,8 +1613,10 @@ end
 function lsp.formatters(filetypes, formatters)
   if type(filetypes) == "string" then filetypes = { filetypes } end
 
+  local conform = package.loaded["conform"]
   for _, filetype in ipairs(filetypes) do
     lsp.formatters_by_ft[filetype] = formatters
+    if conform then conform.formatters_by_ft[filetype] = formatters end
   end
 end
 
@@ -1850,7 +1852,7 @@ function lsp.cbfmt_enabled(_, ctx)
 end
 
 function lsp.use_markdown_formatters(bufnr)
-  local formatters = { "oxfmt", lsp_format = "never" }
+  local formatters = { "markdown_frontmatter", "oxfmt", timeout_ms = 10000, lsp_format = "never" }
   local filename = vim.api.nvim_buf_get_name(bufnr)
   local ctx = {
     buf = bufnr,
@@ -1870,36 +1872,6 @@ local markdown_frontmatter_ignored_suffixes = {
   "%.flashcards%.md$",
   "%.fc%.md$",
 }
-
----@param cmd string[]
----@param input string?
----@return string
-local function markdown_system(cmd, input)
-  local result = vim.system(cmd, { stdin = input, text = true }):wait()
-  if result.code ~= 0 then error((result.stderr or "") ~= "" and result.stderr or table.concat(cmd, " ")) end
-  return result.stdout or ""
-end
-
----@param yaml string
----@return table<string, any>
-local function markdown_yaml_to_table(yaml)
-  if vim.trim(yaml) == "" then return {} end
-  local json = markdown_system({ "yq", "eval", "-o=json", "-" }, yaml)
-  local ok, parsed = pcall(vim.fn.json_decode, json)
-  if ok and type(parsed) == "table" then return parsed end
-  return {}
-end
-
----@param tbl table<string, any>
----@return string[]
-local function markdown_table_to_yaml(tbl)
-  local yaml = markdown_system({ "yq", "eval", "sort_keys(..)", "-P", "-p=json", "-" }, vim.fn.json_encode(tbl))
-  local lines = {}
-  for line in yaml:gmatch "[^\r\n]+" do
-    table.insert(lines, line)
-  end
-  return lines
-end
 
 ---@param path string
 ---@return table<string, any>? vault
@@ -1936,92 +1908,625 @@ function markdown.frontmatter_enabled(bufnr)
   return true
 end
 
----@param bufnr integer?
----@return boolean
-function markdown.update_frontmatter(bufnr)
-  bufnr = (bufnr == nil or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
-  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
-  if not markdown.frontmatter_enabled(bufnr) then return false end
-  if vim.bo[bufnr].buftype ~= "" or not vim.bo[bufnr].modifiable then return false end
+---@param bufnr integer
+function markdown.prepare_frontmatter(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) or vim.b[bufnr].conform_applying_formatting then return end
+  vim.b[bufnr].simple_frontmatter_save = nil
+  if not markdown.frontmatter_enabled(bufnr) then return end
+  if vim.bo[bufnr].buftype ~= "" or not vim.bo[bufnr].modifiable then return end
 
   local path = vim.api.nvim_buf_get_name(bufnr)
-  if markdown.frontmatter_ignored_path(path) then return false end
+  if markdown.frontmatter_ignored_path(path) then return end
+  local _, vault_root = markdown_vault_for_path(path)
+  if not vault_root then return end
 
-  if vim.fn.executable "yq" == 0 then
-    M.warn("frontmatter: yq is required", { title = "markdown" })
-    return false
+  local offset = os.date "%z"
+  vim.b[bufnr].simple_frontmatter_save = {
+    path = path,
+    root = vault_root,
+    modified = vim.bo[bufnr].modified,
+    modified_at = os.date "%Y-%m-%d %H:%M:%S"
+      .. string.format(" GMT%s%s:%s", offset:sub(1, 1), offset:sub(2, 3), offset:sub(4, 5)),
+  }
+end
+
+---@param bufnr integer
+---@return boolean
+function markdown.frontmatter_pending(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) or not markdown.frontmatter_enabled(bufnr) then return false end
+  local save = vim.b[bufnr].simple_frontmatter_save
+  return save ~= nil and save.path == vim.api.nvim_buf_get_name(bufnr)
+end
+
+---@param _ conform.FileLuaFormatterConfig
+---@param ctx conform.Context
+---@param lines string[]
+---@param callback fun(err?: string, output?: string[])
+function markdown.format_frontmatter(_, ctx, lines, callback)
+  local save = vim.b[ctx.buf].simple_frontmatter_save
+  vim.b[ctx.buf].simple_frontmatter_save = nil
+  if not save then
+    callback(nil, lines)
+    return
   end
 
-  local vault, vault_root = markdown_vault_for_path(path)
-  if not vault or not vault_root then return false end
+  local nio = require "nio"
+  local system = nio.wrap(
+    function(cmd, input, on_exit)
+      vim.system(cmd, { stdin = input, text = true, timeout = 10000 }, vim.schedule_wrap(on_exit))
+    end,
+    3
+  )
+  nio.run(function()
+    local function yq(cmd, input)
+      local result = system(cmd, input)
+      if result.code ~= 0 then error((result.stderr or "") ~= "" and result.stderr or "frontmatter: yq failed") end
+      return result.stdout or ""
+    end
 
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  local fm_start, fm_end
+    local fm_end
+    if lines[1] and lines[1]:match "^---%s*$" then
+      for i = 2, #lines do
+        if lines[i]:match "^---%s*$" then
+          fm_end = i
+          break
+        end
+      end
+      if not fm_end then error "frontmatter: unterminated YAML block" end
+    end
 
-  if lines[1] and lines[1]:match "^---%s*$" then
-    fm_start = 1
-    for i = 2, #lines do
-      if lines[i]:match "^---%s*$" then
-        fm_end = i
-        break
+    local existing = {}
+    if fm_end and fm_end > 2 then
+      local yaml = table.concat(vim.list_slice(lines, 2, fm_end - 1), "\n")
+      if vim.trim(yaml) ~= "" then
+        existing = vim.json.decode(yq({ "yq", "eval", "-o=json", "-" }, yaml))
+        if type(existing) ~= "table" then error "frontmatter: expected a YAML mapping" end
       end
     end
-  end
 
-  local existing = {}
-  if fm_start and fm_end and fm_end > fm_start + 1 then
-    local ok, parsed =
-      pcall(markdown_yaml_to_table, table.concat(vim.list_slice(lines, fm_start + 1, fm_end - 1), "\n"))
-    if not ok then
-      M.warn(("frontmatter: %s"):format(tostring(parsed):gsub("\n.*", "")), { title = "markdown" })
-      return false
+    local id = vim.fs.basename(save.path):gsub("%.md$", "")
+    local tags_root = vim.fs.joinpath(save.root, "tags")
+    local is_tag_note = save.path:sub(1, #tags_root + 1) == tags_root .. "/"
+    local frontmatter_defaults = is_tag_note and { title = id }
+      or { date = save.modified_at:sub(1, 10), id = id, tags = { "seed" }, title = id }
+    local frontmatter = vim.tbl_deep_extend("force", frontmatter_defaults, existing)
+    if frontmatter.title == nil then frontmatter.title = id end
+    if frontmatter.aliases and #frontmatter.aliases == 0 then frontmatter.aliases = nil end
+
+    local before = vim.deepcopy(existing)
+    local after = vim.deepcopy(frontmatter)
+    before.modified = nil
+    after.modified = nil
+    if not save.modified and vim.deep_equal(before, after) then return lines end
+
+    if not is_tag_note then frontmatter.modified = save.modified_at end
+    local yaml = yq({ "yq", "eval", "sort_keys(..)", "-P", "-p=json", "-" }, vim.json.encode(frontmatter))
+    local output = { "---" }
+    for line in yaml:gmatch "[^\r\n]+" do
+      output[#output + 1] = line
     end
-    existing = parsed
-  end
-
-  local filename = vim.fs.basename(path)
-  local id = filename:gsub("%.md$", "")
-  local is_tag_note = lsp.path_is_under(path, vim.fs.joinpath(vault_root, "tags"))
-  local default_frontmatter = is_tag_note and { title = id }
-    or { date = os.date "%Y-%m-%d", id = id, tags = { "seed" }, title = id }
-  local frontmatter = vim.tbl_deep_extend("force", default_frontmatter, existing)
-
-  if frontmatter.title == nil then frontmatter.title = id end
-  if frontmatter.aliases and #frontmatter.aliases == 0 then frontmatter.aliases = nil end
-
-  local existing_no_modified = vim.deepcopy(existing)
-  existing_no_modified.modified = nil
-  local frontmatter_no_modified = vim.deepcopy(frontmatter)
-  frontmatter_no_modified.modified = nil
-  local meta_changed = not vim.deep_equal(frontmatter_no_modified, existing_no_modified)
-
-  if not vim.bo[bufnr].modified and not meta_changed then return false end
-
-  if not is_tag_note then
-    local offset = os.date "%z"
-    frontmatter.modified = os.date "%Y-%m-%d %H:%M:%S"
-      .. string.format(" GMT%s%s:%s", offset:sub(1, 1), offset:sub(2, 3), offset:sub(4, 5))
-  end
-
-  local ok, yaml = pcall(markdown_table_to_yaml, frontmatter)
-  if not ok then
-    M.warn(("frontmatter: %s"):format(tostring(yaml):gsub("\n.*", "")), { title = "markdown" })
-    return false
-  end
-
-  local new_fm = { "---" }
-  vim.list_extend(new_fm, yaml)
-  table.insert(new_fm, "---")
-
-  if fm_start and fm_end then
-    vim.api.nvim_buf_set_lines(bufnr, fm_start - 1, fm_end, false, new_fm)
-  else
-    vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, vim.list_extend(new_fm, { "" }))
-  end
-
-  return true
+    output[#output + 1] = "---"
+    if not fm_end then output[#output + 1] = "" end
+    vim.list_extend(output, vim.list_slice(lines, (fm_end or 0) + 1))
+    return output
+  end, function(ok, result)
+    if ok then
+      callback(nil, result)
+    else
+      callback(result)
+    end
+  end)
 end
 
 M.markdown = markdown
+
+---@param text string
+---@return string yaml
+---@return integer? first First YAML line, zero-based.
+---@return integer? last End of YAML, zero-based and exclusive.
+function markdown.garden_frontmatter_projection(text)
+  local lines = vim.split(text, "\n", { plain = true })
+  if not lines[1]:match "^---%s*$" then return "", nil, nil end
+
+  local last = #lines
+  for i = 2, #lines do
+    if lines[i]:match "^---%s*$" or lines[i]:match "^%.%.%.%s*$" then
+      last = i - 1
+      break
+    end
+  end
+
+  -- Keep every YAML line and column in its original Markdown position.
+  for i = 1, #lines do
+    if i > last then
+      lines[i] = nil
+    else
+      lines[i] = i > 1 and lines[i]:gsub("\r$", "") or ""
+    end
+  end
+  return table.concat(lines, "\n"), 1, last
+end
+
+local garden_index = { notes = {}, tags = {}, running = false, scanned = false, pending = {} }
+
+-- The parsers run in Node once per session, then once per saved note.
+function markdown.refresh_garden_frontmatter_index(path)
+  if path then garden_index.pending[path] = true end
+  if garden_index.running or (garden_index.scanned and not next(garden_index.pending)) then return end
+  if vim.fn.executable "node" == 0 then return end
+  local argv = { "node", vim.fs.joinpath(vim.fn.stdpath "config", "scripts/garden_frontmatter_index.mjs") }
+  local single = garden_index.scanned and next(garden_index.pending) or nil
+  if single then
+    garden_index.pending[single] = nil
+    table.insert(argv, single)
+  end
+  garden_index.running = true
+  vim.system(argv, { text = true, timeout = 30000 }, function(result)
+    vim.schedule(function()
+      garden_index.running = false
+      if result.code ~= 0 then
+        M.warn(result.stderr or "Garden index failed", { title = "Garden frontmatter" })
+        return
+      end
+      local ok, records = pcall(vim.json.decode, result.stdout)
+      if not ok then return end
+      if single then
+        garden_index.notes[records.path] = records.note ~= vim.NIL and records.note or nil
+      else
+        garden_index.notes = {}
+        for _, note in ipairs(records) do
+          garden_index.notes[note.path] = note
+        end
+      end
+      garden_index.scanned = true
+      local tags = {}
+      for _, note in pairs(garden_index.notes) do
+        for _, tag in ipairs(note.tags) do
+          tags[tag] = (tags[tag] or 0) + 1
+        end
+      end
+      garden_index.tags = tags
+      if garden_index.rescan then
+        garden_index.rescan, garden_index.scanned = false, false
+      end
+      if not garden_index.scanned or next(garden_index.pending) then markdown.refresh_garden_frontmatter_index() end
+      local blink = package.loaded["blink.cmp"]
+      if blink and vim.api.nvim_get_mode().mode == "i" and markdown.in_garden_frontmatter() then
+        -- A new provider context also invalidates Blink's same-position LSP cache.
+        blink.show { providers = { "lsp" } }
+      end
+    end)
+  end)
+end
+
+function markdown.rescan_garden_frontmatter_index()
+  garden_index.scanned = false
+  garden_index.rescan = garden_index.running
+  markdown.refresh_garden_frontmatter_index()
+end
+
+-- Find the scalar containing the cursor, tolerating incomplete quotes and wikilinks.
+local function garden_scalar(line, col)
+  local start, quote, wiki
+  local i = 1
+  local list_start = line:match "^%s*%-%s+()"
+  if list_start then start = list_start - 1 end
+  local function finish(last)
+    if start == nil or col < start or col > last then return end
+    local value = line:sub(start + 1, last)
+    local leading = #(value:match "^%s*" or "")
+    local trailing = #(value:match "%s*$" or "")
+    local first = math.min(start + leading, col)
+    last = math.max(last - trailing, col)
+    local delimiter = line:sub(first + 1, first + 1)
+    local quoted = delimiter == '"' or delimiter == "'"
+    local closed = quoted and last > first + 1 and line:sub(last, last) == delimiter
+    return {
+      start = first,
+      last = last,
+      quote = quoted and delimiter or nil,
+      inner_start = first + (quoted and 1 or 0),
+      inner_last = last - (closed and 1 or 0),
+    }
+  end
+  while i <= #line do
+    local char = line:sub(i, i)
+    if wiki then
+      if line:sub(i, i + 1) == "]]" then
+        wiki = nil
+        i = i + 1
+      end
+    elseif quote then
+      if char == "\\" and quote == '"' then
+        i = i + 1
+      elseif char == quote then
+        if quote == "'" and line:sub(i + 1, i + 1) == "'" then
+          i = i + 1
+        else
+          local scalar = finish(i)
+          if scalar then return scalar end
+          start, quote = nil, nil
+        end
+      end
+    elseif line:sub(i, i + 1) == "[[" and line:sub(i, i + 2) ~= "[[[" then
+      wiki = true
+      i = i + 1
+    elseif char == '"' or char == "'" then
+      -- Quotes embedded in a plain scalar (e.g. someone's name) stay plain.
+      if not start or line:sub(start + 1, i - 1):match "^%s*$" then quote = char end
+    elseif char == "#" and (i == 1 or line:sub(i - 1, i - 1):match "%s") then
+      return finish(i - 1)
+    elseif char == ":" and (i == #line or line:sub(i + 1, i + 1):match "%s") then
+      start = i
+    elseif char == "[" or char == "{" or char == "," then
+      local scalar = finish(i - 1)
+      if scalar then return scalar end
+      start = i
+    elseif char == "]" or char == "}" then
+      local scalar = finish(i - 1)
+      if scalar then return scalar end
+      start = nil
+    end
+    i = i + 1
+  end
+  return finish(#line)
+end
+
+local function garden_text_edit(line, row, scalar, text, encoding)
+  return {
+    newText = text,
+    range = {
+      start = { line = row, character = vim.str_utfindex(line, encoding, scalar.start) },
+      ["end"] = { line = row, character = vim.str_utfindex(line, encoding, scalar.last) },
+    },
+  }
+end
+
+local function garden_quote(value, quote)
+  if quote == "'" then return "'" .. value:gsub("'", "''") .. "'" end
+  return vim.json.encode(value)
+end
+
+local function garden_tags_at_line(lines, row)
+  for i = row + 1, 2, -1 do
+    local key = lines[i]:match "^([%w_%-]+):"
+    if key then return key == "tags" end
+  end
+  return false
+end
+
+local function garden_dynamic_completions(document, position, encoding)
+  local line = document.lines[position.line + 1] or ""
+  local col = vim.str_byteindex(line, encoding, position.character, false)
+  local scalar = garden_scalar(line, col)
+  if not scalar then return end
+  local inner = line:sub(scalar.inner_start + 1, scalar.inner_last)
+  local before = line:sub(scalar.inner_start + 1, col)
+  local link = before:match ".*()%[%["
+  local items = {}
+  local function add(label, value, detail, filter)
+    table.insert(items, {
+      label = label,
+      kind = 18,
+      detail = detail,
+      filterText = filter or label,
+      insertTextFormat = 1,
+      textEdit = garden_text_edit(line, position.line, scalar, value, encoding),
+    })
+  end
+  if link then
+    local query = before:sub(link + 2)
+    if query:find("]]", 1, true) then return end
+    if query:find("|", 1, true) then return { isIncomplete = true, items = {} } end
+    local close = inner:find("]]", link + 2, true)
+    local last = close and close - 1 or #inner
+    local alias = inner:sub(link + 2, last):match "(|.*)$" or ""
+    local path, heading = query:match "^(.-)#(.*)$"
+    local function candidate(target, title, aliases)
+      local replacement = target
+      if scalar.quote == "'" then replacement = replacement:gsub("'", "''") end
+      if scalar.quote == '"' then replacement = replacement:gsub("\\", "\\\\"):gsub('"', '\\"') end
+      replacement = replacement .. alias
+      local value = inner:sub(1, link + 1) .. replacement .. "]]" .. inner:sub(close and close + 2 or #inner + 1)
+      if scalar.quote then
+        value = scalar.quote .. value .. scalar.quote
+      else
+        value = garden_quote(value)
+      end
+      add(target, value, title, table.concat({ target, title, table.concat(aliases or {}, " ") }, " "))
+    end
+    for _, note in pairs(garden_index.notes) do
+      if heading then
+        if note.path == path or vim.fs.basename(note.path) == path or (path == "" and note.path == document.path) then
+          for _, name in ipairs(note.headings) do
+            candidate((path == "" and "" or note.path) .. "#" .. name, note.title, note.aliases)
+          end
+        end
+      else
+        candidate(note.path, note.title, note.aliases)
+      end
+    end
+    return { isIncomplete = true, items = items }
+  end
+  if garden_tags_at_line(document.lines, position.line) then
+    -- Scalar tags also accept comma-separated values; quoted lists keep their delimiters.
+    local comma = before:match ".*(),"
+    local prefix = comma and inner:sub(1, comma) or ""
+    local suffix = inner:sub(#before + 1):match "(,.*)$" or ""
+    local leading = (comma and inner:sub(comma + 1) or inner):match "^%s*" or ""
+    for tag, count in pairs(garden_index.tags) do
+      local value = prefix .. leading .. tag .. suffix
+      if
+        scalar.quote
+        or value:match "^[%[%]{},&*!|>'\"%@`#]"
+        or value:find(": ", 1, true)
+        or value == "true"
+        or value == "false"
+        or value == "null"
+        or tonumber(value)
+      then
+        value = garden_quote(value, scalar.quote)
+      end
+      add(tag, value, ("Used in %d Garden notes"):format(count))
+    end
+    return { isIncomplete = true, items = items }
+  end
+end
+
+---@param dispatchers vim.lsp.rpc.Dispatchers
+---@param config vim.lsp.ClientConfig
+---@return vim.lsp.rpc.Client
+local function garden_frontmatter_rpc(dispatchers, config)
+  local documents = {}
+  local wrapped = vim.tbl_extend("force", dispatchers, {
+    notification = function(method, params)
+      if method == "textDocument/publishDiagnostics" then
+        local document = documents[params.uri]
+        params.diagnostics = vim.tbl_filter(function(diagnostic)
+          local line = diagnostic.range.start.line
+          if not (document and document.first and document.last > document.first) then return false end
+          if line >= document.last then
+            diagnostic.range = {
+              start = { line = document.last - 1, character = 0 },
+              ["end"] = { line = document.last - 1, character = 1 },
+            }
+          end
+          return line >= document.first
+        end, params.diagnostics)
+      end
+      dispatchers.notification(method, params)
+    end,
+  })
+  local rpc = vim.lsp.rpc.start({ vim.fn.exepath "yaml-language-server", "--stdio" }, wrapped, {
+    cwd = config.root_dir,
+  })
+  local rpc_notify, rpc_request = rpc.notify, rpc.request
+  local local_request_id = 0
+  local encoding = "utf-16"
+
+  local function project(uri, text)
+    local yaml, first, last = markdown.garden_frontmatter_projection(text)
+    local content = vim.fn.expand "~/workspace/garden/content/"
+    documents[uri] = {
+      first = first,
+      last = last,
+      path = vim.uri_to_fname(uri):sub(#content + 1):gsub("%.md$", ""),
+      lines = vim.split(yaml, "\n", { plain = true }),
+    }
+    return yaml
+  end
+
+  rpc.notify = function(method, params)
+    if method == "textDocument/didOpen" then
+      params = vim.deepcopy(params)
+      local document = params.textDocument
+      document.languageId = "yaml"
+      document.text = project(document.uri, document.text)
+    elseif method == "textDocument/didChange" then
+      params = vim.deepcopy(params)
+      for _, change in ipairs(params.contentChanges) do
+        change.text = project(params.textDocument.uri, change.text)
+      end
+    elseif method == "textDocument/didSave" and params.text then
+      params = vim.deepcopy(params)
+      params.text = project(params.textDocument.uri, params.text)
+    elseif method == "textDocument/didClose" then
+      documents[params.textDocument.uri] = nil
+    end
+    return rpc_notify(method, params)
+  end
+
+  rpc.request = function(method, params, callback, notify_reply_callback)
+    local requested_document = params and params.textDocument and documents[params.textDocument.uri]
+    if params and params.textDocument and params.position then
+      local document = requested_document
+      local line = params.position.line
+      if not (document and document.first and line >= document.first and line < document.last) then
+        local_request_id = local_request_id - 1
+        local id = local_request_id
+        vim.schedule(function()
+          callback(nil, nil)
+          if notify_reply_callback then notify_reply_callback(id) end
+        end)
+        return true, id
+      end
+    end
+    return rpc_request(method, params, function(err, result)
+      if method == "initialize" and result then
+        encoding = result.capabilities.positionEncoding or "utf-16"
+        -- Full sync lets the projection handle inserted or removed frontmatter fences.
+        result.capabilities.textDocumentSync = { openClose = true, change = 1 }
+        result.capabilities.completionProvider.triggerCharacters = { ":", " ", '"', "'", "[", ",", "/", "#", "|" }
+        result.capabilities.documentFormattingProvider = false
+        result.capabilities.documentRangeFormattingProvider = false
+        result.capabilities.documentOnTypeFormattingProvider = nil
+        result.capabilities.documentSymbolProvider = false
+        result.capabilities.foldingRangeProvider = false
+        result.capabilities.codeActionProvider = false
+        result.capabilities.executeCommandProvider = nil
+        result.capabilities.renameProvider = false
+        result.capabilities.selectionRangeProvider = false
+      elseif method == "textDocument/completion" and result then
+        -- YAML changes from a key to its value inside the same Blink context.
+        result = { isIncomplete = true, items = result.items or result }
+        local document = requested_document
+        if document then
+          local dynamic = garden_dynamic_completions(document, params.position, encoding)
+          if dynamic then
+            result = dynamic
+          else
+            local line = document.lines[params.position.line + 1] or ""
+            local col = vim.str_byteindex(line, encoding, params.position.character, false)
+            local scalar = garden_scalar(line, col)
+            if scalar and scalar.quote then
+              for _, item in ipairs(result.items) do
+                if item.kind == 12 then
+                  local text = item.label
+                  if text ~= "null" and text ~= "true" and text ~= "false" and not tonumber(text) then
+                    text = garden_quote(text, scalar.quote)
+                  end
+                  item.insertTextFormat = 1
+                  item.textEdit = garden_text_edit(line, params.position.line, scalar, text, encoding)
+                end
+              end
+            end
+          end
+        end
+      end
+      callback(err, result)
+    end, notify_reply_callback)
+  end
+  return rpc
+end
+
+---@param bufnr integer
+---@return boolean
+function markdown.is_garden_content(bufnr)
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  return path:match "%.md$" ~= nil and lsp.path_is_under(path, vim.fn.expand "~/workspace/garden/content")
+end
+
+---@return boolean
+function markdown.in_garden_frontmatter()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.bo[bufnr].filetype ~= "markdown" or not markdown.is_garden_content(bufnr) then return false end
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, row, false)
+  if row < 2 or not lines[1]:match "^---%s*$" then return false end
+  for i = 2, #lines do
+    if lines[i]:match "^---%s*$" or lines[i]:match "^%.%.%.%s*$" then return false end
+  end
+  return true
+end
+
+function markdown.garden_completion_triggers()
+  local frontmatter = markdown.in_garden_frontmatter()
+  local saved = vim.b.simple_garden_trigger_defaults
+  if not frontmatter and not saved then return end
+  local config = vim.deepcopy(vim.b.blink_cmp or {})
+  config.completion = config.completion or {}
+  config.completion.trigger = config.completion.trigger or {}
+  local trigger = config.completion.trigger
+  if frontmatter then
+    if not saved then
+      vim.b.simple_garden_trigger_defaults = {
+        blocked = trigger.show_on_blocked_trigger_characters or vim.NIL,
+        blocked_on_enter = trigger.show_on_x_blocked_trigger_characters or vim.NIL,
+      }
+    end
+    trigger.show_on_blocked_trigger_characters = { "\n", "\t" }
+    trigger.show_on_x_blocked_trigger_characters = {}
+  else
+    trigger.show_on_blocked_trigger_characters = saved.blocked ~= vim.NIL and saved.blocked or nil
+    trigger.show_on_x_blocked_trigger_characters = saved.blocked_on_enter ~= vim.NIL and saved.blocked_on_enter or nil
+    vim.b.simple_garden_trigger_defaults = nil
+  end
+  vim.b.blink_cmp = config
+end
+
+---@param bufnr integer
+function markdown.start_garden_frontmatter(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].filetype ~= "markdown" then return end
+  local clients = vim.lsp.get_clients { bufnr = bufnr, name = "garden_frontmatter" }
+  if not markdown.is_garden_content(bufnr) then
+    for _, client in ipairs(clients) do
+      vim.lsp.buf_detach_client(bufnr, client.id)
+    end
+    return
+  end
+  local garden_root = vim.fn.expand "~/workspace/garden"
+  if M.is_bigfile(bufnr) or vim.bo[bufnr].buftype ~= "" then return end
+  if #clients > 0 then return end
+  lsp.prepend_mason_bin()
+  if vim.fn.executable "yaml-language-server" == 0 then return end
+  local schema = vim.fs.joinpath(vim.fn.stdpath "config", "schemas/garden-frontmatter.json")
+  if vim.fn.filereadable(schema) == 0 then return end
+  markdown.refresh_garden_frontmatter_index()
+
+  lsp.configure_defaults()
+  vim.lsp.start({
+    name = "garden_frontmatter",
+    cmd = garden_frontmatter_rpc,
+    root_dir = garden_root,
+    settings = {
+      redhat = { telemetry = { enabled = false } },
+      yaml = {
+        schemas = { [vim.uri_from_fname(schema)] = { "**/*.md" } },
+        schemaStore = { enable = false },
+        format = { enable = false },
+        validate = true,
+        completion = true,
+        hover = true,
+        keyOrdering = false,
+      },
+    },
+  }, { bufnr = bufnr, silent = true })
+end
+
+function markdown.garden_frontmatter()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if not markdown.is_garden_content(bufnr) then
+    M.warn "GardenFrontmatter: open a Markdown note under ~/workspace/garden/content"
+    return
+  end
+  if not vim.bo[bufnr].modifiable then return end
+  local first = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1] or ""
+  if not first:match "^---%s*$" then vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, { "---", "", "---", "" }) end
+  vim.api.nvim_win_set_cursor(0, { 2, 0 })
+  markdown.start_garden_frontmatter(bufnr)
+end
+
+local garden_schema_refreshing = false
+
+function markdown.refresh_garden_frontmatter_schema()
+  if garden_schema_refreshing then return end
+  if vim.fn.executable "node" == 0 then
+    M.warn "GardenFrontmatterSchema: node is required to read the Garden's TypeScript declarations"
+    return
+  end
+  garden_schema_refreshing = true
+  local script = vim.fs.joinpath(vim.fn.stdpath "config", "scripts/garden_frontmatter_schema.mjs")
+  vim.system({ "node", script }, { text = true, timeout = 30000 }, function(result)
+    vim.schedule(function()
+      garden_schema_refreshing = false
+      if result.code ~= 0 then
+        M.warn(result.stderr or "schema generation failed", { title = "GardenFrontmatterSchema" })
+        return
+      end
+      local buffers = {}
+      for _, client in ipairs(vim.lsp.get_clients { name = "garden_frontmatter" }) do
+        for bufnr in pairs(client.attached_buffers) do
+          buffers[bufnr] = true
+          vim.lsp.buf_detach_client(bufnr, client.id)
+        end
+        client:stop(true)
+      end
+      for bufnr in pairs(buffers) do
+        markdown.start_garden_frontmatter(bufnr)
+      end
+      M.info(vim.trim(result.stdout or "schema refreshed"), { title = "GardenFrontmatterSchema" })
+    end)
+  end)
+end
 
 return M

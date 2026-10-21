@@ -110,15 +110,40 @@ local function start_markdown_oxide(bufnr)
 end
 
 local markdown_buf = vim.api.nvim_get_current_buf()
+vim.api.nvim_create_autocmd("BufWritePost", {
+  group = vim.api.nvim_create_augroup("simple_garden_index", { clear = false }),
+  buffer = markdown_buf,
+  callback = function(ev)
+    if Util.markdown.is_garden_content(ev.buf) then
+      Util.markdown.refresh_garden_frontmatter_index(vim.api.nvim_buf_get_name(ev.buf))
+    end
+  end,
+})
+vim.api.nvim_create_autocmd({ "InsertEnter", "CursorMovedI", "TextChangedI" }, {
+  group = vim.api.nvim_create_augroup("simple_garden_completion", { clear = false }),
+  buffer = markdown_buf,
+  callback = function() Util.markdown.garden_completion_triggers() end,
+})
+local function start_markdown_servers(bufnr)
+  start_markdown_oxide(bufnr)
+  Util.markdown.start_garden_frontmatter(bufnr)
+end
+
+vim.api.nvim_create_autocmd("BufFilePost", {
+  group = vim.api.nvim_create_augroup("simple_garden_frontmatter", { clear = false }),
+  buffer = markdown_buf,
+  callback = function(ev) Util.markdown.start_garden_frontmatter(ev.buf) end,
+})
+
 if vim.v.vim_did_enter == 0 then
   vim.api.nvim_create_autocmd("VimEnter", {
     once = true,
     callback = function()
-      vim.schedule(function() start_markdown_oxide(markdown_buf) end)
+      vim.schedule(function() start_markdown_servers(markdown_buf) end)
     end,
   })
 else
-  start_markdown_oxide(markdown_buf)
+  start_markdown_servers(markdown_buf)
 end
 vim.cmd.runtime "after/ftplugin/latex.lua"
 

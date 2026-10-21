@@ -1,3 +1,13 @@
+vim.api.nvim_create_user_command("GardenFrontmatter", Util.markdown.garden_frontmatter, {
+  desc = "garden: open or insert frontmatter",
+})
+vim.api.nvim_create_user_command("GardenFrontmatterSchema", Util.markdown.refresh_garden_frontmatter_schema, {
+  desc = "garden: refresh frontmatter schema from Quartz sources",
+})
+vim.api.nvim_create_user_command("GardenFrontmatterIndex", Util.markdown.rescan_garden_frontmatter_index, {
+  desc = "garden: refresh tag and wikilink suggestions",
+})
+
 vim.api.nvim_create_user_command("Cheatsheet", function(opts)
   local kind = opts.args == "" and "keymaps" or opts.args
   if kind ~= "keymaps" and kind ~= "commands" then

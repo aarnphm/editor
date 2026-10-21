@@ -1,0 +1,3072 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Garden frontmatter",
+  "description": "Generated from Garden declarations and consumers by scripts/garden_frontmatter_schema.mjs. Custom metadata remains allowed; normalized and authored shapes can differ.",
+  "type": [
+    "object",
+    "null"
+  ],
+  "properties": {
+    "abstract": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Abstract rendered with Markdown links, wikilinks, authored HTML, and LaTeX.\n\nSource: quartz/plugins/transformers/frontmatter.ts:276."
+    },
+    "address": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Place address.\n\nSource: quartz/util/base/render.ts:1766."
+    },
+    "alias": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for aliases. Accepted names, in precedence order: aliases, alias.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "aliases": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "aliases: a list, or a comma-separated scalar for fields normalized by the transformer.\n\nSource: quartz/plugins/transformers/frontmatter.ts:275."
+    },
+    "alt": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "author": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for authors. Accepted names, in precedence order: author, authors.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "authors": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "authors: a list, or a comma-separated scalar for fields normalized by the transformer.\n\nSource: quartz/plugins/transformers/frontmatter.ts:297."
+    },
+    "calendar": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Map calendar years to event keys and official URLs.\n\nSource: quartz/util/triathlon-calendar.ts: parseTriathlonCalendars."
+    },
+    "category": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "chatgpt": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "citations": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Enable citation rendering (false opts out)."
+    },
+    "claude": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "codex": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "collaborator": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Collaborator names or wikilinks shown in content metadata.\n\nSource: quartz/components/ContentMeta.tsx:54."
+    },
+    "collaborators": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Collaborator names or wikilinks shown in content metadata.\n\nSource: quartz/components/ContentMeta.tsx:54."
+    },
+    "collapseHeadings": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Enable collapsible headings (false opts out).\n\nSource: quartz/plugins/transformers/frontmatter.ts:292."
+    },
+    "comments": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Enable the comments component (true by default).\n\nSource: quartz/plugins/transformers/frontmatter.ts:290."
+    },
+    "coordinates": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "course": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "string",
+              "description": "Garden number metadata.\n\nSource: quartz/util/course.ts:26."
+            },
+            "name": {
+              "type": "string",
+              "description": "Garden name metadata.\n\nSource: quartz/util/course.ts:27."
+            },
+            "term": {
+              "type": "string",
+              "description": "Garden term metadata.\n\nSource: quartz/util/course.ts:28."
+            },
+            "level": {
+              "type": "string",
+              "description": "Garden level metadata.\n\nSource: quartz/util/course.ts:29."
+            },
+            "instructors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Garden instructors metadata.\n\nSource: quartz/util/course.ts:30."
+            },
+            "source": {
+              "type": "string",
+              "description": "Garden source metadata.\n\nSource: quartz/util/course.ts:31."
+            },
+            "unitKind": {
+              "type": "string",
+              "enum": [
+                "lecture",
+                "week",
+                "session"
+              ],
+              "description": "Garden unitKind metadata.\n\nSource: quartz/util/course.ts:32."
+            },
+            "parts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Garden parts metadata.\n\nSource: quartz/util/course.ts:33."
+            },
+            "trailing": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Garden trailing metadata.\n\nSource: quartz/util/course.ts:34."
+            },
+            "units": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "n": {
+                    "type": "number",
+                    "description": "Garden n metadata.\n\nSource: quartz/util/course.ts:16."
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Garden title metadata.\n\nSource: quartz/util/course.ts:17."
+                  },
+                  "sessions": {
+                    "type": "string",
+                    "description": "Garden sessions metadata.\n\nSource: quartz/util/course.ts:18."
+                  },
+                  "part": {
+                    "type": "number",
+                    "description": "Garden part metadata.\n\nSource: quartz/util/course.ts:19."
+                  },
+                  "keyDates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Garden keyDates metadata.\n\nSource: quartz/util/course.ts:20."
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Garden id metadata.\n\nSource: quartz/util/course.ts:7."
+                        },
+                        "file": {
+                          "type": "string",
+                          "description": "Garden file metadata.\n\nSource: quartz/util/course.ts:8."
+                        },
+                        "youtube": {
+                          "type": "string",
+                          "description": "Garden youtube metadata.\n\nSource: quartz/util/course.ts:9."
+                        },
+                        "duration": {
+                          "type": "number",
+                          "description": "Video length in seconds, from the vendored captions.\n\nSource: quartz/util/course.ts:11."
+                        },
+                        "cues": {
+                          "type": "number",
+                          "description": "Garden cues metadata.\n\nSource: quartz/util/course.ts:12."
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    "description": "Garden resources metadata.\n\nSource: quartz/util/course.ts:21."
+                  },
+                  "due": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Garden due metadata.\n\nSource: quartz/util/course.ts:22."
+                  }
+                },
+                "additionalProperties": true
+              },
+              "description": "Garden units metadata.\n\nSource: quartz/util/course.ts:35."
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Course home metadata, including units and their resources.\n\nSource: quartz/util/course.ts: parseCourseRecord."
+    },
+    "cover": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for socialImage. Accepted names, in precedence order: socialImage, image, cover.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "created": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for date. Accepted names, in precedence order: date, created.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "cssclasses": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "cssclasses: a list, or a comma-separated scalar for fields normalized by the transformer.\n\nSource: quartz/plugins/transformers/frontmatter.ts:286."
+    },
+    "date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for published. Accepted names, in precedence order: publishDate, published, date.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Page summary. Markdown links, wikilinks, authored HTML, and LaTeX render inline. Link destinations and authored length are preserved; search and social metadata use readable link labels.\n\nSource: quartz/plugins/transformers/frontmatter.ts:280."
+    },
+    "dexa": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": "Garden date metadata.\n\nSource: quartz/plugins/stores/analytics.ts:105."
+              },
+              "totalLbs": {
+                "type": "number",
+                "description": "Garden totalLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:106."
+              },
+              "fatLbs": {
+                "type": "number",
+                "description": "Garden fatLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:107."
+              },
+              "leanLbs": {
+                "type": "number",
+                "description": "Garden leanLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:108."
+              },
+              "bmcLbs": {
+                "type": "number",
+                "description": "Garden bmcLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:109."
+              },
+              "ffmLbs": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden ffmLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:110."
+              },
+              "bodyFat": {
+                "type": "number",
+                "description": "Garden bodyFat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:112."
+              },
+              "vatLbs": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden vatLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:113."
+              },
+              "bmd": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden bmd metadata.\n\nSource: quartz/plugins/stores/analytics.ts:114."
+              },
+              "bmdT": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden bmdT metadata.\n\nSource: quartz/plugins/stores/analytics.ts:115."
+              },
+              "rmr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden rmr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:116."
+              },
+              "rsmi": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden rsmi metadata.\n\nSource: quartz/plugins/stores/analytics.ts:117."
+              },
+              "ag": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden ag metadata.\n\nSource: quartz/plugins/stores/analytics.ts:118."
+              },
+              "arms": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fat": {
+                        "type": "number",
+                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:99."
+                      },
+                      "lean": {
+                        "type": "number",
+                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics.ts:100."
+                      },
+                      "bmc": {
+                        "type": "number",
+                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics.ts:101."
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden arms metadata.\n\nSource: quartz/plugins/stores/analytics.ts:119."
+              },
+              "legs": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fat": {
+                        "type": "number",
+                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:99."
+                      },
+                      "lean": {
+                        "type": "number",
+                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics.ts:100."
+                      },
+                      "bmc": {
+                        "type": "number",
+                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics.ts:101."
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden legs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:120."
+              },
+              "trunk": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fat": {
+                        "type": "number",
+                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:99."
+                      },
+                      "lean": {
+                        "type": "number",
+                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics.ts:100."
+                      },
+                      "bmc": {
+                        "type": "number",
+                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics.ts:101."
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden trunk metadata.\n\nSource: quartz/plugins/stores/analytics.ts:121."
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Authored body-composition lab records.\n\nSource: quartz/plugins/stores/analytics.ts: parseDexa."
+    },
+    "director": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "draft": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Exclude this page when the draft filter is enabled.\n\nSource: quartz/plugins/transformers/frontmatter.ts:282."
+    },
+    "editor": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "email": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "true generates an email signature; an address remains ordinary authored metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:298."
+    },
+    "emailSent": {
+      "description": "Metadata read by the Garden's quartz/plugins/emitters/email.tsx.\n\nSource: quartz/plugins/emitters/email.tsx:691."
+    },
+    "enableToc": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Show the table of contents.\n\nSource: quartz/plugins/transformers/frontmatter.ts:285."
+    },
+    "events": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "overall": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "swim": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "bike": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "run": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "T1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "T2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "distance": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "participated": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Race results keyed by event record key. Times use HH:MM:SS.\n\nSource: quartz/util/triathlon-calendar.ts."
+    },
+    "external": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "finished": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "flashcards": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "boolean",
+              "description": "Optional. true renders flashcards at /<slug> and moves the source note to /<slug>/source. Absent or false keeps the source note at /<slug> and the study page at /<slug>/flashcards."
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Flashcard rendering options for a note with a companion deck.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "folderLayout": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "default",
+            "letter",
+            "technical",
+            "technical-tractatus",
+            "reflection",
+            "letter-poem",
+            "L->ET|A",
+            "L->EAT",
+            "A|L",
+            "L",
+            "triathlon",
+            "course",
+            "courses",
+            "flashcards",
+            "resource",
+            "study-log",
+            "statements",
+            "masonry",
+            "letter-nf",
+            "lydia"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for pageLayout. Accepted names, in precedence order: pageLayout, folderLayout, layout.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "folderSort": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "alphabetical",
+            "alphabetic",
+            "title",
+            "date",
+            "chronological",
+            "created",
+            "modified",
+            "published",
+            "natural",
+            "grammar",
+            "grammatical",
+            "lexical",
+            "lexicographic",
+            "path",
+            "file",
+            "filename"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Folder ordering: title, date or natural, with aliases.\n\nSource: quartz/plugins/transformers/frontmatter.ts:293."
+    },
+    "gemini": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "generatedSocialImage": {
+      "description": "Metadata read by the Garden's quartz/plugins/emitters/ogImage.tsx.\n\nSource: quartz/plugins/emitters/ogImage.tsx:227."
+    },
+    "id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Note identifier, normally the filename without .md.\n\nSource: Neovim lua/utils.lua: markdown.format_frontmatter."
+    },
+    "image": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for socialImage. Accepted names, in precedence order: socialImage, image, cover.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "lang": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Page language or locale code, for example en or fr.\n\nSource: quartz/plugins/transformers/frontmatter.ts:284."
+    },
+    "language": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "last-modified": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for modified. Accepted names, in precedence order: lastmod, updated, last-modified, modified.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "lastmod": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for modified. Accepted names, in precedence order: lastmod, updated, last-modified, modified.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "latex": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Garden source metadata.\n\nSource: quartz/util/course.ts:125."
+            },
+            "lines": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "Garden lines metadata.\n\nSource: quartz/util/course.ts:126."
+            },
+            "section": {
+              "type": "number",
+              "description": "Garden section metadata.\n\nSource: quartz/util/course.ts:127."
+            },
+            "unit": {
+              "type": "number",
+              "description": "Garden unit metadata.\n\nSource: quartz/util/course.ts:128."
+            },
+            "pset": {
+              "type": "number",
+              "description": "Garden pset metadata.\n\nSource: quartz/util/course.ts:129."
+            },
+            "pdf": {
+              "type": "string",
+              "description": "Garden pdf metadata.\n\nSource: quartz/util/course.ts:130."
+            },
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "dateSource": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Provenance for a note rendered from a vendored LaTeX source.\n\nSource: quartz/util/course.ts: latexOf."
+    },
+    "layout": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "default",
+            "letter",
+            "technical",
+            "technical-tractatus",
+            "reflection",
+            "letter-poem",
+            "L->ET|A",
+            "L->EAT",
+            "A|L",
+            "L",
+            "triathlon",
+            "course",
+            "courses",
+            "flashcards",
+            "resource",
+            "study-log",
+            "statements",
+            "masonry",
+            "letter-nf",
+            "lydia"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for pageLayout. Accepted names, in precedence order: pageLayout, folderLayout, layout.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "license": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "License label, for example CC BY-NC-SA 4.0.\n\nSource: quartz/components/CourseHome.tsx:469."
+    },
+    "license_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Link to the license terms.\n\nSource: quartz/components/CourseHome.tsx:470."
+    },
+    "licenseUrl": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for license_url in the License component.\n\nSource: quartz/components/License.tsx:34."
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Training location used by the triathlon page.\n\nSource: quartz/components/pages/TriathlonPage.tsx:83."
+    },
+    "maintenance": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "chain": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "distance": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "lubricant": {
+                    "type": "string"
+                  },
+                  "since": {
+                    "type": "string",
+                    "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                  },
+                  "waxed": {
+                    "type": "boolean"
+                  },
+                  "chainring": {
+                    "type": "string"
+                  },
+                  "ospw": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            },
+            "service": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                        },
+                        "distance": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "place": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "tires": {
+              "type": "object",
+              "properties": {
+                "front": {
+                  "type": "object",
+                  "properties": {
+                    "tires": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "distance": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "range": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "start": {
+                                    "type": "string",
+                                    "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                  },
+                                  "end": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "reason": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "repaired": {
+                                    "type": [
+                                      "boolean",
+                                      "null"
+                                    ]
+                                  }
+                                },
+                                "additionalProperties": true
+                              }
+                            },
+                            "start": {
+                              "type": "string",
+                              "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                            },
+                            "end": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "repaired": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            }
+                          },
+                          "additionalProperties": true
+                        }
+                      }
+                    },
+                    "tube": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "distance": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "range": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "start": {
+                                    "type": "string",
+                                    "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                  },
+                                  "end": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "reason": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "repaired": {
+                                    "type": [
+                                      "boolean",
+                                      "null"
+                                    ]
+                                  }
+                                },
+                                "additionalProperties": true
+                              }
+                            },
+                            "start": {
+                              "type": "string",
+                              "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                            },
+                            "end": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "repaired": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            }
+                          },
+                          "additionalProperties": true
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                },
+                "rear": {
+                  "type": "object",
+                  "properties": {
+                    "tires": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "distance": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "range": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "start": {
+                                    "type": "string",
+                                    "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                  },
+                                  "end": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "reason": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "repaired": {
+                                    "type": [
+                                      "boolean",
+                                      "null"
+                                    ]
+                                  }
+                                },
+                                "additionalProperties": true
+                              }
+                            },
+                            "start": {
+                              "type": "string",
+                              "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                            },
+                            "end": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "repaired": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            }
+                          },
+                          "additionalProperties": true
+                        }
+                      }
+                    },
+                    "tube": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "distance": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "range": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "start": {
+                                    "type": "string",
+                                    "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                  },
+                                  "end": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "reason": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "repaired": {
+                                    "type": [
+                                      "boolean",
+                                      "null"
+                                    ]
+                                  }
+                                },
+                                "additionalProperties": true
+                              }
+                            },
+                            "start": {
+                              "type": "string",
+                              "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                            },
+                            "end": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reason": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "repaired": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            }
+                          },
+                          "additionalProperties": true
+                        }
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "distance": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "range": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "start": {
+                          "type": "string",
+                          "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                        },
+                        "end": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "reason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "repaired": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  },
+                  "start": {
+                    "type": "string",
+                    "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                  },
+                  "end": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "repaired": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Bike maintenance. Component histories use lists of field lists; distance is authored in miles.\n\nSource: quartz/util/triathlon-maintenance.ts: parseTriathlonMaintenance."
+    },
+    "masonry": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Note references for the masonry layout.\n\nSource: quartz/plugins/transformers/frontmatter.ts:271."
+    },
+    "menu": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Use the menu renderer.\n\nSource: quartz/components/renderPage.tsx:1190."
+    },
+    "metadata": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ebnf": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Per-note metadata grammar used by the Obsidian metadata tool.\n\nSource: content/.obsidian/plugins/obsidian-metadata/main.ts: extractEbnfFromFrontmatter."
+    },
+    "modified": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00.\n\nSource: quartz/plugins/transformers/frontmatter.ts:278."
+    },
+    "noCitations": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Disable citation rendering when true."
+    },
+    "noCite": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Bibliography keys to include without an inline citation, such as '@paper' or '@*'.\n\nSource: quartz/plugins/transformers/citations.ts."
+    },
+    "noindex": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Hide from indexing and discovery. The transformer accepts booleans and common true/false spellings.\n\nSource: quartz/plugins/transformers/frontmatter.ts:289."
+    },
+    "notebook": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "notes": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "pageLayout": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "default",
+            "letter",
+            "technical",
+            "technical-tractatus",
+            "reflection",
+            "letter-poem",
+            "L->ET|A",
+            "L->EAT",
+            "A|L",
+            "L",
+            "triathlon",
+            "course",
+            "courses",
+            "flashcards",
+            "resource",
+            "study-log",
+            "statements",
+            "masonry",
+            "letter-nf",
+            "lydia"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Page or folder renderer. layout and folderLayout are accepted aliases.\n\nSource: quartz/plugins/transformers/frontmatter.ts:268."
+    },
+    "password": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Password used by the protected-content pipeline.\n\nSource: quartz/util/base/browser-data.ts:62."
+    },
+    "pdf": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "pdfTitles": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "PDF display titles, keyed by relative filenames on folder index notes.\n\nSource: quartz/util/listing-signature.ts:8."
+    },
+    "permalink": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for permalinks. Accepted names, in precedence order: permalink, permalinks.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "permalinks": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "permalinks: a list, or a comma-separated scalar for fields normalized by the transformer.\n\nSource: quartz/plugins/transformers/frontmatter.ts:273."
+    },
+    "poem": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Use the poem renderer.\n\nSource: quartz/components/renderPage.tsx:1190."
+    },
+    "posters": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "powerpoint": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for slides. Accepted names, in precedence order: slides, slide, ppt, powerpoint.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "ppt": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for slides. Accepted names, in precedence order: slides, slide, ppt, powerpoint.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "priority": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Numeric page priority metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:272."
+    },
+    "private": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Exclude this page when the private or draft filter is enabled.\n\nSource: quartz/plugins/transformers/frontmatter.ts:283."
+    },
+    "problems": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "stuck",
+                  "solved"
+                ],
+                "description": "Garden state metadata.\n\nSource: quartz/util/course-study.ts:38."
+              },
+              "date": {
+                "type": "string",
+                "description": "Garden date metadata.\n\nSource: quartz/util/course-study.ts:39."
+              },
+              "reveal": {
+                "type": "string",
+                "description": "Day the official solution was opened for this problem.\n\nSource: quartz/util/course-study.ts:41."
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Problem-number maps with state, date and solution reveal date.\n\nSource: quartz/util/course-study.ts: parseProblems."
+    },
+    "protected": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Render password-protected content. Password handling belongs to the protected-content pipeline.\n\nSource: quartz/components/ContentMeta.tsx:184."
+    },
+    "publish": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Include this page when the explicit-publish filter is enabled.\n\nSource: quartz/plugins/transformers/frontmatter.ts:281."
+    },
+    "publishDate": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for published. Accepted names, in precedence order: publishDate, published, date.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "published": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00.\n\nSource: quartz/plugins/transformers/frontmatter.ts:279."
+    },
+    "race": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Target race label.\n\nSource: quartz/components/pages/TriathlonPage.tsx:85."
+    },
+    "rating": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Place rating.\n\nSource: quartz/util/base/render.ts:1772."
+    },
+    "resource": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "video",
+                "captions",
+                "transcript",
+                "exam",
+                "exam-solution",
+                "pset",
+                "pset-solution",
+                "tex",
+                "notes",
+                "notes-full",
+                "chapter",
+                "reading",
+                "archive",
+                "image",
+                "other",
+                "collection",
+                "index",
+                "notes-index"
+              ],
+              "description": "Garden kind metadata.\n\nSource: quartz/util/course.ts:91."
+            },
+            "file": {
+              "type": "string",
+              "description": "Garden file metadata.\n\nSource: quartz/util/course.ts:92."
+            },
+            "bytes": {
+              "type": "number",
+              "description": "Garden bytes metadata.\n\nSource: quartz/util/course.ts:93."
+            },
+            "n": {
+              "type": "number",
+              "description": "Garden n metadata.\n\nSource: quartz/util/course.ts:94."
+            },
+            "due": {
+              "type": "number",
+              "description": "Unit number a problem set is due at.\n\nSource: quartz/util/course.ts:96."
+            },
+            "youtube": {
+              "type": "string",
+              "description": "Garden youtube metadata.\n\nSource: quartz/util/course.ts:97."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Garden duration metadata.\n\nSource: quartz/util/course.ts:98."
+            },
+            "cues": {
+              "type": "number",
+              "description": "Garden cues metadata.\n\nSource: quartz/util/course.ts:99."
+            },
+            "captions": {
+              "type": "string",
+              "description": "Garden captions metadata.\n\nSource: quartz/util/course.ts:100."
+            },
+            "captionsId": {
+              "type": "string",
+              "description": "Garden captionsId metadata.\n\nSource: quartz/util/course.ts:101."
+            },
+            "transcript": {
+              "type": "string",
+              "description": "Garden transcript metadata.\n\nSource: quartz/util/course.ts:102."
+            },
+            "transcriptId": {
+              "type": "string",
+              "description": "Garden transcriptId metadata.\n\nSource: quartz/util/course.ts:103."
+            },
+            "of": {
+              "type": "string",
+              "description": "Video resource id a captions or transcript file belongs to.\n\nSource: quartz/util/course.ts:105."
+            },
+            "full": {
+              "type": "boolean",
+              "description": "Garden full metadata.\n\nSource: quartz/util/course.ts:106."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Rendered notes slug for a `.tex` source.\n\nSource: quartz/util/course.ts:108."
+            },
+            "type": {
+              "type": "string",
+              "description": "OCW collection label.\n\nSource: quartz/util/course.ts:110."
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Garden items metadata.\n\nSource: quartz/util/course.ts:111."
+            },
+            "links": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Garden links metadata.\n\nSource: quartz/util/course.ts:112."
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Course resource metadata. Use layout: resource.\n\nSource: quartz/util/course.ts: parseResourceRecord."
+    },
+    "rss": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Introductory text for the folder's Atom feed.\n\nSource: quartz/plugins/emitters/contentIndex.tsx:1088."
+    },
+    "runtime": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "seealso": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "string",
+                        "number"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Related-note wikilinks in a list or labelled map. Citation keys from linked notes can enter noCite.\n\nSource: quartz/plugins/transformers/citations.ts."
+    },
+    "semantic": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Include the page in semantic indexing (false opts out).\n\nSource: quartz/plugins/emitters/semantic.ts:136."
+    },
+    "signature": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Signature appended to content.\n\nSource: quartz/plugins/transformers/frontmatter.ts:295."
+    },
+    "slide": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for slides. Accepted names, in precedence order: slides, slide, ppt, powerpoint.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "slides": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Enable slide generation from this note. slide, ppt and powerpoint are aliases.\n\nSource: quartz/plugins/transformers/frontmatter.ts:291."
+    },
+    "social": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for socials. Accepted names, in precedence order: social, socials.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "socialDescription": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for description. Accepted names, in precedence order: description, socialDescription.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "socialImage": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Social preview image URL or quoted wikilink. image and cover are aliases.\n\nSource: quartz/plugins/transformers/frontmatter.ts:287."
+    },
+    "socials": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Social links keyed by service name. Authored lists of service maps remain accepted; TagList renders a map.\n\nSource: quartz/plugins/transformers/frontmatter.ts:296."
+    },
+    "solutionTerm": {
+      "description": "Metadata read by the Garden's quartz/components/CourseDesk.tsx.\n\nSource: quartz/components/CourseDesk.tsx:93."
+    },
+    "sort": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "alphabetical",
+            "alphabetic",
+            "title",
+            "date",
+            "chronological",
+            "created",
+            "modified",
+            "published",
+            "natural",
+            "grammar",
+            "grammatical",
+            "lexical",
+            "lexicographic",
+            "path",
+            "file",
+            "filename"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for folderSort.\n\nSource: quartz/components/pages/FolderContent.tsx:502."
+    },
+    "sortBy": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "alphabetical",
+            "alphabetic",
+            "title",
+            "date",
+            "chronological",
+            "created",
+            "modified",
+            "published",
+            "natural",
+            "grammar",
+            "grammatical",
+            "lexical",
+            "lexicographic",
+            "path",
+            "file",
+            "filename"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for folderSort.\n\nSource: quartz/components/pages/FolderContent.tsx:503."
+    },
+    "source": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "status": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "strava": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Start date for Strava ingestion.\n\nSource: quartz/components/renderPage.tsx:1610."
+    },
+    "streamCanonical": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Canonical route for a generated stream page.\n\nSource: quartz/components/pages/StreamPage.tsx:143."
+    },
+    "studio": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "study": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "read": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+              }
+            },
+            "problems": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "description": "Date or timestamp, for example 2026-10-11 or 2026-10-11 08:30:00 GMT-04:00."
+              }
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Unit-number maps of reading and problem completion dates.\n\nSource: quartz/util/course.ts: parseStudyLog."
+    },
+    "subcategory": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "tags": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "tags: a list, or a comma-separated scalar for fields normalized by the transformer.\n\nSource: quartz/plugins/transformers/frontmatter.ts:274."
+    },
+    "title": {
+      "anyOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Page title. Quartz converts scalars to text and falls back to the filename.\n\nSource: quartz/plugins/transformers/frontmatter.ts:267."
+    },
+    "transclude": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "dynalist": {
+              "type": "boolean",
+              "description": "Garden dynalist metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:257."
+            },
+            "title": {
+              "type": "boolean",
+              "description": "Garden title metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:258."
+            },
+            "headings": {
+              "type": "boolean",
+              "description": "Garden headings metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:259."
+            },
+            "skipTranscludes": {
+              "type": "boolean",
+              "description": "Garden skipTranscludes metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:260."
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Control transcluded content: dynalist, title, headings, skipTranscludes.\n\nSource: quartz/plugins/transformers/frontmatter.ts:294."
+    },
+    "transclusion": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "dynalist": {
+              "type": "boolean",
+              "description": "Garden dynalist metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:257."
+            },
+            "title": {
+              "type": "boolean",
+              "description": "Garden title metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:258."
+            },
+            "headings": {
+              "type": "boolean",
+              "description": "Garden headings metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:259."
+            },
+            "skipTranscludes": {
+              "type": "boolean",
+              "description": "Garden skipTranscludes metadata.\n\nSource: quartz/plugins/transformers/frontmatter.ts:260."
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for transclude. Accepted names, in precedence order: transclude, transclusion.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "translator": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "triathlon": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Target race or training goal label.\n\nSource: quartz/components/pages/TriathlonPage.tsx:84."
+    },
+    "type": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Place categories or authored type labels.\n\nSource: quartz/util/base/render.ts:1767."
+    },
+    "unlisted": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for noindex. Accepted names, in precedence order: noindex, unlisted.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "updated": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Alias for modified. Accepted names, in precedence order: lastmod, updated, last-modified, modified.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Place or source URL.\n\nSource: quartz/util/base/render.ts:1773."
+    },
+    "visits": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "vo2max": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": "Garden date metadata.\n\nSource: quartz/plugins/stores/analytics.ts:125."
+              },
+              "value": {
+                "type": "number",
+                "description": "Garden value metadata.\n\nSource: quartz/plugins/stores/analytics.ts:126."
+              },
+              "massKg": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden massKg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:127."
+              },
+              "hrMax": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden hrMax metadata.\n\nSource: quartz/plugins/stores/analytics.ts:128."
+              },
+              "hrAtVo2max": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden hrAtVo2max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:129."
+              },
+              "vt1Hr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden vt1Hr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:130."
+              },
+              "vt1Kmh": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden vt1Kmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:131."
+              },
+              "vt2Hr": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden vt2Hr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:132."
+              },
+              "vt2Kmh": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden vt2Kmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:133."
+              },
+              "caloriesAtVt1": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden caloriesAtVt1 metadata.\n\nSource: quartz/plugins/stores/analytics.ts:134."
+              },
+              "maxKmh": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden maxKmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:135."
+              },
+              "ve": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden ve metadata.\n\nSource: quartz/plugins/stores/analytics.ts:136."
+              },
+              "percentile": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Garden percentile metadata.\n\nSource: quartz/plugins/stores/analytics.ts:137."
+              },
+              "zonesHr": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "Garden zonesHr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:138."
+              },
+              "zonesKmh": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "Garden zonesKmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:139."
+              },
+              "zonesKcal": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "Garden zonesKcal metadata.\n\nSource: quartz/plugins/stores/analytics.ts:140."
+              },
+              "profile": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "durationSec": {
+                        "type": "number",
+                        "description": "Garden durationSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:173."
+                      },
+                      "warmupEndSec": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Garden warmupEndSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:174."
+                      },
+                      "cooldownStartSec": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Garden cooldownStartSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:175."
+                      },
+                      "vt1Sec": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Garden vt1Sec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:176."
+                      },
+                      "vo2maxSec": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Garden vo2maxSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:177."
+                      },
+                      "stats": {
+                        "type": "object",
+                        "properties": {
+                          "vo2": {
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "min": {
+                                    "type": "number",
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                  },
+                                  "max": {
+                                    "type": "number",
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                  },
+                                  "avg": {
+                                    "type": "number",
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "hr": {
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "min": {
+                                    "type": "number",
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                  },
+                                  "max": {
+                                    "type": "number",
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                  },
+                                  "avg": {
+                                    "type": "number",
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "ve": {
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "min": {
+                                    "type": "number",
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                  },
+                                  "max": {
+                                    "type": "number",
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                  },
+                                  "avg": {
+                                    "type": "number",
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "rf": {
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "min": {
+                                    "type": "number",
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                  },
+                                  "max": {
+                                    "type": "number",
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                  },
+                                  "avg": {
+                                    "type": "number",
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "tv": {
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "min": {
+                                    "type": "number",
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                  },
+                                  "max": {
+                                    "type": "number",
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                  },
+                                  "avg": {
+                                    "type": "number",
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                  }
+                                },
+                                "additionalProperties": true
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "targetKmh": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "number"
+                              }
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "t": {
+                                  "type": "number",
+                                  "description": "Garden t metadata.\n\nSource: quartz/plugins/stores/analytics.ts:159."
+                                },
+                                "kmh": {
+                                  "type": "number",
+                                  "description": "Garden kmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:160."
+                                }
+                              },
+                              "additionalProperties": true
+                            }
+                          ]
+                        }
+                      },
+                      "samples": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              }
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "t": {
+                                  "type": "number",
+                                  "description": "Garden t metadata.\n\nSource: quartz/plugins/stores/analytics.ts:164."
+                                },
+                                "vo2": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ],
+                                  "description": "Garden vo2 metadata.\n\nSource: quartz/plugins/stores/analytics.ts:165."
+                                },
+                                "hr": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ],
+                                  "description": "Garden hr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:166."
+                                },
+                                "ve": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ],
+                                  "description": "Garden ve metadata.\n\nSource: quartz/plugins/stores/analytics.ts:167."
+                                },
+                                "rf": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ],
+                                  "description": "Garden rf metadata.\n\nSource: quartz/plugins/stores/analytics.ts:168."
+                                },
+                                "tv": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ],
+                                  "description": "Garden tv metadata.\n\nSource: quartz/plugins/stores/analytics.ts:169."
+                                }
+                              },
+                              "additionalProperties": true
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Authored VO₂ lab records; profile samples and target steps accept tuples or objects.\n\nSource: quartz/plugins/stores/analytics.ts: parseVo2Lab."
+    },
+    "watched": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    },
+    "year": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+    }
+  },
+  "additionalProperties": true
+}

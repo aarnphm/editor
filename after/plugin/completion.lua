@@ -55,6 +55,17 @@ vim.api.nvim_create_autocmd(blink.event or "InsertEnter", {
           lua = { inherit_defaults = true, "lazydev" },
         },
         providers = {
+          lsp = {
+            transform_items = function(_, items)
+              if not Util.markdown.in_garden_frontmatter() then return items end
+              -- Frontmatter edits must keep YAML quoting, including wikilink strings.
+              return vim.tbl_filter(function(item)
+                if item.client_name ~= "garden_frontmatter" then return false end
+                item.score_offset = 50
+                return true
+              end, items)
+            end,
+          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",
