@@ -24,8 +24,6 @@ for _, plugin in ipairs {
   vim.g["loaded_" .. plugin] = 1
 end
 
-local background = os.getenv "XDG_SYSTEM_THEME"
-vim.go.background = background ~= nil and background or "dark"
 
 if vim.uv.os_uname().sysname == "Darwin" then
   vim.g.clipboard = {
@@ -48,8 +46,6 @@ Util.bigfile.setup()
 
 hi("HighlightURL", { default = true, underline = true })
 hi("CmpGhostText", { link = "Comment", default = true })
-hi("LeapBackdrop", { link = "Comment" })
-hi("LeapMatch", { fg = vim.go.background == "dark" and "white" or "black", bold = true, nocombine = true })
 
 Util.quickfile.setup()
 
