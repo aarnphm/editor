@@ -46,7 +46,7 @@
       "version": "'main'"
     },
     "grug-far.nvim": {
-      "rev": "bbde8ef5ae46ceee2c3bd8b21fc048c5f8ffbfc0",
+      "rev": "91b7e58b6ffc6ddad5acb7a7c1df21257724449e",
       "src": "https://github.com/MagicDuck/grug-far.nvim.git",
       "version": "'main'"
     },
