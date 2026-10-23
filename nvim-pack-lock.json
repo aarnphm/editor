@@ -41,7 +41,7 @@
       "version": "'main'"
     },
     "gitsigns.nvim": {
-      "rev": "fd780920613e541cbdfac41bf711583ed49f9249",
+      "rev": "683137003522aebd6948358334164a6ba2ca7cd5",
       "src": "https://github.com/lewis6991/gitsigns.nvim.git",
       "version": "'main'"
     },
@@ -71,7 +71,7 @@
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "4d84086ab334a88201b803d11d1086406fe7e43d",
+      "rev": "a6e23131010b800ecbab85fa6adc0ff38eae2c2d",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
