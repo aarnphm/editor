@@ -27,7 +27,7 @@
           "type": "null"
         }
       ],
-      "description": "Place address.\n\nSource: quartz/util/base/render.ts:1766."
+      "description": "Place address.\n\nSource: quartz/util/base/geo-payload.ts:63."
     },
     "alias": {
       "anyOf": [
@@ -239,7 +239,7 @@
       "description": "Enable the comments component (true by default).\n\nSource: quartz/plugins/transformers/frontmatter.ts:290."
     },
     "coordinates": {
-      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
+      "description": "Metadata read by the Garden's quartz/util/base/geo-payload.ts.\n\nSource: quartz/util/base/geo-payload.ts:65."
     },
     "course": {
       "anyOf": [
@@ -248,30 +248,30 @@
           "properties": {
             "number": {
               "type": "string",
-              "description": "Garden number metadata.\n\nSource: quartz/util/course.ts:26."
+              "description": "Garden number metadata.\n\nSource: quartz/util/course/schema.ts:26."
             },
             "name": {
               "type": "string",
-              "description": "Garden name metadata.\n\nSource: quartz/util/course.ts:27."
+              "description": "Garden name metadata.\n\nSource: quartz/util/course/schema.ts:27."
             },
             "term": {
               "type": "string",
-              "description": "Garden term metadata.\n\nSource: quartz/util/course.ts:28."
+              "description": "Garden term metadata.\n\nSource: quartz/util/course/schema.ts:28."
             },
             "level": {
               "type": "string",
-              "description": "Garden level metadata.\n\nSource: quartz/util/course.ts:29."
+              "description": "Garden level metadata.\n\nSource: quartz/util/course/schema.ts:29."
             },
             "instructors": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "Garden instructors metadata.\n\nSource: quartz/util/course.ts:30."
+              "description": "Garden instructors metadata.\n\nSource: quartz/util/course/schema.ts:30."
             },
             "source": {
               "type": "string",
-              "description": "Garden source metadata.\n\nSource: quartz/util/course.ts:31."
+              "description": "Garden source metadata.\n\nSource: quartz/util/course/schema.ts:31."
             },
             "unitKind": {
               "type": "string",
@@ -280,21 +280,21 @@
                 "week",
                 "session"
               ],
-              "description": "Garden unitKind metadata.\n\nSource: quartz/util/course.ts:32."
+              "description": "Garden unitKind metadata.\n\nSource: quartz/util/course/schema.ts:32."
             },
             "parts": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "Garden parts metadata.\n\nSource: quartz/util/course.ts:33."
+              "description": "Garden parts metadata.\n\nSource: quartz/util/course/schema.ts:33."
             },
             "trailing": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "Garden trailing metadata.\n\nSource: quartz/util/course.ts:34."
+              "description": "Garden trailing metadata.\n\nSource: quartz/util/course/schema.ts:34."
             },
             "units": {
               "type": "array",
@@ -303,26 +303,26 @@
                 "properties": {
                   "n": {
                     "type": "number",
-                    "description": "Garden n metadata.\n\nSource: quartz/util/course.ts:16."
+                    "description": "Garden n metadata.\n\nSource: quartz/util/course/schema.ts:16."
                   },
                   "title": {
                     "type": "string",
-                    "description": "Garden title metadata.\n\nSource: quartz/util/course.ts:17."
+                    "description": "Garden title metadata.\n\nSource: quartz/util/course/schema.ts:17."
                   },
                   "sessions": {
                     "type": "string",
-                    "description": "Garden sessions metadata.\n\nSource: quartz/util/course.ts:18."
+                    "description": "Garden sessions metadata.\n\nSource: quartz/util/course/schema.ts:18."
                   },
                   "part": {
                     "type": "number",
-                    "description": "Garden part metadata.\n\nSource: quartz/util/course.ts:19."
+                    "description": "Garden part metadata.\n\nSource: quartz/util/course/schema.ts:19."
                   },
                   "keyDates": {
                     "type": "array",
                     "items": {
                       "type": "string"
                     },
-                    "description": "Garden keyDates metadata.\n\nSource: quartz/util/course.ts:20."
+                    "description": "Garden keyDates metadata.\n\nSource: quartz/util/course/schema.ts:20."
                   },
                   "resources": {
                     "type": "array",
@@ -331,40 +331,40 @@
                       "properties": {
                         "id": {
                           "type": "string",
-                          "description": "Garden id metadata.\n\nSource: quartz/util/course.ts:7."
+                          "description": "Garden id metadata.\n\nSource: quartz/util/course/schema.ts:7."
                         },
                         "file": {
                           "type": "string",
-                          "description": "Garden file metadata.\n\nSource: quartz/util/course.ts:8."
+                          "description": "Garden file metadata.\n\nSource: quartz/util/course/schema.ts:8."
                         },
                         "youtube": {
                           "type": "string",
-                          "description": "Garden youtube metadata.\n\nSource: quartz/util/course.ts:9."
+                          "description": "Garden youtube metadata.\n\nSource: quartz/util/course/schema.ts:9."
                         },
                         "duration": {
                           "type": "number",
-                          "description": "Video length in seconds, from the vendored captions.\n\nSource: quartz/util/course.ts:11."
+                          "description": "Video length in seconds, from the vendored captions.\n\nSource: quartz/util/course/schema.ts:11."
                         },
                         "cues": {
                           "type": "number",
-                          "description": "Garden cues metadata.\n\nSource: quartz/util/course.ts:12."
+                          "description": "Garden cues metadata.\n\nSource: quartz/util/course/schema.ts:12."
                         }
                       },
                       "additionalProperties": true
                     },
-                    "description": "Garden resources metadata.\n\nSource: quartz/util/course.ts:21."
+                    "description": "Garden resources metadata.\n\nSource: quartz/util/course/schema.ts:21."
                   },
                   "due": {
                     "type": "array",
                     "items": {
                       "type": "string"
                     },
-                    "description": "Garden due metadata.\n\nSource: quartz/util/course.ts:22."
+                    "description": "Garden due metadata.\n\nSource: quartz/util/course/schema.ts:22."
                   }
                 },
                 "additionalProperties": true
               },
-              "description": "Garden units metadata.\n\nSource: quartz/util/course.ts:35."
+              "description": "Garden units metadata.\n\nSource: quartz/util/course/schema.ts:35."
             }
           },
           "additionalProperties": true
@@ -452,23 +452,23 @@
             "properties": {
               "date": {
                 "type": "string",
-                "description": "Garden date metadata.\n\nSource: quartz/plugins/stores/analytics.ts:105."
+                "description": "Garden date metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:23."
               },
               "totalLbs": {
                 "type": "number",
-                "description": "Garden totalLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:106."
+                "description": "Garden totalLbs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:24."
               },
               "fatLbs": {
                 "type": "number",
-                "description": "Garden fatLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:107."
+                "description": "Garden fatLbs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:25."
               },
               "leanLbs": {
                 "type": "number",
-                "description": "Garden leanLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:108."
+                "description": "Garden leanLbs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:26."
               },
               "bmcLbs": {
                 "type": "number",
-                "description": "Garden bmcLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:109."
+                "description": "Garden bmcLbs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:27."
               },
               "ffmLbs": {
                 "anyOf": [
@@ -479,11 +479,11 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden ffmLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:110."
+                "description": "Garden ffmLbs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:28."
               },
               "bodyFat": {
                 "type": "number",
-                "description": "Garden bodyFat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:112."
+                "description": "Garden bodyFat metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:30."
               },
               "vatLbs": {
                 "anyOf": [
@@ -494,7 +494,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden vatLbs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:113."
+                "description": "Garden vatLbs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:31."
               },
               "bmd": {
                 "anyOf": [
@@ -505,7 +505,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden bmd metadata.\n\nSource: quartz/plugins/stores/analytics.ts:114."
+                "description": "Garden bmd metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:32."
               },
               "bmdT": {
                 "anyOf": [
@@ -516,7 +516,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden bmdT metadata.\n\nSource: quartz/plugins/stores/analytics.ts:115."
+                "description": "Garden bmdT metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:33."
               },
               "rmr": {
                 "anyOf": [
@@ -527,7 +527,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden rmr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:116."
+                "description": "Garden rmr metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:34."
               },
               "rsmi": {
                 "anyOf": [
@@ -538,7 +538,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden rsmi metadata.\n\nSource: quartz/plugins/stores/analytics.ts:117."
+                "description": "Garden rsmi metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:35."
               },
               "ag": {
                 "anyOf": [
@@ -549,7 +549,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden ag metadata.\n\nSource: quartz/plugins/stores/analytics.ts:118."
+                "description": "Garden ag metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:36."
               },
               "arms": {
                 "anyOf": [
@@ -558,15 +558,15 @@
                     "properties": {
                       "fat": {
                         "type": "number",
-                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:99."
+                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:17."
                       },
                       "lean": {
                         "type": "number",
-                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics.ts:100."
+                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:18."
                       },
                       "bmc": {
                         "type": "number",
-                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics.ts:101."
+                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:19."
                       }
                     },
                     "additionalProperties": true
@@ -575,7 +575,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden arms metadata.\n\nSource: quartz/plugins/stores/analytics.ts:119."
+                "description": "Garden arms metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:37."
               },
               "legs": {
                 "anyOf": [
@@ -584,15 +584,15 @@
                     "properties": {
                       "fat": {
                         "type": "number",
-                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:99."
+                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:17."
                       },
                       "lean": {
                         "type": "number",
-                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics.ts:100."
+                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:18."
                       },
                       "bmc": {
                         "type": "number",
-                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics.ts:101."
+                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:19."
                       }
                     },
                     "additionalProperties": true
@@ -601,7 +601,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden legs metadata.\n\nSource: quartz/plugins/stores/analytics.ts:120."
+                "description": "Garden legs metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:38."
               },
               "trunk": {
                 "anyOf": [
@@ -610,15 +610,15 @@
                     "properties": {
                       "fat": {
                         "type": "number",
-                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics.ts:99."
+                        "description": "Garden fat metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:17."
                       },
                       "lean": {
                         "type": "number",
-                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics.ts:100."
+                        "description": "Garden lean metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:18."
                       },
                       "bmc": {
                         "type": "number",
-                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics.ts:101."
+                        "description": "Garden bmc metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:19."
                       }
                     },
                     "additionalProperties": true
@@ -627,7 +627,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden trunk metadata.\n\nSource: quartz/plugins/stores/analytics.ts:121."
+                "description": "Garden trunk metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:39."
               }
             },
             "additionalProperties": true
@@ -792,13 +792,14 @@
             "triathlon",
             "course",
             "courses",
+            "fr",
+            "university",
             "flashcards",
             "resource",
             "study-log",
             "statements",
             "masonry",
-            "letter-nf",
-            "lydia"
+            "letter-nf"
           ]
         },
         {
@@ -840,7 +841,7 @@
       "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
     },
     "generatedSocialImage": {
-      "description": "Metadata read by the Garden's quartz/plugins/emitters/ogImage.tsx.\n\nSource: quartz/plugins/emitters/ogImage.tsx:227."
+      "description": "Metadata read by the Garden's quartz/plugins/emitters/ogImage.tsx.\n\nSource: quartz/plugins/emitters/ogImage.tsx:334."
     },
     "id": {
       "anyOf": [
@@ -863,6 +864,9 @@
         }
       ],
       "description": "Alias for socialImage. Accepted names, in precedence order: socialImage, image, cover.\n\nSource: quartz/plugins/transformers/frontmatter.ts."
+    },
+    "inquiries": {
+      "description": "Metadata read by the Garden's quartz/components/InquiryMap.tsx.\n\nSource: quartz/components/InquiryMap.tsx:15."
     },
     "lang": {
       "anyOf": [
@@ -907,30 +911,30 @@
           "properties": {
             "source": {
               "type": "string",
-              "description": "Garden source metadata.\n\nSource: quartz/util/course.ts:125."
+              "description": "Garden source metadata.\n\nSource: quartz/util/course/schema.ts:86."
             },
             "lines": {
               "type": "array",
               "items": {
                 "type": "number"
               },
-              "description": "Garden lines metadata.\n\nSource: quartz/util/course.ts:126."
+              "description": "Garden lines metadata.\n\nSource: quartz/util/course/schema.ts:87."
             },
             "section": {
               "type": "number",
-              "description": "Garden section metadata.\n\nSource: quartz/util/course.ts:127."
+              "description": "Garden section metadata.\n\nSource: quartz/util/course/schema.ts:88."
             },
             "unit": {
               "type": "number",
-              "description": "Garden unit metadata.\n\nSource: quartz/util/course.ts:128."
+              "description": "Garden unit metadata.\n\nSource: quartz/util/course/schema.ts:89."
             },
             "pset": {
               "type": "number",
-              "description": "Garden pset metadata.\n\nSource: quartz/util/course.ts:129."
+              "description": "Garden pset metadata.\n\nSource: quartz/util/course/schema.ts:90."
             },
             "pdf": {
               "type": "string",
-              "description": "Garden pdf metadata.\n\nSource: quartz/util/course.ts:130."
+              "description": "Garden pdf metadata.\n\nSource: quartz/util/course/schema.ts:91."
             },
             "pages": {
               "type": "array",
@@ -968,13 +972,14 @@
             "triathlon",
             "course",
             "courses",
+            "fr",
+            "university",
             "flashcards",
             "resource",
             "study-log",
             "statements",
             "masonry",
-            "letter-nf",
-            "lydia"
+            "letter-nf"
           ]
         },
         {
@@ -992,7 +997,7 @@
           "type": "null"
         }
       ],
-      "description": "License label, for example CC BY-NC-SA 4.0.\n\nSource: quartz/components/CourseHome.tsx:469."
+      "description": "License label, for example CC BY-NC-SA 4.0.\n\nSource: quartz/components/CourseHome.tsx:175."
     },
     "license_url": {
       "anyOf": [
@@ -1003,7 +1008,7 @@
           "type": "null"
         }
       ],
-      "description": "Link to the license terms.\n\nSource: quartz/components/CourseHome.tsx:470."
+      "description": "Link to the license terms.\n\nSource: quartz/components/CourseHome.tsx:176."
     },
     "licenseUrl": {
       "anyOf": [
@@ -1025,7 +1030,7 @@
           "type": "null"
         }
       ],
-      "description": "Training location used by the triathlon page.\n\nSource: quartz/components/pages/TriathlonPage.tsx:83."
+      "description": "Training location used by the triathlon page.\n\nSource: quartz/components/pages/TriathlonPage.tsx:82."
     },
     "maintenance": {
       "anyOf": [
@@ -1574,7 +1579,7 @@
           "type": "null"
         }
       ],
-      "description": "Use the menu renderer.\n\nSource: quartz/components/renderPage.tsx:1190."
+      "description": "Use the menu renderer.\n\nSource: quartz/components/renderPage/render.tsx:288."
     },
     "metadata": {
       "anyOf": [
@@ -1700,13 +1705,14 @@
             "triathlon",
             "course",
             "courses",
+            "fr",
+            "university",
             "flashcards",
             "resource",
             "study-log",
             "statements",
             "masonry",
-            "letter-nf",
-            "lydia"
+            "letter-nf"
           ]
         },
         {
@@ -1800,7 +1806,7 @@
           "type": "null"
         }
       ],
-      "description": "Use the poem renderer.\n\nSource: quartz/components/renderPage.tsx:1190."
+      "description": "Use the poem renderer.\n\nSource: quartz/components/renderPage/render.tsx:283."
     },
     "posters": {
       "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
@@ -1936,7 +1942,7 @@
           "type": "null"
         }
       ],
-      "description": "Target race label.\n\nSource: quartz/components/pages/TriathlonPage.tsx:85."
+      "description": "Target race label.\n\nSource: quartz/components/pages/TriathlonPage.tsx:84."
     },
     "rating": {
       "anyOf": [
@@ -1947,7 +1953,10 @@
           "type": "null"
         }
       ],
-      "description": "Place rating.\n\nSource: quartz/util/base/render.ts:1772."
+      "description": "Place rating.\n\nSource: quartz/util/base/render/map.ts:108."
+    },
+    "readonly": {
+      "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
     },
     "resource": {
       "anyOf": [
@@ -1976,81 +1985,81 @@
                 "index",
                 "notes-index"
               ],
-              "description": "Garden kind metadata.\n\nSource: quartz/util/course.ts:91."
+              "description": "Garden kind metadata.\n\nSource: quartz/util/course/schema.ts:60."
             },
             "file": {
               "type": "string",
-              "description": "Garden file metadata.\n\nSource: quartz/util/course.ts:92."
+              "description": "Garden file metadata.\n\nSource: quartz/util/course/schema.ts:61."
             },
             "bytes": {
               "type": "number",
-              "description": "Garden bytes metadata.\n\nSource: quartz/util/course.ts:93."
+              "description": "Garden bytes metadata.\n\nSource: quartz/util/course/schema.ts:62."
             },
             "n": {
               "type": "number",
-              "description": "Garden n metadata.\n\nSource: quartz/util/course.ts:94."
+              "description": "Garden n metadata.\n\nSource: quartz/util/course/schema.ts:63."
             },
             "due": {
               "type": "number",
-              "description": "Unit number a problem set is due at.\n\nSource: quartz/util/course.ts:96."
+              "description": "Unit number a problem set is due at.\n\nSource: quartz/util/course/schema.ts:65."
             },
             "youtube": {
               "type": "string",
-              "description": "Garden youtube metadata.\n\nSource: quartz/util/course.ts:97."
+              "description": "Garden youtube metadata.\n\nSource: quartz/util/course/schema.ts:66."
             },
             "duration": {
               "type": "number",
-              "description": "Garden duration metadata.\n\nSource: quartz/util/course.ts:98."
+              "description": "Garden duration metadata.\n\nSource: quartz/util/course/schema.ts:67."
             },
             "cues": {
               "type": "number",
-              "description": "Garden cues metadata.\n\nSource: quartz/util/course.ts:99."
+              "description": "Garden cues metadata.\n\nSource: quartz/util/course/schema.ts:68."
             },
             "captions": {
               "type": "string",
-              "description": "Garden captions metadata.\n\nSource: quartz/util/course.ts:100."
+              "description": "Garden captions metadata.\n\nSource: quartz/util/course/schema.ts:69."
             },
             "captionsId": {
               "type": "string",
-              "description": "Garden captionsId metadata.\n\nSource: quartz/util/course.ts:101."
+              "description": "Garden captionsId metadata.\n\nSource: quartz/util/course/schema.ts:70."
             },
             "transcript": {
               "type": "string",
-              "description": "Garden transcript metadata.\n\nSource: quartz/util/course.ts:102."
+              "description": "Garden transcript metadata.\n\nSource: quartz/util/course/schema.ts:71."
             },
             "transcriptId": {
               "type": "string",
-              "description": "Garden transcriptId metadata.\n\nSource: quartz/util/course.ts:103."
+              "description": "Garden transcriptId metadata.\n\nSource: quartz/util/course/schema.ts:72."
             },
             "of": {
               "type": "string",
-              "description": "Video resource id a captions or transcript file belongs to.\n\nSource: quartz/util/course.ts:105."
+              "description": "Video resource id a captions or transcript file belongs to.\n\nSource: quartz/util/course/schema.ts:74."
             },
             "full": {
               "type": "boolean",
-              "description": "Garden full metadata.\n\nSource: quartz/util/course.ts:106."
+              "description": "Garden full metadata.\n\nSource: quartz/util/course/schema.ts:75."
             },
             "notes": {
               "type": "string",
-              "description": "Rendered notes slug for a `.tex` source.\n\nSource: quartz/util/course.ts:108."
+              "description": "Rendered notes slug for a `.tex` source.\n\nSource: quartz/util/course/schema.ts:77."
             },
             "type": {
               "type": "string",
-              "description": "OCW collection label.\n\nSource: quartz/util/course.ts:110."
+              "description": "OCW collection label.\n\nSource: quartz/util/course/schema.ts:79."
             },
             "items": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "Garden items metadata.\n\nSource: quartz/util/course.ts:111."
+              "description": "Garden items metadata.\n\nSource: quartz/util/course/schema.ts:80."
             },
             "links": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "Garden links metadata.\n\nSource: quartz/util/course.ts:112."
+              "description": "Garden links metadata.\n\nSource: quartz/util/course/schema.ts:81."
             }
           },
           "additionalProperties": true
@@ -2070,7 +2079,7 @@
           "type": "null"
         }
       ],
-      "description": "Introductory text for the folder's Atom feed.\n\nSource: quartz/plugins/emitters/contentIndex.tsx:1088."
+      "description": "Introductory text for the folder's Atom feed.\n\nSource: quartz/plugins/emitters/contentIndex/atom.ts:439."
     },
     "runtime": {
       "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
@@ -2131,7 +2140,7 @@
           "type": "null"
         }
       ],
-      "description": "Include the page in semantic indexing (false opts out).\n\nSource: quartz/plugins/emitters/semantic.ts:136."
+      "description": "Include the page in semantic indexing (false opts out).\n\nSource: quartz/plugins/emitters/semantic.ts:137."
     },
     "signature": {
       "anyOf": [
@@ -2272,7 +2281,7 @@
           "type": "null"
         }
       ],
-      "description": "Alias for folderSort.\n\nSource: quartz/components/pages/FolderContent.tsx:502."
+      "description": "Alias for folderSort.\n\nSource: quartz/components/pages/FolderContent.tsx:511."
     },
     "sortBy": {
       "anyOf": [
@@ -2301,7 +2310,7 @@
           "type": "null"
         }
       ],
-      "description": "Alias for folderSort.\n\nSource: quartz/components/pages/FolderContent.tsx:503."
+      "description": "Alias for folderSort.\n\nSource: quartz/components/pages/FolderContent.tsx:512."
     },
     "source": {
       "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
@@ -2318,7 +2327,7 @@
           "type": "null"
         }
       ],
-      "description": "Start date for Strava ingestion.\n\nSource: quartz/components/renderPage.tsx:1610."
+      "description": "Start date for Strava ingestion.\n\nSource: quartz/components/renderPage/transclude-triathlon.tsx:145."
     },
     "streamCanonical": {
       "anyOf": [
@@ -2476,7 +2485,7 @@
           "type": "null"
         }
       ],
-      "description": "Target race or training goal label.\n\nSource: quartz/components/pages/TriathlonPage.tsx:84."
+      "description": "Target race or training goal label.\n\nSource: quartz/components/pages/TriathlonPage.tsx:83."
     },
     "type": {
       "anyOf": [
@@ -2500,7 +2509,40 @@
           "type": "null"
         }
       ],
-      "description": "Place categories or authored type labels.\n\nSource: quartz/util/base/render.ts:1767."
+      "description": "Place categories or authored type labels.\n\nSource: quartz/util/base/geo-payload.ts:64."
+    },
+    "university": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string",
+              "description": "Course summary shown on the university course home. Falls back to description when absent.\n\nSource: quartz/components/UniversityCourse.tsx."
+            },
+            "inferred": {
+              "type": "boolean",
+              "description": "Label the summary as inferred from the notes and files when true.\n\nSource: quartz/components/UniversityCourse.tsx."
+            },
+            "instructors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Instructor names shown beside the course term.\n\nSource: quartz/components/UniversityCourse.tsx."
+            },
+            "term": {
+              "type": "string",
+              "description": "Course term label. Falls back to the semester inferred from the course home's date.\n\nSource: quartz/components/UniversityCourse.tsx."
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "University course metadata for notes under thoughts/university/<term>/<course>/.\n\nSource: quartz/components/UniversityCourse.tsx."
     },
     "unlisted": {
       "anyOf": [
@@ -2559,7 +2601,7 @@
           "type": "null"
         }
       ],
-      "description": "Place or source URL.\n\nSource: quartz/util/base/render.ts:1773."
+      "description": "Place or source URL.\n\nSource: quartz/util/base/render/map.ts:109."
     },
     "visits": {
       "description": "Authored Garden metadata. Available to Bases and note tools through the open frontmatter contract; no renderer behavior is inferred.\n\nSource: Garden content/**/*.md."
@@ -2573,11 +2615,11 @@
             "properties": {
               "date": {
                 "type": "string",
-                "description": "Garden date metadata.\n\nSource: quartz/plugins/stores/analytics.ts:125."
+                "description": "Garden date metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:43."
               },
               "value": {
                 "type": "number",
-                "description": "Garden value metadata.\n\nSource: quartz/plugins/stores/analytics.ts:126."
+                "description": "Garden value metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:44."
               },
               "massKg": {
                 "anyOf": [
@@ -2588,7 +2630,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden massKg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:127."
+                "description": "Garden massKg metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:45."
               },
               "hrMax": {
                 "anyOf": [
@@ -2599,7 +2641,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden hrMax metadata.\n\nSource: quartz/plugins/stores/analytics.ts:128."
+                "description": "Garden hrMax metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:46."
               },
               "hrAtVo2max": {
                 "anyOf": [
@@ -2610,7 +2652,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden hrAtVo2max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:129."
+                "description": "Garden hrAtVo2max metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:47."
               },
               "vt1Hr": {
                 "anyOf": [
@@ -2621,7 +2663,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden vt1Hr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:130."
+                "description": "Garden vt1Hr metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:48."
               },
               "vt1Kmh": {
                 "anyOf": [
@@ -2632,7 +2674,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden vt1Kmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:131."
+                "description": "Garden vt1Kmh metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:49."
               },
               "vt2Hr": {
                 "anyOf": [
@@ -2643,7 +2685,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden vt2Hr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:132."
+                "description": "Garden vt2Hr metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:50."
               },
               "vt2Kmh": {
                 "anyOf": [
@@ -2654,7 +2696,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden vt2Kmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:133."
+                "description": "Garden vt2Kmh metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:51."
               },
               "caloriesAtVt1": {
                 "anyOf": [
@@ -2665,7 +2707,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden caloriesAtVt1 metadata.\n\nSource: quartz/plugins/stores/analytics.ts:134."
+                "description": "Garden caloriesAtVt1 metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:52."
               },
               "maxKmh": {
                 "anyOf": [
@@ -2676,7 +2718,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden maxKmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:135."
+                "description": "Garden maxKmh metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:53."
               },
               "ve": {
                 "anyOf": [
@@ -2687,7 +2729,7 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden ve metadata.\n\nSource: quartz/plugins/stores/analytics.ts:136."
+                "description": "Garden ve metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:54."
               },
               "percentile": {
                 "anyOf": [
@@ -2698,28 +2740,28 @@
                     "type": "null"
                   }
                 ],
-                "description": "Garden percentile metadata.\n\nSource: quartz/plugins/stores/analytics.ts:137."
+                "description": "Garden percentile metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:55."
               },
               "zonesHr": {
                 "type": "array",
                 "items": {
                   "type": "number"
                 },
-                "description": "Garden zonesHr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:138."
+                "description": "Garden zonesHr metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:56."
               },
               "zonesKmh": {
                 "type": "array",
                 "items": {
                   "type": "number"
                 },
-                "description": "Garden zonesKmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:139."
+                "description": "Garden zonesKmh metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:57."
               },
               "zonesKcal": {
                 "type": "array",
                 "items": {
                   "type": "number"
                 },
-                "description": "Garden zonesKcal metadata.\n\nSource: quartz/plugins/stores/analytics.ts:140."
+                "description": "Garden zonesKcal metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:58."
               },
               "profile": {
                 "anyOf": [
@@ -2728,7 +2770,7 @@
                     "properties": {
                       "durationSec": {
                         "type": "number",
-                        "description": "Garden durationSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:173."
+                        "description": "Garden durationSec metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:91."
                       },
                       "warmupEndSec": {
                         "anyOf": [
@@ -2739,7 +2781,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "Garden warmupEndSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:174."
+                        "description": "Garden warmupEndSec metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:92."
                       },
                       "cooldownStartSec": {
                         "anyOf": [
@@ -2750,7 +2792,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "Garden cooldownStartSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:175."
+                        "description": "Garden cooldownStartSec metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:93."
                       },
                       "vt1Sec": {
                         "anyOf": [
@@ -2761,7 +2803,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "Garden vt1Sec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:176."
+                        "description": "Garden vt1Sec metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:94."
                       },
                       "vo2maxSec": {
                         "anyOf": [
@@ -2772,7 +2814,7 @@
                             "type": "null"
                           }
                         ],
-                        "description": "Garden vo2maxSec metadata.\n\nSource: quartz/plugins/stores/analytics.ts:177."
+                        "description": "Garden vo2maxSec metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:95."
                       },
                       "stats": {
                         "type": "object",
@@ -2790,15 +2832,15 @@
                                 "properties": {
                                   "min": {
                                     "type": "number",
-                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:63."
                                   },
                                   "max": {
                                     "type": "number",
-                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:64."
                                   },
                                   "avg": {
                                     "type": "number",
-                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:65."
                                   }
                                 },
                                 "additionalProperties": true
@@ -2821,15 +2863,15 @@
                                 "properties": {
                                   "min": {
                                     "type": "number",
-                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:63."
                                   },
                                   "max": {
                                     "type": "number",
-                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:64."
                                   },
                                   "avg": {
                                     "type": "number",
-                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:65."
                                   }
                                 },
                                 "additionalProperties": true
@@ -2852,15 +2894,15 @@
                                 "properties": {
                                   "min": {
                                     "type": "number",
-                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:63."
                                   },
                                   "max": {
                                     "type": "number",
-                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:64."
                                   },
                                   "avg": {
                                     "type": "number",
-                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:65."
                                   }
                                 },
                                 "additionalProperties": true
@@ -2883,15 +2925,15 @@
                                 "properties": {
                                   "min": {
                                     "type": "number",
-                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:63."
                                   },
                                   "max": {
                                     "type": "number",
-                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:64."
                                   },
                                   "avg": {
                                     "type": "number",
-                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:65."
                                   }
                                 },
                                 "additionalProperties": true
@@ -2914,15 +2956,15 @@
                                 "properties": {
                                   "min": {
                                     "type": "number",
-                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics.ts:145."
+                                    "description": "Garden min metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:63."
                                   },
                                   "max": {
                                     "type": "number",
-                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics.ts:146."
+                                    "description": "Garden max metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:64."
                                   },
                                   "avg": {
                                     "type": "number",
-                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics.ts:147."
+                                    "description": "Garden avg metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:65."
                                   }
                                 },
                                 "additionalProperties": true
@@ -2950,11 +2992,11 @@
                               "properties": {
                                 "t": {
                                   "type": "number",
-                                  "description": "Garden t metadata.\n\nSource: quartz/plugins/stores/analytics.ts:159."
+                                  "description": "Garden t metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:77."
                                 },
                                 "kmh": {
                                   "type": "number",
-                                  "description": "Garden kmh metadata.\n\nSource: quartz/plugins/stores/analytics.ts:160."
+                                  "description": "Garden kmh metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:78."
                                 }
                               },
                               "additionalProperties": true
@@ -2980,7 +3022,7 @@
                               "properties": {
                                 "t": {
                                   "type": "number",
-                                  "description": "Garden t metadata.\n\nSource: quartz/plugins/stores/analytics.ts:164."
+                                  "description": "Garden t metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:82."
                                 },
                                 "vo2": {
                                   "anyOf": [
@@ -2991,7 +3033,7 @@
                                       "type": "null"
                                     }
                                   ],
-                                  "description": "Garden vo2 metadata.\n\nSource: quartz/plugins/stores/analytics.ts:165."
+                                  "description": "Garden vo2 metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:83."
                                 },
                                 "hr": {
                                   "anyOf": [
@@ -3002,7 +3044,7 @@
                                       "type": "null"
                                     }
                                   ],
-                                  "description": "Garden hr metadata.\n\nSource: quartz/plugins/stores/analytics.ts:166."
+                                  "description": "Garden hr metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:84."
                                 },
                                 "ve": {
                                   "anyOf": [
@@ -3013,7 +3055,7 @@
                                       "type": "null"
                                     }
                                   ],
-                                  "description": "Garden ve metadata.\n\nSource: quartz/plugins/stores/analytics.ts:167."
+                                  "description": "Garden ve metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:85."
                                 },
                                 "rf": {
                                   "anyOf": [
@@ -3024,7 +3066,7 @@
                                       "type": "null"
                                     }
                                   ],
-                                  "description": "Garden rf metadata.\n\nSource: quartz/plugins/stores/analytics.ts:168."
+                                  "description": "Garden rf metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:86."
                                 },
                                 "tv": {
                                   "anyOf": [
@@ -3035,7 +3077,7 @@
                                       "type": "null"
                                     }
                                   ],
-                                  "description": "Garden tv metadata.\n\nSource: quartz/plugins/stores/analytics.ts:169."
+                                  "description": "Garden tv metadata.\n\nSource: quartz/plugins/stores/analytics/body-and-labs.ts:87."
                                 }
                               },
                               "additionalProperties": true

@@ -6,7 +6,11 @@ Value suggestions open after `:`, a space, or an opening quote, and refresh as y
 
 `flashcards.default` completes as an optional boolean. Set `flashcards: {default: true}` to render a companion deck at `/<slug>` and the source note at `/<slug>/source`. Leaving the setting absent or setting it to `false` keeps the source at `/<slug>` and the study page at `/<slug>/flashcards`.
 
+`layout`, `pageLayout`, and `folderLayout` include `university`. The `university` block on a course home completes `summary`, `inferred`, `instructors`, and `term`. `summary` and `term` are strings; `inferred` is a boolean; `instructors` is a list of names. Missing summary and term values fall back to the page description and the semester derived from its date. The schema follows `UniversityCourse.tsx` and keeps additional metadata allowed.
+
 `description` and `abstract` support Markdown links (`[label](https://example.org/page#section)`), wikilinks, authored HTML, and LaTeX. Descriptions retain complete link destinations and authored length. Search, feeds, and social previews receive readable link labels.
+
+`aliases` and `alias` both accept a single string, a comma-separated string, or a YAML list. Garden and the completion index use `aliases` first when it is non-null, then fall back to `alias`. An empty `aliases` list takes precedence too.
 
 `tags` values complete from existing notes' frontmatter tags and inline hashtags. Scalar, comma-separated, block-list, and flow-list forms are supported, including hierarchical tags. Each suggestion reports how many notes use it. The Markdown parser excludes code and links when collecting inline tags.
 
@@ -22,7 +26,7 @@ Use `:GardenFrontmatter` to jump into the frontmatter. If the note has none, the
 
 Use `:GardenFrontmatterSchema` after changing the Garden's metadata contract. It regenerates `schemas/garden-frontmatter.json` and reattaches the frontmatter clients for open notes. Generation needs Node and the Garden's already installed `typescript` and `js-yaml` packages. The runtime tag and link index uses Node with the Garden's installed `js-yaml`, `unified`, `remark-parse`, and `remark-frontmatter` packages. The YAML server is already managed by Mason here. No packages are installed by these helpers.
 
-The generator reads the transformer declarations and alias lists, direct frontmatter reads across Quartz, layout-specific SCSS, and authored top-level property names. Parser-specific overrides describe the raw YAML shapes for course resources, study records, citation settings, and triathlon records. The raw and normalized types can differ, so check those overrides when a parser changes. Authored values never enter the generated schema. Additional properties and null placeholders remain allowed.
+The generator reads the transformer declarations and alias lists, direct frontmatter reads across Quartz, layout-specific SCSS, and authored top-level property names. Parser-specific overrides describe the raw YAML shapes for university courses, course resources, study records, citation settings, and triathlon records. The raw and normalized types can differ, so check those overrides when a parser changes. Authored values never enter the generated schema. Additional properties and null placeholders remain allowed.
 
 Run the checks from this Neovim config directory:
 
@@ -36,3 +40,5 @@ NVIM_APPNAME=nvim nvim --headless '+lua dofile("scripts/check_async_frontmatter.
 ```
 
 The schema check validates existing Garden frontmatter without writing notes. The index check uses the actual Markdown and YAML parsers against temporary fixtures. The headless integration check uses the real language server to exercise completions, nested choices, tag and link edits, Unicode, hover, diagnostic positions, fence changes, path boundaries, insertion, and schema refresh. The Blink check types into unsaved buffers using the normal config startup path and accepts automatic key, value, tag, and link suggestions. Completion fixtures are never saved. The asynchronous save check writes temporary copies with the real `yq` and `oxfmt` executables, delays `yq`, and verifies responsiveness, concurrent edits, rapid saves, metadata rules, and YAML failures.
+
+Cold-index completion checks allow 35 seconds for the indexer’s existing 30-second process deadline and LSP delivery. Other Blink completion checks retain a 10-second deadline measured with the monotonic clock. The full Markdown scan includes large notes such as `are.na.md`, so a cold scan can outlast the ordinary completion deadline.

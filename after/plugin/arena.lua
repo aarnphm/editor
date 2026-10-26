@@ -1,6 +1,6 @@
-local function normalize_path(path)
-  local expanded = vim.fn.expand(path)
-  return vim.fs.normalize(vim.uv.fs_realpath(expanded) or expanded)
+local function normalize_path(path, expand_env)
+  local expanded = vim.fs.normalize(path, { expand_env = expand_env ~= false })
+  return vim.fs.normalize(vim.uv.fs_realpath(expanded) or expanded, { expand_env = false })
 end
 
 local ts_query
@@ -50,9 +50,10 @@ local ARENA_META_FIELD_ORDER = {
 local METADATA_PARENT_LOOKBACK = 1024
 
 local function is_target(bufnr)
+  if vim.bo[bufnr].buftype ~= "" then return false end
   local name = vim.api.nvim_buf_get_name(bufnr)
   if name == "" then return false end
-  return normalize_path(name) == ARENA_PATH
+  return normalize_path(name, false) == ARENA_PATH
 end
 
 local function mark_arena_buffer(bufnr)

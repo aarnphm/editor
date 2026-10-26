@@ -1,6 +1,6 @@
-local function normalize_path(path)
-  local expanded = vim.fn.expand(path)
-  return vim.fs.normalize(vim.uv.fs_realpath(expanded) or expanded)
+local function normalize_path(path, expand_env)
+  local expanded = vim.fs.normalize(path, { expand_env = expand_env ~= false })
+  return vim.fs.normalize(vim.uv.fs_realpath(expanded) or expanded, { expand_env = false })
 end
 
 local STREAM_PATH = normalize_path(vim.g.stream_path or "~/workspace/garden/content/stream.md")
@@ -41,9 +41,10 @@ local function get_stream_meta_query()
 end
 
 local function is_stream(bufnr)
+  if vim.bo[bufnr].buftype ~= "" then return false end
   local name = vim.api.nvim_buf_get_name(bufnr)
   if name == "" then return false end
-  return normalize_path(name) == STREAM_PATH
+  return normalize_path(name, false) == STREAM_PATH
 end
 
 local stream_group = augroup "stream_meta"
