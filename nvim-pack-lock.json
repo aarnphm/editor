@@ -11,7 +11,7 @@
       "version": "'master'"
     },
     "blink.cmp": {
-      "rev": "06097529cf6d3618546436f9a6bd5beaed979aef",
+      "rev": "3d3631f641e6e9b60066f269f435d23c524ceeb0",
       "src": "https://github.com/Saghen/blink.cmp.git",
       "version": "'main'"
     },
@@ -26,7 +26,7 @@
       "version": "'master'"
     },
     "dropbar.nvim": {
-      "rev": "f7c6fa21e2a7c32576e7a1791774a3736987f467",
+      "rev": "75df03973f3a06a85300bc8ca1f9f68e935cb78e",
       "src": "https://github.com/Bekaboo/dropbar.nvim.git",
       "version": "'master'"
     },
@@ -36,12 +36,12 @@
       "version": "'main'"
     },
     "friendly-snippets": {
-      "rev": "b2ea5c41a150ba72fb656eedb4ed0a86d138d945",
+      "rev": "7a1c9f7897a4eb078b157a04c7af81e5869215b1",
       "src": "https://github.com/rafamadriz/friendly-snippets.git",
       "version": "'main'"
     },
     "gitsigns.nvim": {
-      "rev": "4bcd99167c265f135886b282baad77afe06206b2",
+      "rev": "c0862d382a35b7b45757d8d151a6a634c09bf3ce",
       "src": "https://github.com/lewis6991/gitsigns.nvim.git",
       "version": "'main'"
     },
@@ -71,7 +71,7 @@
       "version": "'main'"
     },
     "mini.nvim": {
-      "rev": "6d5a29e86a7352739506c28e0bc50fe214b5216f",
+      "rev": "e199196f5ed6b085743da6a808e6c8510698cdce",
       "src": "https://github.com/echasnovski/mini.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "adfbb74472f6c231b651b650a89f414c2680fb31",
+      "rev": "e1c6a5a45d95ad22cf55c874db2ff8ab969556f0",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
@@ -91,7 +91,7 @@
       "version": "'v1.10.1'"
     },
     "nvim-treesitter": {
-      "rev": "0195cd62fa89950f34c0e0d648ea7897ab85d4d3",
+      "rev": "b706d642dd20d0922e7e92365dc73617f0fdb4ea",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter.git",
       "version": "'main'"
     }
