@@ -41,7 +41,7 @@
       "version": "'main'"
     },
     "gitsigns.nvim": {
-      "rev": "ea38d317af34f8ffcfbaf0f0dcc1471736661a4c",
+      "rev": "166c03131e6a3528f692dd89f37668d991f17baa",
       "src": "https://github.com/lewis6991/gitsigns.nvim.git",
       "version": "'main'"
     },
@@ -81,7 +81,7 @@
       "version": "'master'"
     },
     "nvim-lspconfig": {
-      "rev": "7d22e678970d95d8d18494ec389c52b07111c53a",
+      "rev": "76f4cafc49677a34dc8ad8142b773d78ab4a041e",
       "src": "https://github.com/neovim/nvim-lspconfig.git",
       "version": "'master'"
     },
